@@ -32,12 +32,12 @@ namespace Texpainter
 			template<class U>
 			using pointer_wrapper = std::unique_ptr<U, detail::CallFree>;
 
-			explicit DataBlock(pointer_wrapper<T> ptr, size_t size):
+			explicit DataBlock(pointer_wrapper<T> ptr, uint32_t size):
 				 m_size{size}
 				,m_ptr{std::move(ptr)}
 			{}
 
-			explicit DataBlock(size_t n):
+			explicit DataBlock(uint32_t n):
 				m_size{n},
 				m_ptr{reinterpret_cast<T*>(malloc(sizeof(T) * n))}
 			{}
@@ -64,7 +64,7 @@ namespace Texpainter
 			{ return begin(); }
 
 		private:
-			size_t m_size;
+			uint32_t m_size;
 			pointer_wrapper<T> m_ptr;
 	};
 
@@ -72,21 +72,21 @@ namespace Texpainter
 	template<class T, class OutputStream>
 	void write(DataBlock<T> const& block, OutputStream stream)
 	{
-		write(static_cast<uint64_t>(block.size()), stream);
+		write(block.size(), stream);
 		write(std::span{std::ranges::data(block), std::ranges::size(block)}, stream);
 	}
 
 	template<class T, class InputStream>
 	DataBlock<T> read(Empty<DataBlock<T>>, InputStream stream)
 	{
-		auto const n = read(Empty<uint64_t>(), stream);
+		auto const n = read(Empty<uint32_t>(), stream);
 		DataBlock<T> ret{n};
 		read(std::span{std::ranges::data(ret), std::ranges::size(ret)}, stream);
 		return ret;
 	}
 
 	template<class T>
-	void resize(DataBlock<T>& block, size_t size_new)
+	void resize(DataBlock<T>& block, uint32_t size_new)
 	{
 		static_assert(std::is_trivial_v<T>);
 		if(size_new > std::size(block))

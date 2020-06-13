@@ -12,15 +12,15 @@ namespace
 	struct Buffer
 	{
 		std::vector<std::byte> m_data;
-		uint64_t m_n_elems;
+		uint32_t m_n_elems;
 	};
 
-	void write(uint64_t val, Buffer& buff)
+	void write(uint32_t val, Buffer& buff)
 	{
 		buff.m_n_elems = val;
 	}
 
-	uint64_t read(Texpainter::Empty<uint64_t>, Buffer const& buff)
+	uint32_t read(Texpainter::Empty<uint32_t>, Buffer const& buff)
 	{
 		return buff.m_n_elems;
 	}
