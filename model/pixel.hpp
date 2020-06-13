@@ -6,10 +6,6 @@
 #include "utils/empty.hpp"
 #include "utils/vec4.hpp"
 
-#include <ranges>
-#include <span>
-#include <memory>
-
 namespace Texpainter::Model
 {
 	class Pixel
@@ -119,32 +115,11 @@ namespace Texpainter::Model
 	constexpr Pixel white()
 	{ return Pixel{1.0f, 1.0f, 1.0f};}
 
-	constexpr bool operator==(Pixel a, Pixel b)
+	constexpr auto distanceSquared(Pixel a, Pixel b)
 	{
-		a-=b;
-		return a.red() == 0.0f && a.green() == 0.0f && a.blue() == 0.0f && a.alpha() == 0.0f;
-	}
-
-	constexpr bool operator!=(Pixel a, Pixel b)
-	{
-		return !(a == b);
-	}
-
-	template<std::ranges::contiguous_range Range, class OutputStream>
-	requires std::is_same_v<typename Range::value_type, Pixel>
-	void write(Range pixels, OutputStream stream)
-	{
-		write(stream, std::span{reinterpret_cast<float const*>(std::ranges::data(pixels)), 4*std::ranges::size(pixels)});
-	}
-
-	template<class SizedArray, class InputStream>
-	SizedArray read(Empty<SizedArray>, InputStream stream)
-	{
-		auto data = read(stream, Empty<float[]>{});
-		using DataBlock = std::decay_t<decltype(data)>;
-		auto const size =data.size()/4;
-		auto const ptr = reinterpret_cast<Pixel*>(data.release());
-		return SizedArray{typename DataBlock::pointer_wrapper<Pixel>{ptr}, size};
+		a -= b;
+		a *= a;
+		return a.red() + a.green() + a.blue() + a.alpha();
 	}
 }
 #endif
