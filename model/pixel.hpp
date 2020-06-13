@@ -4,7 +4,7 @@
 #define TEXPAINTER_MODEL_PIXEL_HPP
 
 #include "utils/empty.hpp"
-#include "utils/vec4.hpp"
+#include "utils/vec_t.hpp"
 
 namespace Texpainter::Model
 {
