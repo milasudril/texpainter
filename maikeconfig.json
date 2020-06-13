@@ -17,6 +17,7 @@
             "config":{
                 "appcompile":{
                     "args":[
+						"-std=c++20",
                         "-g",
                         "-fpic",
                         "{cxxversion}",
@@ -33,7 +34,7 @@
                         "{libdir}",
                         "{dependencies}"
                     ],
-                    "name":"g++"
+                    "name":"g++-10"
                 },
                 "autorun_launcher":{
                     "args":[],
@@ -41,10 +42,9 @@
                 },
                 "cflags_extra":[],
                 "cflags_format":"-^",
-                "cxxversion_max":-1,
-                "cxxversion_min":201703,
                 "dllcompile":{
                     "args":[
+                        "-std=c++20",
                         "-g",
                         "-fpic",
                         "{cxxversion}",
@@ -62,7 +62,7 @@
                         "{libdir}",
                         "{dependencies}"
                     ],
-                    "name":"g++"
+                    "name":"g++-10"
                 },
                 "include_format":"-include^",
                 "includedir":[],
@@ -87,6 +87,7 @@
                 "mode":"c++",
                 "objcompile":{
                     "args":[
+                        "-std=c++20",
                         "-c",
                         "-g",
                         "-fpic",
@@ -102,7 +103,7 @@
                         "{target}",
                         "{source}"
                     ],
-                    "name":"g++"
+                    "name":"g++-10"
                 },
                 "pkgconfig":{
                     "args":[
@@ -120,7 +121,7 @@
                         "c++",
                         "{nullfile}"
                     ],
-                    "name":"g++"
+                    "name":"g++-10"
                 }
             },
             "filename_exts":[
