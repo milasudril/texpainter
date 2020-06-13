@@ -100,6 +100,9 @@ namespace Texpainter::Model
 		vec4_t m_value;
 	};
 
+	constexpr Pixel black()
+	{ return Pixel{0.0f, 0.0f, 0.0f};}
+
 	constexpr Pixel red()
 	{ return Pixel{1.0f, 0.0f, 0.0f};}
 
@@ -109,8 +112,14 @@ namespace Texpainter::Model
 	constexpr Pixel blue()
 	{ return Pixel{0.0f, 0.0f, 1.0f};}
 
-	constexpr Pixel black()
-	{ return Pixel{0.0f, 0.0f, 0.0f};}
+	constexpr Pixel cyan()
+	{ return Pixel{0.0f, 1.0f, 1.0f};}
+
+	constexpr Pixel magenta()
+	{ return Pixel{1.0f, 0.0f, 1.0f};}
+
+	constexpr Pixel yellow()
+	{ return Pixel{1.0f, 1.0f, 0.0f};}
 
 	constexpr Pixel white()
 	{ return Pixel{1.0f, 1.0f, 1.0f};}
