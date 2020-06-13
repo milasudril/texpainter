@@ -41,7 +41,7 @@ namespace
 
 namespace Testcases
 {
-	void texpainterDatablockWrite()
+	void texpainterDatablockWriteRead()
 	{
 		Texpainter::DataBlock<int> test{4};
 		test.begin()[0] = 1;
@@ -68,6 +68,6 @@ namespace Testcases
 
 int main()
 {
-	Testcases::texpainterDatablockWrite();
+	Testcases::texpainterDatablockWriteRead();
 	return 0;
 }

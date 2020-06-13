@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <memory>
 #include <span>
+#include <cstring>
 
 namespace Texpainter
 {
@@ -56,6 +57,12 @@ namespace Texpainter
 			auto end()
 			{ return begin() + size(); }
 
+			auto data()
+			{ return begin(); }
+
+			auto data() const
+			{ return begin(); }
+
 		private:
 			size_t m_size;
 			pointer_wrapper<T> m_ptr;
@@ -76,6 +83,18 @@ namespace Texpainter
 		DataBlock<T> ret{n};
 		read(std::span{std::ranges::data(ret), std::ranges::size(ret)}, stream);
 		return ret;
+	}
+
+	template<class T>
+	void resize(DataBlock<T>& block, size_t size_new)
+	{
+		static_assert(std::is_trivial_v<T>);
+		if(size_new > std::size(block))
+		{
+			DataBlock<T> block_new{size_new};
+			memcpy(std::data(block_new), std::data(block), sizeof(T)*std::size(block));
+			block = std::move(block_new);
+		}
 	}
 }
 
