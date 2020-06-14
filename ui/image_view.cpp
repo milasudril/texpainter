@@ -1,7 +1,8 @@
-//@	{"targets":[{"name":"image_surface.o","type":"object","pkgconfig_libs":["gtk+-3.0"]}]}
+//@	{"targets":[{"name":"image_view.o","type":"object","pkgconfig_libs":["gtk+-3.0"]}]}
 
-#include "./image_surface.hpp"
+#include "./image_view.hpp"
 #include "model/image.hpp"
+#include "geom/dimension.hpp"
 
 #include <gtk/gtk.h>
 
@@ -18,10 +19,10 @@ namespace
 	}
 }
 
-class Texpainter::Ui::ImageSurface::Impl: private ImageSurface
+class Texpainter::Ui::ImageView::Impl: private ImageView
 {
 	public:
-		explicit Impl(Container& cnt):ImageSurface{*this}
+		explicit Impl(Container& cnt):ImageView{*this}
 		{
 			auto widget = gtk_drawing_area_new();
 			g_object_ref_sink(widget);
@@ -174,26 +175,26 @@ class Texpainter::Ui::ImageSurface::Impl: private ImageSurface
 		}
 };
 
-Texpainter::Ui::ImageSurface::ImageSurface(Container& cnt):
+Texpainter::Ui::ImageView::ImageView(Container& cnt):
 m_impl{new Impl{cnt}}
 {}
 
-Texpainter::Ui::ImageSurface::~ImageSurface()
+Texpainter::Ui::ImageView::~ImageView()
 { delete m_impl; }
 
-Texpainter::Ui::ImageSurface& Texpainter::Ui::ImageSurface::image(Model::Image const& img)
+Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::image(Model::Image const& img)
 {
 	m_impl->image(img);
 	return *this;
 }
 
-Texpainter::Ui::ImageSurface& Texpainter::Ui::ImageSurface::eventHandler(void* event_handler, EventHandlerVtable const& vtable)
+Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::eventHandler(void* event_handler, EventHandlerVtable const& vtable)
 {
 	m_impl->eventHandler(event_handler, vtable);
 	return *this;
 }
 
-Texpainter::Ui::ImageSurface& Texpainter::Ui::ImageSurface::update()
+Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::update()
 {
 	m_impl->update();
 	return *this;

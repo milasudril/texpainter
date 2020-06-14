@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"texpainter","type":"application", "autorun":0,"pkgconfig_libs":["gtk+-3.0"]}]}
 
 #include "ui/window.hpp"
-#include "ui/image_surface.hpp"
+#include "ui/image_view.hpp"
 // #include "ui/box.hpp"
 
 #include <gtk/gtk.h>
@@ -15,19 +15,22 @@ struct MyCallback
 	{Texpainter::Ui::Window::terminateApp();}
 
 	template<int>
-	void onMouseDown(Texpainter::Ui::ImageSurface& surface,
+	void onMouseDown(Texpainter::Ui::ImageView& event_source,
 	                 Texpainter::vec2_t pos_window,
 	                 Texpainter::vec2_t pos_screen,
 	                 int button)
 	{
 		m_button_mask |= 1<<button;
 		printf("%d %d\n", m_button_mask, button);
-		r_img.get().get(pos_window[0], pos_window[1]) = Texpainter::Model::white();
-		surface.update();
+		if(m_button_mask & (1 << 1))
+		{
+			r_img.get().get(pos_window[0], pos_window[1]) = Texpainter::Model::white();
+			event_source.update();
+		}
 	}
 
 	template<int>
-	void onMouseUp(Texpainter::Ui::ImageSurface& surface,
+	void onMouseUp(Texpainter::Ui::ImageView& event_source,
 	                 Texpainter::vec2_t pos_window,
 	                 Texpainter::vec2_t,
 	                 int button)
@@ -37,14 +40,14 @@ struct MyCallback
 	}
 
 	template<int>
-	void onMouseMove(Texpainter::Ui::ImageSurface& surface,
+	void onMouseMove(Texpainter::Ui::ImageView& event_source,
 	                 Texpainter::vec2_t pos_window,
 	                 Texpainter::vec2_t)
 	{
 		if(m_button_mask & (1<<1))
 		{
 			r_img.get().get(pos_window[0], pos_window[1]) = Texpainter::Model::white();
-			surface.update();
+			event_source.update();
 		}
 	}
 
@@ -67,7 +70,7 @@ int main(int argc, char* argv[])
 	Texpainter::Model::Image img{641, 480};
 	MyCallback cb{img};
 
-	Texpainter::Ui::ImageSurface imgview{mainwin};
+	Texpainter::Ui::ImageView imgview{mainwin};
 	imgview.image(img).eventHandler<0>(cb);
 
 
