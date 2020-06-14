@@ -129,7 +129,8 @@ class Texpainter::Ui::ImageSurface::Impl: private ImageSurface
 				obj.m_vt.m_on_mouse_down(obj.r_eh,
 				          obj,
 				          vec2_t{event_button->x, event_button->y},
-				          vec2_t{event_button->x_root, event_button->y_root});
+				          vec2_t{event_button->x_root, event_button->y_root},
+				          event_button->button);
 				return FALSE;
 			}
 			return TRUE;

@@ -13,9 +13,9 @@ struct MyCallback
 	{Texpainter::Ui::Window::terminateApp();}
 
 	template<int>
-	void onMouseDown(Texpainter::Ui::ImageSurface&, Texpainter::vec2_t pos_window, Texpainter::vec2_t pos_screen)
+	void onMouseDown(Texpainter::Ui::ImageSurface&, Texpainter::vec2_t pos_window, Texpainter::vec2_t pos_screen, int button)
 	{
-		printf("(%.15g %.15g), (%.15g %.15g)\n", pos_window[0], pos_window[1], pos_screen[0], pos_screen[1]);
+		printf("(%.15g %.15g), (%.15g %.15g) %d\n", pos_window[0], pos_window[1], pos_screen[0], pos_screen[1], button);
 	}
 };
 
