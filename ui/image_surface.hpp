@@ -30,15 +30,16 @@ namespace Texpainter::Ui
 			ImageSurface(ImageSurface&& obj) noexcept:m_impl(obj.m_impl)
 			{ obj.m_impl=nullptr; }
 
-			template<auto id, class Callback>
-			ImageSurface& callback(Callback& cb)
+			template<auto id, class EventHandler>
+			ImageSurface& eventHandler(EventHandler& eh)
 			{
-				auto cb_wrapper=[](void* rvc, ImageSurface& self)
-				{
-					auto x=reinterpret_cast<Callback*>(rvc);
-					x->template clicked<id>(self);
-				};
-				return callback(cb_wrapper, &cb);
+				return eventHandler(&eh, {
+					[](void* event_handler, ImageSurface& self, vec2_t pos_window, vec2_t pos_screen)
+					{
+						auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+						obj.template onMouseDown<id>(self, pos_window, pos_screen);
+					}
+				});
 			}
 
 			ImageSurface& image(Model::Image const& img);
@@ -47,8 +48,11 @@ namespace Texpainter::Ui
 			class Impl;
 			explicit ImageSurface(Impl& impl):m_impl(&impl){}
 			Impl* m_impl;
-			using Callback = void (*)(void* cb_obj, ImageSurface& self);
-			ImageSurface& callback(Callback cb, void* cb_obj);
+			struct EventHandlerVtable
+			{
+				void (*m_on_mouse_down)(void* event_handler, ImageSurface& self, vec2_t pos_window, vec2_t pos_screen);
+			};
+			ImageSurface& eventHandler(void* event_handler, EventHandlerVtable const& vtable);
 	};
 }
 

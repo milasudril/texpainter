@@ -27,8 +27,10 @@ class Texpainter::Ui::ImageSurface::Impl: private ImageSurface
 			m_handle = GTK_DRAWING_AREA(widget);
 			r_img = nullptr;
 			m_img_surface = nullptr;
+			r_eh = nullptr;
 			gtk_widget_add_events(widget, GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_SCROLL_MASK);
 			g_signal_connect(G_OBJECT(widget), "draw", G_CALLBACK(draw_callback), this);
+			g_signal_connect(G_OBJECT(widget), "button-press-event", G_CALLBACK(on_mouse_down), this);
 		}
 
 		~Impl()
@@ -96,18 +98,41 @@ class Texpainter::Ui::ImageSurface::Impl: private ImageSurface
 			cairo_surface_finish(m_img_surface);
 		}
 
+		void eventHandler(void* event_handler, EventHandlerVtable const& vtable)
+		{
+			r_eh = event_handler;
+			m_vt = vtable;
+		}
+
 	private:
-		Callback r_cb;
-		void* r_cb_obj;
+		void* r_eh;
+		EventHandlerVtable m_vt;
+
 		cairo_surface_t* m_img_surface;
 		Model::Image const* r_img;
+
 		GtkDrawingArea* m_handle;  // TODO: Should be a gl area
-		static gboolean draw_callback(GtkWidget* widget, cairo_t* cr, gpointer* self)
+		static gboolean draw_callback(GtkWidget* widget, cairo_t* cr, gpointer self)
 		{
 			auto w = gtk_widget_get_allocated_width(widget);
 			auto h = gtk_widget_get_allocated_height(widget);
 			reinterpret_cast<Impl*>(self)->render(Geom::Dimension{}.width(w).height(h), cr);
 			return FALSE;
+		}
+
+		static gboolean on_mouse_down(GtkWidget*, GdkEvent* e, gpointer self)
+		{
+			auto& obj = *reinterpret_cast<Impl*>(self);
+			if(obj.r_eh != nullptr)
+			{
+				auto event_button = reinterpret_cast<GdkEventButton const*>(e);
+				obj.m_vt.m_on_mouse_down(obj.r_eh,
+				          obj,
+				          vec2_t{event_button->x, event_button->y},
+				          vec2_t{event_button->x_root, event_button->y_root});
+				return FALSE;
+			}
+			return TRUE;
 		}
 };
 
@@ -123,3 +148,10 @@ Texpainter::Ui::ImageSurface& Texpainter::Ui::ImageSurface::image(Model::Image c
 	m_impl->image(img);
 	return *this;
 }
+
+Texpainter::Ui::ImageSurface& Texpainter::Ui::ImageSurface::eventHandler(void* event_handler, EventHandlerVtable const& vtable)
+{
+	m_impl->eventHandler(event_handler, vtable);
+	return *this;
+}
+
