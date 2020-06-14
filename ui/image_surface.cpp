@@ -33,6 +33,8 @@ class Texpainter::Ui::ImageSurface::Impl: private ImageSurface
 			gtk_widget_add_events(widget, GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_SCROLL_MASK);
 			g_signal_connect(G_OBJECT(widget), "draw", G_CALLBACK(draw_callback), this);
 			g_signal_connect(G_OBJECT(widget), "button-press-event", G_CALLBACK(on_mouse_down), this);
+			g_signal_connect(G_OBJECT(widget), "button-release-event", G_CALLBACK(on_mouse_up), this);
+			g_signal_connect(G_OBJECT(widget), "motion-notify-event", G_CALLBACK(on_mouse_move), this);
 		}
 
 		~Impl()
@@ -135,6 +137,37 @@ class Texpainter::Ui::ImageSurface::Impl: private ImageSurface
 				          vec2_t{event_button->x, event_button->y},
 				          vec2_t{event_button->x_root, event_button->y_root},
 				          event_button->button);
+				return FALSE;
+			}
+			return TRUE;
+		}
+
+		static gboolean on_mouse_up(GtkWidget*, GdkEvent* e, gpointer self)
+		{
+			auto& obj = *reinterpret_cast<Impl*>(self);
+			if(obj.r_eh != nullptr)
+			{
+				auto event_button = reinterpret_cast<GdkEventButton const*>(e);
+				obj.m_vt.m_on_mouse_up(obj.r_eh,
+				          obj,
+				          vec2_t{event_button->x, event_button->y},
+				          vec2_t{event_button->x_root, event_button->y_root},
+				          event_button->button);
+				return FALSE;
+			}
+			return TRUE;
+		}
+
+		static gboolean on_mouse_move(GtkWidget*, GdkEvent* e, gpointer self)
+		{
+			auto& obj = *reinterpret_cast<Impl*>(self);
+			if(obj.r_eh != nullptr)
+			{
+				auto event_button = reinterpret_cast<GdkEventMotion const*>(e);
+				obj.m_vt.m_on_mouse_move(obj.r_eh,
+				          obj,
+				          vec2_t{event_button->x, event_button->y},
+				          vec2_t{event_button->x_root, event_button->y_root});
 				return FALSE;
 			}
 			return TRUE;

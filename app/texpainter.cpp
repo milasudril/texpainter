@@ -21,11 +21,33 @@ struct MyCallback
 	                 int button)
 	{
 		m_button_mask |= 1<<button;
-		printf("(%.15g %.15g), (%.15g %.15g) %d %d\n", pos_window[0], pos_window[1], pos_screen[0], pos_screen[1], m_button_mask, button);
-
+		printf("%d %d\n", m_button_mask, button);
 		r_img.get().get(pos_window[0], pos_window[1]) = Texpainter::Model::white();
 		surface.update();
 	}
+
+	template<int>
+	void onMouseUp(Texpainter::Ui::ImageSurface& surface,
+	                 Texpainter::vec2_t pos_window,
+	                 Texpainter::vec2_t,
+	                 int button)
+	{
+		m_button_mask &= ~(1<<button);
+		printf("%d %d\n", m_button_mask, button);
+	}
+
+	template<int>
+	void onMouseMove(Texpainter::Ui::ImageSurface& surface,
+	                 Texpainter::vec2_t pos_window,
+	                 Texpainter::vec2_t)
+	{
+		if(m_button_mask & (1<<1))
+		{
+			r_img.get().get(pos_window[0], pos_window[1]) = Texpainter::Model::white();
+			surface.update();
+		}
+	}
+
 
 
 	std::reference_wrapper<Texpainter::Model::Image> r_img;

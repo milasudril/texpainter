@@ -38,6 +38,16 @@ namespace Texpainter::Ui
 					{
 						auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
 						obj.template onMouseDown<id>(self, pos_window, pos_screen, button);
+					},
+					[](void* event_handler, ImageSurface& self, vec2_t pos_window, vec2_t pos_screen, int button)
+					{
+						auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+						obj.template onMouseUp<id>(self, pos_window, pos_screen, button);
+					},
+					[](void* event_handler, ImageSurface& self, vec2_t pos_window, vec2_t pos_screen)
+					{
+						auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+						obj.template onMouseMove<id>(self, pos_window, pos_screen);
 					}
 				});
 			}
@@ -52,6 +62,8 @@ namespace Texpainter::Ui
 			struct EventHandlerVtable
 			{
 				void (*m_on_mouse_down)(void* event_handler, ImageSurface& self, vec2_t pos_window, vec2_t pos_screen, int button);
+				void (*m_on_mouse_up)(void* event_handler, ImageSurface& self, vec2_t pos_window, vec2_t pos_screen, int button);
+				void (*m_on_mouse_move)(void* event_handler, ImageSurface& self, vec2_t pos_window, vec2_t pos_screen);
 			};
 			ImageSurface& eventHandler(void* event_handler, EventHandlerVtable const& vtable);
 	};
