@@ -90,8 +90,6 @@ int main(int argc, char* argv[])
 	gtk_init(&argc, &argv);
 
 
-
-
 	Texpainter::Model::Image img{641, 480};
 	Texpainter::Model::Palette pal{16};
 
@@ -106,13 +104,13 @@ int main(int argc, char* argv[])
 	Texpainter::Ui::PaletteView palview{box_outer};
 	palview.palette(pal).eventHandler<0>(cb);
 
-	box_outer.insertMode(Texpainter::Ui::Box::InsertMode{4, Texpainter::Ui::Box::Expand | Texpainter::Ui::Box::Fill});
+	box_outer.insertMode(
+	   Texpainter::Ui::Box::InsertMode{4, Texpainter::Ui::Box::Expand | Texpainter::Ui::Box::Fill});
 	Texpainter::Ui::ImageView imgview{box_outer};
 	imgview.image(img).eventHandler<0>(cb);
 
 	// Texpainter::Ui::Button btn{mainwin, "Hej"};
 	// btn.eventHandler<0>(cb);
-
 
 
 	//	Texpainter::Ui::Box box{mainwin, Texpainter::UiBox::Orientation::Vertical};
