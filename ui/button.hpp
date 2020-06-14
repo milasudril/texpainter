@@ -50,7 +50,7 @@ namespace Texpainter::Ui
 
 	private:
 		class Impl;
-		explicit Button(Impl& impl): m_impl(&impl)
+		explicit Button(Impl& impl): m_impl{&impl}
 		{
 		}
 		Impl* m_impl;

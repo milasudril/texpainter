@@ -1,0 +1,47 @@
+//@	{
+//@	 "targets":[{"name":"color_picker.hpp","type":"include"}]
+//@	,"dependencies_extra":[{"ref":"color_picker.o","rel":"implementation"}]
+//@	}
+
+#ifndef TEXPAINTER_COLORPICKER_HPP
+#define TEXPAINTER_COLORPICKER_HPP
+
+#include "./container.hpp"
+
+#include "model/pixel.hpp"
+
+#include <utility>
+
+namespace Texpainter::Ui
+{
+	class ColorPicker
+	{
+	public:
+		explicit ColorPicker(Container& container);
+		~ColorPicker();
+
+		ColorPicker& operator=(ColorPicker&& obj) noexcept
+		{
+			std::swap(obj.m_impl, m_impl);
+			return *this;
+		}
+
+		ColorPicker(ColorPicker&& obj) noexcept: m_impl(obj.m_impl)
+		{
+			obj.m_impl = nullptr;
+		}
+
+		Model::Pixel value() const noexcept;
+
+		ColorPicker& value(Model::Pixel color);
+
+	private:
+		class Impl;
+		explicit ColorPicker(Impl& impl): m_impl{&impl}
+		{
+		}
+		Impl* m_impl;
+	};
+}
+
+#endif
