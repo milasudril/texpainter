@@ -60,10 +60,9 @@ namespace Testcases
 		auto test_2 = read(Texpainter::Empty<decltype(test)>{}, std::ref(buffer));
 
 		assert(test_2.size() == test.size());
-		assert(memcmp(std::begin(test_2), std::begin(test), std::size(test)*sizeof(int)) == 0);
+		assert(memcmp(std::begin(test_2), std::begin(test), std::size(test) * sizeof(int)) == 0);
 	}
 }
-
 
 
 int main()

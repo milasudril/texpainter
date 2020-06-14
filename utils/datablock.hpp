@@ -19,53 +19,67 @@ namespace Texpainter
 		struct CallFree
 		{
 			void operator()(void* buffer)
-			{ free(buffer);}
+			{
+				free(buffer);
+			}
 		};
 	}
 
 	template<Trivial T>
 	class DataBlock
 	{
-		public:
-			using value_type = T;
+	public:
+		using value_type = T;
 
-			template<class U>
-			using pointer_wrapper = std::unique_ptr<U, detail::CallFree>;
+		template<class U>
+		using pointer_wrapper = std::unique_ptr<U, detail::CallFree>;
 
-			explicit DataBlock(pointer_wrapper<T> ptr, uint32_t size):
-				 m_size{size}
-				,m_ptr{std::move(ptr)}
-			{}
+		explicit DataBlock(pointer_wrapper<T> ptr, uint32_t size): m_size{size}, m_ptr{std::move(ptr)}
+		{
+		}
 
-			explicit DataBlock(uint32_t n):
-				m_size{n},
-				m_ptr{reinterpret_cast<T*>(malloc(sizeof(T) * n))}
-			{}
+		explicit DataBlock(uint32_t n): m_size{n}, m_ptr{reinterpret_cast<T*>(malloc(sizeof(T) * n))}
+		{
+		}
 
-			auto size() const
-			{ return m_size;}
+		auto size() const
+		{
+			return m_size;
+		}
 
-			auto begin() const
-			{ return m_ptr.get(); }
+		auto begin() const
+		{
+			return m_ptr.get();
+		}
 
-			auto end() const
-			{ return begin() + size(); }
+		auto end() const
+		{
+			return begin() + size();
+		}
 
-			auto begin()
-			{ return m_ptr.get(); }
+		auto begin()
+		{
+			return m_ptr.get();
+		}
 
-			auto end()
-			{ return begin() + size(); }
+		auto end()
+		{
+			return begin() + size();
+		}
 
-			auto data()
-			{ return begin(); }
+		auto data()
+		{
+			return begin();
+		}
 
-			auto data() const
-			{ return begin(); }
+		auto data() const
+		{
+			return begin();
+		}
 
-		private:
-			uint32_t m_size;
-			pointer_wrapper<T> m_ptr;
+	private:
+		uint32_t m_size;
+		pointer_wrapper<T> m_ptr;
 	};
 
 
@@ -92,7 +106,7 @@ namespace Texpainter
 		if(size_new > std::size(block))
 		{
 			DataBlock<T> block_new{size_new};
-			memcpy(std::data(block_new), std::data(block), sizeof(T)*std::size(block));
+			memcpy(std::data(block_new), std::data(block), sizeof(T) * std::size(block));
 			block = std::move(block_new);
 		}
 	}

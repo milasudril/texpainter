@@ -112,7 +112,8 @@ namespace Testcases
 		auto pal_2 = read(Texpainter::Empty<decltype(pal)>{}, std::ref(buffer));
 
 		assert(pal_2.size() == pal.size());
-		assert(memcmp(std::begin(pal), std::begin(pal), std::size(pal)*sizeof(Texpainter::Model::Pixel)) == 0);
+		assert(memcmp(std::begin(pal), std::begin(pal), std::size(pal) * sizeof(Texpainter::Model::Pixel))
+		       == 0);
 	}
 }
 

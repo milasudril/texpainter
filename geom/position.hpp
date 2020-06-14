@@ -11,52 +11,56 @@ namespace Texpainter::Geom
 {
 	class Position
 	{
-		public:
-			using Scalar = decltype(std::declval<vec2_t>()[0]);
+	public:
+		using Scalar = decltype(std::declval<vec2_t>()[0]);
 
-			Scalar x() const
-				{return m_val[0];}
+		Scalar x() const
+		{
+			return m_val[0];
+		}
 
-			Position& x(Scalar c)
-				{
-				m_val[0] = c;
-				return *this;
-				}
+		Position& x(Scalar c)
+		{
+			m_val[0] = c;
+			return *this;
+		}
 
-			Scalar y() const
-				{return m_val[1];}
+		Scalar y() const
+		{
+			return m_val[1];
+		}
 
-			Position& y(Scalar c)
-				{
-				m_val[1] = c;
-				return *this;
-				}
+		Position& y(Scalar c)
+		{
+			m_val[1] = c;
+			return *this;
+		}
 
-			Position& operator+=(vec2_t offset)
-				{
-				m_val+=offset;
-				return *this;
-				}
+		Position& operator+=(vec2_t offset)
+		{
+			m_val += offset;
+			return *this;
+		}
 
-			Position& operator-=(vec2_t offset)
-				{
-				m_val-=offset;
-				return *this;
-				}
+		Position& operator-=(vec2_t offset)
+		{
+			m_val -= offset;
+			return *this;
+		}
 
-		private:
-			vec2_t m_val;
+	private:
+		vec2_t m_val;
 	};
 
 	inline Position operator-(Position p, vec2_t offset)
 	{
-		p-=offset;
+		p -= offset;
 		return p;
 	}
 
 	inline Position operator+(Position p, vec2_t offset)
 	{
-		p+=offset;
+		p += offset;
 		return p;
 	}
 }

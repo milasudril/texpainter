@@ -1,265 +1,265 @@
 {
-    "directoryoptions":{
-        "paths_full_reject":[],
-        "paths_reject":[
-            "..",
-            ".",
-            ".git",
-            "__targets"
-        ],
-        "recursive":1
-    },
-    "source_files":[
-        "."
-    ],
-    "target_hooks":[
-        {
-            "config":{
-                "appcompile":{
-                    "args":[
+	"directoryoptions": {
+		"paths_full_reject": [],
+		"paths_reject": [
+			"..",
+			".",
+			".git",
+			"__targets"
+		],
+		"recursive": 1
+	},
+	"source_files": [
+		"."
+	],
+	"target_hooks": [
+		{
+			"config": {
+				"appcompile": {
+					"args": [
 						"-std=c++20",
-                        "-O3",
-                        "-fpic",
-                        "{cxxversion}",
-                        "-Wall",
-                        "{cflags_extra}",
-                        "{iquote}",
-                        "{includedir}",
-                        "-DMAIKE_TARGET_DIRECTORY={target_directory}",
-                        "-DMAIKE_CURRENT_DIRECTORY={current_directory}",
-                        "{includes_extra}",
-                        "-o",
-                        "{target}",
-                        "{source}",
-                        "{libdir}",
-                        "{dependencies}"
-                    ],
-                    "name":"g++-10"
-                },
-                "autorun_launcher":{
-                    "args":[],
-                    "name":""
-                },
-                "cflags_extra":[],
-                "cflags_format":"-^",
-                "dllcompile":{
-                    "args":[
-                        "-std=c++20",
-                        "-O3",
-                        "-fpic",
-                        "{cxxversion}",
-                        "-Wall",
-                        "{cflags_extra}",
-                        "{iquote}",
-                        "{includedir}",
-                        "-DMAIKE_TARGET_DIRECTORY={target_directory}",
-                        "-DMAIKE_CURRENT_DIRECTORY={current_directory}",
-                        "{includes_extra}",
-                        "-shared",
-                        "-o",
-                        "{target}",
-                        "{source}",
-                        "{libdir}",
-                        "{dependencies}"
-                    ],
-                    "name":"g++-10"
-                },
-                "include_format":"-include^",
-                "includedir":[],
-                "includedir_format":"-I^",
-                "includedir_noscan":[],
-                "iquote":[
-                    "."
-                ],
-                "iquote_format":"-iquote^",
-                "libcompile":{
-                    "args":[
-                        "rcs",
-                        "{target}",
-                        "{dependencies}"
-                    ],
-                    "name":"ar"
-                },
-                "libdir":[],
-                "libdir_format":"-L^",
-                "libext_format":"-l^",
-                "libint_format":"-l:^",
-                "mode":"c++",
-                "objcompile":{
-                    "args":[
-                        "-std=c++20",
-                        "-c",
-                        "-O3",
-                        "-fpic",
-                        "{cxxversion}",
-                        "-Wall",
-                        "{cflags_extra}",
-                        "{iquote}",
-                        "{includedir}",
-                        "-DMAIKE_TARGET_DIRECTORY={target_directory}",
-                        "-DMAIKE_CURRENT_DIRECTORY={current_directory}",
-                        "{includes_extra}",
-                        "-o",
-                        "{target}",
-                        "{source}"
-                    ],
-                    "name":"g++-10"
-                },
-                "pkgconfig":{
-                    "args":[
-                        "{action}",
-                        "{libname}"
-                    ],
-                    "name":"pkg-config"
-                },
-                "stdprefix":"-std=",
-                "versionquery":{
-                    "args":[
-                        "-E",
-                        "-dM",
-                        "-x",
-                        "c++",
-                        "{nullfile}"
-                    ],
-                    "name":"g++-10"
-                }
-            },
-            "filename_exts":[
-                ".c++",
-                ".cc",
-                ".cpp",
-                ".cxx",
-                ".h",
-                ".h++",
-                ".hh",
-                ".hpp",
-                ".hxx"
-            ],
-            "name":"targetcxx_default",
-            "plugin":"targetcxx"
-        },
-        {
-            "config":{},
-            "filename_exts":[
-                ".cp"
-            ],
-            "name":"targetcp_default",
-            "plugin":"targetcp"
-        },
-        {
-            "config":{
-                "command":{
-                    "args":[
-                        "--",
-                        "{script}",
-                        "{args}"
-                    ],
-                    "name":"python3"
-                }
-            },
-            "filename_exts":[
-                ".py"
-            ],
-            "name":"targetpython_default",
-            "plugin":"targetpython"
-        },
-        {
-            "config":{
-                "tar":{
-                    "command":{
-                        "args":[
-                            "{target_strip}",
-                            "{root_append}",
-                            "{compressor}",
-                            "-cf",
-                            "{target}",
-                            "-T",
-                            "-"
-                        ],
-                        "name":"tar"
-                    },
-                    "compressors":{
-                        "bzip2":"-j",
-                        "gzip":"-z",
-                        "lzma":"-J"
-                    },
-                    "root_append":"--transform=s,\\\\(.*\\\\),^\\\\1,g",
-                    "target_strip":"--transform=s,\\^^,,g"
-                },
-                "zip":{
-                    "create":{
-                        "args":[
-                            "-@",
-                            "{target}"
-                        ],
-                        "name":"zip"
-                    },
-                    "rename":{
-                        "args":[
-                            "-w",
-                            "{target}"
-                        ],
-                        "name":"zipnote"
-                    }
-                }
-            },
-            "filename_exts":[
-                ".archive"
-            ],
-            "name":"targetarchive_default",
-            "plugin":"targetarchive"
-        },
-        {
-            "config":{
-                "command":{
-                    "args":[
-                        "{script}",
-                        "{args}"
-                    ],
-                    "name":"bash"
-                }
-            },
-            "filename_exts":[
-                ".sh"
-            ],
-            "name":"targetbash_default",
-            "plugin":"targetbash"
-        },
-        {
-            "config":{
-                "filter":{
-                    "args":[
-                        "{depfile}",
-                        "{source}"
-                    ],
-                    "name":"xsltproc"
-                }
-            },
-            "filename_exts":[
-                ".xml"
-            ],
-            "name":"targetxml_default",
-            "plugin":"targetxml"
-        },
-        {
-            "config":{
-                "command":{
-                    "args":[
-                        "{script}",
-                        "{args}"
-                    ],
-                    "name":"octave-cli"
-                }
-            },
-            "filename_exts":[
-                ".m"
-            ],
-            "name":"targetoctave_default",
-            "plugin":"targetoctave"
-        }
-    ],
-    "targetinfo":{
-        "project_root":"",
-        "target_directory":"__targets"
-    }
+						"-O3",
+						"-fpic",
+						"{cxxversion}",
+						"-Wall",
+						"{cflags_extra}",
+						"{iquote}",
+						"{includedir}",
+						"-DMAIKE_TARGET_DIRECTORY={target_directory}",
+						"-DMAIKE_CURRENT_DIRECTORY={current_directory}",
+						"{includes_extra}",
+						"-o",
+						"{target}",
+						"{source}",
+						"{libdir}",
+						"{dependencies}"
+					],
+					"name": "g++-10"
+				},
+				"autorun_launcher": {
+					"args": [],
+					"name": ""
+				},
+				"cflags_extra": [],
+				"cflags_format": "-^",
+				"dllcompile": {
+					"args": [
+						"-std=c++20",
+						"-O3",
+						"-fpic",
+						"{cxxversion}",
+						"-Wall",
+						"{cflags_extra}",
+						"{iquote}",
+						"{includedir}",
+						"-DMAIKE_TARGET_DIRECTORY={target_directory}",
+						"-DMAIKE_CURRENT_DIRECTORY={current_directory}",
+						"{includes_extra}",
+						"-shared",
+						"-o",
+						"{target}",
+						"{source}",
+						"{libdir}",
+						"{dependencies}"
+					],
+					"name": "g++-10"
+				},
+				"include_format": "-include^",
+				"includedir": [],
+				"includedir_format": "-I^",
+				"includedir_noscan": [],
+				"iquote": [
+					"."
+				],
+				"iquote_format": "-iquote^",
+				"libcompile": {
+					"args": [
+						"rcs",
+						"{target}",
+						"{dependencies}"
+					],
+					"name": "ar"
+				},
+				"libdir": [],
+				"libdir_format": "-L^",
+				"libext_format": "-l^",
+				"libint_format": "-l:^",
+				"mode": "c++",
+				"objcompile": {
+					"args": [
+						"-std=c++20",
+						"-c",
+						"-O3",
+						"-fpic",
+						"{cxxversion}",
+						"-Wall",
+						"{cflags_extra}",
+						"{iquote}",
+						"{includedir}",
+						"-DMAIKE_TARGET_DIRECTORY={target_directory}",
+						"-DMAIKE_CURRENT_DIRECTORY={current_directory}",
+						"{includes_extra}",
+						"-o",
+						"{target}",
+						"{source}"
+					],
+					"name": "g++-10"
+				},
+				"pkgconfig": {
+					"args": [
+						"{action}",
+						"{libname}"
+					],
+					"name": "pkg-config"
+				},
+				"stdprefix": "-std=",
+				"versionquery": {
+					"args": [
+						"-E",
+						"-dM",
+						"-x",
+						"c++",
+						"{nullfile}"
+					],
+					"name": "g++-10"
+				}
+			},
+			"filename_exts": [
+				".c++",
+				".cc",
+				".cpp",
+				".cxx",
+				".h",
+				".h++",
+				".hh",
+				".hpp",
+				".hxx"
+			],
+			"name": "targetcxx_default",
+			"plugin": "targetcxx"
+		},
+		{
+			"config": {},
+			"filename_exts": [
+				".cp"
+			],
+			"name": "targetcp_default",
+			"plugin": "targetcp"
+		},
+		{
+			"config": {
+				"command": {
+					"args": [
+						"--",
+						"{script}",
+						"{args}"
+					],
+					"name": "python3"
+				}
+			},
+			"filename_exts": [
+				".py"
+			],
+			"name": "targetpython_default",
+			"plugin": "targetpython"
+		},
+		{
+			"config": {
+				"tar": {
+					"command": {
+						"args": [
+							"{target_strip}",
+							"{root_append}",
+							"{compressor}",
+							"-cf",
+							"{target}",
+							"-T",
+							"-"
+						],
+						"name": "tar"
+					},
+					"compressors": {
+						"bzip2": "-j",
+						"gzip": "-z",
+						"lzma": "-J"
+					},
+					"root_append": "--transform=s,\\\\(.*\\\\),^\\\\1,g",
+					"target_strip": "--transform=s,\\^^,,g"
+				},
+				"zip": {
+					"create": {
+						"args": [
+							"-@",
+							"{target}"
+						],
+						"name": "zip"
+					},
+					"rename": {
+						"args": [
+							"-w",
+							"{target}"
+						],
+						"name": "zipnote"
+					}
+				}
+			},
+			"filename_exts": [
+				".archive"
+			],
+			"name": "targetarchive_default",
+			"plugin": "targetarchive"
+		},
+		{
+			"config": {
+				"command": {
+					"args": [
+						"{script}",
+						"{args}"
+					],
+					"name": "bash"
+				}
+			},
+			"filename_exts": [
+				".sh"
+			],
+			"name": "targetbash_default",
+			"plugin": "targetbash"
+		},
+		{
+			"config": {
+				"filter": {
+					"args": [
+						"{depfile}",
+						"{source}"
+					],
+					"name": "xsltproc"
+				}
+			},
+			"filename_exts": [
+				".xml"
+			],
+			"name": "targetxml_default",
+			"plugin": "targetxml"
+		},
+		{
+			"config": {
+				"command": {
+					"args": [
+						"{script}",
+						"{args}"
+					],
+					"name": "octave-cli"
+				}
+			},
+			"filename_exts": [
+				".m"
+			],
+			"name": "targetoctave_default",
+			"plugin": "targetoctave"
+		}
+	],
+	"targetinfo": {
+		"project_root": "",
+		"target_directory": "__targets"
+	}
 }

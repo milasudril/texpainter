@@ -16,10 +16,12 @@ namespace
 	};
 
 	void write(uint32_t val, Buffer& buff)
-	{	if(buff.m_width == 0)
-		{ buff.m_width = val;}
+	{
+		if(buff.m_width == 0) { buff.m_width = val; }
 		else
-		{buff.m_n_elems = val; }
+		{
+			buff.m_n_elems = val;
+		}
 	}
 
 	uint32_t read(Texpainter::Empty<uint32_t>, Buffer& buff)
@@ -72,7 +74,6 @@ namespace Testcases
 
 		assert(distanceSquared(img.get(3, 0), Texpainter::Model::red()) == 0.0f);
 		assert(distanceSquared(img.get(2, 2), Texpainter::Model::blue()) == 0.0f);
-
 	}
 	void texpainterImageCreateEmpty()
 	{
