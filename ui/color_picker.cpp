@@ -14,7 +14,10 @@ public:
 	{
 		GdkRGBA tmp;
 		gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(m_handle), &tmp);
-		return Model::Pixel{static_cast<float>(tmp.red), static_cast<float>(tmp.green), static_cast<float>(tmp.blue), static_cast<float>(tmp.alpha)};
+		return Model::Pixel{static_cast<float>(tmp.red),
+		                    static_cast<float>(tmp.green),
+		                    static_cast<float>(tmp.blue),
+		                    static_cast<float>(tmp.alpha)};
 	}
 
 	void value(Model::Pixel val)

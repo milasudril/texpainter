@@ -63,7 +63,8 @@ Texpainter::Ui::Button::~Button()
 	delete m_impl;
 }
 
-Texpainter::Ui::Button& Texpainter::Ui::Button::eventHandler(void* event_handler, EventHandlerFunc func)
+Texpainter::Ui::Button& Texpainter::Ui::Button::eventHandler(void* event_handler,
+                                                             EventHandlerFunc func)
 {
 	m_impl->eventHandler(event_handler, func);
 	return *this;
@@ -99,7 +100,9 @@ bool Texpainter::Ui::Button::state() const noexcept
 }
 
 
-Texpainter::Ui::Button::Impl::Impl(Container& cnt, const char* lab): Texpainter::Ui::Button{*this}, r_eh{nullptr}
+Texpainter::Ui::Button::Impl::Impl(Container& cnt, const char* lab):
+   Texpainter::Ui::Button{*this},
+   r_eh{nullptr}
 {
 	auto widget = gtk_toggle_button_new();
 	g_signal_connect(widget, "clicked", G_CALLBACK(clicked), this);

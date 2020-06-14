@@ -69,7 +69,7 @@ public:
 	void palette(Model::Palette const& pal)
 	{
 		if(realloc_surface_needed(pal, r_pal))
-		{ gtk_widget_set_size_request(GTK_WIDGET(m_handle), ItemSize, ItemSize * std::size(pal)); }
+		{ gtk_widget_set_size_request(GTK_WIDGET(m_handle), ItemSize * std::size(pal), ItemSize); }
 		r_pal = &pal;
 		update();
 	}

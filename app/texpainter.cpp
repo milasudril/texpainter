@@ -5,7 +5,7 @@
 #include "ui/palette_view.hpp"
 #include "ui/button.hpp"
 #include "ui/color_picker.hpp"
-// #include "ui/box.hpp"
+#include "ui/box.hpp"
 
 #include <gtk/gtk.h>
 
@@ -90,22 +90,29 @@ int main(int argc, char* argv[])
 	gtk_init(&argc, &argv);
 
 
-	Texpainter::Ui::Window mainwin{"Texpainter"};
-	mainwin.defaultSize(Texpainter::Geom::Dimension{}.width(800).height(500));
 
 
 	Texpainter::Model::Image img{641, 480};
 	Texpainter::Model::Palette pal{16};
-	Texpainter::Ui::ColorPicker picker{mainwin};
 
-	 MyCallback cb{img};
+
+	MyCallback cb{img};
+
+	Texpainter::Ui::Window mainwin{"Texpainter"};
+	mainwin.defaultSize(Texpainter::Geom::Dimension{}.width(800).height(500));
+	Texpainter::Ui::Box box_outer{mainwin, Texpainter::Ui::Box::Orientation::Vertical};
+	box_outer.homogenous(false);
+
+	Texpainter::Ui::PaletteView palview{box_outer};
+	palview.palette(pal).eventHandler<0>(cb);
+
+	box_outer.insertMode(Texpainter::Ui::Box::InsertMode{4, Texpainter::Ui::Box::Expand | Texpainter::Ui::Box::Fill});
+	Texpainter::Ui::ImageView imgview{box_outer};
+	imgview.image(img).eventHandler<0>(cb);
+
 	// Texpainter::Ui::Button btn{mainwin, "Hej"};
 	// btn.eventHandler<0>(cb);
-	// Texpainter::Ui::PaletteView palview{mainwin};
-	// palview.palette(pal).eventHandler<0>(cb);
 
-	//	Texpainter::Ui::ImageView imgview{mainwin};
-	//	imgview.image(img).eventHandler<0>(cb);
 
 
 	//	Texpainter::Ui::Box box{mainwin, Texpainter::UiBox::Orientation::Vertical};
