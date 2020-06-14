@@ -188,13 +188,13 @@ namespace Texpainter::Ui
 		Dialog(Container& owner, const char* title, const WidgetParams&... params):
 		   m_window(title, &owner),
 		   m_content(m_window, true),
-		   m_widget(m_content.insertMode({2, Box::FILL | Box::EXPAND}), params...),
+		   m_widget(m_content.insertMode({2, Box::Fill | Box::Expand}), params...),
 		   m_buttons_outer(m_content.insertMode(Box::InsertMode{0, 0}), false),
-		   m_filler_l(m_buttons_outer.insertMode({0, Box::FILL | Box::EXPAND})),
+		   m_filler_l(m_buttons_outer.insertMode({0, Box::Fill | Box::Expand})),
 		   m_buttons_box(m_buttons_outer.insertMode({0, 0}), false),
 		   m_buttons(buttons_create<button_count()>(
-		      m_buttons_box.homogenous(true).insertMode(Box::InsertMode{2, Box::FILL | Box::EXPAND}))),
-		   m_filler_r(m_buttons_outer.insertMode({0, Box::FILL | Box::EXPAND}))
+		      m_buttons_box.homogenous(true).insertMode(Box::InsertMode{2, Box::Fill | Box::Expand}))),
+		   m_filler_r(m_buttons_outer.insertMode({0, Box::Fill | Box::Expand}))
 		{
 			if(has_dismiss())
 			{
