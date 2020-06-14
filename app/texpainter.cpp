@@ -2,6 +2,7 @@
 
 #include "ui/window.hpp"
 #include "ui/image_view.hpp"
+#include "ui/palette_view.hpp"
 // #include "ui/box.hpp"
 
 #include <gtk/gtk.h>
@@ -53,6 +54,30 @@ struct MyCallback
 
 
 
+	template<int>
+	void onMouseDown(Texpainter::Ui::PaletteView&,
+					size_t,
+	                 int)
+	{
+	}
+
+	template<int>
+	void onMouseUp(Texpainter::Ui::PaletteView&,
+                     size_t,
+	                 int)
+	{
+	}
+
+	template<int>
+	void onMouseMove(Texpainter::Ui::PaletteView&,
+					size_t index)
+	{
+		printf("  %zu\r", index);
+		fflush(stdout);
+	}
+
+
+
 	std::reference_wrapper<Texpainter::Model::Image> r_img;
 	uint32_t m_button_mask{};
 
@@ -68,10 +93,15 @@ int main(int argc, char* argv[])
 
 
 	Texpainter::Model::Image img{641, 480};
-	MyCallback cb{img};
+	Texpainter::Model::Palette pal{16};
 
-	Texpainter::Ui::ImageView imgview{mainwin};
-	imgview.image(img).eventHandler<0>(cb);
+	MyCallback cb{img};
+	Texpainter::Ui::PaletteView palview{mainwin};
+	palview.palette(pal).eventHandler<0>(cb);
+
+//	Texpainter::Ui::ImageView imgview{mainwin};
+//	imgview.image(img).eventHandler<0>(cb);
+
 
 
 //	Texpainter::Ui::Box box{mainwin, Texpainter::UiBox::Orientation::Vertical};
