@@ -3,9 +3,9 @@
 #include "ui/window.hpp"
 #include "ui/image_view.hpp"
 #include "ui/palette_view.hpp"
-#include "ui/button.hpp"
 #include "ui/color_picker.hpp"
 #include "ui/box.hpp"
+#include "ui/dialog.hpp"
 
 #include <gtk/gtk.h>
 
