@@ -43,6 +43,7 @@ namespace Texpainter::Ui
 			}
 
 			ImageSurface& image(Model::Image const& img);
+			ImageSurface& update();
 
 		private:
 			class Impl;

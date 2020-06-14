@@ -5,6 +5,8 @@
 
 #include <gtk/gtk.h>
 
+#include <cassert>
+
 namespace
 {
 	bool realloc_surface_needed(Texpainter::Model::Image const& new_image, Texpainter::Model::Image const* old_image)
@@ -78,6 +80,7 @@ class Texpainter::Ui::ImageSurface::Impl: private ImageSurface
 			auto const stride = cairo_image_surface_get_stride(m_img_surface);
 			cairo_surface_flush(m_img_surface);
 			auto const data = cairo_image_surface_get_data(m_img_surface);
+			assert(data != nullptr);
 			auto const w = r_img->width();
 			auto const h = r_img->height();
 			auto read_ptr = r_img->pixels();
@@ -86,7 +89,7 @@ class Texpainter::Ui::ImageSurface::Impl: private ImageSurface
 				auto write_ptr = data + row*stride;
 				for(uint32_t col = 0; col < w; ++col)
 				{
-					auto pixel_out = *read_ptr/255.0f;
+					auto pixel_out = 255.0f * (*read_ptr);
 					write_ptr[0] = pixel_out.blue();
 					write_ptr[1] = pixel_out.green();
 					write_ptr[2] = pixel_out.red();
@@ -95,7 +98,8 @@ class Texpainter::Ui::ImageSurface::Impl: private ImageSurface
 					++read_ptr;
 				}
 			}
-			cairo_surface_finish(m_img_surface);
+			cairo_surface_mark_dirty(m_img_surface);
+			gtk_widget_queue_draw(GTK_WIDGET(m_handle));
 		}
 
 		void eventHandler(void* event_handler, EventHandlerVtable const& vtable)
@@ -156,3 +160,8 @@ Texpainter::Ui::ImageSurface& Texpainter::Ui::ImageSurface::eventHandler(void* e
 	return *this;
 }
 
+Texpainter::Ui::ImageSurface& Texpainter::Ui::ImageSurface::update()
+{
+	m_impl->update();
+	return *this;
+}
