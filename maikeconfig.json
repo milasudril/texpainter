@@ -18,7 +18,7 @@
                 "appcompile":{
                     "args":[
 						"-std=c++20",
-                        "-g",
+                        "-O3",
                         "-fpic",
                         "{cxxversion}",
                         "-Wall",
@@ -45,7 +45,7 @@
                 "dllcompile":{
                     "args":[
                         "-std=c++20",
-                        "-g",
+                        "-O3",
                         "-fpic",
                         "{cxxversion}",
                         "-Wall",
@@ -89,7 +89,7 @@
                     "args":[
                         "-std=c++20",
                         "-c",
-                        "-g",
+                        "-O3",
                         "-fpic",
                         "{cxxversion}",
                         "-Wall",
