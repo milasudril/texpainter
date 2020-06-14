@@ -41,7 +41,7 @@ namespace Texpainter::Ui
 				return callback(cb_wrapper, &cb);
 			}
 
-			ImageSurface& image(Model::Image const* img);
+			ImageSurface& image(Model::Image const& img);
 
 		private:
 			class Impl;

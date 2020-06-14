@@ -124,6 +124,43 @@ namespace Texpainter::Model
 	constexpr Pixel white()
 	{ return Pixel{1.0f, 1.0f, 1.0f};}
 
+	constexpr auto operator+(Pixel a, Pixel b)
+	{
+		return a+=b;
+	}
+
+	constexpr auto operator-(Pixel a, Pixel b)
+	{
+		return a-=b;
+	}
+
+	constexpr auto operator*(Pixel a, Pixel b)
+	{
+		return a*=b;
+	}
+
+	constexpr auto operator/(Pixel a, Pixel b)
+	{
+		return a/=b;
+	}
+
+	constexpr auto operator/(Pixel a, float c)
+	{
+		return a/=c;
+	}
+
+	constexpr auto operator*(Pixel a, float c)
+	{
+		return a*=c;
+	}
+
+	constexpr auto operator*(float c, Pixel a)
+	{
+		return a*c;
+	}
+
+
+
 	constexpr auto distanceSquared(Pixel a, Pixel b)
 	{
 		a -= b;

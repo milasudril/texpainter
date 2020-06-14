@@ -36,6 +36,9 @@ namespace Texpainter::Model
 			Pixel& get(uint32_t x, uint32_t y)
 			{ return *const_cast<Pixel*>(std::as_const(*this).getAddress(x, y));}
 
+			Pixel const* pixels() const
+			{ return std::data(m_block); }
+
 		private:
 			uint32_t m_width;
 			DataBlock<Pixel> m_block;
@@ -61,6 +64,11 @@ namespace Texpainter::Model
 	{
 		auto width = read(Empty<uint32_t>{}, stream);
 		return Image{width, read(Empty<DataBlock<Pixel>>{}, stream)};
+	}
+
+	inline auto size(Image const& img)
+	{
+		return std::tuple{img.width(), img.height()};
 	}
 }
 

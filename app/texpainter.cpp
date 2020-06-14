@@ -21,7 +21,11 @@ int main(int argc, char* argv[])
 	Texpainter::Ui::Window mainwin{"Texpainter"};
 	mainwin.defaultSize(Texpainter::Geom::Dimension{}.width(800).height(500));
 
-	Texpainter::Ui::ImageSurface img{mainwin};
+	Texpainter::Model::Image img{641, 480};
+
+	Texpainter::Ui::ImageSurface imgview{mainwin};
+	imgview.image(img);
+
 
 //	Texpainter::Ui::Box box{mainwin, Texpainter::UiBox::Orientation::Vertical};
 
