@@ -17,6 +17,18 @@ namespace
 
 		return size(new_image) != size(*old_image);
 	}
+
+	constexpr std::array<uint8_t, 256> gen_gamma_22_lut()
+	{
+		std::array<uint8_t, 256> ret{};
+		for(int k = 0; k < 256; ++k)
+		{
+			ret[k] = static_cast<float>(255.0f * std::pow(static_cast<float>(k) / 255.0f, 1 / 2.2f));
+		}
+
+		return ret;
+	}
+	constexpr auto gamma_22 = gen_gamma_22_lut();
 }
 
 class Texpainter::Ui::ImageView::Impl: private ImageView
@@ -91,11 +103,11 @@ public:
 			auto write_ptr = data + row * stride;
 			for(uint32_t col = 0; col < w; ++col)
 			{
-				auto pixel_out = 255.0f * Model::BasicPixel<Model::ColorProfiles::Gamma22>{*read_ptr}.value();
-				write_ptr[0] = pixel_out[2];
-				write_ptr[1] = pixel_out[1];
-				write_ptr[2] = pixel_out[0];
-				write_ptr[3] = pixel_out[3];
+				auto pixel_out = 255.0f * read_ptr->value();
+				write_ptr[0] = gamma_22[static_cast<int>(pixel_out[2])];
+				write_ptr[1] = gamma_22[static_cast<int>(pixel_out[1])];
+				write_ptr[2] = gamma_22[static_cast<int>(pixel_out[0])];
+				write_ptr[3] = gamma_22[static_cast<int>(pixel_out[3])];
 				write_ptr += 4;
 				++read_ptr;
 			}
