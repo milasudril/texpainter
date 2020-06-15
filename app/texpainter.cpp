@@ -87,6 +87,7 @@ struct MyCallback
 				case 3:
 				{
 					m_modified_pal_index = index;
+					r_palview->highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Write);
 					m_color_picker = std::make_unique<ColorPicker>(
 					   *r_mainwin, (std::string{"Select color number "} + std::to_string(index + 1)).c_str());
 					m_color_picker->widget().value(std::as_const(r_doc.get()).palette()[index]);
@@ -94,7 +95,13 @@ struct MyCallback
 					m_color_picker->show();
 				}
 				break;
-				case 1: r_doc.get().selectedColorIndex(index); break;
+				case 1:
+					r_palview
+					   ->highlightMode(r_doc.get().selectedColorIndex(),
+					                   Texpainter::Ui::PaletteView::HighlightMode::None)
+					   .highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Read);
+					r_doc.get().selectedColorIndex(index);
+					break;
 			}
 		}
 	}
@@ -102,6 +109,9 @@ struct MyCallback
 	template<int>
 	void dismiss(ColorPicker&)
 	{
+		r_palview->highlightMode(m_modified_pal_index, Texpainter::Ui::PaletteView::HighlightMode::None)
+		   .highlightMode(r_doc.get().selectedColorIndex(),
+		                  Texpainter::Ui::PaletteView::HighlightMode::Read);
 		m_color_picker.reset();
 	}
 
@@ -109,7 +119,9 @@ struct MyCallback
 	void confirmPositive(ColorPicker& picker)
 	{
 		r_doc.get().palette()[m_modified_pal_index] = picker.widget().value();
-		r_palview->update();
+		r_palview->highlightMode(m_modified_pal_index, Texpainter::Ui::PaletteView::HighlightMode::None)
+		   .highlightMode(r_doc.get().selectedColorIndex(),
+		                  Texpainter::Ui::PaletteView::HighlightMode::Read);
 		m_color_picker.reset();
 	}
 

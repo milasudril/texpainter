@@ -53,6 +53,15 @@ namespace Texpainter::Ui
 		PaletteView& palette(Model::Palette const& pal);
 		PaletteView& update();
 
+		enum class HighlightMode
+		{
+			None,
+			Read,
+			Write
+		};
+
+		PaletteView& highlightMode(size_t index, HighlightMode mode);
+
 	private:
 		class Impl;
 		explicit PaletteView(Impl& impl): m_impl(&impl)

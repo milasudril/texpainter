@@ -19,12 +19,30 @@ namespace
 	}
 
 	constexpr auto ItemSize = 32;
+
+	constexpr Texpainter::Model::BasicPixel<Texpainter::Model::ColorProfiles::Gamma22>
+	color(Texpainter::Ui::PaletteView::HighlightMode mode)
+	{
+		switch(mode)
+		{
+			case Texpainter::Ui::PaletteView::HighlightMode::None:
+				return Texpainter::Model::BasicPixel<Texpainter::Model::ColorProfiles::Gamma22>{
+				   Texpainter::Model::Pixel{0.5f, 0.5f, 0.5f, 1.0f}};
+			case Texpainter::Ui::PaletteView::HighlightMode::Read:
+				return Texpainter::Model::BasicPixel<Texpainter::Model::ColorProfiles::Gamma22>{
+				   Texpainter::Model::Pixel{0.0f, 0.5f, 0.0f, 0.5f}};
+			case Texpainter::Ui::PaletteView::HighlightMode::Write:
+				return Texpainter::Model::BasicPixel<Texpainter::Model::ColorProfiles::Gamma22>{
+				   Texpainter::Model::Pixel{0.5f, 0.0f, 0.0f, 0.5f}};
+			default: abort();
+		}
+	}
 }
 
 class Texpainter::Ui::PaletteView::Impl: private PaletteView
 {
 public:
-	explicit Impl(Container& cnt): PaletteView{*this}
+	explicit Impl(Container& cnt): PaletteView{*this}, m_highlight_mode{1}
 	{
 		auto widget = gtk_drawing_area_new();
 		g_object_ref_sink(widget);
@@ -55,16 +73,21 @@ public:
 		if(r_pal != nullptr)
 		{
 			cairo_set_line_width(cr, 4);
-			std::for_each(std::begin(*r_pal), std::end(*r_pal), [cr, k = 0](auto color) mutable {
-				auto const color_conv = Model::BasicPixel<Model::ColorProfiles::Gamma22>{color};
-				cairo_set_source_rgba(
-				   cr, color_conv.red(), color_conv.green(), color_conv.blue(), color_conv.alpha());
-				cairo_rectangle(cr, k * ItemSize, 0, ItemSize, ItemSize);
-				cairo_fill_preserve(cr);
-				cairo_set_source_rgba(cr, 0.73, 0.73, 0.73, 1.0f);
-				cairo_stroke(cr);
-				++k;
-			});
+			std::for_each(
+			   std::begin(*r_pal),
+			   std::end(*r_pal),
+			   [cr, highlight_mode = m_highlight_mode.begin(), k = 0](auto color) mutable {
+				   auto const color_conv = Model::BasicPixel<Model::ColorProfiles::Gamma22>{color};
+				   cairo_set_source_rgba(
+				      cr, color_conv.red(), color_conv.green(), color_conv.blue(), color_conv.alpha());
+				   cairo_rectangle(cr, k * ItemSize, 0, ItemSize, ItemSize);
+				   cairo_fill_preserve(cr);
+				   auto border_color = ::color(highlight_mode[k]);
+				   cairo_set_source_rgba(
+				      cr, border_color.red(), border_color.green(), border_color.blue(), border_color.alpha());
+				   cairo_stroke(cr);
+				   ++k;
+			   });
 		}
 	}
 
@@ -73,6 +96,8 @@ public:
 		if(realloc_surface_needed(pal, r_pal))
 		{ gtk_widget_set_size_request(GTK_WIDGET(m_handle), ItemSize * std::size(pal), ItemSize); }
 		r_pal = &pal;
+		m_highlight_mode = DataBlock<HighlightMode>{std::size(pal)};
+		std::fill(std::begin(m_highlight_mode), std::end(m_highlight_mode), HighlightMode::None);
 		update();
 	}
 
@@ -87,11 +112,19 @@ public:
 		m_vt = vtable;
 	}
 
+	void highlightMode(size_t index, HighlightMode mode)
+	{
+		*(m_highlight_mode.begin() + index) = mode;
+		update();
+	}
+
+
 private:
 	void* r_eh;
 	EventHandlerVtable m_vt;
 
 	Model::Palette const* r_pal;
+	DataBlock<HighlightMode> m_highlight_mode;
 
 	GtkDrawingArea* m_handle;
 	static gboolean draw_callback(GtkWidget* widget, cairo_t* cr, gpointer self)
@@ -167,5 +200,12 @@ Texpainter::Ui::PaletteView::eventHandler(void* event_handler, EventHandlerVtabl
 Texpainter::Ui::PaletteView& Texpainter::Ui::PaletteView::update()
 {
 	m_impl->update();
+	return *this;
+}
+
+Texpainter::Ui::PaletteView& Texpainter::Ui::PaletteView::highlightMode(size_t index,
+                                                                        HighlightMode mode)
+{
+	m_impl->highlightMode(index, mode);
 	return *this;
 }
