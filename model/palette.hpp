@@ -1,6 +1,6 @@
 //@	{"targets":[{"name":"palette.hpp", "type":"include"}]}
 
-#ifndef TEXPAINTER_PALLETE_HPP
+#ifndef TEXPAINTER_PALETTE_HPP
 #define TEXPAINTER_PALETTE_HPP
 
 #include "./pixel.hpp"
