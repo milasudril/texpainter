@@ -37,12 +37,12 @@ namespace Texpainter::Model
 			std::fill(std::begin(m_block), std::end(m_block), color_init);
 		}
 
-		auto operator[](uint32_t index) const
+		auto operator[](size_t index) const
 		{
 			return *(begin() + index);
 		}
 
-		auto& operator[](uint32_t index)
+		auto& operator[](size_t index)
 		{
 			return *(std::begin(m_block) + index);
 		}

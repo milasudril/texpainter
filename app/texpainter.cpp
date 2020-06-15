@@ -10,6 +10,7 @@
 #include <gtk/gtk.h>
 
 #include <functional>
+#include <string>
 
 struct MyCallback
 {
@@ -42,7 +43,7 @@ struct MyCallback
 		m_button_mask |= 1 << button;
 		if(m_button_mask & (1 << 1))
 		{
-			r_img.get().get(pos_window[0], pos_window[1]) = Texpainter::Model::white();
+			r_img.get().get(pos_window[0], pos_window[1]) = r_pal.get()[m_sel_index];
 			event_source.update();
 		}
 	}
@@ -63,7 +64,7 @@ struct MyCallback
 	{
 		if(m_button_mask & (1 << 1))
 		{
-			r_img.get().get(pos_window[0], pos_window[1]) = Texpainter::Model::white();
+			r_img.get().get(pos_window[0], pos_window[1]) = r_pal.get()[m_sel_index];
 			event_source.update();
 		}
 	}
@@ -74,16 +75,41 @@ struct MyCallback
 	{
 	}
 
+	using ColorPicker = Texpainter::Ui::Dialog<Texpainter::Ui::ColorPicker>;
 	template<int>
 	void onMouseUp(Texpainter::Ui::PaletteView&, size_t index, int button)
 	{
-		if(button == 3 && index < std::size(r_pal.get()))
+		if(index < std::size(r_pal.get()))
 		{
-			m_color_picker = std::make_unique<Texpainter::Ui::Dialog<Texpainter::Ui::ColorPicker>>(
-			   *r_mainwin, "Select color");
-			m_color_picker->widget().value(r_pal.get()[index]);
-			m_color_picker->show();
+			switch(button)
+			{
+				case 3:
+				{
+					m_modified_pal_index = index;
+					m_color_picker = std::make_unique<ColorPicker>(
+					   *r_mainwin, (std::string{"Select color number "} + std::to_string(index + 1)).c_str());
+					m_color_picker->widget().value(r_pal.get()[index]);
+					m_color_picker->eventHandler<0>(*this);
+					m_color_picker->show();
+				}
+				break;
+				case 1: m_sel_index = index; break;
+			}
 		}
+	}
+
+	template<int>
+	void dismiss(ColorPicker&)
+	{
+		m_color_picker.reset();
+	}
+
+	template<int>
+	void confirmPositive(ColorPicker& picker)
+	{
+		r_pal.get()[m_modified_pal_index] = picker.widget().value();
+		r_palview->update();
+		m_color_picker.reset();
 	}
 
 	template<int>
@@ -102,7 +128,11 @@ struct MyCallback
 	std::reference_wrapper<Texpainter::Model::Palette> r_pal;
 
 	Texpainter::Ui::Window* r_mainwin;
-	std::unique_ptr<Texpainter::Ui::Dialog<Texpainter::Ui::ColorPicker>> m_color_picker;
+	Texpainter::Ui::PaletteView* r_palview;
+	std::unique_ptr<ColorPicker> m_color_picker;
+	size_t m_modified_pal_index;
+	size_t m_sel_index;
+
 	uint32_t m_button_mask{};
 };
 
@@ -125,6 +155,8 @@ int main(int argc, char* argv[])
 
 	Texpainter::Ui::PaletteView palview{box_outer};
 	palview.palette(pal).eventHandler<0>(cb);
+	cb.r_palview = &palview;
+	cb.m_sel_index = 0;
 
 	box_outer.insertMode(
 	   Texpainter::Ui::Box::InsertMode{4, Texpainter::Ui::Box::Expand | Texpainter::Ui::Box::Fill});

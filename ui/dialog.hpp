@@ -232,15 +232,14 @@ namespace Texpainter::Ui
 		Dialog& eventHandler(EventHandler& cb_obj)
 		{
 			static_assert(button_count() != 0, "");
-			m_vtable = Vtable{cb_obj, id};
+			m_vtable = Vtable{std::integral_constant<decltype(id), id>{}, cb_obj};
 			r_cb_obj = &cb_obj;
-			m_id = static_cast<int>(id);
-			button_callback_assign<ButtonIndex::dismiss()>(ButtonId::DISMISS);
-			button_callback_assign<ButtonIndex::confirmNegative()>(ButtonId::CONFIRM_NEGATIVE);
-			button_callback_assign<ButtonIndex::confirmPositive()>(ButtonId::CONFIRM_POSITIVE);
-			button_callback_assign<ButtonIndex::user1()>(ButtonId::USER_1);
-			button_callback_assign<ButtonIndex::user2()>(ButtonId::USER_2);
-			m_window.eventHandler<id>(*this, 0);
+			button_callback_assign<ButtonIndex::dismiss(), ButtonId::DISMISS>();
+			button_callback_assign<ButtonIndex::confirmNegative(), ButtonId::CONFIRM_NEGATIVE>();
+			button_callback_assign<ButtonIndex::confirmPositive(), ButtonId::CONFIRM_POSITIVE>();
+			button_callback_assign<ButtonIndex::user1(), ButtonId::USER_1>();
+			button_callback_assign<ButtonIndex::user2(), ButtonId::USER_2>();
+			m_window.eventHandler<id>(*this);
 			return *this;
 		}
 
@@ -254,47 +253,51 @@ namespace Texpainter::Ui
 			return m_widget;
 		}
 
-		void clicked(Button& button, ButtonId id)
+		template<ButtonId id>
+		void onClicked(Button& button)
 		{
 			button.state(0);
 			switch(id)
 			{
-				case ButtonId::DISMISS: m_vtable.dismiss(r_cb_obj, *this, m_id); break;
-				case ButtonId::CONFIRM_NEGATIVE: m_vtable.confirm_negative(r_cb_obj, *this, m_id); break;
-				case ButtonId::CONFIRM_POSITIVE: m_vtable.confirm_positive(r_cb_obj, *this, m_id); break;
-				case ButtonId::USER_1: m_vtable.user_1(r_cb_obj, *this, m_id); break;
-				case ButtonId::USER_2: m_vtable.user_2(r_cb_obj, *this, m_id); break;
+				case ButtonId::DISMISS: m_vtable.dismiss(r_cb_obj, *this); break;
+				case ButtonId::CONFIRM_NEGATIVE: m_vtable.confirm_negative(r_cb_obj, *this); break;
+				case ButtonId::CONFIRM_POSITIVE: m_vtable.confirm_positive(r_cb_obj, *this); break;
+				case ButtonId::USER_1: m_vtable.user_1(r_cb_obj, *this); break;
+				case ButtonId::USER_2: m_vtable.user_2(r_cb_obj, *this); break;
 			}
 			//	We are potentially dead now. Therfore, do not touch button.
 		}
 
-		void onClose(Window& win, int id)
+		template<auto id>
+		void onClose(Window& win)
 		{
-			if(has_dismiss()) { m_vtable.dismiss(r_cb_obj, *this, m_id); }
+			if(has_dismiss()) { m_vtable.dismiss(r_cb_obj, *this); }
 			else
 			{
-				m_vtable.confirm_positive(r_cb_obj, *this, m_id);
+				m_vtable.confirm_positive(r_cb_obj, *this);
 			}
 		}
 
+		template<auto id>
 		void onKeyDown(Window& win, int scancode)
 		{
 			switch(scancode)
 			{
 				case 1: //	ESC
-					if(has_dismiss()) { m_vtable.dismiss(r_cb_obj, *this, m_id); }
+					if(has_dismiss()) { m_vtable.dismiss(r_cb_obj, *this); }
 					else
 					{
-						m_vtable.confirm_positive(r_cb_obj, *this, m_id);
+						m_vtable.confirm_positive(r_cb_obj, *this);
 					}
 					break;
 				case 28: //	ENTER
-					m_vtable.confirm_positive(r_cb_obj, *this, m_id);
+					m_vtable.confirm_positive(r_cb_obj, *this);
 					break;
 				default: break;
 			}
 		}
 
+		template<auto id>
 		void onKeyUp(Window& win, int scancode)
 		{
 		}
@@ -378,6 +381,11 @@ namespace Texpainter::Ui
 				return s_user_2;
 			}
 
+			static constexpr auto id(int index)
+			{
+				return s_button_order[index];
+			}
+
 		private:
 			template<ButtonId button>
 			static constexpr int get() noexcept
@@ -416,36 +424,36 @@ namespace Texpainter::Ui
 		};
 
 
-		template<int index, bool dummy = true>
+		template<int index, ButtonId id>
 		struct button_callback_assign_do
 		{
-			static void assign(Dialog& dlg, ButtonId id)
+			static void assign(Dialog& dlg)
 			{
-				dlg.m_buttons[index].callback(dlg, id);
+				dlg.m_buttons[index].template eventHandler<id>(dlg);
 			}
 		};
 
-		template<bool dummy>
-		struct button_callback_assign_do<-1, dummy>
+		template<ButtonId id>
+		struct button_callback_assign_do<-1, id>
 		{
-			static void assign(Dialog& dlg, ButtonId id)
+			static void assign(Dialog&)
 			{
 			}
 		};
 
-		template<int index>
-		void button_callback_assign(ButtonId id)
+		template<int index, ButtonId id>
+		void button_callback_assign()
 		{
-			button_callback_assign_do<index>::assign(*this, id);
+			button_callback_assign_do<index, id>::assign(*this);
 		}
 
-		typedef void (*DialogCallback)(void* cb_obj, Dialog& self, int id);
+		using DialogCallback = void (*)(void* cb_obj, Dialog& self);
 
-		typedef AddMemberIf<has_dismiss(), DialogCallback, 0> Dismiss;
-		typedef AddMemberIf<has_confirm_neg(), DialogCallback, 1> ConfirmNeg;
-		typedef AddMemberIf<has_confirm_pos(), DialogCallback, 2> ConfirmPos;
-		typedef AddMemberIf<has_user_1(), DialogCallback, 3> User1;
-		typedef AddMemberIf<has_user_2(), DialogCallback, 4> User2;
+		using Dismiss = AddMemberIf<has_dismiss(), DialogCallback, 0>;
+		using ConfirmNeg = AddMemberIf<has_confirm_neg(), DialogCallback, 1>;
+		using ConfirmPos = AddMemberIf<has_confirm_pos(), DialogCallback, 2>;
+		using User1 = AddMemberIf<has_user_1(), DialogCallback, 3>;
+		using User2 = AddMemberIf<has_user_2(), DialogCallback, 4>;
 
 		class Vtable: Dismiss, ConfirmNeg, ConfirmPos, User1, User2
 		{
@@ -453,92 +461,92 @@ namespace Texpainter::Ui
 			Vtable()
 			{
 			}
-			template<class Callback, class IdType>
-			explicit Vtable(Callback& cb, IdType) noexcept
+			template<class IdTag, class Callback>
+			explicit Vtable(IdTag tag, Callback& cb) noexcept
 			{
-				Dismiss::value(call<Dismiss, Callback, IdType, has_dismiss()>::callback);
-				ConfirmNeg::value(call<ConfirmNeg, Callback, IdType, has_confirm_neg()>::callback);
-				ConfirmPos::value(call<ConfirmPos, Callback, IdType, has_confirm_pos()>::callback);
-				User1::value(call<User1, Callback, IdType, has_user_1()>::callback);
-				User2::value(call<User2, Callback, IdType, has_user_2()>::callback);
+				Dismiss::value(call<tag.value, Dismiss, Callback, has_dismiss()>::callback);
+				ConfirmNeg::value(call<tag.value, ConfirmNeg, Callback, has_confirm_neg()>::callback);
+				ConfirmPos::value(call<tag.value, ConfirmPos, Callback, has_confirm_pos()>::callback);
+				User1::value(call<tag.value, User1, Callback, has_user_1()>::callback);
+				User2::value(call<tag.value, User2, Callback, has_user_2()>::callback);
 			}
 
-			void dismiss(void* cb_obj, Dialog& dlg, int id)
+			void dismiss(void* cb_obj, Dialog& dlg)
 			{
-				Dismiss::value()(cb_obj, dlg, id);
+				Dismiss::value()(cb_obj, dlg);
 			}
 
-			void confirm_negative(void* cb_obj, Dialog& dlg, int id)
+			void confirm_negative(void* cb_obj, Dialog& dlg)
 			{
-				ConfirmNeg::value()(cb_obj, dlg, id);
+				ConfirmNeg::value()(cb_obj, dlg);
 			}
 
-			void confirm_positive(void* cb_obj, Dialog& dlg, int id)
+			void confirm_positive(void* cb_obj, Dialog& dlg)
 			{
-				ConfirmPos::value()(cb_obj, dlg, id);
+				ConfirmPos::value()(cb_obj, dlg);
 			}
 
-			void user_1(void* cb_obj, Dialog& dlg, int id)
+			void user_1(void* cb_obj, Dialog& dlg)
 			{
-				User1::value()(cb_obj, dlg, id);
+				User1::value()(cb_obj, dlg);
 			}
 
-			void user_2(void* cb_obj, Dialog& dlg, int id)
+			void user_2(void* cb_obj, Dialog& dlg)
 			{
-				User2::value()(cb_obj, dlg, id);
+				User2::value()(cb_obj, dlg);
 			}
 
 		private:
-			template<class Action, class Callback, class IdType, bool enable>
+			template<auto id, class Action, class Callback, bool enable>
 			struct call
 			{
-				static void callback(void* cb_obj, Dialog& self, int id)
+				static void callback(void*, Dialog&)
 				{
 				}
 			};
 
-			template<class Callback, class IdType>
-			struct call<Dismiss, Callback, IdType, true>
+			template<auto id, class Callback>
+			struct call<id, Dismiss, Callback, true>
 			{
-				static void callback(void* cb_obj, Dialog& self, int id)
+				static void callback(void* cb_obj, Dialog& self)
 				{
-					reinterpret_cast<Callback*>(cb_obj)->dismiss(self, static_cast<IdType>(id));
+					reinterpret_cast<Callback*>(cb_obj)->template dismiss<id>(self);
 				}
 			};
 
-			template<class Callback, class IdType>
-			struct call<ConfirmNeg, Callback, IdType, true>
+			template<auto id, class Callback>
+			struct call<id, ConfirmNeg, Callback, true>
 			{
-				static void callback(void* cb_obj, Dialog& self, int id)
+				static void callback(void* cb_obj, Dialog& self)
 				{
-					reinterpret_cast<Callback*>(cb_obj)->confirmNegative(self, static_cast<IdType>(id));
+					reinterpret_cast<Callback*>(cb_obj)->template confirmNegative<id>(self);
 				}
 			};
 
-			template<class Callback, class IdType>
-			struct call<ConfirmPos, Callback, IdType, true>
+			template<auto id, class Callback>
+			struct call<id, ConfirmPos, Callback, true>
 			{
-				static void callback(void* cb_obj, Dialog& self, int id)
+				static void callback(void* cb_obj, Dialog& self)
 				{
-					reinterpret_cast<Callback*>(cb_obj)->confirmPositive(self, static_cast<IdType>(id));
+					reinterpret_cast<Callback*>(cb_obj)->template confirmPositive<id>(self);
 				}
 			};
 
-			template<class Callback, class IdType>
-			struct call<User1, Callback, IdType, true>
+			template<auto id, class Callback>
+			struct call<id, User1, Callback, true>
 			{
-				static void callback(void* cb_obj, Dialog& self, int id)
+				static void callback(void* cb_obj, Dialog& self)
 				{
-					reinterpret_cast<Callback*>(cb_obj)->user1(self, static_cast<IdType>(id));
+					reinterpret_cast<Callback*>(cb_obj)->template user1<id>(self);
 				}
 			};
 
-			template<class Callback, class IdType>
-			struct call<User2, Callback, IdType, true>
+			template<auto id, class Callback>
+			struct call<id, User2, Callback, true>
 			{
-				static void callback(void* cb_obj, Dialog& self, int id)
+				static void callback(void* cb_obj, Dialog& self)
 				{
-					reinterpret_cast<Callback*>(cb_obj)->user2(self, static_cast<IdType>(id));
+					reinterpret_cast<Callback*>(cb_obj)->template user2<id>(self);
 				}
 			};
 		};
@@ -572,7 +580,6 @@ namespace Texpainter::Ui
 			}
 		}
 
-		int m_id;
 		void* r_cb_obj;
 		Vtable m_vtable;
 
