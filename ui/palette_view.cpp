@@ -56,7 +56,9 @@ public:
 		{
 			cairo_set_line_width(cr, 4);
 			std::for_each(std::begin(*r_pal), std::end(*r_pal), [cr, k = 0](auto color) mutable {
-				cairo_set_source_rgba(cr, color.red(), color.green(), color.blue(), color.alpha());
+				auto const color_conv = Model::BasicPixel<Model::ColorProfiles::Gamma22>{color};
+				cairo_set_source_rgba(
+				   cr, color_conv.red(), color_conv.green(), color_conv.blue(), color_conv.alpha());
 				cairo_rectangle(cr, k * ItemSize, 0, ItemSize, ItemSize);
 				cairo_fill_preserve(cr);
 				cairo_set_source_rgba(cr, 0.73, 0.73, 0.73, 1.0f);

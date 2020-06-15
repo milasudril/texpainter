@@ -14,15 +14,16 @@ public:
 	{
 		GdkRGBA tmp;
 		gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(m_handle), &tmp);
-		return Model::Pixel{static_cast<float>(tmp.red),
-		                    static_cast<float>(tmp.green),
-		                    static_cast<float>(tmp.blue),
-		                    static_cast<float>(tmp.alpha)};
+		return toLinear(Model::BasicPixel<Model::ColorProfiles::Gamma22>{static_cast<float>(tmp.red),
+		                                                                 static_cast<float>(tmp.green),
+		                                                                 static_cast<float>(tmp.blue),
+		                                                                 static_cast<float>(tmp.alpha)});
 	}
 
 	void value(Model::Pixel val)
 	{
-		GdkRGBA tmp{val.red(), val.green(), val.blue(), val.alpha()};
+		auto const g22 = Model::BasicPixel<Model::ColorProfiles::Gamma22>{val};
+		GdkRGBA tmp{g22.red(), g22.green(), g22.blue(), g22.alpha()};
 		gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(m_handle), &tmp);
 	}
 

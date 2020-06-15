@@ -7,21 +7,44 @@
 #include "utils/vec_t.hpp"
 
 #include <type_traits>
+#include <cmath>
 
 namespace Texpainter::Model
 {
-	struct LinearRGBA
+	namespace ColorProfiles
 	{
-		static constexpr auto toLinear(vec4_t a)
+		struct LinearRGBA
 		{
-			return a;
-		}
+			static constexpr auto toLinear(vec4_t a)
+			{
+				return a;
+			}
 
-		static constexpr auto fromLinear(vec4_t a)
+			static constexpr auto fromLinear(vec4_t a)
+			{
+				return a;
+			}
+		};
+
+		struct Gamma22
 		{
-			return a;
-		}
-	};
+			static constexpr vec4_t toLinear(vec4_t val)
+			{
+				return vec4_t{std::pow(val[0], 2.2f),
+				              std::pow(val[1], 2.2f),
+				              std::pow(val[2], 2.2f),
+				              std::pow(val[3], 2.2f)};
+			}
+
+			static constexpr vec4_t fromLinear(vec4_t val)
+			{
+				return vec4_t{std::pow(val[0], 1.0f / 2.2f),
+				              std::pow(val[1], 1.0f / 2.2f),
+				              std::pow(val[2], 1.0f / 2.2f),
+				              std::pow(val[3], 1.0f / 2.2f)};
+			}
+		};
+	}
 
 	template<class ColorProfile>
 	class BasicPixel
@@ -101,42 +124,42 @@ namespace Texpainter::Model
 
 		constexpr BasicPixel& operator+=(BasicPixel other)
 		{
-			static_assert(std::is_same_v<LinearRGBA, ColorProfile>);
+			static_assert(std::is_same_v<ColorProfiles::LinearRGBA, ColorProfile>);
 			m_value += other.m_value;
 			return *this;
 		}
 
 		constexpr BasicPixel& operator-=(BasicPixel other)
 		{
-			static_assert(std::is_same_v<LinearRGBA, ColorProfile>);
+			static_assert(std::is_same_v<ColorProfiles::LinearRGBA, ColorProfile>);
 			m_value -= other.m_value;
 			return *this;
 		}
 
 		constexpr BasicPixel& operator/=(BasicPixel other)
 		{
-			static_assert(std::is_same_v<LinearRGBA, ColorProfile>);
+			static_assert(std::is_same_v<ColorProfiles::LinearRGBA, ColorProfile>);
 			m_value /= other.m_value;
 			return *this;
 		}
 
 		constexpr BasicPixel& operator*=(BasicPixel other)
 		{
-			static_assert(std::is_same_v<LinearRGBA, ColorProfile>);
+			static_assert(std::is_same_v<ColorProfiles::LinearRGBA, ColorProfile>);
 			m_value *= other.m_value;
 			return *this;
 		}
 
 		constexpr BasicPixel& operator*=(float factor)
 		{
-			static_assert(std::is_same_v<LinearRGBA, ColorProfile>);
+			static_assert(std::is_same_v<ColorProfiles::LinearRGBA, ColorProfile>);
 			m_value *= factor;
 			return *this;
 		}
 
 		constexpr BasicPixel& operator/=(float factor)
 		{
-			static_assert(std::is_same_v<LinearRGBA, ColorProfile>);
+			static_assert(std::is_same_v<ColorProfiles::LinearRGBA, ColorProfile>);
 			m_value /= factor;
 			return *this;
 		}
@@ -148,7 +171,7 @@ namespace Texpainter::Model
 	template<class ColorProfile>
 	constexpr auto toLinear(BasicPixel<ColorProfile> a)
 	{
-		return BasicPixel<LinearRGBA>{ColorProfile::toLinear(a.value())};
+		return BasicPixel<ColorProfiles::LinearRGBA>{ColorProfile::toLinear(a.value())};
 	}
 
 	template<class ColorProfileA, class ColorProfileB>
@@ -193,7 +216,7 @@ namespace Texpainter::Model
 		return a * c;
 	}
 
-	using Pixel = BasicPixel<LinearRGBA>;
+	using Pixel = BasicPixel<ColorProfiles::LinearRGBA>;
 
 	constexpr Pixel black()
 	{

@@ -91,11 +91,11 @@ public:
 			auto write_ptr = data + row * stride;
 			for(uint32_t col = 0; col < w; ++col)
 			{
-				auto pixel_out = 255.0f * (*read_ptr);
-				write_ptr[0] = pixel_out.blue();
-				write_ptr[1] = pixel_out.green();
-				write_ptr[2] = pixel_out.red();
-				write_ptr[3] = pixel_out.alpha();
+				auto pixel_out = 255.0f * Model::BasicPixel<Model::ColorProfiles::Gamma22>{*read_ptr}.value();
+				write_ptr[0] = pixel_out[2];
+				write_ptr[1] = pixel_out[1];
+				write_ptr[2] = pixel_out[0];
+				write_ptr[3] = pixel_out[3];
 				write_ptr += 4;
 				++read_ptr;
 			}
