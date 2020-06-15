@@ -187,11 +187,11 @@ namespace Texpainter::Ui
 		template<class... WidgetParams>
 		Dialog(Container& owner, const char* title, const WidgetParams&... params):
 		   m_window(title, &owner),
-		   m_content(m_window, true),
+		   m_content(m_window, Box::Orientation::Vertical),
 		   m_widget(m_content.insertMode({2, Box::Fill | Box::Expand}), params...),
-		   m_buttons_outer(m_content.insertMode(Box::InsertMode{0, 0}), false),
+		   m_buttons_outer(m_content.insertMode(Box::InsertMode{0, 0}), Box::Orientation::Horizontal),
 		   m_filler_l(m_buttons_outer.insertMode({0, Box::Fill | Box::Expand})),
-		   m_buttons_box(m_buttons_outer.insertMode({0, 0}), false),
+		   m_buttons_box(m_buttons_outer.insertMode({0, 0}), Box::Orientation::Horizontal),
 		   m_buttons(buttons_create<button_count()>(
 		      m_buttons_box.homogenous(true).insertMode(Box::InsertMode{2, Box::Fill | Box::Expand}))),
 		   m_filler_r(m_buttons_outer.insertMode({0, Box::Fill | Box::Expand}))
@@ -228,11 +228,11 @@ namespace Texpainter::Ui
 			m_window.modal(true).show();
 		}
 
-		template<class Callback, class IdType>
-		Dialog& callback(Callback& cb_obj, IdType id)
+		template<auto id, class EventHandler>
+		Dialog& eventHandler(EventHandler& cb_obj)
 		{
 			static_assert(button_count() != 0, "");
-			m_vtable = Vtable(cb_obj, id);
+			m_vtable = Vtable{cb_obj, id};
 			r_cb_obj = &cb_obj;
 			m_id = static_cast<int>(id);
 			button_callback_assign<ButtonIndex::dismiss()>(ButtonId::DISMISS);
@@ -240,7 +240,7 @@ namespace Texpainter::Ui
 			button_callback_assign<ButtonIndex::confirmPositive()>(ButtonId::CONFIRM_POSITIVE);
 			button_callback_assign<ButtonIndex::user1()>(ButtonId::USER_1);
 			button_callback_assign<ButtonIndex::user2()>(ButtonId::USER_2);
-			m_window.callback(*this, 0);
+			m_window.eventHandler<id>(*this, 0);
 			return *this;
 		}
 
@@ -268,7 +268,7 @@ namespace Texpainter::Ui
 			//	We are potentially dead now. Therfore, do not touch button.
 		}
 
-		void closing(Window& win, int id)
+		void onClose(Window& win, int id)
 		{
 			if(has_dismiss()) { m_vtable.dismiss(r_cb_obj, *this, m_id); }
 			else
@@ -277,7 +277,7 @@ namespace Texpainter::Ui
 			}
 		}
 
-		void keyDown(Window& win, int scancode, keymask_t keymask, int id)
+		void onKeyDown(Window& win, int scancode)
 		{
 			switch(scancode)
 			{
@@ -295,19 +295,7 @@ namespace Texpainter::Ui
 			}
 		}
 
-		void keyUp(Window& win, int scancode, keymask_t keymask, int id)
-		{
-		}
-
-		void focusIn(Window&, int)
-		{
-		}
-
-		void childFocusOut(Window&, int)
-		{
-		}
-
-		void focusOut(Window&, int)
+		void onKeyUp(Window& win, int scancode)
 		{
 		}
 

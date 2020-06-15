@@ -70,20 +70,25 @@ struct MyCallback
 
 
 	template<int>
-	void onMouseDown(Texpainter::Ui::PaletteView&, size_t, int)
+	void onMouseDown(Texpainter::Ui::PaletteView& view, size_t, int)
 	{
 	}
 
 	template<int>
-	void onMouseUp(Texpainter::Ui::PaletteView&, size_t, int)
+	void onMouseUp(Texpainter::Ui::PaletteView&, size_t index, int button)
 	{
+		if(button == 3 && index < std::size(r_pal.get()))
+		{
+			m_color_picker = std::make_unique<Texpainter::Ui::Dialog<Texpainter::Ui::ColorPicker>>(
+			   *r_mainwin, "Select color");
+			m_color_picker->widget().value(r_pal.get()[index]);
+			m_color_picker->show();
+		}
 	}
 
 	template<int>
-	void onMouseMove(Texpainter::Ui::PaletteView&, size_t index)
+	void onMouseMove(Texpainter::Ui::PaletteView&, size_t)
 	{
-		printf("  %zu\r", index);
-		fflush(stdout);
 	}
 
 	template<int>
@@ -94,6 +99,10 @@ struct MyCallback
 
 
 	std::reference_wrapper<Texpainter::Model::Image> r_img;
+	std::reference_wrapper<Texpainter::Model::Palette> r_pal;
+
+	Texpainter::Ui::Window* r_mainwin;
+	std::unique_ptr<Texpainter::Ui::Dialog<Texpainter::Ui::ColorPicker>> m_color_picker;
 	uint32_t m_button_mask{};
 };
 
@@ -106,12 +115,13 @@ int main(int argc, char* argv[])
 	Texpainter::Model::Palette pal{16};
 
 
-	MyCallback cb{img};
+	MyCallback cb{img, pal};
 
 	Texpainter::Ui::Window mainwin{"Texpainter"};
 	mainwin.defaultSize(Texpainter::Geom::Dimension{}.width(800).height(500));
 	Texpainter::Ui::Box box_outer{mainwin, Texpainter::Ui::Box::Orientation::Vertical};
 	box_outer.homogenous(false);
+	cb.r_mainwin = &mainwin;
 
 	Texpainter::Ui::PaletteView palview{box_outer};
 	palview.palette(pal).eventHandler<0>(cb);

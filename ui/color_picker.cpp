@@ -45,6 +45,12 @@ Texpainter::Model::Pixel Texpainter::Ui::ColorPicker::value() const noexcept
 	return m_impl->value();
 }
 
+Texpainter::Ui::ColorPicker& Texpainter::Ui::ColorPicker::value(Model::Pixel color)
+{
+	m_impl->value(color);
+	return *this;
+}
+
 
 Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt): Texpainter::Ui::ColorPicker{*this}
 {
