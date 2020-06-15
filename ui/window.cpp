@@ -48,10 +48,10 @@ public:
 		return m_handle;
 	}
 
-	void callback(Callback cb, void* cb_obj)
+	void eventHandler(void* eh, EventHandlerVtable const& vtable)
 	{
-		m_cb = cb;
-		r_cb_obj = cb_obj;
+		r_eh = eh;
+		m_vt = vtable;
 	}
 
 	void modal(bool state)
@@ -66,10 +66,12 @@ public:
 
 
 private:
-	static gboolean delete_callback(GtkWidget* widget, GdkEvent* event, void* user_data);
+	static gboolean delete_event(GtkWidget* widget, GdkEvent* event, void* user_data);
+	static gboolean key_press(GtkWidget* widget, GdkEvent* event, void* user_data);
+	static gboolean key_release(GtkWidget* widget, GdkEvent* event, void* user_data);
 
-	Callback m_cb;
-	void* r_cb_obj;
+	void* r_eh;
+	EventHandlerVtable m_vt;
 	GtkWindow* m_handle;
 	GtkWidget* r_focus_old;
 	std::string m_title;
@@ -120,9 +122,10 @@ void* Texpainter::Ui::Window::toplevel() const
 	return m_impl->_toplevel();
 }
 
-Texpainter::Ui::Window& Texpainter::Ui::Window::callback(Callback cb, void* cb_obj)
+Texpainter::Ui::Window& Texpainter::Ui::Window::eventHandler(void* event_handler,
+                                                             EventHandlerVtable const& vt)
 {
-	m_impl->callback(cb, cb_obj);
+	m_impl->eventHandler(event_handler, vt);
 	return *this;
 }
 
@@ -133,12 +136,14 @@ Texpainter::Ui::Window& Texpainter::Ui::Window::modal(bool state)
 }
 
 Texpainter::Ui::Window::Impl::Impl(char const* ti, Container* owner):
-   Window(*this),
-   r_cb_obj(nullptr),
-   r_focus_old(nullptr)
+   Window{*this},
+   r_eh{nullptr},
+   r_focus_old{nullptr}
 {
 	auto widget = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	g_signal_connect(widget, "delete-event", G_CALLBACK(delete_callback), this);
+	g_signal_connect(widget, "delete-event", G_CALLBACK(delete_event), this);
+	g_signal_connect(widget, "key-press-event", G_CALLBACK(key_press), this);
+	g_signal_connect(widget, "key-release-event", G_CALLBACK(key_release), this);
 	m_handle = GTK_WINDOW(widget);
 	title(ti);
 	if(owner != nullptr) { gtk_window_set_transient_for(m_handle, GTK_WINDOW(owner->toplevel())); }
@@ -148,16 +153,71 @@ Texpainter::Ui::Window::Impl::Impl(char const* ti, Container* owner):
 Texpainter::Ui::Window::Impl::~Impl()
 {
 	m_impl = nullptr;
-	r_cb_obj = nullptr;
+	r_eh = nullptr;
 	gtk_widget_destroy(GTK_WIDGET(m_handle));
 	if(m_icon != nullptr) { g_object_unref(m_icon); }
 }
 
 gboolean
-Texpainter::Ui::Window::Impl::delete_callback(GtkWidget* widget, GdkEvent* event, void* user_data)
+Texpainter::Ui::Window::Impl::delete_event(GtkWidget* widget, GdkEvent* event, void* user_data)
 {
 	auto self = reinterpret_cast<Impl*>(user_data);
-	if(self->r_cb_obj != nullptr) { self->m_cb(self->r_cb_obj, *self); }
+	if(self->r_eh != nullptr) { self->m_vt.on_close(self->r_eh, *self); }
+	return TRUE;
+}
+
+gboolean
+Texpainter::Ui::Window::Impl::key_press(GtkWidget* widget, GdkEvent* event, void* user_data)
+{
+	auto self = reinterpret_cast<Impl*>(user_data);
+	auto& key = event->key;
+	auto scancode = key.hardware_keycode - 8;
+#ifndef __linux__
+#waring "Scancode key offset is not tested. Pressing esc should print 1"
+	printf("%d\n", key.hardware_keycode - 8);
+#endif
+	auto w = gtk_window_get_focus(GTK_WINDOW(widget));
+	if(w != NULL)
+	{
+		self->r_focus_old = w;
+		switch(scancode)
+		{
+			case 1: //	ESC
+				gtk_window_set_focus(GTK_WINDOW(widget), NULL);
+				if(self->r_eh != nullptr) { self->m_vt.on_key_down(self->r_eh, *self, scancode); }
+				break;
+			case 28:                                                      //	RETURN
+				if(gtk_window_get_transient_for(GTK_WINDOW(widget)) != NULL) //	Dialog box
+				{
+					gtk_window_set_focus(GTK_WINDOW(widget), NULL);
+					if(self->r_eh != nullptr) { self->m_vt.on_key_down(self->r_eh, *self, scancode); }
+				}
+				break;
+		}
+		return FALSE;
+	}
+	if(scancode == 15 && self->r_focus_old != nullptr)
+	{
+		gtk_window_set_focus(GTK_WINDOW(widget), self->r_focus_old);
+		return TRUE;
+	}
+	if(self->r_eh != nullptr) { self->m_vt.on_key_down(self->r_eh, *self, scancode); }
+	return TRUE;
+}
+
+gboolean
+Texpainter::Ui::Window::Impl::key_release(GtkWidget* widget, GdkEvent* event, void* user_data)
+{
+	auto w = gtk_window_get_focus(GTK_WINDOW(widget));
+	if(w != NULL) { return FALSE; }
+	auto self = reinterpret_cast<Impl*>(user_data);
+	auto& key = event->key;
+	auto scancode = key.hardware_keycode - 8;
+#ifndef __linux__
+#waring "Scancode key offset is not tested. Pressing esc should print 1"
+	printf("%d\n", key.hardware_keycode - 8);
+#endif
+	if(self->r_eh != nullptr) { self->m_vt.on_key_up(self->r_eh, *self, scancode); }
 	return TRUE;
 }
 

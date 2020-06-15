@@ -14,9 +14,23 @@
 struct MyCallback
 {
 	template<int>
-	void closing(Texpainter::Ui::Window&)
+	void onClose(Texpainter::Ui::Window&)
 	{
 		Texpainter::Ui::Window::terminateApp();
+	}
+
+	template<int>
+	void onKeyDown(Texpainter::Ui::Window&, int scancode)
+	{
+		printf("(%d ", scancode);
+		fflush(stdout);
+	}
+
+	template<int>
+	void onKeyUp(Texpainter::Ui::Window&, int scancode)
+	{
+		printf("%d) ", scancode);
+		fflush(stdout);
 	}
 
 	template<int>
@@ -26,7 +40,6 @@ struct MyCallback
 	                 int button)
 	{
 		m_button_mask |= 1 << button;
-		printf("%d %d\n", m_button_mask, button);
 		if(m_button_mask & (1 << 1))
 		{
 			r_img.get().get(pos_window[0], pos_window[1]) = Texpainter::Model::white();
@@ -41,7 +54,6 @@ struct MyCallback
 	               int button)
 	{
 		m_button_mask &= ~(1 << button);
-		printf("%d %d\n", m_button_mask, button);
 	}
 
 	template<int>
@@ -115,6 +127,6 @@ int main(int argc, char* argv[])
 
 	//	Texpainter::Ui::Box box{mainwin, Texpainter::UiBox::Orientation::Vertical};
 
-	mainwin.callback<0>(cb).show();
+	mainwin.eventHandler<0>(cb).show();
 	gtk_main();
 }
