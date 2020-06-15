@@ -39,14 +39,22 @@ namespace Texpainter::Ui
 		const char* title() const noexcept;
 		Window& title(const char* title_new);
 
-		template<auto id, class WindowCallback>
-		Window& callback(WindowCallback& cb) noexcept
+		template<auto id, class EventHandler>
+		Window& eventHandler(EventHandler& eh)
 		{
-			auto cb_wrapper = [](void* rvc, Window& self) {
-				auto x = reinterpret_cast<WindowCallback*>(rvc);
-				x->template closing<id>(self);
-			};
-			return callback(cb_wrapper, &cb);
+			return eventHandler(&eh,
+			                    {[](void* event_handler, Window& self) {
+				                     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				                     obj.template onClose<id>(self);
+			                     },
+			                     [](void* event_handler, Window& self, int scancode) {
+				                     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				                     obj.template onKeyDown<id>(self, scancode);
+			                     },
+			                     [](void* event_handler, Window& self, int scancode) {
+				                     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				                     obj.template onKeyUp<id>(self, scancode);
+			                     }});
 		}
 
 		Window& modal(bool state);
@@ -56,8 +64,13 @@ namespace Texpainter::Ui
 		static void terminateApp();
 
 	protected:
-		using Callback = void (*)(void* cb_obj, Window& self);
-		Window& callback(Callback cb, void* cb_obj);
+		struct EventHandlerVtable
+		{
+			void (*on_close)(void* event_handler, Window& self);
+			void (*on_key_down)(void* event_handler, Window& self, int scancode);
+			void (*on_key_up)(void* event_handler, Window& self, int scancode);
+		};
+		Window& eventHandler(void* event_handler, EventHandlerVtable const& vtable);
 
 		class Impl;
 		Impl* m_impl;
