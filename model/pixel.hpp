@@ -8,31 +8,41 @@
 
 namespace Texpainter::Model
 {
-	class Pixel
+	template<class ColorProfile>
+	class BasicPixel
 	{
 	public:
-		constexpr explicit Pixel(float r, float g, float b, float a = 1.0f): m_value{r, g, b, a}
+		constexpr explicit BasicPixel(float r, float g, float b, float a = 1.0f): m_value{r, g, b, a}
 		{
 		}
 
-		constexpr Pixel() = default;
+		constexpr BasicPixel() = default;
 
-		constexpr Pixel& red(float val)
+		constexpr BasicPixel& red(float val)
 		{
+			m_value[0] = val;
 			return *this;
 		}
 
-		constexpr Pixel& green(float val)
+		constexpr BasicPixel& green(float val)
 		{
+			m_value[1] = val;
 			return *this;
 		}
 
-		constexpr Pixel& blue(float val)
+		constexpr BasicPixel& blue(float val)
 		{
+			m_value[2] = val;
 			return *this;
 		}
 
-		constexpr Pixel& alpha(float val)
+		constexpr BasicPixel& alpha(float val)
+		{
+			m_value[3] = val;
+			return *this;
+		}
+
+		constexpr BasicPixel& value(vec4_t val)
 		{
 			return *this;
 		}
@@ -59,45 +69,116 @@ namespace Texpainter::Model
 		}
 
 
-		constexpr Pixel& operator+=(Pixel other)
+		constexpr auto value() const
 		{
-			m_value += other.m_value;
+			return m_value;
+		}
+
+
+		template<class ColorProfileOther>
+		constexpr BasicPixel& operator+=(BasicPixel<ColorProfileOther> other)
+		{
+			m_value = ColorProfile::fromLinear(ColorProfile::toLinear(m_value)
+			                                   + ColorProfileOther::toLinear(other.value()));
 			return *this;
 		}
 
-		constexpr Pixel& operator-=(Pixel other)
+		template<class ColorProfileOther>
+		constexpr BasicPixel& operator-=(BasicPixel<ColorProfileOther> other)
 		{
-			m_value -= other.m_value;
+			m_value = ColorProfile::fromLinear(ColorProfile::toLinear(m_value)
+			                                   - ColorProfileOther::toLinear(other.value()));
 			return *this;
 		}
 
-		constexpr Pixel& operator/=(Pixel other)
+		template<class ColorProfileOther>
+		constexpr BasicPixel& operator/=(BasicPixel<ColorProfileOther> other)
 		{
-			m_value /= other.m_value;
+			m_value = ColorProfile::fromLinear(ColorProfile::toLinear(m_value)
+			                                   / ColorProfileOther::toLinear(other.value()));
 			return *this;
 		}
 
-		constexpr Pixel& operator*=(Pixel other)
+		template<class ColorProfileOther>
+		constexpr BasicPixel& operator*=(BasicPixel<ColorProfileOther> other)
 		{
-			m_value *= other.m_value;
+			m_value = ColorProfile::fromLinear(ColorProfile::toLinear(m_value)
+			                                   * ColorProfileOther::toLinear(other.value()));
 			return *this;
 		}
 
-		constexpr Pixel& operator*=(float factor)
+		constexpr BasicPixel& operator*=(float factor)
 		{
-			m_value *= factor;
+			m_value = ColorProfile::fromLinear(factor * ColorProfile::toLinear(m_value));
 			return *this;
 		}
 
-		constexpr Pixel& operator/=(float factor)
+		constexpr BasicPixel& operator/=(float factor)
 		{
-			m_value /= factor;
+			m_value = ColorProfile::fromLinear(ColorProfile::toLinear(m_value) / factor);
 			return *this;
 		}
 
 	private:
 		vec4_t m_value;
 	};
+
+	template<class ColorProfileA, class ColorProfileB>
+	constexpr auto operator+(BasicPixel<ColorProfileA> a, BasicPixel<ColorProfileB> b)
+	{
+		return a += b;
+	}
+
+	template<class ColorProfileA, class ColorProfileB>
+	constexpr auto operator-(BasicPixel<ColorProfileA> a, BasicPixel<ColorProfileB> b)
+	{
+		return a -= b;
+	}
+
+	template<class ColorProfileA, class ColorProfileB>
+	constexpr auto operator*(BasicPixel<ColorProfileA> a, BasicPixel<ColorProfileB> b)
+	{
+		return a *= b;
+	}
+
+	template<class ColorProfileA, class ColorProfileB>
+	constexpr auto operator/(BasicPixel<ColorProfileA> a, BasicPixel<ColorProfileB> b)
+	{
+		return a /= b;
+	}
+
+	template<class ColorProfile>
+	constexpr auto operator/(BasicPixel<ColorProfile> a, float c)
+	{
+		return a /= c;
+	}
+
+	template<class ColorProfile>
+	constexpr auto operator*(BasicPixel<ColorProfile> a, float c)
+	{
+		return a *= c;
+	}
+
+	template<class ColorProfile>
+	constexpr auto operator*(float c, BasicPixel<ColorProfile> a)
+	{
+		return a * c;
+	}
+
+	struct LinearRGBA
+	{
+		static constexpr auto toLinear(vec4_t a)
+		{
+			return a;
+		}
+
+		static constexpr auto fromLinear(vec4_t a)
+		{
+			return a;
+		}
+	};
+
+	using Pixel = BasicPixel<LinearRGBA>;
 
 	constexpr Pixel black()
 	{
@@ -139,47 +220,12 @@ namespace Texpainter::Model
 		return Pixel{1.0f, 1.0f, 1.0f};
 	}
 
-	constexpr auto operator+(Pixel a, Pixel b)
+	template<class ColorProfileA, class ColorProfileB>
+	constexpr auto distanceSquared(BasicPixel<ColorProfileA> a, BasicPixel<ColorProfileB> b)
 	{
-		return a += b;
-	}
-
-	constexpr auto operator-(Pixel a, Pixel b)
-	{
-		return a -= b;
-	}
-
-	constexpr auto operator*(Pixel a, Pixel b)
-	{
-		return a *= b;
-	}
-
-	constexpr auto operator/(Pixel a, Pixel b)
-	{
-		return a /= b;
-	}
-
-	constexpr auto operator/(Pixel a, float c)
-	{
-		return a /= c;
-	}
-
-	constexpr auto operator*(Pixel a, float c)
-	{
-		return a *= c;
-	}
-
-	constexpr auto operator*(float c, Pixel a)
-	{
-		return a * c;
-	}
-
-
-	constexpr auto distanceSquared(Pixel a, Pixel b)
-	{
-		a -= b;
-		a *= a;
-		return a.red() + a.green() + a.blue() + a.alpha();
+		auto tmp = a - b;
+		tmp *= tmp;
+		return tmp.red() + tmp.green() + tmp.blue() + tmp.alpha();
 	}
 }
 #endif
