@@ -35,6 +35,15 @@ namespace Texpainter::Ui
 
 		ColorPicker& value(Model::Pixel color);
 
+		/** Returns a non-moving *this
+		 */
+		ColorPicker const& self() const noexcept;
+
+		ColorPicker& self() noexcept
+		{
+			return const_cast<ColorPicker&>(std::as_const(*this).self());
+		}
+
 	private:
 		class Impl;
 		explicit ColorPicker(Impl& impl): m_impl{&impl}

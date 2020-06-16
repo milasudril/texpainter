@@ -10,6 +10,7 @@
 #include "./box.hpp"
 
 #include <utility>
+#include <memory>
 
 namespace Texpainter::Ui
 {
@@ -21,7 +22,7 @@ namespace Texpainter::Ui
 		explicit ExtendedColorPicker(Container& container, Args&&... args):
 		   m_outer{container, Box::Orientation::Horizontal},
 		   m_picker{m_outer},
-		   m_sidepanel{m_outer, std::forward<Args>(args)...}
+		   m_sidepanel{m_outer, m_picker.self(), std::forward<Args>(args)...}
 		{
 		}
 

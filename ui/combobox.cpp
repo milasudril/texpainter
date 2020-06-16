@@ -42,7 +42,7 @@ public:
 	void clear() noexcept
 	{
 		auto eh = r_eh;
-		r_eh= nullptr;
+		r_eh = nullptr;
 		gtk_combo_box_text_remove_all(m_handle);
 		r_eh = eh;
 	}
@@ -104,7 +104,8 @@ Texpainter::Ui::Combobox& Texpainter::Ui::Combobox::clear() noexcept
 	return *this;
 }
 
-Texpainter::Ui::Combobox& Texpainter::Ui::Combobox::eventHandler(void* event_handler, EventHandlerFunc f)
+Texpainter::Ui::Combobox& Texpainter::Ui::Combobox::eventHandler(void* event_handler,
+                                                                 EventHandlerFunc f)
 {
 	m_impl->eventHandler(event_handler, f);
 	return *this;

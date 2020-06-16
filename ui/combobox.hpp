@@ -18,7 +18,7 @@ namespace Texpainter::Ui
 	public:
 		explicit Combobox(Container& parent);
 
-		explicit Combobox(Container& parent, char const* first_item):Combobox{parent}
+		explicit Combobox(Container& parent, char const* first_item): Combobox{parent}
 		{
 			append(first_item);
 		}

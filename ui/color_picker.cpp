@@ -27,6 +27,11 @@ public:
 		gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(m_handle), &tmp);
 	}
 
+	ColorPicker const& self() const noexcept
+	{
+		return *this;
+	}
+
 private:
 	GtkColorChooserWidget* m_handle;
 };
@@ -71,4 +76,9 @@ Texpainter::Ui::ColorPicker::Impl::~Impl()
 	m_impl = nullptr;
 	gtk_widget_destroy(GTK_WIDGET(m_handle));
 	g_object_unref(m_handle);
+}
+
+Texpainter::Ui::ColorPicker const& Texpainter::Ui::ColorPicker::self() const noexcept
+{
+	return m_impl->self();
 }
