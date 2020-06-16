@@ -42,6 +42,21 @@ namespace Texpainter
 		{
 		}
 
+		DataBlock(DataBlock const& other): DataBlock{other.size()}
+		{
+			memcpy(m_ptr.get(), other.m_ptr.get(), other.size() * sizeof(T));
+		}
+
+		DataBlock& operator=(DataBlock const& other)
+		{
+			DataBlock copy{other};
+			std::swap(*this, copy);
+			return *this;
+		};
+
+		DataBlock(DataBlock&&) = default;
+		DataBlock& operator=(DataBlock&&) = default;
+
 		auto size() const
 		{
 			return m_size;

@@ -40,6 +40,7 @@ namespace Texpainter
 	public:
 		explicit PaletteEditor(Ui::Container& owner):
 		   m_sel_color_index{0},
+		   r_eh{nullptr},
 		   m_container{owner, Ui::Box::Orientation::Horizontal},
 		   m_pal_selector{m_container},
 		   m_pal_new{m_container, "+"},
@@ -50,19 +51,21 @@ namespace Texpainter
 			m_pal_view.eventHandler<ControlId::PalView>(*this);
 		}
 
-		void createPalette(char const* name)
+		PaletteEditor& createPalette(char const* name)
 		{
 			m_pal_selector.append(name);
 			m_palettes.push_back(Model::Palette{20});
 			select(m_palettes.size() - 1);
+			return *this;
 		}
 
-		void select(size_t index)
+		PaletteEditor& select(size_t index)
 		{
 			m_pal_selector.selected(index);
 			m_pal_view.palette(m_palettes[index])
 			   .highlightMode(0, Texpainter::Ui::PaletteView::HighlightMode::Read);
 			m_sel_color_index = 0;
+			return *this;
 		}
 
 		Model::Palette const& selectedPalette() const
@@ -70,9 +73,25 @@ namespace Texpainter
 			return m_palettes[m_pal_selector.selected()];
 		}
 
+		template<auto id, class EventHandler>
+		PaletteEditor& eventHandler(EventHandler& eh)
+		{
+			r_eh = &eh;
+			r_func = [](void* event_handler, PaletteEditor& self) {
+				reinterpret_cast<EventHandler*>(event_handler)->template onChanged<id>(self);
+			};
+
+			return *this;
+		}
+
 		size_t paletteCount() const
 		{
 			return m_palettes.size();
+		}
+
+		uint32_t selectedColorIndex() const
+		{
+			return m_sel_color_index;
 		}
 
 		template<ControlId>
@@ -112,6 +131,15 @@ namespace Texpainter
 		uint32_t m_sel_color_index;
 		uint32_t m_modified_pal_index;
 
+		using EventHandlerFunc = void (*)(void*, PaletteEditor&);
+		void* r_eh;
+		EventHandlerFunc r_func;
+
+		void notify()
+		{
+			if(r_eh != nullptr) { r_func(r_eh, *this); }
+		}
+
 		Ui::Box m_container;
 		Ui::Combobox m_pal_selector;
 		Ui::Button m_pal_new;
@@ -126,6 +154,7 @@ namespace Texpainter
 		m_pal_view.palette(m_palettes[m_pal_selector.selected()])
 		   .highlightMode(0, Texpainter::Ui::PaletteView::HighlightMode::Read);
 		m_sel_color_index = 0;
+		notify();
 	}
 
 	template<>
@@ -150,6 +179,7 @@ namespace Texpainter
 		createPalette(dlg.widget().inputField().content());
 		m_pal_name_input.reset();
 		m_pal_new.state(false);
+		notify();
 	}
 
 	template<>
@@ -175,6 +205,7 @@ namespace Texpainter
 					m_pal_view.highlightMode(m_sel_color_index, Texpainter::Ui::PaletteView::HighlightMode::None)
 					   .highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Read);
 					m_sel_color_index = index;
+					notify();
 					break;
 			}
 		}
@@ -197,6 +228,7 @@ namespace Texpainter
 		m_pal_view.highlightMode(m_modified_pal_index, Texpainter::Ui::PaletteView::HighlightMode::None)
 		   .highlightMode(m_sel_color_index, Texpainter::Ui::PaletteView::HighlightMode::Read);
 		m_color_picker.reset();
+		notify();
 	}
 }
 
