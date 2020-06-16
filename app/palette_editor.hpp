@@ -17,6 +17,30 @@
 #include "model/palette.hpp"
 
 #include <vector>
+#include <unordered_set>
+#include <string>
+
+namespace
+{
+	inline std::string generateEntryName(char const* name, std::unordered_set<std::string>& used_names)
+	{
+		std::string name_tmp{name};
+		auto i = used_names.insert(name_tmp);
+		if(!i.second)
+		{
+			auto k = 1;
+			name_tmp += "_";
+			while(true)
+			{
+				auto name_try = name_tmp + std::to_string(k);
+				auto i = used_names.insert(name_try);
+				if(i.second) { return name_try; }
+				++k;
+			}
+		}
+		return name_tmp;
+	}
+}
 
 namespace Texpainter
 {
@@ -49,11 +73,12 @@ namespace Texpainter
 			m_pal_selector.eventHandler<ControlId::PalSelector>(*this);
 			m_pal_new.eventHandler<ControlId::PaletteCreate>(*this);
 			m_pal_view.eventHandler<ControlId::PalView>(*this);
+			m_used_pal_names.reserve(13);
 		}
 
 		PaletteEditor& createPalette(char const* name)
 		{
-			m_pal_selector.append(name);
+			m_pal_selector.append(generateEntryName(name, m_used_pal_names).c_str());
 			m_palettes.push_back(Model::Palette{20});
 			select(m_palettes.size() - 1);
 			return *this;
@@ -144,6 +169,7 @@ namespace Texpainter
 		Ui::Combobox m_pal_selector;
 		Ui::Button m_pal_new;
 		Ui::PaletteView m_pal_view;
+		std::unordered_set<std::string> m_used_pal_names;
 		std::unique_ptr<PaletteNameInput> m_pal_name_input;
 		std::unique_ptr<ColorPicker> m_color_picker;
 	};
