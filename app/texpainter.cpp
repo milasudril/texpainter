@@ -120,14 +120,7 @@ struct MyCallback
 	template<int>
 	void confirmPositive(ColorPicker& picker)
 	{
-		auto target_intensity = picker.widget().sidepanel().targetIntensity();
-		auto color_new = picker.widget().value();
-		if(target_intensity >= 0.0f)
-		{
-			auto alpha_tmp = color_new.alpha();
-			color_new = std::min(1.0f, target_intensity) * color_new / (max(color_new));
-			color_new.alpha(alpha_tmp);
-		}
+		auto color_new = picker.widget().sidepanel().targetIntensity()(picker.widget().value());
 		r_doc.get().palette()[m_modified_pal_index] = color_new;
 		r_palview->highlightMode(m_modified_pal_index, Texpainter::Ui::PaletteView::HighlightMode::None)
 		   .highlightMode(r_doc.get().selectedColorIndex(),

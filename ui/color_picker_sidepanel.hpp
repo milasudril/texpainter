@@ -6,7 +6,7 @@
 #define TEXPAINTER_UI_COLORPICKERSIDEPANEL_HPP
 
 #include "./box.hpp"
-#include "./button.hpp"
+#include "./combobox.hpp"
 #include "./labeled_input.hpp"
 #include "./text_entry.hpp"
 
@@ -16,49 +16,91 @@ namespace Texpainter::Ui
 {
 	class ColorPickerSidepanel
 	{
+	private:
+		using NormalizeFunc = Model::Pixel (*)(Model::Pixel, float target_intensity);
+
+		class Normalizer
+		{
+		public:
+			explicit Normalizer(float value, NormalizeFunc f): m_value{value}, r_f{f}
+			{}
+
+			auto operator()(Model::Pixel pixel) const
+			{
+				return r_f(pixel, m_value);
+			}
+
+		private:
+			float m_value;
+			NormalizeFunc r_f;
+		};
+
 	public:
 		enum class ItemId : int
 		{
 			NormailzeIntensityEnable
 		};
+
 		ColorPickerSidepanel(ColorPickerSidepanel const&&) = delete;
 		ColorPickerSidepanel& operator=(ColorPickerSidepanel const&&) = delete;
 
 		explicit ColorPickerSidepanel(Container& container):
 		   m_box{container, Box::Orientation::Vertical},
-		   m_normalize_intensity{m_box, Box::Orientation::Vertical, "Normalize intensity to"}
+		   m_normalize_intensity{m_box, Box::Orientation::Vertical, "No intensity normalization"}
 		{
 			m_normalize_intensity.inputField().content("0.5").enabled(false);
-			m_normalize_intensity.label().state(false).eventHandler<ItemId::NormailzeIntensityEnable>(*this);
+			m_normalize_intensity.label()
+				.append("Normalize to max(RGB)")
+				.append("Normalize to mean(RGB)")
+				.selected(0).eventHandler<ItemId::NormailzeIntensityEnable>(*this);
+			m_normalization_function = [](Model::Pixel x, float){ return x;};
 		}
 
 		template<ItemId id>
-		void onClicked(Button& btn);
+		void onChanged(Combobox& box);
 
-		float targetIntensity() const
+		auto targetIntensity() const
 		{
-			if(m_normalize_intensity.label().state())
-			{ return std::atof(m_normalize_intensity.inputField().content()); }
-			else
-			{
-				return -1.0f;
-			}
+			return Normalizer{static_cast<float>(std::atof(m_normalize_intensity.inputField().content())), m_normalization_function};
 		}
 
 	private:
 		Box m_box;
-		LabeledInput<TextEntry, Button> m_normalize_intensity;
+		LabeledInput<TextEntry, Combobox> m_normalize_intensity;
+		NormalizeFunc m_normalization_function;
 	};
 
 
 	template<>
-	void ColorPickerSidepanel::onClicked<ColorPickerSidepanel::ItemId::NormailzeIntensityEnable>(
-	   Button& btn)
+	void ColorPickerSidepanel::onChanged<ColorPickerSidepanel::ItemId::NormailzeIntensityEnable>(
+	   Combobox& box)
 	{
-		if(btn.state()) { m_normalize_intensity.inputField().enabled(true).focus(); }
-		else
+		switch(box.selected())
 		{
-			m_normalize_intensity.inputField().enabled(false);
+			case 0:
+				m_normalize_intensity.inputField().enabled(false);
+				m_normalization_function = [](Model::Pixel x, float){ return x;};
+				break;
+
+			case 1:
+				m_normalize_intensity.inputField().enabled(true).focus();
+				m_normalization_function = [](Model::Pixel x, float target_intensity){
+					auto alpha_tmp = x.alpha();
+					x = target_intensity*x/max(x);
+					x.alpha(alpha_tmp);
+					return x;
+				};
+				break;
+
+			case 2:
+				m_normalize_intensity.inputField().enabled(true).focus();
+				m_normalization_function = [](Model::Pixel x, float target_intensity){
+					auto alpha_tmp = x.alpha();
+					x = target_intensity*x/intensity(x);
+					x.alpha(alpha_tmp);
+					return x;
+				};
+				break;
 		}
 	}
 }

@@ -40,7 +40,7 @@
 					"args": [],
 					"name": ""
 				},
-				"cflags_extra": [],
+				"cflags_extra": ["Wno-parentheses", "Werror"],
 				"cflags_format": "-^",
 				"dllcompile": {
 					"args": [
