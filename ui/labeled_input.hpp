@@ -10,7 +10,7 @@
 
 namespace Texpainter::Ui
 {
-	template<class Widget>
+	template<class Widget, class LabelType = Label>
 	class LabeledInput
 	{
 	public:
@@ -23,15 +23,14 @@ namespace Texpainter::Ui
 		   m_label{m_box, label},
 		   m_input_field{m_box, std::forward<Args>(args)...}
 		{
-			m_label.alignment(0.0f);
 		}
 
-		Label& label()
+		LabelType& label()
 		{
 			return m_label;
 		}
 
-		Label const& label() const
+		LabelType const& label() const
 		{
 			return m_label;
 		}
@@ -49,7 +48,7 @@ namespace Texpainter::Ui
 
 	private:
 		Box m_box;
-		Label m_label;
+		LabelType m_label;
 		Widget m_input_field;
 	};
 }

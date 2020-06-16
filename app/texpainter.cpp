@@ -4,8 +4,9 @@
 #include "ui/window.hpp"
 #include "ui/image_view.hpp"
 #include "ui/palette_view.hpp"
-#include "ui/color_picker.hpp"
+#include "ui/extended_color_picker.hpp"
 #include "ui/box.hpp"
+#include "ui/color_picker_sidepanel.hpp"
 #include "ui/dialog.hpp"
 
 #include <gtk/gtk.h>
@@ -76,7 +77,8 @@ struct MyCallback
 	{
 	}
 
-	using ColorPicker = Texpainter::Ui::Dialog<Texpainter::Ui::ColorPicker>;
+	using ColorPicker = Texpainter::Ui::Dialog<
+	   Texpainter::Ui::ExtendedColorPicker<Texpainter::Ui::ColorPickerSidepanel>>;
 	template<int>
 	void onMouseUp(Texpainter::Ui::PaletteView&, size_t index, int button)
 	{
@@ -118,7 +120,15 @@ struct MyCallback
 	template<int>
 	void confirmPositive(ColorPicker& picker)
 	{
-		r_doc.get().palette()[m_modified_pal_index] = picker.widget().value();
+		auto target_intensity = picker.widget().sidepanel().targetIntensity();
+		auto color_new = picker.widget().value();
+		if(target_intensity >= 0.0f)
+		{
+			auto alpha_tmp = color_new.alpha();
+			color_new = std::min(1.0f, target_intensity) * color_new / (max(color_new));
+			color_new.alpha(alpha_tmp);
+		}
+		r_doc.get().palette()[m_modified_pal_index] = color_new;
 		r_palview->highlightMode(m_modified_pal_index, Texpainter::Ui::PaletteView::HighlightMode::None)
 		   .highlightMode(r_doc.get().selectedColorIndex(),
 		                  Texpainter::Ui::PaletteView::HighlightMode::Read);
@@ -136,7 +146,6 @@ struct MyCallback
 		button.state(false);
 	}
 
-
 	std::reference_wrapper<Texpainter::Model::Document> r_doc;
 
 	Texpainter::Ui::Window* r_mainwin;
@@ -149,6 +158,7 @@ struct MyCallback
 
 int main(int argc, char* argv[])
 {
+	gtk_disable_setlocale();
 	gtk_init(&argc, &argv);
 
 	Texpainter::Model::Document doc;

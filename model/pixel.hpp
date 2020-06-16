@@ -8,6 +8,7 @@
 
 #include <type_traits>
 #include <cmath>
+#include <algorithm>
 
 namespace Texpainter::Model
 {
@@ -264,6 +265,18 @@ namespace Texpainter::Model
 		auto tmp = a - b;
 		tmp *= tmp;
 		return tmp.red() + tmp.green() + tmp.blue() + tmp.alpha();
+	}
+
+	template<class ColorProfile>
+	constexpr auto intensity(BasicPixel<ColorProfile> a)
+	{
+		return (a.red() + a.green() + a.blue()) / 3.0f;
+	}
+
+	template<class ColorProfile>
+	constexpr auto max(BasicPixel<ColorProfile> a)
+	{
+		return std::max(a.red(), std::max(a.green(), a.blue()));
 	}
 }
 #endif

@@ -48,9 +48,9 @@ namespace Texpainter::Ui
 
 		TextEntry& alignment(float x) noexcept;
 
-		int id() const noexcept;
-
 		TextEntry& focus();
+
+		TextEntry& enabled(bool status) noexcept;
 
 	protected:
 		using EventHandlerFunc = void (*)(void* event_handler, TextEntry& self);

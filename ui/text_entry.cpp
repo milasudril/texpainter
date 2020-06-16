@@ -62,6 +62,11 @@ public:
 		gtk_widget_grab_focus(GTK_WIDGET(m_handle));
 	}
 
+	void enabled(bool status)
+	{
+		gtk_widget_set_sensitive(GTK_WIDGET(m_handle), status ? TRUE : FALSE);
+	}
+
 private:
 	void* r_eh;
 	EventHandlerFunc r_func;
@@ -169,4 +174,10 @@ gboolean Texpainter::Ui::TextEntry::Impl::focus_callback(GtkWidget*, GdkEvent*, 
 		if(self->r_eh != nullptr) { self->r_func(self->r_eh, *self); }
 	}
 	return FALSE;
+}
+
+Texpainter::Ui::TextEntry& Texpainter::Ui::TextEntry::enabled(bool status) noexcept
+{
+	m_impl->enabled(status);
+	return *this;
 }
