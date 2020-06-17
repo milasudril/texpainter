@@ -23,7 +23,7 @@ namespace Texpainter::Model
 		   m_width{width},
 		   m_block{width * height}
 		{
-			std::fill(std::begin(m_block), std::end(m_block), color_init);
+			std::ranges::fill(m_block, color_init);
 		}
 
 		operator DataBlock<Pixel> const&() const
@@ -52,6 +52,11 @@ namespace Texpainter::Model
 		}
 
 		Pixel const* pixels() const
+		{
+			return std::data(m_block);
+		}
+
+		Pixel* pixels()
 		{
 			return std::data(m_block);
 		}

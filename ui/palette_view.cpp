@@ -73,10 +73,8 @@ public:
 		if(r_pal != nullptr)
 		{
 			cairo_set_line_width(cr, 4);
-			std::for_each(
-			   std::begin(*r_pal),
-			   std::end(*r_pal),
-			   [cr, highlight_mode = m_highlight_mode.begin(), k = 0](auto color) mutable {
+			std::ranges::for_each(
+			   *r_pal, [cr, highlight_mode = m_highlight_mode.begin(), k = 0](auto color) mutable {
 				   auto const color_conv = Model::BasicPixel<Model::ColorProfiles::Gamma22>{color};
 				   cairo_set_source_rgba(
 				      cr, color_conv.red(), color_conv.green(), color_conv.blue(), color_conv.alpha());
@@ -97,7 +95,7 @@ public:
 		{ gtk_widget_set_size_request(GTK_WIDGET(m_handle), ItemSize * std::size(pal), ItemSize); }
 		r_pal = &pal;
 		m_highlight_mode = DataBlock<HighlightMode>{std::size(pal)};
-		std::fill(std::begin(m_highlight_mode), std::end(m_highlight_mode), HighlightMode::None);
+		std::ranges::fill(m_highlight_mode, HighlightMode::None);
 		update();
 	}
 

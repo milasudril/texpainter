@@ -34,7 +34,7 @@ namespace Texpainter::Model
 
 		explicit Palette(uint32_t n, Pixel color_init = black()): m_block{n}
 		{
-			std::fill(std::begin(m_block), std::end(m_block), color_init);
+			std::ranges::fill(m_block, color_init);
 		}
 
 		auto operator[](size_t index) const
