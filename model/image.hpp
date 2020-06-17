@@ -51,14 +51,14 @@ namespace Texpainter::Model
 			return *const_cast<Pixel*>(std::as_const(*this).getAddress(x, y));
 		}
 
-		Pixel const* pixels() const
+		std::span<Pixel const> pixels() const
 		{
-			return std::data(m_block);
+			return {std::data(m_block), std::size(m_block)};
 		}
 
-		Pixel* pixels()
+		std::span<Pixel> pixels()
 		{
-			return std::data(m_block);
+			return {std::data(m_block), std::size(m_block)};
 		}
 
 	private:

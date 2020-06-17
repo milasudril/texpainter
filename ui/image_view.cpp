@@ -97,7 +97,7 @@ public:
 		assert(data != nullptr);
 		auto const w = r_img->width();
 		auto const h = r_img->height();
-		auto read_ptr = r_img->pixels();
+		auto read_ptr = std::data(r_img->pixels());
 		for(uint32_t row = 0; row < h; ++row)
 		{
 			auto write_ptr = data + row * stride;
