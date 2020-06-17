@@ -18,14 +18,12 @@ namespace Texpainter::Generators
 		{
 		}
 
-		Span2d<Model::Pixel> operator|(Span2d<Model::Pixel> pixels)
+		void operator()(Span2d<Model::Pixel> pixels)
 		{
 			std::ranges::generate(pixels, [this]() {
 				auto val = m_dist(r_rng);
 				return Model::Pixel{val, val, val, 1.0f};
 			});
-
-			return pixels;
 		}
 
 	private:
@@ -36,7 +34,7 @@ namespace Texpainter::Generators
 	class TestPattern
 	{
 	public:
-		Span2d<Model::Pixel> operator|(Span2d<Model::Pixel> pixels)
+		void operator()(Span2d<Model::Pixel> pixels) const
 		{
 			for(uint32_t row = 0; row < pixels.height(); ++row)
 			{
@@ -48,8 +46,6 @@ namespace Texpainter::Generators
 					   Model::Pixel{static_cast<float>(col), static_cast<float>(row), 0.0f, 1.0f} / factors;
 				}
 			}
-
-			return pixels;
 		}
 	};
 }

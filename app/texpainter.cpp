@@ -104,9 +104,9 @@ int main(int argc, char* argv[])
 
 	Texpainter::Model::Document doc;
 	MyCallback cb{doc};
-	//	std::mt19937 rng;
-	//	Texpainter::Generators::GrayscaleNoise{rng} | doc.image().pixels();
-	Texpainter::Generators::TestPattern{} | doc.image().pixels();
+
+	std::mt19937 rng;
+	Texpainter::Generators::GrayscaleNoise{rng}(doc.image().pixels());
 
 	Texpainter::Ui::Window mainwin{"Texpainter"};
 	mainwin.defaultSize(Texpainter::Geom::Dimension{}.width(800).height(500));
