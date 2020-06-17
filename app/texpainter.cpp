@@ -10,6 +10,7 @@
 #include "ui/box.hpp"
 #include "ui/color_picker_sidepanel.hpp"
 #include "ui/dialog.hpp"
+#include "generators/generators.hpp"
 
 #include <gtk/gtk.h>
 
@@ -98,8 +99,9 @@ int main(int argc, char* argv[])
 	gtk_init(&argc, &argv);
 
 	Texpainter::Model::Document doc;
-
 	MyCallback cb{doc};
+	std::mt19937 rng;
+	Texpainter::Generators::GrayscaleNoise{rng} | doc.image().pixels();
 
 	Texpainter::Ui::Window mainwin{"Texpainter"};
 	mainwin.defaultSize(Texpainter::Geom::Dimension{}.width(800).height(500));
