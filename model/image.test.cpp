@@ -71,9 +71,6 @@ namespace Testcases
 		assert(distanceSquared(img.get(0, 1), Texpainter::Model::cyan()) == 0.0f);
 		assert(distanceSquared(img.get(1, 1), Texpainter::Model::magenta()) == 0.0f);
 		assert(distanceSquared(img.get(2, 1), Texpainter::Model::yellow()) == 0.0f);
-
-		assert(distanceSquared(img.get(3, 0), Texpainter::Model::red()) == 0.0f);
-		assert(distanceSquared(img.get(2, 2), Texpainter::Model::blue()) == 0.0f);
 	}
 	void texpainterImageCreateEmpty()
 	{

@@ -67,8 +67,6 @@ namespace Texpainter::Model
 
 		Pixel const* getAddress(uint32_t x, uint32_t y) const
 		{
-			x %= width();
-			y %= height();
 			auto ptr = std::begin(m_block);
 			return ptr + y * width() + x;
 		}
