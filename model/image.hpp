@@ -5,6 +5,7 @@
 
 #include "./pixel.hpp"
 #include "utils/datablock.hpp"
+#include "utils/span_2d.hpp"
 
 #include <algorithm>
 
@@ -51,14 +52,14 @@ namespace Texpainter::Model
 			return *const_cast<Pixel*>(std::as_const(*this).getAddress(x, y));
 		}
 
-		std::span<Pixel const> pixels() const
+		Span2d<Pixel const> pixels() const
 		{
-			return {std::data(m_block), std::size(m_block)};
+			return {std::data(m_block), width(), height()};
 		}
 
-		std::span<Pixel> pixels()
+		Span2d<Pixel> pixels()
 		{
-			return {std::data(m_block), std::size(m_block)};
+			return {std::data(m_block), width(), height()};
 		}
 
 	private:

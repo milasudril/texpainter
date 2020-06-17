@@ -13,23 +13,44 @@ namespace Texpainter::Generators
 	template<class Rng, class Distribution = std::uniform_real_distribution<float>>
 	class GrayscaleNoise
 	{
-		public:
-			explicit GrayscaleNoise(Rng& rng, Distribution dist = Distribution{}):r_rng{rng},m_dist{dist}{}
+	public:
+		explicit GrayscaleNoise(Rng& rng, Distribution dist = Distribution{}): r_rng{rng}, m_dist{dist}
+		{
+		}
 
-			std::span<Model::Pixel> operator|(std::span<Model::Pixel> pixels)
+		Span2d<Model::Pixel> operator|(Span2d<Model::Pixel> pixels)
+		{
+			std::ranges::generate(pixels, [this]() {
+				auto val = m_dist(r_rng);
+				return Model::Pixel{val, val, val, 1.0f};
+			});
+
+			return pixels;
+		}
+
+	private:
+		Rng& r_rng;
+		Distribution m_dist;
+	};
+
+	class TestPattern
+	{
+	public:
+		Span2d<Model::Pixel> operator|(Span2d<Model::Pixel> pixels)
+		{
+			for(uint32_t row = 0; row < pixels.height(); ++row)
 			{
-				std::ranges::generate(pixels, [this]()
+				for(uint32_t col = 0; col < pixels.width(); ++col)
 				{
-					auto val = m_dist(r_rng);
-					return Model::Pixel{val, val, val, 1.0f};
-				});
-
-				return pixels;
+					auto factors = Model::Pixel{
+					   static_cast<float>(pixels.width()), static_cast<float>(pixels.height()), 1.0f, 1.0f};
+					pixels(col, row) =
+					   Model::Pixel{static_cast<float>(col), static_cast<float>(row), 0.0f, 1.0f} / factors;
+				}
 			}
 
-		private:
-			Rng& r_rng;
-			Distribution m_dist;
+			return pixels;
+		}
 	};
 }
 

@@ -49,7 +49,8 @@ struct MyCallback
 		if(m_button_mask & (1 << 1))
 		{
 			auto& img = r_doc.get().image();
-			img.get(static_cast<uint32_t>(pos_window[0])%img.width(), static_cast<uint32_t>(pos_window[1])%img.height()) = selectedColor(r_doc);
+			img.get(static_cast<uint32_t>(pos_window[0]) % img.width(),
+			        static_cast<uint32_t>(pos_window[1]) % img.height()) = selectedColor(r_doc);
 			event_source.update();
 		}
 	}
@@ -71,7 +72,8 @@ struct MyCallback
 		if(m_button_mask & (1 << 1))
 		{
 			auto& img = r_doc.get().image();
-			img.get(static_cast<uint32_t>(pos_window[0])%img.width(), static_cast<uint32_t>(pos_window[1])%img.height()) = selectedColor(r_doc);
+			img.get(static_cast<uint32_t>(pos_window[0]) % img.width(),
+			        static_cast<uint32_t>(pos_window[1]) % img.height()) = selectedColor(r_doc);
 			event_source.update();
 		}
 	}
@@ -102,8 +104,9 @@ int main(int argc, char* argv[])
 
 	Texpainter::Model::Document doc;
 	MyCallback cb{doc};
-	std::mt19937 rng;
-	Texpainter::Generators::GrayscaleNoise{rng} | doc.image().pixels();
+	//	std::mt19937 rng;
+	//	Texpainter::Generators::GrayscaleNoise{rng} | doc.image().pixels();
+	Texpainter::Generators::TestPattern{} | doc.image().pixels();
 
 	Texpainter::Ui::Window mainwin{"Texpainter"};
 	mainwin.defaultSize(Texpainter::Geom::Dimension{}.width(800).height(500));
