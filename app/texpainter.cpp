@@ -104,8 +104,9 @@ int main(int argc, char* argv[])
 	Texpainter::Ui::Window mainwin{"Texpainter"};
 	mainwin.defaultSize(Texpainter::Geom::Dimension{}.width(800).height(500));
 	Texpainter::Ui::Box box_outer{mainwin, Texpainter::Ui::Box::Orientation::Vertical};
-	Texpainter::PaletteEditor pal_editor{box_outer};
-	pal_editor.eventHandler<0>(cb);
+
+	Texpainter::Ui::LabeledInput<Texpainter::PaletteEditor> pal_editor{box_outer, Texpainter::Ui::Box::Orientation::Horizontal, "Palettes: "};
+	pal_editor.inputField().eventHandler<0>(cb);
 
 	box_outer.homogenous(false);
 	cb.r_mainwin = &mainwin;
