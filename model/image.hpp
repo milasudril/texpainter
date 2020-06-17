@@ -11,23 +11,24 @@
 
 namespace Texpainter::Model
 {
-	class Image
+	template<class PixelType>
+	class BasicImage
 	{
 	public:
-		explicit Image(uint32_t width, DataBlock<Pixel>&& block):
+		explicit BasicImage(uint32_t width, DataBlock<PixelType>&& block):
 		   m_width{width},
 		   m_block{std::move(block)}
 		{
 		}
 
-		explicit Image(uint32_t width, uint32_t height, Pixel color_init = black()):
+		explicit BasicImage(uint32_t width, uint32_t height, PixelType color_init = black()):
 		   m_width{width},
 		   m_block{width * height}
 		{
 			std::ranges::fill(m_block, color_init);
 		}
 
-		operator DataBlock<Pixel> const&() const
+		operator DataBlock<PixelType> const&() const
 		{
 			return m_block;
 		}
@@ -42,55 +43,58 @@ namespace Texpainter::Model
 			return std::size(m_block) / m_width;
 		}
 
-		Pixel get(uint32_t x, uint32_t y) const
+		PixelType get(uint32_t x, uint32_t y) const
 		{
 			return *getAddress(x, y);
 		}
 
-		Pixel& get(uint32_t x, uint32_t y)
+		PixelType& get(uint32_t x, uint32_t y)
 		{
-			return *const_cast<Pixel*>(std::as_const(*this).getAddress(x, y));
+			return *const_cast<PixelType*>(std::as_const(*this).getAddress(x, y));
 		}
 
-		Span2d<Pixel const> pixels() const
+		Span2d<PixelType const> pixels() const
 		{
 			return {std::data(m_block), width(), height()};
 		}
 
-		Span2d<Pixel> pixels()
+		Span2d<PixelType> pixels()
 		{
 			return {std::data(m_block), width(), height()};
 		}
 
 	private:
 		uint32_t m_width;
-		DataBlock<Pixel> m_block;
+		DataBlock<PixelType> m_block;
 
-		Pixel const* getAddress(uint32_t x, uint32_t y) const
+		PixelType const* getAddress(uint32_t x, uint32_t y) const
 		{
 			auto ptr = std::begin(m_block);
 			return ptr + y * width() + x;
 		}
 	};
 
-	template<class OutputStream>
-	void write(Image const& pal, OutputStream stream)
+	template<class PixelType, class OutputStream>
+	void write(BasicImage<PixelType> const& pal, OutputStream stream)
 	{
 		write(pal.width(), stream);
 		write(static_cast<Texpainter::DataBlock<Texpainter::Model::Pixel> const&>(pal), stream);
 	}
 
-	template<class InputStream>
-	Image read(Empty<Image>, InputStream stream)
+	template<class PixelType, class InputStream>
+	BasicImage<PixelType> read(Empty<BasicImage<PixelType>>, InputStream stream)
 	{
 		auto width = read(Empty<uint32_t>{}, stream);
-		return Image{width, read(Empty<DataBlock<Pixel>>{}, stream)};
+		return BasicImage<PixelType>{width, read(Empty<DataBlock<Pixel>>{}, stream)};
 	}
 
-	inline auto size(Image const& img)
+	template<class PixelType>
+	inline auto size(BasicImage<PixelType> const& img)
 	{
 		return std::tuple{img.width(), img.height()};
 	}
+
+	using Image = BasicImage<Pixel>;
 }
 
 #endif
