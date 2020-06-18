@@ -107,33 +107,65 @@ int main(int argc, char* argv[])
 	Texpainter::Model::Document doc;
 	MyCallback cb{doc};
 
+	Texpainter::Model::BasicImage<float> img_in{512, 512};
+
+	{
+		std::mt19937 rng{};
+		std::ranges::generate(img_in.pixels(), [&rng, U = std::uniform_real_distribution{-1.0f, 1.0f}]() mutable{
+			return U(rng);
+		});
+	}
+
+
+	constexpr auto a = 0;
 	Texpainter::Model::BasicImage<float> img{512, 512};
 
-	std::mt19937 rng{};
-	std::ranges::generate(img.pixels(), [&rng, U = std::uniform_real_distribution{0.0f, 1.0f}]() mutable{
-		return U(rng);
-	});
-
-
-
-	for(int k = 0; k < 1; ++k)
 	{
-		if(k != 0)
-			{
-			std::ranges::for_each(img.pixels(), [&rng, U = std::uniform_real_distribution{0.0f, 1.0f}](auto& val) mutable{
-				val += U(rng);
-			});
-		}
-
+	#if 1
 		for(uint32_t row = 1; row < img.height(); ++row)
 		{
 			for(uint32_t col = 1; col < img.width(); ++col)
 			{
-				constexpr auto a = -0.75f;
-				img(col, row) = (img(col, row) + img(col, row - 1) + img(col - 1, row))/(3.0f + a);
+				auto x = static_cast<float>(col);
+				auto y = static_cast<float>(row);
+				auto r = sqrt(x*x + y*y);
+			//	auto output_x = img_in(col, row) + img(col - 1, row) * (1.0f - a);
+			//	auto output_y = img_in(col, row) + img(col, row - 1) * (1.0f - a);
+
+
+				auto output_x = img(col - 1, row) + r*(img_in(col, row) - a*img(col - 1, row))/x;
+				auto output_y = img(col, row - 1) + r*(img_in(col, row) - a*img(col, row - 1))/y;
+
+				auto sum = 0.5f*(output_x + output_y);
+
+				img(col, row) = sum;
+			}
+		}
+	#endif
+	}
+
+	{
+	#if 0
+	//	Canvas
+		Texpainter::Model::BasicImage<float> img_x{512, 512};
+		memset(std::data(img_x.pixels()), 0, sizeof(float)*img_x.area());
+
+		Texpainter::Model::BasicImage<float> img_y{512, 512};
+		memset(std::data(img_y.pixels()), 0, sizeof(float)*img_y.area());
+		for(uint32_t row = 1; row < img_x.height(); ++row)
+		{
+			for(uint32_t col = 1; col < img_x.width(); ++col)
+			{
+				img_x(col, row) = img_in(col, row) + img_x(col - 1, row) * (1.0f - a);
+				img_y(col, row) = img_in(col, row) + img_y(col, row - 1) * (1.0f - a);
 			}
 		}
 
+		std::ranges::transform(img_x.pixels(), img_y.pixels(), std::begin(img.pixels()), [](auto a, auto b)
+		{
+			return a + b;
+		});
+	#endif
 	}
 
 	auto pixels = img.pixels();
@@ -148,7 +180,7 @@ int main(int argc, char* argv[])
 	   [min = *res.min, max = *res.max](auto val) {
 			Texpainter::Model::Pixel offset{-min, -min, -min, 0.0f};
 			Texpainter::Model::Pixel factor{max - min, max -min, max - min, 1.0f};
-		   return (Texpainter::Model::Pixel{val,val,val} - offset)/factor;
+		   return (Texpainter::Model::Pixel{val, val, val, 1.0f} + offset)/factor;
 	   });
 
 	Texpainter::Ui::Window mainwin{"Texpainter"};
