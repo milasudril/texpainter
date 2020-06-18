@@ -11,6 +11,8 @@
 #include "ui/color_picker_sidepanel.hpp"
 #include "ui/dialog.hpp"
 #include "generators/generators.hpp"
+#include "generators/fourier_transform.hpp"
+#include "generators/fourier_transform.hpp"
 
 #include <gtk/gtk.h>
 
@@ -105,11 +107,52 @@ int main(int argc, char* argv[])
 	Texpainter::Model::Document doc;
 	MyCallback cb{doc};
 
-	std::mt19937 rng;
-	Texpainter::Generators::GrayscaleNoise{rng}(doc.image().pixels());
+	Texpainter::Model::BasicImage<float> img{512, 512};
+
+	std::mt19937 rng{};
+	std::ranges::generate(img.pixels(), [&rng, U = std::uniform_real_distribution{0.0f, 1.0f}]() mutable{
+		return U(rng);
+	});
+
+
+
+	for(int k = 0; k < 1; ++k)
+	{
+		if(k != 0)
+			{
+			std::ranges::for_each(img.pixels(), [&rng, U = std::uniform_real_distribution{0.0f, 1.0f}](auto& val) mutable{
+				val += U(rng);
+			});
+		}
+
+		for(uint32_t row = 1; row < img.height(); ++row)
+		{
+			for(uint32_t col = 1; col < img.width(); ++col)
+			{
+				constexpr auto a = -0.75f;
+				img(col, row) = (img(col, row) + img(col, row - 1) + img(col - 1, row))/(3.0f + a);
+			}
+		}
+
+	}
+
+	auto pixels = img.pixels();
+	auto res = std::ranges::minmax_element(pixels);
+	printf("%.7g %.7g %.7g\n", *res.min, *res.max, *res.max - *res.min);
+
+	auto& img_disp = doc.image();
+
+	std::ranges::transform(
+	   img.pixels(),
+	   img_disp.pixels().begin(),
+	   [min = *res.min, max = *res.max](auto val) {
+			Texpainter::Model::Pixel offset{-min, -min, -min, 0.0f};
+			Texpainter::Model::Pixel factor{max - min, max -min, max - min, 1.0f};
+		   return (Texpainter::Model::Pixel{val,val,val} - offset)/factor;
+	   });
 
 	Texpainter::Ui::Window mainwin{"Texpainter"};
-	mainwin.defaultSize(Texpainter::Geom::Dimension{}.width(800).height(500));
+	mainwin.defaultSize(Texpainter::Geom::Dimension{}.width(800).height(600));
 	Texpainter::Ui::Box box_outer{mainwin, Texpainter::Ui::Box::Orientation::Vertical};
 
 	Texpainter::Ui::LabeledInput<Texpainter::PaletteEditor> pal_editor{

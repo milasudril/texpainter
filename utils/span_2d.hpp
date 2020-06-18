@@ -18,6 +18,14 @@ namespace Texpainter
 		{
 		}
 
+		template<class U>
+		constexpr Span2d(Span2d<U> other):
+		   r_ptr{other.data()},
+		   m_width{other.width()},
+		   m_height{other.height()}
+		{
+		}
+
 		constexpr auto begin() const
 		{
 			return r_ptr;

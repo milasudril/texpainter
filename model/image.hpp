@@ -21,11 +21,8 @@ namespace Texpainter::Model
 		{
 		}
 
-		explicit BasicImage(uint32_t width, uint32_t height, PixelType color_init = black()):
-		   m_width{width},
-		   m_block{width * height}
+		explicit BasicImage(uint32_t width, uint32_t height): m_width{width}, m_block{width * height}
 		{
-			std::ranges::fill(m_block, color_init);
 		}
 
 		operator DataBlock<PixelType> const&() const
@@ -53,6 +50,16 @@ namespace Texpainter::Model
 			return *const_cast<PixelType*>(std::as_const(*this).getAddress(x, y));
 		}
 
+		PixelType operator()(uint32_t x, uint32_t y) const
+		{
+			return *getAddress(x, y);
+		}
+
+		PixelType& operator()(uint32_t x, uint32_t y)
+		{
+			return *const_cast<PixelType*>(std::as_const(*this).getAddress(x, y));
+		}
+
 		Span2d<PixelType const> pixels() const
 		{
 			return {std::data(m_block), width(), height()};
@@ -61,6 +68,11 @@ namespace Texpainter::Model
 		Span2d<PixelType> pixels()
 		{
 			return {std::data(m_block), width(), height()};
+		}
+
+		size_t area() const
+		{
+			return std::size(m_block);
 		}
 
 	private:
