@@ -3,6 +3,9 @@
 #ifndef TEXPAINTER_GENERATORS_GRAYSCALENOISE_HPP
 #define TEXPAINTER_GENERATORS_GRAYSCALENOISE_HPP
 
+#include "utils/size_2d.hpp"
+#include "model/image.hpp"
+
 #include <random>
 #include <algorithm>
 
@@ -18,7 +21,7 @@ namespace Texpainter::Generators
 		{
 		}
 
-		Model::BasicImage<float> operator()(std::tuple<uint32_t, uint32_t> size)
+		Model::BasicImage<float> operator()(Size2d size)
 		{
 			Model::BasicImage<float> ret{size};
 			std::ranges::generate(ret.pixels(), [this]() { return m_dist(m_rng); });

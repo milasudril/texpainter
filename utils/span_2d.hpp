@@ -3,7 +3,7 @@
 #ifndef TEXPAINTER_SPAN_2D_HPP
 #define TEXPAINTER_SPAN_2D_HPP
 
-#include <cstdint>
+#include "./size_2d.hpp"
 
 namespace Texpainter
 {
@@ -11,18 +11,19 @@ namespace Texpainter
 	class Span2d
 	{
 	public:
-		constexpr Span2d(T* ptr, uint32_t width, uint32_t height):
+		constexpr explicit Span2d(T* ptr, uint32_t w, uint32_t h):Span2d{ptr, Size2d{w, h}}
+		{}
+
+		constexpr Span2d(T* ptr, Size2d size):
 		   r_ptr{ptr},
-		   m_width{width},
-		   m_height{height}
+		   m_size{size}
 		{
 		}
 
 		template<class U>
 		constexpr explicit(!std::is_same_v<std::decay_t<U>, std::decay_t<T>>) Span2d(Span2d<U> other):
 		   r_ptr{other.data()},
-		   m_width{other.width()},
-		   m_height{other.height()}
+		   m_size{other.size()}
 		{
 		}
 
@@ -56,42 +57,41 @@ namespace Texpainter
 			return begin();
 		}
 
-		auto width() const
+		constexpr auto width() const
 		{
-			return m_width;
+			return m_size.width();
 		}
 
-		auto height() const
+		constexpr auto height() const
 		{
-			return m_height;
+			return m_size.height();
 		}
 
-		size_t area() const
+		constexpr auto area() const
 		{
-			return static_cast<size_t>(m_width) * static_cast<size_t>(m_height);
+			return m_size.area();
 		}
 
-		T& operator()(uint32_t x, uint32_t y)
+		constexpr T& operator()(uint32_t x, uint32_t y)
 		{
 			auto ptr = begin();
 			return *(ptr + y * width() + x);
 		}
 
-		T const& operator()(uint32_t x, uint32_t y) const
+		constexpr T const& operator()(uint32_t x, uint32_t y) const
 		{
 			auto ptr = begin();
 			return *(ptr + y * width() + x);
 		}
 
-		std::tuple<uint32_t, uint32_t> size() const
+		constexpr auto size() const
 		{
-			return {m_width, m_height};
+			return m_size;
 		}
 
 	private:
 		T* r_ptr;
-		uint32_t m_width;
-		uint32_t m_height;
+		Size2d m_size;
 	};
 
 	template<class T, class Func>

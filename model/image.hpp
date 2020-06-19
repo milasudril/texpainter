@@ -25,9 +25,10 @@ namespace Texpainter::Model
 		{
 		}
 
-		explicit BasicImage(std::tuple<uint32_t, uint32_t> size):
-		   m_width{std::get<0>(size)},
-		   m_block{std::get<0>(size) * std::get<1>(size)}
+		explicit BasicImage(Size2d size):
+		   m_width{size.width()},
+		   // FIXME: Handle buffer size locally so that width and height fits in two uint32_t
+		   m_block{static_cast<uint32_t>(size.area())}
 		{
 		}
 
@@ -68,12 +69,12 @@ namespace Texpainter::Model
 
 		Span2d<PixelType const> pixels() const
 		{
-			return {std::data(m_block), width(), height()};
+			return {std::data(m_block), size()};
 		}
 
 		Span2d<PixelType> pixels()
 		{
-			return {std::data(m_block), width(), height()};
+			return {std::data(m_block), size()};
 		}
 
 		size_t area() const
@@ -81,9 +82,9 @@ namespace Texpainter::Model
 			return std::size(m_block);
 		}
 
-		std::tuple<uint32_t, uint32_t> size() const
+		Size2d size() const
 		{
-			return {width(), height()};
+			return Size2d{width(), height()};
 		}
 
 	private:
@@ -114,7 +115,7 @@ namespace Texpainter::Model
 	template<class PixelType>
 	inline auto size(BasicImage<PixelType> const& img)
 	{
-		return std::tuple{img.width(), img.height()};
+		return img.size();
 	}
 
 	using Image = BasicImage<Pixel>;

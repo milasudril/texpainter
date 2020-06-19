@@ -13,9 +13,9 @@ namespace Texpainter::Generators
 	class ButterworthFreq2dKernel
 	{
 	public:
-		explicit ButterworthFreq2dKernel(std::tuple<uint32_t, uint32_t> size, double a_x, double a_y):
-		   m_x_0{std::get<0>(size) / 2.0},
-		   m_y_0{std::get<1>(size) / 2.0},
+		explicit ButterworthFreq2dKernel(Size2d size, double a_x, double a_y):
+		   m_x_0{size.width() / 2.0},
+		   m_y_0{size.height() / 2.0},
 		   m_α_x{a_x * a_x},
 		   m_α_y{a_y * a_y}
 		{
@@ -46,7 +46,7 @@ namespace Texpainter::Generators
 	class ButterworthFreq2d
 	{
 	public:
-		explicit ButterworthFreq2d(std::tuple<uint32_t, uint32_t> size, double a_x, double a_y):
+		explicit ButterworthFreq2d(Size2d size, double a_x, double a_y):
 		   m_f{ButterworthFreq2dKernel{size, a_x, a_y}}
 		{
 		}
