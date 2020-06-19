@@ -113,7 +113,7 @@ namespace Texpainter
 		{
 			for(uint32_t col = 0; col < in.width(); ++col)
 			{
-				in(col, row) = f(col, row, in(col, row));
+				out(col, row) = f(col, row, in(col, row));
 			}
 		}
 	}

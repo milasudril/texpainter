@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"grayscale_noise.hpp", "type":"include"}]}
 
-#ifndef TEXPAINTER_GENERATORS_HPP
-#define TEXPAINTER_GENERATORS_HPP
+#ifndef TEXPAINTER_GENERATORS_GRAYSCALENOISE_HPP
+#define TEXPAINTER_GENERATORS_GRAYSCALENOISE_HPP
 
 #include <random>
 #include <algorithm>
