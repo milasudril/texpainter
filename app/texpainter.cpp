@@ -13,7 +13,7 @@
 
 #include "generators/grayscale_noise.hpp"
 #include "generators/fourier_transform.hpp"
-#include "generators/pointwise_transform.hpp"
+#include "generators/butterworth_freq_2d.hpp"
 
 #include <gtk/gtk.h>
 
@@ -112,16 +112,7 @@ int main(int argc, char* argv[])
 
 	Texpainter::Generators::FourierTransform fft;
 
-	auto img = fft(Texpainter::Generators::PointwiseTransform{
-	   [x_0 = (img_in.width() - .0f) / 2.0f,
-	    y_0 = (img_in.height() - .0f) / 2.0f](auto col, auto row, auto val) {
-		   constexpr auto a = 2.0f;
-		   auto const xi = std::abs(static_cast<float>(col) - x_0);
-		   auto const eta = std::abs(static_cast<float>(row) - y_0);
-		   auto const r2 = std::max(xi * xi + eta * eta, 1.0f / (1024.0f));
-		   auto H = 1.0f / (r2 + a * a);
-		   return val * H;
-	   }}(fft(img_in.pixels()).pixels())
+	auto img = fft(Texpainter::Generators::ButterworthFreq2d{img_in.size(), 2.0f, 2.0f}(fft(img_in.pixels()).pixels())
 	                  .pixels());
 
 	//	Texpainter::Model::BasicImage<float> img{spectrum.width(), spectrum.height()};
