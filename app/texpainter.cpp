@@ -144,7 +144,7 @@ int main(int argc, char* argv[])
 			auto const eta = std::abs(static_cast<float>(row) - y_0);
 			auto const r2 = std::max(xi*xi + eta*eta, 1.0f/(1024.0f));
 			auto H = 1.0f/(r2 + a*a);
-			spectrum(col, row) *= H/static_cast<float>(img_in.area());
+			spectrum(col, row) *= H;
 		}
 	}
 

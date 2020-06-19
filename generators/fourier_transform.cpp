@@ -43,6 +43,10 @@ operator()(Span2d<float const> vals_in)
 	}
 
 	fftwf_execute_dft(m_plan_fwd.m_plan, input_buffer_ptr, fftw_out_ptr);
+	std::ranges::for_each(ret.pixels(), [area = vals_in.area()](auto& val){
+		return val/=area;
+	});
+
 	return ret;
 }
 
