@@ -108,12 +108,13 @@ int main(int argc, char* argv[])
 	Texpainter::Model::Document doc;
 	MyCallback cb{doc};
 
-	doc.image() = Texpainter::Model::Image{512, 512};
-	auto img_in = Texpainter::Generators::GrayscaleNoise{std::uniform_real_distribution{-1.0f, 1.0f}}(doc.image().size());
+	doc.image() = Texpainter::Model::Image{1023, 1023};
+	auto img_in = Texpainter::Generators::GrayscaleNoise{std::uniform_real_distribution{-1.0f, 1.0f}}(
+	   doc.image().size());
 
 	Texpainter::Generators::FourierTransform fft;
 
-	auto img = fft(Texpainter::Generators::ButterworthFreq2d{img_in.size(), 8, 8}(
+	auto img = fft(Texpainter::Generators::ButterworthFreq2d{img_in.size(), 1.0, 1.0}(
 	                  fft(img_in.pixels()).pixels())
 	                  .pixels());
 

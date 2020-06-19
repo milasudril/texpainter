@@ -53,9 +53,9 @@ operator()(Span2d<std::complex<double> const> vals_in)
 	auto fftw_out_ptr = reinterpret_cast<fftw_complex*>(std::data(output_buffer.pixels()));
 	if(w != m_plan_bkwd.m_w_old || h != m_plan_bkwd.m_h_old) [[unlikely]]
 		{
-			Model::BasicImage<std::complex<float>> tmp{w, h};
+			Model::BasicImage<std::complex<double>> tmp{w, h};
 			auto ptr = reinterpret_cast<fftw_complex*>(std::data(tmp.pixels()));
-			memset(ptr, 0, tmp.area() * sizeof(std::complex<float>));
+			memset(ptr, 0, tmp.area() * sizeof(std::complex<double>));
 			auto plan = fftw_plan_dft_2d(h, w, ptr, fftw_out_ptr, FFTW_BACKWARD, FFTW_MEASURE);
 			m_plan_bkwd.m_w_old = w;
 			m_plan_bkwd.m_h_old = h;
