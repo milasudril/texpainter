@@ -107,45 +107,81 @@ int main(int argc, char* argv[])
 	Texpainter::Model::Document doc;
 	MyCallback cb{doc};
 
+#if 1
 	Texpainter::Model::BasicImage<float> img_in{512, 512};
 
 	{
 		std::mt19937 rng{};
-		std::ranges::generate(img_in.pixels(), [&rng, U = std::uniform_real_distribution{-1.0f, 1.0f}]() mutable{
-			return U(rng);
-		});
+		std::ranges::generate(
+		   img_in.pixels(),
+		   [&rng, U = std::uniform_real_distribution{0.0f, 1.0f}]() mutable { return U(rng); });
+	}
+#else
+	Texpainter::Model::BasicImage<float> img_in{512, 512};
+
+	for(uint32_t row = 0; row < img_in.height(); ++row)
+	{
+		for(uint32_t col = 0; col < img_in.width(); ++col)
+		{
+			auto x = static_cast<float>(col)/static_cast<float>(img_in.width());
+			auto y = static_cast<float>(row)/static_cast<float>(img_in.height());
+			img_in(col, row) = sin(2*M_PI*x*16.0f) + sin(2*M_PI*y*16.0f);
+		}
+	}
+#endif
+
+	Texpainter::Generators::FourierTransform fft;
+
+	constexpr auto a = 2.0f;
+	auto spectrum = fft(img_in.pixels());
+	auto const x_0 = (spectrum.width() - .0f)/2.0f;
+	auto const y_0 = (spectrum.height() - .0f)/2.0f;
+	for(uint32_t row = 0; row < img_in.height(); ++row)
+	{
+		for(uint32_t col = 0; col < img_in.width(); ++col)
+		{
+			auto const xi = std::abs(static_cast<float>(col) - x_0);
+			auto const eta = std::abs(static_cast<float>(row) - y_0);
+			auto const r2 = std::max(xi*xi + eta*eta, 1.0f/(1024.0f));
+			auto H = 1.0f/(r2 + a*a);
+			spectrum(col, row) *= H/static_cast<float>(img_in.area());
+		}
 	}
 
+	auto img = fft(spectrum.pixels());
+//	Texpainter::Model::BasicImage<float> img{spectrum.width(), spectrum.height()};
+//	std::ranges::transform(spectrum.pixels(), img.pixels().begin(), [](auto val) {
+//		auto tmp = (val*conj(val)).real();
+//		return tmp;
+//	});
 
-	constexpr auto a = 0;
-	Texpainter::Model::BasicImage<float> img{512, 512};
 
 	{
-	#if 1
+#if 0
 		for(uint32_t row = 1; row < img.height(); ++row)
 		{
 			for(uint32_t col = 1; col < img.width(); ++col)
 			{
 				auto x = static_cast<float>(col);
 				auto y = static_cast<float>(row);
-				auto r = sqrt(x*x + y*y);
-			//	auto output_x = img_in(col, row) + img(col - 1, row) * (1.0f - a);
-			//	auto output_y = img_in(col, row) + img(col, row - 1) * (1.0f - a);
+				auto r = sqrt(x * x + y * y);
+				//	auto output_x = img_in(col, row) + img(col - 1, row) * (1.0f - a);
+				//	auto output_y = img_in(col, row) + img(col, row - 1) * (1.0f - a);
 
 
-				auto output_x = img(col - 1, row) + r*(img_in(col, row) - a*img(col - 1, row))/x;
-				auto output_y = img(col, row - 1) + r*(img_in(col, row) - a*img(col, row - 1))/y;
+				auto output_x = img(col - 1, row) + r * (img_in(col, row) - a * img(col - 1, row)) / x;
+				auto output_y = img(col, row - 1) + r * (img_in(col, row) - a * img(col, row - 1)) / y;
 
-				auto sum = 0.5f*(output_x + output_y);
+				auto sum = 0.5f * (output_x + output_y);
 
 				img(col, row) = sum;
 			}
 		}
-	#endif
+#endif
 	}
 
 	{
-	#if 0
+#if 0
 	//	Canvas
 		Texpainter::Model::BasicImage<float> img_x{512, 512};
 		memset(std::data(img_x.pixels()), 0, sizeof(float)*img_x.area());
@@ -165,7 +201,7 @@ int main(int argc, char* argv[])
 		{
 			return a + b;
 		});
-	#endif
+#endif
 	}
 
 	auto pixels = img.pixels();
@@ -175,12 +211,10 @@ int main(int argc, char* argv[])
 	auto& img_disp = doc.image();
 
 	std::ranges::transform(
-	   img.pixels(),
-	   img_disp.pixels().begin(),
-	   [min = *res.min, max = *res.max](auto val) {
-			Texpainter::Model::Pixel offset{-min, -min, -min, 0.0f};
-			Texpainter::Model::Pixel factor{max - min, max -min, max - min, 1.0f};
-		   return (Texpainter::Model::Pixel{val, val, val, 1.0f} + offset)/factor;
+	   img.pixels(), img_disp.pixels().begin(), [min = *res.min, max = *res.max](auto val) {
+		   Texpainter::Model::Pixel offset{-min, -min, -min, 0.0f};
+		   Texpainter::Model::Pixel factor{max - min, max - min, max - min, 1.0f};
+		   return (Texpainter::Model::Pixel{val, val, val, 1.0f} + offset) / factor;
 	   });
 
 	Texpainter::Ui::Window mainwin{"Texpainter"};

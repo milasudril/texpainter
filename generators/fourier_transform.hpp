@@ -16,18 +16,24 @@ namespace Texpainter::Generators
 	class FourierTransform
 	{
 	public:
-		FourierTransform(): m_plan{nullptr}, m_w_old{0}, m_h_old{0}
-		{
-		}
-
 		Model::BasicImage<std::complex<float>> operator()(Span2d<float const> vals_in);
+
+		Model::BasicImage<float> operator()(Span2d<std::complex<float> const> vals_in);
 
 		~FourierTransform();
 
 	private:
-		fftwf_plan m_plan;
-		uint32_t m_w_old;
-		uint32_t m_h_old;
+		struct PlanData
+		{
+			PlanData():m_plan{nullptr}, m_w_old{0}, m_h_old{0}{}
+			fftwf_plan m_plan;
+			uint32_t m_w_old;
+			uint32_t m_h_old;
+		};
+
+		PlanData m_plan_fwd;
+		PlanData m_plan_bkwd;
+
 	};
 }
 

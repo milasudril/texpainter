@@ -105,8 +105,7 @@ public:
 			{
 				auto pixel_out = 255.0f * read_ptr->value();
 
-				if(pixel_out[2] < 0.0f)
-				{ printf("???? %.7g\n", pixel_out[2]); }
+				if(pixel_out[2] < 0.0f) { printf("???? %.7g\n", pixel_out[2]); }
 				assert(pixel_out[2] >= 0.0f);
 
 				write_ptr[0] = gamma_22[static_cast<int>(pixel_out[2])];

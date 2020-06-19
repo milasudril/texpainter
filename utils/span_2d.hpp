@@ -19,7 +19,7 @@ namespace Texpainter
 		}
 
 		template<class U>
-		constexpr Span2d(Span2d<U> other):
+		constexpr explicit(!std::is_same_v<std::decay_t<U>, std::decay_t<T>>) Span2d(Span2d<U> other):
 		   r_ptr{other.data()},
 		   m_width{other.width()},
 		   m_height{other.height()}
