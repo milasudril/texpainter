@@ -14,5 +14,5 @@ namespace Texpainter
 			free(buffer);
 		}
 	};
-}		
+}
 #endif

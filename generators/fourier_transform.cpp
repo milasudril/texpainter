@@ -4,6 +4,8 @@
 
 #include "./fourier_transform.hpp"
 
+#include <cstring>
+
 Texpainter::Model::BasicImage<std::complex<double>> Texpainter::Generators::FourierTransform::
 operator()(Span2d<float const> vals_in)
 {

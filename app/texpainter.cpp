@@ -52,8 +52,8 @@ struct MyCallback
 		if(m_button_mask & (1 << 1))
 		{
 			auto& img = r_doc.get().image();
-			img.get(static_cast<uint32_t>(pos_window[0]) % img.width(),
-			        static_cast<uint32_t>(pos_window[1]) % img.height()) = selectedColor(r_doc);
+			img(static_cast<uint32_t>(pos_window[0]) % img.width(),
+			    static_cast<uint32_t>(pos_window[1]) % img.height()) = selectedColor(r_doc);
 			event_source.update();
 		}
 	}
@@ -75,8 +75,8 @@ struct MyCallback
 		if(m_button_mask & (1 << 1))
 		{
 			auto& img = r_doc.get().image();
-			img.get(static_cast<uint32_t>(pos_window[0]) % img.width(),
-			        static_cast<uint32_t>(pos_window[1]) % img.height()) = selectedColor(r_doc);
+			img(static_cast<uint32_t>(pos_window[0]) % img.width(),
+			    static_cast<uint32_t>(pos_window[1]) % img.height()) = selectedColor(r_doc);
 			event_source.update();
 		}
 	}

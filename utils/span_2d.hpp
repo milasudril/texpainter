@@ -11,12 +11,11 @@ namespace Texpainter
 	class Span2d
 	{
 	public:
-		constexpr explicit Span2d(T* ptr, uint32_t w, uint32_t h):Span2d{ptr, Size2d{w, h}}
-		{}
+		constexpr explicit Span2d(T* ptr, uint32_t w, uint32_t h): Span2d{ptr, Size2d{w, h}}
+		{
+		}
 
-		constexpr Span2d(T* ptr, Size2d size):
-		   r_ptr{ptr},
-		   m_size{size}
+		constexpr Span2d(T* ptr, Size2d size): r_ptr{ptr}, m_size{size}
 		{
 		}
 

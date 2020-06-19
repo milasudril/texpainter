@@ -4,58 +4,51 @@
 #define TEXPAINTER_IMAGE_HPP
 
 #include "./pixel.hpp"
-#include "utils/datablock.hpp"
 #include "utils/span_2d.hpp"
+#include "utils/call_free.hpp"
+#include "utils/trivial.hpp"
 
 #include <algorithm>
+#include <memory>
+#include <span>
 
 namespace Texpainter::Model
 {
-	template<class PixelType>
+	template<Trivial PixelType>
 	class BasicImage
 	{
 	public:
-		explicit BasicImage(uint32_t width, DataBlock<PixelType>&& block):
-		   m_width{width},
-		   m_block{std::move(block)}
-		{
-		}
-
-		explicit BasicImage(uint32_t width, uint32_t height): m_width{width}, m_block{width * height}
+		explicit BasicImage(uint32_t width, uint32_t height): BasicImage{Size2d{width, height}}
 		{
 		}
 
 		explicit BasicImage(Size2d size):
-		   m_width{size.width()},
-		   // FIXME: Handle buffer size locally so that width and height fits in two uint32_t
-		   m_block{static_cast<uint32_t>(size.area())}
+		   m_size(size),
+		   m_data{reinterpret_cast<PixelType*>(malloc(area() * sizeof(PixelType)))}
 		{
 		}
 
-		operator DataBlock<PixelType> const&() const
-		{
-			return m_block;
-		}
 
 		auto width() const
 		{
-			return m_width;
+			return m_size.width();
 		}
 
 		auto height() const
 		{
-			return std::size(m_block) / m_width;
+			return m_size.height();
 		}
 
-		PixelType get(uint32_t x, uint32_t y) const
+		auto area() const
 		{
-			return *getAddress(x, y);
+			return m_size.area();
 		}
 
-		PixelType& get(uint32_t x, uint32_t y)
+		Size2d size() const
 		{
-			return *const_cast<PixelType*>(std::as_const(*this).getAddress(x, y));
+			return Size2d{width(), height()};
 		}
+
 
 		PixelType operator()(uint32_t x, uint32_t y) const
 		{
@@ -69,47 +62,39 @@ namespace Texpainter::Model
 
 		Span2d<PixelType const> pixels() const
 		{
-			return {std::data(m_block), size()};
+			return {m_data.get(), size()};
 		}
 
 		Span2d<PixelType> pixels()
 		{
-			return {std::data(m_block), size()};
-		}
-
-		size_t area() const
-		{
-			return std::size(m_block);
-		}
-
-		Size2d size() const
-		{
-			return Size2d{width(), height()};
+			return {m_data.get(), size()};
 		}
 
 	private:
-		uint32_t m_width;
-		DataBlock<PixelType> m_block;
+		Size2d m_size;
+		std::unique_ptr<PixelType, CallFree> m_data;
 
 		PixelType const* getAddress(uint32_t x, uint32_t y) const
 		{
-			auto ptr = std::begin(m_block);
+			auto ptr = m_data.get();
 			return ptr + y * width() + x;
 		}
 	};
 
 	template<class PixelType, class OutputStream>
-	void write(BasicImage<PixelType> const& pal, OutputStream stream)
+	void write(BasicImage<PixelType> const& img, OutputStream stream)
 	{
-		write(pal.width(), stream);
-		write(static_cast<Texpainter::DataBlock<Texpainter::Model::Pixel> const&>(pal), stream);
+		write(img.size(), stream);
+		write(std::span{img.pixels().begin(), img.area()}, stream);
 	}
 
 	template<class PixelType, class InputStream>
 	BasicImage<PixelType> read(Empty<BasicImage<PixelType>>, InputStream stream)
 	{
-		auto width = read(Empty<uint32_t>{}, stream);
-		return BasicImage<PixelType>{width, read(Empty<DataBlock<Pixel>>{}, stream)};
+		auto size = read(Empty<Size2d>{}, stream);
+		BasicImage<PixelType> ret{size};
+		read(std::span{ret.pixels().begin(), ret.area()}, stream);
+		return ret;
 	}
 
 	template<class PixelType>

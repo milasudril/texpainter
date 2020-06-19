@@ -5,6 +5,7 @@
 #include <cassert>
 #include <vector>
 #include <functional>
+#include <cstring>
 
 namespace
 {
@@ -12,7 +13,7 @@ namespace
 	{
 		std::vector<std::byte> m_data;
 		uint32_t m_width{};
-		uint32_t m_n_elems{};
+		uint32_t m_height{};
 	};
 
 	void write(uint32_t val, Buffer& buff)
@@ -20,7 +21,7 @@ namespace
 		if(buff.m_width == 0) { buff.m_width = val; }
 		else
 		{
-			buff.m_n_elems = val;
+			buff.m_height = val;
 		}
 	}
 
@@ -32,7 +33,7 @@ namespace
 			buff.m_width = 0;
 			return ret;
 		}
-		return buff.m_n_elems;
+		return buff.m_height;
 	}
 
 	template<Texpainter::Trivial T>
@@ -53,24 +54,25 @@ namespace Testcases
 {
 	void texpainterImageCreateFromDataBlock()
 	{
-		Texpainter::DataBlock<Texpainter::Model::Pixel> dblock{6};
-		*(std::data(dblock) + 0) = Texpainter::Model::red();
-		*(std::data(dblock) + 1) = Texpainter::Model::green();
-		*(std::data(dblock) + 2) = Texpainter::Model::blue();
-		*(std::data(dblock) + 3) = Texpainter::Model::cyan();
-		*(std::data(dblock) + 4) = Texpainter::Model::magenta();
-		*(std::data(dblock) + 5) = Texpainter::Model::yellow();
-
-		Texpainter::Model::Image img{3u, std::move(dblock)};
+		Texpainter::Model::Image img{3u, 2u};
 		assert(img.width() == 3);
 		assert(img.height() == 2);
+		assert(img.area() == 6);
 
-		assert(distanceSquared(img.get(0, 0), Texpainter::Model::red()) == 0.0f);
-		assert(distanceSquared(img.get(1, 0), Texpainter::Model::green()) == 0.0f);
-		assert(distanceSquared(img.get(2, 0), Texpainter::Model::blue()) == 0.0f);
-		assert(distanceSquared(img.get(0, 1), Texpainter::Model::cyan()) == 0.0f);
-		assert(distanceSquared(img.get(1, 1), Texpainter::Model::magenta()) == 0.0f);
-		assert(distanceSquared(img.get(2, 1), Texpainter::Model::yellow()) == 0.0f);
+		auto ptr = img.pixels().begin();
+		*(ptr + 0) = Texpainter::Model::red();
+		*(ptr + 1) = Texpainter::Model::green();
+		*(ptr + 2) = Texpainter::Model::blue();
+		*(ptr + 3) = Texpainter::Model::cyan();
+		*(ptr + 4) = Texpainter::Model::magenta();
+		*(ptr + 5) = Texpainter::Model::yellow();
+
+		assert(distanceSquared(img(0, 0), Texpainter::Model::red()) == 0.0f);
+		assert(distanceSquared(img(1, 0), Texpainter::Model::green()) == 0.0f);
+		assert(distanceSquared(img(2, 0), Texpainter::Model::blue()) == 0.0f);
+		assert(distanceSquared(img(0, 1), Texpainter::Model::cyan()) == 0.0f);
+		assert(distanceSquared(img(1, 1), Texpainter::Model::magenta()) == 0.0f);
+		assert(distanceSquared(img(2, 1), Texpainter::Model::yellow()) == 0.0f);
 	}
 	void texpainterImageCreateEmpty()
 	{
@@ -82,20 +84,20 @@ namespace Testcases
 
 	void texpainterImageWriteRead()
 	{
-		Texpainter::DataBlock<Texpainter::Model::Pixel> dblock{6};
-		*(std::data(dblock) + 0) = Texpainter::Model::red();
-		*(std::data(dblock) + 1) = Texpainter::Model::green();
-		*(std::data(dblock) + 2) = Texpainter::Model::blue();
-		*(std::data(dblock) + 3) = Texpainter::Model::cyan();
-		*(std::data(dblock) + 4) = Texpainter::Model::magenta();
-		*(std::data(dblock) + 5) = Texpainter::Model::yellow();
+		Texpainter::Model::Image img{3u, 2u};
 
-		Texpainter::Model::Image img{3u, std::move(dblock)};
+		auto ptr = img.pixels().begin();
+		*(ptr + 0) = Texpainter::Model::red();
+		*(ptr + 1) = Texpainter::Model::green();
+		*(ptr + 2) = Texpainter::Model::blue();
+		*(ptr + 3) = Texpainter::Model::cyan();
+		*(ptr + 4) = Texpainter::Model::magenta();
+		*(ptr + 5) = Texpainter::Model::yellow();
 
 		Buffer buffer{};
 		write(std::as_const(img), std::ref(buffer));
-		assert(buffer.m_n_elems == 6);
 		assert(buffer.m_width == 3);
+		assert(buffer.m_height == 2);
 
 		auto img_2 = read(Texpainter::Empty<decltype(img)>{}, std::ref(buffer));
 
