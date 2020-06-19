@@ -25,7 +25,9 @@ namespace Texpainter::Generators
 	private:
 		struct PlanData
 		{
-			PlanData():m_plan{nullptr}, m_w_old{0}, m_h_old{0}{}
+			PlanData(): m_plan{nullptr}, m_w_old{0}, m_h_old{0}
+			{
+			}
 			fftwf_plan m_plan;
 			uint32_t m_w_old;
 			uint32_t m_h_old;
@@ -33,7 +35,6 @@ namespace Texpainter::Generators
 
 		PlanData m_plan_fwd;
 		PlanData m_plan_bkwd;
-
 	};
 }
 

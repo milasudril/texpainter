@@ -84,13 +84,51 @@ namespace Texpainter
 		}
 
 		std::tuple<uint32_t, uint32_t> size() const
-		{ return {m_width, m_height};}
+		{
+			return {m_width, m_height};
+		}
 
 	private:
 		T* r_ptr;
 		uint32_t m_width;
 		uint32_t m_height;
 	};
+
+	template<class T, class Func>
+	void for_each(Span2d<T> span, Func&& f)
+	{
+		for(uint32_t row = 0; row < span.height(); ++row)
+		{
+			for(uint32_t col = 0; col < span.width(); ++col)
+			{
+				f(col, row, span(col, row));
+			}
+		}
+	}
+
+	template<class T, class U, class Func>
+	void transform(Span2d<T> in, Span2d<U> out, Func&& f)
+	{
+		for(uint32_t row = 0; row < in.height(); ++row)
+		{
+			for(uint32_t col = 0; col < in.width(); ++col)
+			{
+				in(col, row) = f(col, row, in(col, row));
+			}
+		}
+	}
+
+	template<class T, class Func>
+	void generate(Span2d<T> out, Func&& f)
+	{
+		for(uint32_t row = 0; row < out.height(); ++row)
+		{
+			for(uint32_t col = 0; col < out.width(); ++col)
+			{
+				out(col, row) = f(col, row);
+			}
+		}
+	}
 }
 
 #endif

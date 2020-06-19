@@ -110,28 +110,25 @@ int main(int argc, char* argv[])
 
 	Texpainter::Generators::FourierTransform fft;
 
-	constexpr auto a = 2.0f;
 	auto spectrum = fft(img_in.pixels());
-	auto const x_0 = (spectrum.width() - .0f)/2.0f;
-	auto const y_0 = (spectrum.height() - .0f)/2.0f;
-	for(uint32_t row = 0; row < img_in.height(); ++row)
-	{
-		for(uint32_t col = 0; col < img_in.width(); ++col)
-		{
-			auto const xi = std::abs(static_cast<float>(col) - x_0);
-			auto const eta = std::abs(static_cast<float>(row) - y_0);
-			auto const r2 = std::max(xi*xi + eta*eta, 1.0f/(1024.0f));
-			auto H = 1.0f/(r2 + a*a);
-			spectrum(col, row) *= H;
-		}
-	}
+
+	for_each(spectrum.pixels(),
+	         [x_0 = (spectrum.width() - .0f) / 2.0f,
+	          y_0 = (spectrum.height() - .0f) / 2.0f](auto col, auto row, auto& val) {
+		         constexpr auto a = 2.0f;
+		         auto const xi = std::abs(static_cast<float>(col) - x_0);
+		         auto const eta = std::abs(static_cast<float>(row) - y_0);
+		         auto const r2 = std::max(xi * xi + eta * eta, 1.0f / (1024.0f));
+		         auto H = 1.0f / (r2 + a * a);
+		         val *= H;
+	         });
 
 	auto img = fft(spectrum.pixels());
-//	Texpainter::Model::BasicImage<float> img{spectrum.width(), spectrum.height()};
-//	std::ranges::transform(spectrum.pixels(), img.pixels().begin(), [](auto val) {
-//		auto tmp = (val*conj(val)).real();
-//		return tmp;
-//	});
+	//	Texpainter::Model::BasicImage<float> img{spectrum.width(), spectrum.height()};
+	//	std::ranges::transform(spectrum.pixels(), img.pixels().begin(), [](auto val) {
+	//		auto tmp = (val*conj(val)).real();
+	//		return tmp;
+	//	});
 
 
 	{

@@ -26,9 +26,10 @@ namespace Texpainter::Model
 		}
 
 		explicit BasicImage(std::tuple<uint32_t, uint32_t> size):
-		  m_width{std::get<0>(size)}
-		 ,m_block{std::get<0>(size)*std::get<1>(size)}
-		{}
+		   m_width{std::get<0>(size)},
+		   m_block{std::get<0>(size) * std::get<1>(size)}
+		{
+		}
 
 		operator DataBlock<PixelType> const&() const
 		{
@@ -81,7 +82,9 @@ namespace Texpainter::Model
 		}
 
 		std::tuple<uint32_t, uint32_t> size() const
-		{ return {width(), height()};}
+		{
+			return {width(), height()};
+		}
 
 	private:
 		uint32_t m_width;

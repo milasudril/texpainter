@@ -12,16 +12,16 @@ namespace Texpainter::Generators
 	class GrayscaleNoise
 	{
 	public:
-		explicit GrayscaleNoise(Rng&& rng = Rng{}, Distribution dist = Distribution{}): m_rng{std::move(rng)}, m_dist{dist}
+		explicit GrayscaleNoise(Rng&& rng = Rng{}, Distribution dist = Distribution{}):
+		   m_rng{std::move(rng)},
+		   m_dist{dist}
 		{
 		}
 
 		Model::BasicImage<float> operator()(std::tuple<uint32_t, uint32_t> size)
 		{
 			Model::BasicImage<float> ret{size};
-			std::ranges::generate(ret.pixels(), [this]() {
-				return m_dist(m_rng);
-			});
+			std::ranges::generate(ret.pixels(), [this]() { return m_dist(m_rng); });
 			return ret;
 		}
 
