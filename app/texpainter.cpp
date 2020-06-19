@@ -10,8 +10,7 @@
 #include "ui/box.hpp"
 #include "ui/color_picker_sidepanel.hpp"
 #include "ui/dialog.hpp"
-#include "generators/generators.hpp"
-#include "generators/fourier_transform.hpp"
+#include "generators/grayscale_noise.hpp"
 #include "generators/fourier_transform.hpp"
 
 #include <gtk/gtk.h>
@@ -107,28 +106,7 @@ int main(int argc, char* argv[])
 	Texpainter::Model::Document doc;
 	MyCallback cb{doc};
 
-#if 1
-	Texpainter::Model::BasicImage<float> img_in{512, 512};
-
-	{
-		std::mt19937 rng{};
-		std::ranges::generate(
-		   img_in.pixels(),
-		   [&rng, U = std::uniform_real_distribution{0.0f, 1.0f}]() mutable { return U(rng); });
-	}
-#else
-	Texpainter::Model::BasicImage<float> img_in{512, 512};
-
-	for(uint32_t row = 0; row < img_in.height(); ++row)
-	{
-		for(uint32_t col = 0; col < img_in.width(); ++col)
-		{
-			auto x = static_cast<float>(col)/static_cast<float>(img_in.width());
-			auto y = static_cast<float>(row)/static_cast<float>(img_in.height());
-			img_in(col, row) = sin(2*M_PI*x*16.0f) + sin(2*M_PI*y*16.0f);
-		}
-	}
-#endif
+	auto img_in = Texpainter::Generators::GrayscaleNoise<>{}(doc.image().size());
 
 	Texpainter::Generators::FourierTransform fft;
 

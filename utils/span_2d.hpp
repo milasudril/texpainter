@@ -83,6 +83,9 @@ namespace Texpainter
 			return *(ptr + y * width() + x);
 		}
 
+		std::tuple<uint32_t, uint32_t> size() const
+		{ return {m_width, m_height};}
+
 	private:
 		T* r_ptr;
 		uint32_t m_width;

@@ -80,6 +80,9 @@ namespace Texpainter::Model
 			return std::size(m_block);
 		}
 
+		std::tuple<uint32_t, uint32_t> size() const
+		{ return {width(), height()};}
+
 	private:
 		uint32_t m_width;
 		DataBlock<PixelType> m_block;
