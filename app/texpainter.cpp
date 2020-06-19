@@ -112,7 +112,8 @@ int main(int argc, char* argv[])
 
 	Texpainter::Generators::FourierTransform fft;
 
-	auto img = fft(Texpainter::Generators::ButterworthFreq2d{img_in.size(), 2.0f, 2.0f}(fft(img_in.pixels()).pixels())
+	auto img = fft(Texpainter::Generators::ButterworthFreq2d{img_in.size(), 2.0f, 16.0f}(
+	                  fft(img_in.pixels()).pixels())
 	                  .pixels());
 
 	//	Texpainter::Model::BasicImage<float> img{spectrum.width(), spectrum.height()};

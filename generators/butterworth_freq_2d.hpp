@@ -16,25 +16,25 @@ namespace Texpainter::Generators
 		explicit ButterworthFreq2dKernel(std::tuple<uint32_t, uint32_t> size, float a_x, float a_y):
 		   m_x_0{std::get<0>(size) / 2.0f},
 		   m_y_0{std::get<1>(size) / 2.0f},
-		   m_a_x{a_x},
-		   m_a_y{a_y}
+		   m_α_x{a_x * a_x},
+		   m_α_y{a_y * a_y}
 		{
 		}
 
 		auto operator()(auto col, auto row, auto val) const
 		{
-			auto const xi = std::abs(static_cast<float>(col) - m_x_0);
-			auto const eta = std::abs(static_cast<float>(row) - m_y_0);
-			auto const r2 = std::max(xi * xi + eta * eta, 1.0f / (1024.0f));
-			auto H = 1.0f / (r2 + m_a_x * m_a_x);
+			auto const ξ = std::abs(static_cast<float>(col) - m_x_0);
+			auto const η = std::abs(static_cast<float>(row) - m_y_0);
+			auto const denom = std::max(ξ * ξ * m_α_y + η * η * m_α_x + m_α_x * m_α_y, 1.0f / (1024.0f));
+			auto const H = 1.0f / denom;
 			return val * H;
 		}
 
 	private:
 		float m_x_0;
 		float m_y_0;
-		float m_a_x;
-		float m_a_y;
+		float m_α_x;
+		float m_α_y;
 	};
 
 	class ButterworthFreq2d
