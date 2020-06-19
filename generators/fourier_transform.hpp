@@ -25,12 +25,11 @@ namespace Texpainter::Generators
 	private:
 		struct PlanData
 		{
-			PlanData(): m_plan{nullptr}, m_w_old{0}, m_h_old{0}
+			PlanData(): m_plan{nullptr}, m_size{0, 0}
 			{
 			}
 			fftw_plan m_plan;
-			uint32_t m_w_old;
-			uint32_t m_h_old;
+			Size2d m_size;
 		};
 
 		PlanData m_plan_fwd;

@@ -13,14 +13,13 @@ operator()(Span2d<float const> vals_in)
 	Model::BasicImage<std::complex<double>> input_buffer{w, h};
 	auto input_buffer_ptr = reinterpret_cast<fftw_complex*>(std::data(input_buffer.pixels()));
 	auto fftw_out_ptr = reinterpret_cast<fftw_complex*>(std::data(ret.pixels()));
-	if(w != m_plan_fwd.m_w_old || h != m_plan_fwd.m_h_old) [[unlikely]]
+	if(vals_in.size() != m_plan_fwd.m_size) [[unlikely]]
 		{
 			memset(static_cast<void*>(std::data(input_buffer.pixels())),
 			       0,
 			       input_buffer.area() * sizeof(std::complex<double>));
 			auto plan = fftw_plan_dft_2d(h, w, input_buffer_ptr, fftw_out_ptr, FFTW_FORWARD, FFTW_MEASURE);
-			m_plan_fwd.m_w_old = w;
-			m_plan_fwd.m_h_old = h;
+			m_plan_fwd.m_size = vals_in.size();
 			fftw_destroy_plan(m_plan_fwd.m_plan);
 			m_plan_fwd.m_plan = plan;
 		}
@@ -51,14 +50,13 @@ operator()(Span2d<std::complex<double> const> vals_in)
 
 	Model::BasicImage<std::complex<double>> output_buffer{w, h};
 	auto fftw_out_ptr = reinterpret_cast<fftw_complex*>(std::data(output_buffer.pixels()));
-	if(w != m_plan_bkwd.m_w_old || h != m_plan_bkwd.m_h_old) [[unlikely]]
+	if(vals_in.size() != m_plan_bkwd.m_size) [[unlikely]]
 		{
 			Model::BasicImage<std::complex<double>> tmp{w, h};
 			auto ptr = reinterpret_cast<fftw_complex*>(std::data(tmp.pixels()));
 			memset(ptr, 0, tmp.area() * sizeof(std::complex<double>));
 			auto plan = fftw_plan_dft_2d(h, w, ptr, fftw_out_ptr, FFTW_BACKWARD, FFTW_MEASURE);
-			m_plan_bkwd.m_w_old = w;
-			m_plan_bkwd.m_h_old = h;
+			m_plan_bkwd.m_size = vals_in.size();
 			fftw_destroy_plan(m_plan_bkwd.m_plan);
 			m_plan_bkwd.m_plan = plan;
 		}
