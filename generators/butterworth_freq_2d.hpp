@@ -14,8 +14,8 @@ namespace Texpainter::Generators
 	{
 	public:
 		explicit ButterworthFreq2dKernel(std::tuple<uint32_t, uint32_t> size, float a_x, float a_y):
-		   m_x_0{std::get<0>(size) / 2.0f},
-		   m_y_0{std::get<1>(size) / 2.0f},
+		   m_x_0{std::get<0>(size) / 2.0},
+		   m_y_0{std::get<1>(size) / 2.0},
 		   m_α_x{a_x * a_x},
 		   m_α_y{a_y * a_y}
 		{
@@ -25,16 +25,16 @@ namespace Texpainter::Generators
 		{
 			auto const ξ = std::abs(static_cast<float>(col) - m_x_0);
 			auto const η = std::abs(static_cast<float>(row) - m_y_0);
-			auto const denom = std::max(ξ * ξ * m_α_y + η * η * m_α_x + m_α_x * m_α_y, 1.0f / (1024.0f));
-			auto const H = 1.0f / denom;
+			auto const denom = std::max(ξ * ξ * m_α_y + η * η * m_α_x + m_α_x * m_α_y, 1.0 / (1024.0*1024.0));
+			auto const H = 1.0 / denom;
 			return val * H;
 		}
 
 	private:
-		float m_x_0;
-		float m_y_0;
-		float m_α_x;
-		float m_α_y;
+		double m_x_0;
+		double m_y_0;
+		double m_α_x;
+		double m_α_y;
 	};
 
 	class ButterworthFreq2d
@@ -45,7 +45,7 @@ namespace Texpainter::Generators
 		{
 		}
 
-		Model::BasicImage<std::complex<float>> operator()(Span2d<std::complex<float> const> in)
+		Model::BasicImage<std::complex<double>> operator()(Span2d<std::complex<double> const> in)
 		{
 			return m_f(in);
 		}

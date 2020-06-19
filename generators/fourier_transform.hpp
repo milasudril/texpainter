@@ -16,9 +16,9 @@ namespace Texpainter::Generators
 	class FourierTransform
 	{
 	public:
-		Model::BasicImage<std::complex<float>> operator()(Span2d<float const> vals_in);
+		Model::BasicImage<std::complex<double>> operator()(Span2d<float const> vals_in);
 
-		Model::BasicImage<float> operator()(Span2d<std::complex<float> const> vals_in);
+		Model::BasicImage<float> operator()(Span2d<std::complex<double> const> vals_in);
 
 		~FourierTransform();
 
@@ -28,7 +28,7 @@ namespace Texpainter::Generators
 			PlanData(): m_plan{nullptr}, m_w_old{0}, m_h_old{0}
 			{
 			}
-			fftwf_plan m_plan;
+			fftw_plan m_plan;
 			uint32_t m_w_old;
 			uint32_t m_h_old;
 		};
