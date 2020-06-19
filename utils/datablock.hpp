@@ -5,6 +5,7 @@
 
 #include "./trivial.hpp"
 #include "./empty.hpp"
+#include "./call_free.hpp"
 
 #include <type_traits>
 #include <cstdlib>
@@ -14,17 +15,6 @@
 
 namespace Texpainter
 {
-	namespace detail
-	{
-		struct CallFree
-		{
-			void operator()(void* buffer)
-			{
-				free(buffer);
-			}
-		};
-	}
-
 	template<Trivial T>
 	class DataBlock
 	{
@@ -32,7 +22,7 @@ namespace Texpainter
 		using value_type = T;
 
 		template<class U>
-		using pointer_wrapper = std::unique_ptr<U, detail::CallFree>;
+		using pointer_wrapper = std::unique_ptr<U, CallFree>;
 
 		explicit DataBlock(pointer_wrapper<T> ptr, uint32_t size): m_size{size}, m_ptr{std::move(ptr)}
 		{
