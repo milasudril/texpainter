@@ -23,8 +23,8 @@ namespace Texpainter::Generators
 
 		auto operator()(auto col, auto row, auto val) const
 		{
-			auto const ξ = std::abs(static_cast<float>(col) - m_x_0);
-			auto const η = std::abs(static_cast<float>(row) - m_y_0);
+			auto const ξ = static_cast<float>(col) - m_x_0;
+			auto const η = static_cast<float>(row) - m_y_0;
 			auto const denom = std::max(ξ * ξ * m_α_y + η * η * m_α_x + m_α_x * m_α_y, aMin() * aMin());
 			auto const H = 1.0 / denom;
 			return val * H;

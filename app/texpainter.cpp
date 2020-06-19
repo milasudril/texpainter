@@ -14,6 +14,7 @@
 #include "generators/grayscale_noise.hpp"
 #include "generators/fourier_transform.hpp"
 #include "generators/butterworth_freq_2d.hpp"
+#include "generators/butterworth_freq_1d.hpp"
 
 #include <gtk/gtk.h>
 
@@ -109,11 +110,13 @@ int main(int argc, char* argv[])
 	MyCallback cb{doc};
 
 	doc.image() = Texpainter::Model::Image{512, 512};
-	auto img_in = Texpainter::Generators::GrayscaleNoise{std::uniform_real_distribution{-1.0f, 1.0f}}(
+	auto img_in = Texpainter::Generators::GrayscaleNoise{std::uniform_real_distribution{0.0f, 1.0f}}(
 	   doc.image().size());
 
 	Texpainter::Generators::FourierTransform fft;
 
+	Texpainter::Model::BasicImage<std::complex<double>> img_test{img_in.size()};
+	std::ranges::fill(img_test.pixels(), std::complex<double>{1.0, 0});
 	auto img = fft(Texpainter::Generators::ButterworthFreq2d{img_in.size(), 2.0, 2.0}(
 	                  fft(img_in.pixels()).pixels())
 	                  .pixels());
