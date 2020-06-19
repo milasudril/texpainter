@@ -8,11 +8,11 @@
 
 namespace Texpainter::Generators
 {
-	template<class Rng = std::mt19937, class Distribution = std::uniform_real_distribution<float>>
+	template<class Distribution = std::uniform_real_distribution<float>, class Rng = std::mt19937>
 	class GrayscaleNoise
 	{
 	public:
-		explicit GrayscaleNoise(Rng&& rng = Rng{}, Distribution dist = Distribution{}):
+		explicit GrayscaleNoise(Distribution dist = Distribution{}, Rng&& rng = Rng{}):
 		   m_rng{std::move(rng)},
 		   m_dist{dist}
 		{

@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
 	MyCallback cb{doc};
 
 	doc.image() = Texpainter::Model::Image{512, 512};
-	auto img_in = Texpainter::Generators::GrayscaleNoise{std::mt19937{}, std::uniform_real_distribution{-1.0f, 1.0f}}(doc.image().size());
+	auto img_in = Texpainter::Generators::GrayscaleNoise{std::uniform_real_distribution{-1.0f, 1.0f}}(doc.image().size());
 
 	Texpainter::Generators::FourierTransform fft;
 
