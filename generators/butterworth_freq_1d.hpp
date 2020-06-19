@@ -6,20 +6,18 @@
 #include "./pointwise_transform.hpp"
 
 #include "model/image.hpp"
-
-#include <numbers>
-#include <cmath>
+#include "utils/angle.hpp"
 
 namespace Texpainter::Generators
 {
 	class ButterworthFreq1dKernel
 	{
 	public:
-		explicit ButterworthFreq1dKernel(Size2d size, double a, double ϴ):
+		explicit ButterworthFreq1dKernel(Size2d size, Angle ϴ, double a):
 		   m_x_0{size.width() / 2.0},
 		   m_y_0{size.height() / 2.0},
-		   m_α{a * a},
-		   m_ϴ{ϴ}
+		   m_ϴ{ϴ},
+		   m_α{a * a}
 		{
 		}
 
@@ -28,10 +26,10 @@ namespace Texpainter::Generators
 			auto const ξ = static_cast<float>(col) - m_x_0;
 			auto const η = static_cast<float>(row) - m_y_0;
 
-			auto const ω = ξ*cos(m_ϴ) + η*sin(m_ϴ);
+			auto const ω = ξ * cos(m_ϴ) - η * sin(m_ϴ);
 
 			auto const denom = std::max(sqrt(ω * ω + m_α), aMin() * aMin());
-			auto const H = 1.0f/denom;
+			auto const H = 1.0f / denom;
 			return val * H;
 		}
 
@@ -42,27 +40,27 @@ namespace Texpainter::Generators
 
 		static constexpr auto ϴMin()
 		{
-			return 0.0f;
+			return Angle{0.0, Angle::Turns{}};
 		}
 
 		static constexpr auto ϴMax()
 		{
-			return std::numbers::pi;
+			return Angle{0.5, Angle::Turns{}};
 		}
 
 
 	private:
 		double m_x_0;
 		double m_y_0;
+		Angle m_ϴ;
 		double m_α;
-		double m_ϴ;
 	};
 
 	class ButterworthFreq1d
 	{
 	public:
-		explicit ButterworthFreq1d(Size2d size, double a, double ϴ):
-		   m_f{ButterworthFreq1dKernel{size, a, ϴ}}
+		explicit ButterworthFreq1d(Size2d size, Angle ϴ, double a):
+		   m_f{ButterworthFreq1dKernel{size, ϴ, a}}
 		{
 		}
 
