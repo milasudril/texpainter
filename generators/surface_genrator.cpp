@@ -23,6 +23,12 @@ namespace
 }
 
 Texpainter::Model::Image Texpainter::Generators::SurfaceGenerator::
+operator()(Tag<FilterGraph::None>, Size2d size)
+{
+	return normalizedRgba(m_noise(size));
+}
+
+Texpainter::Model::Image Texpainter::Generators::SurfaceGenerator::
 operator()(Tag<FilterGraph::Butt2d>, Size2d size)
 {
 	auto freq_scaled = m_cutoff_freq * vec2_t{0.5 * size.width(), 0.5 * size.height()};

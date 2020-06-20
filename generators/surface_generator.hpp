@@ -16,8 +16,9 @@ namespace Texpainter::Generators
 {
 	enum class FilterGraph : int
 	{
-		Butt2d,
+		None,
 		Gaussian2d,
+		Butt2d,
 		Butt1d,
 		Butt1dXThenY,
 		Butt1dXYSum
@@ -30,7 +31,7 @@ namespace Texpainter::Generators
 
 	constexpr FilterGraph begin(Empty<FilterGraph>)
 	{
-		return FilterGraph::Butt2d;
+		return FilterGraph::None;
 	}
 
 	class SurfaceGenerator
@@ -48,6 +49,7 @@ namespace Texpainter::Generators
 			return select(m_filters, *this, output_size);
 		}
 
+		Model::Image operator()(Tag<FilterGraph::None>, Size2d);
 		Model::Image operator()(Tag<FilterGraph::Butt2d>, Size2d);
 		Model::Image operator()(Tag<FilterGraph::Gaussian2d>, Size2d);
 		Model::Image operator()(Tag<FilterGraph::Butt1d>, Size2d);

@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
 
 	Texpainter::Generators::SurfaceGenerator generator;
 	doc.image() =
-	   generator.filters(Texpainter::Generators::FilterGraph::Butt1dXYSum)
+	   generator.filters(Texpainter::Generators::FilterGraph::None)
 	      .cutoffFrequency(Texpainter::SpatialFrequency{Texpainter::vec2_t{1.0 / 128.0, 1.0 / 64.0}})
 	      .orientation(Texpainter::Angle{0.083333, Texpainter::Angle::Turns{}})(
 	         Texpainter::Size2d{512, 512});
