@@ -25,7 +25,7 @@ namespace Texpainter::Generators
 
 	constexpr FilterGraph end(Empty<FilterGraph>)
 	{
-		return FilterGraph{static_cast<int>(FilterGraph::Butt2d) + 1};
+		return FilterGraph{static_cast<int>(FilterGraph::Butt1dXYSum) + 1};
 	}
 
 	constexpr FilterGraph begin(Empty<FilterGraph>)
@@ -54,6 +54,16 @@ namespace Texpainter::Generators
 		Model::Image operator()(Tag<FilterGraph::Butt1dXThenY>, Size2d);
 		Model::Image operator()(Tag<FilterGraph::Butt1dXYSum>, Size2d);
 
+		FilterGraph filters(FilterGraph f) const
+		{
+			return m_filters;
+		}
+
+		SurfaceGenerator& filters(FilterGraph f)
+		{
+			m_filters = f;
+			return *this;
+		}
 
 		Angle orientation() const
 		{

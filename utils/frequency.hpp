@@ -122,6 +122,12 @@ namespace Texpainter
 	{
 		return SpatialFrequency{dot(f, ξ_vec), dot(f, η_vec)};
 	}
+
+	inline constexpr Frequency length(SpatialFrequency f)
+	{
+		auto tmp = dot(f.value(), f.value());
+		return Frequency{sqrt(tmp)};
+	}
 }
 
 #endif

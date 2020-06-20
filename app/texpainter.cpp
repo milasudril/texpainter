@@ -108,58 +108,10 @@ int main(int argc, char* argv[])
 
 	Texpainter::Generators::SurfaceGenerator generator;
 	doc.image() =
-	   generator
-	      .cutoffFrequency(Texpainter::SpatialFrequency{Texpainter::vec2_t{1.0 / 256.0, 1.0 / 64.0}})
+	   generator.filters(Texpainter::Generators::FilterGraph::Butt1dXYSum)
+	      .cutoffFrequency(Texpainter::SpatialFrequency{Texpainter::vec2_t{1.0 / 128.0, 1.0 / 64.0}})
 	      .orientation(Texpainter::Angle{0.083333, Texpainter::Angle::Turns{}})(
 	         Texpainter::Size2d{512, 512});
-
-	{
-#if 0
-		for(uint32_t row = 1; row < img.height(); ++row)
-		{
-			for(uint32_t col = 1; col < img.width(); ++col)
-			{
-				auto x = static_cast<float>(col);
-				auto y = static_cast<float>(row);
-				auto r = sqrt(x * x + y * y);
-				//	auto output_x = img_in(col, row) + img(col - 1, row) * (1.0f - a);
-				//	auto output_y = img_in(col, row) + img(col, row - 1) * (1.0f - a);
-
-
-				auto output_x = img(col - 1, row) + r * (img_in(col, row) - a * img(col - 1, row)) / x;
-				auto output_y = img(col, row - 1) + r * (img_in(col, row) - a * img(col, row - 1)) / y;
-
-				auto sum = 0.5f * (output_x + output_y);
-
-				img(col, row) = sum;
-			}
-		}
-#endif
-	}
-
-	{
-#if 0
-	//	Canvas
-		Texpainter::Model::BasicImage<float> img_x{512, 512};
-		memset(std::data(img_x.pixels()), 0, sizeof(float)*img_x.area());
-
-		Texpainter::Model::BasicImage<float> img_y{512, 512};
-		memset(std::data(img_y.pixels()), 0, sizeof(float)*img_y.area());
-		for(uint32_t row = 1; row < img_x.height(); ++row)
-		{
-			for(uint32_t col = 1; col < img_x.width(); ++col)
-			{
-				img_x(col, row) = img_in(col, row) + img_x(col - 1, row) * (1.0f - a);
-				img_y(col, row) = img_in(col, row) + img_y(col, row - 1) * (1.0f - a);
-			}
-		}
-
-		std::ranges::transform(img_x.pixels(), img_y.pixels(), std::begin(img.pixels()), [](auto a, auto b)
-		{
-			return a + b;
-		});
-#endif
-	}
 
 	Texpainter::Ui::Window mainwin{"Texpainter"};
 	mainwin.defaultSize(Texpainter::Geom::Dimension{}.width(800).height(600));
@@ -181,11 +133,6 @@ int main(int argc, char* argv[])
 
 	box_outer.insertMode(Texpainter::Ui::Box::InsertMode{4, 0});
 
-	// Texpainter::Ui::Button btn{mainwin, "Hej"};
-	// btn.eventHandler<0>(cb);
-
-
-	//	Texpainter::Ui::Box box{mainwin, Texpainter::UiBox::Orientation::Vertical};
 
 	mainwin.eventHandler<0>(cb).show();
 	gtk_main();
