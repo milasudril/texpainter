@@ -3,75 +3,101 @@
 #ifndef TEXPAINTER_UTILS_FREQUENCY_HPP
 #define TEXPAINTER_UTILS_FREQUENCY_HPP
 
+#include "./vec_t.hpp"
+
 namespace Texpainter
 {
-	class Frequency
+	template<class Rep>
+	class BasicFrequency
 	{
 		public:
-			constexpr explicit Frequency(double val):m_val{val}
+			constexpr explicit BasicFrequency(Rep val):m_val{val}
 			{}
 
-			constexpr double operator/(Frequency other) const
+			constexpr Rep operator/(BasicFrequency other) const
 			{
 				return m_val/other.m_val;
 			}
 
-			constexpr Frequency& operator+=(Frequency other)
+			constexpr BasicFrequency& operator+=(BasicFrequency other)
 			{
 				m_val += other.m_val;
 				return *this;
 			}
 
-			constexpr Frequency& operator-=(Frequency other)
+			constexpr BasicFrequency& operator-=(BasicFrequency other)
 			{
 				m_val += other.m_val;
 				return *this;
 			}
 
-			constexpr Frequency& operator*=(double val)
+			constexpr BasicFrequency& operator*=(Rep val)
 			{
 				m_val *= val;
 				return *this;
 			}
 
-			constexpr Frequency& operator/=(double val)
+			constexpr BasicFrequency& operator/=(Rep val)
 			{
 				m_val /= val;
 				return *this;
 			}
 
+			constexpr auto value() const
+			{ return m_val; }
+
 
 		private:
-			double m_val;
+			Rep m_val;
 	};
 
-	constexpr auto operator+(Frequency f1, Frequency f2)
+	template<class Rep>
+	constexpr auto operator+(BasicFrequency<Rep> f1, BasicFrequency<Rep> f2)
 	{
 		f1+=f2;
 		return f1;
 	}
 
-	constexpr auto operator-(Frequency f1, Frequency f2)
+	template<class Rep>
+	constexpr auto operator-(BasicFrequency<Rep> f1, BasicFrequency<Rep> f2)
 	{
 		f1-=f2;
 		return f1;
 	}
 
-	constexpr auto operator*(Frequency f1, double c)
+	template<class Rep>
+	constexpr auto operator*(BasicFrequency<Rep> f1, Rep c)
 	{
 		f1*=c;
 		return f1;
 	}
 
-	constexpr auto operator/(Frequency f1, double c)
+	template<class Rep>
+	constexpr auto operator/(BasicFrequency<Rep> f1, Rep c)
 	{
 		f1/=c;
 		return f1;
 	}
 
-	constexpr auto operator*(double c, Frequency f2)
+	template<class Rep>
+	constexpr auto operator*(Rep c, BasicFrequency<Rep> f2)
 	{
 		return f2*c;
+	}
+
+	using Frequency = BasicFrequency<double>;
+	using SpatialFrequency = BasicFrequency<vec2_t>;
+
+	constexpr auto ξ(SpatialFrequency f)
+	{ return Frequency{f.value()[0]}; }
+
+	constexpr auto η(SpatialFrequency f)
+	{ return Frequency{f.value()[1]}; }
+
+	Frequency dot(SpatialFrequency f, vec2_t v)
+	{
+		f *= v;
+		return ξ(f) + η(f);
 	}
 }
 

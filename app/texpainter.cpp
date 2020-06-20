@@ -117,8 +117,8 @@ int main(int argc, char* argv[])
 
 	Texpainter::Model::BasicImage<std::complex<double>> img_test{img_in.size()};
 	std::ranges::fill(img_test.pixels(), std::complex<double>{1.0, 0});
-	auto img = fft(Texpainter::Generators::ButterworthFreq2d{
-	   img_in.size(), Texpainter::Angle{0.125, Texpainter::Angle::Turns{}}, 8.0, 2.0}(
+	auto img = fft(Texpainter::Generators::ButterworthFreq1d{
+	   img_in.size(), Texpainter::Angle{0.25, Texpainter::Angle::Turns{}}, Texpainter::Frequency{8.0}}(
 	                  fft(img_in.pixels()).pixels())
 	                  .pixels());
 
