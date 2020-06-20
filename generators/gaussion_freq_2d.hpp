@@ -15,12 +15,12 @@ namespace Texpainter::Generators
 	class GaussianFreq2dKernel
 	{
 	public:
-		explicit GaussianFreq2dKernel(Size2d size, Angle ϴ, double a_x, double a_y):
+		explicit GaussianFreq2dKernel(Size2d size, Angle ϴ, SpatialFrequency ω_c):
 		   m_x_0{size.width() / 2.0},
 		   m_y_0{size.height() / 2.0},
-		   m_ϴ{ϴ},
-		   m_α_x{a_x * a_x},
-		   m_α_y{a_y * a_y}
+		   m_rot_vec_ξ{cos(ϴ), -sin(ϴ)},
+		   m_rot_vec_η{sin(ϴ), cos(ϴ)},
+		   m_ω_c{ω_c}
 		{
 		}
 
@@ -41,18 +41,17 @@ namespace Texpainter::Generators
 
 
 	private:
-		double m_x_0;
-		double m_y_0;
-		Angle m_ϴ;
-		double m_α_x;
-		double m_α_y;
+		vec2_t m_O;
+		vec2_t m_rot_vec_ξ;
+		vec2_t m_rot_vec_η;
+		SpatialFrequency m_ω_c;
 	};
 
 	class GaussianFreq2d
 	{
 	public:
-		explicit GaussianFreq2d(Size2d size, Angle ϴ, double a_x, double a_y):
-		   m_f{GaussianFreq2dKernel{size, ϴ, a_x, a_y}}
+		explicit GaussianFreq2d(Size2d size, Angle ϴ, SpatialFrequency ω_c):
+		   m_f{GaussianFreq2dKernel{size, ϴ, ω_c}}
 		{
 		}
 

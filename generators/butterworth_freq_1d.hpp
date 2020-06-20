@@ -25,8 +25,8 @@ namespace Texpainter::Generators
 		{
 			auto ω = SpatialFrequency{vec2_t{static_cast<double>(col), static_cast<double>(row)} - m_O};
 			auto ξ = dot(ω, m_rot_vec);
-			auto const Ϙω = ξ/m_ω_c;
-			auto const H = 1.0 / sqrt(Ϙω*Ϙω + 1.0);
+			auto const Ϙω = ξ / m_ω_c;
+			auto const H = 1.0 / sqrt(Ϙω * Ϙω + 1.0);
 			return val * H;
 		}
 

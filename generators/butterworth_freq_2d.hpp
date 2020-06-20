@@ -7,62 +7,48 @@
 
 #include "model/image.hpp"
 #include "utils/angle.hpp"
+#include "utils/frequency.hpp"
 
 namespace Texpainter::Generators
 {
 	class ButterworthFreq2dKernel
 	{
 	public:
-		explicit ButterworthFreq2dKernel(Size2d size, Angle ϴ, double a_x, double a_y):
-		   m_x_0{size.width() / 2.0},
-		   m_y_0{size.height() / 2.0},
-		   m_ϴ{ϴ},
-		   m_α_x{a_x * a_x},
-		   m_α_y{a_y * a_y}
+		explicit ButterworthFreq2dKernel(Size2d size, Angle ϴ, SpatialFrequency ω_c):
+		   m_O{size.width() / 2.0, size.height() / 2.0},
+		   m_rot_vec_ξ{cos(ϴ), -sin(ϴ)},
+		   m_rot_vec_η{sin(ϴ), cos(ϴ)},
+		   m_ω_c{ω_c}
 		{
 		}
 
 		auto operator()(auto col, auto row, auto val) const
 		{
-			auto const ξ = static_cast<float>(col) - m_x_0;
-			auto const η = static_cast<float>(row) - m_y_0;
-			auto const ξ_ = ξ * cos(m_ϴ) - η * sin(m_ϴ);
-			auto const η_ = ξ * sin(m_ϴ) + η * cos(m_ϴ);
-			auto const denom = std::max(ξ_ * ξ_ * m_α_y + η_ * η_ * m_α_x + m_α_x * m_α_y, aMin() * aMin());
-			auto const H = 1.0 / denom;
+			auto ω = SpatialFrequency{vec2_t{static_cast<double>(col), static_cast<double>(row)} - m_O};
+			ω = transform(ω, m_rot_vec_ξ, m_rot_vec_η);
+			auto const Ϙω = ω / m_ω_c;
+			auto const H = 1.0 / (dot(Ϙω, Ϙω) + 1.0);
 			return val * H;
 		}
 
-		static constexpr auto aMin()
-		{
-			return 1.0 / 1024;
-		}
-
-
 	private:
-		double m_x_0;
-		double m_y_0;
-		Angle m_ϴ;
-		double m_α_x;
-		double m_α_y;
+		vec2_t m_O;
+		vec2_t m_rot_vec_ξ;
+		vec2_t m_rot_vec_η;
+		SpatialFrequency m_ω_c;
 	};
 
 	class ButterworthFreq2d
 	{
 	public:
-		explicit ButterworthFreq2d(Size2d size, Angle ϴ, double a_x, double a_y):
-		   m_f{ButterworthFreq2dKernel{size, ϴ, a_x, a_y}}
+		explicit ButterworthFreq2d(Size2d size, Angle ϴ, SpatialFrequency ω_c):
+		   m_f{ButterworthFreq2dKernel{size, ϴ, ω_c}}
 		{
 		}
 
 		Model::BasicImage<std::complex<double>> operator()(Span2d<std::complex<double> const> in)
 		{
 			return m_f(in);
-		}
-
-		static constexpr auto aMin()
-		{
-			return ButterworthFreq2dKernel::aMin();
 		}
 
 	private:
