@@ -21,7 +21,8 @@ namespace Texpainter::Ui
 		                      Args&&... args):
 		   m_box{container, orientation},
 		   m_label{m_box, label},
-		   m_input_field{m_box, std::forward<Args>(args)...}
+		   m_input_field{m_box.insertMode(Box::InsertMode{0, Box::Expand | Box::Fill}),
+		                 std::forward<Args>(args)...}
 		{
 		}
 

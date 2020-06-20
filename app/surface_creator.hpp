@@ -4,8 +4,9 @@
 //@	 }
 
 #include "generators/surface_generator.hpp"
-#include "ui/combobox.hpp"
 #include "ui/labeled_input.hpp"
+#include "ui/combobox.hpp"
+#include "ui/slider.hpp"
 #include "ui/image_view.hpp"
 #include "ui/box.hpp"
 
@@ -22,6 +23,8 @@ namespace Texpainter
 	private:
 		Ui::Box m_root;
 		Ui::LabeledInput<Ui::Combobox> m_filter_graph;
+		Ui::LabeledInput<Ui::Slider> m_orientation;
+		Ui::ImageView m_img_view;
 	};
 }
 

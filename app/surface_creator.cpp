@@ -26,7 +26,9 @@ namespace
 
 Texpainter::SurfaceCreator::SurfaceCreator(Ui::Container& owner):
    m_root{owner, Ui::Box::Orientation::Vertical},
-   m_filter_graph{m_root, Ui::Box::Orientation::Horizontal, "Filter graph: "}
+   m_filter_graph{m_root, Ui::Box::Orientation::Horizontal, "Filter graph: "},
+   m_orientation{m_root, Ui::Box::Orientation::Horizontal, "Orientation: ", false},
+   m_img_view{m_root}
 {
 	std::ranges::for_each(
 	   GraphNames, [& filters = m_filter_graph.inputField()](auto item) { filters.append(item); });
