@@ -1,6 +1,7 @@
 //@	{"targets":[{"name":"texpainter","type":"application", "pkgconfig_libs":["gtk+-3.0"]}]}
 
 #include "./palette_editor.hpp"
+#include "./surface_creator.hpp"
 
 #include "model/document.hpp"
 #include "ui/window.hpp"
@@ -128,7 +129,10 @@ int main(int argc, char* argv[])
 	box_outer.insertMode(
 	   Texpainter::Ui::Box::InsertMode{4, Texpainter::Ui::Box::Expand | Texpainter::Ui::Box::Fill});
 	Texpainter::Ui::ImageView imgview{box_outer};
+	box_outer.insertMode(Texpainter::Ui::Box::InsertMode{4, 0});
 	imgview.image(std::as_const(doc.image())).eventHandler<0>(cb);
+
+	Texpainter::SurfaceCreator surf{box_outer};
 
 
 	box_outer.insertMode(Texpainter::Ui::Box::InsertMode{4, 0});

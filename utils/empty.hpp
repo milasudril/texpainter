@@ -19,7 +19,16 @@ namespace Texpainter
 	struct Tag
 	{
 		static constexpr auto value = action_id;
+		using value_type = decltype(action_id);
 	};
+
+	// TODO: Add concept
+	template<class ActionId>
+	constexpr int itemDistance(ActionId a, ActionId b)
+	{
+		return static_cast<int>(b) - static_cast<int>(a);
+	}
+
 
 	namespace detail
 	{
@@ -28,13 +37,6 @@ namespace Texpainter
 
 		template<class ActionId, class Function, class... Args>
 		using DispatchFptr = dispatch_ret_type<ActionId, Function, Args...> (*)(Function&& f, Args...);
-
-
-		template<class ActionId>
-		constexpr int itemDistance(ActionId a, ActionId b)
-		{
-			return static_cast<int>(b) - static_cast<int>(a);
-		}
 
 		template<class ActionId>
 		constexpr ActionId previous(ActionId a)
@@ -84,9 +86,33 @@ namespace Texpainter
 	auto select(ActionId id, Function&& f, Args... args)
 	{
 		constexpr auto vtable = detail::genVtable<ActionId, Function, Args...>();
-		return vtable[detail::itemDistance(begin(Empty<ActionId>{}), id)](std::forward<Function>(f),
-		                                                                  std::forward<Args>(args)...);
+		return vtable[itemDistance(begin(Empty<ActionId>{}), id)](std::forward<Function>(f),
+		                                                          std::forward<Args>(args)...);
 	}
+
+	namespace detail
+	{
+		template<auto enum_item>
+		struct VisitEnumItem
+		{
+			using EnumType = decltype(enum_item);
+
+			template<class Function>
+			constexpr static void process(Function&& f)
+			{
+				constexpr auto current_id = previous(enum_item);
+				f(Tag<current_id>{});
+				if constexpr(current_id != begin(Empty<EnumType>{})) { VisitEnumItem<current_id>::process(f); }
+			}
+		};
+	}
+
+	template<class EnumType, class Function>
+	constexpr void forEachEnumItem(Function&& f)
+	{
+		detail::VisitEnumItem<end(Empty<EnumType>{})>::process(f);
+	}
+
 }
 
 #endif

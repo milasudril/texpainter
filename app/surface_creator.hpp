@@ -1,7 +1,32 @@
 //@	{
-//@	  "targets":[{"name":"surface_generator.hpp", "type":"include"}]
-//@	 ,"dependencies_extra":[{"ref":"surface_generator.o", "rel":"implementation"}]
+//@	  "targets":[{"name":"surface_creator.hpp", "type":"include"}]
+//@	 ,"dependencies_extra":[{"ref":"surface_creator.o","rel":"implementation"}]
 //@	 }
+
+#include "generators/surface_generator.hpp"
+#include "ui/combobox.hpp"
+#include "ui/labeled_input.hpp"
+#include "ui/image_view.hpp"
+#include "ui/box.hpp"
+
+#ifndef TEXPAINTER_SURFACECREATOR_HPP
+#define TEXPAINTER_SURFACECREATOR_HPP
+
+namespace Texpainter
+{
+	class SurfaceCreator
+	{
+	public:
+		explicit SurfaceCreator(Ui::Container& owner);
+
+	private:
+		Ui::Box m_root;
+		Ui::LabeledInput<Ui::Combobox> m_filter_graph;
+	};
+}
+
+#endif
+
 
 #ifndef TEXPAINTER_SURFACEGENERATOR_HPP
 #define TEXPAINTER_SURFACEGENERATOR_HPP
@@ -23,43 +48,6 @@ namespace Texpainter::Generators
 		Butt1dXThenY,
 		Butt1dXYSum
 	};
-
-	template<FilterGraph id>
-	struct FilterGraphItemTraits
-	{
-		static constexpr char const* name = "None";
-	};
-
-	template<>
-	struct FilterGraphItemTraits<FilterGraph::Gaussian2d>
-	{
-		static constexpr char const* name = "2d gaussian";
-	};
-
-	template<>
-	struct FilterGraphItemTraits<FilterGraph::Butt2d>
-	{
-		static constexpr char const* name = "2d 1st order Butterworth";
-	};
-
-	template<>
-	struct FilterGraphItemTraits<FilterGraph::Butt1d>
-	{
-		static constexpr char const* name = "1d 1st order Butterworth";
-	};
-
-	template<>
-	struct FilterGraphItemTraits<FilterGraph::Butt1dXThenY>
-	{
-		static constexpr char const* name = "1d 1st order Butterworth (x then y)";
-	};
-
-	template<>
-	struct FilterGraphItemTraits<FilterGraph::Butt1dXYSum>
-	{
-		static constexpr char const* name = "1d 1st order Butterworth (x and y separated, then mixed)";
-	};
-
 
 	constexpr FilterGraph end(Empty<FilterGraph>)
 	{
