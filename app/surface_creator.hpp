@@ -18,12 +18,31 @@ namespace Texpainter
 	class SurfaceCreator
 	{
 	public:
+		enum class ControlId : int
+		{
+			FilterGraph,
+			Orientation,
+			HorzCutoff,
+			VertCutoff
+		};
+
 		explicit SurfaceCreator(Ui::Container& owner);
 
+		template<ControlId id>
+		void onChanged(Ui::Combobox&);
+
+		template<ControlId id>
+		void onChanged(Ui::Slider&);
+
 	private:
+		Model::Image m_preview;
+		Generators::SurfaceGenerator m_generator; // TODO: should be a reference
+
 		Ui::Box m_root;
 		Ui::LabeledInput<Ui::Combobox> m_filter_graph;
 		Ui::LabeledInput<Ui::Slider> m_orientation;
+		Ui::LabeledInput<Ui::Slider> m_horz_cutoff;
+		Ui::LabeledInput<Ui::Slider> m_vert_cutoff;
 		Ui::ImageView m_img_view;
 	};
 }

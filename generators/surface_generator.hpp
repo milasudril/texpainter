@@ -93,7 +93,7 @@ namespace Texpainter::Generators
 		Model::Image operator()(Tag<FilterGraph::Butt1dXThenY>, Size2d);
 		Model::Image operator()(Tag<FilterGraph::Butt1dXYSum>, Size2d);
 
-		FilterGraph filters(FilterGraph f) const
+		FilterGraph filters() const
 		{
 			return m_filters;
 		}
