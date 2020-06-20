@@ -11,14 +11,29 @@
 
 namespace Texpainter::Generators
 {
-	template<class Distribution = std::uniform_real_distribution<float>, class Rng = std::mt19937>
+	template<class Dist = std::uniform_real_distribution<float>, class Rng = std::mt19937>
 	class GrayscaleNoise
 	{
 	public:
+		using RandomGenerator = Rng;
+		using Distribution = Dist;
+
 		explicit GrayscaleNoise(Distribution dist = Distribution{}, Rng&& rng = Rng{}):
 		   m_rng{std::move(rng)},
 		   m_dist{dist}
 		{
+		}
+
+		GrayscaleNoise& rngState(Rng&& state)
+		{
+			m_rng = std::move(state);
+			return *this;
+		}
+
+		GrayscaleNoise& probDist(Distribution&& dist)
+		{
+			m_dist = std::move(dist);
+			return *this;
 		}
 
 		Model::BasicImage<float> operator()(Size2d size)
