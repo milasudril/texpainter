@@ -15,6 +15,7 @@
 #include "generators/fourier_transform.hpp"
 #include "generators/butterworth_freq_2d.hpp"
 #include "generators/butterworth_freq_1d.hpp"
+#include "generators/gaussian_freq_2d.hpp"
 
 #include <gtk/gtk.h>
 
@@ -117,7 +118,7 @@ int main(int argc, char* argv[])
 
 	Texpainter::Model::BasicImage<std::complex<double>> img_test{img_in.size()};
 	std::ranges::fill(img_test.pixels(), std::complex<double>{1.0, 0});
-	auto img = fft(Texpainter::Generators::ButterworthFreq2d{
+	auto img = fft(Texpainter::Generators::GaussianFreq2d{
 	   img_in.size(),
 	   Texpainter::Angle{0.125, Texpainter::Angle::Turns{}},
 	   Texpainter::SpatialFrequency{Texpainter::vec2_t{8.0, 2.0}}}(fft(img_in.pixels()).pixels())
