@@ -82,14 +82,3 @@ operator()(Tag<FilterGraph::Butt1dXYSum>, Size2d size)
 
 	return normalizedRgba(m_fft(output_b));
 }
-
-/*
-Texpainter::Model::Image Texpainter::SurfaceGenerator::operator()(Tag<FilterGraph::Gaussian2d>,
-Size2d)
-
-
-Texpainter::Model::Image Texpainter::SurfaceGenerator::operator()(Tag<FilterGraph::Butt1d>, Size2d);
-Texpainter::Model::Image Texpainter::SurfaceGenerator::operator()(Tag<FilterGraph::Butt1dXThenY>,
-Size2d); Texpainter::Model::Image
-Texpainter::SurfaceGenerator::operator()(Tag<FilterGraph::Butt1dXYSum>, Size2d);
-*/
