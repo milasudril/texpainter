@@ -16,8 +16,15 @@ namespace Texpainter::Generators
 	class FourierTransform
 	{
 	public:
+		FourierTransform() = default;
+
+		FourierTransform(FourierTransform const&) = delete;
+		FourierTransform& operator=(FourierTransform const&) = delete;
+
 		Model::BasicImage<std::complex<double>> operator()(Span2d<float const> vals_in);
 
+		// This function should return a double, in case filtering makes the output range
+		// small
 		Model::BasicImage<float> operator()(Span2d<std::complex<double> const> vals_in);
 
 		~FourierTransform();

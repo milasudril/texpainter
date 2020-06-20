@@ -70,6 +70,16 @@ namespace Texpainter::Model
 			return {m_data.get(), size()};
 		}
 
+		operator Span2d<PixelType>()
+		{
+			return pixels();
+		}
+
+		operator Span2d<PixelType const>() const
+		{
+			return pixels();
+		}
+
 	private:
 		Size2d m_size;
 		std::unique_ptr<PixelType, CallFree> m_data;

@@ -11,11 +11,7 @@
 #include "ui/color_picker_sidepanel.hpp"
 #include "ui/dialog.hpp"
 
-#include "generators/grayscale_noise.hpp"
-#include "generators/fourier_transform.hpp"
-#include "generators/butterworth_freq_2d.hpp"
-#include "generators/butterworth_freq_1d.hpp"
-#include "generators/gaussian_freq_2d.hpp"
+#include "generators/surface_generator.hpp"
 
 #include <gtk/gtk.h>
 
@@ -110,19 +106,12 @@ int main(int argc, char* argv[])
 	Texpainter::Model::Document doc;
 	MyCallback cb{doc};
 
-	doc.image() = Texpainter::Model::Image{512, 512};
-	auto img_in = Texpainter::Generators::GrayscaleNoise{std::uniform_real_distribution{0.0f, 1.0f}}(
-	   doc.image().size());
-
-	Texpainter::Generators::FourierTransform fft;
-
-	Texpainter::Model::BasicImage<std::complex<double>> img_test{img_in.size()};
-	std::ranges::fill(img_test.pixels(), std::complex<double>{1.0, 0});
-	auto img = fft(Texpainter::Generators::GaussianFreq2d{
-	   img_in.size(),
-	   Texpainter::Angle{0.125, Texpainter::Angle::Turns{}},
-	   Texpainter::SpatialFrequency{Texpainter::vec2_t{8.0, 2.0}}}(fft(img_in.pixels()).pixels())
-	                  .pixels());
+	Texpainter::Generators::SurfaceGenerator generator;
+	doc.image() =
+	   generator
+	      .cutoffFrequency(Texpainter::SpatialFrequency{Texpainter::vec2_t{1.0 / 256.0, 1.0 / 64.0}})
+	      .orientation(Texpainter::Angle{0.083333, Texpainter::Angle::Turns{}})(
+	         Texpainter::Size2d{512, 512});
 
 	{
 #if 0
@@ -171,19 +160,6 @@ int main(int argc, char* argv[])
 		});
 #endif
 	}
-
-	auto pixels = img.pixels();
-	auto res = std::ranges::minmax_element(pixels);
-	printf("%.7g %.7g %.7g\n", *res.min, *res.max, *res.max - *res.min);
-
-	auto& img_disp = doc.image();
-
-	std::ranges::transform(
-	   img.pixels(), img_disp.pixels().begin(), [min = *res.min, max = *res.max](auto val) {
-		   Texpainter::Model::Pixel offset{-min, -min, -min, 0.0f};
-		   Texpainter::Model::Pixel factor{max - min, max - min, max - min, 1.0f};
-		   return (Texpainter::Model::Pixel{val, val, val, 1.0f} + offset) / factor;
-	   });
 
 	Texpainter::Ui::Window mainwin{"Texpainter"};
 	mainwin.defaultSize(Texpainter::Geom::Dimension{}.width(800).height(600));

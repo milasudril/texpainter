@@ -14,18 +14,28 @@
 
 namespace Texpainter::Generators
 {
+	enum class FilterGraph : int
+	{
+		Butt2d,
+		Gaussian2d,
+		Butt1d,
+		Butt1dXThenY,
+		Butt1dXYSum
+	};
+
+	constexpr FilterGraph end(Empty<FilterGraph>)
+	{
+		return FilterGraph{static_cast<int>(FilterGraph::Butt2d) + 1};
+	}
+
+	constexpr FilterGraph begin(Empty<FilterGraph>)
+	{
+		return FilterGraph::Butt2d;
+	}
+
 	class SurfaceGenerator
 	{
 	public:
-		enum class FilterGraph : int
-		{
-			Butt2d,
-			Gaussian2d,
-			Butt1d,
-			Butt1dXThenY,
-			Butt1dXYSum
-		};
-
 		SurfaceGenerator():
 		   m_filters{FilterGraph::Butt2d},
 		   m_orientation{0, Angle::Turns{}},
@@ -33,7 +43,17 @@ namespace Texpainter::Generators
 		{
 		}
 
-		Model::Image operator()(Size2d output_size);
+		Model::Image operator()(Size2d output_size)
+		{
+			return select(m_filters, *this, output_size);
+		}
+
+		Model::Image operator()(Tag<FilterGraph::Butt2d>, Size2d);
+		Model::Image operator()(Tag<FilterGraph::Gaussian2d>, Size2d);
+		Model::Image operator()(Tag<FilterGraph::Butt1d>, Size2d);
+		Model::Image operator()(Tag<FilterGraph::Butt1dXThenY>, Size2d);
+		Model::Image operator()(Tag<FilterGraph::Butt1dXYSum>, Size2d);
+
 
 		Angle orientation() const
 		{
@@ -42,7 +62,7 @@ namespace Texpainter::Generators
 
 		SurfaceGenerator& orientation(Angle orientation)
 		{
-			m_orientation = m_orientation;
+			m_orientation = orientation;
 			return *this;
 		}
 
