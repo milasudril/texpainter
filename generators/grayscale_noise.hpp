@@ -11,7 +11,7 @@
 
 namespace Texpainter::Generators
 {
-	template<class Dist = std::uniform_real_distribution<float>, class Rng = std::mt19937>
+	template<class Dist = std::uniform_real_distribution<double>, class Rng = std::mt19937>
 	class GrayscaleNoise
 	{
 	public:
@@ -36,9 +36,9 @@ namespace Texpainter::Generators
 			return *this;
 		}
 
-		Model::BasicImage<float> operator()(Size2d size)
+		Model::BasicImage<double> operator()(Size2d size)
 		{
-			Model::BasicImage<float> ret{size};
+			Model::BasicImage<double> ret{size};
 			std::ranges::generate(ret.pixels(), [this]() { return m_dist(m_rng); });
 			return ret;
 		}

@@ -7,7 +7,7 @@
 #include <cstring>
 
 Texpainter::Model::BasicImage<std::complex<double>> Texpainter::Generators::FourierTransform::
-operator()(Span2d<float const> vals_in)
+operator()(Span2d<double const> vals_in)
 {
 	auto const w = vals_in.width();
 	auto const h = vals_in.height();
@@ -44,7 +44,7 @@ operator()(Span2d<float const> vals_in)
 	return ret;
 }
 
-Texpainter::Model::BasicImage<float> Texpainter::Generators::FourierTransform::
+Texpainter::Model::BasicImage<double> Texpainter::Generators::FourierTransform::
 operator()(Span2d<std::complex<double> const> vals_in)
 {
 	auto const w = vals_in.width();
@@ -66,7 +66,7 @@ operator()(Span2d<std::complex<double> const> vals_in)
 	auto input_buffer_ptr =
 	   reinterpret_cast<fftw_complex*>(const_cast<std::complex<double>*>(std::data(vals_in)));
 	fftw_execute_dft(m_plan_bkwd.m_plan, input_buffer_ptr, fftw_out_ptr);
-	Texpainter::Model::BasicImage<float> ret{w, h};
+	Texpainter::Model::BasicImage<double> ret{w, h};
 	auto sign_row = 1;
 	for(uint32_t row = 0; row < h; ++row)
 	{

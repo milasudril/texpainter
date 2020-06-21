@@ -9,14 +9,20 @@
 
 namespace
 {
-	Texpainter::Model::Image normalizedRgba(Texpainter::Span2d<float const> source)
+	Texpainter::Model::Image normalizedRgba(Texpainter::Span2d<double const> source)
 	{
 		auto res = std::ranges::minmax_element(source);
 		Texpainter::Model::Image ret{source.size()};
 		std::ranges::transform(source, ret.pixels().begin(), [min = *res.min, max = *res.max](auto val) {
-			Texpainter::Model::Pixel offset{-min, -min, -min, 0.0f};
-			Texpainter::Model::Pixel factor{max - min, max - min, max - min, 1.0f};
-			return (Texpainter::Model::Pixel{val, val, val, 1.0f} + offset) / factor;
+			Texpainter::vec4_double_t const offset{-min, -min, -min, 0.0};
+			Texpainter::vec4_double_t const factor{max - min, max - min, max - min, 1.0};
+
+			auto const output = (Texpainter::vec4_double_t{val, val, val, 1.0} + offset) / factor;
+
+			return Texpainter::Model::Pixel{static_cast<float>(output[0]),
+			                                static_cast<float>(output[1]),
+			                                static_cast<float>(output[2]),
+			                                static_cast<float>(output[3])};
 		});
 		return ret;
 	}

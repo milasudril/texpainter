@@ -6,6 +6,7 @@
 namespace Texpainter
 {
 	using vec4_t __attribute__((vector_size(16))) = float;
+	using vec4_double_t __attribute__((vector_size(32))) = double;
 	using vec2_t __attribute__((vector_size(16))) = double;
 
 	constexpr inline double dot(vec2_t a, vec2_t b)
