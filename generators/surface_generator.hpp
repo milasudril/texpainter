@@ -74,6 +74,9 @@ namespace Texpainter::Generators
 	class SurfaceGenerator
 	{
 	public:
+		using NoiseSource = GrayscaleNoise<>;
+		using Distribution = NoiseSource::Distribution;
+
 		SurfaceGenerator():
 		   m_filters{FilterGraph::Butt2d},
 		   m_orientation{0, Angle::Turns{}},
@@ -126,24 +129,23 @@ namespace Texpainter::Generators
 			return *this;
 		}
 
-		SurfaceGenerator& noiseRng(GrayscaleNoise<>::RandomGenerator&& rng)
+		SurfaceGenerator& noiseRng(NoiseSource::RandomGenerator&& rng)
 		{
 			m_noise.rngState(std::move(rng));
 			return *this;
 		}
 
-		SurfaceGenerator& noiseDistribution(GrayscaleNoise<>::Distribution&& dist)
+		SurfaceGenerator& noiseDistribution(Distribution&& dist)
 		{
 			m_noise.probDist(std::move(dist));
 			return *this;
 		}
 
-
 	private:
 		FilterGraph m_filters;
 		Angle m_orientation;
 		SpatialFrequency m_cutoff_freq;
-		GrayscaleNoise<> m_noise;
+		NoiseSource m_noise;
 		FourierTransform m_fft;
 	};
 }
