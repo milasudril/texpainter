@@ -128,6 +128,11 @@ namespace Texpainter
 		auto tmp = dot(f.value(), f.value());
 		return Frequency{sqrt(tmp)};
 	}
+
+	inline constexpr Frequency mean(Frequency a, Frequency b)
+	{
+		return Frequency{sqrt(a.value() * b.value())};
+	}
 }
 
 #endif

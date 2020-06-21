@@ -39,8 +39,12 @@ Texpainter::SurfaceCreator::SurfaceCreator(Ui::Container& owner):
    m_root{owner, Ui::Box::Orientation::Vertical},
    m_filter_graph{m_root, Ui::Box::Orientation::Horizontal, "Filter graph: "},
    m_orientation{m_root, Ui::Box::Orientation::Horizontal, "Orientation: ", false},
-   m_horz_cutoff{m_root, Ui::Box::Orientation::Horizontal, "Horz cutoff freq: ", false},
-   m_vert_cutoff{m_root, Ui::Box::Orientation::Horizontal, "Vert cutoff freq: ", false},
+   m_cutoff{m_root, Ui::Box::Orientation::Horizontal},
+   m_cutoff_sliders{m_cutoff.insertMode(Ui::Box::InsertMode{0, Ui::Box::Expand | Ui::Box::Fill}),
+                    Ui::Box::Orientation::Vertical},
+   m_horz_cutoff{m_cutoff_sliders, Ui::Box::Orientation::Horizontal, "Horz cutoff freq: ", false},
+   m_vert_cutoff{m_cutoff_sliders, Ui::Box::Orientation::Horizontal, "Vert cutoff freq: ", false},
+   m_cutoff_sliders_lock{m_cutoff.insertMode(Ui::Box::InsertMode{0, 0}), "Lock\nv/h"},
    m_img_view{m_root.insertMode(Ui::Box::InsertMode{0, Ui::Box::Expand | Ui::Box::Fill})}
 {
 	std::ranges::for_each(
@@ -58,6 +62,7 @@ Texpainter::SurfaceCreator::SurfaceCreator(Ui::Container& owner):
 	m_vert_cutoff.inputField()
 	   .value(toSliderValue(cutoff.η()))
 	   .eventHandler<ControlId::VertCutoff>(*this);
+	m_cutoff_sliders_lock.eventHandler<ControlId::LockHvCutoff>(*this);
 	m_preview = m_generator(m_preview.size());
 	m_img_view.image(m_preview);
 }
@@ -84,9 +89,22 @@ template<>
 void Texpainter::SurfaceCreator::onChanged<Texpainter::SurfaceCreator::ControlId::HorzCutoff>(
    Ui::Slider& source)
 {
-	auto horz_cutoff = sliderValueToFrequency(source.value());
-	auto vert_cutoff = sliderValueToFrequency(m_vert_cutoff.inputField().value());
-	m_generator.cutoffFrequency(SpatialFrequency{horz_cutoff, vert_cutoff});
+	auto const horz_cutoff = sliderValueToFrequency(source.value());
+	auto const vert_cutoff = sliderValueToFrequency(m_vert_cutoff.inputField().value());
+
+	if(m_cutoff_sliders_lock.state())
+	{
+		auto freq_new = mean(horz_cutoff, vert_cutoff);
+		auto val_new = toSliderValue(freq_new);
+		m_horz_cutoff.inputField().value(val_new);
+		m_vert_cutoff.inputField().value(val_new);
+		m_generator.cutoffFrequency(SpatialFrequency{freq_new, freq_new});
+	}
+	else
+	{
+		m_generator.cutoffFrequency(SpatialFrequency{horz_cutoff, vert_cutoff});
+	}
+
 	m_preview = m_generator(m_preview.size());
 	m_img_view.update();
 }
@@ -95,9 +113,42 @@ template<>
 void Texpainter::SurfaceCreator::onChanged<Texpainter::SurfaceCreator::ControlId::VertCutoff>(
    Ui::Slider& source)
 {
-	auto horz_cutoff = sliderValueToFrequency(m_horz_cutoff.inputField().value());
-	auto vert_cutoff = sliderValueToFrequency(source.value());
-	m_generator.cutoffFrequency(SpatialFrequency{horz_cutoff, vert_cutoff});
+	auto const horz_cutoff = sliderValueToFrequency(m_horz_cutoff.inputField().value());
+	auto const vert_cutoff = sliderValueToFrequency(source.value());
+
+	if(m_cutoff_sliders_lock.state())
+	{
+		auto freq_new = mean(horz_cutoff, vert_cutoff);
+		auto val_new = toSliderValue(freq_new);
+		m_horz_cutoff.inputField().value(val_new);
+		m_vert_cutoff.inputField().value(val_new);
+		m_generator.cutoffFrequency(SpatialFrequency{freq_new, freq_new});
+	}
+	else
+	{
+		m_generator.cutoffFrequency(SpatialFrequency{horz_cutoff, vert_cutoff});
+	}
+
 	m_preview = m_generator(m_preview.size());
 	m_img_view.update();
+}
+
+template<>
+void Texpainter::SurfaceCreator::onClicked<Texpainter::SurfaceCreator::ControlId::LockHvCutoff>(
+   Ui::Button& btn)
+{
+	if(btn.state())
+	{
+		auto horz_cutoff = sliderValueToFrequency(m_horz_cutoff.inputField().value());
+		auto vert_cutoff = sliderValueToFrequency(m_vert_cutoff.inputField().value());
+
+		auto freq_new = mean(horz_cutoff, vert_cutoff);
+		auto val_new = toSliderValue(freq_new);
+		m_horz_cutoff.inputField().value(val_new);
+		m_vert_cutoff.inputField().value(val_new);
+		m_generator.cutoffFrequency(SpatialFrequency{freq_new, freq_new});
+
+		m_preview = m_generator(m_preview.size());
+		m_img_view.update();
+	}
 }

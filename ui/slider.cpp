@@ -23,7 +23,10 @@ public:
 
 	void value(double x) noexcept
 	{
+		auto r_eh_old = r_eh; // Disable event handler when changing value
+		r_eh = nullptr;
 		gtk_range_set_value(GTK_RANGE(m_handle), x);
+		r_eh = r_eh_old;
 	}
 
 private:
