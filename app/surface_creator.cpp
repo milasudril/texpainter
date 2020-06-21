@@ -22,6 +22,16 @@ namespace
 	}
 
 	constexpr auto GraphNames = getGraphNames();
+
+	Texpainter::Frequency sliderValueToFrequency(double val)
+	{
+		return Texpainter::Frequency{std::exp2(10 * (val - 1.0))};
+	}
+
+	double toSliderValue(Texpainter::Frequency f)
+	{
+		return std::log2(f.value()) / 10.0 + 1.0;
+	}
 }
 
 Texpainter::SurfaceCreator::SurfaceCreator(Ui::Container& owner):
@@ -42,8 +52,12 @@ Texpainter::SurfaceCreator::SurfaceCreator(Ui::Container& owner):
 	   .value(m_generator.orientation().turns())
 	   .eventHandler<ControlId::Orientation>(*this);
 	auto cutoff = m_generator.cutoffFrequency();
-	m_horz_cutoff.inputField().value(cutoff.ξ().value()).eventHandler<ControlId::HorzCutoff>(*this);
-	m_vert_cutoff.inputField().value(cutoff.η().value()).eventHandler<ControlId::VertCutoff>(*this);
+	m_horz_cutoff.inputField()
+	   .value(toSliderValue(cutoff.ξ()))
+	   .eventHandler<ControlId::HorzCutoff>(*this);
+	m_vert_cutoff.inputField()
+	   .value(toSliderValue(cutoff.η()))
+	   .eventHandler<ControlId::VertCutoff>(*this);
 	m_preview = m_generator(m_preview.size());
 	m_img_view.image(m_preview);
 }
@@ -70,8 +84,9 @@ template<>
 void Texpainter::SurfaceCreator::onChanged<Texpainter::SurfaceCreator::ControlId::HorzCutoff>(
    Ui::Slider& source)
 {
-	auto vert_cutoff = m_vert_cutoff.inputField().value();
-	m_generator.cutoffFrequency(SpatialFrequency{vec2_t{source.value(), vert_cutoff}});
+	auto horz_cutoff = sliderValueToFrequency(source.value());
+	auto vert_cutoff = sliderValueToFrequency(m_vert_cutoff.inputField().value());
+	m_generator.cutoffFrequency(SpatialFrequency{horz_cutoff, vert_cutoff});
 	m_preview = m_generator(m_preview.size());
 	m_img_view.update();
 }
@@ -80,8 +95,9 @@ template<>
 void Texpainter::SurfaceCreator::onChanged<Texpainter::SurfaceCreator::ControlId::VertCutoff>(
    Ui::Slider& source)
 {
-	auto horz_cutoff = m_horz_cutoff.inputField().value();
-	m_generator.cutoffFrequency(SpatialFrequency{vec2_t{horz_cutoff, source.value()}});
+	auto horz_cutoff = sliderValueToFrequency(m_horz_cutoff.inputField().value());
+	auto vert_cutoff = sliderValueToFrequency(source.value());
+	m_generator.cutoffFrequency(SpatialFrequency{horz_cutoff, vert_cutoff});
 	m_preview = m_generator(m_preview.size());
 	m_img_view.update();
 }
