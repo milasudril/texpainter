@@ -54,8 +54,8 @@ Texpainter::Model::Image Texpainter::Generators::SurfaceGenerator::
 operator()(Tag<FilterGraph::Butt1d>, Size2d size)
 {
 	auto freq_scaled = m_cutoff_freq * vec2_t{0.5 * size.width(), 0.5 * size.height()};
-	return normalizedRgba(
-	   m_fft(ButterworthFreq1d{size, m_orientation, mean(freq_scaled.ξ(), freq_scaled.η())}(m_fft(m_noise(size)))));
+	return normalizedRgba(m_fft(ButterworthFreq1d{
+	   size, m_orientation, mean(freq_scaled.ξ(), freq_scaled.η())}(m_fft(m_noise(size)))));
 }
 
 Texpainter::Model::Image Texpainter::Generators::SurfaceGenerator::

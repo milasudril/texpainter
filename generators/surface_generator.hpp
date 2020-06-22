@@ -60,15 +60,9 @@ namespace Texpainter::Generators
 		static constexpr char const* name = "1d 1st order Butterworth (x and y separated, then mixed)";
 	};
 
-
 	constexpr FilterGraph end(Empty<FilterGraph>)
 	{
 		return FilterGraph{static_cast<int>(FilterGraph::Butt1dXYSum) + 1};
-	}
-
-	constexpr FilterGraph begin(Empty<FilterGraph>)
-	{
-		return FilterGraph::None;
 	}
 
 	class SurfaceGenerator

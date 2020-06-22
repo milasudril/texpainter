@@ -32,22 +32,24 @@ namespace Texpainter
 
 	namespace detail
 	{
-		template<class ActionId, class Function, class... Args>
-		using dispatch_ret_type = std::result_of_t<Function(Tag<begin(Empty<ActionId>{})>, Args&&...)>;
-
-		template<class ActionId, class Function, class... Args>
-		using DispatchFptr = dispatch_ret_type<ActionId, Function, Args...> (*)(Function&& f, Args...);
-
 		template<class ActionId>
 		constexpr ActionId previous(ActionId a)
 		{
 			return ActionId{static_cast<int>(a) - 1};
 		}
 
+		template<class ActionId, class Function, class... Args>
+		using dispatch_ret_type =
+		   std::result_of_t<Function(Tag<previous(end(Empty<ActionId>{}))>, Args&&...)>;
+
+		template<class ActionId, class Function, class... Args>
+		using DispatchFptr = dispatch_ret_type<ActionId, Function, Args...> (*)(Function&& f, Args...);
+
+
 		template<class ActionId>
 		constexpr auto itemCount(Empty<ActionId> x)
 		{
-			return itemDistance(begin(x), end(x));
+			return static_cast<int>(end(x));
 		}
 
 		template<class ActionId, class Function, class... Args>
@@ -63,12 +65,12 @@ namespace Texpainter
 			constexpr static void assign(FptrArray<ActionId, Function, Args...>& pointers)
 			{
 				constexpr auto current_id = previous(action_id);
-				pointers[itemDistance(begin(Empty<ActionId>{}), current_id)] = []<class... A>(auto f, A... args)
+				pointers[static_cast<int>(current_id)] = []<class... A>(auto f, A... args)
 				{
 					return f(Tag<current_id>{}, std::forward<Args>(args)...);
 				};
 
-				if constexpr(current_id != begin(Empty<ActionId>{}))
+				if constexpr(static_cast<int>(current_id) != 0)
 				{ GenVtable<current_id>::template assign<Function, Args...>(pointers); }
 			}
 		};
@@ -86,8 +88,7 @@ namespace Texpainter
 	auto select(ActionId id, Function&& f, Args... args)
 	{
 		constexpr auto vtable = detail::genVtable<ActionId, Function, Args...>();
-		return vtable[itemDistance(begin(Empty<ActionId>{}), id)](std::forward<Function>(f),
-		                                                          std::forward<Args>(args)...);
+		return vtable[static_cast<int>(id)](std::forward<Function>(f), std::forward<Args>(args)...);
 	}
 
 	namespace detail
@@ -102,7 +103,7 @@ namespace Texpainter
 			{
 				constexpr auto current_id = previous(enum_item);
 				f(Tag<current_id>{});
-				if constexpr(current_id != begin(Empty<EnumType>{})) { VisitEnumItem<current_id>::process(f); }
+				if constexpr(static_cast<int>(current_id) != 0) { VisitEnumItem<current_id>::process(f); }
 			}
 		};
 	}

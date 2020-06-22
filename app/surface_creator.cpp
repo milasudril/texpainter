@@ -13,8 +13,7 @@ namespace
 		   ret{};
 
 		Texpainter::forEachEnumItem<Texpainter::Generators::FilterGraph>([&ret]<class Tag>(Tag) {
-			constexpr auto i =
-			   Texpainter::itemDistance(begin(Texpainter::Empty<typename Tag::value_type>{}), Tag::value);
+			constexpr auto i = static_cast<int>(Tag::value);
 			ret[i] = Texpainter::Generators::FilterGraphItemTraits<Tag::value>::name;
 		});
 
