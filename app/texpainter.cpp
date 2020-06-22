@@ -11,13 +11,49 @@
 #include "ui/box.hpp"
 #include "ui/color_picker_sidepanel.hpp"
 #include "ui/dialog.hpp"
-
-#include "generators/surface_generator.hpp"
+#include "ui/toolbar.hpp"
 
 #include <gtk/gtk.h>
 
 #include <functional>
 #include <string>
+
+enum class MenuAction : int
+{
+	GenNoise,
+	GenCracks,
+	GenVoronoi
+};
+
+constexpr auto end(Texpainter::Empty<MenuAction>)
+{
+	return static_cast<MenuAction>(static_cast<int>(MenuAction::GenVoronoi) + 1);
+}
+
+template<MenuAction action>
+struct MenuActionTraits;
+
+template<>
+struct MenuActionTraits<MenuAction::GenNoise>
+{
+	using type = Texpainter::Ui::Button;
+	static constexpr char const* name = "Gen. noise";
+};
+
+template<>
+struct MenuActionTraits<MenuAction::GenCracks>
+{
+	using type = Texpainter::Ui::Button;
+	static constexpr char const* name = "Gen. cracks";
+};
+
+template<>
+struct MenuActionTraits<MenuAction::GenVoronoi>
+{
+	using type = Texpainter::Ui::Button;
+	static constexpr char const* name = "Gen. voronoi";
+};
+
 
 struct MyCallback
 {
@@ -93,6 +129,12 @@ struct MyCallback
 		r_doc.get().selectedColorIndex(pal_editor.selectedColorIndex());
 	}
 
+	template<MenuAction>
+	void onClicked(Texpainter::Ui::Button& source)
+	{
+		source.state(false);
+	}
+
 
 	std::reference_wrapper<Texpainter::Model::Document> r_doc;
 	Texpainter::Ui::Window* r_mainwin;
@@ -123,6 +165,8 @@ int main(int argc, char* argv[])
 	pal_editor.inputField().eventHandler<0>(cb);
 
 	box_outer.homogenous(false);
+	Texpainter::Ui::Toolbar<MenuAction, MenuActionTraits, MyCallback> toolbar{box_outer,
+	                                                              Texpainter::Ui::Box::Orientation::Horizontal, cb};
 	cb.r_mainwin = &mainwin;
 
 

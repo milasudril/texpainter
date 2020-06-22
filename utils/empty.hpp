@@ -114,6 +114,60 @@ namespace Texpainter
 		detail::VisitEnumItem<end(Empty<EnumType>{})>::process(f);
 	}
 
+
+	namespace detail
+	{
+		template<class EnumType, int enum_item, template<auto> class EnumItemTraits>
+		struct MakeTupleFromEnum: public MakeTupleFromEnum<EnumType, previous(enum_item), EnumItemTraits>
+		{
+		private:
+			using Base = MakeTupleFromEnum<EnumType, previous(enum_item), EnumItemTraits>;
+			static constexpr auto CurrentIndex = previous(static_cast<EnumType>(enum_item));
+		public:
+			typename EnumItemTraits<CurrentIndex>::type m_value;
+
+			template<class CtorContext>
+			explicit MakeTupleFromEnum(CtorContext&& ctxt): Base{ctxt}, m_value{ctxt.template create<CurrentIndex>()}
+			{}
+		};
+
+		template<class EnumType, template<auto> class EnumItemTraits>
+		struct MakeTupleFromEnum<EnumType, 0, EnumItemTraits>
+		{
+			using type = EnumType;
+
+			template<class CtorContext>
+			explicit MakeTupleFromEnum(CtorContext&&){}
+
+
+			static constexpr auto size()
+			{
+				return static_cast<size_t>(end(Empty<EnumType>{}));
+			}
+		};
+	}
+
+	template<class EnumType, template<auto> class EnumItemTraits>
+	using TupleFromEnum =
+	   detail::MakeTupleFromEnum<EnumType, static_cast<int>(end(Empty<EnumType>{})), EnumItemTraits>;
+
+	template<auto EnumType, template<auto> class EnumItemTraits>
+	constexpr auto const& get(TupleFromEnum<decltype(EnumType), EnumItemTraits> const& x)
+	{
+		return static_cast<detail::MakeTupleFromEnum<decltype(EnumType),
+		                                             static_cast<int>(EnumType) + 1,
+		                                             EnumItemTraits> const&>(x)
+		   .m_value;
+	}
+
+	template<auto EnumType, template<auto> class EnumItemTraits>
+	constexpr auto& get(TupleFromEnum<decltype(EnumType), EnumItemTraits>& x)
+	{
+		return static_cast<detail::MakeTupleFromEnum<decltype(EnumType),
+		                                             static_cast<int>(EnumType) + 1,
+		                                             EnumItemTraits> const&>(x)
+		   .m_value;
+	}
 }
 
 #endif
