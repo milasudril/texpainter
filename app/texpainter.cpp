@@ -1,5 +1,8 @@
 //@	{"targets":[{"name":"texpainter","type":"application", "pkgconfig_libs":["gtk+-3.0"]}]}
 
+
+#include "./app_window.hpp"
+
 #include "./palette_editor.hpp"
 #include "./surface_creator.hpp"
 
@@ -15,6 +18,7 @@
 
 #include <gtk/gtk.h>
 
+#if 0
 #include <functional>
 #include <string>
 
@@ -140,11 +144,22 @@ struct MyCallback
 	Texpainter::Ui::Window* r_mainwin;
 	uint32_t m_button_mask{};
 };
+#endif
+
 
 int main(int argc, char* argv[])
 {
 	gtk_disable_setlocale();
 	gtk_init(&argc, &argv);
+
+	Texpainter::Ui::Window mainwin{"Texpainter"};
+	Texpainter::AppWindow app{mainwin};
+
+	mainwin.show();
+	gtk_main();
+
+
+#if 0
 
 	Texpainter::Model::Document doc;
 	MyCallback cb{doc};
@@ -187,5 +202,7 @@ int main(int argc, char* argv[])
 
 
 	mainwin.eventHandler<0>(cb).show();
+
 	gtk_main();
+#endif
 }

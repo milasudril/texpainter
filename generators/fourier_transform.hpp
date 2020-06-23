@@ -23,8 +23,6 @@ namespace Texpainter::Generators
 
 		Model::BasicImage<std::complex<double>> operator()(Span2d<double const> vals_in);
 
-		// This function should return a double, in case filtering makes the output range
-		// small
 		Model::BasicImage<double> operator()(Span2d<std::complex<double> const> vals_in);
 
 		~FourierTransform();
