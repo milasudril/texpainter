@@ -12,29 +12,31 @@
 
 namespace Texpainter::Ui
 {
-	template<class EnumType, template<EnumType> class EnumTypeTraits, class EventHandler>
+	template<class EnumType, template<EnumType> class EnumTypeTraits>
 	class Toolbar
 	{
 	public:
 		using ControlId = EnumType;
 
-		explicit Toolbar(Container& owner, Box::Orientation orientation, EventHandler& eh): m_box{owner, orientation},
-		m_eh{eh},
-		m_widgets{*this}
+		explicit Toolbar(Container& owner, Box::Orientation orientation): m_box{owner, orientation},
+		m_widgets{m_box, ""}
 		{
 		}
 
-		template<ControlId id>
-		decltype(auto) create()
+		template<EnumType item>
+		auto const& get() const
 		{
-			auto ret = typename EnumTypeTraits<id>::type{m_box, EnumTypeTraits<id>::name};
-			ret.template eventHandler<id>(m_eh);
-			return ret;
+			return Texpainter::get<item>(m_widgets);
+		}
+
+		template<EnumType item>
+		auto& get()
+		{
+			return Texpainter::get<item>(m_widgets);
 		}
 
 	private:
 		Box m_box;
-		EventHandler& m_eh;
 		TupleFromEnum<ControlId, EnumTypeTraits> m_widgets;
 	};
 }

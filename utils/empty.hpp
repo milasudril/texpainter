@@ -126,8 +126,8 @@ namespace Texpainter
 		public:
 			typename EnumItemTraits<CurrentIndex>::type m_value;
 
-			template<class CtorContext>
-			explicit MakeTupleFromEnum(CtorContext&& ctxt): Base{ctxt}, m_value{ctxt.template create<CurrentIndex>()}
+			template<class ... CtorArgs>
+			explicit MakeTupleFromEnum(CtorArgs&&... args): Base{args...}, m_value{args...}
 			{}
 		};
 
@@ -136,9 +136,8 @@ namespace Texpainter
 		{
 			using type = EnumType;
 
-			template<class CtorContext>
-			explicit MakeTupleFromEnum(CtorContext&&){}
-
+			template<class ... CtorArgs>
+			explicit MakeTupleFromEnum(CtorArgs&& ...){}
 
 			static constexpr auto size()
 			{
@@ -165,7 +164,7 @@ namespace Texpainter
 	{
 		return static_cast<detail::MakeTupleFromEnum<decltype(EnumType),
 		                                             static_cast<int>(EnumType) + 1,
-		                                             EnumItemTraits> const&>(x)
+		                                             EnumItemTraits>&>(x)
 		   .m_value;
 	}
 }

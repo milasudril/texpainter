@@ -165,8 +165,12 @@ int main(int argc, char* argv[])
 	pal_editor.inputField().eventHandler<0>(cb);
 
 	box_outer.homogenous(false);
-	Texpainter::Ui::Toolbar<MenuAction, MenuActionTraits, MyCallback> toolbar{box_outer,
-	                                                              Texpainter::Ui::Box::Orientation::Horizontal, cb};
+	Texpainter::Ui::Toolbar<MenuAction, MenuActionTraits> toolbar{box_outer,
+	                                                              Texpainter::Ui::Box::Orientation::Horizontal};
+
+	Texpainter::forEachEnumItem<MenuAction>([&toolbar](auto tag){
+		toolbar.get<tag.value>().label(MenuActionTraits<tag.value>::name);
+	});
 	cb.r_mainwin = &mainwin;
 
 
