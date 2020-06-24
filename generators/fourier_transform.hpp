@@ -7,33 +7,24 @@
 #define TEXPAINTER_GENERATORS_FOURIERTRANSFORM_HPP
 
 #include "model/image.hpp"
-
-#include <fftw3.h>
-#include <complex>
+#include "dft/plan.hpp"
 
 namespace Texpainter::Generators
 {
 	class FourierTransform
 	{
 	public:
-		FourierTransform() = default;
+		Model::BasicImage<Dft::Plan::sample_type> operator()(Span2d<double const> vals_in);
 
-		FourierTransform(FourierTransform const&) = delete;
-		FourierTransform& operator=(FourierTransform const&) = delete;
-
-		Model::BasicImage<std::complex<double>> operator()(Span2d<double const> vals_in);
-
-		Model::BasicImage<double> operator()(Span2d<std::complex<double> const> vals_in);
-
-		~FourierTransform();
+		Model::BasicImage<double> operator()(Span2d<Dft::Plan::sample_type const> vals_in);
 
 	private:
 		struct PlanData
 		{
-			PlanData(): m_plan{nullptr}, m_size{0, 0}
+			PlanData(): m_size{0, 0}
 			{
 			}
-			fftw_plan m_plan;
+			Dft::Plan m_plan;
 			Size2d m_size;
 		};
 
