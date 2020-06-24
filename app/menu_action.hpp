@@ -36,7 +36,7 @@ namespace Texpainter
 		}
 	};
 
-		template<>
+	template<>
 	struct MenuActionTraits<MenuAction::Open>
 	{
 		using type = Texpainter::Ui::Button;
@@ -46,7 +46,7 @@ namespace Texpainter
 		}
 	};
 
-		template<>
+	template<>
 	struct MenuActionTraits<MenuAction::Save>
 	{
 		using type = Texpainter::Ui::Button;

@@ -16,12 +16,13 @@ namespace Texpainter
 	{
 	public:
 		explicit AppWindow(Ui::Container& container):
-		   m_img{512,512},
+		   m_img{512, 512},
 		   m_columns{container, Ui::Box::Orientation::Horizontal},
 		   m_toolbar{m_columns, Ui::Box::Orientation::Vertical},
-		   m_rows{m_columns.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill|Ui::Box::Expand}), Ui::Box::Orientation::Vertical},
+		   m_rows{m_columns.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand}),
+		          Ui::Box::Orientation::Vertical},
 		   m_pal_editor{m_rows, Ui::Box::Orientation::Horizontal, "Palettes: "},
-		   m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill|Ui::Box::Expand})}
+		   m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
 		{
 			forEachEnumItem<MenuAction>([this](auto tag) {
 				m_toolbar.get<tag.value>()
