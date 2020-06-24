@@ -8,8 +8,8 @@
 Texpainter::Dft::Plan::Plan(Size2d size, Direction dir)
 {
 	auto const n = size.area();
-	auto input_buff = std::make_unique<std::complex<double>>(n);
-	auto output_buff = std::make_unique<std::complex<double>>(n);
+	auto input_buff = std::make_unique<std::complex<double>[]>(n);
+	auto output_buff = std::make_unique<std::complex<double>[]>(n);
 	std::fill(input_buff.get(), input_buff.get() + n, 0);
 	auto input_buff_ptr = reinterpret_cast<fftw_complex*>(input_buff.get());
 	auto output_buff_ptr = reinterpret_cast<fftw_complex*>(output_buff.get());
