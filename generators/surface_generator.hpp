@@ -28,42 +28,54 @@ namespace Texpainter::Generators
 	struct FilterGraphItemTraits
 	{
 		static constexpr char const* displayName()
-		{return "None";}
+		{
+			return "None";
+		}
 	};
 
 	template<>
 	struct FilterGraphItemTraits<FilterGraph::Gaussian2d>
 	{
 		static constexpr char const* displayName()
-		{ return "2d gaussian";}
+		{
+			return "2d gaussian";
+		}
 	};
 
 	template<>
 	struct FilterGraphItemTraits<FilterGraph::Butt2d>
 	{
 		static constexpr char const* displayName()
-		{ return "2d 1st order Butterworth";}
+		{
+			return "2d 1st order Butterworth";
+		}
 	};
 
 	template<>
 	struct FilterGraphItemTraits<FilterGraph::Butt1d>
 	{
 		static constexpr char const* displayName()
-		{ return "1d 1st order Butterworth"; }
+		{
+			return "1d 1st order Butterworth";
+		}
 	};
 
 	template<>
 	struct FilterGraphItemTraits<FilterGraph::Butt1dXThenY>
 	{
 		static constexpr char const* displayName()
-		{ return "1d 1st order Butterworth (x then y)";}
+		{
+			return "1d 1st order Butterworth (x then y)";
+		}
 	};
 
 	template<>
 	struct FilterGraphItemTraits<FilterGraph::Butt1dXYSum>
 	{
 		static constexpr char const* displayName()
-		{ return "1d 1st order Butterworth (x and y separated, then mixed)";}
+		{
+			return "1d 1st order Butterworth (x and y separated, then mixed)";
+		}
 	};
 
 	constexpr FilterGraph end(Empty<FilterGraph>)
