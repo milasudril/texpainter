@@ -14,22 +14,23 @@ namespace Texpainter::Generators
 	class FourierTransform
 	{
 	public:
-		Model::BasicImage<Dft::Plan::sample_type> operator()(Span2d<double const> vals_in);
+		Model::BasicImage<std::complex<double>> operator()(Span2d<double const> vals_in);
 
-		Model::BasicImage<double> operator()(Span2d<Dft::Plan::sample_type const> vals_in);
+		Model::BasicImage<double> operator()(Span2d<std::complex<double> const> vals_in);
 
 	private:
+		template<Dft::Direction dir>
 		struct PlanData
 		{
 			PlanData(): m_size{0, 0}
 			{
 			}
-			Dft::Plan m_plan;
+			Dft::Plan<dir> m_plan;
 			Size2d m_size;
 		};
 
-		PlanData m_plan_fwd;
-		PlanData m_plan_bkwd;
+		PlanData<Dft::Direction::Forward> m_plan_fwd;
+		PlanData<Dft::Direction::Backward> m_plan_bkwd;
 	};
 }
 

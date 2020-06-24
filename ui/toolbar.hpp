@@ -18,8 +18,9 @@ namespace Texpainter::Ui
 	public:
 		using ControlId = EnumType;
 
-		explicit Toolbar(Container& owner, Box::Orientation orientation): m_box{owner, orientation},
-		m_widgets{m_box, ""}
+		explicit Toolbar(Container& owner, Box::Orientation orientation):
+		   m_box{owner, orientation},
+		   m_widgets{m_box, ""}
 		{
 		}
 

@@ -5,7 +5,7 @@
 #include "./plan.hpp"
 #include "utils/datablock.hpp"
 
-Texpainter::Dft::Plan::Plan(Size2d size, Direction dir)
+Texpainter::Dft::BasicPlan::BasicPlan(Size2d size, Direction dir)
 {
 	auto const n = size.area();
 	auto input_buff = std::make_unique<std::complex<double>[]>(n);

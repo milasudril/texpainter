@@ -123,12 +123,14 @@ namespace Texpainter
 		private:
 			using Base = MakeTupleFromEnum<EnumType, previous(enum_item), EnumItemTraits>;
 			static constexpr auto CurrentIndex = previous(static_cast<EnumType>(enum_item));
+
 		public:
 			typename EnumItemTraits<CurrentIndex>::type m_value;
 
-			template<class ... CtorArgs>
+			template<class... CtorArgs>
 			explicit MakeTupleFromEnum(CtorArgs&&... args): Base{args...}, m_value{args...}
-			{}
+			{
+			}
 		};
 
 		template<class EnumType, template<auto> class EnumItemTraits>
@@ -136,8 +138,10 @@ namespace Texpainter
 		{
 			using type = EnumType;
 
-			template<class ... CtorArgs>
-			explicit MakeTupleFromEnum(CtorArgs&& ...){}
+			template<class... CtorArgs>
+			explicit MakeTupleFromEnum(CtorArgs&&...)
+			{
+			}
 
 			static constexpr auto size()
 			{
