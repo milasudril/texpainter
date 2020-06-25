@@ -7,7 +7,7 @@
 #define TEXPAINTER_GENERATORS_FOURIERTRANSFORM_HPP
 
 #include "model/image.hpp"
-#include "dft/plan.hpp"
+#include "dft/engine.hpp"
 
 namespace Texpainter::Generators
 {
@@ -19,18 +19,7 @@ namespace Texpainter::Generators
 		Model::BasicImage<double> operator()(Span2d<std::complex<double> const> vals_in);
 
 	private:
-		template<Dft::Direction dir>
-		struct PlanData
-		{
-			PlanData(): m_size{0, 0}
-			{
-			}
-			Dft::Plan<dir> m_plan;
-			Size2d m_size;
-		};
-
-		PlanData<Dft::Direction::Forward> m_plan_fwd;
-		PlanData<Dft::Direction::Backward> m_plan_bkwd;
+		Dft::Engine m_engine;
 	};
 }
 

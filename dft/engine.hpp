@@ -9,6 +9,7 @@
 
 #include <array>
 #include <chrono>
+#include <algorithm>
 
 namespace Texpainter::Dft
 {
@@ -18,15 +19,15 @@ namespace Texpainter::Dft
 		template<Direction dir>
 		void run(Size2d size,
 		         BasicPlan::sample_type const* input_buffer,
-		         BasicPlansample_type* output_buffer) const
+		         BasicPlan::sample_type* output_buffer) const
 		{
-			auto i = std::ranges::find_if(m_plans, [size, dir](auto const& val) {
-				return val.m_size;
+			auto i = std::ranges::find_if(m_plans, [size](auto const& val) {
+				return val.m_size == size;
 			});
 
 			if(i == std::end(m_plans)) [[unlikely]]
 			{
-				auto i = std::ranges::min_element(
+				i = std::ranges::min_element(
 					   m_plans, [](auto const& a, auto const& b) { return a.m_last_used < b.m_last_used; });
 				i->m_size = size;
 				i->m_plan_fwd = Plan<Direction::Forward>{size};
@@ -46,13 +47,13 @@ namespace Texpainter::Dft
 	private:
 		struct PlanData
 		{
-			Size2d m_size{};
+			Size2d m_size{0, 0};
 			std::chrono::time_point<std::chrono::steady_clock> m_last_used;
 			Plan<Direction::Forward> m_plan_fwd{};
-			Plan<direction::Backward> m_plan_bkwd{};
+			Plan<Direction::Backward> m_plan_bkwd{};
 		};
 
-		std::array<PlanData, 16> m_plans;
+		mutable std::array<PlanData, 16> m_plans;
 	};
 }
 
