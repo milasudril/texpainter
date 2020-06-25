@@ -146,6 +146,24 @@ struct MyCallback
 };
 #endif
 
+struct MainwinEventHandler
+{
+	template<int>
+	void onClose(Texpainter::Ui::Window&)
+	{
+		Texpainter::Ui::Window::terminateApp();
+	}
+
+	template<int>
+	void onKeyDown(Texpainter::Ui::Window&, int scancode)
+	{
+	}
+
+	template<int>
+	void onKeyUp(Texpainter::Ui::Window&, int scancode)
+	{
+	}
+};
 
 int main(int argc, char* argv[])
 {
@@ -155,7 +173,8 @@ int main(int argc, char* argv[])
 	Texpainter::Ui::Window mainwin{"Texpainter"};
 	Texpainter::AppWindow app{mainwin};
 
-	mainwin.show();
+	MainwinEventHandler eh;
+	mainwin.eventHandler<0>(eh).show();
 	gtk_main();
 
 
