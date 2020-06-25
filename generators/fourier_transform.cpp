@@ -6,15 +6,11 @@
 
 #include <cstring>
 
-Texpainter::Model::BasicImage<Texpainter::Dft::Plan::sample_type> Texpainter::Generators::FourierTransform::
+Texpainter::Dft::Engine Texpainter::Generators::FourierTransform::s_engine;
+
+Texpainter::Model::BasicImage<std::complex<double>> Texpainter::Generators::FourierTransform::
 operator()(Span2d<double const> vals_in)
 {
-	if(vals_in.size() != m_plan_fwd.m_size) [[unlikely]]
-		{
-			m_plan_fwd.m_plan = Dft::Plan{vals_in.size(), Dft::Direction::Forward};
-			m_plan_fwd.m_size = vals_in.size();
-		}
-
 	auto sign_row = 1;
 	Model::BasicImage<std::complex<double>> input_buffer{vals_in.size()};
 	for(uint32_t row = 0; row < vals_in.height(); ++row)
@@ -28,27 +24,21 @@ operator()(Span2d<double const> vals_in)
 		sign_row *= -1;
 	}
 
-	Model::BasicImage<Dft::Plan::sample_type> ret{vals_in.size()};
-	m_plan_fwd.m_plan.execute(input_buffer.pixels().data(), ret.pixels().data());
+	Model::BasicImage<std::complex<double>> ret{vals_in.size()};
+	s_engine.run<Dft::Direction::Forward>(vals_in.size(), input_buffer.pixels().data(), ret.pixels().data());
 	std::ranges::for_each(ret.pixels(), [area = vals_in.area()](auto& val) { return val /= area; });
 
 	return ret;
 }
 
 Texpainter::Model::BasicImage<double> Texpainter::Generators::FourierTransform::
-operator()(Span2d<Dft::Plan::sample_type const> vals_in)
+operator()(Span2d<std::complex<double> const> vals_in)
 {
 	auto const w = vals_in.width();
 	auto const h = vals_in.height();
 
-	if(vals_in.size() != m_plan_bkwd.m_size) [[unlikely]]
-		{
-			m_plan_fwd.m_plan = Dft::Plan{vals_in.size(), Dft::Direction::Backward};
-			m_plan_fwd.m_size = vals_in.size();
-		}
-
 	Model::BasicImage<std::complex<double>> output_buffer{w, h};
-	m_plan_fwd.m_plan.execute(vals_in.data(), output_buffer.pixels().data());
+	s_engine.run<Dft::Direction::Backward>(vals_in.size(), vals_in.data(), output_buffer.pixels().data());
 
 	Texpainter::Model::BasicImage<double> ret{w, h};
 	auto sign_row = 1;

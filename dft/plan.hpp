@@ -20,8 +20,7 @@ namespace Texpainter::Dft
 	{
 		void operator()(fftw_plan plan)
 		{
-			if(plan != nullptr)
-			{ fftw_destroy_plan(plan); }
+			if(plan != nullptr) { fftw_destroy_plan(plan); }
 		}
 	};
 
@@ -31,12 +30,14 @@ namespace Texpainter::Dft
 		Backward = FFTW_BACKWARD
 	};
 
-	class Plan
+	class BasicPlan
 	{
 	public:
-		explicit Plan(Size2d size, Direction dir);
+		explicit BasicPlan(Size2d size, Direction dir);
 
-		Plan():m_plan{nullptr}{}
+		BasicPlan(): m_plan{nullptr}
+		{
+		}
 
 		using sample_type = std::complex<double>;
 
@@ -49,11 +50,26 @@ namespace Texpainter::Dft
 		}
 
 		bool valid() const
-		{ return m_plan != nullptr; }
+		{
+			return m_plan != nullptr;
+		}
 
 	private:
 		using PlanType = std::remove_pointer_t<fftw_plan>;
 		std::unique_ptr<PlanType, PlanDeleter> m_plan;
+	};
+
+	template<Direction dir>
+	class Plan: public BasicPlan
+	{
+	public:
+		Plan(): BasicPlan{}
+		{
+		}
+
+		explicit Plan(Size2d size): BasicPlan{size, dir}
+		{
+		}
 	};
 }
 
