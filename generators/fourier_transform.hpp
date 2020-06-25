@@ -19,7 +19,7 @@ namespace Texpainter::Generators
 		Model::BasicImage<double> operator()(Span2d<std::complex<double> const> vals_in);
 
 	private:
-		Dft::Engine m_engine;
+		static Dft::Engine s_engine;
 	};
 }
 
