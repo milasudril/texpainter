@@ -51,6 +51,8 @@ namespace Texpainter::Ui
 
 		ImageView& image(Model::Image const& img);
 
+		ImageView& minSize(Size2d size);
+
 	private:
 		class Impl;
 		explicit ImageView(Impl& impl): m_impl(&impl)

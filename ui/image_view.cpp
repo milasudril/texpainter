@@ -86,6 +86,11 @@ public:
 		m_vt = vtable;
 	}
 
+	void minSize(Size2d size)
+	{
+		gtk_widget_set_size_request(GTK_WIDGET(m_handle), size.width(), size.height());
+	}
+
 private:
 	void* r_eh;
 	EventHandlerVtable m_vt;
@@ -203,5 +208,11 @@ Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::eventHandler(void* event_h
                                                                    EventHandlerVtable const& vtable)
 {
 	m_impl->eventHandler(event_handler, vtable);
+	return *this;
+}
+
+Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::minSize(Size2d size)
+{
+	m_impl->minSize(size);
 	return *this;
 }

@@ -63,7 +63,7 @@ Texpainter::SurfaceCreator::SurfaceCreator(Ui::Container& owner):
 	   .eventHandler<ControlId::VertCutoff>(*this);
 	m_cutoff_sliders_lock.eventHandler<ControlId::LockHvCutoff>(*this);
 	m_preview = m_generator(m_preview.size());
-	m_img_view.image(m_preview);
+	m_img_view.minSize(Size2d{385, 384}).image(m_preview);
 }
 
 template<>
