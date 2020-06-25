@@ -5,15 +5,19 @@
 
 #include "./palette_editor.hpp"
 #include "./menu_action.hpp"
+#include "./surface_creator.hpp"
 #include "ui/box.hpp"
 #include "ui/toolbar.hpp"
 #include "ui/image_view.hpp"
 #include "ui/labeled_input.hpp"
+#include "ui/dialog.hpp"
 
 namespace Texpainter
 {
 	class AppWindow
 	{
+		using NoiseGenDlg = Ui::Dialog<SurfaceCreator>;
+
 	public:
 		explicit AppWindow(Ui::Container& container):
 		   m_img{512, 512},
@@ -39,6 +43,22 @@ namespace Texpainter
 			btn.state(false);
 		}
 
+		template<MenuAction id>
+		void dismiss(NoiseGenDlg& dlg)
+		{
+			m_surf_creator.reset();
+			m_toolbar.get<id>().state(false);
+		}
+
+		template<MenuAction id>
+		void confirmPositive(NoiseGenDlg& dlg)
+		{
+			m_toolbar.get<id>().state(false);
+			m_img = m_surf_creator->widget().generate(Size2d{1024, 1024});
+			m_surf_creator.reset();
+			m_img_view.image(m_img);
+		}
+
 	private:
 		Model::Image m_img;
 		Ui::Box m_columns;
@@ -46,7 +66,16 @@ namespace Texpainter
 		Ui::Box m_rows;
 		Ui::LabeledInput<PaletteEditor> m_pal_editor;
 		Ui::ImageView m_img_view;
+
+		std::unique_ptr<NoiseGenDlg> m_surf_creator;
 	};
+
+	template<>
+	void AppWindow::onClicked<MenuAction::GenNoise>(Ui::Button& btn)
+	{
+		m_surf_creator = std::make_unique<NoiseGenDlg>(m_columns, "Generate noise");
+		m_surf_creator->eventHandler<MenuAction::GenNoise>(*this);
+	}
 }
 
 #endif

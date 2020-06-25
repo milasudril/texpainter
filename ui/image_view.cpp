@@ -10,14 +10,6 @@
 
 namespace
 {
-	bool realloc_surface_needed(Texpainter::Model::Image const& new_image,
-	                            Texpainter::Model::Image const* old_image)
-	{
-		if(old_image == nullptr) { return true; }
-
-		return size(new_image) != size(*old_image);
-	}
-
 	constexpr std::array<uint8_t, 256> gen_gamma_22_lut()
 	{
 		std::array<uint8_t, 256> ret{};
@@ -34,13 +26,12 @@ namespace
 class Texpainter::Ui::ImageView::Impl: private ImageView
 {
 public:
-	explicit Impl(Container& cnt): ImageView{*this}
+	explicit Impl(Container& cnt): ImageView{*this}, m_size_current{0, 0}
 	{
 		auto widget = gtk_drawing_area_new();
 		g_object_ref_sink(widget);
 		cnt.add(widget);
 		m_handle = GTK_DRAWING_AREA(widget);
-		r_img = nullptr;
 		m_img_surface = nullptr;
 		r_eh = nullptr;
 		gtk_widget_add_events(widget,
@@ -64,40 +55,53 @@ public:
 	{
 		auto context = gtk_widget_get_style_context(GTK_WIDGET(m_handle));
 		gtk_render_background(context, cr, 0, 0, dim.width(), dim.height());
-		if(m_img_surface != nullptr)
-		{
-			cairo_set_source_surface(cr, m_img_surface, 0.0, 0.0);
-			auto const w = r_img->width();
-			auto const h = r_img->height();
-			cairo_rectangle(cr, 0.0, 0.0, w, h);
-			cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
-			cairo_fill(cr);
-		}
+		if(m_img_surface != nullptr) [[likely]]
+			{
+				cairo_set_source_surface(cr, m_img_surface, 0.0, 0.0);
+				cairo_rectangle(cr, 0.0, 0.0, m_size_current.width(), m_size_current.height());
+				cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+				cairo_fill(cr);
+			}
 	}
 
 	void image(Model::Image const& img)
 	{
-		if(realloc_surface_needed(img, r_img))
-		{
-			auto surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, img.width(), img.height());
-			if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) { return; }
+		if(img.size() != m_size_current || m_img_surface == nullptr) [[unlikely]]
+			{
+				auto surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, img.width(), img.height());
+				if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) { return; }
 
-			if(m_img_surface != nullptr) { cairo_surface_destroy(m_img_surface); }
-			m_img_surface = surface;
-		}
-		r_img = &img;
-		update();
+				if(surface == nullptr) { abort(); }
+
+				cairo_surface_destroy(m_img_surface);
+				m_img_surface = surface;
+				m_size_current = img.size();
+			}
+		update(img);
 	}
 
-	void update()
+	void eventHandler(void* event_handler, EventHandlerVtable const& vtable)
+	{
+		r_eh = event_handler;
+		m_vt = vtable;
+	}
+
+private:
+	void* r_eh;
+	EventHandlerVtable m_vt;
+
+	cairo_surface_t* m_img_surface;
+	Size2d m_size_current;
+
+	void update(Model::Image const& img)
 	{
 		auto const stride = cairo_image_surface_get_stride(m_img_surface);
 		cairo_surface_flush(m_img_surface);
 		auto const data = cairo_image_surface_get_data(m_img_surface);
 		assert(data != nullptr);
-		auto const w = r_img->width();
-		auto const h = r_img->height();
-		auto read_ptr = std::data(r_img->pixels());
+		auto const w = img.width();
+		auto const h = img.height();
+		auto read_ptr = std::data(img.pixels());
 		for(uint32_t row = 0; row < h; ++row)
 		{
 			auto write_ptr = data + row * stride;
@@ -122,18 +126,6 @@ public:
 		gtk_widget_queue_draw(GTK_WIDGET(m_handle));
 	}
 
-	void eventHandler(void* event_handler, EventHandlerVtable const& vtable)
-	{
-		r_eh = event_handler;
-		m_vt = vtable;
-	}
-
-private:
-	void* r_eh;
-	EventHandlerVtable m_vt;
-
-	cairo_surface_t* m_img_surface;
-	Model::Image const* r_img;
 
 	GtkDrawingArea* m_handle; // TODO: Should be a gl area
 	static gboolean draw_callback(GtkWidget* widget, cairo_t* cr, gpointer self)
@@ -211,11 +203,5 @@ Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::eventHandler(void* event_h
                                                                    EventHandlerVtable const& vtable)
 {
 	m_impl->eventHandler(event_handler, vtable);
-	return *this;
-}
-
-Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::update()
-{
-	m_impl->update();
 	return *this;
 }

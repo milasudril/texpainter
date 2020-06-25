@@ -50,7 +50,6 @@ namespace Texpainter::Ui
 		}
 
 		ImageView& image(Model::Image const& img);
-		ImageView& update();
 
 	private:
 		class Impl;

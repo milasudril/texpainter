@@ -39,6 +39,11 @@ namespace Texpainter
 		template<ControlId id>
 		void onClicked(Ui::Button&);
 
+		Model::Image generate(Size2d output_size)
+		{
+			return m_generator(output_size);
+		}
+
 	private:
 		Model::Image m_preview;
 		Generators::SurfaceGenerator m_generator;

@@ -72,7 +72,7 @@ void Texpainter::SurfaceCreator::onChanged<Texpainter::SurfaceCreator::ControlId
 {
 	m_generator.filters(static_cast<Generators::FilterGraph>(source.selected()));
 	m_preview = m_generator(m_preview.size());
-	m_img_view.update();
+	m_img_view.image(m_preview);
 }
 
 template<>
@@ -81,7 +81,7 @@ void Texpainter::SurfaceCreator::onChanged<Texpainter::SurfaceCreator::ControlId
 {
 	m_generator.orientation(Angle{0.5 * source.value(), Angle::Turns{}});
 	m_preview = m_generator(m_preview.size());
-	m_img_view.update();
+	m_img_view.image(m_preview);
 }
 
 template<>
@@ -105,7 +105,7 @@ void Texpainter::SurfaceCreator::onChanged<Texpainter::SurfaceCreator::ControlId
 	}
 
 	m_preview = m_generator(m_preview.size());
-	m_img_view.update();
+	m_img_view.image(m_preview);
 }
 
 template<>
@@ -129,7 +129,7 @@ void Texpainter::SurfaceCreator::onChanged<Texpainter::SurfaceCreator::ControlId
 	}
 
 	m_preview = m_generator(m_preview.size());
-	m_img_view.update();
+	m_img_view.image(m_preview);
 }
 
 template<>
@@ -148,6 +148,6 @@ void Texpainter::SurfaceCreator::onClicked<Texpainter::SurfaceCreator::ControlId
 		m_generator.cutoffFrequency(SpatialFrequency{freq_new, freq_new});
 
 		m_preview = m_generator(m_preview.size());
-		m_img_view.update();
+		m_img_view.image(m_preview);
 	}
 }
