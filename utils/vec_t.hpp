@@ -3,6 +3,8 @@
 #ifndef TEXPAINTER_UTILS_VECT_HPP
 #define TEXPAINTER_UTILS_VECT_HPP
 
+#include <cmath>
+
 namespace Texpainter
 {
 	using vec4_t __attribute__((vector_size(16))) = float;
@@ -13,6 +15,11 @@ namespace Texpainter
 	{
 		a *= b;
 		return a[0] + a[1];
+	}
+
+	constexpr inline double length(vec2_t v)
+	{
+		return sqrt(dot(v,v));
 	}
 }
 
