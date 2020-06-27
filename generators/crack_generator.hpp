@@ -22,14 +22,14 @@ namespace Texpainter::Generators
 		{
 			auto const dir = to - from;
 			auto const l = length(dir);
-			auto const v = dir/l;
-			auto const n = vec2_t{-v[1], v[0]};
+			auto const t = dir/l;
+			auto const n = vec2_t{-t[1], t[0]};
 			std::uniform_real_distribution<float> max_depth;
-			for(int t = 0; t < static_cast<int>(l + 0.5); ++t)
+			for(int t_i = 0; t_i < static_cast<int>(l + 0.5); ++t_i)
 			{
-				for(int s = -static_cast<int>(line_width); s < static_cast<int>(line_width + 0.5); ++s)
+				for(int n_i = -static_cast<int>(line_width); n_i < static_cast<int>(line_width + 0.5); ++n_i)
 				{
-					auto const pos = from + static_cast<double>(t)*v + static_cast<double>(s)*0.5*n;
+					auto const pos = from + static_cast<double>(t_i)*t + static_cast<double>(n_i)*0.5*n;
 					auto pos_x = static_cast<int>(pos[0]);
 					auto pos_y = static_cast<int>(pos[1]);
 					pos_x = (pos_x < 0 ? pos_x + img.width() : pos_x)%img.width();
