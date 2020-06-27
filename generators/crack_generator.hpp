@@ -28,6 +28,61 @@ namespace Texpainter::Generators
 
 		Model::Image operator()(Size2d output_size);
 
+		int nCracks() const
+		{
+			return m_n_cracks;
+		}
+
+		CrackGenerator nCracks(int value)
+		{
+			m_n_cracks = value;
+			return *this;
+		}
+
+		float lineWidth() const
+		{
+			return m_line_width;
+		}
+
+		CrackGenerator& lineWidth(float value)
+		{
+			m_line_width = value;
+			return *this;
+		}
+
+		double segLength() const
+		{
+			return m_seg_length;
+		}
+
+		CrackGenerator& segLength(double value)
+		{
+			m_seg_length = value;
+			return *this;
+		}
+
+		double branchProb() const
+		{
+			return m_branch_prob;
+		}
+
+		CrackGenerator& branchProb(double val)
+		{
+			m_branch_prob = val;
+			return *this;
+		}
+
+		double maxLength() const
+		{
+			return m_max_length;
+		}
+
+		CrackGenerator& maxLength(double value)
+		{
+			m_max_length = value;
+			return *this;
+		}
+
 	private:
 		Rng m_rng;
 		int m_n_cracks;
