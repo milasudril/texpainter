@@ -19,6 +19,7 @@ namespace
 	               Texpainter::vec2_t from,
 	               Texpainter::vec2_t to,
 	               double line_width,
+	               double line_width_end,
 	               Rng& rng,
 	               int level)
 	{
@@ -27,17 +28,21 @@ namespace
 		auto const t = dir / l;
 		auto const n = Texpainter::vec2_t{-t[1], t[0]};
 		std::uniform_real_distribution<double> max_depth;
+		auto const line_width_delta = (line_width_end - line_width)/l;
+		constexpr auto noise_mod = 0.5;
 		for(int t_i = 0; t_i < static_cast<int>(l + 0.5); ++t_i)
 		{
-			for(int n_i = -static_cast<int>(line_width); n_i < static_cast<int>(line_width + 0.5); ++n_i)
+			auto const w = line_width + t_i*line_width_delta;
+			for(int n_i = -static_cast<int>(w); n_i < static_cast<int>(w + 0.5); ++n_i)
 			{
 				auto const pos = from + static_cast<double>(t_i) * t + static_cast<double>(n_i) * 0.5 * n;
 				auto pos_x = static_cast<int>(pos[0]);
 				auto pos_y = static_cast<int>(pos[1]);
 				pos_x = (pos_x < 0 ? pos_x + img.width() : pos_x) % img.width();
 				pos_y = (pos_y < 0 ? pos_y + img.height() : pos_y) % img.height();
-				auto const n_pos = static_cast<double>(n_i) / line_width;
-				auto val = static_cast<float>(1.0 - n_pos * n_pos * (0.5 * max_depth(rng) + 0.5));
+				auto const n_pos = static_cast<double>(n_i) / w;
+				auto val =  static_cast<float>(noise_mod*static_cast<float>(max_depth(rng))
+				+ (1.0 - noise_mod)*(1.0 - n_pos * n_pos));
 				img(pos_x, pos_y) = Texpainter::Model::Pixel{val, val, val, 1.0};
 			}
 		}
@@ -79,6 +84,7 @@ Texpainter::Model::Image Texpainter::Generators::CrackGenerator::operator()(Size
 	std::ranges::fill(ret.pixels(), Model::Pixel{0.0, 0.0, 0.0, 1.0f});
 	auto const line_width = static_cast<float>(m_line_width * size);
 	auto const max_length = m_max_length;
+	auto const line_width_decay = m_line_width_decay;
 	auto n = m_n_cracks;
 	while(n != 0)
 	{
@@ -113,8 +119,8 @@ Texpainter::Model::Image Texpainter::Generators::CrackGenerator::operator()(Size
 				{
 					auto x_next = line.x + seg_length * Texpainter::vec2_t{cos(line.dir), sin(line.dir)};
 					traveled_distance += seg_length;
-					draw_line(ret.pixels(), line.x, x_next, line.width, r_rng, line.level);
-					line.width *= 0.75;
+					draw_line(ret.pixels(), line.x, x_next, line.width, line.width*line_width_decay, r_rng, line.level);
+					line.width *= line_width_decay;
 					if(branch(r_rng))
 					{
 						segs.push(LineSeg{x_next,
