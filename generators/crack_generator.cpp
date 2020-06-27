@@ -31,7 +31,7 @@ namespace
 		auto const line_width_delta = (line_width_to - line_width_from) / l;
 		for(int t_i = 0; t_i < static_cast<int>(l + 0.5); ++t_i)
 		{
-			auto const w = line_width_from + t_i * line_width_delta;
+			auto const w = std::max(line_width_from + t_i * line_width_delta, 2.0);
 			for(int n_i = -static_cast<int>(w); n_i < static_cast<int>(w + 0.5); ++n_i)
 			{
 				auto const pos = from + static_cast<double>(t_i) * t + static_cast<double>(n_i) * 0.5 * n;
@@ -83,7 +83,7 @@ Texpainter::Model::Image Texpainter::Generators::CrackGenerator::operator()(Size
 	std::ranges::fill(ret.pixels(), Model::Pixel{0.0, 0.0, 0.0, 1.0f});
 	auto const line_width = static_cast<float>(m_line_width * size);
 	auto const max_length = m_max_length;
-	auto const line_width_decay = m_line_width_decay;
+	auto const line_width_growth = m_line_width_growth;
 	auto const noise_mod = m_noise_mod;
 	auto n = m_n_cracks;
 	while(n != 0)
@@ -113,8 +113,8 @@ Texpainter::Model::Image Texpainter::Generators::CrackGenerator::operator()(Size
 					auto x_next = line.x + seg_length * Texpainter::vec2_t{cos(line.dir), sin(line.dir)};
 					traveled_distance += seg_length;
 					draw_line(
-					   ret.pixels(), line.x, x_next, line.width, line.width * line_width_decay, r_rng, noise_mod);
-					line.width *= line_width_decay;
+					   ret.pixels(), line.x, x_next, line.width, line.width * line_width_growth, r_rng, noise_mod);
+					line.width *= line_width_growth;
 					if(branch(r_rng))
 					{
 						segs.push(LineSeg{x_next,
