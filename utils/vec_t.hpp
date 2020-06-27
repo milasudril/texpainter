@@ -19,7 +19,7 @@ namespace Texpainter
 
 	constexpr inline double length(vec2_t v)
 	{
-		return sqrt(dot(v,v));
+		return sqrt(dot(v, v));
 	}
 }
 

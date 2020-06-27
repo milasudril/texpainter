@@ -32,7 +32,9 @@ namespace Texpainter
 		{
 		}
 
-		constexpr explicit Angle(uint32_t value):m_value{value}{}
+		constexpr explicit Angle(uint32_t value): m_value{value}
+		{
+		}
 
 		static constexpr Angle inRadians(double α)
 		{

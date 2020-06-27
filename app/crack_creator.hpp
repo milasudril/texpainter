@@ -15,14 +15,14 @@ namespace Texpainter
 	{
 	public:
 		explicit CrackCreator(Ui::Container& owner):
-			m_preview{384, 384},
-			m_root{owner, Ui::Box::Orientation::Vertical},
-			m_img_view{m_root}
-			{
-				m_img_view.minSize(Size2d{384, 384});
-				m_preview = m_generator(Size2d{384, 384});
-				m_img_view.image(m_preview);
-			}
+		   m_preview{384, 384},
+		   m_root{owner, Ui::Box::Orientation::Vertical},
+		   m_img_view{m_root}
+		{
+			m_img_view.minSize(Size2d{384, 384});
+			m_preview = m_generator(Size2d{384, 384});
+			m_img_view.image(m_preview);
+		}
 
 
 		Model::Image generate(Size2d output_size)
