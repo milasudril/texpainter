@@ -188,7 +188,8 @@ namespace Texpainter::Ui
 		Dialog(Container& owner, const char* title, WidgetParams&&... params):
 		   m_window(title, &owner),
 		   m_content(m_window, Box::Orientation::Vertical),
-		   m_widget(m_content.insertMode({2, Box::Fill | Box::Expand}), std::forward<WidgetParams>(params)...),
+		   m_widget(m_content.insertMode({2, Box::Fill | Box::Expand}),
+		            std::forward<WidgetParams>(params)...),
 		   m_buttons_outer(m_content.insertMode(Box::InsertMode{0, 0}), Box::Orientation::Horizontal),
 		   m_filler_l(m_buttons_outer.insertMode({0, Box::Fill | Box::Expand})),
 		   m_buttons_box(m_buttons_outer.insertMode({0, 0}), Box::Orientation::Horizontal),

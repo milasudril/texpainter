@@ -18,21 +18,20 @@ namespace
 	void draw_line(Texpainter::Span2d<Texpainter::Model::Pixel> img,
 	               Texpainter::vec2_t from,
 	               Texpainter::vec2_t to,
-	               double line_width,
-	               double line_width_end,
+	               double line_width_from,
+	               double line_width_to,
 	               Rng& rng,
-	               int level)
+	               float noise_mod)
 	{
 		auto const dir = to - from;
 		auto const l = Texpainter::length(dir);
 		auto const t = dir / l;
 		auto const n = Texpainter::vec2_t{-t[1], t[0]};
-		std::uniform_real_distribution<double> max_depth;
-		auto const line_width_delta = (line_width_end - line_width)/l;
-		constexpr auto noise_mod = 0.5;
+		std::uniform_real_distribution<float> max_depth;
+		auto const line_width_delta = (line_width_to - line_width_from) / l;
 		for(int t_i = 0; t_i < static_cast<int>(l + 0.5); ++t_i)
 		{
-			auto const w = line_width + t_i*line_width_delta;
+			auto const w = line_width_from + t_i * line_width_delta;
 			for(int n_i = -static_cast<int>(w); n_i < static_cast<int>(w + 0.5); ++n_i)
 			{
 				auto const pos = from + static_cast<double>(t_i) * t + static_cast<double>(n_i) * 0.5 * n;
@@ -41,8 +40,8 @@ namespace
 				pos_x = (pos_x < 0 ? pos_x + img.width() : pos_x) % img.width();
 				pos_y = (pos_y < 0 ? pos_y + img.height() : pos_y) % img.height();
 				auto const n_pos = static_cast<double>(n_i) / w;
-				auto val =  static_cast<float>(noise_mod*static_cast<float>(max_depth(rng))
-				+ (1.0 - noise_mod)*(1.0 - n_pos * n_pos));
+				auto val =
+				   noise_mod * max_depth(rng) + (1.0f - noise_mod) * (1.0f - static_cast<float>(n_pos * n_pos));
 				img(pos_x, pos_y) = Texpainter::Model::Pixel{val, val, val, 1.0};
 			}
 		}
@@ -85,6 +84,7 @@ Texpainter::Model::Image Texpainter::Generators::CrackGenerator::operator()(Size
 	auto const line_width = static_cast<float>(m_line_width * size);
 	auto const max_length = m_max_length;
 	auto const line_width_decay = m_line_width_decay;
+	auto const noise_mod = m_noise_mod;
 	auto n = m_n_cracks;
 	while(n != 0)
 	{
@@ -92,19 +92,12 @@ Texpainter::Model::Image Texpainter::Generators::CrackGenerator::operator()(Size
 
 		{
 			auto dir_init = Angle{static_cast<uint32_t>(dir_dist_init(r_rng))};
-			auto pos_init = vec2_t{static_cast<double>(init_pos_x(r_rng)), static_cast<double>(init_pos_y(r_rng))};
+			auto pos_init =
+			   vec2_t{static_cast<double>(init_pos_x(r_rng)), static_cast<double>(init_pos_y(r_rng))};
 
-			segs.push(
-			LineSeg{pos_init,
-					dir_init,
-					line_width,
-					1});
+			segs.push(LineSeg{pos_init, dir_init, line_width, 1});
 
-			segs.push(
-			LineSeg{pos_init,
-					dir_init + Angle{0.5, Angle::Turns{}},
-					line_width,
-					1});
+			segs.push(LineSeg{pos_init, dir_init + Angle{0.5, Angle::Turns{}}, line_width, 1});
 		}
 
 		while(!segs.empty())
@@ -119,7 +112,8 @@ Texpainter::Model::Image Texpainter::Generators::CrackGenerator::operator()(Size
 				{
 					auto x_next = line.x + seg_length * Texpainter::vec2_t{cos(line.dir), sin(line.dir)};
 					traveled_distance += seg_length;
-					draw_line(ret.pixels(), line.x, x_next, line.width, line.width*line_width_decay, r_rng, line.level);
+					draw_line(
+					   ret.pixels(), line.x, x_next, line.width, line.width * line_width_decay, r_rng, noise_mod);
 					line.width *= line_width_decay;
 					if(branch(r_rng))
 					{
