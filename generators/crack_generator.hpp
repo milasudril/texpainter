@@ -17,13 +17,14 @@ namespace Texpainter::Generators
 {
 	namespace detail
 	{
-		template<class Rng, class Distribution>
-		void draw_line(Span2d<Model::Pixel> img, vec2_t from, vec2_t to, double line_width, Rng&, Distribution&)
+		template<class Rng>
+		void draw_line(Span2d<Model::Pixel> img, vec2_t from, vec2_t to, double line_width, Rng& rng)
 		{
 			auto const dir = to - from;
 			auto const l = length(dir);
 			auto const v = dir/l;
 			auto const n = vec2_t{-v[1], v[0]};
+			std::uniform_real_distribution<float> max_depth;
 			for(int t = 0; t < static_cast<int>(l + 0.5); ++t)
 			{
 				for(int s = -static_cast<int>(line_width); s < static_cast<int>(line_width + 0.5); ++s)
@@ -33,7 +34,8 @@ namespace Texpainter::Generators
 					auto pos_y = static_cast<int>(pos[1]);
 					pos_x = (pos_x < 0 ? pos_x + img.width() : pos_x)%img.width();
 					pos_y = (pos_y < 0 ? pos_y + img.height() : pos_y)%img.height();
-					img(pos_x, pos_y) = Model::Pixel{1.0, 1.0, 1.0, 1.0};
+					auto val = max_depth(rng);
+					img(pos_x, pos_y) = Model::Pixel{val, val, val, 1.0};
 				}
 			}
 		}
@@ -54,7 +56,7 @@ namespace Texpainter::Generators
 
 		CrackGenerator():
 		   m_n_cracks{2},
-		   m_line_width{1.0f/256.0f},
+		   m_line_width{1.0f/128.0f},
 		   m_seg_length{1.0/64.0},
 		   m_branch_prob{0.25},
 		   m_max_length{0.25}
@@ -82,7 +84,6 @@ namespace Texpainter::Generators
 
 			auto const branch_prob = m_branch_prob;
 			std::bernoulli_distribution branch{branch_prob};
-			std::uniform_real_distribution<double> max_depth;
 			Model::Image ret{output_size};
 			std::ranges::fill(ret.pixels(), Model::Pixel{0.0, 0.0, 0.0, 1.0f});
 			auto const line_width = static_cast<float>(m_line_width*size);
@@ -108,7 +109,7 @@ namespace Texpainter::Generators
 						{
 							auto x_next = line.x + seg_length*vec2_t{cos(line.dir), sin(line.dir)};
 							traveled_distance += seg_length;
-							detail::draw_line(ret.pixels(), line.x, x_next, line.width, m_rng, max_depth);
+							detail::draw_line(ret.pixels(), line.x, x_next, line.width, m_rng);
 							line.width *= 0.95;
 							if(branch(m_rng))
 							{
