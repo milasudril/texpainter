@@ -86,6 +86,7 @@ namespace Texpainter
 		Ui::ImageView m_img_view;
 
 		std::unique_ptr<NoiseGenDlg> m_surf_creator;
+		Generators::CrackGenerator::Rng m_rng;
 		std::unique_ptr<CrackGenDlg> m_crack_creator;
 	};
 
@@ -99,7 +100,7 @@ namespace Texpainter
 	template<>
 	void AppWindow::onClicked<MenuAction::GenCracks>(Ui::Button& btn)
 	{
-		m_crack_creator = std::make_unique<CrackGenDlg>(m_columns, "Generate cracks");
+		m_crack_creator = std::make_unique<CrackGenDlg>(m_columns, "Generate cracks", m_rng);
 		m_crack_creator->eventHandler<MenuAction::GenCracks>(*this);
 	}
 }

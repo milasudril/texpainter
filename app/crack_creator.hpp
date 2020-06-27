@@ -14,8 +14,9 @@ namespace Texpainter
 	class CrackCreator
 	{
 	public:
-		explicit CrackCreator(Ui::Container& owner):
+		explicit CrackCreator(Ui::Container& owner, Generators::CrackGenerator::Rng& rng):
 		   m_preview{384, 384},
+		   m_generator{rng},
 		   m_root{owner, Ui::Box::Orientation::Vertical},
 		   m_img_view{m_root}
 		{

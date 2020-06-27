@@ -17,7 +17,8 @@ namespace Texpainter::Generators
 	public:
 		using Rng = std::mt19937;
 
-		CrackGenerator():
+		CrackGenerator(Rng& rng):
+			r_rng{rng},
 		   m_n_cracks{2},
 		   m_line_width{1.0f / 128.0f},
 		   m_seg_length{1.0 / 64.0},
@@ -84,7 +85,7 @@ namespace Texpainter::Generators
 		}
 
 	private:
-		Rng m_rng;
+		Rng& r_rng;
 		int m_n_cracks;
 		float m_line_width;
 		double m_seg_length;

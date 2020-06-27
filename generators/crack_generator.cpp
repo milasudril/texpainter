@@ -19,7 +19,8 @@ namespace
 	               Texpainter::vec2_t from,
 	               Texpainter::vec2_t to,
 	               double line_width,
-	               Rng& rng)
+	               Rng& rng,
+	               int level)
 	{
 		auto const dir = to - from;
 		auto const l = Texpainter::length(dir);
@@ -58,6 +59,8 @@ Texpainter::Model::Image Texpainter::Generators::CrackGenerator::operator()(Size
 	std::uniform_int_distribution<uint32_t> init_pos_y{0, output_size.height() - 1};
 	std::exponential_distribution<double> seg_length_dist{1.0 / (m_seg_length * size)};
 
+	std::uniform_int_distribution<uint32_t> dir_dist_init{0, std::numeric_limits<uint32_t>::max()};
+
 	std::uniform_int_distribution<int32_t> dir_dist{
 	   static_cast<int32_t>(Angle{-0.1666, Angle::Turns{}}.bits()),
 	   static_cast<int32_t>(Angle{0.1666, Angle::Turns{}}.bits())};
@@ -80,11 +83,13 @@ Texpainter::Model::Image Texpainter::Generators::CrackGenerator::operator()(Size
 	while(n != 0)
 	{
 		std::stack<LineSeg> segs;
+
 		segs.push(
-		   LineSeg{vec2_t{static_cast<double>(init_pos_x(m_rng)), static_cast<double>(init_pos_y(m_rng))},
-		           Angle{static_cast<uint32_t>(dir_dist(m_rng))},
-		           line_width,
-		           1});
+		LineSeg{vec2_t{static_cast<double>(init_pos_x(r_rng)), static_cast<double>(init_pos_y(r_rng))},
+				Angle{static_cast<uint32_t>(dir_dist_init(r_rng))},
+				line_width,
+				1});
+
 		while(!segs.empty())
 		{
 			auto line = segs.top();
@@ -92,25 +97,28 @@ Texpainter::Model::Image Texpainter::Generators::CrackGenerator::operator()(Size
 			auto traveled_distance = 0.0;
 			while(traveled_distance < max_length * size / line.level)
 			{
-				auto const seg_length = seg_length_dist(m_rng);
+				auto const seg_length = seg_length_dist(r_rng);
 				if(seg_length > size / 64.0)
 				{
 					auto x_next = line.x + seg_length * Texpainter::vec2_t{cos(line.dir), sin(line.dir)};
 					traveled_distance += seg_length;
-					draw_line(ret.pixels(), line.x, x_next, line.width, m_rng);
-					line.width *= 0.95;
-					if(branch(m_rng))
+					draw_line(ret.pixels(), line.x, x_next, line.width, r_rng, line.level);
+					line.width *= 0.75;
+					if(branch(r_rng))
 					{
-						line.x = x_next;
-						line.dir += Angle{static_cast<uint32_t>(dir_dist_split_a(m_rng))};
 						segs.push(LineSeg{x_next,
-						                  Angle{static_cast<uint32_t>(dir_dist_split_b(m_rng))},
+						                  line.dir + Angle{static_cast<uint32_t>(dir_dist_split_b(r_rng))},
 						                  line.width,
 						                  line.level + 1});
+						segs.push(LineSeg{x_next,
+						                  line.dir + Angle{static_cast<uint32_t>(dir_dist_split_a(r_rng))},
+						                  line.width,
+						                  line.level + 1});
+						break;
 					}
 					else
 					{
-						line.dir += Angle{static_cast<uint32_t>(dir_dist(m_rng))};
+						line.dir += Angle{static_cast<uint32_t>(dir_dist(r_rng))};
 						line.x = x_next;
 					}
 				}
