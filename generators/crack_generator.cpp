@@ -84,11 +84,22 @@ Texpainter::Model::Image Texpainter::Generators::CrackGenerator::operator()(Size
 	{
 		std::stack<LineSeg> segs;
 
-		segs.push(
-		LineSeg{vec2_t{static_cast<double>(init_pos_x(r_rng)), static_cast<double>(init_pos_y(r_rng))},
-				Angle{static_cast<uint32_t>(dir_dist_init(r_rng))},
-				line_width,
-				1});
+		{
+			auto dir_init = Angle{static_cast<uint32_t>(dir_dist_init(r_rng))};
+			auto pos_init = vec2_t{static_cast<double>(init_pos_x(r_rng)), static_cast<double>(init_pos_y(r_rng))};
+
+			segs.push(
+			LineSeg{pos_init,
+					dir_init,
+					line_width,
+					1});
+
+			segs.push(
+			LineSeg{pos_init,
+					dir_init + Angle{0.5, Angle::Turns{}},
+					line_width,
+					1});
+		}
 
 		while(!segs.empty())
 		{
