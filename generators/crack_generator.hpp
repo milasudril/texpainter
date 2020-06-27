@@ -11,6 +11,7 @@
 #include <random>
 #include <limits>
 #include <ranges>
+#include <stack>
 
 namespace Texpainter::Generators
 {
@@ -33,6 +34,14 @@ namespace Texpainter::Generators
 				img(pos_x, pos_y) = Model::Pixel{1.0, 1.0, 1.0, 1.0};
 			}
 		}
+
+		struct LineSeg
+		{
+			vec2_t x;
+			Angle dir;
+			float width;
+			int level;
+		};
 	}
 
 	class CrackGenerator
@@ -41,36 +50,78 @@ namespace Texpainter::Generators
 		using Rng = std::mt19937;
 
 		CrackGenerator():
-		   m_intensity{1.0/16},
-		   m_impulse_size{1.0/32.0},
-		   m_line_width{1.0/16.0}
+		   m_n_cracks{1},
+		   m_line_width{1.0f},
+		   m_seg_length{1.0/64.0},
+		   m_branch_prob{0.25},
+		   m_max_length{0.25}
 		{
 		}
 
 		Model::Image operator()(Size2d output_size)
 		{
 			auto size = sqrt(output_size.area());
-			auto n = static_cast<int>(m_intensity*sqrt(output_size.area()));
 			std::uniform_int_distribution<uint32_t> init_pos_x{0, output_size.width() - 1};
 			std::uniform_int_distribution<uint32_t> init_pos_y{0, output_size.height() - 1};
-			std::exponential_distribution<double> impulse_size{1.0/(m_impulse_size * size)};
-			std::uniform_int_distribution<uint32_t> impulse_direction{0, std::numeric_limits<uint32_t>::max()};
+			std::exponential_distribution<double> seg_length_dist{1.0/(m_seg_length * size)};
+			printf("%08x\n", Angle{-0.25, Angle::Turns{}}.bits());
+			printf("%08x\n", Angle{0.25, Angle::Turns{}}.bits());
+			std::uniform_int_distribution<int32_t> dir_dist{
+				static_cast<int32_t>(Angle{-0.1666, Angle::Turns{}}.bits()),
+				static_cast<int32_t>(Angle{0.1666, Angle::Turns{}}.bits())};
+
+			std::uniform_int_distribution<int32_t> dir_dist_split_a{
+				static_cast<int32_t>(Angle{-0.25, Angle::Turns{}}.bits()),
+				static_cast<int32_t>(Angle{-0.08333, Angle::Turns{}}.bits())};
+
+			std::uniform_int_distribution<int32_t> dir_dist_split_b{
+				static_cast<int32_t>(Angle{0.08333, Angle::Turns{}}.bits()),
+				static_cast<int32_t>(Angle{0.25, Angle::Turns{}}.bits())};
+
+			auto const branch_prob = m_branch_prob;
+			std::bernoulli_distribution branch{branch_prob};
 			std::uniform_real_distribution<double> max_depth;
 			Model::Image ret{output_size};
 			std::ranges::fill(ret.pixels(), Model::Pixel{0.0, 0.0, 0.0, 1.0f});
-			constexpr auto dt = 1.0;
+			auto const line_width = static_cast<float>(m_line_width*size);
+			auto const max_length = m_max_length;
+			auto n = m_n_cracks;
 			while(n != 0)
 			{
-				vec2_t x{static_cast<double>(init_pos_x(m_rng)), static_cast<double>(init_pos_y(m_rng))};
-				auto line_width = m_line_width*size;
-				while(static_cast<int>(line_width) != 0)
+				std::stack<detail::LineSeg> segs;
+				segs.push(detail::LineSeg{
+					vec2_t{static_cast<double>(init_pos_x(m_rng)), static_cast<double>(init_pos_y(m_rng))},
+					Angle{static_cast<uint32_t>(dir_dist(m_rng))},
+					line_width,
+					1});
+				while(!segs.empty())
 				{
-					auto impulse = impulse_size(m_rng);
-					auto dir = Angle{impulse_direction(m_rng)};
-					auto x_next = x +  impulse*vec2_t{cos(dir), sin(dir)} * dt;
-					detail::draw_line(ret.pixels(), x, x_next, line_width, m_rng, max_depth);
-					line_width *= 0.75;
-					x = x_next;
+					auto line = segs.top();
+					segs.pop();
+					auto traveled_distance = 0.0;
+					while(traveled_distance < max_length*size/line.level)
+					{
+						auto const seg_length = seg_length_dist(m_rng);
+						if(seg_length > size/64.0)
+						{
+							auto x_next = line.x + seg_length*vec2_t{cos(line.dir), sin(line.dir)};
+							traveled_distance += seg_length;
+							detail::draw_line(ret.pixels(), line.x, x_next, line.width, m_rng, max_depth);
+							line.width *= 0.9;
+							if(branch(m_rng))
+							{
+								line.x = x_next;
+								line.dir += Angle{static_cast<uint32_t>(dir_dist_split_a(m_rng))};
+								segs.push(detail::LineSeg{x_next, Angle{static_cast<uint32_t>(dir_dist_split_b(m_rng))}, line.width,
+								line.level + 1});
+							}
+							else
+							{
+								line.dir += Angle{static_cast<uint32_t>(dir_dist(m_rng))};
+								line.x = x_next;
+							}
+						}
+					}
 				}
 				--n;
 			}
@@ -79,9 +130,11 @@ namespace Texpainter::Generators
 
 	private:
 		Rng m_rng;
-		double m_intensity;
-		double m_impulse_size;
-		double m_line_width;
+		int m_n_cracks;
+		float m_line_width;
+		double m_seg_length;
+		double m_branch_prob;
+		double m_max_length;
 
 	};
 }
