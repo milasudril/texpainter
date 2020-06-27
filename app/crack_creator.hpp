@@ -45,13 +45,22 @@ namespace Texpainter
 			m_img_view.minSize(Size2d{384, 384});
 			m_preview = m_generator(Size2d{384, 384});
 			m_img_view.image(m_preview);
-			m_n_cracks.inputField().eventHandler<ControlId::NumberOfCracks>(*this);
-			m_line_width.inputField().eventHandler<ControlId::LineWidth>(*this);
-			m_line_width_growth.inputField().eventHandler<ControlId::LineWidthGrowth>(*this);
-			m_noise_mod.inputField().eventHandler<ControlId::NoiseModulation>(*this);
-			m_seg_length.inputField().eventHandler<ControlId::SegLength>(*this);
-			m_branch_prob.inputField().eventHandler<ControlId::BranchProb>(*this);
-			m_max_length.inputField().eventHandler<ControlId::MaxLength>(*this);
+			m_n_cracks.inputField().eventHandler<ControlId::NumberOfCracks>(*this)
+				.value((m_generator.nCracks() - 1.0)/7.0);
+			m_line_width.inputField().eventHandler<ControlId::LineWidth>(*this)
+				.value(std::log2(m_generator.lineWidth())/(10.0) + 1.0);
+			m_line_width_growth.inputField().eventHandler<ControlId::LineWidthGrowth>(*this)
+				.value(m_generator.lineWidthGrowth());
+			m_noise_mod.inputField().eventHandler<ControlId::NoiseModulation>(*this)
+				.value(m_generator.noiseMod());
+//		auto const val = static_cast<float>(std::exp2(-7.0 * (1.0 - slider.value()) - 1.0));
+
+			m_seg_length.inputField().eventHandler<ControlId::SegLength>(*this)
+				.value(std::log2((m_generator.segLength() + 1.0)/7.0 + 1.0));
+			m_branch_prob.inputField().eventHandler<ControlId::BranchProb>(*this)
+				.value(m_generator.branchProb()/(0.5 - 1.0 / 256.0));
+			m_max_length.inputField().eventHandler<ControlId::MaxLength>(*this)
+				.value(m_generator.maxLength());
 		}
 
 
