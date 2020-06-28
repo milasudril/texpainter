@@ -82,6 +82,7 @@ namespace Texpainter
 
 	private:
 		Model::Image m_img;
+
 		Ui::Box m_columns;
 		Ui::Toolbar<MenuAction, MenuActionTraits> m_toolbar;
 		Ui::Box m_rows;

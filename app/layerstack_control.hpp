@@ -17,7 +17,10 @@ namespace Texpainter
 				m_layer_new{m_root, "+"},
 				m_layer_delete{m_root, "-"},
 				m_layer_move_up{m_root, "↑"},
-				m_layer_move_down{m_root, "↓"}
+				m_layer_move_down{m_root, "↓"},
+				m_layer_solo{m_root, "Solo"},
+				m_layer_mute{m_root, "Hide"},
+				m_blend_func{m_root, "f(x)"}
 			{}
 
 			LayerStackControl& layers(Model::LayerStack&& l, std::vector<std::string>&& n)
@@ -41,6 +44,9 @@ namespace Texpainter
 			Ui::Button m_layer_delete;
 			Ui::Button m_layer_move_up;
 			Ui::Button m_layer_move_down;
+			Ui::Button m_layer_solo;
+			Ui::Button m_layer_mute;
+			Ui::Button m_blend_func;
 	};
 }
 
