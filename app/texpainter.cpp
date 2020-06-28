@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
 	Texpainter::Model::Image canvas{Texpainter::Size2d{512, 512}};
 	std::ranges::fill(canvas.pixels(), Texpainter::Model::Pixel{0.25f, 0.50f, 0.25f, 1.0f});
 
-	render(test.location(Texpainter::vec2_t{256.0, 256.0})
+	render(test.location(Texpainter::vec2_t{0.0, 0.0})
 	          .rotation(Texpainter::Angle{-0.08333, Texpainter::Angle::Turns{}})
 	          .scaleFactor(Texpainter::vec2_t{1.0, 0.5}),
 	       canvas.pixels());

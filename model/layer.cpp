@@ -28,8 +28,8 @@ void Texpainter::Model::render(Layer const& layer, Span2d<Pixel> ret)
 			   scale_factor * transform(loc_ret - loc_src_ret_coord, rot_x, rot_y) + origin_src;
 			if(src_pos[0] >= 0 && src_pos[0] < src.width() && src_pos[1] >= 0 && src_pos[1] < src.height())
 			{
-				//			printf("%u %u\n", col, row);
-				ret(col, row) = src(static_cast<uint32_t>(src_pos[0]), static_cast<uint32_t>(src_pos[1]));
+				ret(col % ret.width(), row % ret.height()) =
+				   src(static_cast<uint32_t>(src_pos[0]), static_cast<uint32_t>(src_pos[1]));
 			}
 		}
 	}
