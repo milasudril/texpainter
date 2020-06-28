@@ -4,6 +4,7 @@
 #define TEXPAINTER_LAYERSTACK_HPP
 
 #include "./layer.hpp"
+#include "./layer_index.hpp"
 
 #include <vector>
 #include <cassert>
@@ -17,7 +18,11 @@ namespace Texpainter::Model
 	public:
 		using Base::begin;
 		using Base::end;
-		using Base::size;
+
+		LayerIndex::element_type size() const
+		{
+			return static_cast<LayerIndex::element_type>(Base::size());
+		}
 
 		LayerStack& append(Layer&& layer)
 		{
@@ -27,23 +32,24 @@ namespace Texpainter::Model
 
 		LayerStack& remove(LayerIndex index)
 		{
-			assert(index < size());
+			assert(index.value() < size());
 			Base::erase(begin() + index.value());
 		}
 
-		static auto lastLayerIndex() const
+		static auto lastLayerIndex()
 		{
 			return LayerIndex{0};
 		}
 
-		auto lastLayerIndex() const
+		auto firstLayerIndex() const
 		{
 			return LayerIndex{size() - 1};
 		}
 
-		LayerStack& moveDown(LayerStack index)
+		LayerStack& moveDown(LayerIndex index)
 		{
-			assert(index < size()) if(index != lastLayerIndex())
+			assert(index.value() < size());
+			if(index != lastLayerIndex())
 			{
 				auto i = begin() + index.value();
 				std::swap(*(i - 1), *i);
@@ -51,9 +57,9 @@ namespace Texpainter::Model
 			return *this;
 		}
 
-		LayerStack& moveDown(LayerStack index)
+		LayerStack& moveUp(LayerIndex index)
 		{
-			assert(index < size());
+			assert(index.value() < size());
 			if(index != firstLayerIndex())
 			{
 				auto i = begin() + index.value();

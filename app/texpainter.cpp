@@ -3,7 +3,7 @@
 
 #include "./app_window.hpp"
 
-#include "model/layer.hpp"
+#include "model/layer_stack.hpp"
 
 #include <gtk/gtk.h>
 
