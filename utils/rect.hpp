@@ -8,7 +8,7 @@
 
 namespace Texpainter::Utils
 {
-	vec2_t axisAlignedBoundingBox(vec2_t size, Angle ϴ)
+	inline vec2_t axisAlignedBoundingBox(vec2_t size, Angle ϴ)
 	{
 		auto const corner = size;
 		auto const rot_x = vec2_t{cos(ϴ), -sin(ϴ)};

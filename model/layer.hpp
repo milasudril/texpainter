@@ -107,7 +107,7 @@ namespace Texpainter::Model
 		}
 	};
 
-	vec2_t axisAlignedBoundingBox(Layer const& layer)
+	inline vec2_t axisAlignedBoundingBox(Layer const& layer)
 	{
 		auto const size = layer.content().size();
 		auto const scaled_size =

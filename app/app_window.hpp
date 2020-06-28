@@ -7,6 +7,7 @@
 #include "./menu_action.hpp"
 #include "./surface_creator.hpp"
 #include "./crack_creator.hpp"
+
 #include "ui/box.hpp"
 #include "ui/toolbar.hpp"
 #include "ui/image_view.hpp"
