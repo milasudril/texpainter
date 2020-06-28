@@ -19,13 +19,13 @@ namespace Texpainter::Generators
 
 		CrackGenerator(Rng& rng):
 		   r_rng{rng},
-		   m_n_cracks{2},
+		   m_n_cracks{3},
 		   m_line_width{1.0f / 64.0f},
-		   m_line_width_growth{0.75f},
+		   m_line_width_growth{0.9f},
 		   m_noise_mod{0.5f},
 		   m_seg_length{1.0 / 64.0},
-		   m_branch_prob{0.25},
-		   m_max_length{0.25}
+		   m_branch_prob{0.125},
+		   m_max_length{0.5}
 		{
 		}
 
