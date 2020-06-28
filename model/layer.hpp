@@ -16,7 +16,7 @@ namespace Texpainter::Model
 	{
 		public:
 			explicit Layer(Size2d image):
-				m_loc{0.0, 0.0}, m_angle{}, m_scale{1.0f}
+				m_loc{0.0, 0.0}, m_angle{}, vec2_t{1.0, 1.0}
 			m_content{std::make_shared<Image>(img_size)}
 			{
 				std::ranges::fill(m_content->pixels(), Pixel{0.0, 0.0, 0.0, 0.0});
@@ -76,12 +76,12 @@ namespace Texpainter::Model
 				return *this;
 			}
 
-			float scale() const
+			vec2_t scale() const
 			{
 				return m_scale;
 			}
 
-			Layer& scale(float val)
+			Layer& scale(vec2_t val)
 			{
 				m_scale = val;
 				return *this;
@@ -90,7 +90,7 @@ namespace Texpainter::Model
 		private:
 			vec2_t m_loc;
 			Angle m_rot;
-			float m_scale;
+			vec2_t m_scale;
 			std::shared_ptr<Image> m_content;
 
 			explicit Layer(vec2_t loc, Angle rot, scale, std::shared_ptr<Image> const& content):
