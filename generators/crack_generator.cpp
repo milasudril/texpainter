@@ -37,12 +37,10 @@ namespace
 				auto const pos = from + static_cast<double>(t_i) * t + static_cast<double>(n_i) * 0.5 * n;
 				auto pos_x = static_cast<int>(pos[0]);
 				auto pos_y = static_cast<int>(pos[1]);
-				pos_x = (pos_x < 0 ? pos_x + img.width() : pos_x) % img.width();
-				pos_y = (pos_y < 0 ? pos_y + img.height() : pos_y) % img.height();
 				auto const n_pos = static_cast<double>(n_i) / w;
 				auto val =
 				   noise_mod * max_depth(rng) + (1.0f - noise_mod) * (1.0f - static_cast<float>(n_pos * n_pos));
-				img(pos_x, pos_y) = Texpainter::Model::Pixel{val, val, val, 1.0};
+				img(pos_x % img.width(), pos_y % img.height()) = Texpainter::Model::Pixel{val, val, val, 1.0};
 			}
 		}
 	}
