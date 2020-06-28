@@ -6,7 +6,7 @@
 #include "./vec_t.hpp"
 #include "./angle.hpp"
 
-namespace Texpainter::Utils
+namespace Texpainter
 {
 	inline vec2_t axisAlignedBoundingBox(vec2_t size, Angle ϴ)
 	{

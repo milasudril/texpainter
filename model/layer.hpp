@@ -114,7 +114,7 @@ namespace Texpainter::Model
 		   vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())}
 		   * layer.scaleFactor();
 
-		return Utils::axisAlignedBoundingBox(scaled_size, layer.rotation());
+		return axisAlignedBoundingBox(scaled_size, layer.rotation());
 	}
 
 	void render(Layer const& layer, Span2d<Pixel> ret);
