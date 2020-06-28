@@ -39,15 +39,16 @@ int main(int argc, char* argv[])
 	Texpainter::Model::Image canvas{Texpainter::Size2d{512, 512}};
 	std::ranges::fill(canvas.pixels(), Texpainter::Model::Pixel{0.25f, 0.50f, 0.25f, 1.0f});
 
-	render(test.location(Texpainter::vec2_t{256.0, 256.0}).rotation(Texpainter::Angle{-0.08333, Texpainter::Angle::Turns{}}), canvas.pixels());
+	render(test.location(Texpainter::vec2_t{256.0, 256.0})
+	          .rotation(Texpainter::Angle{-0.08333, Texpainter::Angle::Turns{}})
+	          .scaleFactor(Texpainter::vec2_t{1.0, 0.5}),
+	       canvas.pixels());
 
 	Texpainter::Ui::ImageView img_view{mainwin};
-	img_view.image(canvas)
-		.minSize(Texpainter::Size2d{512, 512});
+	img_view.image(canvas).minSize(Texpainter::Size2d{512, 512});
 
 
-
-//	Texpainter::AppWindow app{mainwin};
+	//	Texpainter::AppWindow app{mainwin};
 
 	MainwinEventHandler eh;
 	mainwin.eventHandler<0>(eh).show();

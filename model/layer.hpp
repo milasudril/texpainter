@@ -81,12 +81,12 @@ namespace Texpainter::Model
 			return *this;
 		}
 
-		vec2_t scale() const
+		vec2_t scaleFactor() const
 		{
 			return m_scale;
 		}
 
-		Layer& scale(vec2_t val)
+		Layer& scaleFactor(vec2_t val)
 		{
 			m_scale = val;
 			return *this;
@@ -111,7 +111,8 @@ namespace Texpainter::Model
 	{
 		auto const size = layer.content().size();
 		auto const scaled_size =
-		   vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())} * layer.scale();
+		   vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())}
+		   * layer.scaleFactor();
 
 		return Utils::axisAlignedBoundingBox(scaled_size, layer.rotation());
 	}
