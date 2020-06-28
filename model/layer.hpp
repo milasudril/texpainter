@@ -97,6 +97,8 @@ namespace Texpainter::Model
 				m_loc{loc}, m_rot{rot}, m_scale{scale}, m_content{content}
 			{}
 	};
+
+	std::pair<vec2_t, vec2_t> axisAlignedBoundingBox(Layer const& layer);
 }
 
 #endif
