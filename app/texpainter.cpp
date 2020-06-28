@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 	Texpainter::Model::Layer test{Texpainter::Size2d{256, 256}};
 	std::ranges::fill(test.content().pixels(), Texpainter::Model::Pixel{0.5f, 0.25f, 0.25f, 1.0f});
 
-	Texpainter::Model::Image canvas{Texpainter::Size2d{512, 512}};
+/*	Texpainter::Model::Image canvas{Texpainter::Size2d{512, 512}};
 	std::ranges::fill(canvas.pixels(), Texpainter::Model::Pixel{0.25f, 0.50f, 0.25f, 1.0f});
 
 	render(test.location(Texpainter::vec2_t{0.0, 0.0})
@@ -45,10 +45,10 @@ int main(int argc, char* argv[])
 	       canvas.pixels());
 
 	Texpainter::Ui::ImageView img_view{mainwin};
-	img_view.image(canvas).minSize(Texpainter::Size2d{512, 512});
+	img_view.image(canvas).minSize(Texpainter::Size2d{512, 512});*/
 
 
-	//	Texpainter::AppWindow app{mainwin};
+	Texpainter::AppWindow app{mainwin};
 
 	MainwinEventHandler eh;
 	mainwin.eventHandler<0>(eh).show();
