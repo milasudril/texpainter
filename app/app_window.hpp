@@ -7,6 +7,7 @@
 #include "./menu_action.hpp"
 #include "./surface_creator.hpp"
 #include "./crack_creator.hpp"
+#include "./layerstack_control.hpp"
 
 #include "ui/box.hpp"
 #include "ui/toolbar.hpp"
@@ -29,6 +30,7 @@ namespace Texpainter
 		   m_rows{m_columns.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand}),
 		          Ui::Box::Orientation::Vertical},
 		   m_pal_editor{m_rows, Ui::Box::Orientation::Horizontal, "Palettes: "},
+		   m_layerstack_ctrl{m_rows, Ui::Box::Orientation::Horizontal, "Layers: "},
 		   m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
 		{
 			forEachEnumItem<MenuAction>([this](auto tag) {
@@ -84,6 +86,7 @@ namespace Texpainter
 		Ui::Toolbar<MenuAction, MenuActionTraits> m_toolbar;
 		Ui::Box m_rows;
 		Ui::LabeledInput<PaletteEditor> m_pal_editor;
+		Ui::LabeledInput<LayerStackControl> m_layerstack_ctrl;
 		Ui::ImageView m_img_view;
 
 		std::unique_ptr<NoiseGenDlg> m_surf_creator;
