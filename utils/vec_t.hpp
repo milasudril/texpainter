@@ -21,6 +21,11 @@ namespace Texpainter
 	{
 		return sqrt(dot(v, v));
 	}
+
+	inline constexpr vec2_t transform(vec2_t v, vec2_t x_vec, vec2_t y_vec)
+	{
+		return vec2_t{dot(v, x_vec), dot(v, y_vec)};
+	}
 }
 
 #endif
