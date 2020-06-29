@@ -34,9 +34,12 @@ namespace Texpainter
 		   m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
 		{
 			forEachEnumItem<MenuAction>([this](auto tag) {
-				m_toolbar.get<tag.value>()
-				   .label(MenuActionTraits<tag.value>::displayName())
-				   .template eventHandler<tag.value>(*this);
+				if constexpr(std::is_same_v<Ui::Button, typename MenuActionTraits<tag.value>::type>)
+				{
+					m_toolbar.get<tag.value>()
+					   .label(MenuActionTraits<tag.value>::displayName())
+					   .template eventHandler<tag.value>(*this);
+				}
 			});
 			std::ranges::fill(m_img.pixels(), Model::Pixel{0.5f, 0.5f, 0.5f, 1.0f});
 			m_img_view.image(m_img);

@@ -3,6 +3,9 @@
 #ifndef TEXPAINTER_MENUACTION_HPP
 #define TEXPAITNER_MENUACTION_HPP
 
+#include "ui/button.hpp"
+#include "ui/separator.hpp"
+
 namespace Texpainter
 {
 	enum class MenuAction : int
@@ -11,6 +14,7 @@ namespace Texpainter
 		Open,
 		Save,
 		Export,
+		GeneratorsSep,
 		GenSolidColor,
 		SelectBrush,
 		GenNoise,
@@ -60,6 +64,16 @@ namespace Texpainter
 	struct MenuActionTraits<MenuAction::Export>
 	{
 		using type = Texpainter::Ui::Button;
+		static constexpr char const* displayName()
+		{
+			return "Export";
+		}
+	};
+
+	template<>
+	struct MenuActionTraits<MenuAction::GeneratorsSep>
+	{
+		using type = Texpainter::Ui::Separator;
 		static constexpr char const* displayName()
 		{
 			return "Export";

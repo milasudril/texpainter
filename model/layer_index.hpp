@@ -9,18 +9,22 @@ namespace Texpainter::Model
 {
 	class LayerIndex
 	{
-		public:
-			using element_type = uint32_t;
+	public:
+		using element_type = uint32_t;
 
-			explicit LayerIndex(uint32_t val):m_value{val}{}
+		explicit LayerIndex(uint32_t val): m_value{val}
+		{
+		}
 
-			uint32_t value() const
-			{ return m_value;}
+		uint32_t value() const
+		{
+			return m_value;
+		}
 
-			 auto operator<=>(LayerIndex const&) const = default;
+		auto operator<=>(LayerIndex const&) const = default;
 
-		private:
-			uint32_t m_value;
+	private:
+		uint32_t m_value;
 	};
 }
 

@@ -15,7 +15,7 @@ namespace Texpainter::Ui
 	class Button
 	{
 	public:
-		explicit Button(Container& container, const char* label);
+		explicit Button(Container& container, const char* label = "");
 		~Button();
 
 		Button& operator=(Button&& obj) noexcept

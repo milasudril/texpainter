@@ -52,10 +52,16 @@ public:
 
 	void alignment(float x) noexcept;
 
+	Orientation orientation() const noexcept
+	{
+		return m_orientation;
+	}
+
 private:
 	static void destroy_callback(GtkWidget* object, gpointer user_data);
 	GtkBox* m_handle;
 	InsertMode m_mode;
+	Orientation m_orientation;
 };
 
 Texpainter::Ui::Box::Box(Container& cnt, Orientation orientation, int global_spacing)
@@ -109,10 +115,16 @@ Texpainter::Ui::Box& Texpainter::Ui::Box::alignment(float x) noexcept
 	return *this;
 }
 
+Texpainter::Ui::Box::Orientation Texpainter::Ui::Box::orientation() const noexcept
+{
+	return m_impl->orientation();
+}
+
 Texpainter::Ui::Box::Impl::Impl(Container& cnt, Orientation orientation, int global_spacing):
    Box(*this),
    m_mode{0, 0}
 {
+	m_orientation = orientation;
 	auto widget = gtk_box_new(orientation == Orientation::Vertical ? GTK_ORIENTATION_VERTICAL :
 	                                                                 GTK_ORIENTATION_HORIZONTAL,
 	                          global_spacing);

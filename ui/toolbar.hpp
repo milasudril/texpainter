@@ -20,7 +20,7 @@ namespace Texpainter::Ui
 
 		explicit Toolbar(Container& owner, Box::Orientation orientation):
 		   m_box{owner, orientation},
-		   m_widgets{m_box, ""}
+		   m_widgets{m_box}
 		{
 		}
 

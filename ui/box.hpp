@@ -47,12 +47,14 @@ namespace Texpainter::Ui
 		Box& add(void* handle) override;
 		Box& show() override;
 		Box& sensitive(bool val) override;
-		void* toplevel() const;
+		void* toplevel() const override;
 
 		Box& homogenous(bool status) noexcept;
 		Box& insertMode(const InsertMode& mode) noexcept;
 
 		Box& alignment(float x) noexcept;
+
+		Orientation orientation() const noexcept;
 
 	protected:
 		class Impl;
