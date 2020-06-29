@@ -18,11 +18,11 @@ namespace Texpainter::Model
 	class Layer
 	{
 	public:
-		explicit Layer(Size2d image):
+		explicit Layer(Size2d size):
 		   m_loc{0.0, 0.0},
 		   m_rot{0},
 		   m_scale{1.0, 1.0},
-		   m_content{std::make_shared<Image>(image)}
+		   m_content{std::make_shared<Image>(size)}
 		{
 			std::ranges::fill(m_content->pixels(), Pixel{0.0, 0.0, 0.0, 0.0});
 		}
@@ -43,7 +43,7 @@ namespace Texpainter::Model
 		}
 
 #if 0
-		Layer clonedLayer() const
+		Layer copiedLayer() const
 		{
 			return Layer{m_loc, m_rot, m_scale, std::make_shared<Image>(*m_content)};
 		}
