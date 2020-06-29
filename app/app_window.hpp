@@ -23,6 +23,8 @@ namespace Texpainter
 		using CrackGenDlg = Ui::Dialog<CrackCreator>;
 
 	public:
+		enum class ControlId:int{LayerStackCtrl};
+
 		explicit AppWindow(Ui::Container& container):
 		   m_img{512, 512},
 		   m_columns{container, Ui::Box::Orientation::Horizontal},
@@ -45,7 +47,16 @@ namespace Texpainter
 				}
 			});
 			std::ranges::fill(m_img.pixels(), Model::Pixel{0.5f, 0.5f, 0.5f, 1.0f});
-			m_img_view.image(m_img);
+			m_layerstack_ctrl.inputField().eventHandler<ControlId::LayerStackCtrl>(*this);
+		}
+
+		template<ControlId>
+		void onChanged(LayerStackControl& layer_stack)
+		{
+			Model::Image canvas{512, 512};
+			std::ranges::fill(canvas.pixels(), Model::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
+			render(layer_stack.layers(), canvas.pixels());
+			m_img_view.image(canvas);
 		}
 
 		template<MenuAction id>

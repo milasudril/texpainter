@@ -48,7 +48,13 @@ namespace Texpainter
 			std::ranges::for_each(m_layer_names, [& layer_selector = m_layer_selector](auto const& item) {
 				layer_selector.append(item.c_str());
 			});
+			notify();
 			return *this;
+		}
+
+		Model::LayerStack const& layers() const
+		{
+			return m_layers;
 		}
 
 		LayerStackControl& add(std::string&& name, Model::Layer&& layer)
@@ -57,6 +63,7 @@ namespace Texpainter
 			m_layer_names.push_back(std::move(name));
 			m_layers.append(std::move(layer));
 			m_layer_selector.selected(m_layer_names.size() - 1);
+			notify();
 
 			return *this;
 		}
@@ -71,6 +78,7 @@ namespace Texpainter
 			add(std::move(res.first), std::move(res.second));
 			m_create_layer.reset();
 			m_layer_new.state(false);
+			notify();
 		}
 
 		template<ControlId>
@@ -80,9 +88,29 @@ namespace Texpainter
 			m_layer_new.state(false);
 		}
 
+		template<auto id, class EventHandler>
+		LayerStackControl& eventHandler(EventHandler& eh)
+		{
+			r_eh = &eh;
+			r_func = [](void* event_handler, LayerStackControl& self) {
+				reinterpret_cast<EventHandler*>(event_handler)->template onChanged<id>(self);
+			};
+
+			return *this;
+		}
+
 	private:
 		Model::LayerStack m_layers;
 		std::vector<std::string> m_layer_names;
+
+		using EventHandlerFunc = void (*)(void*, LayerStackControl&);
+		void* r_eh;
+		EventHandlerFunc r_func;
+
+		void notify()
+		{
+			if(r_eh != nullptr) { r_func(r_eh, *this); }
+		}
 
 		Ui::Box m_root;
 		Ui::Combobox m_layer_selector;
