@@ -27,10 +27,13 @@ namespace Texpainter
 		   m_img{512, 512},
 		   m_columns{container, Ui::Box::Orientation::Horizontal},
 		   m_toolbar{m_columns, Ui::Box::Orientation::Vertical},
+		   m_tools_separator{m_columns},
 		   m_rows{m_columns.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand}),
 		          Ui::Box::Orientation::Vertical},
 		   m_pal_editor{m_rows, Ui::Box::Orientation::Horizontal, "Palettes: "},
+		   m_pal_separator{m_rows},
 		   m_layerstack_ctrl{m_rows, Ui::Box::Orientation::Horizontal, "Layers: "},
+		   m_layeres_separator{m_rows},
 		   m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
 		{
 			forEachEnumItem<MenuAction>([this](auto tag) {
@@ -88,9 +91,12 @@ namespace Texpainter
 
 		Ui::Box m_columns;
 		Ui::Toolbar<MenuAction, MenuActionTraits> m_toolbar;
+		Ui::Separator m_tools_separator;
 		Ui::Box m_rows;
 		Ui::LabeledInput<PaletteEditor> m_pal_editor;
+		Ui::Separator m_pal_separator;
 		Ui::LabeledInput<LayerStackControl> m_layerstack_ctrl;
+		Ui::Separator m_layeres_separator;
 		Ui::ImageView m_img_view;
 
 		std::unique_ptr<NoiseGenDlg> m_surf_creator;

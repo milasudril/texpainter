@@ -5,6 +5,7 @@
 
 #include "model/layer_stack.hpp"
 #include "ui/box.hpp"
+#include "ui/separator.hpp"
 
 namespace Texpainter
 {
@@ -14,8 +15,9 @@ namespace Texpainter
 		explicit LayerStackControl(Ui::Container& owner):
 		   m_root{owner, Ui::Box::Orientation::Horizontal},
 		   m_layer_selector{m_root},
-		   m_layer_new{m_root, "+"},
-		   m_layer_delete{m_root, "-"},
+		   m_layer_new{m_root, "＋"},
+		   m_layer_delete{m_root, "−"},
+		   m_layer_sel_separator{m_root},
 		   m_layer_move_up{m_root, "↑"},
 		   m_layer_move_down{m_root, "↓"},
 		   m_layer_solo{m_root, "Solo"},
@@ -43,6 +45,7 @@ namespace Texpainter
 		Ui::Combobox m_layer_selector;
 		Ui::Button m_layer_new;
 		Ui::Button m_layer_delete;
+		Ui::Separator m_layer_sel_separator;
 		Ui::Button m_layer_move_up;
 		Ui::Button m_layer_move_down;
 		Ui::Button m_layer_solo;

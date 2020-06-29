@@ -14,6 +14,7 @@
 #include "ui/dialog.hpp"
 #include "ui/extended_color_picker.hpp"
 #include "ui/color_picker_sidepanel.hpp"
+#include "ui/separator.hpp"
 #include "model/palette.hpp"
 
 #include <vector>
@@ -67,7 +68,7 @@ namespace Texpainter
 		   r_eh{nullptr},
 		   m_container{owner, Ui::Box::Orientation::Horizontal},
 		   m_pal_selector{m_container},
-		   m_pal_new{m_container, "+"},
+		   m_pal_new{m_container, "＋"},
 		   m_pal_view{m_container.insertMode(Ui::Box::InsertMode{4})}
 		{
 			m_pal_selector.eventHandler<ControlId::PalSelector>(*this);
