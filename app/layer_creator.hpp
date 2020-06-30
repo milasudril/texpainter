@@ -1,7 +1,7 @@
-//@	{"targets":[{"name":"create_layer_dlg.hpp","type":"include"}]}
+//@	{"targets":[{"name":"layer_creator.hpp","type":"include"}]}
 
-#ifndef TEXPAINTER_CREATELAYERDLG_HPP
-#define TEXPAINTER_CREATELAYERDLG_HPP
+#ifndef TEXPAINTER_LAYERCREATOR_HPP
+#define TEXPAINTER_LAYERCREATOR_HPP
 
 #include "model/layer.hpp"
 #include "ui/box.hpp"

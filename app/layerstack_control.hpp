@@ -3,7 +3,7 @@
 #ifndef TEXPAINTER_LAYERSTACKCONTROL_HPP
 #define TEXPAINTER_LAYERSTACKCONTROL_HPP
 
-#include "./create_layer_dlg.hpp"
+#include "./layer_creator.hpp"
 #include "model/layer_stack.hpp"
 #include "ui/box.hpp"
 #include "ui/separator.hpp"
