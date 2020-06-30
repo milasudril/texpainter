@@ -33,6 +33,7 @@ int main(int argc, char* argv[])
 
 	Texpainter::Ui::Window mainwin{"Texpainter"};
 
+#if 0
 	Texpainter::Model::Layer test{Texpainter::Size2d{256, 256}};
 	std::ranges::fill(test.content().pixels(), Texpainter::Model::Pixel{0.5f, 0.25f, 0.25f, 1.0f});
 
@@ -46,9 +47,9 @@ int main(int argc, char* argv[])
 
 	 Texpainter::Ui::ImageView img_view{mainwin};
 	 img_view.image(canvas).minSize(Texpainter::Size2d{512, 512});
+#endif
 
-
-//	Texpainter::AppWindow app{mainwin};
+	Texpainter::AppWindow app{mainwin};
 
 	MainwinEventHandler eh;
 	mainwin.eventHandler<0>(eh).show();

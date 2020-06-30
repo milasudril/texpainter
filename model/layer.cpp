@@ -12,8 +12,11 @@ void Texpainter::Model::render(Layer const& layer, Span2d<Pixel> ret)
 	auto const scale_factor = 1.0 / layer.scaleFactor();
 
 	auto const src = layer.content().pixels();
-	auto const origin_src = 0.5*vec2_t{static_cast<double>(src.width()), static_cast<double>(src.height())};
-	auto const loc_src_ret_coord = layer.location() + 0.5*vec2_t{static_cast<double>(ret.width()), static_cast<double>(ret.height())};
+	auto const origin_src =
+	   0.5 * vec2_t{static_cast<double>(src.width()), static_cast<double>(src.height())};
+	auto const loc_src_ret_coord =
+	   layer.location()
+	   + 0.5 * vec2_t{static_cast<double>(ret.width()), static_cast<double>(ret.height())};
 
 	auto const aabb = 0.5 * axisAlignedBoundingBox(layer);
 	auto const begin_coords = loc_src_ret_coord - aabb;
@@ -33,4 +36,24 @@ void Texpainter::Model::render(Layer const& layer, Span2d<Pixel> ret)
 			}
 		}
 	}
+}
+
+Texpainter::Model::Layer& Texpainter::Model::Layer::paint(vec2_t origin, double radius, Pixel color)
+{
+	auto const begin_coords = origin - vec2_t{radius, radius};
+	auto const end_coords = origin + vec2_t{radius, radius};
+	auto const w = m_content->width();
+	auto const h = m_content->height();
+	auto pixels = m_content->pixels();
+
+	for(int row = static_cast<int>(begin_coords[1]); row < static_cast<int>(end_coords[1]); ++row)
+	{
+		for(int col = static_cast<int>(begin_coords[0]); col < static_cast<int>(end_coords[0]); ++col)
+		{
+			auto const loc_ret = vec2_t{static_cast<double>(col), static_cast<double>(row)};
+			auto d = loc_ret - origin;
+			if(dot(d, d) < radius * radius) { pixels(col % w, row % h) = color; }
+		}
+	}
+	return *this;
 }

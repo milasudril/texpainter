@@ -23,7 +23,11 @@ namespace Texpainter
 		using CrackGenDlg = Ui::Dialog<CrackCreator>;
 
 	public:
-		enum class ControlId:int{LayerStackCtrl};
+		enum class ControlId : int
+		{
+			LayerStackCtrl,
+			Canvas
+		};
 
 		explicit AppWindow(Ui::Container& container):
 		   m_canvas_size{512, 512},
@@ -36,7 +40,8 @@ namespace Texpainter
 		   m_pal_separator{m_rows},
 		   m_layerstack_ctrl{m_rows, Ui::Box::Orientation::Horizontal, "Layers: "},
 		   m_layeres_separator{m_rows},
-		   m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
+		   m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})},
+		   m_button_mask{0}
 		{
 			forEachEnumItem<MenuAction>([this](auto tag) {
 				if constexpr(std::is_same_v<Ui::Button, typename MenuActionTraits<tag.value>::type>)
@@ -47,16 +52,23 @@ namespace Texpainter
 				}
 			});
 			m_layerstack_ctrl.inputField().eventHandler<ControlId::LayerStackCtrl>(*this);
+			m_img_view.eventHandler<ControlId::Canvas>(*this);
 		}
 
 		template<ControlId>
-		void onChanged(LayerStackControl& layer_stack)
+		void onChanged(LayerStackControl&)
 		{
-			Model::Image canvas{m_canvas_size};
-			std::ranges::fill(canvas.pixels(), Model::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
-			render(layer_stack.layers(), canvas.pixels());
-			m_img_view.image(canvas);
+			doRender();
 		}
+
+		template<ControlId>
+		void onMouseUp(Ui::ImageView& view, vec2_t pos_window, vec2_t pos_screen, int button);
+
+		template<ControlId>
+		void onMouseDown(Ui::ImageView& view, vec2_t pos_window, vec2_t pos_screen, int button);
+
+		template<ControlId>
+		void onMouseMove(Ui::ImageView& view, vec2_t pos_window, vec2_t pos_screen);
 
 		template<MenuAction id>
 		void onClicked(Ui::Button& btn)
@@ -75,9 +87,9 @@ namespace Texpainter
 		void confirmPositive(NoiseGenDlg& dlg)
 		{
 			m_toolbar.get<id>().state(false);
-//			m_img = m_surf_creator->widget().generate(Size2d{m_canvas_size});
+			//			m_img = m_surf_creator->widget().generate(Size2d{m_canvas_size});
 			m_surf_creator.reset();
-//			m_img_view.image(m_img);
+			//			m_img_view.image(m_img);
 		}
 
 		template<MenuAction id>
@@ -91,9 +103,9 @@ namespace Texpainter
 		void confirmPositive(CrackGenDlg& dlg)
 		{
 			m_toolbar.get<id>().state(false);
-//			m_img = m_crack_creator->widget().generate(Size2d{m_canvas_size});
+			//			m_img = m_crack_creator->widget().generate(Size2d{m_canvas_size});
 			m_crack_creator.reset();
-//			m_img_view.image(m_img);
+			//			m_img_view.image(m_img);
 		}
 
 	private:
@@ -112,6 +124,16 @@ namespace Texpainter
 		std::unique_ptr<NoiseGenDlg> m_surf_creator;
 		Generators::CrackGenerator::Rng m_rng;
 		std::unique_ptr<CrackGenDlg> m_crack_creator;
+
+		uint32_t m_button_mask;
+
+		void doRender()
+		{
+			Model::Image canvas{m_canvas_size};
+			std::ranges::fill(canvas.pixels(), Model::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
+			render(m_layerstack_ctrl.inputField().layers(), canvas.pixels());
+			m_img_view.image(canvas);
+		}
 	};
 
 	template<>
@@ -126,6 +148,40 @@ namespace Texpainter
 	{
 		m_crack_creator = std::make_unique<CrackGenDlg>(m_columns, "Generate cracks", m_rng);
 		m_crack_creator->eventHandler<MenuAction::GenCracks>(*this);
+	}
+
+	template<>
+	void AppWindow::onMouseUp<AppWindow::ControlId::Canvas>(Ui::ImageView&, vec2_t, vec2_t, int button)
+	{
+		m_button_mask &= ~(1 << button);
+	}
+
+	template<>
+	void AppWindow::onMouseDown<AppWindow::ControlId::Canvas>(Ui::ImageView& view,
+	                                                          vec2_t pos_window,
+	                                                          vec2_t pos_screen,
+	                                                          int button)
+	{
+		m_button_mask |= (1 << button);
+		if(m_button_mask == 2)
+		{
+			m_layerstack_ctrl.inputField().paintCurrentLayer(
+			   pos_window, 16.0, Model::Pixel{1.0f, 1.0f, 1.0f, 1.0f});
+			doRender();
+		}
+	}
+
+	template<>
+	void AppWindow::onMouseMove<AppWindow::ControlId::Canvas>(Ui::ImageView& view,
+	                                                          vec2_t pos_window,
+	                                                          vec2_t pos_screen)
+	{
+		if(m_button_mask == 2)
+		{
+			m_layerstack_ctrl.inputField().paintCurrentLayer(
+			   pos_window, 16.0, Model::Pixel{1.0f, 1.0f, 1.0f, 1.0f});
+			doRender();
+		}
 	}
 }
 

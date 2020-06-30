@@ -81,9 +81,7 @@ namespace Texpainter::Model
 
 	void render(LayerStack const& layers, Span2d<Pixel> ret)
 	{
-		std::ranges::for_each(layers, [ret](auto const& layer) {
-			render(layer, ret);
-		});
+		std::ranges::for_each(layers, [ret](auto const& layer) { render(layer, ret); });
 	}
 }
 

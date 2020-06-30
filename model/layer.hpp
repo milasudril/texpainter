@@ -49,12 +49,7 @@ namespace Texpainter::Model
 		}
 #endif
 
-
-
-		Image& content()
-		{
-			return *m_content;
-		}
+		Layer& paint(vec2_t origin, double radius, Pixel color);
 
 		Image const& content() const
 		{

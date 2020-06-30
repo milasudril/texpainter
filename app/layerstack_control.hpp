@@ -21,6 +21,7 @@ namespace Texpainter
 		};
 
 		explicit LayerStackControl(Ui::Container& owner):
+		   r_current_layer{nullptr},
 		   m_root{owner, Ui::Box::Orientation::Horizontal},
 		   m_layer_selector{m_root},
 		   m_layer_new{m_root, "＋"},
@@ -48,7 +49,6 @@ namespace Texpainter
 			std::ranges::for_each(m_layer_names, [& layer_selector = m_layer_selector](auto const& item) {
 				layer_selector.append(item.c_str());
 			});
-			notify();
 			return *this;
 		}
 
@@ -62,9 +62,16 @@ namespace Texpainter
 			m_layer_selector.append(name.c_str());
 			m_layer_names.push_back(std::move(name));
 			m_layers.append(std::move(layer));
+			auto const index = m_layer_names.size() - 1;
 			m_layer_selector.selected(m_layer_names.size() - 1);
-			notify();
+			r_current_layer = &m_layers[Model::LayerIndex{static_cast<uint32_t>(index)}];
+			return *this;
+		}
 
+		template<class... Args>
+		LayerStackControl& paintCurrentLayer(Args&&... args)
+		{
+			if(r_current_layer != nullptr) { r_current_layer->paint(std::forward<Args>(args)...); }
 			return *this;
 		}
 
@@ -101,6 +108,7 @@ namespace Texpainter
 		}
 
 	private:
+		Model::Layer* r_current_layer;
 		Model::LayerStack m_layers;
 		std::vector<std::string> m_layer_names;
 
