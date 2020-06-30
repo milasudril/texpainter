@@ -12,8 +12,8 @@ void Texpainter::Model::render(Layer const& layer, Span2d<Pixel> ret)
 	auto const scale_factor = 1.0 / layer.scaleFactor();
 
 	auto const src = layer.content().pixels();
-	auto const origin_src = vec2_t{src.width() / 2.0, src.height() / 2.0};
-	auto const loc_src_ret_coord = layer.location();
+	auto const origin_src = 0.5*vec2_t{static_cast<double>(src.width()), static_cast<double>(src.height())};
+	auto const loc_src_ret_coord = layer.location() + 0.5*vec2_t{static_cast<double>(ret.width()), static_cast<double>(ret.height())};
 
 	auto const aabb = 0.5 * axisAlignedBoundingBox(layer);
 	auto const begin_coords = loc_src_ret_coord - aabb;

@@ -49,6 +49,8 @@ namespace Texpainter::Model
 		}
 #endif
 
+
+
 		Image& content()
 		{
 			return *m_content;
