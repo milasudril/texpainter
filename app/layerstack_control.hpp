@@ -74,6 +74,7 @@ namespace Texpainter
 		template<ControlId>
 		void confirmPositive(CreateLayerDlg& dlg)
 		{
+			// FIXME: resulting layer must be smaller than canvas size
 			auto res = dlg.widget().create();
 			add(std::move(res.first), std::move(res.second));
 			m_create_layer.reset();

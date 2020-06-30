@@ -26,7 +26,7 @@ namespace Texpainter
 		enum class ControlId:int{LayerStackCtrl};
 
 		explicit AppWindow(Ui::Container& container):
-		   m_img{512, 512},
+		   m_canvas_size{512, 512},
 		   m_columns{container, Ui::Box::Orientation::Horizontal},
 		   m_toolbar{m_columns, Ui::Box::Orientation::Vertical},
 		   m_tools_separator{m_columns},
@@ -46,14 +46,13 @@ namespace Texpainter
 					   .template eventHandler<tag.value>(*this);
 				}
 			});
-			std::ranges::fill(m_img.pixels(), Model::Pixel{0.5f, 0.5f, 0.5f, 1.0f});
 			m_layerstack_ctrl.inputField().eventHandler<ControlId::LayerStackCtrl>(*this);
 		}
 
 		template<ControlId>
 		void onChanged(LayerStackControl& layer_stack)
 		{
-			Model::Image canvas{512, 512};
+			Model::Image canvas{m_canvas_size};
 			std::ranges::fill(canvas.pixels(), Model::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
 			render(layer_stack.layers(), canvas.pixels());
 			m_img_view.image(canvas);
@@ -76,9 +75,9 @@ namespace Texpainter
 		void confirmPositive(NoiseGenDlg& dlg)
 		{
 			m_toolbar.get<id>().state(false);
-			m_img = m_surf_creator->widget().generate(Size2d{1024, 1024});
+//			m_img = m_surf_creator->widget().generate(Size2d{m_canvas_size});
 			m_surf_creator.reset();
-			m_img_view.image(m_img);
+//			m_img_view.image(m_img);
 		}
 
 		template<MenuAction id>
@@ -92,13 +91,13 @@ namespace Texpainter
 		void confirmPositive(CrackGenDlg& dlg)
 		{
 			m_toolbar.get<id>().state(false);
-			m_img = m_crack_creator->widget().generate(Size2d{1024, 1024});
+//			m_img = m_crack_creator->widget().generate(Size2d{m_canvas_size});
 			m_crack_creator.reset();
-			m_img_view.image(m_img);
+//			m_img_view.image(m_img);
 		}
 
 	private:
-		Model::Image m_img;
+		Size2d m_canvas_size;
 
 		Ui::Box m_columns;
 		Ui::Toolbar<MenuAction, MenuActionTraits> m_toolbar;
