@@ -25,12 +25,14 @@ namespace Texpainter
 	public:
 		enum class ControlId : int
 		{
+			PaletteEd,
 			LayerStackCtrl,
 			Canvas
 		};
 
 		explicit AppWindow(Ui::Container& container):
 		   m_canvas_size{512, 512},
+		   m_current_color{0.5f, 0.5f, 0.5f, 1.0f},
 		   m_columns{container, Ui::Box::Orientation::Horizontal},
 		   m_toolbar{m_columns, Ui::Box::Orientation::Vertical},
 		   m_tools_separator{m_columns},
@@ -51,6 +53,7 @@ namespace Texpainter
 					   .template eventHandler<tag.value>(*this);
 				}
 			});
+			m_pal_editor.inputField().eventHandler<ControlId::PaletteEd>(*this);
 			m_layerstack_ctrl.inputField().eventHandler<ControlId::LayerStackCtrl>(*this);
 			m_img_view.eventHandler<ControlId::Canvas>(*this);
 		}
@@ -59,6 +62,12 @@ namespace Texpainter
 		void onChanged(LayerStackControl&)
 		{
 			doRender();
+		}
+
+		template<ControlId>
+		void onChanged(PaletteEditor& pal)
+		{
+			m_current_color = pal.selectedPalette()[pal.selectedColorIndex()];
 		}
 
 		template<ControlId>
@@ -110,6 +119,7 @@ namespace Texpainter
 
 	private:
 		Size2d m_canvas_size;
+		Model::Pixel m_current_color;
 
 		Ui::Box m_columns;
 		Ui::Toolbar<MenuAction, MenuActionTraits> m_toolbar;
@@ -165,8 +175,7 @@ namespace Texpainter
 		m_button_mask |= (1 << button);
 		if(m_button_mask == 2)
 		{
-			m_layerstack_ctrl.inputField().paintCurrentLayer(
-			   pos_window, 16.0, Model::Pixel{1.0f, 1.0f, 1.0f, 1.0f});
+			m_layerstack_ctrl.inputField().paintCurrentLayer(pos_window, 16.0, m_current_color);
 			doRender();
 		}
 	}
@@ -178,8 +187,7 @@ namespace Texpainter
 	{
 		if(m_button_mask == 2)
 		{
-			m_layerstack_ctrl.inputField().paintCurrentLayer(
-			   pos_window, 16.0, Model::Pixel{1.0f, 1.0f, 1.0f, 1.0f});
+			m_layerstack_ctrl.inputField().paintCurrentLayer(pos_window, 16.0, m_current_color);
 			doRender();
 		}
 	}
