@@ -17,7 +17,9 @@ namespace Texpainter
 	public:
 		enum class ControlId : int
 		{
-			LayerNew
+			LayerNew,
+			LayerMoveUp,
+			LayerMoveDown
 		};
 
 		explicit LayerStackControl(Ui::Container& owner):
@@ -39,6 +41,8 @@ namespace Texpainter
 		   m_blend_func{m_root, "f(x)"}
 		{
 			m_layer_new.eventHandler<ControlId::LayerNew>(*this);
+			m_layer_move_up.eventHandler<ControlId::LayerMoveUp>(*this);
+			m_layer_move_down.eventHandler<ControlId::LayerMoveDown>(*this);
 		}
 
 		LayerStackControl& layers(Model::LayerStack&& l, std::vector<std::string>&& n)
@@ -145,6 +149,32 @@ namespace Texpainter
 	{
 		m_create_layer = std::make_unique<CreateLayerDlg>(m_root, "Create layer");
 		m_create_layer->eventHandler<LayerStackControl::ControlId::LayerNew>(*this);
+	}
+
+	template<>
+	void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerMoveUp>(Ui::Button& btn)
+	{
+		auto const selected = static_cast<uint32_t>(m_layer_selector.selected());
+		if(selected < m_layers.size())
+		{
+			auto current_index = Model::LayerIndex{selected};
+			m_layers.moveUp(current_index);
+			notify();
+		}
+		btn.state(false);
+	}
+
+	template<>
+	void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerMoveDown>(Ui::Button& btn)
+	{
+		auto const selected = static_cast<uint32_t>(m_layer_selector.selected());
+		if(selected < m_layers.size())
+		{
+			auto current_index = Model::LayerIndex{selected};
+			m_layers.moveDown(current_index);
+			notify();
+		}
+		btn.state(false);
 	}
 }
 
