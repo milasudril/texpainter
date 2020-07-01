@@ -13,12 +13,14 @@ namespace Texpainter
 	class LayerStackControl
 	{
 		using CreateLayerDlg = Ui::Dialog<LayerCreator>;
+		using TextInputDlg = Ui::Dialog<Ui::LabeledInput<Ui::TextEntry>>;
 
 	public:
 		enum class ControlId : int
 		{
 			LayerSelector,
 			LayerNew,
+			LayerCopy,
 			LayerMoveUp,
 			LayerMoveDown
 		};
@@ -42,6 +44,7 @@ namespace Texpainter
 		   m_blend_func{m_root, "f(x)"}
 		{
 			m_layer_selector.eventHandler<ControlId::LayerSelector>(*this);
+			m_layer_copy.eventHandler<ControlId::LayerCopy>(*this);
 			m_layer_new.eventHandler<ControlId::LayerNew>(*this);
 			m_layer_move_up.eventHandler<ControlId::LayerMoveUp>(*this);
 			m_layer_move_down.eventHandler<ControlId::LayerMoveDown>(*this);
@@ -93,12 +96,16 @@ namespace Texpainter
 		}
 
 		template<ControlId>
+		void onChanged(Ui::Combobox&);
+
+		template<ControlId>
 		void onClicked(Ui::Button&);
 
 		template<ControlId>
 		void confirmPositive(CreateLayerDlg& dlg)
 		{
 			// FIXME: resulting layer must be smaller than canvas size
+			// FIXME: handle duplicated names
 			auto res = dlg.widget().create();
 			add(std::move(res.first), std::move(res.second));
 			m_create_layer.reset();
@@ -114,7 +121,11 @@ namespace Texpainter
 		}
 
 		template<ControlId>
-		void onChanged(Ui::Combobox&);
+		void confirmPositive(TextInputDlg&);
+
+		template<ControlId>
+		void dismiss(TextInputDlg&);
+
 
 	private:
 		Model::Layer* r_current_layer;
@@ -147,6 +158,7 @@ namespace Texpainter
 		Ui::Button m_blend_func;
 
 		std::unique_ptr<CreateLayerDlg> m_create_layer;
+		std::unique_ptr<TextInputDlg> m_copy_layer;
 	};
 
 	template<>
@@ -161,6 +173,36 @@ namespace Texpainter
 	{
 		m_create_layer = std::make_unique<CreateLayerDlg>(m_root, "Create layer");
 		m_create_layer->eventHandler<LayerStackControl::ControlId::LayerNew>(*this);
+	}
+
+	template<>
+	void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerCopy>(Ui::Button& btn)
+	{
+		m_copy_layer =
+		   std::make_unique<TextInputDlg>(m_root, "Copy layer", Ui::Box::Orientation::Horizontal, "Name");
+		m_copy_layer->eventHandler<LayerStackControl::ControlId::LayerCopy>(*this);
+	}
+
+
+	template<>
+	void LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerCopy>(TextInputDlg& src)
+	{
+		if(r_current_layer != nullptr)
+		{
+			// FIXME: handle duplicated names
+			add(src.widget().inputField().content(), r_current_layer->copiedLayer());
+			m_copy_layer.reset();
+			m_layer_copy.state(false);
+			notify();
+		}
+	}
+
+	template<>
+	void LayerStackControl::dismiss<LayerStackControl::ControlId::LayerCopy>(TextInputDlg&)
+	{
+		m_copy_layer.reset();
+		m_layer_copy.state(false);
+		notify();
 	}
 
 	template<>

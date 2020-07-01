@@ -42,12 +42,10 @@ namespace Texpainter::Model
 			return Layer{m_loc, m_rot, m_scale, m_content};
 		}
 
-#if 0
 		Layer copiedLayer() const
 		{
 			return Layer{m_loc, m_rot, m_scale, std::make_shared<Image>(*m_content)};
 		}
-#endif
 
 		Layer& paint(vec2_t origin, double radius, Pixel color);
 

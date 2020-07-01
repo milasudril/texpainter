@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <memory>
 #include <span>
+#include <cstring>
 
 namespace Texpainter::Model
 {
@@ -28,6 +29,16 @@ namespace Texpainter::Model
 		{
 		}
 
+		BasicImage(BasicImage const& src): BasicImage{src.size()}
+		{
+			memcpy(m_data.get(), src.m_data.get(), area() * sizeof(PixelType));
+		}
+
+		BasicImage& operator=(BasicImage&&) = default;
+
+		BasicImage(BasicImage&&) = default;
+
+		BasicImage& operator=(BasicImage const&) = delete;
 
 		auto width() const
 		{
