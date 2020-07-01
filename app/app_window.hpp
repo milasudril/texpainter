@@ -175,7 +175,10 @@ namespace Texpainter
 		m_button_mask |= (1 << button);
 		if(m_button_mask == 2)
 		{
-			m_layerstack_ctrl.inputField().paintCurrentLayer(pos_window, 16.0, m_current_color);
+			auto const size = view.imageSize();
+			auto const offset =
+			   0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
+			m_layerstack_ctrl.inputField().paintCurrentLayer(pos_window - offset, 16.0, m_current_color);
 			doRender();
 		}
 	}
@@ -187,7 +190,10 @@ namespace Texpainter
 	{
 		if(m_button_mask == 2)
 		{
-			m_layerstack_ctrl.inputField().paintCurrentLayer(pos_window, 16.0, m_current_color);
+			auto const size = view.imageSize();
+			auto const offset =
+			   0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
+			m_layerstack_ctrl.inputField().paintCurrentLayer(pos_window - offset, 16.0, m_current_color);
 			doRender();
 		}
 	}

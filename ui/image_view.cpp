@@ -91,6 +91,11 @@ public:
 		gtk_widget_set_size_request(GTK_WIDGET(m_handle), size.width(), size.height());
 	}
 
+	Size2d imageSize() const noexcept
+	{
+		return m_size_current;
+	}
+
 private:
 	void* r_eh;
 	EventHandlerVtable m_vt;
@@ -215,4 +220,9 @@ Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::minSize(Size2d size)
 {
 	m_impl->minSize(size);
 	return *this;
+}
+
+Texpainter::Size2d Texpainter::Ui::ImageView::imageSize() const noexcept
+{
+	return m_impl->imageSize();
 }
