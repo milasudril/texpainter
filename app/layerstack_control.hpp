@@ -252,7 +252,7 @@ namespace Texpainter
 		if(selected < m_layers.size())
 		{
 			auto current_index = Model::LayerIndex{selected};
-			m_layers.moveUp(current_index);
+			m_layers.moveBackward(current_index);
 			notify();
 		}
 		btn.state(false);
@@ -265,7 +265,7 @@ namespace Texpainter
 		if(selected < m_layers.size())
 		{
 			auto current_index = Model::LayerIndex{selected};
-			m_layers.moveDown(current_index);
+			m_layers.moveForward(current_index);
 			notify();
 		}
 		btn.state(false);
