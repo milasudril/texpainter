@@ -14,6 +14,7 @@ namespace Texpainter
 	{
 		using CreateLayerDlg = Ui::Dialog<LayerCreator>;
 		using TextInputDlg = Ui::Dialog<Ui::LabeledInput<Ui::TextEntry>>;
+		using ConfirmationDlg = Ui::Dialog<Ui::Label, Ui::DialogYesNo>;
 
 	public:
 		enum class ControlId : int
@@ -22,6 +23,7 @@ namespace Texpainter
 			LayerNew,
 			LayerCopy,
 			LayerLink,
+			LayerDelete,
 			LayerMoveUp,
 			LayerMoveDown
 		};
@@ -45,9 +47,10 @@ namespace Texpainter
 		   m_blend_func{m_root, "f(x)"}
 		{
 			m_layer_selector.eventHandler<ControlId::LayerSelector>(*this);
+			m_layer_new.eventHandler<ControlId::LayerNew>(*this);
 			m_layer_copy.eventHandler<ControlId::LayerCopy>(*this);
 			m_layer_link.eventHandler<ControlId::LayerLink>(*this);
-			m_layer_new.eventHandler<ControlId::LayerNew>(*this);
+			m_layer_delete.eventHandler<ControlId::LayerDelete>(*this);
 			m_layer_move_up.eventHandler<ControlId::LayerMoveUp>(*this);
 			m_layer_move_down.eventHandler<ControlId::LayerMoveDown>(*this);
 		}
@@ -128,6 +131,12 @@ namespace Texpainter
 		template<ControlId>
 		void dismiss(TextInputDlg&);
 
+		template<ControlId>
+		void confirmPositive(ConfirmationDlg&);
+
+		template<ControlId>
+		void confirmNegative(ConfirmationDlg&);
+
 
 	private:
 		Model::Layer* r_current_layer;
@@ -162,6 +171,7 @@ namespace Texpainter
 		std::unique_ptr<CreateLayerDlg> m_create_layer;
 		std::unique_ptr<TextInputDlg> m_copy_layer;
 		std::unique_ptr<TextInputDlg> m_link_layer;
+		std::unique_ptr<ConfirmationDlg> m_delete_layer;
 	};
 
 	template<>
@@ -260,6 +270,36 @@ namespace Texpainter
 			notify();
 		}
 		btn.state(false);
+	}
+
+
+	template<>
+	void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerDelete>(Ui::Button& btn)
+	{
+		auto const selected = static_cast<uint32_t>(m_layer_selector.selected());
+		if(selected < m_layers.size())
+		{
+			std::string msg{"Do you wish to delete `"};
+			msg += m_layer_names[selected];
+			msg += "`?";
+			m_delete_layer = std::make_unique<ConfirmationDlg>(m_root, "Deleting layer", msg.c_str());
+			m_delete_layer->eventHandler<ControlId::LayerDelete>(*this);
+		}
+	}
+
+	template<>
+	void LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerDelete>(ConfirmationDlg&)
+	{
+		// FIXME
+		m_delete_layer.reset();
+		m_layer_delete.state(false);
+	}
+
+	template<>
+	void LayerStackControl::confirmNegative<LayerStackControl::ControlId::LayerDelete>(ConfirmationDlg&)
+	{
+		m_delete_layer.reset();
+		m_layer_delete.state(false);
 	}
 }
 

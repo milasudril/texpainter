@@ -42,6 +42,34 @@ namespace Texpainter::Ui
 		}
 	};
 
+	struct DialogYesNo
+	{
+		static constexpr const char* dismiss() noexcept
+		{
+			return nullptr;
+		}
+
+		static constexpr const char* confirmPositive() noexcept
+		{
+			return "Yes";
+		}
+
+		static constexpr const char* confirmNegative() noexcept
+		{
+			return "No";
+		}
+
+		static constexpr const char* user1() noexcept
+		{
+			return nullptr;
+		}
+
+		static constexpr const char* user2() noexcept
+		{
+			return nullptr;
+		}
+	};
+
 	struct DialogCancel
 	{
 		static constexpr const char* dismiss() noexcept
