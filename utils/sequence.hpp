@@ -38,7 +38,9 @@ namespace Texpainter
 		}
 
 		static auto firstIndex()
-		{ return index_type{0}; }
+		{
+			return index_type{0};
+		}
 
 		auto lastIndex() const
 		{

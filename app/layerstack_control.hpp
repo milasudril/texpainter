@@ -58,10 +58,8 @@ namespace Texpainter
 		{
 			m_layers = std::move(l);
 			m_layer_names = std::move(n);
-			m_layer_selector.clear();
-			std::ranges::for_each(m_layer_names, [& layer_selector = m_layer_selector](auto const& item) {
-				layer_selector.append(item.c_str());
-			});
+			m_current_layer = m_layers.lastIndex();
+			updateLayerSelector();
 			return *this;
 		}
 
@@ -76,8 +74,8 @@ namespace Texpainter
 			m_layer_names.append(std::move(name));
 			m_layers.append(std::move(layer));
 			auto const index = m_layer_names.size() - 1;
-			m_layer_selector.selected(m_layer_names.size() - 1);
 			m_current_layer = Model::LayerIndex{static_cast<uint32_t>(index)};
+			updateLayerSelector();
 			return *this;
 		}
 
@@ -149,6 +147,16 @@ namespace Texpainter
 		void notify()
 		{
 			if(r_eh != nullptr) { r_func(r_eh, *this); }
+		}
+
+		void updateLayerSelector()
+		{
+			m_layer_selector.clear();
+			std::ranges::for_each(std::ranges::reverse_view{m_layer_names},
+			                      [& layer_selector = m_layer_selector](auto const& item) {
+				                      layer_selector.append(item.c_str());
+			                      });
+			m_layer_selector.selected(m_layers.lastIndex().value() - m_current_layer.value());
 		}
 
 		Ui::Box m_root;
@@ -248,11 +256,12 @@ namespace Texpainter
 	template<>
 	void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerMoveUp>(Ui::Button& btn)
 	{
-		auto const selected = static_cast<uint32_t>(m_layer_selector.selected());
-		if(selected < m_layers.size())
+		if(m_current_layer.valid() && m_current_layer != m_layers.lastIndex())
 		{
-			auto current_index = Model::LayerIndex{selected};
-			m_layers.moveBackward(current_index);
+			m_layers.moveBackward(m_current_layer);
+			m_layer_names.moveBackward(m_current_layer);
+			++m_current_layer;
+			updateLayerSelector();
 			notify();
 		}
 		btn.state(false);
@@ -261,11 +270,12 @@ namespace Texpainter
 	template<>
 	void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerMoveDown>(Ui::Button& btn)
 	{
-		auto const selected = static_cast<uint32_t>(m_layer_selector.selected());
-		if(selected < m_layers.size())
+		if(m_current_layer.valid() && m_current_layer != m_layers.firstIndex())
 		{
-			auto current_index = Model::LayerIndex{selected};
-			m_layers.moveForward(current_index);
+			m_layers.moveForward(m_current_layer);
+			m_layer_names.moveForward(m_current_layer);
+			--m_current_layer;
+			updateLayerSelector();
 			notify();
 		}
 		btn.state(false);
@@ -287,7 +297,8 @@ namespace Texpainter
 	}
 
 	template<>
-	void LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerDelete>(ConfirmationDlg&)
+	void LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerDelete>(
+	   ConfirmationDlg&)
 	{
 		// FIXME
 		m_delete_layer.reset();
@@ -295,7 +306,8 @@ namespace Texpainter
 	}
 
 	template<>
-	void LayerStackControl::confirmNegative<LayerStackControl::ControlId::LayerDelete>(ConfirmationDlg&)
+	void LayerStackControl::confirmNegative<LayerStackControl::ControlId::LayerDelete>(
+	   ConfirmationDlg&)
 	{
 		m_delete_layer.reset();
 		m_layer_delete.state(false);
