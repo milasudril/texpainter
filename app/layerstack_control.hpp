@@ -21,6 +21,7 @@ namespace Texpainter
 			LayerSelector,
 			LayerNew,
 			LayerCopy,
+			LayerLink,
 			LayerMoveUp,
 			LayerMoveDown
 		};
@@ -45,6 +46,7 @@ namespace Texpainter
 		{
 			m_layer_selector.eventHandler<ControlId::LayerSelector>(*this);
 			m_layer_copy.eventHandler<ControlId::LayerCopy>(*this);
+			m_layer_link.eventHandler<ControlId::LayerLink>(*this);
 			m_layer_new.eventHandler<ControlId::LayerNew>(*this);
 			m_layer_move_up.eventHandler<ControlId::LayerMoveUp>(*this);
 			m_layer_move_down.eventHandler<ControlId::LayerMoveDown>(*this);
@@ -159,6 +161,7 @@ namespace Texpainter
 
 		std::unique_ptr<CreateLayerDlg> m_create_layer;
 		std::unique_ptr<TextInputDlg> m_copy_layer;
+		std::unique_ptr<TextInputDlg> m_link_layer;
 	};
 
 	template<>
@@ -178,11 +181,10 @@ namespace Texpainter
 	template<>
 	void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerCopy>(Ui::Button& btn)
 	{
-		m_copy_layer =
-		   std::make_unique<TextInputDlg>(m_root, "Copy layer", Ui::Box::Orientation::Horizontal, "Name");
+		m_copy_layer = std::make_unique<TextInputDlg>(
+		   m_root, "Copy layer", Ui::Box::Orientation::Horizontal, "New name");
 		m_copy_layer->eventHandler<LayerStackControl::ControlId::LayerCopy>(*this);
 	}
-
 
 	template<>
 	void LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerCopy>(TextInputDlg& src)
@@ -202,6 +204,35 @@ namespace Texpainter
 	{
 		m_copy_layer.reset();
 		m_layer_copy.state(false);
+		notify();
+	}
+
+	template<>
+	void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerLink>(Ui::Button& btn)
+	{
+		m_link_layer = std::make_unique<TextInputDlg>(
+		   m_root, "Link layer", Ui::Box::Orientation::Horizontal, "New name");
+		m_link_layer->eventHandler<LayerStackControl::ControlId::LayerLink>(*this);
+	}
+
+	template<>
+	void LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerLink>(TextInputDlg& src)
+	{
+		if(r_current_layer != nullptr)
+		{
+			// FIXME: handle duplicated names
+			add(src.widget().inputField().content(), r_current_layer->linkedLayer());
+			m_link_layer.reset();
+			m_layer_link.state(false);
+			notify();
+		}
+	}
+
+	template<>
+	void LayerStackControl::dismiss<LayerStackControl::ControlId::LayerLink>(TextInputDlg&)
+	{
+		m_link_layer.reset();
+		m_layer_link.state(false);
 		notify();
 	}
 
