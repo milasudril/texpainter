@@ -17,6 +17,7 @@ namespace Texpainter
 	public:
 		enum class ControlId : int
 		{
+			LayerSelector,
 			LayerNew,
 			LayerMoveUp,
 			LayerMoveDown
@@ -40,6 +41,7 @@ namespace Texpainter
 		   m_separator_3{m_root},
 		   m_blend_func{m_root, "f(x)"}
 		{
+			m_layer_selector.eventHandler<ControlId::LayerSelector>(*this);
 			m_layer_new.eventHandler<ControlId::LayerNew>(*this);
 			m_layer_move_up.eventHandler<ControlId::LayerMoveUp>(*this);
 			m_layer_move_down.eventHandler<ControlId::LayerMoveDown>(*this);
@@ -79,6 +81,17 @@ namespace Texpainter
 			return *this;
 		}
 
+		template<auto id, class EventHandler>
+		LayerStackControl& eventHandler(EventHandler& eh)
+		{
+			r_eh = &eh;
+			r_func = [](void* event_handler, LayerStackControl& self) {
+				reinterpret_cast<EventHandler*>(event_handler)->template onChanged<id>(self);
+			};
+
+			return *this;
+		}
+
 		template<ControlId>
 		void onClicked(Ui::Button&);
 
@@ -100,16 +113,8 @@ namespace Texpainter
 			m_layer_new.state(false);
 		}
 
-		template<auto id, class EventHandler>
-		LayerStackControl& eventHandler(EventHandler& eh)
-		{
-			r_eh = &eh;
-			r_func = [](void* event_handler, LayerStackControl& self) {
-				reinterpret_cast<EventHandler*>(event_handler)->template onChanged<id>(self);
-			};
-
-			return *this;
-		}
+		template<ControlId>
+		void onChanged(Ui::Combobox&);
 
 	private:
 		Model::Layer* r_current_layer;
@@ -143,6 +148,13 @@ namespace Texpainter
 
 		std::unique_ptr<CreateLayerDlg> m_create_layer;
 	};
+
+	template<>
+	void LayerStackControl::onChanged<LayerStackControl::ControlId::LayerSelector>(Ui::Combobox& src)
+	{
+		auto const sel_index = static_cast<uint32_t>(src.selected());
+		if(sel_index < m_layers.size()) { r_current_layer = &m_layers[Model::LayerIndex{sel_index}]; }
+	}
 
 	template<>
 	void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerNew>(Ui::Button& btn)
