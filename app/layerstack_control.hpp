@@ -29,7 +29,6 @@ namespace Texpainter
 		};
 
 		explicit LayerStackControl(Ui::Container& owner):
-		   r_current_layer{nullptr},
 		   m_root{owner, Ui::Box::Orientation::Horizontal},
 		   m_layer_selector{m_root},
 		   m_layer_new{m_root, "＋"},
@@ -78,14 +77,14 @@ namespace Texpainter
 			m_layers.append(std::move(layer));
 			auto const index = m_layer_names.size() - 1;
 			m_layer_selector.selected(m_layer_names.size() - 1);
-			r_current_layer = &m_layers[Model::LayerIndex{static_cast<uint32_t>(index)}];
+			m_current_layer = Model::LayerIndex{static_cast<uint32_t>(index)};
 			return *this;
 		}
 
 		template<class... Args>
 		LayerStackControl& paintCurrentLayer(Args&&... args)
 		{
-			if(r_current_layer != nullptr) { r_current_layer->paint(std::forward<Args>(args)...); }
+			if(m_current_layer.valid()) { m_layers[m_current_layer].paint(std::forward<Args>(args)...); }
 			return *this;
 		}
 
@@ -139,7 +138,7 @@ namespace Texpainter
 
 
 	private:
-		Model::Layer* r_current_layer;
+		Model::LayerIndex m_current_layer;
 		Model::LayerStack m_layers;
 		std::vector<std::string> m_layer_names;
 
@@ -177,8 +176,8 @@ namespace Texpainter
 	template<>
 	void LayerStackControl::onChanged<LayerStackControl::ControlId::LayerSelector>(Ui::Combobox& src)
 	{
-		auto const sel_index = static_cast<uint32_t>(src.selected());
-		if(sel_index < m_layers.size()) { r_current_layer = &m_layers[Model::LayerIndex{sel_index}]; }
+		auto const selected = static_cast<uint32_t>(src.selected());
+		if(selected < m_layers.size()) { m_current_layer = Model::LayerIndex{selected}; }
 	}
 
 	template<>
@@ -199,10 +198,10 @@ namespace Texpainter
 	template<>
 	void LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerCopy>(TextInputDlg& src)
 	{
-		if(r_current_layer != nullptr)
+		if(m_current_layer.valid())
 		{
 			// FIXME: handle duplicated names
-			add(src.widget().inputField().content(), r_current_layer->copiedLayer());
+			add(src.widget().inputField().content(), m_layers[m_current_layer].copiedLayer());
 			m_copy_layer.reset();
 			m_layer_copy.state(false);
 			notify();
@@ -228,10 +227,10 @@ namespace Texpainter
 	template<>
 	void LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerLink>(TextInputDlg& src)
 	{
-		if(r_current_layer != nullptr)
+		if(m_current_layer.valid())
 		{
 			// FIXME: handle duplicated names
-			add(src.widget().inputField().content(), r_current_layer->linkedLayer());
+			add(src.widget().inputField().content(), m_layers[m_current_layer].linkedLayer());
 			m_link_layer.reset();
 			m_layer_link.state(false);
 			notify();

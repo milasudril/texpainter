@@ -12,6 +12,8 @@ namespace Texpainter::Model
 	public:
 		using element_type = uint32_t;
 
+		LayerIndex():m_value{std::numeric_limits<uint32_t>::max()}{}
+
 		explicit LayerIndex(uint32_t val): m_value{val}
 		{
 		}
@@ -22,6 +24,9 @@ namespace Texpainter::Model
 		}
 
 		auto operator<=>(LayerIndex const&) const = default;
+
+		bool valid() const
+		{ return m_value != std::numeric_limits<uint32_t>::max(); }
 
 	private:
 		uint32_t m_value;
