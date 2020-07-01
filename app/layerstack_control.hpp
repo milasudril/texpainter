@@ -54,7 +54,7 @@ namespace Texpainter
 			m_layer_move_down.eventHandler<ControlId::LayerMoveDown>(*this);
 		}
 
-		LayerStackControl& layers(Model::LayerStack&& l, std::vector<std::string>&& n)
+		LayerStackControl& layers(Model::LayerStack&& l, Sequence<std::string, Model::LayerIndex>&& n)
 		{
 			m_layers = std::move(l);
 			m_layer_names = std::move(n);
@@ -73,7 +73,7 @@ namespace Texpainter
 		LayerStackControl& add(std::string&& name, Model::Layer&& layer)
 		{
 			m_layer_selector.append(name.c_str());
-			m_layer_names.push_back(std::move(name));
+			m_layer_names.append(std::move(name));
 			m_layers.append(std::move(layer));
 			auto const index = m_layer_names.size() - 1;
 			m_layer_selector.selected(m_layer_names.size() - 1);
@@ -140,7 +140,7 @@ namespace Texpainter
 	private:
 		Model::LayerIndex m_current_layer;
 		Model::LayerStack m_layers;
-		std::vector<std::string> m_layer_names;
+		Sequence<std::string, Model::LayerIndex> m_layer_names;
 
 		using EventHandlerFunc = void (*)(void*, LayerStackControl&);
 		void* r_eh;
@@ -279,7 +279,7 @@ namespace Texpainter
 		if(selected < m_layers.size())
 		{
 			std::string msg{"Do you wish to delete `"};
-			msg += m_layer_names[selected];
+			msg += m_layer_names[Model::LayerIndex{selected}];
 			msg += "`?";
 			m_delete_layer = std::make_unique<ConfirmationDlg>(m_root, "Deleting layer", msg.c_str());
 			m_delete_layer->eventHandler<ControlId::LayerDelete>(*this);
