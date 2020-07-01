@@ -285,11 +285,10 @@ namespace Texpainter
 	template<>
 	void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerDelete>(Ui::Button& btn)
 	{
-		auto const selected = static_cast<uint32_t>(m_layer_selector.selected());
-		if(selected < m_layers.size())
+		if(m_current_layer.valid())
 		{
 			std::string msg{"Do you wish to delete `"};
-			msg += m_layer_names[Model::LayerIndex{selected}];
+			msg += m_layer_names[m_current_layer];
 			msg += "`?";
 			m_delete_layer = std::make_unique<ConfirmationDlg>(m_root, "Deleting layer", msg.c_str());
 			m_delete_layer->eventHandler<ControlId::LayerDelete>(*this);
@@ -300,9 +299,21 @@ namespace Texpainter
 	void LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerDelete>(
 	   ConfirmationDlg&)
 	{
-		// FIXME
+		auto const current_layer_new = [](auto const& layers, auto layer_index) {
+			if(layers.size() <= 1) { return Model::LayerIndex{}; }
+
+			if(layer_index == layers.firstIndex()) { return layer_index; }
+
+			return Model::LayerIndex{layer_index.value() - 1};
+		}(m_layers, m_current_layer);
+
+		m_layers.remove(m_current_layer);
+		m_layer_names.remove(m_current_layer);
 		m_delete_layer.reset();
 		m_layer_delete.state(false);
+		m_current_layer = current_layer_new;
+		updateLayerSelector();
+		notify();
 	}
 
 	template<>

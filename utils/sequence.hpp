@@ -35,6 +35,7 @@ namespace Texpainter
 		{
 			assert(index.value() < size());
 			Base::erase(begin() + index.value());
+			return *this;
 		}
 
 		static auto firstIndex()
