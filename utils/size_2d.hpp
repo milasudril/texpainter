@@ -6,6 +6,7 @@
 #include "./empty.hpp"
 
 #include <cstdint>
+#include <limits>
 
 namespace Texpainter
 {
@@ -59,6 +60,13 @@ namespace Texpainter
 		auto const w = read(Empty<uint32_t>{}, stream);
 		auto const h = read(Empty<uint32_t>{}, stream);
 		return Size2d{w, h};
+	}
+
+	template<class T>
+	bool isSupported(Size2d size)
+	{
+		auto const a = size.area();
+		return a != 0 && a < std::numeric_limits<size_t>::max() / sizeof(T);
 	}
 }
 
