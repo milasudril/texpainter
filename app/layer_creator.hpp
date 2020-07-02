@@ -19,6 +19,7 @@ namespace Texpainter
 		   m_width{m_root, Ui::Box::Orientation::Horizontal, "Width: "},
 		   m_height{m_root, Ui::Box::Orientation::Horizontal, "Height: "}
 		{
+			m_name.inputField().focus();
 			m_width.inputField().content(std::to_string(default_size.width()).c_str());
 			m_height.inputField().content(std::to_string(default_size.height()).c_str());
 		}

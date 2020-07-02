@@ -195,7 +195,15 @@ namespace Texpainter::Ui
 		   Button(cnt, ""), Button(cnt, ""), Button(cnt, ""), Button(cnt, ""), Button(cnt, "")};
 	}
 
-	template<class Widget, class DialogTraits = DialogOkCancel>
+	enum class InitialFocus : int
+	{
+		NoChange,
+		DefaultButton
+	};
+
+	template<class Widget,
+	         class DialogTraits = DialogOkCancel,
+	         InitialFocus Focus = InitialFocus::DefaultButton>
 	class Dialog
 	{
 	public:
@@ -207,7 +215,6 @@ namespace Texpainter::Ui
 			USER_1,
 			USER_2
 		};
-
 
 		Dialog& operator=(Dialog&&) = delete;
 		Dialog(Dialog&&) = delete;
@@ -251,7 +258,7 @@ namespace Texpainter::Ui
 				m_buttons[ButtonIndex::user2()].label(DialogTraits::user2());
 			}
 
-			focus_select();
+			if constexpr(Focus != InitialFocus::NoChange) { focus_select(); }
 
 
 			m_window.modal(true).show();

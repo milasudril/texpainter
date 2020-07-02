@@ -12,7 +12,7 @@ namespace Texpainter
 {
 	class LayerStackControl
 	{
-		using CreateLayerDlg = Ui::Dialog<LayerCreator>;
+		using CreateLayerDlg = Ui::Dialog<LayerCreator, Ui::DialogOkCancel, Ui::InitialFocus::NoChange>;
 		using TextInputDlg = Ui::Dialog<Ui::LabeledInput<Ui::TextEntry>>;
 		using ConfirmationDlg = Ui::Dialog<Ui::Label, Ui::DialogYesNo>;
 
