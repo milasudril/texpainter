@@ -185,7 +185,7 @@ namespace Texpainter
 	void LayerStackControl::onChanged<LayerStackControl::ControlId::LayerSelector>(Ui::Combobox& src)
 	{
 		auto const selected = static_cast<uint32_t>(src.selected());
-		if(selected < m_layers.size()) { m_current_layer = Model::LayerIndex{selected}; }
+		if(selected < m_layers.size()) { m_current_layer = Model::LayerIndex{m_layers.lastIndex().value() - selected}; }
 	}
 
 	template<>
