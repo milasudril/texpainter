@@ -117,11 +117,18 @@ namespace Texpainter
 		{
 			// FIXME: resulting layer must be smaller than canvas size
 			// FIXME: handle duplicated names
-			auto res = dlg.widget().create();
-			add(std::move(res.first), std::move(res.second));
-			m_create_layer.reset();
-			m_layer_new.state(false);
-			notify();
+			try
+			{
+				auto res = dlg.widget().create();
+				add(std::move(res.first), std::move(res.second));
+				m_create_layer.reset();
+				m_layer_new.state(false);
+				notify();
+			}
+			catch(std::exception const& err)
+			{
+				printf("%s\n", err.what());
+			}
 		}
 
 		template<ControlId>

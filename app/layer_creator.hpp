@@ -8,6 +8,8 @@
 #include "ui/labeled_input.hpp"
 #include "ui/text_entry.hpp"
 
+#include <stdexcept>
+
 namespace Texpainter
 {
 	class LayerCreator
@@ -40,8 +42,16 @@ namespace Texpainter
 
 		std::pair<std::string, Model::Layer> create() const
 		{
-			auto width = static_cast<uint32_t>(std::atoi(m_width.inputField().content()));
-			auto height = static_cast<uint32_t>(std::atoi(m_height.inputField().content()));
+			auto const width = static_cast<uint32_t>(std::atoi(m_width.inputField().content()));
+			auto const height = static_cast<uint32_t>(std::atoi(m_height.inputField().content()));
+
+			auto size = Size2d{width, height};
+			if(!isSupported<Model::Pixel>(size))
+			{
+				throw std::runtime_error{
+				   "A layer of this size cannot be created. The number of bytes required to create a layer of "
+				   "this size exeeds the largest supported integer value."};
+			}
 			return {m_name.inputField().content(), Model::Layer{Size2d{width, height}}};
 		}
 
