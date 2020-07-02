@@ -40,7 +40,7 @@ namespace Texpainter
 		          Ui::Box::Orientation::Vertical},
 		   m_pal_editor{m_rows, Ui::Box::Orientation::Horizontal, "Palettes: "},
 		   m_pal_separator{m_rows},
-		   m_layerstack_ctrl{m_rows, Ui::Box::Orientation::Horizontal, "Layers: "},
+		   m_layerstack_ctrl{m_rows, Ui::Box::Orientation::Horizontal, "Layers: ", m_canvas_size},
 		   m_layeres_separator{m_rows},
 		   m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})},
 		   m_button_mask{0}

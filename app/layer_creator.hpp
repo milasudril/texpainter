@@ -13,12 +13,14 @@ namespace Texpainter
 	class LayerCreator
 	{
 	public:
-		explicit LayerCreator(Ui::Container& container):
+		explicit LayerCreator(Ui::Container& container, Size2d default_size):
 		   m_root{container, Ui::Box::Orientation::Vertical},
 		   m_name{m_root, Ui::Box::Orientation::Horizontal, "Name: "},
 		   m_width{m_root, Ui::Box::Orientation::Horizontal, "Width: "},
 		   m_height{m_root, Ui::Box::Orientation::Horizontal, "Height: "}
 		{
+			m_width.inputField().content(std::to_string(default_size.width()).c_str());
+			m_height.inputField().content(std::to_string(default_size.height()).c_str());
 		}
 
 		std::pair<std::string, Model::Layer> create() const

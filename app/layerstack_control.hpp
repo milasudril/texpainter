@@ -29,7 +29,8 @@ namespace Texpainter
 			LayerHide
 		};
 
-		explicit LayerStackControl(Ui::Container& owner):
+		explicit LayerStackControl(Ui::Container& owner, Size2d canvas_size):
+		   m_canvas_size{canvas_size},
 		   m_root{owner, Ui::Box::Orientation::Horizontal},
 		   m_layer_selector{m_root},
 		   m_layer_new{m_root, "＋"},
@@ -78,6 +79,12 @@ namespace Texpainter
 			auto const index = m_layer_names.size() - 1;
 			m_current_layer = Model::LayerIndex{static_cast<uint32_t>(index)};
 			updateLayerSelector();
+			return *this;
+		}
+
+		LayerStackControl& canvasSize(Size2d val)
+		{
+			m_canvas_size = val;
 			return *this;
 		}
 
@@ -141,6 +148,7 @@ namespace Texpainter
 		Model::LayerIndex m_current_layer;
 		Model::LayerStack m_layers;
 		Sequence<std::string, Model::LayerIndex> m_layer_names;
+		Size2d m_canvas_size;
 
 		using EventHandlerFunc = void (*)(void*, LayerStackControl&);
 		void* r_eh;
@@ -194,7 +202,10 @@ namespace Texpainter
 	template<>
 	void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerNew>(Ui::Button& btn)
 	{
-		m_create_layer = std::make_unique<CreateLayerDlg>(m_root, "Create layer");
+		m_create_layer = std::make_unique<CreateLayerDlg>(
+		   m_root,
+		   "Create layer",
+		   m_current_layer.valid() ? m_layers[m_current_layer].size() : m_canvas_size);
 		m_create_layer->eventHandler<LayerStackControl::ControlId::LayerNew>(*this);
 	}
 

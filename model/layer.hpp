@@ -99,6 +99,11 @@ namespace Texpainter::Model
 			return *this;
 		}
 
+		auto size() const
+		{
+			return m_content->size();
+		}
+
 	private:
 		bool m_visible;
 		vec2_t m_loc;
