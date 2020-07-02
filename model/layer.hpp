@@ -19,6 +19,7 @@ namespace Texpainter::Model
 	{
 	public:
 		explicit Layer(Size2d size):
+		   m_visible{true},
 		   m_loc{0.0, 0.0},
 		   m_rot{0},
 		   m_scale{1.0, 1.0},
@@ -87,7 +88,19 @@ namespace Texpainter::Model
 			return *this;
 		}
 
+		bool visible() const
+		{
+			return m_visible;
+		}
+
+		Layer& visible(bool val)
+		{
+			m_visible = val;
+			return *this;
+		}
+
 	private:
+		bool m_visible;
 		vec2_t m_loc;
 		Angle m_rot;
 		vec2_t m_scale;

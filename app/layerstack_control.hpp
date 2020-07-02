@@ -25,7 +25,8 @@ namespace Texpainter
 			LayerLink,
 			LayerDelete,
 			LayerMoveUp,
-			LayerMoveDown
+			LayerMoveDown,
+			LayerHide
 		};
 
 		explicit LayerStackControl(Ui::Container& owner):
@@ -41,7 +42,7 @@ namespace Texpainter
 		   m_layer_move_down{m_root, "↓"},
 		   m_separator_2{m_root},
 		   m_layer_solo{m_root, "Solo"},
-		   m_layer_mute{m_root, "Hide"},
+		   m_layer_hide{m_root, "Hide"},
 		   m_separator_3{m_root},
 		   m_blend_func{m_root, "f(x)"}
 		{
@@ -52,6 +53,7 @@ namespace Texpainter
 			m_layer_delete.eventHandler<ControlId::LayerDelete>(*this);
 			m_layer_move_up.eventHandler<ControlId::LayerMoveUp>(*this);
 			m_layer_move_down.eventHandler<ControlId::LayerMoveDown>(*this);
+			m_layer_hide.eventHandler<ControlId::LayerHide>(*this);
 		}
 
 		LayerStackControl& layers(Model::LayerStack&& l, Sequence<std::string, Model::LayerIndex>&& n)
@@ -171,7 +173,7 @@ namespace Texpainter
 		Ui::Button m_layer_move_down;
 		Ui::Separator m_separator_2;
 		Ui::Button m_layer_solo;
-		Ui::Button m_layer_mute;
+		Ui::Button m_layer_hide;
 		Ui::Separator m_separator_3;
 		Ui::Button m_blend_func;
 
@@ -185,7 +187,8 @@ namespace Texpainter
 	void LayerStackControl::onChanged<LayerStackControl::ControlId::LayerSelector>(Ui::Combobox& src)
 	{
 		auto const selected = static_cast<uint32_t>(src.selected());
-		if(selected < m_layers.size()) { m_current_layer = Model::LayerIndex{m_layers.lastIndex().value() - selected}; }
+		if(selected < m_layers.size())
+		{ m_current_layer = Model::LayerIndex{m_layers.lastIndex().value() - selected}; }
 	}
 
 	template<>
@@ -322,6 +325,20 @@ namespace Texpainter
 	{
 		m_delete_layer.reset();
 		m_layer_delete.state(false);
+	}
+
+	template<>
+	void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerHide>(Ui::Button& btn)
+	{
+		if(m_current_layer.valid())
+		{
+			m_layers[m_current_layer].visible(!btn.state());
+			notify();
+		}
+		else
+		{
+			btn.state(false);
+		}
 	}
 }
 
