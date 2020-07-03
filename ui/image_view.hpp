@@ -46,7 +46,16 @@ namespace Texpainter::Ui
 			    [](void* event_handler, ImageView& self, vec2_t pos_window, vec2_t pos_screen) {
 				    auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
 				    obj.template onMouseMove<id>(self, pos_window, pos_screen);
-			    }});
+			    },
+			    [](void* event_handler, ImageView& self, int scancode) {
+					auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				    obj.template onKeyDown<id>(self, scancode);
+			    },
+			    [](void* event_handler, ImageView& self, int scancode) {
+					auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				    obj.template onKeyUp<id>(self, scancode);
+			    }
+			    });
 		}
 
 		ImageView& image(Model::Image const& img);
@@ -71,6 +80,8 @@ namespace Texpainter::Ui
 			                        ImageView& self,
 			                        vec2_t pos_window,
 			                        vec2_t pos_screen);
+			void (*on_key_down)(void* event_handler, ImageView& self, int scancode);
+			void (*on_key_up)(void* event_handler, ImageView& self, int scancode);
 		};
 		ImageView& eventHandler(void* event_handler, EventHandlerVtable const& vtable);
 	};

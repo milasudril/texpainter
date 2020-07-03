@@ -36,11 +36,14 @@ public:
 		r_eh = nullptr;
 		gtk_widget_add_events(widget,
 		                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK
-		                         | GDK_KEY_PRESS_MASK | GDK_SCROLL_MASK);
+		                         | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_SCROLL_MASK);
 		g_signal_connect(G_OBJECT(widget), "draw", G_CALLBACK(draw_callback), this);
 		g_signal_connect(G_OBJECT(widget), "button-press-event", G_CALLBACK(on_mouse_down), this);
 		g_signal_connect(G_OBJECT(widget), "button-release-event", G_CALLBACK(on_mouse_up), this);
 		g_signal_connect(G_OBJECT(widget), "motion-notify-event", G_CALLBACK(on_mouse_move), this);
+		g_signal_connect(G_OBJECT(widget), "key-press-event", G_CALLBACK(on_key_press), this);
+		g_signal_connect(G_OBJECT(widget), "key-release-event", G_CALLBACK(on_key_release), this);
+		gtk_widget_set_can_focus(widget, TRUE);
 	}
 
 	~Impl()
@@ -127,7 +130,6 @@ private:
 				write_ptr[2] = gamma_22[static_cast<int>(pixel_out[0])];
 				write_ptr[3] = gamma_22[static_cast<int>(pixel_out[3])];
 
-
 				write_ptr += 4;
 				++read_ptr;
 			}
@@ -146,11 +148,12 @@ private:
 		return FALSE;
 	}
 
-	static gboolean on_mouse_down(GtkWidget*, GdkEvent* e, gpointer self)
+	static gboolean on_mouse_down(GtkWidget* w, GdkEvent* e, gpointer self)
 	{
 		auto& obj = *reinterpret_cast<Impl*>(self);
 		if(obj.r_eh != nullptr)
 		{
+			gtk_widget_grab_focus(w);
 			auto event_button = reinterpret_cast<GdkEventButton const*>(e);
 			obj.m_vt.m_on_mouse_down(obj.r_eh,
 			                         obj,
@@ -190,6 +193,32 @@ private:
 			                         vec2_t{event_button->x_root, event_button->y_root});
 			return FALSE;
 		}
+		return TRUE;
+	}
+
+	static gboolean on_key_press(GtkWidget* widget, GdkEvent* event, gpointer self)
+	{
+		auto obj = reinterpret_cast<Impl*>(self);
+		auto& key = event->key;
+		auto scancode = key.hardware_keycode - 8;
+	#ifndef __linux__
+	#waring "Scancode key offset is not tested. Pressing esc should print 1"
+	//	printf("%d\n", key.hardware_keycode - 8);
+	#endif
+		if(obj->r_eh != nullptr) { obj->m_vt.on_key_down(obj->r_eh, *obj, scancode); }
+		return TRUE;
+	}
+
+	static gboolean on_key_release(GtkWidget* widget, GdkEvent* event, gpointer self)
+	{
+		auto obj = reinterpret_cast<Impl*>(self);
+		auto& key = event->key;
+		auto scancode = key.hardware_keycode - 8;
+	#ifndef __linux__
+	#waring "Scancode key offset is not tested. Pressing esc should print 1"
+		printf("%d\n", key.hardware_keycode - 8);
+	#endif
+		if(obj->r_eh != nullptr) { obj->m_vt.on_key_up(obj->r_eh, *obj, scancode); }
 		return TRUE;
 	}
 };

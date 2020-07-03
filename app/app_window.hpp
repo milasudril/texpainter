@@ -43,7 +43,7 @@ namespace Texpainter
 		   m_layerstack_ctrl{m_rows, Ui::Box::Orientation::Horizontal, "Layers: ", m_canvas_size},
 		   m_layeres_separator{m_rows},
 		   m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})},
-		   m_button_mask{0}
+		   m_painting{false}
 		{
 			forEachEnumItem<MenuAction>([this](auto tag) {
 				if constexpr(std::is_same_v<Ui::Button, typename MenuActionTraits<tag.value>::type>)
@@ -78,6 +78,12 @@ namespace Texpainter
 
 		template<ControlId>
 		void onMouseMove(Ui::ImageView& view, vec2_t pos_window, vec2_t pos_screen);
+
+		template<ControlId>
+		void onKeyDown(Ui::ImageView& view, int scancode);
+
+		template<ControlId>
+		void onKeyUp(Ui::ImageView& view, int scancode);
 
 		template<MenuAction id>
 		void onClicked(Ui::Button& btn)
@@ -135,7 +141,6 @@ namespace Texpainter
 		Generators::CrackGenerator::Rng m_rng;
 		std::unique_ptr<CrackGenDlg> m_crack_creator;
 
-		uint32_t m_button_mask;
 
 		void doRender()
 		{
@@ -144,6 +149,10 @@ namespace Texpainter
 			render(m_layerstack_ctrl.inputField().layers(), canvas.pixels());
 			m_img_view.image(canvas);
 		}
+
+		bool m_painting;
+		enum class PaintMode:int{Draw, Grab};
+		PaintMode m_paintmode;
 	};
 
 	template<>
@@ -161,9 +170,26 @@ namespace Texpainter
 	}
 
 	template<>
-	void AppWindow::onMouseUp<AppWindow::ControlId::Canvas>(Ui::ImageView&, vec2_t, vec2_t, int button)
+	void AppWindow::onMouseUp<AppWindow::ControlId::Canvas>(Ui::ImageView&, vec2_t, vec2_t, int)
 	{
-		m_button_mask &= ~(1 << button);
+		m_painting = false;
+	}
+
+	template<>
+	void AppWindow::onKeyDown<AppWindow::ControlId::Canvas>(Ui::ImageView& view, int scancode)
+	{
+		printf("%d\n", scancode);
+		switch(scancode)
+		{
+			case 34:  // M
+				m_paintmode = PaintMode::Grab;
+		}
+	}
+
+	template<>
+	void AppWindow::onKeyUp<AppWindow::ControlId::Canvas>(Ui::ImageView&, int)
+	{
+		m_paintmode = PaintMode::Draw;
 	}
 
 	template<>
@@ -172,14 +198,21 @@ namespace Texpainter
 	                                                          vec2_t pos_screen,
 	                                                          int button)
 	{
-		m_button_mask |= (1 << button);
-		if(m_button_mask == (1<<1))
+		m_painting = true;
+		switch(m_paintmode)
 		{
-			auto const size = view.imageSize();
-			auto const offset =
-			   0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
-			m_layerstack_ctrl.inputField().paintCurrentLayer(pos_window - offset, 16.0, m_current_color);
-			doRender();
+			case PaintMode::Draw:
+			{
+				auto const size = view.imageSize();
+				auto const offset =
+				0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
+				m_layerstack_ctrl.inputField().paintCurrentLayer(pos_window - offset, 16.0, m_current_color);
+				doRender();
+				}
+				break;
+
+			default:
+				break;
 		}
 	}
 
@@ -188,22 +221,32 @@ namespace Texpainter
 	                                                          vec2_t pos_window,
 	                                                          vec2_t pos_screen)
 	{
-		if(m_button_mask == (1<<1))
+		if(!m_painting)
 		{
-			auto const size = view.imageSize();
-			auto const offset =
-			   0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
-			m_layerstack_ctrl.inputField().paintCurrentLayer(pos_window - offset, 16.0, m_current_color);
-			doRender();
+			return;
 		}
 
-		if(m_button_mask == (1<<3))
+		switch(m_paintmode)
 		{
-			auto const size = view.imageSize();
-			auto const offset =
-			   0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
-			m_layerstack_ctrl.inputField().moveCurrentLayer(pos_window - offset);
-			doRender();
+			case PaintMode::Draw:
+			{
+				auto const size = view.imageSize();
+				auto const offset =
+				0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
+				m_layerstack_ctrl.inputField().paintCurrentLayer(pos_window - offset, 16.0, m_current_color);
+				doRender();
+				}
+				break;
+
+			case PaintMode::Grab:
+			{
+				auto const size = view.imageSize();
+				auto const offset =
+				0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
+				m_layerstack_ctrl.inputField().moveCurrentLayer(pos_window - offset);
+				doRender();
+				}
+				break;
 		}
 	}
 }
