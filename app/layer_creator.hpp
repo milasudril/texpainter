@@ -21,13 +21,14 @@ namespace Texpainter
 			Height
 		};
 
-		explicit LayerCreator(Ui::Container& container, Size2d default_size):
+		explicit LayerCreator(Ui::Container& container, Size2d default_size, Size2d max_size):
 		   m_root{container, Ui::Box::Orientation::Vertical},
 		   m_name{m_root, Ui::Box::Orientation::Horizontal, "Name: "},
 		   m_width{m_root, Ui::Box::Orientation::Horizontal, "Width: "},
 		   m_height{m_root, Ui::Box::Orientation::Horizontal, "Height: "},
 		   m_width_str{std::to_string(default_size.width())},
-		   m_height_str{std::to_string(default_size.height())}
+		   m_height_str{std::to_string(default_size.height())},
+		   m_max_size{max_size}
 		{
 			m_name.inputField().focus();
 			m_width.inputField()
@@ -66,29 +67,32 @@ namespace Texpainter
 
 		std::string m_width_str;
 		std::string m_height_str;
+		Size2d m_max_size;
 
-		char const* make_valid_int(char const* str, std::string& replace_str)
+		char const* make_valid_int(char const* str, uint32_t max_size, std::string& replace_str)
 		{
 			char* end;
 			errno = 0;
 			auto val = strtol(str, &end, 10);
 			if(errno != 0 || *end != '\0' || val <= 0 || val > std::numeric_limits<uint32_t>::max())
 			{ return replace_str.c_str(); }
-			replace_str = str;
-			return str;
+
+			val = std::min(static_cast<uint32_t>(val), max_size);
+			replace_str = std::to_string(val);
+			return replace_str.c_str();
 		}
 	};
 
 	template<>
 	void LayerCreator::onChanged<LayerCreator::ControlId::Width>(Ui::TextEntry& entry)
 	{
-		entry.content(make_valid_int(entry.content(), m_width_str));
+		entry.content(make_valid_int(entry.content(), m_max_size.width(), m_width_str));
 	}
 
 	template<>
 	void LayerCreator::onChanged<LayerCreator::ControlId::Height>(Ui::TextEntry& entry)
 	{
-		entry.content(make_valid_int(entry.content(), m_height_str));
+		entry.content(make_valid_int(entry.content(), m_max_size.height(), m_height_str));
 	}
 }
 

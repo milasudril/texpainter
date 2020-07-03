@@ -115,7 +115,6 @@ namespace Texpainter
 		template<ControlId>
 		void confirmPositive(CreateLayerDlg& dlg)
 		{
-			// FIXME: resulting layer must be smaller than canvas size
 			// FIXME: handle duplicated names
 			try
 			{
@@ -212,7 +211,7 @@ namespace Texpainter
 		m_create_layer = std::make_unique<CreateLayerDlg>(
 		   m_root,
 		   "Create layer",
-		   m_current_layer.valid() ? m_layers[m_current_layer].size() : m_canvas_size);
+		   m_current_layer.valid() ? m_layers[m_current_layer].size() : m_canvas_size, m_canvas_size);
 		m_create_layer->eventHandler<LayerStackControl::ControlId::LayerNew>(*this);
 	}
 
