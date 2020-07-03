@@ -173,7 +173,7 @@ namespace Texpainter
 	                                                          int button)
 	{
 		m_button_mask |= (1 << button);
-		if(m_button_mask == 2)
+		if(m_button_mask == (1<<1))
 		{
 			auto const size = view.imageSize();
 			auto const offset =
@@ -188,12 +188,21 @@ namespace Texpainter
 	                                                          vec2_t pos_window,
 	                                                          vec2_t pos_screen)
 	{
-		if(m_button_mask == 2)
+		if(m_button_mask == (1<<1))
 		{
 			auto const size = view.imageSize();
 			auto const offset =
 			   0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
 			m_layerstack_ctrl.inputField().paintCurrentLayer(pos_window - offset, 16.0, m_current_color);
+			doRender();
+		}
+
+		if(m_button_mask == (1<<3))
+		{
+			auto const size = view.imageSize();
+			auto const offset =
+			   0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
+			m_layerstack_ctrl.inputField().moveCurrentLayer(pos_window - offset);
 			doRender();
 		}
 	}

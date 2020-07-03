@@ -95,6 +95,12 @@ namespace Texpainter
 			return *this;
 		}
 
+		LayerStackControl& moveCurrentLayer(vec2_t pos)
+		{
+			if(m_current_layer.valid()) { m_layers[m_current_layer].location(pos); }
+			return *this;
+		}
+
 		template<auto id, class EventHandler>
 		LayerStackControl& eventHandler(EventHandler& eh)
 		{
