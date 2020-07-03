@@ -6,6 +6,7 @@
 #include "./trivial.hpp"
 #include "./empty.hpp"
 #include "./call_free.hpp"
+#include "./malloc.hpp"
 
 #include <type_traits>
 #include <cstdlib>
@@ -28,7 +29,7 @@ namespace Texpainter
 		{
 		}
 
-		explicit DataBlock(uint32_t n): m_size{n}, m_ptr{reinterpret_cast<T*>(malloc(sizeof(T) * n))}
+		explicit DataBlock(uint32_t n): m_size{n}, m_ptr{allocMem<T>(n)}
 		{
 		}
 

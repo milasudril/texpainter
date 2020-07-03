@@ -7,6 +7,7 @@
 #include "utils/span_2d.hpp"
 #include "utils/call_free.hpp"
 #include "utils/trivial.hpp"
+#include "utils/malloc.hpp"
 
 #include <algorithm>
 #include <memory>
@@ -25,7 +26,7 @@ namespace Texpainter::Model
 
 		explicit BasicImage(Size2d size):
 		   m_size(size),
-		   m_data{reinterpret_cast<PixelType*>(malloc(area() * sizeof(PixelType)))}
+		   m_data{reinterpret_cast<PixelType*>(allocMem<PixelType>(area()))}
 		{
 		}
 
