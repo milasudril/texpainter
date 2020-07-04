@@ -279,7 +279,50 @@ namespace Texpainter
 
 			case PaintMode::Scale:
 			{
-				m_layerstack_ctrl.inputField().scaleCurrentLayer(loc, m_paint_start_pos);
+				constexpr double SnapFactors[] = {-(1.0 / 8),
+				                                  -(1.0 / 7),
+				                                  -(1.0 / 6),
+				                                  -(1.0 / 5),
+				                                  -(1.0 / 4),
+				                                  -(1.0 / 3),
+				                                  -(1.0 / 2),
+				                                  -(1.0),
+				                                  -(2.0),
+				                                  -(3.0),
+				                                  -(4.0),
+				                                  -(5.0),
+				                                  -(7.0),
+				                                  -(8.0),
+				                                  -(1.0),
+				                                  -(1.0 / std::numbers::phi),
+				                                  -(std::numbers::phi),
+				                                  -(1.0 - 1.0 / std::numbers::phi),
+				                                  1.0 / 8,
+				                                  1.0 / 7,
+				                                  1.0 / 6,
+				                                  1.0 / 5,
+				                                  1.0 / 4,
+				                                  1.0 / 3,
+				                                  1.0 / 2,
+				                                  1.0,
+				                                  2.0,
+				                                  3.0,
+				                                  4.0,
+				                                  5.0,
+				                                  7.0,
+				                                  8.0,
+				                                  1.0,
+				                                  1.0 / std::numbers::phi,
+				                                  std::numbers::phi,
+				                                  1.0 - 1.0 / std::numbers::phi};
+				if(m_keymask & KeymaskCtrl)
+				{
+					m_layerstack_ctrl.inputField().scaleCurrentLayer(loc, m_paint_start_pos, Snap{SnapFactors});
+				}
+				else
+				{
+					m_layerstack_ctrl.inputField().scaleCurrentLayer(loc, m_paint_start_pos, Snap<double, 0>{});
+				}
 				doRender();
 			}
 			break;
@@ -308,7 +351,7 @@ namespace Texpainter
 				   Angle{3.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}},
 				   Angle{4.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}},
 				   Angle{5.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}}};
-				if(m_keymask & KeymaskShift)
+				if(m_keymask & KeymaskCtrl)
 				{ m_layerstack_ctrl.inputField().rotateCurrentLayer(loc, Snap{SnapAngles}); }
 				else
 				{

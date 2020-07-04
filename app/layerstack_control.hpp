@@ -121,12 +121,15 @@ namespace Texpainter
 			return *this;
 		}
 
-		LayerStackControl& scaleCurrentLayer(vec2_t loc, vec2_t origin)
+		template<size_t N>
+		LayerStackControl& scaleCurrentLayer(vec2_t loc, vec2_t origin, Snap<double, N> const& snap)
 		{
 			if(m_current_layer.valid())
 			{
 				auto const layer_loc = m_layers[m_current_layer].location();
-				auto const factor = (loc - layer_loc) / (origin - layer_loc);
+				auto factor = (loc - layer_loc) / (origin - layer_loc);
+				factor[0] = snap.nearest(factor[0]);
+				factor[1] = snap.nearest(factor[1]);
 				m_layers[m_current_layer].scaleFactor(factor);
 				showLayerInfo(m_current_layer);
 			}
