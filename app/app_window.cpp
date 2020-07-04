@@ -80,6 +80,13 @@ namespace
 		return Texpainter::vec2_t{snap.nearest(v[0]), snap.nearest(v[1])};
 	}
 
+	constexpr Texpainter::vec2_t keep_aspect_ratio(Texpainter::vec2_t v)
+	{
+		auto const factor = Texpainter::length(v);
+
+		return Texpainter::vec2_t{factor, factor};
+	}
+
 	template<class T>
 	constexpr T unity(T val)
 	{
@@ -119,6 +126,10 @@ void Texpainter::AppWindow::onMouseMove<Texpainter::AppWindow::ControlId::Canvas
 			if(m_keymask & KeymaskCtrl)
 			{
 				m_layerstack_ctrl.inputField().scaleCurrentLayer(loc, m_paint_start_pos, snap_scale_factor);
+			}
+			else if(m_keymask & KeymaskShift)
+			{
+				m_layerstack_ctrl.inputField().scaleCurrentLayer(loc, m_paint_start_pos, keep_aspect_ratio);
 			}
 			else
 			{
