@@ -262,8 +262,7 @@ namespace Texpainter
 
 			case PaintMode::Scale:
 			{
-				auto const d = loc / m_paint_start_pos;
-				m_layerstack_ctrl.inputField().scaleCurrentLayer(d);
+				m_layerstack_ctrl.inputField().scaleCurrentLayer(loc, m_paint_start_pos);
 				doRender();
 			}
 			break;

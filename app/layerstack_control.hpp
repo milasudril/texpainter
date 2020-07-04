@@ -106,9 +106,14 @@ namespace Texpainter
 			return *this;
 		}
 
-		LayerStackControl& scaleCurrentLayer(vec2_t factor)
+		LayerStackControl& scaleCurrentLayer(vec2_t loc, vec2_t origin)
 		{
-			if(m_current_layer.valid()) { m_layers[m_current_layer].scaleFactor(factor); }
+			if(m_current_layer.valid())
+			{
+				auto const layer_loc = m_layers[m_current_layer].location();
+				auto const factor = (loc - layer_loc)/(layer_loc - origin);
+				m_layers[m_current_layer].scaleFactor(factor);
+			}
 			return *this;
 		}
 
