@@ -8,12 +8,15 @@
 #include "./surface_creator.hpp"
 #include "./crack_creator.hpp"
 #include "./layerstack_control.hpp"
+#include "./snap.hpp"
 
 #include "ui/box.hpp"
 #include "ui/toolbar.hpp"
 #include "ui/image_view.hpp"
 #include "ui/labeled_input.hpp"
 #include "ui/dialog.hpp"
+
+#include <numbers>
 
 namespace Texpainter
 {
@@ -33,6 +36,9 @@ namespace Texpainter
 		explicit AppWindow(Ui::Container& container):
 		   m_canvas_size{512, 512},
 		   m_current_color{0.5f, 0.5f, 0.5f, 1.0f},
+		   m_painting{false},
+		   m_paintmode{PaintMode::Draw},
+		   m_keymask{0},
 		   m_columns{container, Ui::Box::Orientation::Horizontal},
 		   m_toolbar{m_columns, Ui::Box::Orientation::Vertical},
 		   m_tools_separator{m_columns},
@@ -42,9 +48,7 @@ namespace Texpainter
 		   m_pal_separator{m_rows},
 		   m_layerstack_ctrl{m_rows, Ui::Box::Orientation::Horizontal, "Layers: ", m_canvas_size},
 		   m_layeres_separator{m_rows},
-		   m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})},
-		   m_painting{false},
-		   m_paintmode{PaintMode::Draw}
+		   m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
 		{
 			forEachEnumItem<MenuAction>([this](auto tag) {
 				if constexpr(std::is_same_v<Ui::Button, typename MenuActionTraits<tag.value>::type>)
@@ -129,6 +133,19 @@ namespace Texpainter
 	private:
 		Size2d m_canvas_size;
 		Model::Pixel m_current_color;
+		enum class PaintMode : int
+		{
+			Draw,
+			Grab,
+			Scale,
+			Rotate
+		};
+		bool m_painting;
+		PaintMode m_paintmode;
+		static constexpr uint32_t KeymaskShift = 0x1;
+		static constexpr uint32_t KeymaskCtrl = 0x2;
+		uint32_t m_keymask;
+		vec2_t m_paint_start_pos;
 
 		Ui::Box m_columns;
 		Ui::Toolbar<MenuAction, MenuActionTraits> m_toolbar;
@@ -153,17 +170,6 @@ namespace Texpainter
 			m_layerstack_ctrl.inputField().outlineCurrentLayer(canvas.pixels());
 			m_img_view.image(canvas);
 		}
-
-		bool m_painting;
-		enum class PaintMode : int
-		{
-			Draw,
-			Grab,
-			Scale,
-			Rotate
-		};
-		PaintMode m_paintmode;
-		vec2_t m_paint_start_pos;
 	};
 
 	template<>
@@ -200,14 +206,21 @@ namespace Texpainter
 			case 19: // R
 				m_paintmode = PaintMode::Rotate;
 				break;
+			case 29: m_keymask |= KeymaskCtrl; break;
+			case 42: m_keymask |= KeymaskShift; break;
 			default: printf("%d\n", scancode);
 		}
 	}
 
 	template<>
-	void AppWindow::onKeyUp<AppWindow::ControlId::Canvas>(Ui::ImageView&, int)
+	void AppWindow::onKeyUp<AppWindow::ControlId::Canvas>(Ui::ImageView&, int scancode)
 	{
 		m_paintmode = PaintMode::Draw;
+		switch(scancode)
+		{
+			case 29: m_keymask &= ~KeymaskCtrl; break;
+			case 48: m_keymask &= ~KeymaskShift; break;
+		}
 	}
 
 	template<>
@@ -273,7 +286,29 @@ namespace Texpainter
 
 			case PaintMode::Rotate:
 			{
-				m_layerstack_ctrl.inputField().rotateCurrentLayer(loc);
+				constexpr Angle SnapAngles[] = {
+				   Angle{0.0 / 12, Angle::Turns{}},
+				   Angle{1.0 / 12, Angle::Turns{}},
+				   Angle{2.0 / 12, Angle::Turns{}},
+				   Angle{3.0 / 12, Angle::Turns{}},
+				   Angle{4.0 / 12, Angle::Turns{}},
+				   Angle{5.0 / 12, Angle::Turns{}},
+				   Angle{6.0 / 12, Angle::Turns{}},
+				   Angle{7.0 / 12, Angle::Turns{}},
+				   Angle{8.0 / 12, Angle::Turns{}},
+				   Angle{9.0 / 12, Angle::Turns{}},
+				   Angle{10.0 / 12, Angle::Turns{}},
+				   Angle{11.0 / 12, Angle::Turns{}},
+				   Angle{1.0 / 8, Angle::Turns{}},
+				   Angle{3.0 / 8, Angle::Turns{}},
+				   Angle{5.0 / 8, Angle::Turns{}},
+				   Angle{7.0 / 8, Angle::Turns{}},
+				   Angle{(1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}},
+				   Angle{(1.0 - 1.0 / std::numbers::phi), Angle::Turns{}},
+				   Angle{3.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}},
+				   Angle{4.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}},
+				   Angle{5.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}}};
+				m_layerstack_ctrl.inputField().rotateCurrentLayer(loc, Snap{SnapAngles});
 				doRender();
 			}
 		}

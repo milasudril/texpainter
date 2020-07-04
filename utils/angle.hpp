@@ -24,6 +24,8 @@ namespace Texpainter
 		{
 		};
 
+		constexpr Angle() = default;
+
 		constexpr explicit Angle(vec2_t pos): Angle{std::atan2(pos[1], pos[0]), Radians{}}
 		{
 		}
@@ -107,6 +109,17 @@ namespace Texpainter
 	{
 		return !(α == β);
 	}
+
+	constexpr bool operator<(Angle α, Angle β)
+	{
+		return α.bits() < β.bits();
+	}
+
+	constexpr uint32_t abs(Angle α)
+	{
+		return std::abs(static_cast<int32_t>(α.bits()));
+	}
+
 
 	constexpr auto cos(Angle α)
 	{

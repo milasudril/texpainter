@@ -7,6 +7,8 @@
 #define TEXPAINTER_LAYERSTACKCONTROL_HPP
 
 #include "./layer_creator.hpp"
+#include "./snap.hpp"
+
 #include "model/layer_stack.hpp"
 #include "ui/box.hpp"
 #include "ui/separator.hpp"
@@ -36,21 +38,24 @@ namespace Texpainter
 
 		explicit LayerStackControl(Ui::Container& owner, Size2d canvas_size):
 		   m_canvas_size{canvas_size},
-		   m_root{owner, Ui::Box::Orientation::Horizontal},
-		   m_layer_selector{m_root},
-		   m_layer_new{m_root, "＋"},
-		   m_separator_0{m_root},
-		   m_layer_copy{m_root, "Copy"},
-		   m_layer_link{m_root, "Link"},
-		   m_layer_delete{m_root, "−"},
-		   m_separator_1{m_root},
-		   m_layer_move_up{m_root, "↑"},
-		   m_layer_move_down{m_root, "↓"},
-		   m_separator_2{m_root},
-		   m_layer_solo{m_root, "Solo"},
-		   m_layer_hide{m_root, "Hide"},
-		   m_separator_3{m_root},
-		   m_blend_func{m_root, "f(x)"}
+		   m_root{owner, Ui::Box::Orientation::Vertical},
+		   m_row_1{m_root, Ui::Box::Orientation::Horizontal},
+		   m_layer_selector{m_row_1},
+		   m_layer_new{m_row_1, "＋"},
+		   m_separator_0{m_row_1},
+		   m_layer_copy{m_row_1, "Copy"},
+		   m_layer_link{m_row_1, "Link"},
+		   m_layer_delete{m_row_1, "−"},
+		   m_separator_1{m_row_1},
+		   m_layer_move_up{m_row_1, "↑"},
+		   m_layer_move_down{m_row_1, "↓"},
+		   m_separator_2{m_row_1},
+		   m_layer_solo{m_row_1, "Solo"},
+		   m_layer_hide{m_row_1, "Hide"},
+		   m_separator_3{m_row_1},
+		   m_blend_func{m_row_1, "f(x)"},
+		   m_row_2{m_root, Ui::Box::Orientation::Horizontal},
+		   m_status{m_row_2.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand}), ""}
 		{
 			m_layer_selector.eventHandler<ControlId::LayerSelector>(*this);
 			m_layer_new.eventHandler<ControlId::LayerNew>(*this);
@@ -84,6 +89,7 @@ namespace Texpainter
 			auto const index = m_layer_names.size() - 1;
 			m_current_layer = Model::LayerIndex{static_cast<uint32_t>(index)};
 			updateLayerSelector();
+			showLayerInfo(m_current_layer);
 			return *this;
 		}
 
@@ -96,13 +102,21 @@ namespace Texpainter
 		template<class... Args>
 		LayerStackControl& paintCurrentLayer(Args&&... args)
 		{
-			if(m_current_layer.valid()) { m_layers[m_current_layer].paint(std::forward<Args>(args)...); }
+			if(m_current_layer.valid())
+			{
+				m_layers[m_current_layer].paint(std::forward<Args>(args)...);
+				showLayerInfo(m_current_layer);
+			}
 			return *this;
 		}
 
 		LayerStackControl& moveCurrentLayer(vec2_t pos)
 		{
-			if(m_current_layer.valid()) { m_layers[m_current_layer].location(pos); }
+			if(m_current_layer.valid())
+			{
+				m_layers[m_current_layer].location(pos);
+				showLayerInfo(m_current_layer);
+			}
 			return *this;
 		}
 
@@ -111,19 +125,22 @@ namespace Texpainter
 			if(m_current_layer.valid())
 			{
 				auto const layer_loc = m_layers[m_current_layer].location();
-				auto const factor = (loc - layer_loc) / (layer_loc - origin);
+				auto const factor = (loc - layer_loc) / (origin - layer_loc);
 				m_layers[m_current_layer].scaleFactor(factor);
+				showLayerInfo(m_current_layer);
 			}
 			return *this;
 		}
 
-		LayerStackControl& rotateCurrentLayer(vec2_t loc)
+		template<size_t N>
+		LayerStackControl& rotateCurrentLayer(vec2_t loc, Snap<Angle, N> const& snap)
 		{
 			if(m_current_layer.valid())
 			{
 				auto const layer_loc = m_layers[m_current_layer].location();
-				auto const ϴ = Angle{loc - layer_loc};
+				auto const ϴ = snap.nearest(Angle{loc - layer_loc});
 				m_layers[m_current_layer].rotation(ϴ);
+				showLayerInfo(m_current_layer);
 			}
 			return *this;
 		}
@@ -211,6 +228,7 @@ namespace Texpainter
 		}
 
 		Ui::Box m_root;
+		Ui::Box m_row_1;
 		Ui::Combobox m_layer_selector;
 		Ui::Button m_layer_new;
 		Ui::Separator m_separator_0;
@@ -225,11 +243,33 @@ namespace Texpainter
 		Ui::Button m_layer_hide;
 		Ui::Separator m_separator_3;
 		Ui::Button m_blend_func;
+		Ui::Box m_row_2;
+		Ui::Label m_status;
 
 		std::unique_ptr<CreateLayerDlg> m_create_layer;
 		std::unique_ptr<TextInputDlg> m_copy_layer;
 		std::unique_ptr<TextInputDlg> m_link_layer;
 		std::unique_ptr<ConfirmationDlg> m_delete_layer;
+
+		void showLayerInfo(Model::LayerIndex index)
+		{
+			auto const& layer = m_layers[index];
+			std::string msg{"Size: "};
+			msg += std::to_string(layer.size().width());
+			msg += "x";
+			msg += std::to_string(layer.size().height());
+			msg += ". Position: (";
+			msg += std::to_string(layer.location()[0]);
+			msg += ", ";
+			msg += std::to_string(layer.location()[1]);
+			msg += "). Scale: (";
+			msg += std::to_string(layer.scaleFactor()[0]);
+			msg += ", ";
+			msg += std::to_string(layer.scaleFactor()[1]);
+			msg += "). Rotation: ";
+			msg += std::to_string(layer.rotation().turns());
+			m_status.content(msg.c_str());
+		}
 	};
 
 	template<>
@@ -240,6 +280,7 @@ namespace Texpainter
 		if(selected < m_layers.size())
 		{
 			m_current_layer = Model::LayerIndex{m_layers.lastIndex().value() - selected};
+			showLayerInfo(m_current_layer);
 			notify();
 		}
 	}
@@ -248,7 +289,7 @@ namespace Texpainter
 	inline void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerNew>(Ui::Button& btn)
 	{
 		m_create_layer = std::make_unique<CreateLayerDlg>(
-		   m_root,
+		   m_row_1,
 		   "Create layer",
 		   m_current_layer.valid() ? m_layers[m_current_layer].size() : m_canvas_size,
 		   m_canvas_size);
@@ -259,7 +300,7 @@ namespace Texpainter
 	inline void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerCopy>(Ui::Button& btn)
 	{
 		m_copy_layer = std::make_unique<TextInputDlg>(
-		   m_root, "Copy layer", Ui::Box::Orientation::Horizontal, "New name");
+		   m_row_1, "Copy layer", Ui::Box::Orientation::Horizontal, "New name");
 		m_copy_layer->eventHandler<LayerStackControl::ControlId::LayerCopy>(*this);
 	}
 
@@ -289,7 +330,7 @@ namespace Texpainter
 	inline void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerLink>(Ui::Button& btn)
 	{
 		m_link_layer = std::make_unique<TextInputDlg>(
-		   m_root, "Link layer", Ui::Box::Orientation::Horizontal, "New name");
+		   m_row_1, "Link layer", Ui::Box::Orientation::Horizontal, "New name");
 		m_link_layer->eventHandler<LayerStackControl::ControlId::LayerLink>(*this);
 	}
 
@@ -355,7 +396,7 @@ namespace Texpainter
 			std::string msg{"Do you wish to delete `"};
 			msg += m_layer_names[m_current_layer];
 			msg += "`?";
-			m_delete_layer = std::make_unique<ConfirmationDlg>(m_root, "Deleting layer", msg.c_str());
+			m_delete_layer = std::make_unique<ConfirmationDlg>(m_row_1, "Deleting layer", msg.c_str());
 			m_delete_layer->eventHandler<ControlId::LayerDelete>(*this);
 		}
 	}
