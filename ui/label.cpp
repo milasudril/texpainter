@@ -30,11 +30,15 @@ public:
 		pango_layout_set_width(m_content, -1);
 		pango_layout_get_pixel_extents(m_content, NULL, &m_content_rect);
 
-		//	Change with so the rendered text is at most 500 px
-		auto w = std::min(m_content_rect.width, 500);
-		pango_layout_set_wrap(m_content, PANGO_WRAP_WORD);
-		pango_layout_set_width(m_content, PANGO_SCALE * w);
-		pango_layout_get_pixel_extents(m_content, NULL, &m_content_rect);
+		auto w = m_content_rect.width;
+		if(!m_oneline)
+		{
+			//	Change with so the rendered text is at most 500 px
+			auto w = std::min(m_content_rect.width, 500);
+			pango_layout_set_wrap(m_content, PANGO_WRAP_WORD);
+			pango_layout_set_width(m_content, PANGO_SCALE * w);
+			pango_layout_get_pixel_extents(m_content, NULL, &m_content_rect);
+		}
 
 		//	Request size based on the size of the layout
 		gtk_widget_set_size_request(GTK_WIDGET(m_handle), w, m_content_rect.height);
@@ -64,11 +68,17 @@ public:
 		gtk_widget_queue_draw(GTK_WIDGET(m_handle));
 	}
 
+	void oneline(bool status)
+	{
+		m_oneline = status;
+	}
+
 private:
 	double m_alignment_x;
 	GtkDrawingArea* m_handle;
 	PangoLayout* m_content;
 	PangoRectangle m_content_rect;
+	bool m_oneline;
 	static gboolean draw(GtkWidget* object, cairo_t* cr, void* obj);
 	static void size_changed(GtkWidget* widget, GtkAllocation* allocation, void* obj);
 	static void screen_changed(GtkWidget* widget, GdkScreen* previous_screen, void* obj);
@@ -108,8 +118,9 @@ Texpainter::Ui::Label& Texpainter::Ui::Label::alignment(float x)
 }
 
 
-Texpainter::Ui::Label::Impl::Impl(Container& cnt, const char* text): Label(*this)
+Texpainter::Ui::Label::Impl::Impl(Container& cnt, const char* text): Label{*this}
 {
+	m_oneline = false;
 	m_alignment_x = 0.5f;
 	auto widget = gtk_drawing_area_new();
 
@@ -212,4 +223,10 @@ void Texpainter::Ui::Label::Impl::screen_changed(GtkWidget* widget,
 		g_object_unref(self->m_content);
 		self->m_content = content;
 	}
+}
+
+Texpainter::Ui::Label& Texpainter::Ui::Label::oneline(bool status)
+{
+	m_impl->oneline(status);
+	return *this;
 }

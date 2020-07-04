@@ -37,6 +37,8 @@ namespace Texpainter::Ui
 
 		Label& alignment(float x);
 
+		Label& oneline(bool status);
+
 
 	protected:
 		class Impl;

@@ -65,6 +65,7 @@ namespace Texpainter
 			m_layer_move_up.eventHandler<ControlId::LayerMoveUp>(*this);
 			m_layer_move_down.eventHandler<ControlId::LayerMoveDown>(*this);
 			m_layer_hide.eventHandler<ControlId::LayerHide>(*this);
+			m_status.oneline(true).alignment(0.0f);
 		}
 
 		LayerStackControl& layers(Model::LayerStack&& l, Sequence<std::string, Model::LayerIndex>&& n)
