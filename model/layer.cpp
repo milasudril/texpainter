@@ -45,8 +45,9 @@ Texpainter::Model::Layer& Texpainter::Model::Layer::paint(vec2_t origin, double 
 	auto const w = m_content->width();
 	auto const h = m_content->height();
 
+	origin /= m_scale;
 	auto const offset = 0.5 * vec2_t{static_cast<double>(w), static_cast<double>(h)};
-	origin += offset - m_loc;
+	origin += offset - m_loc / m_scale;
 	auto const begin_coords = origin - vec2_t{radius, radius};
 	auto const end_coords = origin + vec2_t{radius, radius};
 	auto pixels = m_content->pixels();

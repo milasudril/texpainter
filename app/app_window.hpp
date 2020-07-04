@@ -223,7 +223,7 @@ namespace Texpainter
 			{
 				auto const offset =
 				   0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
-				m_layerstack_ctrl.inputField().paintCurrentLayer(pos_window - offset, 16.0, m_current_color);
+				m_layerstack_ctrl.inputField().paintCurrentLayer(pos_window - offset, 4.0, m_current_color);
 				doRender();
 			}
 			break;
@@ -248,7 +248,7 @@ namespace Texpainter
 		{
 			case PaintMode::Draw:
 			{
-				m_layerstack_ctrl.inputField().paintCurrentLayer(loc, 16.0, m_current_color);
+				m_layerstack_ctrl.inputField().paintCurrentLayer(loc, 4.0, m_current_color);
 				doRender();
 			}
 			break;
