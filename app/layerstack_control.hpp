@@ -369,6 +369,7 @@ namespace Texpainter
 			m_layer_names.moveBackward(m_current_layer);
 			++m_current_layer;
 			updateLayerSelector();
+			showLayerInfo(m_current_layer);
 			notify();
 		}
 		btn.state(false);
@@ -384,6 +385,7 @@ namespace Texpainter
 			m_layer_names.moveForward(m_current_layer);
 			--m_current_layer;
 			updateLayerSelector();
+			showLayerInfo(m_current_layer);
 			notify();
 		}
 		btn.state(false);
@@ -422,6 +424,7 @@ namespace Texpainter
 		m_layer_delete.state(false);
 		m_current_layer = current_layer_new;
 		updateLayerSelector();
+		showLayerInfo(m_current_layer);
 		notify();
 	}
 
