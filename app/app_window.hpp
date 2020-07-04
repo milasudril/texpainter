@@ -219,7 +219,7 @@ namespace Texpainter
 		switch(scancode)
 		{
 			case 29: m_keymask &= ~KeymaskCtrl; break;
-			case 48: m_keymask &= ~KeymaskShift; break;
+			case 42: m_keymask &= ~KeymaskShift; break;
 		}
 	}
 
@@ -308,7 +308,12 @@ namespace Texpainter
 				   Angle{3.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}},
 				   Angle{4.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}},
 				   Angle{5.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}}};
-				m_layerstack_ctrl.inputField().rotateCurrentLayer(loc, Snap{SnapAngles});
+				if(m_keymask & KeymaskShift)
+				{ m_layerstack_ctrl.inputField().rotateCurrentLayer(loc, Snap{SnapAngles}); }
+				else
+				{
+					m_layerstack_ctrl.inputField().rotateCurrentLayer(loc, Snap<Angle, 0>{});
+				}
 				doRender();
 			}
 		}

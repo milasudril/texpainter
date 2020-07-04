@@ -255,19 +255,21 @@ namespace Texpainter
 		void showLayerInfo(Model::LayerIndex index)
 		{
 			auto const& layer = m_layers[index];
-			std::string msg{"Size: "};
+			std::string msg{"Layer "};
+			msg += std::to_string(index.value());
+			msg += ". Size: ";
 			msg += std::to_string(layer.size().width());
 			msg += "x";
 			msg += std::to_string(layer.size().height());
-			msg += ". Position: (";
+			msg += " Position: (";
 			msg += std::to_string(layer.location()[0]);
 			msg += ", ";
 			msg += std::to_string(layer.location()[1]);
-			msg += "). Scale: (";
+			msg += ") Scale: (";
 			msg += std::to_string(layer.scaleFactor()[0]);
 			msg += ", ";
 			msg += std::to_string(layer.scaleFactor()[1]);
-			msg += "). Rotation: ";
+			msg += ") Rotation: ";
 			msg += std::to_string(layer.rotation().turns());
 			m_status.content(msg.c_str());
 		}

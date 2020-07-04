@@ -14,7 +14,13 @@ namespace Texpainter
 	class Snap
 	{
 	public:
-		explicit constexpr Snap(T const (&vals)[N])
+		template<class Dummy = int>
+		constexpr Snap(std::enable_if_t<N == 0, Dummy> = 0)
+		{
+		}
+
+		template<class Dummy = int>
+		explicit constexpr Snap(T const (&vals)[N], std::enable_if_t<N != 0, Dummy> = 0)
 		{
 			std::ranges::copy(vals, std::begin(m_vals));
 			std::sort(std::begin(m_vals), std::end(m_vals));
