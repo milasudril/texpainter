@@ -3,6 +3,8 @@
 #ifndef TEXPAINTER_ANGLE_HPP
 #define TEXPAINTER_ANGLE_HPP
 
+#include "./vec_t.hpp"
+
 #include <cmath>
 #include <cstdint>
 #include <limits>
@@ -21,6 +23,10 @@ namespace Texpainter
 		struct Turns
 		{
 		};
+
+		constexpr explicit Angle(vec2_t pos): Angle{std::atan2(pos[1], pos[0]), Radians{}}
+		{
+		}
 
 		constexpr explicit Angle(double α, Radians):
 		   m_value{static_cast<uint32_t>(static_cast<int64_t>(0x1p31 * α / π))}

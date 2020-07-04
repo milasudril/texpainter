@@ -159,7 +159,8 @@ namespace Texpainter
 		{
 			Draw,
 			Grab,
-			Scale
+			Scale,
+			Rotate
 		};
 		PaintMode m_paintmode;
 		vec2_t m_paint_start_pos;
@@ -195,6 +196,9 @@ namespace Texpainter
 				break;
 			case 31: // S
 				m_paintmode = PaintMode::Scale;
+				break;
+			case 19: // R
+				m_paintmode = PaintMode::Rotate;
 				break;
 			default: printf("%d\n", scancode);
 		}
@@ -266,6 +270,12 @@ namespace Texpainter
 				doRender();
 			}
 			break;
+
+			case PaintMode::Rotate:
+			{
+				m_layerstack_ctrl.inputField().rotateCurrentLayer(loc);
+				doRender();
+			}
 		}
 	}
 }

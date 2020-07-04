@@ -111,8 +111,19 @@ namespace Texpainter
 			if(m_current_layer.valid())
 			{
 				auto const layer_loc = m_layers[m_current_layer].location();
-				auto const factor = (loc - layer_loc)/(layer_loc - origin);
+				auto const factor = (loc - layer_loc) / (layer_loc - origin);
 				m_layers[m_current_layer].scaleFactor(factor);
+			}
+			return *this;
+		}
+
+		LayerStackControl& rotateCurrentLayer(vec2_t loc)
+		{
+			if(m_current_layer.valid())
+			{
+				auto const layer_loc = m_layers[m_current_layer].location();
+				auto const ϴ = Angle{loc - layer_loc};
+				m_layers[m_current_layer].rotation(ϴ);
 			}
 			return *this;
 		}

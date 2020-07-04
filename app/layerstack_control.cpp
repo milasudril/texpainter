@@ -48,16 +48,14 @@ Texpainter::LayerStackControl::outlineCurrentLayer(Span2d<Model::Pixel> canvas)
 		auto const scale_factor = current_layer.scaleFactor();
 
 		auto const size_layer = current_layer.size();
-		auto const box_layer = transform(
+		auto const box_layer =
 		   0.5 * scale_factor
-		      * vec2_t{static_cast<double>(size_layer.width()), static_cast<double>(size_layer.height())},
-		   rot_x,
-		   rot_y);
+		   * vec2_t{static_cast<double>(size_layer.width()), static_cast<double>(size_layer.height())};
 		draw_marker(origin, canvas);
-		draw_marker(origin + box_layer * vec2_t{1.0, 1.0}, canvas);
-		draw_marker(origin + box_layer * vec2_t{-1.0, 1.0}, canvas);
-		draw_marker(origin + box_layer * vec2_t{-1.0, -1.0}, canvas);
-		draw_marker(origin + box_layer * vec2_t{1.0, -1.0}, canvas);
+		draw_marker(origin + transform(box_layer * vec2_t{1.0, 1.0}, rot_x, rot_y), canvas);
+		draw_marker(origin + transform(box_layer * vec2_t{-1.0, 1.0}, rot_x, rot_y), canvas);
+		draw_marker(origin + transform(box_layer * vec2_t{-1.0, -1.0}, rot_x, rot_y), canvas);
+		draw_marker(origin + transform(box_layer * vec2_t{1.0, -1.0}, rot_x, rot_y), canvas);
 	}
 	return *this;
 }
