@@ -90,7 +90,7 @@ namespace Texpainter::Ui
 	};
 
 	template<>
-	void ColorPickerSidepanel::onChanged<ColorPickerSidepanel::ItemId::NormalizeIntensityValue>(
+	inline void ColorPickerSidepanel::onChanged<ColorPickerSidepanel::ItemId::NormalizeIntensityValue>(
 	   TextEntry& entry)
 	{
 		auto value = static_cast<float>(std::atof(entry.content()));
@@ -107,7 +107,7 @@ namespace Texpainter::Ui
 	}
 
 	template<>
-	void ColorPickerSidepanel::onChanged<ColorPickerSidepanel::ItemId::NormalizeIntensityMode>(
+	inline void ColorPickerSidepanel::onChanged<ColorPickerSidepanel::ItemId::NormalizeIntensityMode>(
 	   Combobox& box)
 	{
 		switch(box.selected())

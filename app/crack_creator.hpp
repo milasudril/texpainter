@@ -89,7 +89,7 @@ namespace Texpainter
 	};
 
 	template<>
-	void CrackCreator::onChanged<CrackCreator::ControlId::NumberOfCracks>(Ui::Slider& slider)
+	inline void CrackCreator::onChanged<CrackCreator::ControlId::NumberOfCracks>(Ui::Slider& slider)
 	{
 		auto const val = static_cast<int>(1.0 + slider.value() * 7.0);
 		m_preview = m_generator.nCracks(val)(m_preview.size());
@@ -97,7 +97,7 @@ namespace Texpainter
 	}
 
 	template<>
-	void CrackCreator::onChanged<CrackCreator::ControlId::LineWidth>(Ui::Slider& slider)
+	inline void CrackCreator::onChanged<CrackCreator::ControlId::LineWidth>(Ui::Slider& slider)
 	{
 		auto const val = static_cast<float>(std::exp2(-10.0 * (1.0 - slider.value())));
 		m_preview = m_generator.lineWidth(val)(m_preview.size());
@@ -105,7 +105,7 @@ namespace Texpainter
 	}
 
 	template<>
-	void CrackCreator::onChanged<CrackCreator::ControlId::LineWidthGrowth>(Ui::Slider& slider)
+	inline void CrackCreator::onChanged<CrackCreator::ControlId::LineWidthGrowth>(Ui::Slider& slider)
 	{
 		auto const val = slider.value();
 		m_preview = m_generator.lineWidthGrowth(val)(m_preview.size());
@@ -113,7 +113,7 @@ namespace Texpainter
 	}
 
 	template<>
-	void CrackCreator::onChanged<CrackCreator::ControlId::NoiseModulation>(Ui::Slider& slider)
+	inline void CrackCreator::onChanged<CrackCreator::ControlId::NoiseModulation>(Ui::Slider& slider)
 	{
 		auto const val = slider.value();
 		m_preview = m_generator.noiseMod(val)(m_preview.size());
@@ -121,7 +121,7 @@ namespace Texpainter
 	}
 
 	template<>
-	void CrackCreator::onChanged<CrackCreator::ControlId::SegLength>(Ui::Slider& slider)
+	inline void CrackCreator::onChanged<CrackCreator::ControlId::SegLength>(Ui::Slider& slider)
 	{
 		auto const val = static_cast<float>(std::exp2(-7.0 * (1.0 - slider.value()) - 1.0));
 		m_preview = m_generator.segLength(val)(m_preview.size());
@@ -129,7 +129,7 @@ namespace Texpainter
 	}
 
 	template<>
-	void CrackCreator::onChanged<CrackCreator::ControlId::BranchProb>(Ui::Slider& slider)
+	inline void CrackCreator::onChanged<CrackCreator::ControlId::BranchProb>(Ui::Slider& slider)
 	{
 		auto const val = (0.5 - 1.0 / 256.0) * slider.value();
 		m_preview = m_generator.branchProb(val)(m_preview.size());
@@ -137,7 +137,7 @@ namespace Texpainter
 	}
 
 	template<>
-	void CrackCreator::onChanged<CrackCreator::ControlId::MaxLength>(Ui::Slider& slider)
+	inline void CrackCreator::onChanged<CrackCreator::ControlId::MaxLength>(Ui::Slider& slider)
 	{
 		auto const val = slider.value();
 		m_preview = m_generator.maxLength(val)(m_preview.size());

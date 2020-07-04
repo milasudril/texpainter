@@ -121,28 +121,26 @@ namespace Texpainter
 			return *this;
 		}
 
-		template<size_t N>
-		LayerStackControl& scaleCurrentLayer(vec2_t loc, vec2_t origin, Snap<double, N> const& snap)
+		template<class ScaleConstraint>
+		LayerStackControl& scaleCurrentLayer(vec2_t loc, vec2_t origin, ScaleConstraint&& constraint)
 		{
 			if(m_current_layer.valid())
 			{
 				auto const layer_loc = m_layers[m_current_layer].location();
-				auto factor = (loc - layer_loc) / (origin - layer_loc);
-				factor[0] = snap.nearest(factor[0]);
-				factor[1] = snap.nearest(factor[1]);
+				auto factor = constraint((loc - layer_loc) / (origin - layer_loc));
 				m_layers[m_current_layer].scaleFactor(factor);
 				showLayerInfo(m_current_layer);
 			}
 			return *this;
 		}
 
-		template<size_t N>
-		LayerStackControl& rotateCurrentLayer(vec2_t loc, Snap<Angle, N> const& snap)
+		template<class RotConstraint>
+		LayerStackControl& rotateCurrentLayer(vec2_t loc, RotConstraint&& constraint)
 		{
 			if(m_current_layer.valid())
 			{
 				auto const layer_loc = m_layers[m_current_layer].location();
-				auto const ϴ = snap.nearest(Angle{loc - layer_loc});
+				auto const ϴ = constraint(Angle{loc - layer_loc});
 				m_layers[m_current_layer].rotation(ϴ);
 				showLayerInfo(m_current_layer);
 			}

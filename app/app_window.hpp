@@ -1,4 +1,7 @@
-//@	{"targets":[{"name":"app_window.hpp","type":"include"}]}
+//@	{
+//@	"targets":[{"name":"app_window.hpp","type":"include"}]
+//@	,"dependencies_extra":[{"ref":"app_window.o","rel":"implementation"}]
+//@	}
 
 #ifndef TEXPAINTER_APPWINDOW_HPP
 #define TEXPAINTER_APPWINDOW_HPP
@@ -173,27 +176,27 @@ namespace Texpainter
 	};
 
 	template<>
-	void AppWindow::onClicked<MenuAction::GenNoise>(Ui::Button& btn)
+	inline void AppWindow::onClicked<MenuAction::GenNoise>(Ui::Button& btn)
 	{
 		m_surf_creator = std::make_unique<NoiseGenDlg>(m_columns, "Generate noise");
 		m_surf_creator->eventHandler<MenuAction::GenNoise>(*this);
 	}
 
 	template<>
-	void AppWindow::onClicked<MenuAction::GenCracks>(Ui::Button& btn)
+	inline void AppWindow::onClicked<MenuAction::GenCracks>(Ui::Button& btn)
 	{
 		m_crack_creator = std::make_unique<CrackGenDlg>(m_columns, "Generate cracks", m_rng);
 		m_crack_creator->eventHandler<MenuAction::GenCracks>(*this);
 	}
 
 	template<>
-	void AppWindow::onMouseUp<AppWindow::ControlId::Canvas>(Ui::ImageView&, vec2_t, vec2_t, int)
+	inline void AppWindow::onMouseUp<AppWindow::ControlId::Canvas>(Ui::ImageView&, vec2_t, vec2_t, int)
 	{
 		m_painting = false;
 	}
 
 	template<>
-	void AppWindow::onKeyDown<AppWindow::ControlId::Canvas>(Ui::ImageView& view, int scancode)
+	inline void AppWindow::onKeyDown<AppWindow::ControlId::Canvas>(Ui::ImageView& view, int scancode)
 	{
 		switch(scancode)
 		{
@@ -213,7 +216,7 @@ namespace Texpainter
 	}
 
 	template<>
-	void AppWindow::onKeyUp<AppWindow::ControlId::Canvas>(Ui::ImageView&, int scancode)
+	inline void AppWindow::onKeyUp<AppWindow::ControlId::Canvas>(Ui::ImageView&, int scancode)
 	{
 		m_paintmode = PaintMode::Draw;
 		switch(scancode)
@@ -224,10 +227,10 @@ namespace Texpainter
 	}
 
 	template<>
-	void AppWindow::onMouseDown<AppWindow::ControlId::Canvas>(Ui::ImageView& view,
-	                                                          vec2_t pos_window,
-	                                                          vec2_t pos_screen,
-	                                                          int button)
+	inline void AppWindow::onMouseDown<AppWindow::ControlId::Canvas>(Ui::ImageView& view,
+	                                                                 vec2_t pos_window,
+	                                                                 vec2_t pos_screen,
+	                                                                 int button)
 	{
 		m_painting = true;
 		auto const size = view.imageSize();
@@ -246,119 +249,6 @@ namespace Texpainter
 			break;
 
 			default: break;
-		}
-	}
-
-	template<>
-	void AppWindow::onMouseMove<AppWindow::ControlId::Canvas>(Ui::ImageView& view,
-	                                                          vec2_t pos_window,
-	                                                          vec2_t pos_screen)
-	{
-		if(!m_painting) { return; }
-
-		auto const size = view.imageSize();
-		auto const offset =
-		   0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
-		auto const loc = pos_window - offset;
-
-		switch(m_paintmode)
-		{
-			case PaintMode::Draw:
-			{
-				m_layerstack_ctrl.inputField().paintCurrentLayer(loc, 4.0, m_current_color);
-				doRender();
-			}
-			break;
-
-			case PaintMode::Grab:
-			{
-				m_layerstack_ctrl.inputField().moveCurrentLayer(loc);
-				doRender();
-			}
-			break;
-
-			case PaintMode::Scale:
-			{
-				constexpr double SnapFactors[] = {-(1.0 / 8),
-				                                  -(1.0 / 7),
-				                                  -(1.0 / 6),
-				                                  -(1.0 / 5),
-				                                  -(1.0 / 4),
-				                                  -(1.0 / 3),
-				                                  -(1.0 / 2),
-				                                  -(1.0),
-				                                  -(2.0),
-				                                  -(3.0),
-				                                  -(4.0),
-				                                  -(5.0),
-				                                  -(7.0),
-				                                  -(8.0),
-				                                  -(1.0),
-				                                  -(1.0 / std::numbers::phi),
-				                                  -(std::numbers::phi),
-				                                  -(1.0 - 1.0 / std::numbers::phi),
-				                                  1.0 / 8,
-				                                  1.0 / 7,
-				                                  1.0 / 6,
-				                                  1.0 / 5,
-				                                  1.0 / 4,
-				                                  1.0 / 3,
-				                                  1.0 / 2,
-				                                  1.0,
-				                                  2.0,
-				                                  3.0,
-				                                  4.0,
-				                                  5.0,
-				                                  7.0,
-				                                  8.0,
-				                                  1.0,
-				                                  1.0 / std::numbers::phi,
-				                                  std::numbers::phi,
-				                                  1.0 - 1.0 / std::numbers::phi};
-				if(m_keymask & KeymaskCtrl)
-				{
-					m_layerstack_ctrl.inputField().scaleCurrentLayer(loc, m_paint_start_pos, Snap{SnapFactors});
-				}
-				else
-				{
-					m_layerstack_ctrl.inputField().scaleCurrentLayer(loc, m_paint_start_pos, Snap<double, 0>{});
-				}
-				doRender();
-			}
-			break;
-
-			case PaintMode::Rotate:
-			{
-				constexpr Angle SnapAngles[] = {
-				   Angle{0.0 / 12, Angle::Turns{}},
-				   Angle{1.0 / 12, Angle::Turns{}},
-				   Angle{2.0 / 12, Angle::Turns{}},
-				   Angle{3.0 / 12, Angle::Turns{}},
-				   Angle{4.0 / 12, Angle::Turns{}},
-				   Angle{5.0 / 12, Angle::Turns{}},
-				   Angle{6.0 / 12, Angle::Turns{}},
-				   Angle{7.0 / 12, Angle::Turns{}},
-				   Angle{8.0 / 12, Angle::Turns{}},
-				   Angle{9.0 / 12, Angle::Turns{}},
-				   Angle{10.0 / 12, Angle::Turns{}},
-				   Angle{11.0 / 12, Angle::Turns{}},
-				   Angle{1.0 / 8, Angle::Turns{}},
-				   Angle{3.0 / 8, Angle::Turns{}},
-				   Angle{5.0 / 8, Angle::Turns{}},
-				   Angle{7.0 / 8, Angle::Turns{}},
-				   Angle{(1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}},
-				   Angle{(1.0 - 1.0 / std::numbers::phi), Angle::Turns{}},
-				   Angle{3.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}},
-				   Angle{4.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}},
-				   Angle{5.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}}};
-				if(m_keymask & KeymaskCtrl)
-				{ m_layerstack_ctrl.inputField().rotateCurrentLayer(loc, Snap{SnapAngles}); }
-				else
-				{
-					m_layerstack_ctrl.inputField().rotateCurrentLayer(loc, Snap<Angle, 0>{});
-				}
-				doRender();
-			}
 		}
 	}
 }
