@@ -99,6 +99,11 @@ public:
 		return m_size_current;
 	}
 
+	void focus()
+	{
+		gtk_widget_grab_focus(GTK_WIDGET(m_handle));
+	}
+
 private:
 	void* r_eh;
 	EventHandlerVtable m_vt;
@@ -153,7 +158,11 @@ private:
 		auto& obj = *reinterpret_cast<Impl*>(self);
 		if(obj.r_eh != nullptr)
 		{
-			gtk_widget_grab_focus(w);
+			if(!gtk_widget_is_focus(w))
+			{
+				gtk_widget_grab_focus(w);
+				return FALSE;
+			}
 			auto event_button = reinterpret_cast<GdkEventButton const*>(e);
 			obj.m_vt.m_on_mouse_down(obj.r_eh,
 			                         obj,
@@ -201,10 +210,10 @@ private:
 		auto obj = reinterpret_cast<Impl*>(self);
 		auto& key = event->key;
 		auto scancode = key.hardware_keycode - 8;
-	#ifndef __linux__
-	#waring "Scancode key offset is not tested. Pressing esc should print 1"
-	//	printf("%d\n", key.hardware_keycode - 8);
-	#endif
+#ifndef __linux__
+#waring "Scancode key offset is not tested. Pressing esc should print 1"
+//	printf("%d\n", key.hardware_keycode - 8);
+#endif
 		if(obj->r_eh != nullptr) { obj->m_vt.on_key_down(obj->r_eh, *obj, scancode); }
 		return TRUE;
 	}
@@ -214,10 +223,10 @@ private:
 		auto obj = reinterpret_cast<Impl*>(self);
 		auto& key = event->key;
 		auto scancode = key.hardware_keycode - 8;
-	#ifndef __linux__
-	#waring "Scancode key offset is not tested. Pressing esc should print 1"
+#ifndef __linux__
+#waring "Scancode key offset is not tested. Pressing esc should print 1"
 		printf("%d\n", key.hardware_keycode - 8);
-	#endif
+#endif
 		if(obj->r_eh != nullptr) { obj->m_vt.on_key_up(obj->r_eh, *obj, scancode); }
 		return TRUE;
 	}
@@ -254,4 +263,10 @@ Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::minSize(Size2d size)
 Texpainter::Size2d Texpainter::Ui::ImageView::imageSize() const noexcept
 {
 	return m_impl->imageSize();
+}
+
+Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::focus()
+{
+	m_impl->focus();
+	return *this;
 }

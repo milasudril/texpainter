@@ -62,12 +62,14 @@ namespace Texpainter
 		void onChanged(LayerStackControl&)
 		{
 			doRender();
+			m_img_view.focus();
 		}
 
 		template<ControlId>
 		void onChanged(PaletteEditor& pal)
 		{
 			m_current_color = pal.selectedPalette()[pal.selectedColorIndex()];
+			m_img_view.focus();
 		}
 
 		template<ControlId>
@@ -151,7 +153,11 @@ namespace Texpainter
 		}
 
 		bool m_painting;
-		enum class PaintMode:int{Draw, Grab};
+		enum class PaintMode : int
+		{
+			Draw,
+			Grab
+		};
 		PaintMode m_paintmode;
 	};
 
@@ -178,11 +184,13 @@ namespace Texpainter
 	template<>
 	void AppWindow::onKeyDown<AppWindow::ControlId::Canvas>(Ui::ImageView& view, int scancode)
 	{
-		printf("%d\n", scancode);
 		switch(scancode)
 		{
-			case 34:  // M
+			case 34: // G
 				m_paintmode = PaintMode::Grab;
+				break;
+			default:
+				printf("%d\n", scancode);
 		}
 	}
 
@@ -205,14 +213,13 @@ namespace Texpainter
 			{
 				auto const size = view.imageSize();
 				auto const offset =
-				0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
+				   0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
 				m_layerstack_ctrl.inputField().paintCurrentLayer(pos_window - offset, 16.0, m_current_color);
 				doRender();
-				}
-				break;
+			}
+			break;
 
-			default:
-				break;
+			default: break;
 		}
 	}
 
@@ -221,10 +228,7 @@ namespace Texpainter
 	                                                          vec2_t pos_window,
 	                                                          vec2_t pos_screen)
 	{
-		if(!m_painting)
-		{
-			return;
-		}
+		if(!m_painting) { return; }
 
 		switch(m_paintmode)
 		{
@@ -232,21 +236,21 @@ namespace Texpainter
 			{
 				auto const size = view.imageSize();
 				auto const offset =
-				0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
+				   0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
 				m_layerstack_ctrl.inputField().paintCurrentLayer(pos_window - offset, 16.0, m_current_color);
 				doRender();
-				}
-				break;
+			}
+			break;
 
 			case PaintMode::Grab:
 			{
 				auto const size = view.imageSize();
 				auto const offset =
-				0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
+				   0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
 				m_layerstack_ctrl.inputField().moveCurrentLayer(pos_window - offset);
 				doRender();
-				}
-				break;
+			}
+			break;
 		}
 	}
 }

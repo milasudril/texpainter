@@ -217,7 +217,8 @@ namespace Texpainter
 		m_create_layer = std::make_unique<CreateLayerDlg>(
 		   m_root,
 		   "Create layer",
-		   m_current_layer.valid() ? m_layers[m_current_layer].size() : m_canvas_size, m_canvas_size);
+		   m_current_layer.valid() ? m_layers[m_current_layer].size() : m_canvas_size,
+		   m_canvas_size);
 		m_create_layer->eventHandler<LayerStackControl::ControlId::LayerNew>(*this);
 	}
 

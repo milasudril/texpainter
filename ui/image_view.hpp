@@ -48,14 +48,13 @@ namespace Texpainter::Ui
 				    obj.template onMouseMove<id>(self, pos_window, pos_screen);
 			    },
 			    [](void* event_handler, ImageView& self, int scancode) {
-					auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				    auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
 				    obj.template onKeyDown<id>(self, scancode);
 			    },
 			    [](void* event_handler, ImageView& self, int scancode) {
-					auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				    auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
 				    obj.template onKeyUp<id>(self, scancode);
-			    }
-			    });
+			    }});
 		}
 
 		ImageView& image(Model::Image const& img);
@@ -63,6 +62,8 @@ namespace Texpainter::Ui
 		ImageView& minSize(Size2d size);
 
 		Size2d imageSize() const noexcept;
+
+		ImageView& focus();
 
 	private:
 		class Impl;
