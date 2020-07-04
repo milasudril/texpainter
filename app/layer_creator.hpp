@@ -84,13 +84,13 @@ namespace Texpainter
 	};
 
 	template<>
-	void LayerCreator::onChanged<LayerCreator::ControlId::Width>(Ui::TextEntry& entry)
+	inline void LayerCreator::onChanged<LayerCreator::ControlId::Width>(Ui::TextEntry& entry)
 	{
 		entry.content(make_valid_int(entry.content(), m_max_size.width(), m_width_str));
 	}
 
 	template<>
-	void LayerCreator::onChanged<LayerCreator::ControlId::Height>(Ui::TextEntry& entry)
+	inline void LayerCreator::onChanged<LayerCreator::ControlId::Height>(Ui::TextEntry& entry)
 	{
 		entry.content(make_valid_int(entry.content(), m_max_size.height(), m_height_str));
 	}

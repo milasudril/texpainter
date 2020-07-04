@@ -149,6 +149,7 @@ namespace Texpainter
 			Model::Image canvas{m_canvas_size};
 			std::ranges::fill(canvas.pixels(), Model::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
 			render(m_layerstack_ctrl.inputField().layers(), canvas.pixels());
+			m_layerstack_ctrl.inputField().outlineCurrentLayer(canvas.pixels());
 			m_img_view.image(canvas);
 		}
 
@@ -189,8 +190,7 @@ namespace Texpainter
 			case 34: // G
 				m_paintmode = PaintMode::Grab;
 				break;
-			default:
-				printf("%d\n", scancode);
+			default: printf("%d\n", scancode);
 		}
 	}
 

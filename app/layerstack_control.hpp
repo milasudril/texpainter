@@ -1,4 +1,7 @@
-//@	{"targets":[{"name":"layerstack_control.hpp", "type":"include"}]}
+//@	{
+//@	 "targets":[{"name":"layerstack_control.hpp", "type":"include"}]
+//@	,"dependencies_extra":[{"ref":"layerstack_control.o","rel":"implementation"}]
+//@	}
 
 #ifndef TEXPAINTER_LAYERSTACKCONTROL_HPP
 #define TEXPAINTER_LAYERSTACKCONTROL_HPP
@@ -7,6 +10,8 @@
 #include "model/layer_stack.hpp"
 #include "ui/box.hpp"
 #include "ui/separator.hpp"
+#include "ui/dialog.hpp"
+#include "ui/combobox.hpp"
 
 namespace Texpainter
 {
@@ -100,6 +105,8 @@ namespace Texpainter
 			if(m_current_layer.valid()) { m_layers[m_current_layer].location(pos); }
 			return *this;
 		}
+
+		LayerStackControl& outlineCurrentLayer(Span2d<Model::Pixel> canvas);
 
 		template<auto id, class EventHandler>
 		LayerStackControl& eventHandler(EventHandler& eh)
@@ -204,15 +211,19 @@ namespace Texpainter
 	};
 
 	template<>
-	void LayerStackControl::onChanged<LayerStackControl::ControlId::LayerSelector>(Ui::Combobox& src)
+	inline void
+	LayerStackControl::onChanged<LayerStackControl::ControlId::LayerSelector>(Ui::Combobox& src)
 	{
 		auto const selected = static_cast<uint32_t>(src.selected());
 		if(selected < m_layers.size())
-		{ m_current_layer = Model::LayerIndex{m_layers.lastIndex().value() - selected}; }
+		{
+			m_current_layer = Model::LayerIndex{m_layers.lastIndex().value() - selected};
+			notify();
+		}
 	}
 
 	template<>
-	void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerNew>(Ui::Button& btn)
+	inline void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerNew>(Ui::Button& btn)
 	{
 		m_create_layer = std::make_unique<CreateLayerDlg>(
 		   m_root,
@@ -223,7 +234,7 @@ namespace Texpainter
 	}
 
 	template<>
-	void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerCopy>(Ui::Button& btn)
+	inline void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerCopy>(Ui::Button& btn)
 	{
 		m_copy_layer = std::make_unique<TextInputDlg>(
 		   m_root, "Copy layer", Ui::Box::Orientation::Horizontal, "New name");
@@ -231,7 +242,8 @@ namespace Texpainter
 	}
 
 	template<>
-	void LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerCopy>(TextInputDlg& src)
+	inline void
+	LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerCopy>(TextInputDlg& src)
 	{
 		if(m_current_layer.valid())
 		{
@@ -244,7 +256,7 @@ namespace Texpainter
 	}
 
 	template<>
-	void LayerStackControl::dismiss<LayerStackControl::ControlId::LayerCopy>(TextInputDlg&)
+	inline void LayerStackControl::dismiss<LayerStackControl::ControlId::LayerCopy>(TextInputDlg&)
 	{
 		m_copy_layer.reset();
 		m_layer_copy.state(false);
@@ -252,7 +264,7 @@ namespace Texpainter
 	}
 
 	template<>
-	void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerLink>(Ui::Button& btn)
+	inline void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerLink>(Ui::Button& btn)
 	{
 		m_link_layer = std::make_unique<TextInputDlg>(
 		   m_root, "Link layer", Ui::Box::Orientation::Horizontal, "New name");
@@ -260,7 +272,8 @@ namespace Texpainter
 	}
 
 	template<>
-	void LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerLink>(TextInputDlg& src)
+	inline void
+	LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerLink>(TextInputDlg& src)
 	{
 		if(m_current_layer.valid())
 		{
@@ -273,7 +286,7 @@ namespace Texpainter
 	}
 
 	template<>
-	void LayerStackControl::dismiss<LayerStackControl::ControlId::LayerLink>(TextInputDlg&)
+	inline void LayerStackControl::dismiss<LayerStackControl::ControlId::LayerLink>(TextInputDlg&)
 	{
 		m_link_layer.reset();
 		m_layer_link.state(false);
@@ -281,7 +294,8 @@ namespace Texpainter
 	}
 
 	template<>
-	void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerMoveUp>(Ui::Button& btn)
+	inline void
+	LayerStackControl::onClicked<LayerStackControl::ControlId::LayerMoveUp>(Ui::Button& btn)
 	{
 		if(m_current_layer.valid() && m_current_layer != m_layers.lastIndex())
 		{
@@ -295,7 +309,8 @@ namespace Texpainter
 	}
 
 	template<>
-	void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerMoveDown>(Ui::Button& btn)
+	inline void
+	LayerStackControl::onClicked<LayerStackControl::ControlId::LayerMoveDown>(Ui::Button& btn)
 	{
 		if(m_current_layer.valid() && m_current_layer != m_layers.firstIndex())
 		{
@@ -310,7 +325,8 @@ namespace Texpainter
 
 
 	template<>
-	void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerDelete>(Ui::Button& btn)
+	inline void
+	LayerStackControl::onClicked<LayerStackControl::ControlId::LayerDelete>(Ui::Button& btn)
 	{
 		if(m_current_layer.valid())
 		{
@@ -323,8 +339,8 @@ namespace Texpainter
 	}
 
 	template<>
-	void LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerDelete>(
-	   ConfirmationDlg&)
+	inline void
+	LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerDelete>(ConfirmationDlg&)
 	{
 		auto const current_layer_new = [](auto const& layers, auto layer_index) {
 			if(layers.size() <= 1) { return Model::LayerIndex{}; }
@@ -344,15 +360,15 @@ namespace Texpainter
 	}
 
 	template<>
-	void LayerStackControl::confirmNegative<LayerStackControl::ControlId::LayerDelete>(
-	   ConfirmationDlg&)
+	inline void
+	LayerStackControl::confirmNegative<LayerStackControl::ControlId::LayerDelete>(ConfirmationDlg&)
 	{
 		m_delete_layer.reset();
 		m_layer_delete.state(false);
 	}
 
 	template<>
-	void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerHide>(Ui::Button& btn)
+	inline void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerHide>(Ui::Button& btn)
 	{
 		if(m_current_layer.valid())
 		{

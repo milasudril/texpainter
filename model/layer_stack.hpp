@@ -15,7 +15,7 @@ namespace Texpainter::Model
 {
 	using LayerStack = Sequence<Layer, LayerIndex>;
 
-	void render(LayerStack const& layers, Span2d<Pixel> ret)
+	inline void render(LayerStack const& layers, Span2d<Pixel> ret)
 	{
 		std::ranges::for_each(layers, [ret](auto const& layer) {
 			if(layer.visible()) { render(layer, ret); }
