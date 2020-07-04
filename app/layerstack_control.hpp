@@ -55,7 +55,7 @@ namespace Texpainter
 		   m_separator_3{m_row_1},
 		   m_blend_func{m_row_1, "f(x)"},
 		   m_row_2{m_root, Ui::Box::Orientation::Horizontal},
-		   m_status{m_row_2.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand}), ""}
+		   m_status{m_row_2.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand}), "Click ＋ to create a new layer"}
 		{
 			m_layer_selector.eventHandler<ControlId::LayerSelector>(*this);
 			m_layer_new.eventHandler<ControlId::LayerNew>(*this);
@@ -255,24 +255,31 @@ namespace Texpainter
 
 		void showLayerInfo(Model::LayerIndex index)
 		{
-			auto const& layer = m_layers[index];
-			std::string msg{"Layer "};
-			msg += std::to_string(index.value());
-			msg += ". Size: ";
-			msg += std::to_string(layer.size().width());
-			msg += "x";
-			msg += std::to_string(layer.size().height());
-			msg += " Position: (";
-			msg += std::to_string(layer.location()[0]);
-			msg += ", ";
-			msg += std::to_string(layer.location()[1]);
-			msg += ") Scale: (";
-			msg += std::to_string(layer.scaleFactor()[0]);
-			msg += ", ";
-			msg += std::to_string(layer.scaleFactor()[1]);
-			msg += ") Rotation: ";
-			msg += std::to_string(layer.rotation().turns());
-			m_status.content(msg.c_str());
+			if(index.valid())
+			{
+				auto const& layer = m_layers[index];
+				std::string msg{"Layer "};
+				msg += std::to_string(index.value());
+				msg += ". Size: ";
+				msg += std::to_string(layer.size().width());
+				msg += "x";
+				msg += std::to_string(layer.size().height());
+				msg += " Position: (";
+				msg += std::to_string(layer.location()[0]);
+				msg += ", ";
+				msg += std::to_string(layer.location()[1]);
+				msg += ") Scale: (";
+				msg += std::to_string(layer.scaleFactor()[0]);
+				msg += ", ";
+				msg += std::to_string(layer.scaleFactor()[1]);
+				msg += ") Rotation: ";
+				msg += std::to_string(layer.rotation().turns());
+				m_status.content(msg.c_str());
+			}
+			else
+			{
+				m_status.content("Click ＋ to create a new layer");
+			}
 		}
 	};
 
