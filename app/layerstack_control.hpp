@@ -106,6 +106,12 @@ namespace Texpainter
 			return *this;
 		}
 
+		LayerStackControl& scaleCurrentLayer(vec2_t factor)
+		{
+			if(m_current_layer.valid()) { m_layers[m_current_layer].scaleFactor(factor); }
+			return *this;
+		}
+
 		LayerStackControl& outlineCurrentLayer(Span2d<Model::Pixel> canvas);
 
 		template<auto id, class EventHandler>

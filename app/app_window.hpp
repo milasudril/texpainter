@@ -43,7 +43,8 @@ namespace Texpainter
 		   m_layerstack_ctrl{m_rows, Ui::Box::Orientation::Horizontal, "Layers: ", m_canvas_size},
 		   m_layeres_separator{m_rows},
 		   m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})},
-		   m_painting{false}
+		   m_painting{false},
+		   m_paintmode{PaintMode::Draw}
 		{
 			forEachEnumItem<MenuAction>([this](auto tag) {
 				if constexpr(std::is_same_v<Ui::Button, typename MenuActionTraits<tag.value>::type>)
@@ -157,9 +158,11 @@ namespace Texpainter
 		enum class PaintMode : int
 		{
 			Draw,
-			Grab
+			Grab,
+			Scale
 		};
 		PaintMode m_paintmode;
+		vec2_t m_paint_start_pos;
 	};
 
 	template<>
@@ -190,6 +193,9 @@ namespace Texpainter
 			case 34: // G
 				m_paintmode = PaintMode::Grab;
 				break;
+			case 31: // S
+				m_paintmode = PaintMode::Scale;
+				break;
 			default: printf("%d\n", scancode);
 		}
 	}
@@ -207,11 +213,14 @@ namespace Texpainter
 	                                                          int button)
 	{
 		m_painting = true;
+		auto const size = view.imageSize();
+		m_paint_start_pos =
+		   pos_window
+		   - 0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
 		switch(m_paintmode)
 		{
 			case PaintMode::Draw:
 			{
-				auto const size = view.imageSize();
 				auto const offset =
 				   0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
 				m_layerstack_ctrl.inputField().paintCurrentLayer(pos_window - offset, 16.0, m_current_color);
@@ -230,24 +239,31 @@ namespace Texpainter
 	{
 		if(!m_painting) { return; }
 
+		auto const size = view.imageSize();
+		auto const offset =
+		   0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
+		auto const loc = pos_window - offset;
+
 		switch(m_paintmode)
 		{
 			case PaintMode::Draw:
 			{
-				auto const size = view.imageSize();
-				auto const offset =
-				   0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
-				m_layerstack_ctrl.inputField().paintCurrentLayer(pos_window - offset, 16.0, m_current_color);
+				m_layerstack_ctrl.inputField().paintCurrentLayer(loc, 16.0, m_current_color);
 				doRender();
 			}
 			break;
 
 			case PaintMode::Grab:
 			{
-				auto const size = view.imageSize();
-				auto const offset =
-				   0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
-				m_layerstack_ctrl.inputField().moveCurrentLayer(pos_window - offset);
+				m_layerstack_ctrl.inputField().moveCurrentLayer(loc);
+				doRender();
+			}
+			break;
+
+			case PaintMode::Scale:
+			{
+				auto const d = loc / m_paint_start_pos;
+				m_layerstack_ctrl.inputField().scaleCurrentLayer(d);
 				doRender();
 			}
 			break;
