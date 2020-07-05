@@ -58,8 +58,7 @@ namespace Texpainter
 
 		using PaletteNameInput = Texpainter::Ui::Dialog<Ui::LabeledInput<Ui::TextEntry>>;
 
-		using ColorPicker = Texpainter::Ui::Dialog<
-		   Texpainter::Ui::ExtendedColorPicker<Texpainter::Ui::ColorPickerSidepanel>>;
+		using ColorPicker = Texpainter::Ui::Dialog<Texpainter::Ui::ColorPicker>;
 
 
 	public:
@@ -250,7 +249,8 @@ namespace Texpainter
 	inline void
 	PaletteEditor::confirmPositive<PaletteEditor::ControlId::ColorPicker>(ColorPicker& picker)
 	{
-		auto color_new = picker.widget().sidepanel().targetIntensity()(picker.widget().value());
+		auto color_new =
+		   picker.widget().value(); // .sidepanel().targetIntensity()(picker.widget().value());
 		m_palettes[m_pal_selector.selected()][m_modified_pal_index] = color_new;
 
 		m_pal_view.highlightMode(m_modified_pal_index, Texpainter::Ui::PaletteView::HighlightMode::None)

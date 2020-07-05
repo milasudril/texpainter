@@ -55,7 +55,8 @@ namespace Texpainter
 		   m_separator_3{m_row_1},
 		   m_blend_func{m_row_1, "f(x)"},
 		   m_row_2{m_root, Ui::Box::Orientation::Horizontal},
-		   m_status{m_row_2.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand}), "Click ＋ to create a new layer"}
+		   m_status{m_row_2.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand}),
+		            "Click ＋ to create a new layer"}
 		{
 			m_layer_selector.eventHandler<ControlId::LayerSelector>(*this);
 			m_layer_new.eventHandler<ControlId::LayerNew>(*this);
