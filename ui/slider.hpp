@@ -12,7 +12,23 @@
 
 namespace Texpainter::Ui
 {
-	class Container;
+	class SliderValue
+	{
+	public:
+		explicit SliderValue(double val): m_value{val}
+		{
+		}
+
+		bool operator<=>(SliderValue const&) const = default;
+
+		double value() const
+		{
+			return m_value;
+		}
+
+	private:
+		double m_value;
+	};
 
 	class Slider
 	{
@@ -40,9 +56,9 @@ namespace Texpainter::Ui
 			});
 		}
 
-		double value() const noexcept;
+		SliderValue value() const noexcept;
 
-		Slider& value(double x);
+		Slider& value(SliderValue x);
 
 	protected:
 		using EventHandlerFunc = void (*)(void* event_handler, Slider& self);

@@ -16,16 +16,16 @@ public:
 		r_func = func;
 	}
 
-	double value() const noexcept
+	SliderValue value() const noexcept
 	{
-		return gtk_range_get_value(GTK_RANGE(m_handle));
+		return SliderValue{gtk_range_get_value(GTK_RANGE(m_handle))};
 	}
 
-	void value(double x) noexcept
+	void value(SliderValue x) noexcept
 	{
 		auto r_eh_old = r_eh; // Disable event handler when changing value
 		r_eh = nullptr;
-		gtk_range_set_value(GTK_RANGE(m_handle), x);
+		gtk_range_set_value(GTK_RANGE(m_handle), x.value());
 		r_eh = r_eh_old;
 	}
 
@@ -53,12 +53,12 @@ Texpainter::Ui::Slider& Texpainter::Ui::Slider::eventHandler(void* event_handler
 	return *this;
 }
 
-double Texpainter::Ui::Slider::value() const noexcept
+Texpainter::Ui::SliderValue Texpainter::Ui::Slider::value() const noexcept
 {
 	return m_impl->value();
 }
 
-Texpainter::Ui::Slider& Texpainter::Ui::Slider::value(double x)
+Texpainter::Ui::Slider& Texpainter::Ui::Slider::value(SliderValue x)
 {
 	m_impl->value(x);
 	return *this;
