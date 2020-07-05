@@ -9,6 +9,7 @@
 #include "model/hsi_rgb.hpp"
 
 #include <gtk/gtk.h>
+#include <cassert>
 
 namespace
 {
@@ -18,7 +19,8 @@ namespace
 		generate(ret.pixels(), [intensity, alpha, size](auto col, auto row) {
 			auto x = static_cast<float>(col) / size.width();
 			auto y = 1.0f - static_cast<float>(row) / size.height();
-			return toRgb(Texpainter::Model::Hsi{x, y, intensity, alpha});
+			auto ret = toRgb(Texpainter::Model::Hsi{x, y, intensity, alpha});
+			return ret;
 		});
 		return ret;
 	}
@@ -194,6 +196,7 @@ Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt):
    m_intensity{m_root, true}
 {
 	m_btn_state = 0;
+	std::ranges::fill(m_colors_cache.pixels(), Model::Pixel{0.0f, 0.0f, 0.0f, 1.0f});
 	m_colors.minSize(Size2d{384, 384})
 	   .eventHandler<ControlId::Colors>(*this)
 	   .alwaysEmitMouseEvents(true);

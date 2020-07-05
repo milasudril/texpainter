@@ -3,7 +3,6 @@
 #include "./image_view.hpp"
 #include "model/image.hpp"
 #include "geom/dimension.hpp"
-#include "utils/snap.hpp"
 
 #include <gtk/gtk.h>
 
@@ -13,12 +12,14 @@ namespace
 {
 	constexpr auto gen_gamma_22_lut()
 	{
-		float input_vals[256] = {};
-		for(int k = 0; k < 256; ++k)
+		std::array<uint8_t, 42868> ret{};
+		for(int k = 0; k < static_cast<int>(ret.size()); ++k)
 		{
-			input_vals[k] = std::pow(static_cast<float>(k) / 255.0f, 2.2f);
+			ret[k] =
+			   static_cast<float>(255.0 * std::pow(static_cast<double>(k) / (ret.size() - 1), 1 / 2.2));
 		}
-		return Texpainter::Snap{input_vals};
+
+		return ret;
 	}
 	constexpr auto gamma_22 = gen_gamma_22_lut();
 }
@@ -57,10 +58,8 @@ public:
 
 	void render(Geom::Dimension dim, cairo_t* cr)
 	{
-		//		auto context = gtk_widget_get_style_context(GTK_WIDGET(m_handle));
-		//		gtk_render_background(context, cr, 0, 0, dim.width(), dim.height());
-		cairo_set_source_rgba(cr, 1.0, 0.0, 1.0, 1.0);
-		cairo_rectangle(cr, 0.0, 0.0, m_size_current.width(), m_size_current.height());
+		auto context = gtk_widget_get_style_context(GTK_WIDGET(m_handle));
+		gtk_render_background(context, cr, 0, 0, dim.width(), dim.height());
 		if(m_img_surface != nullptr) [[likely]]
 			{
 				cairo_set_source_surface(cr, m_img_surface, 0.0, 0.0);
@@ -134,12 +133,13 @@ private:
 			auto write_ptr = data + row * stride;
 			for(uint32_t col = 0; col < w; ++col)
 			{
-				auto pixel_out = read_ptr->value();
+				constexpr auto last_lut_entry = static_cast<int>(gamma_22.size() - 1);
+				auto pixel_out = static_cast<float>(last_lut_entry) * read_ptr->value();
 
-				write_ptr[0] = gamma_22.nearestIndex(pixel_out[2]);
-				write_ptr[1] = gamma_22.nearestIndex(pixel_out[1]);
-				write_ptr[2] = gamma_22.nearestIndex(pixel_out[0]);
-				write_ptr[3] = gamma_22.nearestIndex(pixel_out[3]);
+				write_ptr[0] = gamma_22[std::min(static_cast<int>(pixel_out[2]), last_lut_entry)];
+				write_ptr[1] = gamma_22[std::min(static_cast<int>(pixel_out[1]), last_lut_entry)];
+				write_ptr[2] = gamma_22[std::min(static_cast<int>(pixel_out[0]), last_lut_entry)];
+				write_ptr[3] = gamma_22[std::min(static_cast<int>(pixel_out[3]), last_lut_entry)];
 
 				write_ptr += 4;
 				++read_ptr;
