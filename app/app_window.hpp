@@ -11,8 +11,8 @@
 #include "./surface_creator.hpp"
 #include "./crack_creator.hpp"
 #include "./layerstack_control.hpp"
-#include "./snap.hpp"
 
+#include "utils/snap.hpp"
 #include "ui/box.hpp"
 #include "ui/toolbar.hpp"
 #include "ui/image_view.hpp"

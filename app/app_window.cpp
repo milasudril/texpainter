@@ -33,7 +33,7 @@ namespace
 
 		constexpr auto snap = Texpainter::Snap{snap_angles};
 
-		return snap.nearest(ϴ);
+		return snap.nearestValue(ϴ);
 	}
 
 	constexpr Texpainter::vec2_t snap_scale_factor(Texpainter::vec2_t v)
@@ -77,7 +77,7 @@ namespace
 
 		constexpr auto snap = Texpainter::Snap{snap_factors};
 
-		return Texpainter::vec2_t{snap.nearest(v[0]), snap.nearest(v[1])};
+		return Texpainter::vec2_t{snap.nearestValue(v[0]), snap.nearestValue(v[1])};
 	}
 
 	constexpr Texpainter::vec2_t keep_aspect_ratio(Texpainter::vec2_t v)

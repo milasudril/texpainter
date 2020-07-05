@@ -7,7 +7,6 @@
 #define TEXPAINTER_LAYERSTACKCONTROL_HPP
 
 #include "./layer_creator.hpp"
-#include "./snap.hpp"
 
 #include "model/layer_stack.hpp"
 #include "ui/box.hpp"
