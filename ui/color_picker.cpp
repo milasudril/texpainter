@@ -2,29 +2,30 @@
 
 #include "./color_picker.hpp"
 
+#include "./box.hpp"
+#include "./image_view.hpp"
+#include "./slider.hpp"
+
+#include "model/hsi_rgb.hpp"
+
 #include <gtk/gtk.h>
 
 class Texpainter::Ui::ColorPicker::Impl: private Texpainter::Ui::ColorPicker
 {
 public:
+	enum class ControlId: int{Colors, Intensity};
+
 	Impl(Container& cnt);
 	~Impl();
 
 	Model::Pixel value() const
 	{
-		GdkRGBA tmp;
-		gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(m_handle), &tmp);
-		return toLinear(Model::BasicPixel<Model::ColorProfiles::Gamma22>{static_cast<float>(tmp.red),
-		                                                                 static_cast<float>(tmp.green),
-		                                                                 static_cast<float>(tmp.blue),
-		                                                                 static_cast<float>(tmp.alpha)});
+		return m_value;
 	}
 
 	void value(Model::Pixel val)
 	{
-		auto const g22 = Model::BasicPixel<Model::ColorProfiles::Gamma22>{val};
-		GdkRGBA tmp{g22.red(), g22.green(), g22.blue(), g22.alpha()};
-		gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(m_handle), &tmp);
+		m_value = val;
 	}
 
 	ColorPicker const& self() const noexcept
@@ -32,8 +33,15 @@ public:
 		return *this;
 	}
 
+	template<ControlId>
+	void onChanged(Slider&);
+
 private:
-	GtkColorChooserWidget* m_handle;
+	Box m_root;
+	ImageView m_colors;
+	Slider m_intensity;
+
+	Model::Pixel m_value;
 };
 
 Texpainter::Ui::ColorPicker::ColorPicker(Container& cnt)
@@ -57,25 +65,41 @@ Texpainter::Ui::ColorPicker& Texpainter::Ui::ColorPicker::value(Model::Pixel col
 	return *this;
 }
 
+namespace
+{
+	Texpainter::Model::Image genColors(float intensity, float alpha, Texpainter::Size2d size)
+	{
+		Texpainter::Model::Image ret{size};
+		generate(ret.pixels(), [intensity, alpha, size](auto col, auto row) {
+			auto x = static_cast<float>(col)/size.width();
+			auto y = 1.0f - static_cast<float>(row)/size.height();
+			return convert(Texpainter::Model::Hsi{Texpainter::Angle{x, Texpainter::Angle::Turns{}}, y, intensity, alpha});
+		});
+		return ret;
+	}
+}
+
+template<>
+void Texpainter::Ui::ColorPicker::Impl::onChanged<Texpainter::Ui::ColorPicker::Impl::ControlId::Intensity>(Slider& src)
+{
+	auto colors = genColors(src.value(), 1.0f, Size2d{384, 384});
+	m_colors.minSize(Size2d{384,384}).image(colors);
+}
 
 Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt): Texpainter::Ui::ColorPicker{*this}
+,m_root{cnt, Box::Orientation::Horizontal}
+,m_colors{m_root}
+,m_intensity{m_root, true}
+,m_value{0.5f, 0.5f, 0.5f, 1.0f}
 {
-	auto widget = gtk_color_chooser_widget_new();
-	GValue show_editor = G_VALUE_INIT;
-	g_value_init(&show_editor, G_TYPE_BOOLEAN);
-	g_value_set_boolean(&show_editor, TRUE);
-	g_object_set_property(G_OBJECT(widget), "show-editor", &show_editor);
-	g_object_ref_sink(widget);
-	cnt.add(widget);
-	g_value_reset(&show_editor);
-	m_handle = GTK_COLOR_CHOOSER_WIDGET(widget);
+	auto colors = genColors(0.5, 1.0f, Size2d{384, 384});
+	m_colors.minSize(Size2d{384,384}).image(colors);
+	m_intensity.eventHandler<ControlId::Intensity>(*this);
 }
 
 Texpainter::Ui::ColorPicker::Impl::~Impl()
 {
 	m_impl = nullptr;
-	gtk_widget_destroy(GTK_WIDGET(m_handle));
-	g_object_unref(m_handle);
 }
 
 Texpainter::Ui::ColorPicker const& Texpainter::Ui::ColorPicker::self() const noexcept
