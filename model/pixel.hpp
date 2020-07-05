@@ -273,13 +273,19 @@ namespace Texpainter::Model
 	template<class ColorProfile>
 	constexpr auto intensity(BasicPixel<ColorProfile> a)
 	{
-		return (a.red() + a.green() + a.blue()) / 3.0f;
+		return a.red() + a.green() + a.blue();
 	}
 
 	template<class ColorProfile>
 	constexpr auto max(BasicPixel<ColorProfile> a)
 	{
 		return std::max(a.red(), std::max(a.green(), a.blue()));
+	}
+
+	template<class ColorProfile>
+	constexpr auto min(BasicPixel<ColorProfile> a)
+	{
+		return std::min(a.red(), std::min(a.green(), a.blue()));
 	}
 }
 #endif

@@ -34,6 +34,7 @@ public:
 		m_handle = GTK_DRAWING_AREA(widget);
 		m_img_surface = nullptr;
 		r_eh = nullptr;
+		m_emit_mouse_events = false;
 		gtk_widget_add_events(widget,
 		                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK
 		                         | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_SCROLL_MASK);
@@ -106,9 +107,15 @@ public:
 		gtk_widget_grab_focus(GTK_WIDGET(m_handle));
 	}
 
+	void alwaysEmitMouseEvents(bool status)
+	{
+		m_emit_mouse_events = status;
+	}
+
 private:
 	void* r_eh;
 	EventHandlerVtable m_vt;
+	bool m_emit_mouse_events;
 
 	cairo_surface_t* m_img_surface;
 	Size2d m_size_current;
@@ -157,7 +164,7 @@ private:
 		auto& obj = *reinterpret_cast<Impl*>(self);
 		if(obj.r_eh != nullptr)
 		{
-			if(!gtk_widget_is_focus(w))
+			if(!gtk_widget_is_focus(w) && !obj.m_emit_mouse_events)
 			{
 				gtk_widget_grab_focus(w);
 				return FALSE;
@@ -267,5 +274,11 @@ Texpainter::Size2d Texpainter::Ui::ImageView::imageSize() const noexcept
 Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::focus()
 {
 	m_impl->focus();
+	return *this;
+}
+
+Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::alwaysEmitMouseEvents(bool status)
+{
+	m_impl->alwaysEmitMouseEvents(true);
 	return *this;
 }

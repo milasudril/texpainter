@@ -36,7 +36,8 @@ namespace Texpainter::Ui
 	inline constexpr SliderValue
 	logValue(double x, double min_exponent = -10.0, double max_exponent = 0.0)
 	{
-		auto const ret = (std::max(std::log2(x), 0.0) - min_exponent) / (max_exponent - min_exponent);
+		x = (x == 0.0) ? std::exp(min_exponent - 1.0) : x;
+		auto const ret = (std::log2(x) - min_exponent) / (max_exponent - min_exponent);
 		return Texpainter::Ui::SliderValue{ret};
 	}
 

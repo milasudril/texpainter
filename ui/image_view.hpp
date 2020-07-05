@@ -65,6 +65,8 @@ namespace Texpainter::Ui
 
 		ImageView& focus();
 
+		ImageView& alwaysEmitMouseEvents(bool status);
+
 	private:
 		class Impl;
 		explicit ImageView(Impl& impl): m_impl(&impl)
