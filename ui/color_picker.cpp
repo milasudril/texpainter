@@ -162,11 +162,18 @@ private:
 template<>
 void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseDown<
    Texpainter::Ui::ColorPicker::ColorPicker::Impl::ControlId::Colors>(ImageView&,
-                                                                      vec2_t,
+                                                                      vec2_t pos_window,
                                                                       vec2_t,
                                                                       int button)
 {
 	m_btn_state |= (1 << button);
+	if(m_btn_state == 2)
+	{
+		auto pos = pos_window / vec2_t{384.0, 384.0};
+		m_hsi.hue = std::clamp(pos[0], 0.0, 1.0);
+		m_hsi.saturation = 1.0f - std::clamp(pos[1], 0.0, 1.0);
+		update();
+	}
 }
 
 template<>
@@ -183,13 +190,13 @@ template<>
 void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseMove<
    Texpainter::Ui::ColorPicker::ColorPicker::Impl::ControlId::Colors>(ImageView& view,
                                                                       vec2_t pos_window,
-                                                                      vec2_t pos_screen)
+                                                                      vec2_t)
 {
 	if(m_btn_state == 2)
 	{
 		auto pos = pos_window / vec2_t{384.0, 384.0};
-		m_hsi.hue = pos[0];
-		m_hsi.saturation = 1.0f - pos[1];
+		m_hsi.hue = std::clamp(pos[0], 0.0, 1.0);
+		m_hsi.saturation = 1.0f - std::clamp(pos[1], 0.0, 1.0);
 		update();
 	}
 }

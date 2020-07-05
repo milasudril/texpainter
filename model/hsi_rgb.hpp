@@ -24,7 +24,7 @@ namespace Texpainter::Model
 		auto tmp = [](Hsi const& hsi) {
 			auto const h = static_cast<float>(6.0f * hsi.hue);
 			auto const z = 1.0f - std::abs(std::fmod(h, 2.0f) - 1.0f);
-			auto const c = 3.0f * hsi.intensity * hsi.saturation;
+			auto const c = (3.0f * hsi.intensity * hsi.saturation) / (1.0f + z);
 			auto const x = c * z;
 
 			if(h < 1.0f) { return Pixel{c, x, 0.0f, 0.0f}; }
