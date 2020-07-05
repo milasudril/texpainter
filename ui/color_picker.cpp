@@ -34,11 +34,11 @@ namespace
 		auto const end_coords = pos + Texpainter::vec2_t{radius, radius};
 
 		for(auto row = std::max(static_cast<int>(begin_coords[1]), 0);
-		    row < std::min(static_cast<int>(end_coords[1]), static_cast<int>(h));
+		    row <= std::min(static_cast<int>(end_coords[1]), static_cast<int>(h) - 1);
 		    ++row)
 		{
 			for(auto col = std::max(static_cast<int>(begin_coords[0]), 0);
-			    col < std::min(static_cast<int>(end_coords[0]), static_cast<int>(w));
+			    col <= std::min(static_cast<int>(end_coords[0]), static_cast<int>(w) - 1);
 			    ++col)
 			{
 				auto const loc_ret = Texpainter::vec2_t{static_cast<double>(col), static_cast<double>(row)};
@@ -46,7 +46,9 @@ namespace
 				if(Texpainter::dot(d, d) < radius * radius)
 				{
 					auto& pixel = canvas(col, row);
-					pixel = Texpainter::Model::Pixel{1.0f, 1.0f, 1.0f, 1.0f} - pixel;
+					auto const i = intensity(pixel);
+					pixel = i >= 1.0f ? Texpainter::Model::Pixel{0.0f, 0.0f, 0.0f, 1.0f} :
+					                    Texpainter::Model::Pixel{1.0f, 1.0f, 1.0f, 1.0f};
 					pixel.alpha(1.0f);
 				}
 			}
