@@ -13,10 +13,10 @@ namespace
 {
 	constexpr auto gen_gamma_22_lut()
 	{
-		float input_vals[256]={};
+		float input_vals[256] = {};
 		for(int k = 0; k < 256; ++k)
 		{
-			input_vals[k] = std::pow(static_cast<float>(k)/255.0f, 2.2f);
+			input_vals[k] = std::pow(static_cast<float>(k) / 255.0f, 2.2f);
 		}
 		return Texpainter::Snap{input_vals};
 	}
@@ -56,8 +56,8 @@ public:
 
 	void render(Geom::Dimension dim, cairo_t* cr)
 	{
-//		auto context = gtk_widget_get_style_context(GTK_WIDGET(m_handle));
-//		gtk_render_background(context, cr, 0, 0, dim.width(), dim.height());
+		//		auto context = gtk_widget_get_style_context(GTK_WIDGET(m_handle));
+		//		gtk_render_background(context, cr, 0, 0, dim.width(), dim.height());
 		cairo_set_source_rgba(cr, 1.0, 0.0, 1.0, 1.0);
 		cairo_rectangle(cr, 0.0, 0.0, m_size_current.width(), m_size_current.height());
 		if(m_img_surface != nullptr) [[likely]]

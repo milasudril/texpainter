@@ -33,16 +33,19 @@ namespace Texpainter::Ui
 		double m_value;
 	};
 
-	inline constexpr SliderValue logValue(double x, double min_exponent = -10.0, double max_exponent = 0.0)
+	inline constexpr SliderValue
+	logValue(double x, double min_exponent = -10.0, double max_exponent = 0.0)
 	{
-		auto const ret = (std::max(std::log2(x), 0.0) - min_exponent)/(max_exponent - min_exponent);
+		auto const ret = (std::max(std::log2(x), 0.0) - min_exponent) / (max_exponent - min_exponent);
 		return Texpainter::Ui::SliderValue{ret};
 	}
 
-	inline constexpr double logValue(SliderValue val, double min_exponent = -10.0, double max_exponent = 0.0)
+	inline constexpr double
+	logValue(SliderValue val, double min_exponent = -10.0, double max_exponent = 0.0)
 	{
-		auto x = val.value();
-		return std::exp2(min_exponent*(1.0 - x) + x*max_exponent);
+		auto const x = val.value();
+
+		return x == 0.0 ? 0.0 : std::exp2(min_exponent * (1.0 - x) + x * max_exponent);
 	}
 
 	class Slider
