@@ -22,14 +22,19 @@ namespace
 
 	constexpr auto GraphNames = getGraphNames();
 
-	Texpainter::Frequency sliderValueToFrequency(double val)
+	auto toFrequency(Texpainter::Ui::SliderValue val)
 	{
-		return Texpainter::Frequency{std::exp2(10 * (val - 1.0))};
+		return Texpainter::Frequency{std::exp2(10 * (val.value() - 1.0))};
 	}
 
-	double toSliderValue(Texpainter::Frequency f)
+	auto toSliderValue(Texpainter::Frequency f)
 	{
-		return std::log2(f.value()) / 10.0 + 1.0;
+		return Texpainter::Ui::SliderValue{std::log2(f.value()) / 10.0 + 1.0};
+	}
+
+	auto toAngle(Texpainter::Ui::SliderValue val, double max_range = 0.5)
+	{
+		return Texpainter::Angle{max_range * val.value(), Texpainter::Angle::Turns{}};
 	}
 }
 
@@ -52,7 +57,7 @@ Texpainter::SurfaceCreator::SurfaceCreator(Ui::Container& owner):
 	   .selected(static_cast<int>(m_generator.filters()))
 	   .eventHandler<ControlId::FilterGraph>(*this);
 	m_orientation.inputField()
-	   .value(m_generator.orientation().turns())
+	   .value(Ui::SliderValue{m_generator.orientation().turns()})
 	   .eventHandler<ControlId::Orientation>(*this);
 	auto cutoff = m_generator.cutoffFrequency();
 	m_horz_cutoff.inputField()
@@ -79,7 +84,7 @@ template<>
 void Texpainter::SurfaceCreator::onChanged<Texpainter::SurfaceCreator::ControlId::Orientation>(
    Ui::Slider& source)
 {
-	m_generator.orientation(Angle{0.5 * source.value(), Angle::Turns{}});
+	m_generator.orientation(toAngle(source.value()));
 	m_preview = m_generator(m_preview.size());
 	m_img_view.image(m_preview);
 }
@@ -88,8 +93,8 @@ template<>
 void Texpainter::SurfaceCreator::onChanged<Texpainter::SurfaceCreator::ControlId::HorzCutoff>(
    Ui::Slider& source)
 {
-	auto const horz_cutoff = sliderValueToFrequency(source.value());
-	auto const vert_cutoff = sliderValueToFrequency(m_vert_cutoff.inputField().value());
+	auto const horz_cutoff = toFrequency(source.value());
+	auto const vert_cutoff = toFrequency(m_vert_cutoff.inputField().value());
 
 	if(m_cutoff_sliders_lock.state())
 	{
@@ -112,8 +117,8 @@ template<>
 void Texpainter::SurfaceCreator::onChanged<Texpainter::SurfaceCreator::ControlId::VertCutoff>(
    Ui::Slider& source)
 {
-	auto const horz_cutoff = sliderValueToFrequency(m_horz_cutoff.inputField().value());
-	auto const vert_cutoff = sliderValueToFrequency(source.value());
+	auto const horz_cutoff = toFrequency(m_horz_cutoff.inputField().value());
+	auto const vert_cutoff = toFrequency(source.value());
 
 	if(m_cutoff_sliders_lock.state())
 	{
@@ -138,8 +143,8 @@ void Texpainter::SurfaceCreator::onClicked<Texpainter::SurfaceCreator::ControlId
 {
 	if(btn.state())
 	{
-		auto horz_cutoff = sliderValueToFrequency(m_horz_cutoff.inputField().value());
-		auto vert_cutoff = sliderValueToFrequency(m_vert_cutoff.inputField().value());
+		auto horz_cutoff = toFrequency(m_horz_cutoff.inputField().value());
+		auto vert_cutoff = toFrequency(m_vert_cutoff.inputField().value());
 
 		auto freq_new = mean(horz_cutoff, vert_cutoff);
 		auto val_new = toSliderValue(freq_new);
