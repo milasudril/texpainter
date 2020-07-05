@@ -72,8 +72,8 @@ public:
 	void value(Model::Pixel val)
 	{
 		m_hsi = toHsi(val);
-		printf("%.7e %.7e %.7e\n", m_hsi.hue, m_hsi.saturation, m_hsi.intensity);
 		m_intensity.value(logValue(m_hsi.intensity, -16));
+		m_colors_cache = gen_colors(m_hsi.intensity, 1.0f, Size2d{384, 384});
 		update();
 	}
 
@@ -105,18 +105,18 @@ public:
 	void onMouseMove(ImageView& src, vec2_t pos_window, vec2_t pos_screen);
 
 private:
+	Model::Hsi m_hsi;
+	Model::Image m_colors_cache;
+	uint32_t m_btn_state;
+
 	Box m_root;
 	ImageView m_colors;
 	Slider m_intensity;
 
-	Model::Hsi m_hsi;
-	uint32_t m_btn_state;
 	void update()
 	{
-		auto i = m_hsi.intensity;
-		auto colors = gen_colors(i, 1.0f, Size2d{384, 384});
+		auto colors = m_colors_cache;
 		draw_marker(vec2_t{384.0, 384.0} * vec2_t{m_hsi.hue, 1.0 - m_hsi.saturation}, colors.pixels());
-
 		m_colors.image(colors);
 	}
 };
@@ -182,11 +182,13 @@ void Texpainter::Ui::ColorPicker::Impl::onChanged<
    Texpainter::Ui::ColorPicker::Impl::ControlId::Intensity>(Slider& src)
 {
 	m_hsi.intensity = logValue(src.value(), -16);
+	m_colors_cache = gen_colors(m_hsi.intensity, 1.0f, Size2d{384, 384});
 	update();
 }
 
 Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt):
    Texpainter::Ui::ColorPicker{*this},
+   m_colors_cache{Size2d{384, 384}},
    m_root{cnt, Box::Orientation::Horizontal},
    m_colors{m_root},
    m_intensity{m_root, true}
