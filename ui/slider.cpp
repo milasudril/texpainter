@@ -29,6 +29,13 @@ public:
 		r_eh = r_eh_old;
 	}
 
+	void ticks(std::span<TickMark const> marks)
+	{
+		std::ranges::for_each(marks, [scale = m_handle](auto item) {
+			gtk_scale_add_mark(scale, item.position.value(), GTK_POS_RIGHT, item.text);
+		});
+	}
+
 private:
 	void* r_eh;
 	EventHandlerFunc r_func;
@@ -61,6 +68,12 @@ Texpainter::Ui::SliderValue Texpainter::Ui::Slider::value() const noexcept
 Texpainter::Ui::Slider& Texpainter::Ui::Slider::value(SliderValue x)
 {
 	m_impl->value(x);
+	return *this;
+}
+
+Texpainter::Ui::Slider& Texpainter::Ui::Slider::ticks(std::span<TickMark const> marks)
+{
+	m_impl->ticks(marks);
 	return *this;
 }
 

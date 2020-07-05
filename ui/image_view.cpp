@@ -136,8 +136,12 @@ private:
 				constexpr auto last_lut_entry = static_cast<int>(gamma_22.size() - 1);
 				auto pixel_out = static_cast<float>(last_lut_entry) * read_ptr->value();
 
-				auto as_ints = vec4i_t{static_cast<int>(pixel_out[0]), static_cast<int>(pixel_out[1]), static_cast<int>(pixel_out[2]), static_cast<int>(pixel_out[3])};
-				auto constexpr max_val = vec4i_t{last_lut_entry, last_lut_entry, last_lut_entry, last_lut_entry};
+				auto as_ints = vec4i_t{static_cast<int>(pixel_out[0]),
+				                       static_cast<int>(pixel_out[1]),
+				                       static_cast<int>(pixel_out[2]),
+				                       static_cast<int>(pixel_out[3])};
+				auto constexpr max_val =
+				   vec4i_t{last_lut_entry, last_lut_entry, last_lut_entry, last_lut_entry};
 
 				as_ints = min(as_ints, max_val);
 

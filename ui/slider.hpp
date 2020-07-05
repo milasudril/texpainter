@@ -11,12 +11,15 @@
 #include <utility>
 #include <algorithm>
 #include <cmath>
+#include <span>
 
 namespace Texpainter::Ui
 {
 	class SliderValue
 	{
 	public:
+		constexpr SliderValue() = default;
+
 		constexpr explicit SliderValue(double val): m_value{val}
 		{
 		}
@@ -52,6 +55,12 @@ namespace Texpainter::Ui
 	class Slider
 	{
 	public:
+		struct TickMark
+		{
+			SliderValue position;
+			char const* text;
+		};
+
 		explicit Slider(Container& container, bool vertical);
 		~Slider();
 
@@ -78,6 +87,8 @@ namespace Texpainter::Ui
 		SliderValue value() const noexcept;
 
 		Slider& value(SliderValue x);
+
+		Slider& ticks(std::span<TickMark const> marks);
 
 	protected:
 		using EventHandlerFunc = void (*)(void* event_handler, Slider& self);

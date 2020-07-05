@@ -52,6 +52,42 @@ namespace
 			}
 		}
 	}
+
+	constexpr auto gen_tickmarks()
+	{
+		constexpr char const* tick_mark_text[] = {" /59049",
+		                                          " /19683",
+		                                          " /6561",
+		                                          " /2187",
+		                                          " /729",
+		                                          " /243",
+		                                          " /81",
+		                                          " /27",
+		                                          " /9",
+		                                          " /3",
+		                                          " /1"};
+		constexpr double values[] = {1.0 / 59049,
+		                             1.0 / 19683,
+		                             1.0 / 6561,
+		                             1.0 / 2187,
+		                             1.0 / 729,
+		                             1.0 / 243,
+		                             1.0 / 81,
+		                             1.0 / 27.0,
+		                             1.0 / 9.0,
+		                             1.0 / 3.0,
+		                             1};
+		std::array<Texpainter::Ui::Slider::TickMark, std::size(tick_mark_text)> ret{};
+
+		for(size_t k = 0; k < std::size(ret); ++k)
+		{
+			ret[k] = {Texpainter::Ui::logValue(values[k], -16), tick_mark_text[k]};
+		}
+
+		return ret;
+	}
+
+	constexpr auto intensity_tickmarks = gen_tickmarks();
 }
 
 class Texpainter::Ui::ColorPicker::Impl: private Texpainter::Ui::ColorPicker
@@ -201,7 +237,7 @@ Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt):
 	   .eventHandler<ControlId::Colors>(*this)
 	   .alwaysEmitMouseEvents(true);
 	value(Model::Pixel{0.5f, 0.5f, 0.5f, 1.0f});
-	m_intensity.eventHandler<ControlId::Intensity>(*this);
+	m_intensity.eventHandler<ControlId::Intensity>(*this).ticks(intensity_tickmarks);
 }
 
 Texpainter::Ui::ColorPicker::Impl::~Impl()
