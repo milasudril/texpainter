@@ -9,19 +9,22 @@
 #include "./container.hpp"
 
 #include <utility>
+#include <algorithm>
+#include <cmath>
 
 namespace Texpainter::Ui
 {
 	class SliderValue
 	{
 	public:
-		explicit SliderValue(double val): m_value{val}
+		constexpr explicit SliderValue(double val): m_value{val}
 		{
 		}
 
-		bool operator<=>(SliderValue const&) const = default;
+		// SIGSEGV during compilation in gcc 10.1 [bug 96064]
+		// constexpr bool operator<=>(SliderValue const&) const = default;
 
-		double value() const
+		constexpr double value() const
 		{
 			return m_value;
 		}
@@ -29,6 +32,18 @@ namespace Texpainter::Ui
 	private:
 		double m_value;
 	};
+
+	inline constexpr SliderValue logValue(double x, double min_exponent = -10.0, double max_exponent = 0.0)
+	{
+		auto const ret = (std::max(std::log2(x), 0.0) - min_exponent)/(max_exponent - min_exponent);
+		return Texpainter::Ui::SliderValue{ret};
+	}
+
+	inline constexpr double logValue(SliderValue val, double min_exponent = -10.0, double max_exponent = 0.0)
+	{
+		auto x = val.value();
+		return std::exp2(min_exponent*(1.0 - x) + x*max_exponent);
+	}
 
 	class Slider
 	{
