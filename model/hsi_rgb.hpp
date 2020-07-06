@@ -43,13 +43,13 @@ namespace Texpainter::Model
 	inline Hsi toHsi(Pixel pixel)
 	{
 		auto const i = intensity(pixel) / 3.0f;
-		auto const h = [](auto val) {
+		auto h = [](auto val) {
 			auto const maxval = max(val);
 			auto const minval = min(val);
 			auto const c = maxval - minval;
 			if(c == 0.0f) { return 0.0f; }
 
-			if(maxval == val.red()) { return std::fmod((val.green() - val.blue()) / c, 6.0f); }
+			if(maxval == val.red()) { return (val.green() - val.blue()) / c; }
 
 			if(maxval == val.green()) { return (val.blue() - val.red()) / c + 2.0f; }
 
@@ -57,6 +57,8 @@ namespace Texpainter::Model
 
 			return 0.0f;
 		}(pixel);
+
+		h = h < 0.0f ? h + 6.0f : h;
 
 		auto const s = (i == 0.0f) ? 0.0f : 1.0f - min(pixel) / i;
 		return Hsi{h / 6.0f, s, i, pixel.alpha()};
