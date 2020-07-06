@@ -57,28 +57,39 @@ namespace
 
 	constexpr auto gen_tickmarks()
 	{
-		constexpr char const* tick_mark_text[] = {" /59049",
-		                                          " /19683",
-		                                          " /6561",
-		                                          " /2187",
-		                                          " /729",
-		                                          " /243",
-		                                          " /81",
-		                                          " /27",
-		                                          " /9",
-		                                          " /3",
-		                                          " /1"};
-		constexpr double values[] = {1.0 / 59049,
-		                             1.0 / 19683,
-		                             1.0 / 6561,
-		                             1.0 / 2187,
-		                             1.0 / 729,
-		                             1.0 / 243,
-		                             1.0 / 81,
-		                             1.0 / 27.0,
-		                             1.0 / 9.0,
-		                             1.0 / 3.0,
-		                             1};
+		constexpr char const* tick_mark_text[] = {" -14",
+		                                          " -13",
+		                                          " -12",
+		                                          " -11",
+		                                          " -10",
+		                                          "  -9",
+		                                          "  -8",
+		                                          "  -7",
+		                                          "  -6",
+		                                          "  -5",
+		                                          "  -4",
+		                                          "  -3",
+		                                          "  -2",
+		                                          "  -1",
+		                                          "   0",
+		                                          "  +1"};
+
+		constexpr double values[] = {std::exp2(-14.0f) / 3.0f,
+		                             std::exp2(-13.0f) / 3.0f,
+		                             std::exp2(-12.0f) / 3.0f,
+		                             std::exp2(-11.0f) / 3.0f,
+		                             std::exp2(-10.0f) / 3.0f,
+		                             std::exp2(-9.0f) / 3.0f,
+		                             std::exp2(-8.0f) / 3.0f,
+		                             std::exp2(-7.0f) / 3.0f,
+		                             std::exp2(-6.0f) / 3.0f,
+		                             std::exp2(-5.0f) / 3.0f,
+		                             std::exp2(-4.0f) / 3.0f,
+		                             std::exp2(-3.0f) / 3.0f,
+		                             std::exp2(-2.0f) / 3.0f,
+		                             std::exp2(-1.0f) / 3.0f,
+		                             std::exp2(0.0f) / 3.0f,
+		                             std::exp2(1.0f) / 3.0f};
 		std::array<Texpainter::Ui::Slider::TickMark, std::size(tick_mark_text)> ret{};
 
 		for(size_t k = 0; k < std::size(ret); ++k)
