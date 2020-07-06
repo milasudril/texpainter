@@ -5,6 +5,7 @@
 #include "./box.hpp"
 #include "./image_view.hpp"
 #include "./slider.hpp"
+#include "./labeled_input.hpp"
 
 #include "model/hsi_rgb.hpp"
 
@@ -109,7 +110,8 @@ public:
 	enum class ControlId : int
 	{
 		Colors,
-		Intensity
+		Intensity,
+		Alpha
 	};
 
 	Impl(Container& cnt);
@@ -123,8 +125,9 @@ public:
 	void value(Model::Pixel val)
 	{
 		m_hsi = toHsi(val);
-		m_intensity.value(logValue(m_hsi.intensity, -16));
-		m_colors_cache = gen_colors(m_hsi.intensity, 1.0f, Size2d{384, 384});
+		m_intensity.inputField().value(logValue(m_hsi.intensity, -16));
+		m_alpha.inputField().value(linValue(m_hsi.alpha));
+		m_colors_cache = gen_colors(m_hsi.intensity, m_hsi.alpha, Size2d{384, 384});
 		update();
 	}
 
@@ -161,14 +164,16 @@ private:
 	uint32_t m_btn_state;
 
 	Box m_root;
-	ImageView m_colors;
-	Slider m_intensity;
+	Box m_cols;
+	LabeledInput<ImageView> m_colors;
+	LabeledInput<Slider> m_intensity;
+	LabeledInput<Slider> m_alpha;
 
 	void update()
 	{
 		auto colors = m_colors_cache;
 		draw_marker(vec2_t{384.0, 384.0} * vec2_t{m_hsi.hue, 1.0 - m_hsi.saturation}, colors.pixels());
-		m_colors.image(colors);
+		m_colors.inputField().image(colors);
 	}
 };
 
@@ -240,24 +245,37 @@ void Texpainter::Ui::ColorPicker::Impl::onChanged<
    Texpainter::Ui::ColorPicker::Impl::ControlId::Intensity>(Slider& src)
 {
 	m_hsi.intensity = logValue(src.value(), -16);
-	m_colors_cache = gen_colors(m_hsi.intensity, 1.0f, Size2d{384, 384});
+	m_colors_cache = gen_colors(m_hsi.intensity, m_hsi.alpha, Size2d{384, 384});
+	update();
+}
+
+template<>
+void Texpainter::Ui::ColorPicker::Impl::onChanged<
+   Texpainter::Ui::ColorPicker::Impl::ControlId::Alpha>(Slider& src)
+{
+	m_hsi.alpha = static_cast<float>(linValue(src.value()));
+	m_colors_cache = gen_colors(m_hsi.intensity, m_hsi.alpha, Size2d{384, 384});
 	update();
 }
 
 Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt):
    Texpainter::Ui::ColorPicker{*this},
    m_colors_cache{Size2d{384, 384}},
-   m_root{cnt, Box::Orientation::Horizontal},
-   m_colors{m_root},
-   m_intensity{m_root, true}
+   m_root{cnt, Box::Orientation::Vertical},
+   m_cols{m_root, Box::Orientation::Horizontal},
+   m_colors{m_cols, Box::Orientation::Vertical, "Saturation \\ Hue"},
+   m_intensity{m_cols, Box::Orientation::Vertical, "I/evFS", true},
+   m_alpha{m_root, Box::Orientation::Horizontal, "Opacity: ", false}
 {
 	m_btn_state = 0;
 	std::ranges::fill(m_colors_cache.pixels(), Model::Pixel{0.0f, 0.0f, 0.0f, 1.0f});
-	m_colors.minSize(Size2d{384, 384})
+	m_colors.inputField()
+	   .minSize(Size2d{384, 384})
 	   .eventHandler<ControlId::Colors>(*this)
 	   .alwaysEmitMouseEvents(true);
 	value(Model::Pixel{0.5f, 0.5f, 0.5f, 1.0f});
-	m_intensity.eventHandler<ControlId::Intensity>(*this).ticks(intensity_tickmarks);
+	m_intensity.inputField().eventHandler<ControlId::Intensity>(*this).ticks(intensity_tickmarks);
+	m_alpha.inputField().eventHandler<ControlId::Alpha>(*this);
 }
 
 Texpainter::Ui::ColorPicker::Impl::~Impl()

@@ -52,6 +52,17 @@ namespace Texpainter::Ui
 		return x == 0.0 ? 0.0 : std::exp2(min_exponent * (1.0 - x) + x * max_exponent);
 	}
 
+	inline constexpr SliderValue linValue(double x, double min = 0.0, double max = 1.0)
+	{
+		return Texpainter::Ui::SliderValue{(x - min) / (max - min)};
+	}
+
+	inline constexpr double linValue(SliderValue val, double min = 0.0, double max = 1.0)
+	{
+		auto const x = val.value();
+		return min * (1.0 - x) + max * x;
+	}
+
 	class Slider
 	{
 	public:
