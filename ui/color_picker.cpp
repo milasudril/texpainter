@@ -57,22 +57,22 @@ namespace
 
 	constexpr auto gen_tickmarks()
 	{
-		constexpr char const* tick_mark_text[] = {" -14",
-		                                          " -13",
-		                                          " -12",
-		                                          " -11",
-		                                          " -10",
-		                                          "  -9",
-		                                          "  -8",
-		                                          "  -7",
-		                                          "  -6",
-		                                          "  -5",
-		                                          "  -4",
-		                                          "  -3",
-		                                          "  -2",
-		                                          "  -1",
-		                                          "   0",
-		                                          "  +1"};
+		constexpr char const* tick_mark_text[] = {"  -14",
+		                                          "",
+		                                          "  -12",
+		                                          "",
+		                                          "  -10",
+		                                          "",
+		                                          "   -8",
+		                                          "",
+		                                          "   -6",
+		                                          "",
+		                                          "   -4",
+		                                          "",
+		                                          "   -2",
+		                                          "",
+		                                          "    0",
+		                                          ""};
 
 		constexpr double values[] = {std::exp2(-14.0f) / 3.0f,
 		                             std::exp2(-13.0f) / 3.0f,
