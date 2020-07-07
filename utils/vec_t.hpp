@@ -33,6 +33,11 @@ namespace Texpainter
 		return a < b ? a : b;
 	}
 
+	constexpr auto min(vec4_t a, vec4_t b)
+	{
+		return a < b ? a : b;
+	}
+
 }
 
 #endif

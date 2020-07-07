@@ -104,6 +104,13 @@ namespace
 	}
 
 	constexpr auto intensity_tickmarks = gen_tickmarks();
+
+	auto to_char_array(float x)
+	{
+		std::array<char, 16> ret{};
+		sprintf(ret.data(), "%.7e", x);
+		return ret;
+	}
 }
 
 class Texpainter::Ui::ColorPicker::Impl: private Texpainter::Ui::ColorPicker
@@ -192,6 +199,23 @@ private:
 		auto colors = m_colors_cache;
 		draw_marker(vec2_t{384.0, 384.0} * vec2_t{m_hsi.hue, 1.0 - m_hsi.saturation}, colors.pixels());
 		m_colors.inputField().image(colors);
+		auto const rgb = toRgb(m_hsi);
+
+		m_red.inputField().content(to_char_array(rgb.red()).data());
+		m_green.inputField().content(to_char_array(rgb.green()).data());
+		m_blue.inputField().content(to_char_array(rgb.blue()).data());
+
+		{
+			auto const rgb_g22 = Model::BasicPixel<Model::ColorProfiles::Gamma22>{rgb};
+			auto const val = min(255.0f * rgb_g22.value(), vec4_t{255.0f, 255.0f, 255.0f, 255.0f});
+			std::array<char, 8> hex_str{};
+			sprintf(hex_str.data(),
+			        "%02X%02X%02X",
+			        static_cast<uint8_t>(val[0]),
+			        static_cast<uint8_t>(val[1]),
+			        static_cast<uint8_t>(val[2]));
+			m_hex.inputField().content(hex_str.data());
+		}
 	}
 };
 
@@ -320,7 +344,6 @@ Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt):
 	m_intensity_text.inputField().small(true).width(10);
 
 	m_alpha_text.inputField().small(true).width(10);
-
 }
 
 Texpainter::Ui::ColorPicker::Impl::~Impl()
