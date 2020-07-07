@@ -8,6 +8,7 @@
 #include "./labeled_input.hpp"
 #include "./text_entry.hpp"
 #include "./separator.hpp"
+#include "./button.hpp"
 
 #include "model/hsi_rgb.hpp"
 
@@ -180,7 +181,6 @@ private:
 	LabeledInput<Slider> m_alpha;
 	Separator m_lrsep;
 	Box m_right;
-	Label m_num_label;
 	Box m_rgb_inner;
 	LabeledInput<TextEntry> m_red;
 	LabeledInput<TextEntry> m_green;
@@ -321,7 +321,6 @@ Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt):
    m_alpha{m_left, Box::Orientation::Horizontal, "Opacity: ", false},
    m_lrsep{m_root},
    m_right{m_root, Box::Orientation::Vertical},
-   m_num_label{m_right, "Numerical input"},
    m_rgb_inner{m_right, Box::Orientation::Vertical},
    m_red{m_rgb_inner, Box::Orientation::Horizontal, "R: "},
    m_green{m_rgb_inner, Box::Orientation::Horizontal, "G: "},
@@ -344,16 +343,16 @@ Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt):
 	value(Model::Pixel{0.5f, 0.5f, 0.5f, 1.0f});
 	m_intensity.inputField().eventHandler<ControlId::Intensity>(*this).ticks(intensity_tickmarks);
 	m_alpha.inputField().eventHandler<ControlId::Alpha>(*this);
-	m_red.inputField().small(true).width(10);
-	m_green.inputField().small(true).width(10);
-	m_blue.inputField().small(true).width(10);
+	m_red.inputField().small(true).width(13);
+	m_green.inputField().small(true).width(13);
+	m_blue.inputField().small(true).width(13);
 	m_hex.inputField().small(true).width(8);
 
-	m_hue.inputField().small(true).width(10);
-	m_saturation.inputField().small(true).width(10);
-	m_intensity_text.inputField().small(true).width(10);
+	m_hue.inputField().small(true).width(13);
+	m_saturation.inputField().small(true).width(13);
+	m_intensity_text.inputField().small(true).width(13);
 
-	m_alpha_text.inputField().small(true).width(10);
+	m_alpha_text.inputField().small(true).width(13);
 }
 
 Texpainter::Ui::ColorPicker::Impl::~Impl()
