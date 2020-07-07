@@ -6,6 +6,8 @@
 #include "./image_view.hpp"
 #include "./slider.hpp"
 #include "./labeled_input.hpp"
+#include "./text_entry.hpp"
+#include "./separator.hpp"
 
 #include "model/hsi_rgb.hpp"
 
@@ -164,10 +166,26 @@ private:
 	uint32_t m_btn_state;
 
 	Box m_root;
+	Box m_left;
 	Box m_cols;
 	LabeledInput<ImageView> m_colors;
 	LabeledInput<Slider> m_intensity;
 	LabeledInput<Slider> m_alpha;
+	Separator m_lrsep;
+	Box m_right;
+	Label m_num_label;
+	Box m_rgb_inner;
+	LabeledInput<TextEntry> m_red;
+	LabeledInput<TextEntry> m_green;
+	LabeledInput<TextEntry> m_blue;
+	LabeledInput<TextEntry> m_hex;
+	Separator m_num_sep_1;
+	Box m_hsi_inner;
+	LabeledInput<TextEntry> m_hue;
+	LabeledInput<TextEntry> m_saturation;
+	LabeledInput<TextEntry> m_intensity_text;
+	Separator m_num_sep_2;
+	LabeledInput<TextEntry> m_alpha_text;
 
 	void update()
 	{
@@ -261,11 +279,27 @@ void Texpainter::Ui::ColorPicker::Impl::onChanged<
 Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt):
    Texpainter::Ui::ColorPicker{*this},
    m_colors_cache{Size2d{384, 384}},
-   m_root{cnt, Box::Orientation::Vertical},
-   m_cols{m_root, Box::Orientation::Horizontal},
+   m_root{cnt, Box::Orientation::Horizontal},
+   m_left{m_root, Box::Orientation::Vertical},
+   m_cols{m_left, Box::Orientation::Horizontal},
    m_colors{m_cols, Box::Orientation::Vertical, "Saturation \\ Hue"},
    m_intensity{m_cols, Box::Orientation::Vertical, "I/evFS", true},
-   m_alpha{m_root, Box::Orientation::Horizontal, "Opacity: ", false}
+   m_alpha{m_left, Box::Orientation::Horizontal, "Opacity: ", false},
+   m_lrsep{m_root},
+   m_right{m_root, Box::Orientation::Vertical},
+   m_num_label{m_right, "Numerical input"},
+   m_rgb_inner{m_right, Box::Orientation::Vertical},
+   m_red{m_rgb_inner, Box::Orientation::Horizontal, "R: "},
+   m_green{m_rgb_inner, Box::Orientation::Horizontal, "G: "},
+   m_blue{m_rgb_inner, Box::Orientation::Horizontal, "B: "},
+   m_hex{m_rgb_inner, Box::Orientation::Horizontal, "Hex: "},
+   m_num_sep_1{m_right},
+   m_hsi_inner{m_right, Box::Orientation::Vertical},
+   m_hue{m_hsi_inner, Box::Orientation::Horizontal, "H: "},
+   m_saturation{m_hsi_inner, Box::Orientation::Horizontal, "S: "},
+   m_intensity_text{m_hsi_inner, Box::Orientation::Horizontal, "I: "},
+   m_num_sep_2{m_right},
+   m_alpha_text{m_right, Box::Orientation::Horizontal, "α: "}
 {
 	m_btn_state = 0;
 	std::ranges::fill(m_colors_cache.pixels(), Model::Pixel{0.0f, 0.0f, 0.0f, 1.0f});
@@ -276,6 +310,17 @@ Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt):
 	value(Model::Pixel{0.5f, 0.5f, 0.5f, 1.0f});
 	m_intensity.inputField().eventHandler<ControlId::Intensity>(*this).ticks(intensity_tickmarks);
 	m_alpha.inputField().eventHandler<ControlId::Alpha>(*this);
+	m_red.inputField().small(true).width(10);
+	m_green.inputField().small(true).width(10);
+	m_blue.inputField().small(true).width(10);
+	m_hex.inputField().small(true).width(8);
+
+	m_hue.inputField().small(true).width(10);
+	m_saturation.inputField().small(true).width(10);
+	m_intensity_text.inputField().small(true).width(10);
+
+	m_alpha_text.inputField().small(true).width(10);
+
 }
 
 Texpainter::Ui::ColorPicker::Impl::~Impl()
