@@ -4,6 +4,12 @@
 
 #include <gtk/gtk.h>
 
+namespace
+{
+	static GtkCssProvider* s_smallstyle = nullptr;
+	static size_t s_style_refcount = 0;
+}
+
 class Texpainter::Ui::Button::Impl: private Texpainter::Ui::Button
 {
 public:
@@ -42,6 +48,20 @@ public:
 	void focus() noexcept
 	{
 		gtk_widget_grab_focus(GTK_WIDGET(m_handle));
+	}
+
+	void small(bool status)
+	{
+		auto context = gtk_widget_get_style_context(GTK_WIDGET(m_handle));
+		if(status)
+		{
+			gtk_style_context_add_provider(
+			   context, GTK_STYLE_PROVIDER(s_smallstyle), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION + 50);
+		}
+		else
+		{
+			gtk_style_context_remove_provider(context, GTK_STYLE_PROVIDER(s_smallstyle));
+		}
 	}
 
 private:
@@ -99,6 +119,12 @@ bool Texpainter::Ui::Button::state() const noexcept
 	return m_impl->state();
 }
 
+Texpainter::Ui::Button& Texpainter::Ui::Button::small(bool status) noexcept
+{
+	m_impl->small(status);
+	return *this;
+}
+
 
 Texpainter::Ui::Button::Impl::Impl(Container& cnt, const char* lab):
    Texpainter::Ui::Button{*this},
@@ -107,7 +133,15 @@ Texpainter::Ui::Button::Impl::Impl(Container& cnt, const char* lab):
 	auto widget = gtk_toggle_button_new();
 	g_signal_connect(widget, "clicked", G_CALLBACK(clicked), this);
 	m_handle = GTK_TOGGLE_BUTTON(widget);
-	g_object_ref_sink(widget);
+
+	if(s_style_refcount == 0)
+	{
+		s_smallstyle = gtk_css_provider_new();
+		gtk_css_provider_load_from_data(
+		   s_smallstyle, "*{font-size:0.9em;padding:1px;min-height:0px}", -1, nullptr);
+	}
+	++s_style_refcount;
+
 	cnt.add(widget);
 	label(lab);
 }
@@ -116,8 +150,18 @@ Texpainter::Ui::Button::Impl::~Impl()
 {
 	m_impl = nullptr;
 	r_eh = nullptr;
+	if(s_style_refcount != 0)
+	{
+		auto context = gtk_widget_get_style_context(GTK_WIDGET(m_handle));
+		gtk_style_context_remove_provider(context, GTK_STYLE_PROVIDER(s_smallstyle));
+	}
+	else
+	{
+		--s_style_refcount;
+		if(s_style_refcount == 0) { g_object_unref(s_smallstyle); }
+	}
+
 	gtk_widget_destroy(GTK_WIDGET(m_handle));
-	g_object_unref(m_handle);
 }
 
 void Texpainter::Ui::Button::Impl::clicked(GtkWidget* widget, gpointer data)

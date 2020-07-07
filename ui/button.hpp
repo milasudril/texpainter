@@ -48,6 +48,8 @@ namespace Texpainter::Ui
 
 		Button& focus() noexcept;
 
+		Button& small(bool status) noexcept;
+
 	private:
 		class Impl;
 		explicit Button(Impl& impl): m_impl{&impl}

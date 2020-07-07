@@ -134,8 +134,6 @@ Texpainter::Ui::TextEntry::Impl::Impl(Container& cnt): TextEntry{*this}, r_eh{nu
 	g_signal_connect(widget, "focus-out-event", G_CALLBACK(focus_callback), this);
 	m_handle = GTK_ENTRY(widget);
 
-	g_object_ref_sink(widget);
-
 	if(s_style_refcount == 0)
 	{
 		s_smallstyle = gtk_css_provider_new();
@@ -152,8 +150,6 @@ Texpainter::Ui::TextEntry::Impl::~Impl()
 	m_impl = nullptr;
 	r_eh = nullptr;
 
-	gtk_widget_destroy(GTK_WIDGET(m_handle));
-
 	if(s_style_refcount != 0)
 	{
 		auto context = gtk_widget_get_style_context(GTK_WIDGET(m_handle));
@@ -164,6 +160,8 @@ Texpainter::Ui::TextEntry::Impl::~Impl()
 		--s_style_refcount;
 		if(s_style_refcount == 0) { g_object_unref(s_smallstyle); }
 	}
+
+	gtk_widget_destroy(GTK_WIDGET(m_handle));
 }
 
 gboolean Texpainter::Ui::TextEntry::Impl::focus_callback(GtkWidget*, GdkEvent*, gpointer data)

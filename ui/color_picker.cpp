@@ -193,6 +193,8 @@ private:
 	LabeledInput<TextEntry> m_intensity_text;
 	Separator m_num_sep_2;
 	LabeledInput<TextEntry> m_alpha_text;
+	Separator m_num_sep_3;
+	Button m_random;
 
 	void update()
 	{
@@ -206,9 +208,9 @@ private:
 		m_blue.inputField().content(to_char_array(rgb.blue()).data());
 
 		if(rgb.red() > 1.0f || rgb.green() > 1.0f || rgb.blue() > 1.0f) [[unlikely]]
-		{
-			m_hex.inputField().content("------");
-		}
+			{
+				m_hex.inputField().content("------");
+			}
 		else
 		{
 			auto const rgb_g22 = Model::BasicPixel<Model::ColorProfiles::Gamma22>{rgb};
@@ -332,7 +334,9 @@ Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt):
    m_saturation{m_hsi_inner, Box::Orientation::Horizontal, "S: "},
    m_intensity_text{m_hsi_inner, Box::Orientation::Horizontal, "I: "},
    m_num_sep_2{m_right},
-   m_alpha_text{m_right, Box::Orientation::Horizontal, "α: "}
+   m_alpha_text{m_right, Box::Orientation::Horizontal, "α: "},
+   m_num_sep_3{m_right},
+   m_random{m_right, "Random HSI"}
 {
 	m_btn_state = 0;
 	std::ranges::fill(m_colors_cache.pixels(), Model::Pixel{0.0f, 0.0f, 0.0f, 1.0f});
@@ -353,6 +357,8 @@ Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt):
 	m_intensity_text.inputField().small(true).width(13);
 
 	m_alpha_text.inputField().small(true).width(13);
+
+	m_random.small(true);
 }
 
 Texpainter::Ui::ColorPicker::Impl::~Impl()
