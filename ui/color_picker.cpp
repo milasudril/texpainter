@@ -205,9 +205,14 @@ private:
 		m_green.inputField().content(to_char_array(rgb.green()).data());
 		m_blue.inputField().content(to_char_array(rgb.blue()).data());
 
+		if(rgb.red() > 1.0f || rgb.green() > 1.0f || rgb.blue() > 1.0f) [[unlikely]]
+		{
+			m_hex.inputField().content("------");
+		}
+		else
 		{
 			auto const rgb_g22 = Model::BasicPixel<Model::ColorProfiles::Gamma22>{rgb};
-			auto const val = min(255.0f * rgb_g22.value(), vec4_t{255.0f, 255.0f, 255.0f, 255.0f});
+			auto const val = 255.0f * rgb_g22.value();
 			std::array<char, 8> hex_str{};
 			sprintf(hex_str.data(),
 			        "%02X%02X%02X",
@@ -216,6 +221,11 @@ private:
 			        static_cast<uint8_t>(val[2]));
 			m_hex.inputField().content(hex_str.data());
 		}
+
+		m_hue.inputField().content(to_char_array(m_hsi.hue).data());
+		m_saturation.inputField().content(to_char_array(m_hsi.saturation).data());
+		m_intensity_text.inputField().content(to_char_array(m_hsi.intensity).data());
+		m_alpha_text.inputField().content(to_char_array(m_hsi.alpha).data());
 	}
 };
 
