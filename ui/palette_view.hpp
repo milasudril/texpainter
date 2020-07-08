@@ -8,8 +8,8 @@
 
 #include "./container.hpp"
 
-#include "geom/dimension.hpp"
 #include "model/palette.hpp"
+#include "utils/size_2d.hpp"
 
 #include <utility>
 
@@ -61,6 +61,8 @@ namespace Texpainter::Ui
 		};
 
 		PaletteView& highlightMode(size_t index, HighlightMode mode);
+
+		PaletteView& minSize(Size2d size);
 
 	private:
 		class Impl;

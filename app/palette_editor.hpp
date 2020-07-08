@@ -68,7 +68,7 @@ namespace Texpainter
 		   m_container{owner, Ui::Box::Orientation::Horizontal},
 		   m_pal_selector{m_container},
 		   m_pal_new{m_container, "＋"},
-		   m_pal_view{m_container.insertMode(Ui::Box::InsertMode{4})}
+		   m_pal_view{m_container.insertMode(Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand})}
 		{
 			m_pal_selector.eventHandler<ControlId::PalSelector>(*this);
 			m_pal_new.eventHandler<ControlId::PaletteCreate>(*this);
