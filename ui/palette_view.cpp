@@ -69,16 +69,20 @@ public:
 		auto context = gtk_widget_get_style_context(GTK_WIDGET(m_handle));
 		gtk_render_background(context, cr, 0, 0, dim.width(), dim.height());
 		std::ranges::for_each(
-		m_colors,
-		[cr, item_width = dim.width() / m_n_cols, item_height = dim.height() / m_n_rows, k = 0](
-			auto color) mutable {
-			auto const color_conv = Model::BasicPixel<Model::ColorProfiles::Gamma22>{color};
-			cairo_set_source_rgba(
-				cr, color_conv.red(), color_conv.green(), color_conv.blue(), color_conv.alpha());
-			cairo_rectangle(cr, k * item_width, 0, item_width, item_height);
-			cairo_fill(cr);
-			++k;
-		});
+		   m_colors,
+		   [cr,
+		    item_width = dim.width() / m_n_cols,
+		    item_height = dim.height() / m_n_rows,
+		    cols = m_n_cols,
+		    k = 0](auto color) mutable {
+			   auto const color_conv = Model::BasicPixel<Model::ColorProfiles::Gamma22>{color};
+			   cairo_set_source_rgba(
+			      cr, color_conv.red(), color_conv.green(), color_conv.blue(), color_conv.alpha());
+			   cairo_rectangle(
+			      cr, (k % cols) * item_width, (k / cols) * item_height, item_width, item_height);
+			   cairo_fill(cr);
+			   ++k;
+		   });
 	}
 
 	void palette(Model::Palette const& pal)
@@ -86,15 +90,12 @@ public:
 		m_colors = pal;
 		m_highlight_mode = DataBlock<HighlightMode>{std::size(pal)};
 		std::ranges::fill(m_highlight_mode, HighlightMode::None);
-		update();
+		recalculateWidgetSize();
 	}
 
 	void update()
 	{
 		auto widget = GTK_WIDGET(m_handle);
-
-
-
 		gtk_widget_queue_draw(widget);
 	}
 
@@ -107,13 +108,11 @@ public:
 	void highlightMode(size_t index, HighlightMode mode)
 	{
 		*(m_highlight_mode.begin() + index) = mode;
-		update();
 	}
 
 	void minSize(Size2d size)
 	{
 		m_min_size = size;
-		update();
 	}
 
 
@@ -133,7 +132,7 @@ private:
 	{
 		auto widget = GTK_WIDGET(m_handle);
 		auto w = static_cast<uint32_t>(gtk_widget_get_allocated_width(widget));
-		if( w < m_min_size.width())
+		if(w < m_min_size.width())
 		{
 			w = m_min_size.width();
 			gtk_widget_set_size_request(widget, w, -1);
@@ -160,7 +159,8 @@ private:
 	{
 		auto w = gtk_widget_get_allocated_width(widget);
 		auto h = gtk_widget_get_allocated_height(widget);
-		reinterpret_cast<Impl*>(self)->render(Size2d{static_cast<uint32_t>(w), static_cast<uint32_t>(h)}, cr);
+		reinterpret_cast<Impl*>(self)->render(Size2d{static_cast<uint32_t>(w), static_cast<uint32_t>(h)},
+		                                      cr);
 		return FALSE;
 	}
 
@@ -170,7 +170,7 @@ private:
 		if(obj.r_eh != nullptr)
 		{
 			auto event = reinterpret_cast<GdkEventButton const*>(e);
-			auto const index = 0; //static_cast<size_t>(event->x / obj.m_width_item);
+			auto const index = 0; //	static_cast<size_t>(event->x / obj.m_width_item);
 			obj.m_vt.m_on_mouse_down(obj.r_eh, obj, index, event->button);
 			return FALSE;
 		}
@@ -183,7 +183,7 @@ private:
 		if(obj.r_eh != nullptr)
 		{
 			auto event = reinterpret_cast<GdkEventButton const*>(e);
-			auto const index = 0; //static_cast<size_t>(event->x / obj.m_width_item);
+			auto const index = 0; //	static_cast<size_t>(event->x / obj.m_width_item);
 			obj.m_vt.m_on_mouse_up(obj.r_eh, obj, index, event->button);
 			return FALSE;
 		}
@@ -195,8 +195,8 @@ private:
 		auto& obj = *reinterpret_cast<Impl*>(self);
 		if(obj.r_eh != nullptr)
 		{
-//			auto event = reinterpret_cast<GdkEventMotion const*>(e);
-			auto const index = 0; //static_cast<size_t>(event->x / obj.m_width_item);
+			//			auto event = reinterpret_cast<GdkEventMotion const*>(e);
+			auto const index = 0; //	static_cast<size_t>(event->x / obj.m_width_item);
 			obj.m_vt.m_on_mouse_move(obj.r_eh, obj, index);
 			return FALSE;
 		}

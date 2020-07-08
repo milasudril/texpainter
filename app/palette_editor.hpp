@@ -253,8 +253,10 @@ namespace Texpainter
 		   picker.widget().value(); // .sidepanel().targetIntensity()(picker.widget().value());
 		m_palettes[m_pal_selector.selected()][m_modified_pal_index] = color_new;
 
-		m_pal_view.highlightMode(m_modified_pal_index, Texpainter::Ui::PaletteView::HighlightMode::None)
-		   .highlightMode(m_sel_color_index, Texpainter::Ui::PaletteView::HighlightMode::Read);
+		m_pal_view.palette(m_palettes[m_pal_selector.selected()])
+		   .highlightMode(m_modified_pal_index, Texpainter::Ui::PaletteView::HighlightMode::None)
+		   .highlightMode(m_sel_color_index, Texpainter::Ui::PaletteView::HighlightMode::Read)
+		   .update();
 		m_color_picker.reset();
 		notify();
 	}
