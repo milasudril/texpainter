@@ -7,7 +7,6 @@
 
 #include <cassert>
 
-#if 0
 namespace
 {
 	constexpr Texpainter::Model::BasicPixel<Texpainter::Model::ColorProfiles::Gamma22>
@@ -17,7 +16,7 @@ namespace
 		{
 			case Texpainter::Ui::PaletteView::HighlightMode::None:
 				return Texpainter::Model::BasicPixel<Texpainter::Model::ColorProfiles::Gamma22>{
-				   Texpainter::Model::Pixel{0.5f, 0.5f, 0.5f, 1.0f}};
+				   Texpainter::Model::Pixel{0.16f, 0.16f, 0.16f, 1.0f}};
 			case Texpainter::Ui::PaletteView::HighlightMode::Read:
 				return Texpainter::Model::BasicPixel<Texpainter::Model::ColorProfiles::Gamma22>{
 				   Texpainter::Model::Pixel{0.0f, 0.5f, 0.0f, 0.5f}};
@@ -28,8 +27,6 @@ namespace
 		}
 	}
 }
-#endif
-
 class Texpainter::Ui::PaletteView::Impl: private PaletteView
 {
 public:
@@ -38,8 +35,8 @@ public:
 	   m_min_size{Size2d{32, 32}},
 	   m_n_cols{1},
 	   m_n_rows{1},
-	   m_colors{1},
-	   m_highlight_mode{1}
+	   m_colors{0},
+	   m_highlight_mode{0}
 	{
 		auto widget = gtk_drawing_area_new();
 		g_object_ref_sink(widget);
@@ -71,16 +68,34 @@ public:
 		std::ranges::for_each(
 		   m_colors,
 		   [cr,
-		    item_width = dim.width() / m_n_cols,
-		    item_height = dim.height() / m_n_rows,
+		    item_width = dim.width() / m_n_cols - 4,
+		    item_height = dim.height() / m_n_rows - 4,
 		    cols = m_n_cols,
 		    k = 0](auto color) mutable {
 			   auto const color_conv = Model::BasicPixel<Model::ColorProfiles::Gamma22>{color};
 			   cairo_set_source_rgba(
 			      cr, color_conv.red(), color_conv.green(), color_conv.blue(), color_conv.alpha());
 			   cairo_rectangle(
-			      cr, (k % cols) * item_width, (k / cols) * item_height, item_width, item_height);
+			      cr, (k % cols) * (item_width + 4) + 2, (k / cols) * (item_height + 4) + 2, item_width, item_height);
 			   cairo_fill(cr);
+			   ++k;
+
+		   });
+
+		cairo_set_line_width(cr, 2);
+		std::ranges::for_each(
+		   m_highlight_mode,
+		   [cr,
+		    item_width = dim.width() / m_n_cols - 2,
+		    item_height = dim.height() / m_n_rows - 2,
+		    cols = m_n_cols,
+		    k = 0](auto mode) mutable {
+			   auto const color_conv = color(mode);
+			   cairo_set_source_rgba(
+			      cr, color_conv.red(), color_conv.green(), color_conv.blue(), color_conv.alpha());
+			   cairo_rectangle(
+			      cr, (k % cols) * (item_width + 2) + 1, (k / cols) * (item_height + 2) + 1, item_width, item_height);
+			   cairo_stroke(cr);
 			   ++k;
 		   });
 	}
@@ -130,6 +145,11 @@ private:
 
 	void recalculateWidgetSize()
 	{
+		if(m_colors.size() == 0) [[unlikely]]
+		{
+			return;
+		}
+
 		auto widget = GTK_WIDGET(m_handle);
 		auto w = static_cast<uint32_t>(gtk_widget_get_allocated_width(widget));
 		if(w < m_min_size.width())
