@@ -219,7 +219,7 @@ namespace Texpainter
 				case 3:
 				{
 					m_modified_pal_index = static_cast<uint32_t>(index);
-					m_pal_view.highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Write);
+					m_pal_view.highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Write).update();
 					m_color_picker = std::make_unique<ColorPicker>(
 					   m_container, (std::string{"Select color number "} + std::to_string(index + 1)).c_str());
 					m_color_picker->eventHandler<ControlId::ColorPicker>(*this).widget().value(
@@ -229,7 +229,8 @@ namespace Texpainter
 
 				case 1:
 					m_pal_view.highlightMode(m_sel_color_index, Texpainter::Ui::PaletteView::HighlightMode::None)
-					   .highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Read);
+					   .highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Read)
+					   .update();
 					m_sel_color_index = index;
 					notify();
 					break;

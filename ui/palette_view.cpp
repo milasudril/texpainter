@@ -75,11 +75,13 @@ public:
 			   auto const color_conv = Model::BasicPixel<Model::ColorProfiles::Gamma22>{color};
 			   cairo_set_source_rgba(
 			      cr, color_conv.red(), color_conv.green(), color_conv.blue(), color_conv.alpha());
-			   cairo_rectangle(
-			      cr, (k % cols) * (item_width + 4) + 2, (k / cols) * (item_height + 4) + 2, item_width, item_height);
+			   cairo_rectangle(cr,
+			                   (k % cols) * (item_width + 4) + 2,
+			                   (k / cols) * (item_height + 4) + 2,
+			                   item_width,
+			                   item_height);
 			   cairo_fill(cr);
 			   ++k;
-
 		   });
 
 		cairo_set_line_width(cr, 2);
@@ -93,8 +95,11 @@ public:
 			   auto const color_conv = color(mode);
 			   cairo_set_source_rgba(
 			      cr, color_conv.red(), color_conv.green(), color_conv.blue(), color_conv.alpha());
-			   cairo_rectangle(
-			      cr, (k % cols) * (item_width + 2) + 1, (k / cols) * (item_height + 2) + 1, item_width, item_height);
+			   cairo_rectangle(cr,
+			                   (k % cols) * (item_width + 2) + 1,
+			                   (k / cols) * (item_height + 2) + 1,
+			                   item_width,
+			                   item_height);
 			   cairo_stroke(cr);
 			   ++k;
 		   });
@@ -146,9 +151,9 @@ private:
 	void recalculateWidgetSize()
 	{
 		if(m_colors.size() == 0) [[unlikely]]
-		{
-			return;
-		}
+			{
+				return;
+			}
 
 		auto widget = GTK_WIDGET(m_handle);
 		auto w = static_cast<uint32_t>(gtk_widget_get_allocated_width(widget));
@@ -168,6 +173,22 @@ private:
 		m_n_cols = div;
 		m_n_rows = m_colors.size() / div + ((m_colors.size() % div) != 0);
 		gtk_widget_set_size_request(widget, -1, m_n_rows * m_min_size.height());
+	}
+
+	size_t coordsToItem(vec2_t pos) const
+	{
+		auto const widget = GTK_WIDGET(m_handle);
+		auto const widget_size = vec2_t{static_cast<double>(gtk_widget_get_allocated_width(widget)),
+		                                static_cast<double>(gtk_widget_get_allocated_height(widget))};
+
+		auto const item_size =
+		   widget_size / vec2_t{static_cast<double>(m_n_cols), static_cast<double>(m_n_rows)};
+		auto const col_row = pos / item_size;
+
+		auto const col = static_cast<int>(col_row[0]);
+		auto const row = static_cast<int>(col_row[1]);
+
+		return std::min(m_colors.size(), static_cast<uint32_t>(m_n_cols * row + col));
 	}
 
 	static void size_callback(GtkWidget* widget, GdkRectangle* allocation, gpointer self)
@@ -190,7 +211,8 @@ private:
 		if(obj.r_eh != nullptr)
 		{
 			auto event = reinterpret_cast<GdkEventButton const*>(e);
-			auto const index = 0; //	static_cast<size_t>(event->x / obj.m_width_item);
+			auto const index =
+			   obj.coordsToItem(vec2_t{static_cast<double>(event->x), static_cast<double>(event->y)});
 			obj.m_vt.m_on_mouse_down(obj.r_eh, obj, index, event->button);
 			return FALSE;
 		}
@@ -203,7 +225,8 @@ private:
 		if(obj.r_eh != nullptr)
 		{
 			auto event = reinterpret_cast<GdkEventButton const*>(e);
-			auto const index = 0; //	static_cast<size_t>(event->x / obj.m_width_item);
+			auto const index =
+			   obj.coordsToItem(vec2_t{static_cast<double>(event->x), static_cast<double>(event->y)});
 			obj.m_vt.m_on_mouse_up(obj.r_eh, obj, index, event->button);
 			return FALSE;
 		}
@@ -215,8 +238,9 @@ private:
 		auto& obj = *reinterpret_cast<Impl*>(self);
 		if(obj.r_eh != nullptr)
 		{
-			//			auto event = reinterpret_cast<GdkEventMotion const*>(e);
-			auto const index = 0; //	static_cast<size_t>(event->x / obj.m_width_item);
+			auto event = reinterpret_cast<GdkEventMotion const*>(e);
+			auto const index =
+			   obj.coordsToItem(vec2_t{static_cast<double>(event->x), static_cast<double>(event->y)});
 			obj.m_vt.m_on_mouse_move(obj.r_eh, obj, index);
 			return FALSE;
 		}
