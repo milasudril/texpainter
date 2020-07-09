@@ -9,6 +9,7 @@
 #include "./text_entry.hpp"
 #include "./separator.hpp"
 #include "./button.hpp"
+#include "./palette_view.hpp"
 
 #include "model/hsi_rgb.hpp"
 
@@ -195,6 +196,8 @@ private:
 	LabeledInput<TextEntry> m_alpha_text;
 	Separator m_num_sep_3;
 	Button m_random;
+	Separator m_num_sep_4;
+	LabeledInput<PaletteView> m_current_color;
 
 	void update()
 	{
@@ -228,6 +231,10 @@ private:
 		m_saturation.inputField().content(to_char_array(m_hsi.saturation).data());
 		m_intensity_text.inputField().content(to_char_array(m_hsi.intensity).data());
 		m_alpha_text.inputField().content(to_char_array(m_hsi.alpha).data());
+
+		Model::Palette pal{1};
+		pal[0] = rgb;
+		m_current_color.inputField().palette(pal).minSize(Size2d{32, 64}).update();
 	}
 };
 
@@ -336,7 +343,9 @@ Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt):
    m_num_sep_2{m_right},
    m_alpha_text{m_right, Box::Orientation::Horizontal, "α: "},
    m_num_sep_3{m_right},
-   m_random{m_right, "Random HSI"}
+   m_random{m_right, "Random HSI"},
+   m_num_sep_4{m_right},
+   m_current_color{m_right, Box::Orientation::Vertical, "Selected\ncolor"}
 {
 	m_btn_state = 0;
 	std::ranges::fill(m_colors_cache.pixels(), Model::Pixel{0.0f, 0.0f, 0.0f, 1.0f});
@@ -357,8 +366,10 @@ Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt):
 	m_intensity_text.inputField().small(true).width(13);
 
 	m_alpha_text.inputField().small(true).width(13);
-
 	m_random.small(true);
+	Model::Palette pal{1};
+	pal[0] = toRgb(m_hsi);
+	m_current_color.inputField().palette(pal).minSize(Size2d{32, 64}).update();
 }
 
 Texpainter::Ui::ColorPicker::Impl::~Impl()

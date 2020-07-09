@@ -133,6 +133,7 @@ public:
 	void minSize(Size2d size)
 	{
 		m_min_size = size;
+		recalculateWidgetSize();
 	}
 
 
