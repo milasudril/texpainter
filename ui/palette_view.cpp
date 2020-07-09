@@ -195,6 +195,7 @@ private:
 	static void size_callback(GtkWidget* widget, GdkRectangle* allocation, gpointer self)
 	{
 		reinterpret_cast<Impl*>(self)->recalculateWidgetSize();
+		reinterpret_cast<Impl*>(self)->update();
 	}
 
 	static gboolean draw_callback(GtkWidget* widget, cairo_t* cr, gpointer self)

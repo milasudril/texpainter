@@ -8,7 +8,7 @@
 
 #include "./container.hpp"
 
-#include "geom/dimension.hpp"
+#include "utils/size_2d.hpp"
 
 #include <utility>
 
@@ -59,7 +59,9 @@ namespace Texpainter::Ui
 
 		Window& modal(bool state);
 
-		Window& defaultSize(Geom::Dimension dim);
+		Window& defaultSize(Size2d size);
+
+		Window& resize(Size2d size);
 
 		static void terminateApp();
 

@@ -59,9 +59,14 @@ public:
 		gtk_window_set_modal(m_handle, state);
 	}
 
-	void defaultSize(Geom::Dimension dim)
+	void defaultSize(Size2d size)
 	{
-		gtk_window_set_default_size(m_handle, dim.width(), dim.height());
+		gtk_window_set_default_size(m_handle, size.width(), size.height());
+	}
+
+	void resize(Size2d size)
+	{
+		gtk_window_resize(m_handle, size.width(), size.height());
 	}
 
 
@@ -221,9 +226,16 @@ Texpainter::Ui::Window::Impl::key_release(GtkWidget* widget, GdkEvent* event, vo
 	return TRUE;
 }
 
-Texpainter::Ui::Window& Texpainter::Ui::Window::defaultSize(Geom::Dimension dim)
+Texpainter::Ui::Window& Texpainter::Ui::Window::defaultSize(Size2d size)
 {
-	m_impl->defaultSize(dim);
+	m_impl->defaultSize(size);
+	return *this;
+}
+
+
+Texpainter::Ui::Window& Texpainter::Ui::Window::resize(Size2d size)
+{
+	m_impl->resize(size);
 	return *this;
 }
 

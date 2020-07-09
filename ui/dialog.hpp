@@ -261,7 +261,7 @@ namespace Texpainter::Ui
 			if constexpr(Focus != InitialFocus::NoChange) { focus_select(); }
 
 
-			m_window.modal(true).show();
+			m_window.modal(true).show().resize(Size2d{1, 1});
 		}
 
 		template<auto id, class EventHandler>

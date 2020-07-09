@@ -125,7 +125,9 @@ public:
 		Alpha
 	};
 
-	Impl(Container& cnt);
+	Impl(Container& cnt,
+	     char const* predef_label = "Predef colors: ",
+	     Model::Palette const& predef_colors = Model::Palette{1});
 	~Impl();
 
 	Model::Pixel value() const
@@ -175,8 +177,9 @@ private:
 	uint32_t m_btn_state;
 
 	Box m_root;
-	Box m_left;
 	Box m_cols;
+	Box m_left;
+	Box m_leftcols;
 	LabeledInput<ImageView> m_colors;
 	LabeledInput<Slider> m_intensity;
 	LabeledInput<Slider> m_alpha;
@@ -197,6 +200,8 @@ private:
 	Separator m_num_sep_3;
 	Button m_random;
 	Separator m_num_sep_4;
+	Box m_bottom_box;
+	LabeledInput<PaletteView> m_predef_colors;
 	LabeledInput<PaletteView> m_current_color;
 
 	void update()
@@ -234,7 +239,7 @@ private:
 
 		Model::Palette pal{1};
 		pal[0] = rgb;
-		m_current_color.inputField().palette(pal).minSize(Size2d{32, 64}).update();
+		m_current_color.inputField().palette(pal).update();
 	}
 };
 
@@ -280,9 +285,11 @@ void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseMove<
 	}
 }
 
-Texpainter::Ui::ColorPicker::ColorPicker(Container& cnt)
+Texpainter::Ui::ColorPicker::ColorPicker(Container& cnt,
+                                         char const* predef_label,
+                                         Model::Palette const& predef_colors)
 {
-	m_impl = new Impl(cnt);
+	m_impl = new Impl(cnt, predef_label, predef_colors);
 }
 
 Texpainter::Ui::ColorPicker::~ColorPicker()
@@ -319,17 +326,20 @@ void Texpainter::Ui::ColorPicker::Impl::onChanged<
 	update();
 }
 
-Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt):
+Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt,
+                                        char const* predef_label,
+                                        Model::Palette const& predef_colors):
    Texpainter::Ui::ColorPicker{*this},
    m_colors_cache{Size2d{384, 384}},
-   m_root{cnt, Box::Orientation::Horizontal},
-   m_left{m_root, Box::Orientation::Vertical},
-   m_cols{m_left, Box::Orientation::Horizontal},
-   m_colors{m_cols, Box::Orientation::Vertical, "Saturation \\ Hue"},
-   m_intensity{m_cols, Box::Orientation::Vertical, "I/evFS", true},
+   m_root{cnt, Box::Orientation::Vertical},
+   m_cols{m_root, Box::Orientation::Horizontal},
+   m_left{m_cols, Box::Orientation::Vertical},
+   m_leftcols{m_left, Box::Orientation::Horizontal},
+   m_colors{m_leftcols, Box::Orientation::Vertical, "Saturation \\ Hue"},
+   m_intensity{m_leftcols, Box::Orientation::Vertical, "I/evFS", true},
    m_alpha{m_left, Box::Orientation::Horizontal, "Opacity: ", false},
-   m_lrsep{m_root},
-   m_right{m_root, Box::Orientation::Vertical},
+   m_lrsep{m_cols},
+   m_right{m_cols, Box::Orientation::Vertical},
    m_rgb_inner{m_right, Box::Orientation::Vertical},
    m_red{m_rgb_inner, Box::Orientation::Horizontal, "R: "},
    m_green{m_rgb_inner, Box::Orientation::Horizontal, "G: "},
@@ -345,7 +355,13 @@ Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt):
    m_num_sep_3{m_right},
    m_random{m_right, "Random HSI"},
    m_num_sep_4{m_right},
-   m_current_color{m_right, Box::Orientation::Vertical, "Selected\ncolor"}
+   m_bottom_box{m_root, Box::Orientation::Horizontal},
+   m_predef_colors{m_bottom_box.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand}),
+                   Box::Orientation::Vertical,
+                   predef_label},
+   m_current_color{m_bottom_box.insertMode(Ui::Box::InsertMode{0, 0}),
+                   Box::Orientation::Vertical,
+                   "Selected color:"}
 {
 	m_btn_state = 0;
 	std::ranges::fill(m_colors_cache.pixels(), Model::Pixel{0.0f, 0.0f, 0.0f, 1.0f});
@@ -367,9 +383,11 @@ Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt):
 
 	m_alpha_text.inputField().small(true).width(13);
 	m_random.small(true);
+
+	m_predef_colors.inputField().palette(predef_colors);
 	Model::Palette pal{1};
 	pal[0] = toRgb(m_hsi);
-	m_current_color.inputField().palette(pal).minSize(Size2d{32, 64}).update();
+	m_current_color.inputField().palette(pal).minSize(Size2d{48, 48}).update();
 }
 
 Texpainter::Ui::ColorPicker::Impl::~Impl()

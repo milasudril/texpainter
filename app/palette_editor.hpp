@@ -68,7 +68,8 @@ namespace Texpainter
 		   m_container{owner, Ui::Box::Orientation::Horizontal},
 		   m_pal_selector{m_container},
 		   m_pal_new{m_container, "＋"},
-		   m_pal_view{m_container.insertMode(Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand})}
+		   m_pal_view{m_container.insertMode(Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand})},
+		   m_color_history{8}
 		{
 			m_pal_selector.eventHandler<ControlId::PalSelector>(*this);
 			m_pal_new.eventHandler<ControlId::PaletteCreate>(*this);
@@ -171,6 +172,7 @@ namespace Texpainter
 		Ui::PaletteView m_pal_view;
 		std::unordered_set<std::string> m_used_pal_names;
 		std::unique_ptr<PaletteNameInput> m_pal_name_input;
+		Model::Palette m_color_history;
 		std::unique_ptr<ColorPicker> m_color_picker;
 	};
 
@@ -221,7 +223,10 @@ namespace Texpainter
 					m_modified_pal_index = static_cast<uint32_t>(index);
 					m_pal_view.highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Write).update();
 					m_color_picker = std::make_unique<ColorPicker>(
-					   m_container, (std::string{"Select color number "} + std::to_string(index + 1)).c_str());
+					   m_container,
+					   (std::string{"Select color number "} + std::to_string(index + 1)).c_str(),
+					   "Recently used: ",
+					   m_color_history);
 					m_color_picker->eventHandler<ControlId::ColorPicker>(*this).widget().value(
 					   selectedPalette()[index]);
 				}

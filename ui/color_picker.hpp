@@ -9,6 +9,7 @@
 #include "./container.hpp"
 
 #include "model/pixel.hpp"
+#include "model/palette.hpp"
 
 #include <utility>
 
@@ -17,7 +18,9 @@ namespace Texpainter::Ui
 	class ColorPicker
 	{
 	public:
-		explicit ColorPicker(Container& container);
+		explicit ColorPicker(Container& cnt,
+		                     char const* predef_label,
+		                     Model::Palette const& predef_colors);
 		~ColorPicker();
 
 		ColorPicker& operator=(ColorPicker&& obj) noexcept
