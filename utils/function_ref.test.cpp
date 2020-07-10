@@ -23,10 +23,22 @@ namespace Testcases
 		res = f(std::make_unique<int>(1), 2);
 		assert(*res == 6);
 	}
+
+	void texpainterFunctionRefShouldNotDoubleWrap()
+	{
+		auto callback = []() mutable {};
+		Texpainter::FunctionRef<void()> f{callback};
+
+		Texpainter::FunctionRef<void()> other{f};
+
+		assert(other.handle() == f.handle());
+		assert(other.function() == f.function());
+	}
 }
 
 int main()
 {
 	Testcases::texpainterFunctionRefCreateAndCall();
+	Testcases::texpainterFunctionRefShouldNotDoubleWrap();
 	return 0;
 }

@@ -14,7 +14,9 @@
 #include "model/hsi_rgb.hpp"
 
 #include <gtk/gtk.h>
+
 #include <cassert>
+#include <random>
 
 namespace
 {
@@ -122,10 +124,12 @@ public:
 	{
 		Colors,
 		Intensity,
-		Alpha
+		Alpha,
+		Random
 	};
 
 	Impl(Container& cnt,
+	     PolymorphicRng rng,
 	     char const* predef_label = "Predef colors: ",
 	     Model::Palette const& predef_colors = Model::Palette{1});
 	~Impl();
@@ -171,9 +175,14 @@ public:
 	template<ControlId>
 	void onMouseMove(ImageView& src, vec2_t pos_window, vec2_t pos_screen);
 
+	template<ControlId>
+	void onClicked(Button& btn);
+
 private:
 	Model::Hsi m_hsi;
 	Model::Image m_colors_cache;
+	PolymorphicRng m_rng;
+
 	uint32_t m_btn_state;
 
 	Box m_root;
@@ -285,11 +294,22 @@ void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseMove<
 	}
 }
 
+
+template<>
+void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onClicked<
+   Texpainter::Ui::ColorPicker::ColorPicker::Impl::ControlId::Random>(Button& btn)
+{
+	std::uniform_real_distribution U{0.0f, 1.0f};
+	btn.state(false);
+	value(Model::Pixel{U(m_rng), U(m_rng), U(m_rng), U(m_rng)});
+}
+
 Texpainter::Ui::ColorPicker::ColorPicker(Container& cnt,
+                                         PolymorphicRng rng,
                                          char const* predef_label,
                                          Model::Palette const& predef_colors)
 {
-	m_impl = new Impl(cnt, predef_label, predef_colors);
+	m_impl = new Impl(cnt, rng, predef_label, predef_colors);
 }
 
 Texpainter::Ui::ColorPicker::~ColorPicker()
@@ -327,10 +347,12 @@ void Texpainter::Ui::ColorPicker::Impl::onChanged<
 }
 
 Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt,
+                                        PolymorphicRng rng,
                                         char const* predef_label,
                                         Model::Palette const& predef_colors):
    Texpainter::Ui::ColorPicker{*this},
    m_colors_cache{Size2d{384, 384}},
+   m_rng{rng},
    m_root{cnt, Box::Orientation::Vertical},
    m_cols{m_root, Box::Orientation::Horizontal},
    m_left{m_cols, Box::Orientation::Vertical},
@@ -353,7 +375,7 @@ Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt,
    m_num_sep_2{m_right},
    m_alpha_text{m_right, Box::Orientation::Horizontal, "α: "},
    m_num_sep_3{m_right},
-   m_random{m_right, "Random HSI"},
+   m_random{m_right, "Random"},
    m_num_sep_4{m_right},
    m_bottom_box{m_root, Box::Orientation::Horizontal},
    m_predef_colors{m_bottom_box.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand}),
@@ -382,7 +404,7 @@ Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt,
 	m_intensity_text.inputField().small(true).width(13);
 
 	m_alpha_text.inputField().small(true).width(13);
-	m_random.small(true);
+	m_random.small(true).eventHandler<ControlId::Random>(*this);
 
 	m_predef_colors.inputField().palette(predef_colors);
 	Model::Palette pal{1};

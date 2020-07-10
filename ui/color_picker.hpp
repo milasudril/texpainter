@@ -10,6 +10,7 @@
 
 #include "model/pixel.hpp"
 #include "model/palette.hpp"
+#include "utils/polymorphic_rng.hpp"
 
 #include <utility>
 
@@ -19,6 +20,7 @@ namespace Texpainter::Ui
 	{
 	public:
 		explicit ColorPicker(Container& cnt,
+		                     PolymorphicRng rng,
 		                     char const* predef_label,
 		                     Model::Palette const& predef_colors);
 		~ColorPicker();

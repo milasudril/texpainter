@@ -16,6 +16,7 @@
 #include "ui/color_picker_sidepanel.hpp"
 #include "ui/separator.hpp"
 #include "model/palette.hpp"
+#include "pcg-cpp/include/pcg_random.hpp"
 
 #include <vector>
 #include <unordered_set>
@@ -173,6 +174,7 @@ namespace Texpainter
 		std::unordered_set<std::string> m_used_pal_names;
 		std::unique_ptr<PaletteNameInput> m_pal_name_input;
 		Model::Palette m_color_history;
+		pcg64 m_rng; // TODO:Should be global
 		std::unique_ptr<ColorPicker> m_color_picker;
 	};
 
@@ -225,6 +227,7 @@ namespace Texpainter
 					m_color_picker = std::make_unique<ColorPicker>(
 					   m_container,
 					   (std::string{"Select color number "} + std::to_string(index + 1)).c_str(),
+					   PolymorphicRng{m_rng},
 					   "Recently used: ",
 					   m_color_history);
 					m_color_picker->eventHandler<ControlId::ColorPicker>(*this).widget().value(

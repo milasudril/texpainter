@@ -21,7 +21,8 @@ namespace Texpainter
 		   class Rng,
 		   std::enable_if_t<
 		      std::is_unsigned_v<
-		         typename Rng::result_type> && sizeof(typename Rng::result_type) <= sizeof(result_type),
+		         typename Rng::result_type> && sizeof(typename Rng::result_type) <= sizeof(result_type)
+		         && !std::is_same_v<std::decay_t<Rng>, PolymorphicRng>,
 		      int> = 0>
 		explicit PolymorphicRng(Rng& rng): m_rng_state{rng}, m_min{rng.min()}, m_max{rng.max()}
 		{
