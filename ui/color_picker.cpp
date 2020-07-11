@@ -377,8 +377,15 @@ void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseUp<ControlId::Predef
 
 template<>
 void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onChanged<ControlId::Red>(
-   Texpainter::Ui::TextEntry&)
+   Texpainter::Ui::TextEntry& src)
 {
+	auto val = toFloat(src.content());
+	if(!val.has_value())
+	{
+		src.content(toArray(toRgb(m_hsi).red()).data());
+		return;
+	}
+	value(toRgb(m_hsi).red(std::clamp(*val, 0.0f, 1.0f)));
 }
 
 template<>
