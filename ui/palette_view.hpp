@@ -51,6 +51,7 @@ namespace Texpainter::Ui
 		}
 
 		PaletteView& palette(Model::Palette const& pal);
+		Model::Palette const& palette() const;
 		PaletteView& update();
 
 		enum class HighlightMode
@@ -59,6 +60,9 @@ namespace Texpainter::Ui
 			Read,
 			Write
 		};
+
+		PaletteView& color(size_t index, Model::Pixel value);
+		Model::Pixel color(size_t index) const;
 
 		PaletteView& highlightMode(size_t index, HighlightMode mode);
 

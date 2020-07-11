@@ -125,7 +125,8 @@ public:
 		Colors,
 		Intensity,
 		Alpha,
-		Random
+		Random,
+		PredefColors
 	};
 
 	Impl(Container& cnt,
@@ -177,6 +178,20 @@ public:
 
 	template<ControlId>
 	void onClicked(Button& btn);
+
+
+	template<ControlId>
+	void onMouseDown(Texpainter::Ui::PaletteView& view, size_t, int)
+	{
+	}
+
+	template<ControlId>
+	void onMouseUp(Texpainter::Ui::PaletteView&, size_t, int);
+
+	template<ControlId>
+	void onMouseMove(Texpainter::Ui::PaletteView&, size_t)
+	{
+	}
 
 private:
 	Model::Hsi m_hsi;
@@ -252,6 +267,30 @@ private:
 	}
 };
 
+Texpainter::Ui::ColorPicker::ColorPicker(Container& cnt,
+                                         PolymorphicRng rng,
+                                         char const* predef_label,
+                                         Model::Palette const& predef_colors)
+{
+	m_impl = new Impl(cnt, rng, predef_label, predef_colors);
+}
+
+Texpainter::Ui::ColorPicker::~ColorPicker()
+{
+	delete m_impl;
+}
+
+Texpainter::Model::Pixel Texpainter::Ui::ColorPicker::value() const noexcept
+{
+	return m_impl->value();
+}
+
+Texpainter::Ui::ColorPicker& Texpainter::Ui::ColorPicker::value(Model::Pixel color)
+{
+	m_impl->value(color);
+	return *this;
+}
+
 template<>
 void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseDown<
    Texpainter::Ui::ColorPicker::ColorPicker::Impl::ControlId::Colors>(ImageView&,
@@ -296,39 +335,6 @@ void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseMove<
 
 
 template<>
-void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onClicked<
-   Texpainter::Ui::ColorPicker::ColorPicker::Impl::ControlId::Random>(Button& btn)
-{
-	std::uniform_real_distribution U{0.0f, 1.0f};
-	btn.state(false);
-	value(Model::Pixel{U(m_rng), U(m_rng), U(m_rng), U(m_rng)});
-}
-
-Texpainter::Ui::ColorPicker::ColorPicker(Container& cnt,
-                                         PolymorphicRng rng,
-                                         char const* predef_label,
-                                         Model::Palette const& predef_colors)
-{
-	m_impl = new Impl(cnt, rng, predef_label, predef_colors);
-}
-
-Texpainter::Ui::ColorPicker::~ColorPicker()
-{
-	delete m_impl;
-}
-
-Texpainter::Model::Pixel Texpainter::Ui::ColorPicker::value() const noexcept
-{
-	return m_impl->value();
-}
-
-Texpainter::Ui::ColorPicker& Texpainter::Ui::ColorPicker::value(Model::Pixel color)
-{
-	m_impl->value(color);
-	return *this;
-}
-
-template<>
 void Texpainter::Ui::ColorPicker::Impl::onChanged<
    Texpainter::Ui::ColorPicker::Impl::ControlId::Intensity>(Slider& src)
 {
@@ -344,6 +350,23 @@ void Texpainter::Ui::ColorPicker::Impl::onChanged<
 	m_hsi.alpha = static_cast<float>(linValue(src.value()));
 	m_colors_cache = gen_colors(m_hsi.intensity, m_hsi.alpha, Size2d{384, 384});
 	update();
+}
+
+template<>
+void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onClicked<
+   Texpainter::Ui::ColorPicker::ColorPicker::Impl::ControlId::Random>(Button& btn)
+{
+	std::uniform_real_distribution U{0.0f, 1.0f};
+	btn.state(false);
+	value(Model::Pixel{U(m_rng), U(m_rng), U(m_rng), U(m_rng)});
+}
+
+template<>
+void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseUp<
+   Texpainter::Ui::ColorPicker::ColorPicker::Impl::ControlId::PredefColors>(
+   Texpainter::Ui::PaletteView& src, size_t index, int button)
+{
+	if(button == 1) { value(src.color(index)); }
 }
 
 Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt,
@@ -406,7 +429,7 @@ Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt,
 	m_alpha_text.inputField().small(true).width(13);
 	m_random.small(true).eventHandler<ControlId::Random>(*this);
 
-	m_predef_colors.inputField().palette(predef_colors);
+	m_predef_colors.inputField().palette(predef_colors).eventHandler<ControlId::PredefColors>(*this);
 	Model::Palette pal{1};
 	pal[0] = toRgb(m_hsi);
 	m_current_color.inputField().palette(pal).minSize(Size2d{48, 48}).update();

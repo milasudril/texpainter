@@ -10,7 +10,7 @@
 namespace
 {
 	constexpr Texpainter::Model::BasicPixel<Texpainter::Model::ColorProfiles::Gamma22>
-	color(Texpainter::Ui::PaletteView::HighlightMode mode)
+	toRgbGamma22(Texpainter::Ui::PaletteView::HighlightMode mode)
 	{
 		switch(mode)
 		{
@@ -92,7 +92,7 @@ public:
 		    item_height = dim.height() / m_n_rows - 2,
 		    cols = m_n_cols,
 		    k = 0](auto mode) mutable {
-			   auto const color_conv = color(mode);
+			   auto const color_conv = toRgbGamma22(mode);
 			   cairo_set_source_rgba(
 			      cr, color_conv.red(), color_conv.green(), color_conv.blue(), color_conv.alpha());
 			   cairo_rectangle(cr,
@@ -134,6 +134,11 @@ public:
 	{
 		m_min_size = size;
 		recalculateWidgetSize();
+	}
+
+	Model::Pixel color(size_t index) const
+	{
+		return m_colors[index];
 	}
 
 
@@ -289,4 +294,9 @@ Texpainter::Ui::PaletteView& Texpainter::Ui::PaletteView::minSize(Size2d size)
 {
 	m_impl->minSize(size);
 	return *this;
+}
+
+Texpainter::Model::Pixel Texpainter::Ui::PaletteView::PaletteView::color(size_t index) const
+{
+	return m_impl->color(index);
 }

@@ -134,12 +134,12 @@ namespace Texpainter
 		void confirmPositive(PaletteNameInput&);
 
 		template<ControlId>
-		void onMouseDown(Texpainter::Ui::PaletteView& view, size_t, int);
-
-		template<ControlId>
-		void onMouseUp(Texpainter::Ui::PaletteView&, size_t, int)
+		void onMouseDown(Texpainter::Ui::PaletteView& view, size_t, int)
 		{
 		}
+
+		template<ControlId>
+		void onMouseUp(Texpainter::Ui::PaletteView&, size_t, int);
 
 		template<ControlId>
 		void onMouseMove(Texpainter::Ui::PaletteView&, size_t)
@@ -213,7 +213,7 @@ namespace Texpainter
 	}
 
 	template<>
-	inline void PaletteEditor::onMouseDown<PaletteEditor::ControlId::PalView>(
+	inline void PaletteEditor::onMouseUp<PaletteEditor::ControlId::PalView>(
 	   Texpainter::Ui::PaletteView& view, size_t index, int button)
 	{
 		if(index < std::size(selectedPalette()))
@@ -258,8 +258,7 @@ namespace Texpainter
 	inline void
 	PaletteEditor::confirmPositive<PaletteEditor::ControlId::ColorPicker>(ColorPicker& picker)
 	{
-		auto color_new =
-		   picker.widget().value(); // .sidepanel().targetIntensity()(picker.widget().value());
+		auto color_new = picker.widget().value();
 		m_palettes[m_pal_selector.selected()][m_modified_pal_index] = color_new;
 
 		m_pal_view.palette(m_palettes[m_pal_selector.selected()])
