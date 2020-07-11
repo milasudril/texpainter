@@ -39,8 +39,7 @@ namespace Texpainter
 		char* end;
 		errno = 0;
 		auto val = strtof(str, &end);
-		if(errno != 0 || *end != '\0')
-		{ return std::optional<float>{}; }
+		if(errno != 0 || *end != '\0') { return std::optional<float>{}; }
 
 		return val;
 	}

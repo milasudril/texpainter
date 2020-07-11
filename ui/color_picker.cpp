@@ -379,7 +379,7 @@ template<>
 void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onChanged<ControlId::Red>(
    Texpainter::Ui::TextEntry& src)
 {
-	auto val = toFloat(src.content());
+	auto const val = toFloat(src.content());
 	if(!val.has_value())
 	{
 		src.content(toArray(toRgb(m_hsi).red()).data());
@@ -390,44 +390,93 @@ void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onChanged<ControlId::Red>(
 
 template<>
 void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onChanged<ControlId::Green>(
-   Texpainter::Ui::TextEntry&)
+   Texpainter::Ui::TextEntry& src)
 {
+	auto const val = toFloat(src.content());
+	if(!val.has_value())
+	{
+		src.content(toArray(toRgb(m_hsi).green()).data());
+		return;
+	}
+	value(toRgb(m_hsi).green(std::clamp(*val, 0.0f, 1.0f)));
 }
 
 template<>
 void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onChanged<ControlId::Blue>(
-   Texpainter::Ui::TextEntry&)
+   Texpainter::Ui::TextEntry& src)
 {
+	auto const val = toFloat(src.content());
+	if(!val.has_value())
+	{
+		src.content(toArray(toRgb(m_hsi).blue()).data());
+		return;
+	}
+	value(toRgb(m_hsi).blue(std::clamp(*val, 0.0f, 1.0f)));
 }
 
 template<>
 void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onChanged<ControlId::Hex>(
-   Texpainter::Ui::TextEntry&)
+   Texpainter::Ui::TextEntry& src)
 {
 }
 
 template<>
 void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onChanged<ControlId::Hue>(
-   Texpainter::Ui::TextEntry&)
+   Texpainter::Ui::TextEntry& src)
 {
+	auto const val = toFloat(src.content());
+	if(!val.has_value())
+	{
+		src.content(toArray(m_hsi.hue).data());
+		return;
+	}
+	m_hsi.hue = std::clamp(*val, 0.0f, 1.0f);
+	update();
 }
 
 template<>
 void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onChanged<ControlId::Saturation>(
-   Texpainter::Ui::TextEntry&)
+   Texpainter::Ui::TextEntry& src)
 {
+	auto const val = toFloat(src.content());
+	if(!val.has_value())
+	{
+		src.content(toArray(m_hsi.saturation).data());
+		return;
+	}
+	m_hsi.saturation = std::clamp(*val, 0.0f, 1.0f);
+	update();
 }
 
 template<>
 void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onChanged<ControlId::Intensity>(
-   Texpainter::Ui::TextEntry&)
+   Texpainter::Ui::TextEntry& src)
 {
+	auto const val = toFloat(src.content());
+	if(!val.has_value())
+	{
+		src.content(toArray(m_hsi.intensity).data());
+		return;
+	}
+	m_hsi.intensity = std::clamp(*val, 0.0f, 1.0f);
+	m_intensity.inputField().value(logValue(m_hsi.intensity, -16));
+	m_colors_cache = gen_colors(m_hsi.intensity, m_hsi.alpha, Size2d{384, 384});
+	update();
 }
 
 template<>
 void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onChanged<ControlId::Alpha>(
-   Texpainter::Ui::TextEntry&)
+   Texpainter::Ui::TextEntry& src)
 {
+	auto const val = toFloat(src.content());
+	if(!val.has_value())
+	{
+		src.content(toArray(m_hsi.alpha).data());
+		return;
+	}
+	m_hsi.alpha = std::clamp(*val, 0.0f, 1.0f);
+	m_alpha.inputField().value(linValue(m_hsi.alpha));
+	update();
 }
 
 Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt,
