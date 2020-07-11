@@ -158,14 +158,10 @@ public:
 	void onChanged(Slider&);
 
 	template<ControlId>
-	void onKeyDown(ImageView&, int)
-	{
-	}
+	void onKeyDown(ImageView&, int val);
 
 	template<ControlId>
-	void onKeyUp(ImageView&, int)
-	{
-	}
+	void onKeyUp(ImageView&, int);
 
 	template<ControlId>
 	void onMouseDown(ImageView& src, vec2_t pos_window, vec2_t pos_screen, int button);
@@ -199,6 +195,7 @@ private:
 	PolymorphicRng m_rng;
 
 	uint32_t m_btn_state;
+	int m_key;
 
 	Box m_root;
 	Box m_cols;
@@ -265,6 +262,26 @@ private:
 		pal[0] = rgb;
 		m_current_color.inputField().palette(pal).update();
 	}
+
+	void updateHueSaturation(vec2_t pos_window)
+	{
+		auto pos = pos_window / vec2_t{384.0, 384.0};
+		switch(m_key)
+		{
+			case 29:
+				m_hsi.hue = std::clamp(pos[0], 0.0, 1.0);
+				break;
+
+			case 42:
+				m_hsi.saturation = 1.0f - std::clamp(pos[1], 0.0, 1.0);
+				break;
+
+			default:
+				m_hsi.hue = std::clamp(pos[0], 0.0, 1.0);
+				m_hsi.saturation = 1.0f - std::clamp(pos[1], 0.0, 1.0);
+		}
+		update();
+	}
 };
 
 Texpainter::Ui::ColorPicker::ColorPicker(Container& cnt,
@@ -298,10 +315,7 @@ void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseDown<ControlId::Colo
 	m_btn_state |= (1 << button);
 	if(m_btn_state == 2)
 	{
-		auto pos = pos_window / vec2_t{384.0, 384.0};
-		m_hsi.hue = std::clamp(pos[0], 0.0, 1.0);
-		m_hsi.saturation = 1.0f - std::clamp(pos[1], 0.0, 1.0);
-		update();
+		updateHueSaturation(pos_window);
 	}
 }
 
@@ -320,13 +334,21 @@ void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseMove<ControlId::Colo
 {
 	if(m_btn_state == 2)
 	{
-		auto pos = pos_window / vec2_t{384.0, 384.0};
-		m_hsi.hue = std::clamp(pos[0], 0.0, 1.0);
-		m_hsi.saturation = 1.0f - std::clamp(pos[1], 0.0, 1.0);
-		update();
+		updateHueSaturation(pos_window);
 	}
 }
 
+template<>
+void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onKeyDown<ControlId::Colors>(ImageView&, int val)
+{
+	m_key = val;
+}
+
+template<>
+void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onKeyUp<ControlId::Colors>(ImageView&, int)
+{
+	m_key = 0;
+}
 
 template<>
 void Texpainter::Ui::ColorPicker::Impl::onChanged<ControlId::Intensity>(Slider& src)
@@ -399,6 +421,7 @@ Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt,
                    "Selected color:"}
 {
 	m_btn_state = 0;
+	m_key = 0;
 	std::ranges::fill(m_colors_cache.pixels(), Model::Pixel{0.0f, 0.0f, 0.0f, 1.0f});
 	m_colors.inputField()
 	   .minSize(Size2d{384, 384})
