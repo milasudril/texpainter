@@ -131,8 +131,8 @@ public:
 
 	Impl(Container& cnt,
 	     PolymorphicRng rng,
-	     char const* predef_label = "Predef colors: ",
-	     Model::Palette const& predef_colors = Model::Palette{1});
+	     char const* predef_label,
+	     std::span<Model::Pixel const> predef_colors);
 	~Impl();
 
 	Model::Pixel value() const
@@ -270,7 +270,7 @@ private:
 Texpainter::Ui::ColorPicker::ColorPicker(Container& cnt,
                                          PolymorphicRng rng,
                                          char const* predef_label,
-                                         Model::Palette const& predef_colors)
+                                         std::span<Model::Pixel const> predef_colors)
 {
 	m_impl = new Impl(cnt, rng, predef_label, predef_colors);
 }
@@ -372,7 +372,7 @@ void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseUp<
 Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt,
                                         PolymorphicRng rng,
                                         char const* predef_label,
-                                        Model::Palette const& predef_colors):
+                                        std::span<Model::Pixel const> predef_colors):
    Texpainter::Ui::ColorPicker{*this},
    m_colors_cache{Size2d{384, 384}},
    m_rng{rng},

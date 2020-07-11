@@ -32,6 +32,12 @@ namespace Texpainter::Model
 		{
 		}
 
+		explicit Palette(std::span<Pixel const> src): m_block{static_cast<uint32_t>(std::size(src))}
+		{
+			std::copy_n(std::begin(src), std::size(m_block), std::begin(m_block));
+		}
+
+
 		explicit Palette(uint32_t n, Pixel color_init = black()): m_block{n}
 		{
 			std::ranges::fill(m_block, color_init);

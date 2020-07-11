@@ -50,8 +50,8 @@ namespace Texpainter::Ui
 			                     }});
 		}
 
-		PaletteView& palette(Model::Palette const& pal);
-		Model::Palette const& palette() const;
+		PaletteView& palette(std::span<Model::Pixel const> predef_colors);
+		std::span<Model::Pixel const> palette() const;
 		PaletteView& update();
 
 		enum class HighlightMode

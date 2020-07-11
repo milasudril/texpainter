@@ -69,8 +69,7 @@ namespace Texpainter
 		   m_container{owner, Ui::Box::Orientation::Horizontal},
 		   m_pal_selector{m_container},
 		   m_pal_new{m_container, "＋"},
-		   m_pal_view{m_container.insertMode(Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand})},
-		   m_color_history{8}
+		   m_pal_view{m_container.insertMode(Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand})}
 		{
 			m_pal_selector.eventHandler<ControlId::PalSelector>(*this);
 			m_pal_new.eventHandler<ControlId::PaletteCreate>(*this);
@@ -173,7 +172,7 @@ namespace Texpainter
 		Ui::PaletteView m_pal_view;
 		std::unordered_set<std::string> m_used_pal_names;
 		std::unique_ptr<PaletteNameInput> m_pal_name_input;
-		Model::Palette m_color_history;
+		std::array<Model::Pixel, 8> m_color_history;
 		pcg64 m_rng; // TODO:Should be global
 		std::unique_ptr<ColorPicker> m_color_picker;
 	};
@@ -267,8 +266,8 @@ namespace Texpainter
 		   .update();
 
 		std::rotate(
-		   std::begin(m_color_history), std::begin(m_color_history) + 1, std::end(m_color_history));
-		m_color_history[m_color_history.size() - 1] = color_new;
+		   std::rbegin(m_color_history), std::rbegin(m_color_history) + 1, std::rend(m_color_history));
+		m_color_history[0] = color_new;
 		m_color_picker.reset();
 		notify();
 	}

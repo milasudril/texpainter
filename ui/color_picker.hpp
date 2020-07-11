@@ -22,7 +22,7 @@ namespace Texpainter::Ui
 		explicit ColorPicker(Container& cnt,
 		                     PolymorphicRng rng,
 		                     char const* predef_label,
-		                     Model::Palette const& predef_colors);
+		                     std::span<Model::Pixel const> predef_colors);
 		~ColorPicker();
 
 		ColorPicker& operator=(ColorPicker&& obj) noexcept

@@ -105,10 +105,10 @@ public:
 		   });
 	}
 
-	void palette(Model::Palette const& pal)
+	void palette(std::span<Model::Pixel const> pal)
 	{
-		m_colors = pal;
-		m_highlight_mode = DataBlock<HighlightMode>{std::size(pal)};
+		m_colors = Model::Palette{pal};
+		m_highlight_mode = DataBlock<HighlightMode>{std::size(m_colors)};
 		std::ranges::fill(m_highlight_mode, HighlightMode::None);
 		recalculateWidgetSize();
 	}
@@ -264,7 +264,7 @@ Texpainter::Ui::PaletteView::~PaletteView()
 	delete m_impl;
 }
 
-Texpainter::Ui::PaletteView& Texpainter::Ui::PaletteView::palette(Model::Palette const& pal)
+Texpainter::Ui::PaletteView& Texpainter::Ui::PaletteView::palette(std::span<Model::Pixel const> pal)
 {
 	m_impl->palette(pal);
 	return *this;
