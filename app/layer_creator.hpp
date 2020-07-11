@@ -83,7 +83,7 @@ namespace Texpainter
 			return;
 		}
 
-		entry.content(toArray(std::min(m_max_size.width(), *val)).data());
+		entry.content(toArray(std::clamp(*val, 1u, m_max_size.width())).data());
 	}
 
 	template<>
@@ -96,7 +96,7 @@ namespace Texpainter
 			return;
 		}
 
-		entry.content(toArray(std::min(m_max_size.height(), *val)).data());
+		entry.content(toArray(std::clamp(*val, 1u, m_max_size.height())).data());
 	}
 }
 

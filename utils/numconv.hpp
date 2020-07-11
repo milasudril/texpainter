@@ -21,7 +21,7 @@ namespace Texpainter
 		char* end;
 		errno = 0;
 		auto val = strtol(str, &end, 10);
-		if(errno != 0 || *end != '\0' || val <= 0 || val > std::numeric_limits<unsigned int>::max())
+		if(errno != 0 || *end != '\0' || val > std::numeric_limits<unsigned int>::max())
 		{ return std::optional<unsigned int>{}; }
 
 		return static_cast<unsigned int>(val);
@@ -34,9 +34,15 @@ namespace Texpainter
 		return ret;
 	}
 
-	inline float toFloat(char const*)
+	inline std::optional<float> toFloat(char const* str)
 	{
-		return 0.0f;
+		char* end;
+		errno = 0;
+		auto val = strtof(str, &end);
+		if(errno != 0 || *end != '\0')
+		{ return std::optional<float>{}; }
+
+		return val;
 	}
 }
 
