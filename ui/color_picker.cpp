@@ -121,6 +121,12 @@ namespace
 		Colors,
 		Intensity,
 		Alpha,
+		Red,
+		Green,
+		Blue,
+		Hex,
+		Hue,
+		Saturation,
 		Random,
 		PredefColors
 	};
@@ -188,6 +194,9 @@ public:
 	void onMouseMove(Texpainter::Ui::PaletteView&, size_t)
 	{
 	}
+
+	template<ControlId>
+	void onChanged(Texpainter::Ui::TextEntry&);
 
 private:
 	Model::Hsi m_hsi;
@@ -268,13 +277,9 @@ private:
 		auto pos = pos_window / vec2_t{384.0, 384.0};
 		switch(m_key)
 		{
-			case 29:
-				m_hsi.hue = std::clamp(pos[0], 0.0, 1.0);
-				break;
+			case 29: m_hsi.hue = std::clamp(pos[0], 0.0, 1.0); break;
 
-			case 42:
-				m_hsi.saturation = 1.0f - std::clamp(pos[1], 0.0, 1.0);
-				break;
+			case 42: m_hsi.saturation = 1.0f - std::clamp(pos[1], 0.0, 1.0); break;
 
 			default:
 				m_hsi.hue = std::clamp(pos[0], 0.0, 1.0);
@@ -313,10 +318,7 @@ void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseDown<ControlId::Colo
    ImageView&, vec2_t pos_window, vec2_t, int button)
 {
 	m_btn_state |= (1 << button);
-	if(m_btn_state == 2)
-	{
-		updateHueSaturation(pos_window);
-	}
+	if(m_btn_state == 2) { updateHueSaturation(pos_window); }
 }
 
 template<>
@@ -332,14 +334,12 @@ template<>
 void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseMove<ControlId::Colors>(
    ImageView& view, vec2_t pos_window, vec2_t)
 {
-	if(m_btn_state == 2)
-	{
-		updateHueSaturation(pos_window);
-	}
+	if(m_btn_state == 2) { updateHueSaturation(pos_window); }
 }
 
 template<>
-void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onKeyDown<ControlId::Colors>(ImageView&, int val)
+void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onKeyDown<ControlId::Colors>(ImageView&,
+                                                                                  int val)
 {
 	m_key = val;
 }
@@ -379,6 +379,54 @@ void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseUp<ControlId::Predef
    Texpainter::Ui::PaletteView& src, size_t index, int button)
 {
 	if(button == 1) { value(src.color(index)); }
+}
+
+template<>
+void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onChanged<ControlId::Red>(
+   Texpainter::Ui::TextEntry&)
+{
+}
+
+template<>
+void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onChanged<ControlId::Green>(
+   Texpainter::Ui::TextEntry&)
+{
+}
+
+template<>
+void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onChanged<ControlId::Blue>(
+   Texpainter::Ui::TextEntry&)
+{
+}
+
+template<>
+void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onChanged<ControlId::Hex>(
+   Texpainter::Ui::TextEntry&)
+{
+}
+
+template<>
+void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onChanged<ControlId::Hue>(
+   Texpainter::Ui::TextEntry&)
+{
+}
+
+template<>
+void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onChanged<ControlId::Saturation>(
+   Texpainter::Ui::TextEntry&)
+{
+}
+
+template<>
+void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onChanged<ControlId::Intensity>(
+   Texpainter::Ui::TextEntry&)
+{
+}
+
+template<>
+void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onChanged<ControlId::Alpha>(
+   Texpainter::Ui::TextEntry&)
+{
 }
 
 Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt,
@@ -430,16 +478,18 @@ Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt,
 	value(Model::Pixel{0.5f, 0.5f, 0.5f, 1.0f});
 	m_intensity.inputField().eventHandler<ControlId::Intensity>(*this).ticks(intensity_tickmarks);
 	m_alpha.inputField().eventHandler<ControlId::Alpha>(*this);
-	m_red.inputField().small(true).width(13);
-	m_green.inputField().small(true).width(13);
-	m_blue.inputField().small(true).width(13);
-	m_hex.inputField().small(true).width(8);
 
-	m_hue.inputField().small(true).width(13);
-	m_saturation.inputField().small(true).width(13);
-	m_intensity_text.inputField().small(true).width(13);
+	m_red.inputField().small(true).width(13).eventHandler<ControlId::Red>(*this);
+	m_green.inputField().small(true).width(13).eventHandler<ControlId::Green>(*this);
+	m_blue.inputField().small(true).width(13).eventHandler<ControlId::Blue>(*this);
+	m_hex.inputField().small(true).width(8).eventHandler<ControlId::Hex>(*this);
 
-	m_alpha_text.inputField().small(true).width(13);
+	m_hue.inputField().small(true).width(13).eventHandler<ControlId::Hue>(*this);
+	m_saturation.inputField().small(true).width(13).eventHandler<ControlId::Saturation>(*this);
+	m_intensity_text.inputField().small(true).width(13).eventHandler<ControlId::Intensity>(*this);
+
+	m_alpha_text.inputField().small(true).width(13).eventHandler<ControlId::Alpha>(*this);
+
 	m_random.small(true).eventHandler<ControlId::Random>(*this);
 
 	m_predef_colors.inputField().palette(predef_colors).eventHandler<ControlId::PredefColors>(*this);

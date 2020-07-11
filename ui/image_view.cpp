@@ -176,8 +176,7 @@ private:
 			if(!gtk_widget_is_focus(w))
 			{
 				gtk_widget_grab_focus(w);
-				if(!obj.m_emit_mouse_events)
-				{ return FALSE; }
+				if(!obj.m_emit_mouse_events) { return FALSE; }
 			}
 			auto event_button = reinterpret_cast<GdkEventButton const*>(e);
 			obj.m_vt.m_on_mouse_down(obj.r_eh,
