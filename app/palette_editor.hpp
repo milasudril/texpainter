@@ -265,6 +265,10 @@ namespace Texpainter
 		   .highlightMode(m_modified_pal_index, Texpainter::Ui::PaletteView::HighlightMode::None)
 		   .highlightMode(m_sel_color_index, Texpainter::Ui::PaletteView::HighlightMode::Read)
 		   .update();
+
+		std::rotate(
+		   std::begin(m_color_history), std::begin(m_color_history) + 1, std::end(m_color_history));
+		m_color_history[m_color_history.size() - 1] = color_new;
 		m_color_picker.reset();
 		notify();
 	}
