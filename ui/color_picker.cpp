@@ -12,6 +12,7 @@
 #include "./palette_view.hpp"
 
 #include "model/hsi_rgb.hpp"
+#include "utils/numconv.hpp"
 
 #include <gtk/gtk.h>
 
@@ -108,13 +109,6 @@ namespace
 	}
 
 	constexpr auto intensity_tickmarks = gen_tickmarks();
-
-	auto to_char_array(float x)
-	{
-		std::array<char, 16> ret{};
-		sprintf(ret.data(), "%.7e", x);
-		return ret;
-	}
 
 	enum class ControlId : int
 	{
@@ -241,9 +235,9 @@ private:
 		m_colors.inputField().image(colors);
 		auto const rgb = toRgb(m_hsi);
 
-		m_red.inputField().content(to_char_array(rgb.red()).data());
-		m_green.inputField().content(to_char_array(rgb.green()).data());
-		m_blue.inputField().content(to_char_array(rgb.blue()).data());
+		m_red.inputField().content(toArray(rgb.red()).data());
+		m_green.inputField().content(toArray(rgb.green()).data());
+		m_blue.inputField().content(toArray(rgb.blue()).data());
 
 		if(rgb.red() > 1.0f || rgb.green() > 1.0f || rgb.blue() > 1.0f) [[unlikely]]
 			{
@@ -262,10 +256,10 @@ private:
 			m_hex.inputField().content(hex_str.data());
 		}
 
-		m_hue.inputField().content(to_char_array(m_hsi.hue).data());
-		m_saturation.inputField().content(to_char_array(m_hsi.saturation).data());
-		m_intensity_text.inputField().content(to_char_array(m_hsi.intensity).data());
-		m_alpha_text.inputField().content(to_char_array(m_hsi.alpha).data());
+		m_hue.inputField().content(toArray(m_hsi.hue).data());
+		m_saturation.inputField().content(toArray(m_hsi.saturation).data());
+		m_intensity_text.inputField().content(toArray(m_hsi.intensity).data());
+		m_alpha_text.inputField().content(toArray(m_hsi.alpha).data());
 
 		Model::Palette pal{1};
 		pal[0] = rgb;
