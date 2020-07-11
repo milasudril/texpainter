@@ -54,13 +54,13 @@ namespace Testcases
 		auto const red_rgb = Texpainter::Model::Pixel{1.0f, 0.0f, 0.0f, 1.0f};
 		auto const magenta_rgb = Texpainter::Model::Pixel{0.5f, 0.0f, 0.5f, 1.0f};
 
-		auto const rgb_hsi = toHsi(red_rgb);
+		auto const red_hsi = toHsi(red_rgb);
 		auto const magenta_hsi = toHsi(magenta_rgb);
 
 
-		assert(rgb_hsi.hue == 0.0f);
-		assert(rgb_hsi.saturation == 1.0f);
-		assert(rgb_hsi.intensity == 1.0f / 3.0f);
+		assert(red_hsi.hue == 0.0f);
+		assert(red_hsi.saturation == 1.0f);
+		assert(red_hsi.intensity == 1.0f / 3.0f);
 
 		assert(magenta_hsi.hue == 5.0f / 6.0f);
 		assert(magenta_hsi.saturation == 1.0f);
