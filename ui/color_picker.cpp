@@ -115,11 +115,7 @@ namespace
 		sprintf(ret.data(), "%.7e", x);
 		return ret;
 	}
-}
 
-class Texpainter::Ui::ColorPicker::Impl: private Texpainter::Ui::ColorPicker
-{
-public:
 	enum class ControlId : int
 	{
 		Colors,
@@ -128,7 +124,11 @@ public:
 		Random,
 		PredefColors
 	};
+}
 
+class Texpainter::Ui::ColorPicker::Impl: private Texpainter::Ui::ColorPicker
+{
+public:
 	Impl(Container& cnt,
 	     PolymorphicRng rng,
 	     char const* predef_label,
@@ -292,11 +292,8 @@ Texpainter::Ui::ColorPicker& Texpainter::Ui::ColorPicker::value(Model::Pixel col
 }
 
 template<>
-void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseDown<
-   Texpainter::Ui::ColorPicker::ColorPicker::Impl::ControlId::Colors>(ImageView&,
-                                                                      vec2_t pos_window,
-                                                                      vec2_t,
-                                                                      int button)
+void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseDown<ControlId::Colors>(
+   ImageView&, vec2_t pos_window, vec2_t, int button)
 {
 	m_btn_state |= (1 << button);
 	if(m_btn_state == 2)
@@ -309,20 +306,17 @@ void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseDown<
 }
 
 template<>
-void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseUp<
-   Texpainter::Ui::ColorPicker::ColorPicker::Impl::ControlId::Colors>(ImageView&,
-                                                                      vec2_t,
-                                                                      vec2_t,
-                                                                      int button)
+void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseUp<ControlId::Colors>(ImageView&,
+                                                                                  vec2_t,
+                                                                                  vec2_t,
+                                                                                  int button)
 {
 	m_btn_state &= (~(1 << button));
 }
 
 template<>
-void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseMove<
-   Texpainter::Ui::ColorPicker::ColorPicker::Impl::ControlId::Colors>(ImageView& view,
-                                                                      vec2_t pos_window,
-                                                                      vec2_t)
+void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseMove<ControlId::Colors>(
+   ImageView& view, vec2_t pos_window, vec2_t)
 {
 	if(m_btn_state == 2)
 	{
@@ -335,8 +329,7 @@ void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseMove<
 
 
 template<>
-void Texpainter::Ui::ColorPicker::Impl::onChanged<
-   Texpainter::Ui::ColorPicker::Impl::ControlId::Intensity>(Slider& src)
+void Texpainter::Ui::ColorPicker::Impl::onChanged<ControlId::Intensity>(Slider& src)
 {
 	m_hsi.intensity = logValue(src.value(), -16);
 	m_colors_cache = gen_colors(m_hsi.intensity, m_hsi.alpha, Size2d{384, 384});
@@ -344,8 +337,7 @@ void Texpainter::Ui::ColorPicker::Impl::onChanged<
 }
 
 template<>
-void Texpainter::Ui::ColorPicker::Impl::onChanged<
-   Texpainter::Ui::ColorPicker::Impl::ControlId::Alpha>(Slider& src)
+void Texpainter::Ui::ColorPicker::Impl::onChanged<ControlId::Alpha>(Slider& src)
 {
 	m_hsi.alpha = static_cast<float>(linValue(src.value()));
 	m_colors_cache = gen_colors(m_hsi.intensity, m_hsi.alpha, Size2d{384, 384});
@@ -353,8 +345,7 @@ void Texpainter::Ui::ColorPicker::Impl::onChanged<
 }
 
 template<>
-void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onClicked<
-   Texpainter::Ui::ColorPicker::ColorPicker::Impl::ControlId::Random>(Button& btn)
+void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onClicked<ControlId::Random>(Button& btn)
 {
 	std::uniform_real_distribution U{0.0f, 1.0f};
 	btn.state(false);
@@ -362,8 +353,7 @@ void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onClicked<
 }
 
 template<>
-void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseUp<
-   Texpainter::Ui::ColorPicker::ColorPicker::Impl::ControlId::PredefColors>(
+void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseUp<ControlId::PredefColors>(
    Texpainter::Ui::PaletteView& src, size_t index, int button)
 {
 	if(button == 1) { value(src.color(index)); }
