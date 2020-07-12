@@ -54,7 +54,6 @@ namespace Texpainter::Ui
 
 		explicit SubmenuBuilder(Container& owner): m_root{owner}, m_items{m_root}
 		{
-
 		}
 
 	private:

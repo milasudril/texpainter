@@ -6,6 +6,7 @@
 #include "ui/button.hpp"
 #include "ui/separator.hpp"
 #include "ui/menu_item.hpp"
+#include "ui/submenu.hpp"
 
 namespace Texpainter
 {
@@ -16,9 +17,21 @@ namespace Texpainter
 		Palette
 	};
 
-	enum class FileAction:int{New, Open, Save, Export};
-	enum class LayerAction:int{New};
-	enum class PaletteAction:int{New};
+	enum class FileAction : int
+	{
+		New,
+		Open,
+		Save,
+		Export
+	};
+	enum class LayerAction : int
+	{
+		New
+	};
+	enum class PaletteAction : int
+	{
+		New
+	};
 
 	constexpr auto end(Empty<MainMenuItem>)
 	{
@@ -37,13 +50,11 @@ namespace Texpainter
 		}
 
 		using Item = FileAction;
-		using type = Ui::MenuItem;
+		using type = Ui::Submenu;
 	};
 
 	template<FileAction>
 	struct FileActionTraits;
-
-
 
 
 	template<>
@@ -73,7 +84,6 @@ namespace Texpainter
 
 	template<PaletteAction>
 	struct PaletteActionTraits;
-
 
 
 	enum class MenuAction : int
