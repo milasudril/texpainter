@@ -12,7 +12,7 @@
 
 namespace Texpainter::Ui
 {
-	class MenuItem
+	class MenuItem:public Container
 	{
 	public:
 		explicit MenuItem(Container& parent, char const* label);
@@ -37,6 +37,11 @@ namespace Texpainter::Ui
 				obj.template onActivated<id>(self);
 			});
 		}
+
+		MenuItem& add(void* handle) override;
+		MenuItem& show() override;
+		MenuItem& sensitive(bool val) override;
+		void* toplevel() const override;
 
 
 	protected:
