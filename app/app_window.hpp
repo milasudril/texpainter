@@ -14,7 +14,6 @@
 
 #include "utils/snap.hpp"
 #include "ui/box.hpp"
-#include "ui/toolbar.hpp"
 #include "ui/image_view.hpp"
 #include "ui/labeled_input.hpp"
 #include "ui/dialog.hpp"
@@ -43,11 +42,7 @@ namespace Texpainter
 		   m_painting{false},
 		   m_paintmode{PaintMode::Draw},
 		   m_keymask{0},
-		   m_columns{container, Ui::Box::Orientation::Horizontal},
-		   m_toolbar{m_columns, Ui::Box::Orientation::Vertical},
-		   m_tools_separator{m_columns},
-		   m_rows{m_columns.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand}),
-		          Ui::Box::Orientation::Vertical},
+		   m_rows{container, Ui::Box::Orientation::Vertical},
 		   m_menu{m_rows},
 		   m_pal_editor{m_rows, Ui::Box::Orientation::Horizontal, "Palettes: "},
 		   m_pal_separator{m_rows},
@@ -55,14 +50,6 @@ namespace Texpainter
 		   m_layeres_separator{m_rows},
 		   m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
 		{
-			forEachEnumItem<MenuAction>([this](auto tag) {
-				if constexpr(std::is_same_v<Ui::Button, typename MenuActionTraits<tag.value>::type>)
-				{
-					m_toolbar.get<tag.value>()
-					   .label(MenuActionTraits<tag.value>::displayName())
-					   .template eventHandler<tag.value>(*this);
-				}
-			});
 			m_pal_editor.inputField().eventHandler<ControlId::PaletteEd>(*this);
 			m_layerstack_ctrl.inputField().eventHandler<ControlId::LayerStackCtrl>(*this);
 			m_img_view.eventHandler<ControlId::Canvas>(*this);
@@ -70,7 +57,7 @@ namespace Texpainter
 		}
 
 		template<auto>
-		void onActivated(Ui::MenuItem&);
+		void onActivated(Ui::MenuItem&){}
 
 		template<ControlId>
 		void onChanged(LayerStackControl&)
@@ -101,44 +88,6 @@ namespace Texpainter
 		template<ControlId>
 		void onKeyUp(Ui::ImageView& view, int scancode);
 
-		template<MenuAction id>
-		void onClicked(Ui::Button& btn)
-		{
-			btn.state(false);
-		}
-
-		template<MenuAction id>
-		void dismiss(NoiseGenDlg& dlg)
-		{
-			m_surf_creator.reset();
-			m_toolbar.get<id>().state(false);
-		}
-
-		template<MenuAction id>
-		void confirmPositive(NoiseGenDlg& dlg)
-		{
-			m_toolbar.get<id>().state(false);
-			//			m_img = m_surf_creator->widget().generate(Size2d{m_canvas_size});
-			m_surf_creator.reset();
-			//			m_img_view.image(m_img);
-		}
-
-		template<MenuAction id>
-		void dismiss(CrackGenDlg& dlg)
-		{
-			m_crack_creator.reset();
-			m_toolbar.get<id>().state(false);
-		}
-
-		template<MenuAction id>
-		void confirmPositive(CrackGenDlg& dlg)
-		{
-			m_toolbar.get<id>().state(false);
-			//			m_img = m_crack_creator->widget().generate(Size2d{m_canvas_size});
-			m_crack_creator.reset();
-			//			m_img_view.image(m_img);
-		}
-
 	private:
 		Size2d m_canvas_size;
 		Model::Pixel m_current_color;
@@ -156,9 +105,6 @@ namespace Texpainter
 		uint32_t m_keymask;
 		vec2_t m_paint_start_pos;
 
-		Ui::Box m_columns;
-		Ui::Toolbar<MenuAction, MenuActionTraits> m_toolbar;
-		Ui::Separator m_tools_separator;
 		Ui::Box m_rows;
 		Ui::MenuBuilder<MainMenuItem, MainMenuItemTraits> m_menu;
 		Ui::LabeledInput<PaletteEditor> m_pal_editor;
@@ -181,20 +127,6 @@ namespace Texpainter
 			m_img_view.image(canvas);
 		}
 	};
-
-	template<>
-	inline void AppWindow::onClicked<MenuAction::GenNoise>(Ui::Button& btn)
-	{
-		m_surf_creator = std::make_unique<NoiseGenDlg>(m_columns, "Generate noise");
-		m_surf_creator->eventHandler<MenuAction::GenNoise>(*this);
-	}
-
-	template<>
-	inline void AppWindow::onClicked<MenuAction::GenCracks>(Ui::Button& btn)
-	{
-		m_crack_creator = std::make_unique<CrackGenDlg>(m_columns, "Generate cracks", m_rng);
-		m_crack_creator->eventHandler<MenuAction::GenCracks>(*this);
-	}
 
 	template<>
 	inline void AppWindow::onMouseUp<AppWindow::ControlId::Canvas>(Ui::ImageView&, vec2_t, vec2_t, int)
