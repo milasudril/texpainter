@@ -3,8 +3,11 @@
 #ifndef TEXPAINTER_MENUACTION_HPP
 #define TEXPAITNER_MENUACTION_HPP
 
-#include "ui/button.hpp"
-#include "ui/separator.hpp"
+#include "./menu_app.hpp"
+#include "./menu_file.hpp"
+#include "./menu_layer.hpp"
+#include "./menu_palette.hpp"
+
 #include "ui/menu_item.hpp"
 #include "ui/menu_builder.hpp"
 
@@ -12,74 +15,10 @@ namespace Texpainter
 {
 	enum class MainMenuItem : int
 	{
+		Application,
 		File,
 		Layer,
 		Palette
-	};
-
-	enum class FileAction : int
-	{
-		New,
-		Open,
-		Save,
-		Export
-	};
-
-	constexpr auto end(Empty<FileAction>)
-	{
-		return static_cast<FileAction>(static_cast<int>(FileAction::Export) + 1);
-	}
-
-	template<FileAction>
-	struct FileActionTraits;
-
-	template<>
-	struct FileActionTraits<FileAction::New>
-	{
-		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "New";
-		}
-	};
-
-	template<>
-	struct FileActionTraits<FileAction::Open>
-	{
-		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Open";
-		}
-	};
-
-	template<>
-	struct FileActionTraits<FileAction::Save>
-	{
-		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Save";
-		}
-	};
-
-	template<>
-	struct FileActionTraits<FileAction::Export>
-	{
-		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Export";
-		}
-	};
-
-	enum class LayerAction : int
-	{
-		New
-	};
-	enum class PaletteAction : int
-	{
-		New
 	};
 
 	constexpr auto end(Empty<MainMenuItem>)
@@ -91,6 +30,17 @@ namespace Texpainter
 	struct MainMenuItemTraits;
 
 	template<>
+	struct MainMenuItemTraits<MainMenuItem::Application>
+	{
+		static constexpr char const* displayName()
+		{
+			return "Application";
+		}
+
+		using type = Ui::SubmenuBuilder<AppAction, AppActionTraits>;
+	};
+
+	template<>
 	struct MainMenuItemTraits<MainMenuItem::File>
 	{
 		static constexpr char const* displayName()
@@ -98,7 +48,6 @@ namespace Texpainter
 			return "File";
 		}
 
-		using Item = FileAction;
 		using type = Ui::SubmenuBuilder<FileAction, FileActionTraits>;
 	};
 
@@ -110,7 +59,7 @@ namespace Texpainter
 			return "Layer";
 		}
 
-		using type = Ui::MenuItem;
+		using type = Ui::SubmenuBuilder<LayerAction, LayerActionTraits>;
 	};
 
 	template<LayerAction>
@@ -124,7 +73,7 @@ namespace Texpainter
 			return "Palette";
 		}
 
-		using type = Ui::MenuItem;
+		using type = Ui::SubmenuBuilder<PaletteAction, PaletteActionTraits>;
 	};
 
 	template<PaletteAction>
