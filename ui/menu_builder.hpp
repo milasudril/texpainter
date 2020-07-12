@@ -7,6 +7,7 @@
 
 #include "./menu_bar.hpp"
 #include "./menu_item.hpp"
+#include "./menu.hpp"
 
 #include "utils/empty.hpp"
 
@@ -46,6 +47,22 @@ namespace Texpainter::Ui
 	}
 
 	template<class EnumType, template<EnumType> class EnumTypeTraits>
+	class SubmenuBuilder
+	{
+	public:
+		using ControlId = EnumType;
+
+		explicit SubmenuBuilder(Container& owner): m_root{owner}, m_items{m_root}
+		{
+
+		}
+
+	private:
+		Menu m_root;
+		detial::InitArray<MenuItem, static_cast<size_t>(end(Empty<EnumType>{}))> m_items;
+	};
+
+	template<class EnumType, template<EnumType> class EnumTypeTraits>
 	class MenuBuilder
 	{
 	public:
@@ -54,16 +71,13 @@ namespace Texpainter::Ui
 		explicit MenuBuilder(Container& owner): m_root{owner}, m_items{m_root}
 		{
 			forEachEnumItem<EnumType>([this](auto tag) {
-				m_items[static_cast<size_t>(tag.value)].label(EnumTypeTraits<tag.value>::displayName());
+				get<tag.value>(m_items).label(EnumTypeTraits<tag.value>::displayName());
 			});
 		}
 
 	private:
 		MenuBar m_root;
-		detial::InitArray<MenuItem, static_cast<size_t>(end(Empty<EnumType>{}))> m_items;
-
-		//		std::array<MenuItem, static_cast<size_t>(end(Empty<EnumType>{}))> m_items;
-		//		MenuItem m_items[static_cast<size_t>(end(Empty<EnumType>{}))];
+		TupleFromEnum<EnumType, EnumTypeTraits> m_items;
 	};
 }
 

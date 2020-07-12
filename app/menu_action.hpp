@@ -5,9 +5,77 @@
 
 #include "ui/button.hpp"
 #include "ui/separator.hpp"
+#include "ui/menu_item.hpp"
 
 namespace Texpainter
 {
+	enum class MainMenuItem : int
+	{
+		File,
+		Layer,
+		Palette
+	};
+
+	enum class FileAction:int{New, Open, Save, Export};
+	enum class LayerAction:int{New};
+	enum class PaletteAction:int{New};
+
+	constexpr auto end(Empty<MainMenuItem>)
+	{
+		return static_cast<MainMenuItem>(static_cast<int>(MainMenuItem::Palette) + 1);
+	}
+
+	template<MainMenuItem>
+	struct MainMenuItemTraits;
+
+	template<>
+	struct MainMenuItemTraits<MainMenuItem::File>
+	{
+		static constexpr char const* displayName()
+		{
+			return "File";
+		}
+
+		using Item = FileAction;
+		using type = Ui::MenuItem;
+	};
+
+	template<FileAction>
+	struct FileActionTraits;
+
+
+
+
+	template<>
+	struct MainMenuItemTraits<MainMenuItem::Layer>
+	{
+		static constexpr char const* displayName()
+		{
+			return "Layer";
+		}
+
+		using type = Ui::MenuItem;
+	};
+
+	template<LayerAction>
+	struct LayerActionTraits;
+
+	template<>
+	struct MainMenuItemTraits<MainMenuItem::Palette>
+	{
+		static constexpr char const* displayName()
+		{
+			return "Palette";
+		}
+
+		using type = Ui::MenuItem;
+	};
+
+	template<PaletteAction>
+	struct PaletteActionTraits;
+
+
+
 	enum class MenuAction : int
 	{
 		New,

@@ -156,7 +156,7 @@ namespace Texpainter
 		Ui::Toolbar<MenuAction, MenuActionTraits> m_toolbar;
 		Ui::Separator m_tools_separator;
 		Ui::Box m_rows;
-		Ui::MenuBuilder<MenuAction, MenuActionTraits> m_menu;
+		Ui::MenuBuilder<MainMenuItem, MainMenuItemTraits> m_menu;
 		Ui::LabeledInput<PaletteEditor> m_pal_editor;
 		Ui::Separator m_pal_separator;
 		Ui::LabeledInput<LayerStackControl> m_layerstack_ctrl;
