@@ -35,6 +35,20 @@ namespace Texpainter::Ui
 			return *this;
 		}
 
+		template<class EventHandler>
+		SubmenuBuilder& eventHandler(EventHandler& eh)
+		{
+			forEachEnumItem<EnumType>([this, &eh](auto tag) {
+				if constexpr(std::is_same_v<Ui::MenuItem, typename EnumTypeTraits<tag.value>::type>)
+				{ get<tag.value>(m_items).template eventHandler<tag.value>(eh); }
+				else
+				{
+					get<tag.value>(m_items).eventHandler(eh);
+				}
+			});
+			return *this;
+		}
+
 	private:
 		Submenu m_root;
 		TupleFromEnum<EnumType, EnumTypeTraits> m_items;
@@ -51,6 +65,20 @@ namespace Texpainter::Ui
 			forEachEnumItem<EnumType>([this](auto tag) {
 				get<tag.value>(m_items).label(EnumTypeTraits<tag.value>::displayName());
 			});
+		}
+
+		template<class EventHandler>
+		MenuBuilder& eventHandler(EventHandler& eh)
+		{
+			forEachEnumItem<EnumType>([this, &eh](auto tag) {
+				if constexpr(std::is_same_v<Ui::MenuItem, typename EnumTypeTraits<tag.value>::type>)
+				{ get<tag.value>(m_items).template eventHandler<tag.value>(eh); }
+				else
+				{
+					get<tag.value>(m_items).eventHandler(eh);
+				}
+			});
+			return *this;
 		}
 
 	private:

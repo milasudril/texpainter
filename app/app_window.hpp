@@ -66,7 +66,11 @@ namespace Texpainter
 			m_pal_editor.inputField().eventHandler<ControlId::PaletteEd>(*this);
 			m_layerstack_ctrl.inputField().eventHandler<ControlId::LayerStackCtrl>(*this);
 			m_img_view.eventHandler<ControlId::Canvas>(*this);
+			m_menu.eventHandler(*this);
 		}
+
+		template<auto>
+		void onActivated(Ui::MenuItem&);
 
 		template<ControlId>
 		void onChanged(LayerStackControl&)
