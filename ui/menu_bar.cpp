@@ -79,4 +79,3 @@ void* Texpainter::Ui::MenuBar::toplevel() const
 {
 	return m_impl->_toplevel();
 }
-

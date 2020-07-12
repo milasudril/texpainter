@@ -12,10 +12,10 @@
 
 namespace Texpainter::Ui
 {
-	class MenuItem:public Container
+	class MenuItem: public Container
 	{
 	public:
-		explicit MenuItem(Container& parent, char const* label);
+		explicit MenuItem(Container& parent, char const* label = "");
 		~MenuItem();
 
 		MenuItem& operator=(MenuItem&& obj) noexcept
@@ -32,11 +32,13 @@ namespace Texpainter::Ui
 		template<auto id, class EventHandler>
 		MenuItem& eventHandler(EventHandler& eh)
 		{
-			return eventHandler(&eh, [](void* eh, MenuItem& self){
+			return eventHandler(&eh, [](void* eh, MenuItem& self) {
 				auto& obj = *reinterpret_cast<EventHandler*>(eh);
 				obj.template onActivated<id>(self);
 			});
 		}
+
+		MenuItem& label(char const* label);
 
 		MenuItem& add(void* handle) override;
 		MenuItem& show() override;

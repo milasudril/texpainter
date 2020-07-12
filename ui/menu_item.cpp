@@ -16,6 +16,11 @@ public:
 		r_func = func;
 	}
 
+	void label(char const* label)
+	{
+		gtk_menu_item_set_label(m_handle, label);
+	}
+
 	void _add(GtkWidget* handle) noexcept
 	{
 		gtk_menu_item_set_submenu(m_handle, handle);
@@ -44,10 +49,7 @@ private:
 	static void activate(GtkMenuItem*, void* data)
 	{
 		auto& self = *reinterpret_cast<Impl*>(data);
-		if(self.r_eh != nullptr)
-		{
-			self.r_func(self.r_eh, self);
-		}
+		if(self.r_eh != nullptr) { self.r_func(self.r_eh, self); }
 	}
 };
 
@@ -76,7 +78,14 @@ Texpainter::Ui::MenuItem::Impl::~Impl()
 	gtk_widget_destroy(GTK_WIDGET(m_handle));
 }
 
-Texpainter::Ui::MenuItem& Texpainter::Ui::MenuItem::eventHandler(void* event_handler, EventHandlerFunc f)
+Texpainter::Ui::MenuItem& Texpainter::Ui::MenuItem::label(char const* label)
+{
+	m_impl->label(label);
+	return *this;
+}
+
+Texpainter::Ui::MenuItem& Texpainter::Ui::MenuItem::eventHandler(void* event_handler,
+                                                                 EventHandlerFunc f)
 {
 	m_impl->eventHandler(event_handler, f);
 	return *this;

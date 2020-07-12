@@ -12,7 +12,7 @@
 
 namespace Texpainter::Ui
 {
-	class MenuBar:public Container
+	class MenuBar: public Container
 	{
 	public:
 		explicit MenuBar(Container& parent);
