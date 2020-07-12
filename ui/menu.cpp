@@ -12,7 +12,8 @@ public:
 
 	void _add(GtkWidget* handle) noexcept
 	{
-		gtk_menu_attach(m_handle, handle, 0, 1, 0, 1);
+		gtk_menu_attach(m_handle, handle, 0, 1, m_k, m_k + 1);
+		++m_k;
 	}
 
 	void _show() noexcept
@@ -32,9 +33,10 @@ public:
 
 private:
 	GtkMenu* m_handle;
+	size_t m_k;
 };
 
-Texpainter::Ui::Menu::Impl::Impl(Container& cnt): Menu{*this}
+Texpainter::Ui::Menu::Impl::Impl(Container& cnt): Menu{*this}, m_k{0}
 {
 	auto widget = gtk_menu_new();
 	m_handle = GTK_MENU(widget);

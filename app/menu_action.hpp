@@ -6,7 +6,7 @@
 #include "ui/button.hpp"
 #include "ui/separator.hpp"
 #include "ui/menu_item.hpp"
-#include "ui/submenu.hpp"
+#include "ui/menu_builder.hpp"
 
 namespace Texpainter
 {
@@ -24,6 +24,55 @@ namespace Texpainter
 		Save,
 		Export
 	};
+
+	constexpr auto end(Empty<FileAction>)
+	{
+		return static_cast<FileAction>(static_cast<int>(FileAction::Export) + 1);
+	}
+
+	template<FileAction>
+	struct FileActionTraits;
+
+	template<>
+	struct FileActionTraits<FileAction::New>
+	{
+		using type = Ui::MenuItem;
+		static constexpr char const* displayName()
+		{
+			return "New";
+		}
+	};
+
+	template<>
+	struct FileActionTraits<FileAction::Open>
+	{
+		using type = Ui::MenuItem;
+		static constexpr char const* displayName()
+		{
+			return "Open";
+		}
+	};
+
+	template<>
+	struct FileActionTraits<FileAction::Save>
+	{
+		using type = Ui::MenuItem;
+		static constexpr char const* displayName()
+		{
+			return "Save";
+		}
+	};
+
+	template<>
+	struct FileActionTraits<FileAction::Export>
+	{
+		using type = Ui::MenuItem;
+		static constexpr char const* displayName()
+		{
+			return "Export";
+		}
+	};
+
 	enum class LayerAction : int
 	{
 		New
@@ -50,12 +99,8 @@ namespace Texpainter
 		}
 
 		using Item = FileAction;
-		using type = Ui::Submenu;
+		using type = Ui::SubmenuBuilder<FileAction, FileActionTraits>;
 	};
-
-	template<FileAction>
-	struct FileActionTraits;
-
 
 	template<>
 	struct MainMenuItemTraits<MainMenuItem::Layer>

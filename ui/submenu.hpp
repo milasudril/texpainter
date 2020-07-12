@@ -28,6 +28,11 @@ namespace Texpainter::Ui
 			return *this;
 		}
 
+		Menu& menu()
+		{
+			return m_menu;
+		}
+
 	private:
 		MenuItem m_menuitem;
 		Menu m_menu;
