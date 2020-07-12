@@ -18,6 +18,7 @@
 #include "ui/image_view.hpp"
 #include "ui/labeled_input.hpp"
 #include "ui/dialog.hpp"
+#include "ui/menu_item.hpp"
 
 #include <numbers>
 
@@ -47,6 +48,7 @@ namespace Texpainter
 		   m_tools_separator{m_columns},
 		   m_rows{m_columns.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand}),
 		          Ui::Box::Orientation::Vertical},
+		   m_menu{m_rows, "Foobar"},
 		   m_pal_editor{m_rows, Ui::Box::Orientation::Horizontal, "Palettes: "},
 		   m_pal_separator{m_rows},
 		   m_layerstack_ctrl{m_rows, Ui::Box::Orientation::Horizontal, "Layers: ", m_canvas_size},
@@ -64,6 +66,13 @@ namespace Texpainter
 			m_pal_editor.inputField().eventHandler<ControlId::PaletteEd>(*this);
 			m_layerstack_ctrl.inputField().eventHandler<ControlId::LayerStackCtrl>(*this);
 			m_img_view.eventHandler<ControlId::Canvas>(*this);
+			m_menu.eventHandler<0>(*this);
+		}
+
+		template<int>
+		void onActivated(Ui::MenuItem&)
+		{
+			printf("Hej\n");
 		}
 
 		template<ControlId>
@@ -154,6 +163,7 @@ namespace Texpainter
 		Ui::Toolbar<MenuAction, MenuActionTraits> m_toolbar;
 		Ui::Separator m_tools_separator;
 		Ui::Box m_rows;
+		Ui::MenuItem m_menu;
 		Ui::LabeledInput<PaletteEditor> m_pal_editor;
 		Ui::Separator m_pal_separator;
 		Ui::LabeledInput<LayerStackControl> m_layerstack_ctrl;
