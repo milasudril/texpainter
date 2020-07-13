@@ -109,14 +109,14 @@ void Texpainter::AppWindow::onMouseMove<Texpainter::AppWindow::ControlId::Canvas
 	{
 		case PaintMode::Draw:
 		{
-			m_layerstack_ctrl.inputField().paintCurrentLayer(loc, 4.0, m_current_color);
+			m_layerstack_ctrl.paintCurrentLayer(loc, 4.0, m_current_color);
 			doRender();
 		}
 		break;
 
 		case PaintMode::Grab:
 		{
-			m_layerstack_ctrl.inputField().moveCurrentLayer(loc);
+			m_layerstack_ctrl.moveCurrentLayer(loc);
 			doRender();
 		}
 		break;
@@ -124,16 +124,14 @@ void Texpainter::AppWindow::onMouseMove<Texpainter::AppWindow::ControlId::Canvas
 		case PaintMode::Scale:
 		{
 			if(m_keymask & KeymaskCtrl)
-			{
-				m_layerstack_ctrl.inputField().scaleCurrentLayer(loc, m_paint_start_pos, snap_scale_factor);
-			}
+			{ m_layerstack_ctrl.scaleCurrentLayer(loc, m_paint_start_pos, snap_scale_factor); }
 			else if(m_keymask & KeymaskShift)
 			{
-				m_layerstack_ctrl.inputField().scaleCurrentLayer(loc, m_paint_start_pos, keep_aspect_ratio);
+				m_layerstack_ctrl.scaleCurrentLayer(loc, m_paint_start_pos, keep_aspect_ratio);
 			}
 			else
 			{
-				m_layerstack_ctrl.inputField().scaleCurrentLayer(loc, m_paint_start_pos, unity<vec2_t>);
+				m_layerstack_ctrl.scaleCurrentLayer(loc, m_paint_start_pos, unity<vec2_t>);
 			}
 			doRender();
 		}
@@ -141,11 +139,10 @@ void Texpainter::AppWindow::onMouseMove<Texpainter::AppWindow::ControlId::Canvas
 
 		case PaintMode::Rotate:
 		{
-			if(m_keymask & KeymaskCtrl)
-			{ m_layerstack_ctrl.inputField().rotateCurrentLayer(loc, snap_angle); }
+			if(m_keymask & KeymaskCtrl) { m_layerstack_ctrl.rotateCurrentLayer(loc, snap_angle); }
 			else
 			{
-				m_layerstack_ctrl.inputField().rotateCurrentLayer(loc, unity<Angle>);
+				m_layerstack_ctrl.rotateCurrentLayer(loc, unity<Angle>);
 			}
 			doRender();
 		}

@@ -42,16 +42,16 @@ namespace Texpainter
 		   m_painting{false},
 		   m_paintmode{PaintMode::Draw},
 		   m_keymask{0},
+		   m_layerstack_ctrl{m_rows, m_canvas_size},
 		   m_rows{container, Ui::Box::Orientation::Vertical},
 		   m_menu{m_rows},
 		   m_pal_editor{m_rows, Ui::Box::Orientation::Horizontal, "Palettes: "},
 		   m_pal_separator{m_rows},
-		   m_layerstack_ctrl{m_rows, Ui::Box::Orientation::Horizontal, "Layers: ", m_canvas_size},
 		   m_layeres_separator{m_rows},
 		   m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
 		{
 			m_pal_editor.inputField().eventHandler<ControlId::PaletteEd>(*this);
-			m_layerstack_ctrl.inputField().eventHandler<ControlId::LayerStackCtrl>(*this);
+			m_layerstack_ctrl.eventHandler<ControlId::LayerStackCtrl>(*this);
 			m_img_view.eventHandler<ControlId::Canvas>(*this);
 			m_menu.eventHandler(*this);
 		}
@@ -106,12 +106,12 @@ namespace Texpainter
 		static constexpr uint32_t KeymaskCtrl = 0x2;
 		uint32_t m_keymask;
 		vec2_t m_paint_start_pos;
+		LayerStackControl m_layerstack_ctrl;
 
 		Ui::Box m_rows;
 		Ui::MenuBuilder<MainMenuItem, MainMenuItemTraits> m_menu;
 		Ui::LabeledInput<PaletteEditor> m_pal_editor;
 		Ui::Separator m_pal_separator;
-		Ui::LabeledInput<LayerStackControl> m_layerstack_ctrl;
 		Ui::Separator m_layeres_separator;
 		Ui::ImageView m_img_view;
 
@@ -124,8 +124,8 @@ namespace Texpainter
 		{
 			Model::Image canvas{m_canvas_size};
 			std::ranges::fill(canvas.pixels(), Model::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
-			render(m_layerstack_ctrl.inputField().layers(), canvas.pixels());
-			m_layerstack_ctrl.inputField().outlineCurrentLayer(canvas.pixels());
+			render(m_layerstack_ctrl.layers(), canvas.pixels());
+			m_layerstack_ctrl.outlineCurrentLayer(canvas.pixels());
 			m_img_view.image(canvas);
 		}
 	};
@@ -184,7 +184,7 @@ namespace Texpainter
 			{
 				auto const offset =
 				   0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
-				m_layerstack_ctrl.inputField().paintCurrentLayer(pos_window - offset, 4.0, m_current_color);
+				m_layerstack_ctrl.paintCurrentLayer(pos_window - offset, 4.0, m_current_color);
 				doRender();
 			}
 			break;
