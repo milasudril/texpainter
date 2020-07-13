@@ -46,8 +46,6 @@ namespace Texpainter
 		   m_rows{container, Ui::Box::Orientation::Vertical},
 		   m_menu{m_rows},
 		   m_pal_editor{m_rows, Ui::Box::Orientation::Horizontal, "Palettes: "},
-		   m_pal_separator{m_rows},
-		   m_layeres_separator{m_rows},
 		   m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
 		{
 			m_pal_editor.inputField().eventHandler<ControlId::PaletteEd>(*this);
@@ -111,8 +109,6 @@ namespace Texpainter
 		Ui::Box m_rows;
 		Ui::MenuBuilder<MainMenuItem, MainMenuItemTraits> m_menu;
 		Ui::LabeledInput<PaletteEditor> m_pal_editor;
-		Ui::Separator m_pal_separator;
-		Ui::Separator m_layeres_separator;
 		Ui::ImageView m_img_view;
 
 		std::unique_ptr<NoiseGenDlg> m_surf_creator;
