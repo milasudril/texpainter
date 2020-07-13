@@ -54,9 +54,44 @@ namespace Texpainter
 			m_menu.eventHandler(*this);
 		}
 
-		template<auto>
+
+		template<AppAction>
 		void onActivated(Ui::MenuItem&)
 		{
+		}
+
+		template<FileAction>
+		void onActivated(Ui::MenuItem&)
+		{
+		}
+
+		template<LayerAction>
+		void onActivated(Ui::MenuItem&)
+		{
+		}
+
+		template<LayerActionNew>
+		void onActivated(Ui::MenuItem&)
+		{
+		}
+
+		template<LayerActionClearTransformation>
+		void onActivated(Ui::MenuItem&)
+		{
+		}
+
+		template<PaletteAction>
+		void onActivated(Ui::MenuItem&)
+		{
+		}
+
+		template<PaletteActionNew action>
+		void onActivated(Ui::MenuItem&)
+		{
+			if constexpr(action == PaletteActionNew::Empty)
+			{ m_pal_editor.inputField().createEmptyPalette(); }
+			/*	else
+			 { m_pal_editor.generatePalette(); }*/
 		}
 
 		template<ControlId>

@@ -49,6 +49,7 @@ namespace Texpainter
 		enum class ControlId : int
 		{
 			PalSelector,
+			PalCreateEmpty,
 			PalView,
 			ColorPicker
 		};
@@ -64,14 +65,24 @@ namespace Texpainter
 		   r_eh{nullptr},
 		   m_container{owner, Ui::Box::Orientation::Horizontal},
 		   m_pal_selector{m_container},
-		   m_pal_view{m_container.insertMode(Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand})}
+		   m_pal_view{m_container.insertMode(Ui::Box::InsertMode{2, Ui::Box::Fill | Ui::Box::Expand})}
 		{
 			m_pal_selector.eventHandler<ControlId::PalSelector>(*this);
 			m_pal_view.eventHandler<ControlId::PalView>(*this);
 			m_used_pal_names.reserve(13);
 		}
 
-		PaletteEditor& createPalette(char const* name)
+		void createEmptyPalette()
+		{
+			m_pal_name_input =
+			   std::make_unique<PaletteNameInput>(m_container,
+			                                      "Create new palette",
+			                                      Texpainter::Ui::Box::Orientation::Horizontal,
+			                                      "Palette name:");
+			m_pal_name_input->eventHandler<ControlId::PalCreateEmpty>(*this);
+		}
+
+		PaletteEditor& createEmptyPalette(char const* name)
 		{
 			m_pal_selector.append(generateEntryName(name, m_used_pal_names).c_str());
 			m_palettes.push_back(Model::Palette{20});
@@ -131,6 +142,12 @@ namespace Texpainter
 		}
 
 		template<ControlId>
+		void dismiss(PaletteNameInput&);
+
+		template<ControlId>
+		void confirmPositive(PaletteNameInput&);
+
+		template<ControlId>
 		void dismiss(ColorPicker&);
 
 		template<ControlId>
@@ -174,6 +191,12 @@ namespace Texpainter
 	inline void PaletteEditor::onMouseUp<PaletteEditor::ControlId::PalView>(
 	   Texpainter::Ui::PaletteView& view, size_t index, int button)
 	{
+		if(std::size(m_palettes) == 0)
+		{
+			createEmptyPalette();
+			return;
+		}
+
 		if(index < std::size(selectedPalette()))
 		{
 			switch(button)
@@ -202,6 +225,20 @@ namespace Texpainter
 					break;
 			}
 		}
+	}
+
+	template<>
+	inline void PaletteEditor::dismiss<PaletteEditor::ControlId::PalCreateEmpty>(PaletteNameInput&)
+	{
+	}
+
+	template<>
+	inline void
+	PaletteEditor::confirmPositive<PaletteEditor::ControlId::PalCreateEmpty>(PaletteNameInput& input)
+	{
+		createEmptyPalette(input.widget().inputField().content());
+		m_pal_name_input.reset();
+		notify();
 	}
 
 	template<>
