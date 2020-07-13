@@ -60,6 +60,8 @@ namespace Texpainter
 		Copy,
 		Link,
 		LinkToCopy,
+		Delete,
+		ClearTransformation,
 		MoveUp,
 		MoveDown,
 		EffectsAndBlendMode,
@@ -115,6 +117,83 @@ namespace Texpainter
 			return "Convert link to copy";
 		}
 	};
+
+	template<>
+	struct LayerActionTraits<LayerAction::Delete>
+	{
+		using type = Ui::MenuItem;
+		static constexpr char const* displayName()
+		{
+			return "Delete";
+		}
+	};
+
+	enum class LayerActionClearTransformation : int
+	{
+		Rotation,
+		Location,
+		Scale,
+		All
+	};
+
+	constexpr auto end(Empty<LayerActionClearTransformation>)
+	{
+		return static_cast<LayerActionClearTransformation>(static_cast<int>(LayerActionClearTransformation::All) + 1);
+	}
+
+	template<LayerActionClearTransformation>
+	struct LayerActionClearTransformationTraits;
+
+	template<>
+	struct LayerActionClearTransformationTraits<LayerActionClearTransformation::Rotation>
+	{
+		using type = Ui::MenuItem;
+		static constexpr char const* displayName()
+		{
+			return "Rotation";
+		}
+	};
+
+	template<>
+	struct LayerActionClearTransformationTraits<LayerActionClearTransformation::Location>
+	{
+		using type = Ui::MenuItem;
+		static constexpr char const* displayName()
+		{
+			return "Location";
+		}
+	};
+
+	template<>
+	struct LayerActionClearTransformationTraits<LayerActionClearTransformation::Scale>
+	{
+		using type = Ui::MenuItem;
+		static constexpr char const* displayName()
+		{
+			return "Scale";
+		}
+	};
+
+	template<>
+	struct LayerActionClearTransformationTraits<LayerActionClearTransformation::All>
+	{
+		using type = Ui::MenuItem;
+		static constexpr char const* displayName()
+		{
+			return "All";
+		}
+	};
+
+	template<>
+	struct LayerActionTraits<LayerAction::ClearTransformation>
+	{
+		using type = Ui::SubmenuBuilder<LayerActionClearTransformation, LayerActionClearTransformationTraits>;
+		static constexpr char const* displayName()
+		{
+			return "Clear transformation";
+		}
+	};
+
 
 	template<>
 	struct LayerActionTraits<LayerAction::MoveUp>
