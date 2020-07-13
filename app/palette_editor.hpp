@@ -8,12 +8,10 @@
 #include "ui/box.hpp"
 #include "ui/combobox.hpp"
 #include "ui/palette_view.hpp"
-#include "ui/button.hpp"
 #include "ui/labeled_input.hpp"
 #include "ui/text_entry.hpp"
 #include "ui/dialog.hpp"
-#include "ui/extended_color_picker.hpp"
-#include "ui/color_picker_sidepanel.hpp"
+#include "ui/color_picker.hpp"
 #include "ui/separator.hpp"
 #include "model/palette.hpp"
 #include "pcg-cpp/include/pcg_random.hpp"
@@ -51,8 +49,6 @@ namespace Texpainter
 		enum class ControlId : int
 		{
 			PalSelector,
-			PaletteCreate,
-			PaletteCreateDlg,
 			PalView,
 			ColorPicker
 		};
@@ -68,11 +64,9 @@ namespace Texpainter
 		   r_eh{nullptr},
 		   m_container{owner, Ui::Box::Orientation::Horizontal},
 		   m_pal_selector{m_container},
-		   m_pal_new{m_container, "＋"},
 		   m_pal_view{m_container.insertMode(Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand})}
 		{
 			m_pal_selector.eventHandler<ControlId::PalSelector>(*this);
-			m_pal_new.eventHandler<ControlId::PaletteCreate>(*this);
 			m_pal_view.eventHandler<ControlId::PalView>(*this);
 			m_used_pal_names.reserve(13);
 		}
@@ -124,15 +118,6 @@ namespace Texpainter
 		void onChanged(Ui::Combobox&);
 
 		template<ControlId>
-		void onClicked(Ui::Button&);
-
-		template<ControlId>
-		void dismiss(PaletteNameInput&);
-
-		template<ControlId>
-		void confirmPositive(PaletteNameInput&);
-
-		template<ControlId>
 		void onMouseDown(Texpainter::Ui::PaletteView& view, size_t, int)
 		{
 		}
@@ -168,7 +153,6 @@ namespace Texpainter
 
 		Ui::Box m_container;
 		Ui::Combobox m_pal_selector;
-		Ui::Button m_pal_new;
 		Ui::PaletteView m_pal_view;
 		std::unordered_set<std::string> m_used_pal_names;
 		std::unique_ptr<PaletteNameInput> m_pal_name_input;
@@ -183,31 +167,6 @@ namespace Texpainter
 		m_pal_view.palette(m_palettes[m_pal_selector.selected()])
 		   .highlightMode(0, Texpainter::Ui::PaletteView::HighlightMode::Read);
 		m_sel_color_index = 0;
-		notify();
-	}
-
-	template<>
-	inline void PaletteEditor::onClicked<PaletteEditor::ControlId::PaletteCreate>(Ui::Button& btn)
-	{
-		m_pal_name_input = std::make_unique<PaletteNameInput>(
-		   m_container, "Create a new palette", Ui::Box::Orientation::Horizontal, "Enter palette name: ");
-		m_pal_name_input->eventHandler<ControlId::PaletteCreateDlg>(*this).widget().inputField().focus();
-	}
-
-	template<>
-	inline void PaletteEditor::dismiss<PaletteEditor::ControlId::PaletteCreateDlg>(PaletteNameInput&)
-	{
-		m_pal_name_input.reset();
-		m_pal_new.state(false);
-	}
-
-	template<>
-	inline void
-	PaletteEditor::confirmPositive<PaletteEditor::ControlId::PaletteCreateDlg>(PaletteNameInput& dlg)
-	{
-		createPalette(dlg.widget().inputField().content());
-		m_pal_name_input.reset();
-		m_pal_new.state(false);
 		notify();
 	}
 
