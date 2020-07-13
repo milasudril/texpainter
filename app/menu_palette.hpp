@@ -46,12 +46,13 @@ namespace Texpainter
 	{
 		New,
 		Load,
-		Store
+		Store,
+		Remove
 	};
 
 	constexpr auto end(Empty<PaletteAction>)
 	{
-		return static_cast<PaletteAction>(static_cast<int>(PaletteAction::Store) + 1);
+		return static_cast<PaletteAction>(static_cast<int>(PaletteAction::Remove) + 1);
 	}
 
 	template<PaletteAction>
@@ -84,6 +85,16 @@ namespace Texpainter
 		static constexpr char const* displayName()
 		{
 			return "Store";
+		}
+	};
+
+	template<>
+	struct PaletteActionTraits<PaletteAction::Remove>
+	{
+		using type = Ui::MenuItem;
+		static constexpr char const* displayName()
+		{
+			return "Remove";
 		}
 	};
 }
