@@ -79,7 +79,7 @@ namespace Texpainter
 			                                      "Create new palette",
 			                                      Texpainter::Ui::Box::Orientation::Horizontal,
 			                                      "Palette name:");
-			m_pal_name_input->eventHandler<ControlId::PalCreateEmpty>(*this);
+			m_pal_name_input->eventHandler<ControlId::PalCreateEmpty>(*this).widget().inputField().focus();
 		}
 
 		PaletteEditor& createEmptyPalette(char const* name)
@@ -182,7 +182,7 @@ namespace Texpainter
 	inline void PaletteEditor::onChanged<PaletteEditor::ControlId::PalSelector>(Ui::Combobox& box)
 	{
 		m_pal_view.palette(m_palettes[m_pal_selector.selected()])
-		   .highlightMode(0, Texpainter::Ui::PaletteView::HighlightMode::Read);
+		   .highlightMode(0, Texpainter::Ui::PaletteView::HighlightMode::Read).update();
 		m_sel_color_index = 0;
 		notify();
 	}
@@ -230,6 +230,7 @@ namespace Texpainter
 	template<>
 	inline void PaletteEditor::dismiss<PaletteEditor::ControlId::PalCreateEmpty>(PaletteNameInput&)
 	{
+		m_pal_name_input.reset();
 	}
 
 	template<>
