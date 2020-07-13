@@ -57,7 +57,9 @@ namespace Texpainter
 		}
 
 		template<auto>
-		void onActivated(Ui::MenuItem&){}
+		void onActivated(Ui::MenuItem&)
+		{
+		}
 
 		template<ControlId>
 		void onChanged(LayerStackControl&)

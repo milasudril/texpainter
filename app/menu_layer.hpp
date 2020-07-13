@@ -138,7 +138,8 @@ namespace Texpainter
 
 	constexpr auto end(Empty<LayerActionClearTransformation>)
 	{
-		return static_cast<LayerActionClearTransformation>(static_cast<int>(LayerActionClearTransformation::All) + 1);
+		return static_cast<LayerActionClearTransformation>(
+		   static_cast<int>(LayerActionClearTransformation::All) + 1);
 	}
 
 	template<LayerActionClearTransformation>
@@ -187,7 +188,8 @@ namespace Texpainter
 	template<>
 	struct LayerActionTraits<LayerAction::ClearTransformation>
 	{
-		using type = Ui::SubmenuBuilder<LayerActionClearTransformation, LayerActionClearTransformationTraits>;
+		using type =
+		   Ui::SubmenuBuilder<LayerActionClearTransformation, LayerActionClearTransformationTraits>;
 		static constexpr char const* displayName()
 		{
 			return "Clear transformation";

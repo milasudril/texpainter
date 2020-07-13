@@ -108,6 +108,83 @@ namespace
 		return ret;
 	}
 
+	std::array<char, 8> rgb_to_hex(Texpainter::Model::Pixel rgb)
+	{
+		std::array<char, 8> ret{};
+		if(rgb.red() > 1.0f || rgb.green() > 1.0f || rgb.blue() > 1.0f) [[unlikely]]
+			{
+				strcpy(ret.data(), "------");
+				return ret;
+			}
+		else
+		{
+			auto const rgb_g22 =
+			   Texpainter::Model::BasicPixel<Texpainter::Model::ColorProfiles::Gamma22>{rgb};
+			auto const val = 255.0f * rgb_g22.value();
+			sprintf(ret.data(),
+			        "%02X%02X%02X",
+			        static_cast<uint8_t>(val[0]),
+			        static_cast<uint8_t>(val[1]),
+			        static_cast<uint8_t>(val[2]));
+			return ret;
+		}
+	}
+
+	std::optional<uint8_t> hexdigit_to_number(char x)
+	{
+		if(x >= '0' && x <= '9') [[likely]]
+			{
+				return x - '0';
+			}
+
+		if(x >= 'A' && x <= 'F') [[likely]]
+			{
+				return 10 + (x - 'A');
+			}
+
+		if(x >= 'a' && x <= 'f') [[likely]]
+			{
+				return 10 + (x - 'a');
+			}
+
+		return std::optional<uint8_t>{};
+	}
+
+	std::optional<Texpainter::Model::Pixel> hex_to_rgb(char const* str)
+	{
+		auto const n = strlen(str);
+		if(n != 6) [[unlikely]]
+			{
+				return std::optional<Texpainter::Model::Pixel>{};
+			}
+
+		std::array<uint8_t, 4> vals{};
+		for(size_t k = 0; k < 3; ++k)
+		{
+			auto msb_digit = *str;
+			auto lsb_digit = *(str + 1);
+
+			auto msb = hexdigit_to_number(msb_digit);
+			auto lsb = hexdigit_to_number(lsb_digit);
+			if(!(msb.has_value() && lsb.has_value())) [[unlikely]]
+				{
+					return std::optional<Texpainter::Model::Pixel>{};
+				}
+
+			vals[k] = (*msb << 4) | (*lsb);
+
+			str += 2;
+		}
+
+		return Texpainter::Model::Pixel{
+		   Texpainter::Model::BasicPixel<Texpainter::Model::ColorProfiles::Gamma22>{
+		      Texpainter::vec4_t{static_cast<float>(vals[0]),
+		                         static_cast<float>(vals[1]),
+		                         static_cast<float>(vals[2]),
+		                         static_cast<float>(vals[3])}
+		      / 255.0f}};
+	}
+
 	constexpr auto intensity_tickmarks = gen_tickmarks();
 
 	enum class ControlId : int
@@ -238,32 +315,14 @@ private:
 		m_red.inputField().content(toArray(rgb.red()).data());
 		m_green.inputField().content(toArray(rgb.green()).data());
 		m_blue.inputField().content(toArray(rgb.blue()).data());
-
-		if(rgb.red() > 1.0f || rgb.green() > 1.0f || rgb.blue() > 1.0f) [[unlikely]]
-			{
-				m_hex.inputField().content("------");
-			}
-		else
-		{
-			auto const rgb_g22 = Model::BasicPixel<Model::ColorProfiles::Gamma22>{rgb};
-			auto const val = 255.0f * rgb_g22.value();
-			std::array<char, 8> hex_str{};
-			sprintf(hex_str.data(),
-			        "%02X%02X%02X",
-			        static_cast<uint8_t>(val[0]),
-			        static_cast<uint8_t>(val[1]),
-			        static_cast<uint8_t>(val[2]));
-			m_hex.inputField().content(hex_str.data());
-		}
+		m_hex.inputField().content(rgb_to_hex(rgb).data());
 
 		m_hue.inputField().content(toArray(m_hsi.hue).data());
 		m_saturation.inputField().content(toArray(m_hsi.saturation).data());
 		m_intensity_text.inputField().content(toArray(m_hsi.intensity).data());
 		m_alpha_text.inputField().content(toArray(m_hsi.alpha).data());
 
-		Model::Palette pal{1};
-		pal[0] = rgb;
-		m_current_color.inputField().palette(pal).update();
+		m_current_color.inputField().palette(std::span{&rgb, 1}).update();
 	}
 
 	void updateHueSaturation(vec2_t pos_window)
@@ -386,6 +445,7 @@ void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onChanged<ControlId::Red>(
 		return;
 	}
 	value(toRgb(m_hsi).red(std::clamp(*val, 0.0f, 1.0f)));
+	update();
 }
 
 template<>
@@ -399,6 +459,7 @@ void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onChanged<ControlId::Green>
 		return;
 	}
 	value(toRgb(m_hsi).green(std::clamp(*val, 0.0f, 1.0f)));
+	update();
 }
 
 template<>
@@ -412,12 +473,22 @@ void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onChanged<ControlId::Blue>(
 		return;
 	}
 	value(toRgb(m_hsi).blue(std::clamp(*val, 0.0f, 1.0f)));
+	update();
 }
 
 template<>
 void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onChanged<ControlId::Hex>(
    Texpainter::Ui::TextEntry& src)
 {
+	auto val = hex_to_rgb(src.content());
+	if(!val.has_value())
+	{
+		src.content(rgb_to_hex(toRgb(m_hsi)).data());
+		return;
+	}
+	val->alpha(m_hsi.alpha);
+	value(*val);
+	update();
 }
 
 template<>
