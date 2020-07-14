@@ -12,6 +12,7 @@
 #include "./crack_creator.hpp"
 #include "./layerstack_control.hpp"
 
+#include "model/document.hpp"
 #include "utils/snap.hpp"
 #include "ui/box.hpp"
 #include "ui/image_view.hpp"
