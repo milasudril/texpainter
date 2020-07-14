@@ -5,6 +5,8 @@
 #ifndef TEXPAINTER_PALETTEEDITOR_HPP
 #define TEXPAINTER_PALETTEEDITOR_HPP
 
+#include "./unique_name.hpp"
+
 #include "ui/box.hpp"
 #include "ui/combobox.hpp"
 #include "ui/palette_view.hpp"
@@ -19,28 +21,6 @@
 #include <vector>
 #include <unordered_set>
 #include <string>
-
-namespace
-{
-	inline std::string generateEntryName(char const* name, std::unordered_set<std::string>& used_names)
-	{
-		std::string name_tmp{name};
-		auto i = used_names.insert(name_tmp);
-		if(!i.second)
-		{
-			auto k = 1;
-			name_tmp += "_";
-			while(true)
-			{
-				auto name_try = name_tmp + std::to_string(k);
-				auto i = used_names.insert(name_try);
-				if(i.second) { return name_try; }
-				++k;
-			}
-		}
-		return name_tmp;
-	}
-}
 
 namespace Texpainter
 {
