@@ -8,6 +8,7 @@
 #include "./palette_collection.hpp"
 
 #include <cassert>
+#include <map>
 
 namespace Texpainter::Model
 {
@@ -120,6 +121,47 @@ namespace Texpainter::Model
 		}
 
 
+		std::map<std::string, PaletteIndex> const& paletteNames() const
+		{
+			return m_palette_names;
+		}
+
+		Document& paletteNames(PaletteNames&& names)
+		{
+			m_palette_names = std::move(names);
+			m_dirty = true;
+			return *this;
+		}
+
+		template<class F>
+		Document& paletteNamesModify(F&& f)
+		{
+			f(m_palette_names);
+			m_dirty = true;
+			return *this;
+		}
+
+
+		std::map<std::string, PaletteIndex> const& layerNames() const
+		{
+			return m_layer_names;
+		}
+
+		Document& layerNames(PaletteNames&& names)
+		{
+			m_layer_names = std::move(names);
+			m_dirty = true;
+			return *this;
+		}
+
+		template<class F>
+		Document& layerNamesModify(F&& f)
+		{
+			f(m_layer_names);
+			m_dirty = true;
+			return *this;
+		}
+
 	private:
 		Size2d m_canvas_size;
 		LayerStack m_layers;
@@ -129,8 +171,8 @@ namespace Texpainter::Model
 		PaletteIndex m_current_palette;
 		ColorIndex m_current_color;
 
-		//		std::vector<std::string> m_palette_names;
-		//		std::vector<std::string> m_layer_names;
+		std::map<std::string, PaletteIndex> m_palette_names;
+		Sequence<std::string, LayerIndex> m_layer_names;
 
 		bool m_dirty;
 	};

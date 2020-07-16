@@ -19,6 +19,7 @@ namespace Texpainter
 		using index_type = IndexType;
 		using size_type = typename IndexType::element_type;
 		using value_type = T;
+		using const_iterator = Base::const_iterator;
 
 		auto size() const
 		{
