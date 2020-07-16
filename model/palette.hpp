@@ -4,6 +4,7 @@
 #define TEXPAINTER_PALETTE_HPP
 
 #include "./pixel.hpp"
+#include "./color_index.hpp"
 #include "utils/datablock.hpp"
 
 #include <algorithm>
@@ -32,13 +33,14 @@ namespace Texpainter::Model
 		{
 		}
 
-		explicit Palette(std::span<Pixel const> src): m_block{static_cast<uint32_t>(std::size(src))}
+		explicit Palette(std::span<Pixel const> src):
+		   m_block{static_cast<ColorIndex::element_type>(std::size(src))}
 		{
 			std::copy_n(std::begin(src), std::size(m_block), std::begin(m_block));
 		}
 
 
-		explicit Palette(uint32_t n, Pixel color_init = black()): m_block{n}
+		explicit Palette(uint32_t size, Pixel color_init = black()): m_block{size}
 		{
 			std::ranges::fill(m_block, color_init);
 		}
@@ -53,26 +55,19 @@ namespace Texpainter::Model
 			return *(std::begin(m_block) + index);
 		}
 
-		void resize(uint32_t size_new)
-		{
-			auto offset_end = size();
-			Texpainter::resize(m_block, size_new);
-			std::fill(begin() + offset_end, end(), black());
-		}
-
 		operator DataBlock<Pixel> const&() const
 		{
 			return m_block;
 		}
 
+		auto lastIndex() const
+		{
+			return ColorIndex{size() - 1};
+		}
+
 	private:
 		DataBlock<Pixel> m_block;
 	};
-
-	inline void resize(Palette& p, uint32_t size_new)
-	{
-		p.resize(size_new);
-	}
 
 	template<class OutputStream>
 	void write(Palette const& pal, OutputStream stream)

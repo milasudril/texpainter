@@ -16,16 +16,28 @@ namespace Texpainter
 		template<class T, class Value>
 		concept Container = requires(T a)
 		{
-			{*std::begin(a)} -> std::same_as<std::add_lvalue_reference_t<std::add_const_t<Value>>>;
+			{
+				*std::begin(a)
+			}
+			->std::same_as<std::add_lvalue_reference_t<std::add_const_t<Value>>>;
 			std::end(a);
-			{std::size(a)} -> std::convertible_to<size_t>;
+			{
+				std::size(a)
+			}
+			->std::convertible_to<size_t>;
 		};
 
 		template<class T, class Value>
-		concept Set = Container<T, Value> && requires(T a, Value b)
+		concept Set = Container<T, Value>&& requires(T a, Value b)
 		{
-			{a.find(b)} -> std::same_as<decltype(a.begin())>;
-			{a.insert(b)} -> std::same_as<std::pair<decltype(a.begin()), bool>>;
+			{
+				a.find(b)
+			}
+			->std::same_as<decltype(a.begin())>;
+			{
+				a.insert(b)
+			}
+			->std::same_as<std::pair<decltype(a.begin()), bool>>;
 		};
 	}
 

@@ -48,7 +48,9 @@ namespace Texpainter
 		   m_menu{m_rows},
 		   m_selectors{m_rows, Ui::Box::Orientation::Horizontal},
 		   m_layer_selector{m_selectors, Ui::Box::Orientation::Horizontal, "Layer: "},
-		   m_pal_editor{m_selectors.insertMode(Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand}), Ui::Box::Orientation::Horizontal, "Palette: "},
+		   m_pal_editor{m_selectors.insertMode(Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand}),
+		                Ui::Box::Orientation::Horizontal,
+		                "Palette: "},
 		   m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
 		{
 			m_pal_editor.inputField().eventHandler<ControlId::PaletteEd>(*this);

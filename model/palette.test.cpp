@@ -78,27 +78,6 @@ namespace Testcases
 		assert(pal[2].alpha() == 1.0f);
 	}
 
-	void texpainterPaletteResize()
-	{
-		Texpainter::Model::Palette pal{2};
-		pal[0] = Texpainter::Model::red();
-		pal[1] = Texpainter::Model::green();
-
-		resize(pal, 3);
-
-		assert(std::size(pal) == 3);
-		assert(pal[0].red() == 1.0f);
-		assert(pal[0].green() == 0.0f);
-		assert(pal[0].blue() == 0.0f);
-		assert(pal[1].red() == 0.0f);
-		assert(pal[1].green() == 1.0f);
-		assert(pal[1].blue() == 0.0f);
-		assert(pal[2].red() == 0.0f);
-		assert(pal[2].green() == 0.0f);
-		assert(pal[2].blue() == 0.0f);
-		assert(pal[2].alpha() == 1.0f);
-	}
-
 	void texpainterPaletteWriteRead()
 	{
 		Texpainter::Model::Palette pal{2};
@@ -121,6 +100,5 @@ int main()
 {
 	Testcases::texpainterPaletteCreateFromDataBlock();
 	Testcases::texpainterPaletteCreateEmpty();
-	Testcases::texpainterPaletteResize();
 	Testcases::texpainterPaletteWriteRead();
 }

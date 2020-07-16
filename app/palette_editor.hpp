@@ -162,7 +162,8 @@ namespace Texpainter
 	inline void PaletteEditor::onChanged<PaletteEditor::ControlId::PalSelector>(Ui::Combobox& box)
 	{
 		m_pal_view.palette(m_palettes[m_pal_selector.selected()])
-		   .highlightMode(0, Texpainter::Ui::PaletteView::HighlightMode::Read).update();
+		   .highlightMode(0, Texpainter::Ui::PaletteView::HighlightMode::Read)
+		   .update();
 		m_sel_color_index = 0;
 		notify();
 	}

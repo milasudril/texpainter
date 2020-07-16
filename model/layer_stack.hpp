@@ -9,7 +9,6 @@
 #include "utils/sequence.hpp"
 
 #include <vector>
-#include <cassert>
 
 namespace Texpainter::Model
 {
