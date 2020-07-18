@@ -46,7 +46,7 @@ namespace Texpainter
 		public:
 			using difference_type = intptr_t;
 			using value_type =
-			   std::remove_reference_t<decltype(*(std::declval<typename Iter::value_type>().second))>;
+			   std::remove_reference_t<decltype(*(std::declval<typename Iter::value_type>().second.first))>;
 			using iterator_category = std::bidirectional_iterator_tag;
 
 			DerefSecond() = default;
@@ -62,7 +62,7 @@ namespace Texpainter
 
 			auto& operator*() const
 			{
-				return *(m_i->second);
+				return *(m_i->second.first);
 			}
 
 			auto operator-> () const
@@ -144,10 +144,13 @@ namespace Texpainter
 			auto ptr = std::make_unique<ValueType>(std::move(value));
 			auto val_ins = &(*ptr);
 
-			auto ip1 = m_first_index.insert(std::make_pair(std::move(key_a), std::move(ptr)));
-			auto ip2 = m_second_index.insert(std::make_pair(std::move(key_b), val_ins));
-			m_val_to_first_key.insert(std::make_pair(val_ins, &ip1.first->first)).second;
-			m_val_to_second_key.insert(std::make_pair(val_ins, &ip2.first->first)).second;
+			auto ip1 = m_first_index.insert(
+			   std::make_pair(std::move(key_a), std::make_pair(std::move(ptr), nullptr)));
+			auto ip2 =
+			   m_second_index.insert(std::make_pair(std::move(key_b), std::make_pair(val_ins, nullptr)));
+			ip1.first->second.second = &ip2.first->first;
+			ip2.first->second.second = &ip1.first->first;
+
 			return static_cast<InsertResult>(res);
 		}
 
@@ -159,12 +162,8 @@ namespace Texpainter
 					return *this;
 				}
 
-			auto val = &(*(i->second));
-			auto const& second_key = *m_val_to_second_key.find(val)->second;
-			m_first_index.erase(key);
-			m_second_index.erase(second_key);
-			m_val_to_first_key.erase(val);
-			m_val_to_second_key.erase(val);
+			m_second_index.erase(*(i->second.second));
+			m_first_index.erase(i);
 
 			return *this;
 		}
@@ -177,12 +176,8 @@ namespace Texpainter
 					return *this;
 				}
 
-			auto val = &(*(i->second));
-			auto const& first_key = *m_val_to_first_key.find(val)->second;
-			m_first_index.erase(first_key);
-			m_second_index.erase(key);
-			m_val_to_first_key.erase(val);
-			m_val_to_second_key.erase(val);
+			m_first_index.erase(*(i->second.second));
+			m_second_index.erase(i);
 
 			return *this;
 		}
@@ -195,8 +190,8 @@ namespace Texpainter
 				{
 					auto i_prev = i;
 					--i_prev;
-					m_val_to_second_key.find(i->second)->second = &i_prev->first;
-					m_val_to_second_key.find(i_prev->second)->second = &i->first;
+					m_first_index.find(*(i->second.second))->second.second = &i_prev->first;
+					m_first_index.find(*(i_prev->second.second))->second.second = &i->first;
 					std::swap(i_prev->second, i->second);
 				}
 			return *this;
@@ -217,8 +212,8 @@ namespace Texpainter
 					return *this;
 				}
 
-			m_val_to_second_key.find(i->second)->second = &i_next->first;
-			m_val_to_second_key.find(i_next->second)->second = &i->first;
+			m_first_index.find(*(i->second.second))->second.second = &i_next->first;
+			m_first_index.find(*(i_next->second.second))->second.second = &i->first;
 			std::swap(i_next->second, i->second);
 			return *this;
 		}
@@ -227,7 +222,7 @@ namespace Texpainter
 		ValueType const* operator[](FirstKey const& key) const
 		{
 			auto i = m_first_index.find(key);
-			return i != std::end(m_first_index) ? &(*(i->second)) : nullptr;
+			return i != std::end(m_first_index) ? &(*(i->second.first)) : nullptr;
 		}
 
 		ValueType* operator[](FirstKey const& key)
@@ -238,7 +233,7 @@ namespace Texpainter
 		ValueType const* operator[](SecondKey const& key) const
 		{
 			auto i = m_second_index.find(key);
-			return i != std::end(m_second_index) ? &(*(i->second)) : nullptr;
+			return i != std::end(m_second_index) ? &(*(i->second.first)) : nullptr;
 		}
 
 		ValueType* operator[](SecondKey const& key)
@@ -291,10 +286,8 @@ namespace Texpainter
 
 
 	private:
-		std::map<FirstKey, owner> m_first_index;
-		std::map<SecondKey, ValueType*> m_second_index;
-		std::map<ValueType*, FirstKey const*> m_val_to_first_key;
-		std::map<ValueType*, SecondKey const*> m_val_to_second_key;
+		std::map<FirstKey, std::pair<owner, SecondKey const*>> m_first_index;
+		std::map<SecondKey, std::pair<ValueType*, FirstKey const*>> m_second_index;
 	};
 }
 
