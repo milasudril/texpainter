@@ -119,7 +119,7 @@ namespace Texpainter
 			NoError,
 			FirstKeyExists,
 			SecondKeyExists,
-			BothExists
+			BothKeysExist
 		};
 
 		InsertResult insert(ValueType&& value, FirstKey&& key_a, SecondKey&& key_b)
@@ -145,7 +145,6 @@ namespace Texpainter
 			auto val_ins = &(*ptr);
 
 			auto ip1 = m_first_index.insert(std::make_pair(std::move(key_a), std::move(ptr)));
-			;
 			auto ip2 = m_second_index.insert(std::make_pair(std::move(key_b), val_ins));
 			m_val_to_first_key.insert(std::make_pair(val_ins, &ip1.first->first)).second;
 			m_val_to_second_key.insert(std::make_pair(val_ins, &ip2.first->first)).second;
@@ -186,6 +185,27 @@ namespace Texpainter
 			m_val_to_second_key.erase(val);
 
 			return *this;
+		}
+
+
+		InsertResult rename(FirstKey const& old_key, FirstKey&& new_key)
+		{
+			auto i = m_first_index.find(old_key);
+			if(i == std::end(m_first_index)) [[unlikely]]
+				{
+					return InsertResult::NoError;
+				}
+
+			auto j = m_first_index.find(new_key);
+			if(j != std::end(m_first_index)) [[unlikely]]
+				{
+					return InsertResult::FirstKeyExists;
+				}
+
+			m_first_index.insert(std::make_pair(std::move(new_key), std::move(i->second)));
+			m_first_index.erase(i);
+
+			return InsertResult::NoError;
 		}
 
 
