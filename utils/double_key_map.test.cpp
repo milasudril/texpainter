@@ -14,8 +14,8 @@ namespace Testcases
 		Texpainter::DoubleKeyMap<double, int, std::string> map;
 		assert(map.size() == 0);
 
-		map.insert(static_cast<double>(std::numbers::pi), 0,  "pi");
-		map.insert(static_cast<double>(std::numbers::phi), 1,  "Phi");
+		map.insert(static_cast<double>(std::numbers::pi), 0, "pi");
+		map.insert(static_cast<double>(std::numbers::phi), 1, "Phi");
 		map.insert(static_cast<double>(std::numbers::e), 2, "e");
 
 		assert(map.size() == 3);
@@ -28,12 +28,13 @@ namespace Testcases
 		assert(*map["Phi"] == std::numbers::phi);
 		assert(*map["e"] == std::numbers::e);
 
-#if 0
 		{
 			std::array<double, 3> expected_vals{std::numbers::pi, std::numbers::phi, std::numbers::e};
-			assert(std::ranges::equal(seq.valuesInSequence(), expected_vals));
+
+			assert(std::ranges::equal(map.valuesByFirstKey(), expected_vals));
 		}
 
+#if 0
 		{
 			std::array<std::string, 3> expected_names{"Pi", "Phi", "e"};
 			assert(std::ranges::equal(seq.namesInSequence(), expected_names));
