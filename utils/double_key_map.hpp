@@ -218,6 +218,27 @@ namespace Texpainter
 			return *this;
 		}
 
+		auto rename(FirstKey const& key_old, FirstKey&& key_new)
+		{
+			auto i_new = m_first_index.find(key_new);
+			auto i_old = m_first_index.find(key_old);
+
+			if(i_new != std::end(m_first_index)) [[unlikely]]
+				{
+					return InsertResult::FirstKeyExists;
+				}
+
+			if(i_old == std::end(m_first_index)) [[unlikely]]
+				{
+					return InsertResult::NoError;
+				}
+
+			auto ip = m_first_index.insert(std::make_pair(std::move(key_new), std::move(i_old->second)));
+			m_second_index.find(*(ip.first->second.second))->second.second = &ip.first->first;
+			m_first_index.erase(i_old);
+			return InsertResult::NoError;
+		}
+
 
 		ValueType const* operator[](FirstKey const& key) const
 		{
