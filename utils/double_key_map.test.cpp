@@ -133,6 +133,86 @@ namespace Testcases
 		        == Texpainter::DoubleKeyMap<double, int, std::string>::InsertResult::BothKeysExist));
 		assert(map.size() == 3);
 	}
+
+	void texpainterDoubleMapMoveSecondKeyForward()
+	{
+		Texpainter::DoubleKeyMap<double, std::string, int> map;
+
+		map.insert(static_cast<double>(std::numbers::pi), "pi", 0);
+		map.insert(static_cast<double>(std::numbers::phi), "Phi", 1);
+		map.insert(static_cast<double>(std::numbers::e), "e", 2);
+
+		{
+			std::array<double, 3> expected_vals{std::numbers::pi, std::numbers::phi, std::numbers::e};
+			assert(std::ranges::equal(map.valuesBySecondKey(), expected_vals));
+		}
+
+		map.moveForward(1);
+
+		assert(*map["Phi"] == std::numbers::phi);
+		assert(*map["pi"] == std::numbers::pi);
+
+		{
+			std::array<double, 3> expected_vals{std::numbers::phi, std::numbers::pi, std::numbers::e};
+			assert(std::ranges::equal(map.valuesBySecondKey(), expected_vals));
+		}
+
+		{
+			std::array<std::string, 3> expected_keys{"Phi", "e", "pi"};
+			assert(std::ranges::equal(map.firstKey(), expected_keys));
+		}
+
+		map.remove("Phi");
+		{
+			std::array<std::string, 2> expected_keys{"e", "pi"};
+			assert(std::ranges::equal(map.firstKey(), expected_keys));
+		}
+
+		{
+			std::array<int, 2> expected_keys{1, 2};
+			assert(std::ranges::equal(map.secondKey(), expected_keys));
+		}
+	}
+
+	void texpainterDoubleMapMoveSecondKeyBackward()
+	{
+		Texpainter::DoubleKeyMap<double, std::string, int> map;
+
+		map.insert(static_cast<double>(std::numbers::pi), "pi", 0);
+		map.insert(static_cast<double>(std::numbers::phi), "Phi", 1);
+		map.insert(static_cast<double>(std::numbers::e), "e", 2);
+
+		{
+			std::array<double, 3> expected_vals{std::numbers::pi, std::numbers::phi, std::numbers::e};
+			assert(std::ranges::equal(map.valuesBySecondKey(), expected_vals));
+		}
+
+		map.moveBackward(1);
+
+		assert(*map["Phi"] == std::numbers::phi);
+		assert(*map["pi"] == std::numbers::pi);
+
+		{
+			std::array<double, 3> expected_vals{std::numbers::pi, std::numbers::e, std::numbers::phi};
+			assert(std::ranges::equal(map.valuesBySecondKey(), expected_vals));
+		}
+
+		{
+			std::array<std::string, 3> expected_keys{"Phi", "e", "pi"};
+			assert(std::ranges::equal(map.firstKey(), expected_keys));
+		}
+
+		map.remove("Phi");
+		{
+			std::array<std::string, 2> expected_keys{"e", "pi"};
+			assert(std::ranges::equal(map.firstKey(), expected_keys));
+		}
+
+		{
+			std::array<int, 2> expected_keys{0, 1};
+			assert(std::ranges::equal(map.secondKey(), expected_keys));
+		}
+	}
 }
 
 int main()
@@ -143,5 +223,7 @@ int main()
 	Testcases::texpainterDoubleMapInsertFirstKeyExists();
 	Testcases::texpainterDoubleMapInsertSecondKeyExists();
 	Testcases::texpainterDoubleMapInsertBothKeysExists();
+	Testcases::texpainterDoubleMapMoveSecondKeyForward();
+	Testcases::texpainterDoubleMapMoveSecondKeyBackward();
 	return 0;
 }

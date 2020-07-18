@@ -188,6 +188,42 @@ namespace Texpainter
 		}
 
 
+		auto& moveForward(SecondKey const& key)
+		{
+			auto i = m_second_index.find(key);
+			if(i != std::end(m_second_index) && i != std::begin(m_second_index)) [[likely]]
+				{
+					auto i_prev = i;
+					--i_prev;
+					m_val_to_second_key.find(i->second)->second = &i_prev->first;
+					m_val_to_second_key.find(i_prev->second)->second = &i->first;
+					std::swap(i_prev->second, i->second);
+				}
+			return *this;
+		}
+
+		auto& moveBackward(SecondKey const& key)
+		{
+			auto i = m_second_index.find(key);
+			if(i == std::end(m_second_index)) [[unlikely]]
+				{
+					return *this;
+				}
+
+			auto i_next = i;
+			++i_next;
+			if(i_next == std::end(m_second_index)) [[unlikely]]
+				{
+					return *this;
+				}
+
+			m_val_to_second_key.find(i->second)->second = &i_next->first;
+			m_val_to_second_key.find(i_next->second)->second = &i->first;
+			std::swap(i_next->second, i->second);
+			return *this;
+		}
+
+
 		ValueType const* operator[](FirstKey const& key) const
 		{
 			auto i = m_first_index.find(key);
