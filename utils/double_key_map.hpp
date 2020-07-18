@@ -188,27 +188,6 @@ namespace Texpainter
 		}
 
 
-		InsertResult rename(FirstKey const& old_key, FirstKey&& new_key)
-		{
-			auto i = m_first_index.find(old_key);
-			if(i == std::end(m_first_index)) [[unlikely]]
-				{
-					return InsertResult::NoError;
-				}
-
-			auto j = m_first_index.find(new_key);
-			if(j != std::end(m_first_index)) [[unlikely]]
-				{
-					return InsertResult::FirstKeyExists;
-				}
-
-			m_first_index.insert(std::make_pair(std::move(new_key), std::move(i->second)));
-			m_first_index.erase(i);
-
-			return InsertResult::NoError;
-		}
-
-
 		ValueType const* operator[](FirstKey const& key) const
 		{
 			auto i = m_first_index.find(key);

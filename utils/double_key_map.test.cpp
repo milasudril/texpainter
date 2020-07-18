@@ -133,34 +133,6 @@ namespace Testcases
 		        == Texpainter::DoubleKeyMap<double, int, std::string>::InsertResult::BothKeysExist));
 		assert(map.size() == 3);
 	}
-
-	void texpainterDoubleMapRenameFirstByFirst()
-	{
-		Texpainter::DoubleKeyMap<double, int, std::string> map;
-
-		map.insert(static_cast<double>(std::numbers::pi), 0, "pi");
-		map.insert(static_cast<double>(std::numbers::phi), 1, "Phi");
-		map.insert(static_cast<double>(std::numbers::e), 2, "e");
-
-		map.rename(2, -1);
-		assert(map[2] == nullptr);
-		assert(*map[-1] == std::numbers::e);
-		assert(*map["e"] == std::numbers::e);
-		assert(map.size() == 3);
-	}
-
-	void texpainterDoubleMapRenameFirstByFirstNewKeyExists()
-	{
-		Texpainter::DoubleKeyMap<double, int, std::string> map;
-
-		map.insert(static_cast<double>(std::numbers::pi), 0, "pi");
-		map.insert(static_cast<double>(std::numbers::phi), 1, "Phi");
-		map.insert(static_cast<double>(std::numbers::e), 2, "e");
-
-		assert((map.rename(2, 0) == Texpainter::DoubleKeyMap<double, int, std::string>::InsertResult::FirstKeyExists));
-		assert(*map[0] == std::numbers::pi);
-		assert(*map[2] == std::numbers::e);
-	}
 }
 
 int main()
@@ -171,7 +143,5 @@ int main()
 	Testcases::texpainterDoubleMapInsertFirstKeyExists();
 	Testcases::texpainterDoubleMapInsertSecondKeyExists();
 	Testcases::texpainterDoubleMapInsertBothKeysExists();
-	Testcases::texpainterDoubleMapRenameFirstByFirst();
-	Testcases::texpainterDoubleMapRenameFirstByFirstNewKeyExists();
 	return 0;
 }
