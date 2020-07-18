@@ -28,6 +28,10 @@ namespace Testcases
 		assert(*map["Phi"] == std::numbers::phi);
 		assert(*map["e"] == std::numbers::e);
 
+		assert(map["Kalle"] == nullptr);
+		assert(map[1243] == nullptr);
+
+
 		{
 			std::array<double, 3> expected_vals{std::numbers::pi, std::numbers::phi, std::numbers::e};
 			assert(std::ranges::equal(map.valuesByFirstKey(), expected_vals));
@@ -38,30 +42,15 @@ namespace Testcases
 			assert(std::ranges::equal(map.valuesBySecondKey(), expected_vals));
 		}
 
-#if 0
 		{
-			std::array<std::string, 3> expected_names{"Pi", "Phi", "e"};
-			assert(std::ranges::equal(seq.namesInSequence(), expected_names));
+			std::array<int, 3> expected_keys{0, 1, 2};
+			assert(std::ranges::equal(map.firstKey(), expected_keys));
 		}
 
 		{
-			std::array<std::string, 3> expected_names{"Phi", "Pi", "e"};
-			assert(std::ranges::equal(seq.namesInOrder(), expected_names));
+			std::array<std::string, 3> expected_keys{"Phi", "e", "pi"};
+			assert(std::ranges::equal(map.secondKey(), expected_keys));
 		}
-
-		{
-			std::array<IndexType, 3> expected_indices{IndexType{1}, IndexType{0}, IndexType{2}};
-			assert(std::ranges::equal(seq.indicesInOrder(), expected_indices));
-		}
-
-
-
-		assert(*seq["Pi"] == std::numbers::pi);
-		assert(*seq["Phi"] == std::numbers::phi);
-		assert(*seq["e"] == std::numbers::e);
-
-		assert(seq["Kalle"] == nullptr);
-#endif
 	}
 }
 

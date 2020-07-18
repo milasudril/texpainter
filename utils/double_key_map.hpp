@@ -4,6 +4,7 @@
 #define TEXPAINTER_DOUBLEKEYMAP_HPP
 
 #include "./iter_pair.hpp"
+#include "./pair_iterator.hpp"
 
 #include <map>
 #include <memory>
@@ -241,11 +242,17 @@ namespace Texpainter
 			                detail::DerefSecond{std::end(m_second_index)}};
 		}
 
-#if 0
-		// TODO:
-		auto itemsBySecondKey() const
-		{ return PairIterator{};}
-#endif
+		auto firstKey() const
+		{
+			return IterPair{PairFirstIterator{std::begin(m_first_index)},
+			                PairFirstIterator{std::end(m_first_index)}};
+		}
+
+		auto secondKey() const
+		{
+			return IterPair{PairFirstIterator{std::begin(m_second_index)},
+			                PairFirstIterator{std::end(m_second_index)}};
+		}
 
 
 	private:

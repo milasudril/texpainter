@@ -14,7 +14,7 @@ namespace Texpainter
 	{
 	public:
 		using difference_type = intptr_t;
-		using value_type = std::remove_cvref_t<decltype(std::get<item>(*std::declval<Iter>()))>;
+		using value_type = std::remove_reference_t<decltype(std::get<item>(*std::declval<Iter>()))>;
 		using iterator_category = std::bidirectional_iterator_tag;
 
 		PairIterator() = default;
