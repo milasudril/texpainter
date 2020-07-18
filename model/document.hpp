@@ -3,10 +3,11 @@
 #ifndef TEXPAINTER_DOCUMENT_HPP
 #define TEXPAINTER_DOCUMENT_HPP
 
-#include "./layer_stack.hpp"
+#include "./utils/double_key_map.hpp"
 #include "./color_index.hpp"
-#include "./palette_collection.hpp"
+#include "./palette_index.hpp"
 
+#include <string>
 #include <cassert>
 #include <map>
 
@@ -15,6 +16,9 @@ namespace Texpainter::Model
 	class Document
 	{
 	public:
+		using LayerStack = DoubleKeyMap<Layer, std::string, LayerIndex>;
+		using PaletteCollection = DoubleKeyMap<Palette, std::string, PaletteIndex>;
+
 		explicit Document(Size2d canvas_size): m_canvas_size{canvas_size}, m_dirty{false}
 		{
 		}
@@ -58,14 +62,15 @@ namespace Texpainter::Model
 		}
 
 
-		LayerIndex currentLayer() const
+		std::string const& currentLayer() const
 		{
 			return m_current_layer;
 		}
 
-		Document& currentLayer(LayerIndex i)
+		Document& currentLayer(std::string&& current_layer)
 		{
-			assert(i <= m_layers.lastIndex());
+			assert(m_layers[current_layer] != nullptr);
+			m_current_layer = std::move(current_layer);
 			m_dirty = true;
 			return *this;
 		}
@@ -92,16 +97,15 @@ namespace Texpainter::Model
 		}
 
 
-		PaletteIndex currentPalette() const
+		std::string const& currentPalette() const
 		{
 			return m_current_palette;
 		}
 
-		Document& currentPalette(PaletteIndex i)
+		Document& currentPalette(std::string&& current_palette)
 		{
-			assert(i <= m_palettes.lastIndex());
-			m_current_palette = i;
-			m_current_color = std::min(m_palettes[m_current_palette].lastIndex(), m_current_color);
+			assert(m_palettes[current_palette] != nullptr);
+			m_current_palette = std::move(current_palette);
 			m_dirty = true;
 			return *this;
 		}
@@ -114,67 +118,20 @@ namespace Texpainter::Model
 
 		Document& currentColor(ColorIndex i)
 		{
-			assert(i <= m_palettes[m_current_palette].lastIndex());
+			assert(i <= m_palettes[m_current_palette]->lastIndex());
 			m_current_color = i;
 			m_dirty = true;
 			return *this;
 		}
 
-
-#if 0
-		std::map<std::string, PaletteIndex> const& paletteNames() const
-		{
-			return m_palette_names;
-		}
-
-		Document& paletteNames(PaletteNames&& names)
-		{
-			m_palette_names = std::move(names);
-			m_dirty = true;
-			return *this;
-		}
-
-		template<class F>
-		Document& paletteNamesModify(F&& f)
-		{
-			f(m_palette_names);
-			m_dirty = true;
-			return *this;
-		}
-
-
-		std::map<std::string, PaletteIndex> const& layerNames() const
-		{
-			return m_layer_names;
-		}
-
-		Document& layerNames(PaletteNames&& names)
-		{
-			m_layer_names = std::move(names);
-			m_dirty = true;
-			return *this;
-		}
-
-		template<class F>
-		Document& layerNamesModify(F&& f)
-		{
-			f(m_layer_names);
-			m_dirty = true;
-			return *this;
-		}
-#endif
-
 	private:
 		Size2d m_canvas_size;
 		LayerStack m_layers;
-		LayerIndex m_current_layer;
-
 		PaletteCollection m_palettes;
-		PaletteIndex m_current_palette;
 		ColorIndex m_current_color;
 
-		std::map<std::string, PaletteIndex> m_palette_names;
-		Sequence<std::string, LayerIndex> m_layer_names;
+		std::string m_current_layer;
+		std::string m_current_palette;
 
 		bool m_dirty;
 	};
