@@ -52,10 +52,54 @@ namespace Testcases
 			assert(std::ranges::equal(map.secondKey(), expected_keys));
 		}
 	}
+
+	void texpainterDoubleMapRemoveByFirst()
+	{
+		Texpainter::DoubleKeyMap<double, int, std::string> map;
+
+		map.insert(static_cast<double>(std::numbers::pi), 0, "pi");
+		map.insert(static_cast<double>(std::numbers::phi), 1, "Phi");
+		map.insert(static_cast<double>(std::numbers::e), 2, "e");
+
+		map.remove(1);
+
+		assert(map.size() == 2);
+
+		assert(*map[0] == std::numbers::pi);
+		assert(map[1] == nullptr);
+		assert(*map[2] == std::numbers::e);
+
+		assert(*map["pi"] == std::numbers::pi);
+		assert(map[1] == nullptr);
+		assert(*map["e"] == std::numbers::e);
+	}
+
+	void texpainterDoubleMapRemoveBySecond()
+	{
+		Texpainter::DoubleKeyMap<double, int, std::string> map;
+
+		map.insert(static_cast<double>(std::numbers::pi), 0, "pi");
+		map.insert(static_cast<double>(std::numbers::phi), 1, "Phi");
+		map.insert(static_cast<double>(std::numbers::e), 2, "e");
+
+		map.remove("Phi");
+
+		assert(map.size() == 2);
+
+		assert(*map[0] == std::numbers::pi);
+		assert(map[1] == nullptr);
+		assert(*map[2] == std::numbers::e);
+
+		assert(*map["pi"] == std::numbers::pi);
+		assert(map[1] == nullptr);
+		assert(*map["e"] == std::numbers::e);
+	}
 }
 
 int main()
 {
 	Testcases::texpainterDoubleMapInsert();
+	Testcases::texpainterDoubleMapRemoveByFirst();
+	Testcases::texpainterDoubleMapRemoveBySecond();
 	return 0;
 }

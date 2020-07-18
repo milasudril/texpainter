@@ -160,7 +160,7 @@ namespace Texpainter
 					return *this;
 				}
 
-			auto& val = &(*(i->second));
+			auto val = &(*(i->second));
 			auto const& second_key = *m_val_to_second_key.find(val)->second;
 			m_first_index.erase(key);
 			m_second_index.erase(second_key);
