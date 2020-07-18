@@ -121,6 +121,7 @@ namespace Texpainter::Model
 		}
 
 
+#if 0
 		std::map<std::string, PaletteIndex> const& paletteNames() const
 		{
 			return m_palette_names;
@@ -161,6 +162,7 @@ namespace Texpainter::Model
 			m_dirty = true;
 			return *this;
 		}
+#endif
 
 	private:
 		Size2d m_canvas_size;
