@@ -30,8 +30,12 @@ namespace Testcases
 
 		{
 			std::array<double, 3> expected_vals{std::numbers::pi, std::numbers::phi, std::numbers::e};
-
 			assert(std::ranges::equal(map.valuesByFirstKey(), expected_vals));
+		}
+
+		{
+			std::array<double, 3> expected_vals{std::numbers::phi, std::numbers::e, std::numbers::pi};
+			assert(std::ranges::equal(map.valuesBySecondKey(), expected_vals));
 		}
 
 #if 0

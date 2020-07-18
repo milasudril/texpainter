@@ -229,6 +229,18 @@ namespace Texpainter
 			                detail::DerefSecond{std::end(m_first_index)}};
 		}
 
+		auto valuesBySecondKey() const
+		{
+			return IterPair{detail::DerefSecond{std::begin(m_second_index)},
+			                detail::DerefSecond{std::end(m_second_index)}};
+		}
+
+		auto valuesBySecondKey()
+		{
+			return IterPair{detail::DerefSecond{std::begin(m_second_index)},
+			                detail::DerefSecond{std::end(m_second_index)}};
+		}
+
 #if 0
 		// TODO:
 		auto itemsBySecondKey() const
