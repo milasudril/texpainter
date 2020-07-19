@@ -37,7 +37,7 @@ namespace Texpainter
 			   .eventHandler<ControlId::Width>(*this);
 
 			m_height.inputField()
-			   .content(m_width_str.c_str())
+			   .content(m_height_str.c_str())
 			   .alignment(1.0f)
 			   .width(5)
 			   .eventHandler<ControlId::Height>(*this);
