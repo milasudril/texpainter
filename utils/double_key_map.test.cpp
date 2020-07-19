@@ -231,6 +231,25 @@ namespace Testcases
 		map.remove(0);
 		assert(map["foobar"] == nullptr);
 	}
+
+
+	void texpainterDoubleMapRenameSecondByFirst()
+	{
+		Texpainter::DoubleKeyMap<double, std::string, int> map;
+
+		map.insert(static_cast<double>(std::numbers::pi), "pi", 0);
+		map.insert(static_cast<double>(std::numbers::phi), "Phi", 1);
+		map.insert(static_cast<double>(std::numbers::e), "e", 2);
+
+		map.rename("Phi", -1);
+		assert(map[1] == nullptr);
+		assert(*map["Phi"] == *map[-1]);
+		assert(*map["Phi"] == std::numbers::phi);
+		assert(map.size() == 3);
+
+		map.remove("Phi");
+		assert(map[-1] == nullptr);
+	}
 }
 
 int main()
@@ -244,5 +263,6 @@ int main()
 	Testcases::texpainterDoubleMapMoveSecondKeyForward();
 	Testcases::texpainterDoubleMapMoveSecondKeyBackward();
 	Testcases::texpainterDoubleMapRenameFirstByFirst();
+	Testcases::texpainterDoubleMapRenameSecondByFirst();
 	return 0;
 }
