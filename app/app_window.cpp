@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"app_window.o","type":"object"}]}
 
 #include "./app_window.hpp"
-
+#if 0
 namespace
 {
 	constexpr Texpainter::Angle snap_angle(Texpainter::Angle ϴ)
@@ -148,3 +148,4 @@ void Texpainter::AppWindow::onMouseMove<Texpainter::AppWindow::ControlId::Canvas
 		}
 	}
 }
+#endif

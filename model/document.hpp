@@ -3,10 +3,12 @@
 #ifndef TEXPAINTER_DOCUMENT_HPP
 #define TEXPAINTER_DOCUMENT_HPP
 
-#include "./utils/double_key_map.hpp"
 #include "./color_index.hpp"
 #include "./palette_index.hpp"
+#include "./layer.hpp"
+#include "./layer_index.hpp"
 
+#include "utils/double_key_map.hpp"
 #include "utils/mutator.hpp"
 
 #include <string>
