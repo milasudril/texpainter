@@ -7,6 +7,8 @@
 #include "./color_index.hpp"
 #include "./palette_index.hpp"
 
+#include "utils/mutator.hpp"
+
 #include <string>
 #include <cassert>
 #include <map>
@@ -53,11 +55,10 @@ namespace Texpainter::Model
 			return *this;
 		}
 
-		template<class Func>
+		template<Mutator<LayerStack> Func>
 		Document& layersModify(Func&& f)
 		{
-			f(m_layers);
-			m_dirty = true;
+			m_dirty = f(m_layers);
 			return *this;
 		}
 
@@ -88,11 +89,10 @@ namespace Texpainter::Model
 			return *this;
 		}
 
-		template<class F>
-		Document& palettesModify(F&& f)
+		template<Mutator<PaletteCollection> Func>
+		Document& palettesModify(Func&& f)
 		{
-			f(m_palettes);
-			m_dirty = true;
+			m_dirty = f(m_palettes);
 			return *this;
 		}
 
