@@ -83,15 +83,17 @@ namespace Texpainter
 					return;
 				}
 
-			Model::Layer new_layer{layer_info.size, Model::Pixel{0.0f, 0.0f, 0.0f, 1.0f}};
+
+			Model::Layer new_layer{layer_info.size
+			//TODO: ,r_doc_owner.document().currentColor()
+			};
 
 			r_doc_owner.documentModify(
 			   [&new_layer, layer_name = std::move(layer_info.name) ](auto& doc) mutable noexcept {
-				   doc.layersModify([&new_layer, &layer_name ](auto& layers) noexcept {
+				  return doc.layersModify([&new_layer, &layer_name ](auto& layers) noexcept {
 					   layers.insert(std::move(new_layer), std::move(layer_name), Model::LayerIndex{0});
 					   return true;
 				   });
-				   return true;
 			   });
 			m_new_from_color_dlg.reset();
 		}

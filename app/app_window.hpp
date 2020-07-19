@@ -58,10 +58,12 @@ namespace Texpainter
 		}
 
 		template<Mutator<Model::Document> Func>
-		AppWindow& documentModify(Func&& f)
+		bool documentModify(Func&& f)
 		{
-			if(f(*m_current_document)) { doRender(); }
-			return *this;
+			auto res = f(*m_current_document);
+			if(res)
+			{ doRender(); }
+			return res;
 		}
 
 		Model::Document const& document() const

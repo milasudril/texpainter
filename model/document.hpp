@@ -70,10 +70,10 @@ namespace Texpainter::Model
 		}
 
 		template<Mutator<LayerStack> Func>
-		Document& layersModify(Func&& f)
+		bool layersModify(Func&& f)
 		{
 			m_dirty = f(m_layers);
-			return *this;
+			return m_dirty;
 		}
 
 
@@ -104,10 +104,10 @@ namespace Texpainter::Model
 		}
 
 		template<Mutator<PaletteCollection> Func>
-		Document& palettesModify(Func&& f)
+		bool palettesModify(Func&& f)
 		{
 			m_dirty = f(m_palettes);
-			return *this;
+			return m_dirty;
 		}
 
 
