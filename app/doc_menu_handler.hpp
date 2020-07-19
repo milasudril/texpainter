@@ -7,6 +7,7 @@
 
 #include "./menu_file.hpp"
 #include "./size_input.hpp"
+
 #include "model/document.hpp"
 #include "ui/dialog.hpp"
 
@@ -29,12 +30,6 @@ namespace Texpainter
 		   r_dlg_owner{dialog_owner},
 		   r_doc_owner{doc_owner}
 		{
-		}
-
-		template<auto id, class EventHandler>
-		DocMenuHandler& eventHandler(EventHandler&)
-		{
-			return *this;
 		}
 
 		template<FileAction action>

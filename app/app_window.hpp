@@ -8,6 +8,7 @@
 
 #include "./menu_action.hpp"
 #include "./doc_menu_handler.hpp"
+#include "./layer_menu_handler.hpp"
 #include "./palette_editor.hpp"
 
 #include "model/document.hpp"
@@ -34,6 +35,7 @@ namespace Texpainter
 
 		explicit AppWindow(Ui::Container& container):
 		   m_doc_menu_handler{container, *this},
+		   m_layer_menu_handler{container, *this},
 		   m_rows{container, Ui::Box::Orientation::Vertical},
 		   m_menu{m_rows},
 		   m_selectors{m_rows, Ui::Box::Orientation::Horizontal},
@@ -62,6 +64,11 @@ namespace Texpainter
 			return *this;
 		}
 
+		Model::Document const& document() const
+		{
+			return *m_current_document;
+		}
+
 		bool hasDocument() const
 		{
 			return m_current_document != nullptr;
@@ -76,7 +83,7 @@ namespace Texpainter
 		template<FileAction action>
 		void onActivated(Ui::MenuItem& item)
 		{
-			m_doc_menu_handler.template onActivated<action>(item);
+			m_doc_menu_handler.onActivated<action>(item);
 		}
 
 		template<LayerAction>
@@ -84,9 +91,10 @@ namespace Texpainter
 		{
 		}
 
-		template<LayerActionNew>
-		void onActivated(Ui::MenuItem&)
+		template<LayerActionNew action>
+		void onActivated(Ui::MenuItem& item)
 		{
+			m_layer_menu_handler.onActivated<action>(item);
 		}
 
 		template<LayerActionClearTransformation>
@@ -133,6 +141,7 @@ namespace Texpainter
 	private:
 		std::unique_ptr<Model::Document> m_current_document;
 		DocMenuHandler<AppWindow> m_doc_menu_handler;
+		LayerMenuHandler<AppWindow> m_layer_menu_handler;
 
 		Ui::Box m_rows;
 		Ui::MenuBuilder<MainMenuItem, MainMenuItemTraits> m_menu;

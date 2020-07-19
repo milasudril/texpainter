@@ -18,14 +18,14 @@ namespace Texpainter::Model
 	class Layer
 	{
 	public:
-		explicit Layer(Size2d size):
+		explicit Layer(Size2d size, Pixel initial_color = Pixel{0.0f, 0.0f, 0.0f, 0.0f}):
 		   m_visible{true},
 		   m_loc{0.0, 0.0},
 		   m_rot{0},
 		   m_scale{1.0, 1.0},
 		   m_content{std::make_shared<Image>(size)}
 		{
-			std::ranges::fill(m_content->pixels(), Pixel{0.0, 0.0, 0.0, 0.0});
+			fill(initial_color);
 		}
 
 		Layer(Layer const& other) = delete;
@@ -49,6 +49,12 @@ namespace Texpainter::Model
 		}
 
 		Layer& paint(vec2_t origin, double radius, Pixel color);
+
+		Layer& fill(Pixel color)
+		{
+			std::ranges::fill(m_content->pixels(), color);
+			return *this;
+		}
 
 		Image const& content() const
 		{

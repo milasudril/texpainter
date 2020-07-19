@@ -43,8 +43,16 @@ namespace Texpainter
 			return {m_name.inputField().content(), Model::Layer{size}};
 		}
 
-		template<ControlId>
-		void onChanged(Ui::TextEntry& entry);
+		struct LayerInfo
+		{
+			std::string name;
+			Size2d size;
+		};
+
+		auto value() const
+		{
+			return LayerInfo{m_name.inputField().content(), m_size.value()};
+		}
 
 	private:
 		Ui::Box m_root;

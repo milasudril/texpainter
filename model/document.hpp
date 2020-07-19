@@ -21,6 +21,8 @@ namespace Texpainter::Model
 	{
 	public:
 		using LayerStack = DoubleKeyMap<Layer, std::string, LayerIndex>;
+
+		// TODO: Use a regular map (There is no need to keep the order of palettes intact)
 		using PaletteCollection = DoubleKeyMap<Palette, std::string, PaletteIndex>;
 
 		explicit Document(Size2d canvas_size): m_canvas_size{canvas_size}, m_dirty{false}
