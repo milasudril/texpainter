@@ -63,7 +63,8 @@ public:
 		if(m_img_surface != nullptr) [[likely]]
 			{
 				cairo_set_source_surface(cr, m_img_surface, 0.0, 0.0);
-				cairo_rectangle(cr, 0.0, 0.0, m_size_current.width(), m_size_current.height());
+				cairo_pattern_set_extend(cairo_get_source(cr), CAIRO_EXTEND_REPEAT);
+				cairo_rectangle(cr, 0.0, 0.0, dim.width(), dim.height());
 				cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
 				cairo_fill(cr);
 			}
