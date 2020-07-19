@@ -61,8 +61,7 @@ namespace Texpainter
 		bool documentModify(Func&& f)
 		{
 			auto res = f(*m_current_document);
-			if(res)
-			{ doRender(); }
+			if(res) { doRender(); }
 			return res;
 		}
 

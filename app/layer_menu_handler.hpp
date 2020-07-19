@@ -82,15 +82,11 @@ namespace Texpainter
 					//  "this size exeeds the largest supported integer value."};
 					return;
 				}
-
-
-			Model::Layer new_layer{layer_info.size
-			//TODO: ,r_doc_owner.document().currentColor()
-			};
+			Model::Layer new_layer{layer_info.size, currentColor(r_doc_owner.document())};
 
 			r_doc_owner.documentModify(
 			   [&new_layer, layer_name = std::move(layer_info.name) ](auto& doc) mutable noexcept {
-				  return doc.layersModify([&new_layer, &layer_name ](auto& layers) noexcept {
+				   return doc.layersModify([&new_layer, &layer_name ](auto& layers) noexcept {
 					   layers.insert(std::move(new_layer), std::move(layer_name), Model::LayerIndex{0});
 					   return true;
 				   });

@@ -158,9 +158,9 @@ public:
 		m_vt = vtable;
 	}
 
-	void highlightMode(size_t index, HighlightMode mode)
+	void highlightMode(Model::ColorIndex index, HighlightMode mode)
 	{
-		*(m_highlight_mode.begin() + index) = mode;
+		*(m_highlight_mode.begin() + index.value()) = mode;
 	}
 
 	void minSize(Size2d size)
@@ -169,7 +169,7 @@ public:
 		recalculateWidgetSize();
 	}
 
-	Model::Pixel color(size_t index) const
+	Model::Pixel color(Model::ColorIndex index) const
 	{
 		return m_colors[index];
 	}
@@ -215,7 +215,7 @@ private:
 		gtk_widget_set_size_request(widget, -1, m_n_rows * m_min_size.height());
 	}
 
-	size_t coordsToItem(vec2_t pos) const
+	Model::ColorIndex coordsToItem(vec2_t pos) const
 	{
 		auto const widget = GTK_WIDGET(m_handle);
 		auto const widget_size = vec2_t{static_cast<double>(gtk_widget_get_allocated_width(widget)),
@@ -228,7 +228,7 @@ private:
 		auto const col = static_cast<int>(col_row[0]);
 		auto const row = static_cast<int>(col_row[1]);
 
-		return std::min(m_colors.size(), static_cast<uint32_t>(m_n_cols * row + col));
+		return Model::ColorIndex{std::min(m_colors.size(), static_cast<uint32_t>(m_n_cols * row + col))};
 	}
 
 	static void size_callback(GtkWidget* widget, GdkRectangle* allocation, gpointer self)
@@ -317,7 +317,7 @@ Texpainter::Ui::PaletteView& Texpainter::Ui::PaletteView::update()
 	return *this;
 }
 
-Texpainter::Ui::PaletteView& Texpainter::Ui::PaletteView::highlightMode(size_t index,
+Texpainter::Ui::PaletteView& Texpainter::Ui::PaletteView::highlightMode(Model::ColorIndex index,
                                                                         HighlightMode mode)
 {
 	m_impl->highlightMode(index, mode);
@@ -330,7 +330,8 @@ Texpainter::Ui::PaletteView& Texpainter::Ui::PaletteView::minSize(Size2d size)
 	return *this;
 }
 
-Texpainter::Model::Pixel Texpainter::Ui::PaletteView::PaletteView::color(size_t index) const
+Texpainter::Model::Pixel
+Texpainter::Ui::PaletteView::PaletteView::color(Model::ColorIndex index) const
 {
 	return m_impl->color(index);
 }

@@ -74,8 +74,8 @@ namespace Texpainter
 		{
 			m_pal_selector.selected(index);
 			m_pal_view.palette(m_palettes[index])
-			   .highlightMode(0, Texpainter::Ui::PaletteView::HighlightMode::Read);
-			m_sel_color_index = 0;
+			   .highlightMode(Model::ColorIndex{0}, Texpainter::Ui::PaletteView::HighlightMode::Read);
+			m_sel_color_index = Model::ColorIndex{0};
 			return *this;
 		}
 
@@ -100,7 +100,7 @@ namespace Texpainter
 			return m_palettes.size();
 		}
 
-		uint32_t selectedColorIndex() const
+		Model::ColorIndex selectedColorIndex() const
 		{
 			return m_sel_color_index;
 		}
@@ -109,15 +109,15 @@ namespace Texpainter
 		void onChanged(Ui::Combobox&);
 
 		template<ControlId>
-		void onMouseDown(Texpainter::Ui::PaletteView& view, size_t, int)
+		void onMouseDown(Texpainter::Ui::PaletteView& view, Model::ColorIndex, int)
 		{
 		}
 
 		template<ControlId>
-		void onMouseUp(Texpainter::Ui::PaletteView&, size_t, int);
+		void onMouseUp(Texpainter::Ui::PaletteView&, Model::ColorIndex, int);
 
 		template<ControlId>
-		void onMouseMove(Texpainter::Ui::PaletteView&, size_t)
+		void onMouseMove(Texpainter::Ui::PaletteView&, Model::ColorIndex)
 		{
 		}
 
@@ -136,8 +136,8 @@ namespace Texpainter
 
 	private:
 		std::vector<Model::Palette> m_palettes;
-		uint32_t m_sel_color_index;
-		uint32_t m_modified_pal_index;
+		Model::ColorIndex m_sel_color_index;
+		Model::ColorIndex m_modified_pal_index;
 
 		using EventHandlerFunc = void (*)(void*, PaletteEditor&);
 		void* r_eh;
@@ -162,15 +162,15 @@ namespace Texpainter
 	inline void PaletteEditor::onChanged<PaletteEditor::ControlId::PalSelector>(Ui::Combobox& box)
 	{
 		m_pal_view.palette(m_palettes[m_pal_selector.selected()])
-		   .highlightMode(0, Texpainter::Ui::PaletteView::HighlightMode::Read)
+		   .highlightMode(Model::ColorIndex{0}, Texpainter::Ui::PaletteView::HighlightMode::Read)
 		   .update();
-		m_sel_color_index = 0;
+		m_sel_color_index = Model::ColorIndex{0};
 		notify();
 	}
 
 	template<>
 	inline void PaletteEditor::onMouseUp<PaletteEditor::ControlId::PalView>(
-	   Texpainter::Ui::PaletteView& view, size_t index, int button)
+	   Texpainter::Ui::PaletteView& view, Model::ColorIndex index, int button)
 	{
 		if(std::size(m_palettes) == 0)
 		{
@@ -178,17 +178,17 @@ namespace Texpainter
 			return;
 		}
 
-		if(index < std::size(selectedPalette()))
+		if(index <= selectedPalette().lastIndex())
 		{
 			switch(button)
 			{
 				case 3:
 				{
-					m_modified_pal_index = static_cast<uint32_t>(index);
+					m_modified_pal_index = index;
 					m_pal_view.highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Write).update();
 					m_color_picker = std::make_unique<ColorPicker>(
 					   m_container,
-					   (std::string{"Select color number "} + std::to_string(index + 1)).c_str(),
+					   (std::string{"Select color number "} + std::to_string(index.value() + 1)).c_str(),
 					   PolymorphicRng{m_rng},
 					   "Recently used: ",
 					   m_color_history);

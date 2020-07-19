@@ -1,4 +1,4 @@
-//@	{"targets":[{"name":"palette.test", "type":"application", "autorun":1}]}
+//	{"targets":[{"name":"palette.test", "type":"application", "autorun":1}]}
 
 #include "./palette.hpp"
 

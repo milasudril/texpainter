@@ -45,14 +45,14 @@ namespace Texpainter::Model
 			std::ranges::fill(m_block, color_init);
 		}
 
-		auto operator[](size_t index) const
+		auto operator[](ColorIndex index) const
 		{
-			return *(begin() + index);
+			return *(begin() + index.value());
 		}
 
-		auto& operator[](size_t index)
+		auto& operator[](ColorIndex index)
 		{
-			return *(std::begin(m_block) + index);
+			return *(std::begin(m_block) + index.value());
 		}
 
 		operator DataBlock<Pixel> const&() const
