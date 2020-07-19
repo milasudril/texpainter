@@ -50,6 +50,16 @@ namespace Texpainter::Model
 			return m_layers;
 		}
 
+		auto layersByIndex() const
+		{
+			return m_layers.valuesBySecondKey();
+		}
+
+		auto layersByName() const
+		{
+			return m_layers.valuesByFirstKey();
+		}
+
 		Document& layers(LayerStack&& layers_new)
 		{
 			m_layers = std::move(layers_new);

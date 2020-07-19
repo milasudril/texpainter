@@ -51,16 +51,14 @@ namespace Texpainter
 		AppWindow& document(Model::Document&& doc)
 		{
 			m_current_document = std::make_unique<Model::Document>(std::move(doc));
+			doRender();
 			return *this;
 		}
 
 		template<Mutator<Model::Document> Func>
 		AppWindow& documentModify(Func&& f)
 		{
-			if(f(*m_current_document))
-			{
-			// Update ...
-			}
+			if(f(*m_current_document)) { doRender(); }
 			return *this;
 		}
 
@@ -137,6 +135,19 @@ namespace Texpainter
 		Ui::LabeledInput<Ui::Combobox> m_layer_selector;
 		Ui::LabeledInput<PaletteEditor> m_pal_editor;
 		Ui::ImageView m_img_view;
+
+
+		void doRender()
+		{
+			Model::Image canvas{m_current_document->canvasSize()};
+			std::ranges::fill(canvas.pixels(), Model::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
+			std::ranges::for_each(m_current_document->layersByIndex(), [&canvas](auto const& layer) {
+				if(layer.visible()) { render(layer, canvas); }
+			});
+
+			// TODO:	m_layerstack_ctrl.inputField().outlineCurrentLayer(canvas.pixels());
+			m_img_view.image(canvas);
+		}
 	};
 }
 

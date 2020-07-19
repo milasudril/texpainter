@@ -68,8 +68,8 @@ namespace Texpainter
 
 		void onActivated(Tag<FileAction::SetCanvasSize>, Ui::MenuItem&)
 		{
-			m_canvas_dlg = std::make_unique<CanvasSizeDialog>
-				(r_dlg_owner, "Set canvas size", m_default_size, Size2d{16384, 16384});
+			m_canvas_dlg = std::make_unique<CanvasSizeDialog>(
+			   r_dlg_owner, "Set canvas size", m_default_size, Size2d{16384, 16384});
 			m_canvas_dlg->eventHandler<ControlId::SetCanvasSize>(*this);
 		}
 
@@ -95,7 +95,7 @@ namespace Texpainter
 		{
 			m_default_size = src.widget().value();
 			m_canvas_dlg.reset();
-			r_doc_owner.documentModify([size = m_default_size](Model::Document& doc) noexcept {
+			r_doc_owner.documentModify([size = m_default_size](Model::Document & doc) noexcept {
 				doc.canvasSize(size);
 				return true;
 			});
@@ -114,7 +114,6 @@ namespace Texpainter
 
 		std::unique_ptr<CanvasSizeDialog> m_new_dlg;
 		std::unique_ptr<CanvasSizeDialog> m_canvas_dlg;
-
 	};
 }
 
