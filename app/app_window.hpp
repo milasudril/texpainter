@@ -54,6 +54,16 @@ namespace Texpainter
 			return *this;
 		}
 
+		template<Mutator<Model::Document> Func>
+		AppWindow& documentModify(Func&& f)
+		{
+			if(f(*m_current_document))
+			{
+			// Update ...
+			}
+			return *this;
+		}
+
 
 		template<AppAction>
 		void onActivated(Ui::MenuItem&)
