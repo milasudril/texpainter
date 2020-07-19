@@ -71,7 +71,7 @@ namespace Texpainter
 			if(r_doc_owner.hasDocument())
 			{
 				m_canvas_dlg = std::make_unique<CanvasSizeDialog>(
-				r_dlg_owner, "Set canvas size", m_default_size, Size2d{16384, 16384});
+				   r_dlg_owner, "Set canvas size", m_default_size, Size2d{16384, 16384});
 				m_canvas_dlg->eventHandler<ControlId::SetCanvasSize>(*this);
 			}
 			else
@@ -95,7 +95,7 @@ namespace Texpainter
 
 		void dismiss(Tag<ControlId::NewDocument>, CanvasSizeDialog&)
 		{
-			m_canvas_dlg.reset();
+			m_new_dlg.reset();
 		}
 
 		void confirmPositive(Tag<ControlId::SetCanvasSize>, CanvasSizeDialog& src)

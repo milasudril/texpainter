@@ -63,7 +63,9 @@ namespace Texpainter
 		}
 
 		bool hasDocument() const
-		{ return m_current_document != nullptr;}
+		{
+			return m_current_document != nullptr;
+		}
 
 
 		template<AppAction>
