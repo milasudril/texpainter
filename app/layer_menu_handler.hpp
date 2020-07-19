@@ -73,22 +73,26 @@ namespace Texpainter
 
 		void confirmPositive(Tag<ControlId::NewFromCurrentColor>, NewFromCurrentColor& src)
 		{
-			r_doc_owner.documentModify([layer_info = src.widget().value()](auto& doc) mutable noexcept {
-				if(!isSupported<Model::Pixel>(layer_info.size)) [[unlikely]]
-					{
-						// FIXME:
-						//   "A layer of this size cannot be created. The number of bytes required to create a layer
-						//   of "
-						//  "this size exeeds the largest supported integer value."};
-						return false;
-					}
-				doc.layersModify([&layer_info](auto& layers) noexcept {
-					auto new_layer = Model::Layer{layer_info.size, Model::Pixel{0.0f, 0.0f, 0.0f, 1.0f}};
-					layers.insert(std::move(new_layer), std::move(layer_info.name), Model::LayerIndex{0});
-					return true;
-				});
-				return true;
-			});
+			auto layer_info = src.widget().value();
+			if(!isSupported<Model::Pixel>(layer_info.size)) [[unlikely]]
+				{
+					// FIXME:
+					//   "A layer of this size cannot be created. The number of bytes required to create a layer
+					//   of "
+					//  "this size exeeds the largest supported integer value."};
+					return;
+				}
+
+			Model::Layer new_layer{layer_info.size, Model::Pixel{0.0f, 0.0f, 0.0f, 1.0f}};
+
+			r_doc_owner.documentModify(
+			   [&new_layer, layer_name = std::move(layer_info.name) ](auto& doc) mutable noexcept {
+				   doc.layersModify([&new_layer, &layer_name ](auto& layers) noexcept {
+					   layers.insert(std::move(new_layer), std::move(layer_name), Model::LayerIndex{0});
+					   return true;
+				   });
+				   return true;
+			   });
 			m_new_from_color_dlg.reset();
 		}
 
