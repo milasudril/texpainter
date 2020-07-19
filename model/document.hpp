@@ -11,7 +11,6 @@
 
 #include <string>
 #include <cassert>
-#include <map>
 
 namespace Texpainter::Model
 {

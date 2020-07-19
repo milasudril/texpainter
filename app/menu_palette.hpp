@@ -47,6 +47,7 @@ namespace Texpainter
 		New,
 		Load,
 		Store,
+		Rename,
 		Remove
 	};
 
@@ -85,6 +86,16 @@ namespace Texpainter
 		static constexpr char const* displayName()
 		{
 			return "Store";
+		}
+	};
+
+	template<>
+	struct PaletteActionTraits<PaletteAction::Rename>
+	{
+		using type = Ui::MenuItem;
+		static constexpr char const* displayName()
+		{
+			return "Rename";
 		}
 	};
 

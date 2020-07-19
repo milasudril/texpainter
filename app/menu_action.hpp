@@ -45,7 +45,7 @@ namespace Texpainter
 	{
 		static constexpr char const* displayName()
 		{
-			return "File";
+			return "Document";
 		}
 
 		using type = Ui::SubmenuBuilder<FileAction, FileActionTraits>;

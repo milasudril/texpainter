@@ -14,12 +14,13 @@ namespace Texpainter
 		Save,
 		SaveAs,
 		SaveCopy,
-		Export
+		Export,
+		SetCanvasSize
 	};
 
 	constexpr auto end(Empty<FileAction>)
 	{
-		return static_cast<FileAction>(static_cast<int>(FileAction::Export) + 1);
+		return static_cast<FileAction>(static_cast<int>(FileAction::SetCanvasSize) + 1);
 	}
 
 	template<FileAction>
@@ -83,6 +84,16 @@ namespace Texpainter
 		static constexpr char const* displayName()
 		{
 			return "Export";
+		}
+	};
+
+	template<>
+	struct FileActionTraits<FileAction::SetCanvasSize>
+	{
+		using type = Ui::MenuItem;
+		static constexpr char const* displayName()
+		{
+			return "Set canvas size";
 		}
 	};
 }

@@ -60,10 +60,13 @@ namespace Texpainter
 		Copy,
 		Link,
 		LinkToCopy,
+		Rename,
 		Delete,
 		ClearTransformation,
+		MoveToTop,
 		MoveUp,
 		MoveDown,
+		MoveToBottom,
 		EffectsAndBlendMode,
 		Isolate,
 		Hide
@@ -115,6 +118,16 @@ namespace Texpainter
 		static constexpr char const* displayName()
 		{
 			return "Convert link to copy";
+		}
+	};
+
+	template<>
+	struct LayerActionTraits<LayerAction::Rename>
+	{
+		using type = Ui::MenuItem;
+		static constexpr char const* displayName()
+		{
+			return "Rename";
 		}
 	};
 
@@ -198,6 +211,16 @@ namespace Texpainter
 
 
 	template<>
+	struct LayerActionTraits<LayerAction::MoveToTop>
+	{
+		using type = Ui::MenuItem;
+		static constexpr char const* displayName()
+		{
+			return "Move to top";
+		}
+	};
+
+	template<>
 	struct LayerActionTraits<LayerAction::MoveUp>
 	{
 		using type = Ui::MenuItem;
@@ -216,6 +239,17 @@ namespace Texpainter
 			return "Move down";
 		}
 	};
+
+	template<>
+	struct LayerActionTraits<LayerAction::MoveToBottom>
+	{
+		using type = Ui::MenuItem;
+		static constexpr char const* displayName()
+		{
+			return "Move to bottom";
+		}
+	};
+
 
 	template<>
 	struct LayerActionTraits<LayerAction::EffectsAndBlendMode>
