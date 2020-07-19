@@ -32,6 +32,7 @@ int main(int argc, char* argv[])
 	gtk_init(&argc, &argv);
 
 	Texpainter::Ui::Window mainwin{"Texpainter"};
+	mainwin.resize(Texpainter::Size2d{800, 500});
 
 #if 0
 	Texpainter::Model::Layer test{Texpainter::Size2d{256, 256}};
