@@ -6,8 +6,9 @@
 #ifndef TEXPAINTER_APPWINDOW_HPP
 #define TEXPAINTER_APPWINDOW_HPP
 
-#include "./palette_editor.hpp"
 #include "./menu_action.hpp"
+#include "./doc_menu_handler.hpp"
+#include "./palette_editor.hpp"
 
 #include "model/document.hpp"
 #include "utils/snap.hpp"
@@ -32,6 +33,7 @@ namespace Texpainter
 		};
 
 		explicit AppWindow(Ui::Container& container):
+		   m_doc_menu_handler{container, *this},
 		   m_rows{container, Ui::Box::Orientation::Vertical},
 		   m_menu{m_rows},
 		   m_selectors{m_rows, Ui::Box::Orientation::Horizontal},
@@ -42,8 +44,14 @@ namespace Texpainter
 		   m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
 		{
 			m_pal_editor.inputField().eventHandler<ControlId::PaletteEd>(*this);
-		//	m_img_view.eventHandler<ControlId::Canvas>(*this);
+			//	m_img_view.eventHandler<ControlId::Canvas>(*this);
 			m_menu.eventHandler(*this);
+		}
+
+		AppWindow& document(Model::Document&& doc)
+		{
+			m_current_document = std::make_unique<Model::Document>(std::move(doc));
+			return *this;
 		}
 
 
@@ -52,9 +60,10 @@ namespace Texpainter
 		{
 		}
 
-		template<FileAction>
-		void onActivated(Ui::MenuItem&)
+		template<FileAction action>
+		void onActivated(Ui::MenuItem& item)
 		{
+			m_doc_menu_handler.template onActivated<action>(item);
 		}
 
 		template<LayerAction>
@@ -89,7 +98,7 @@ namespace Texpainter
 		template<ControlId>
 		void onChanged(PaletteEditor& pal)
 		{
-//			m_current_color = pal.selectedPalette()[pal.selectedColorIndex()];
+			//			m_current_color = pal.selectedPalette()[pal.selectedColorIndex()];
 			m_img_view.focus();
 		}
 
@@ -110,6 +119,7 @@ namespace Texpainter
 
 	private:
 		std::unique_ptr<Model::Document> m_current_document;
+		DocMenuHandler<AppWindow> m_doc_menu_handler;
 
 		Ui::Box m_rows;
 		Ui::MenuBuilder<MainMenuItem, MainMenuItemTraits> m_menu;

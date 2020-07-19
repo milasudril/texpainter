@@ -4,6 +4,7 @@
 #define TEXPAITNER_MENUAPP_HPP
 
 #include "ui/menu_item.hpp"
+#include "utils/empty.hpp"
 
 namespace Texpainter
 {

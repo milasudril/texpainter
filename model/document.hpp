@@ -7,6 +7,7 @@
 #include "./palette_index.hpp"
 #include "./layer.hpp"
 #include "./layer_index.hpp"
+#include "./palette.hpp"
 
 #include "utils/double_key_map.hpp"
 #include "utils/mutator.hpp"
