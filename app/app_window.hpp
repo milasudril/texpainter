@@ -62,6 +62,9 @@ namespace Texpainter
 			return *this;
 		}
 
+		bool hasDocument() const
+		{ return m_current_document != nullptr;}
+
 
 		template<AppAction>
 		void onActivated(Ui::MenuItem&)

@@ -66,11 +66,18 @@ namespace Texpainter
 			}
 		}
 
-		void onActivated(Tag<FileAction::SetCanvasSize>, Ui::MenuItem&)
+		void onActivated(Tag<FileAction::SetCanvasSize>, Ui::MenuItem& item)
 		{
-			m_canvas_dlg = std::make_unique<CanvasSizeDialog>(
-			   r_dlg_owner, "Set canvas size", m_default_size, Size2d{16384, 16384});
-			m_canvas_dlg->eventHandler<ControlId::SetCanvasSize>(*this);
+			if(r_doc_owner.hasDocument())
+			{
+				m_canvas_dlg = std::make_unique<CanvasSizeDialog>(
+				r_dlg_owner, "Set canvas size", m_default_size, Size2d{16384, 16384});
+				m_canvas_dlg->eventHandler<ControlId::SetCanvasSize>(*this);
+			}
+			else
+			{
+				onActivated(Tag<FileAction::New>{}, item);
+			}
 		}
 
 		template<FileAction action>
