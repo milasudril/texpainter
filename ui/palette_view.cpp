@@ -52,6 +52,31 @@ public:
 		g_signal_connect(G_OBJECT(widget), "button-press-event", G_CALLBACK(on_mouse_down), this);
 		g_signal_connect(G_OBJECT(widget), "button-release-event", G_CALLBACK(on_mouse_up), this);
 		g_signal_connect(G_OBJECT(widget), "motion-notify-event", G_CALLBACK(on_mouse_move), this);
+
+		// TODO: Share with ImageView
+		m_background = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 32, 32);
+		auto const stride = cairo_image_surface_get_stride(m_background);
+		cairo_surface_flush(m_background);
+		auto const data = cairo_image_surface_get_data(m_background);
+		for(uint32_t row = 0; row < 32; ++row)
+		{
+			auto write_ptr = data + row * stride;
+			for(uint32_t col = 0; col < 32; ++col)
+			{
+				constexpr auto intensity_a = static_cast<uint8_t>(196);
+				constexpr auto intensity_b = static_cast<uint8_t>(175);
+
+				auto const i = (col < 16 && row < 16) || (col >= 16 && row >= 16) ? intensity_a : intensity_b;
+
+				write_ptr[0] = i;
+				write_ptr[1] = i;
+				write_ptr[2] = i;
+				write_ptr[3] = 255;
+
+				write_ptr += 4;
+			}
+		}
+		cairo_surface_mark_dirty(m_background);
 	}
 
 	~Impl()
@@ -59,12 +84,19 @@ public:
 		gtk_widget_destroy(GTK_WIDGET(m_handle));
 		g_object_unref(m_handle);
 		m_impl = nullptr;
+		cairo_surface_destroy(m_background);
 	}
 
 	void render(Size2d dim, cairo_t* cr)
 	{
-		auto context = gtk_widget_get_style_context(GTK_WIDGET(m_handle));
-		gtk_render_background(context, cr, 0, 0, dim.width(), dim.height());
+		cairo_set_source_surface(cr, m_background, 0.0, 0.0);
+		cairo_pattern_set_extend(cairo_get_source(cr), CAIRO_EXTEND_REPEAT);
+		cairo_rectangle(
+		   cr, 0.0, 0.0, m_n_cols * (dim.width() / m_n_cols), m_n_rows * (dim.height() / m_n_rows));
+		cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+		cairo_fill(cr);
+
+		cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
 		std::ranges::for_each(
 		   m_colors,
 		   [cr,
@@ -72,6 +104,7 @@ public:
 		    item_height = dim.height() / m_n_rows - 4,
 		    cols = m_n_cols,
 		    k = 0](auto color) mutable {
+			   color *= Model::Pixel{color.alpha(), color.alpha(), color.alpha(), 1.0f};
 			   auto const color_conv = Model::BasicPixel<Model::ColorProfiles::Gamma22>{color};
 			   cairo_set_source_rgba(
 			      cr, color_conv.red(), color_conv.green(), color_conv.blue(), color_conv.alpha());
@@ -153,6 +186,7 @@ private:
 	DataBlock<HighlightMode> m_highlight_mode;
 
 	GtkDrawingArea* m_handle;
+	cairo_surface_t* m_background;
 
 	void recalculateWidgetSize()
 	{
