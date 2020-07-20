@@ -15,10 +15,6 @@
 
 namespace Texpainter
 {
-	namespace detail
-	{
-	}
-
 	template<class Key, class Value, class IndexType = size_t>
 	class SortedSequence
 	{
@@ -52,12 +48,12 @@ namespace Texpainter
 					return true;
 				}
 
-			if(i_new == std::end(m_map)) [[unlikely]]
+			if(i_new != std::end(m_map)) [[unlikely]]
 				{
 					return false;
 				}
 
-			auto node = extract(i_old);
+			auto node = m_map.extract(i_old);
 			node.key() = std::move(new_name);
 			m_map.insert(std::move(node));
 			return true;
@@ -160,14 +156,14 @@ namespace Texpainter
 			return IterPair{DerefIterator{std::begin(m_key_seq)}, DerefIterator{std::end(m_key_seq)}};
 		}
 
-
 		auto valuesByKey() const
 		{
+			return IterPair{PairSecondIterator{std::begin(m_map)}, PairSecondIterator{std::end(m_map)}};
 		}
-
 
 		auto keys() const
 		{
+			return IterPair{PairFirstIterator{std::begin(m_map)}, PairFirstIterator{std::end(m_map)}};
 		}
 
 	private:
