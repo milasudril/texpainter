@@ -53,7 +53,7 @@ namespace Texpainter
 		AppWindow& document(Model::Document&& doc)
 		{
 			m_current_document = std::make_unique<Model::Document>(std::move(doc));
-			doRender();
+			update();
 			return *this;
 		}
 
@@ -61,7 +61,7 @@ namespace Texpainter
 		bool documentModify(Func&& f)
 		{
 			auto res = f(*m_current_document);
-			if(res) { doRender(); }
+			if(res) { update(); }
 			return res;
 		}
 
@@ -151,6 +151,19 @@ namespace Texpainter
 		Ui::LabeledInput<PaletteEditor> m_pal_editor;
 		Ui::ImageView m_img_view;
 
+
+		void update()
+		{
+			auto& layer_selector = m_layer_selector.inputField();
+			layer_selector.clear();
+			std::ranges::for_each(
+			   m_current_document->layers().firstKey(),
+			   [&layer_selector](auto const& name) { layer_selector.append(name.c_str()); });
+
+			// FIXME: Does not work with current map
+			// layer_selector.selected(static_cast<int>(currentLayerIndex(m_current_document->currentLayer())));
+			doRender();
+		}
 
 		void doRender()
 		{

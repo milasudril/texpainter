@@ -82,15 +82,9 @@ namespace Texpainter
 					//  "this size exeeds the largest supported integer value."};
 					return;
 				}
-			Model::Layer new_layer{layer_info.size, currentColor(r_doc_owner.document())};
 
-			r_doc_owner.documentModify(
-			   [&new_layer, layer_name = std::move(layer_info.name) ](auto& doc) mutable noexcept {
-				   return doc.layersModify([&new_layer, &layer_name ](auto& layers) noexcept {
-					   layers.insert(std::move(new_layer), std::move(layer_name), Model::LayerIndex{0});
-					   return true;
-				   });
-			   });
+			insertNewLayer(std::move(layer_info.name),
+			               Model::Layer{layer_info.size, currentColor(r_doc_owner.document())});
 			m_new_from_color_dlg.reset();
 		}
 
@@ -105,6 +99,18 @@ namespace Texpainter
 		DocOwner& r_doc_owner;
 
 		std::unique_ptr<NewFromCurrentColor> m_new_from_color_dlg;
+
+
+		void insertNewLayer(std::string&& layer_name, Model::Layer&& layer)
+		{
+			r_doc_owner.documentModify([&layer_name, &layer ](auto& doc) noexcept {
+				return doc.layersModify([ layer_name, &layer ](auto& layers) mutable noexcept {
+					layers.insert(std::move(layer), std::move(layer_name), Model::LayerIndex{0});
+					return true;
+				});
+				doc.currentLayer(std::move(layer_name));
+			});
+		}
 	};
 }
 
