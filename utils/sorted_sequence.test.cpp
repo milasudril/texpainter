@@ -215,6 +215,86 @@ namespace Testcases
 			assert(seq.index("e") == 1);
 		}
 	}
+
+	void texpainterSortedSequenceMoveFront()
+	{
+		Texpainter::SortedSequence<std::string, double> seq;
+
+		seq.insert(std::make_pair("pi", std::numbers::pi));
+		seq.insert(std::make_pair("Phi", std::numbers::phi));
+		seq.insert(std::make_pair("e", std::numbers::e));
+
+		seq.moveFront(2);
+
+		{
+			assert(seq.size() == 3);
+			{
+				std::array<std::string, 3> keys{"Phi", "e", "pi"};
+				assert(std::ranges::equal(seq.keys(), keys));
+			}
+
+			{
+				std::array<double, 3> values{std::numbers::phi, std::numbers::e, std::numbers::pi};
+				assert(std::ranges::equal(seq.valuesByKey(), values));
+			}
+
+			{
+				std::array<std::string, 3> keys{"e", "pi", "Phi"};
+				assert(std::ranges::equal(seq.keysByIndex(), keys));
+			}
+
+			{
+				std::array<double, 3> values{std::numbers::e, std::numbers::pi, std::numbers::phi};
+				assert(std::ranges::equal(seq.valuesByIndex(), values));
+			}
+
+			assert(*seq["e"] == std::numbers::e);
+			assert(*seq[0] == std::numbers::e);
+			assert(*seq[2] == std::numbers::phi);
+			assert(seq.index("Phi") == 2);
+			assert(seq.index("e") == 0);
+		}
+	}
+
+	void texpainterSortedSequenceMoveBack()
+	{
+		Texpainter::SortedSequence<std::string, double> seq;
+
+		seq.insert(std::make_pair("pi", std::numbers::pi));
+		seq.insert(std::make_pair("Phi", std::numbers::phi));
+		seq.insert(std::make_pair("e", std::numbers::e));
+
+		seq.moveBack(0);
+
+		{
+			assert(seq.size() == 3);
+			{
+				std::array<std::string, 3> keys{"Phi", "e", "pi"};
+				assert(std::ranges::equal(seq.keys(), keys));
+			}
+
+			{
+				std::array<double, 3> values{std::numbers::phi, std::numbers::e, std::numbers::pi};
+				assert(std::ranges::equal(seq.valuesByKey(), values));
+			}
+
+			{
+				std::array<std::string, 3> keys{"Phi", "e", "pi"};
+				assert(std::ranges::equal(seq.keys(), keys));
+			}
+
+			{
+				std::array<double, 3> values{std::numbers::phi, std::numbers::e, std::numbers::pi};
+				assert(std::ranges::equal(seq.valuesByKey(), values));
+			}
+
+			assert(*seq["pi"] == std::numbers::pi);
+			assert(*seq[0] == std::numbers::phi);
+			assert(*seq[2] == std::numbers::pi);
+			assert(seq.index("Phi") == 0);
+			assert(seq.index("pi") == 2);
+		}
+	}
 }
 
 int main()
@@ -224,5 +304,7 @@ int main()
 	Testcases::texpainterSortedSequenceErase();
 	Testcases::texpainterSortedSequenceMoveForward();
 	Testcases::texpainterSortedSequenceMoveBackward();
+	Testcases::texpainterSortedSequenceMoveFront();
+	Testcases::texpainterSortedSequenceMoveBack();
 	return 0;
 }
