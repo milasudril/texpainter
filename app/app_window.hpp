@@ -10,7 +10,6 @@
 #include "./doc_menu_handler.hpp"
 #include "./layer_menu_handler.hpp"
 #include "./palette_menu_handler.hpp"
-#include "./palette_editor.hpp"
 
 #include "model/document.hpp"
 #include "utils/snap.hpp"
@@ -19,6 +18,8 @@
 #include "ui/labeled_input.hpp"
 #include "ui/dialog.hpp"
 #include "ui/menu_builder.hpp"
+#include "ui/palette_view.hpp"
+#include "ui/combobox.hpp"
 
 #include <numbers>
 
@@ -43,12 +44,10 @@ namespace Texpainter
 		   m_menu{m_rows},
 		   m_selectors{m_rows, Ui::Box::Orientation::Horizontal},
 		   m_layer_selector{m_selectors, Ui::Box::Orientation::Horizontal, "Layer: "},
-		   m_pal_editor{m_selectors.insertMode(Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand}),
-		                Ui::Box::Orientation::Horizontal,
-		                "Palette: "},
+		   m_palette_selector{m_selectors, Ui::Box::Orientation::Horizontal, "Palettes: "},
+		   m_pal_view{m_selectors.insertMode(Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand})},
 		   m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
 		{
-			m_pal_editor.inputField().eventHandler<ControlId::PaletteEd>(*this);
 			//	m_img_view.eventHandler<ControlId::Canvas>(*this);
 			m_menu.eventHandler(*this);
 		}
@@ -118,13 +117,6 @@ namespace Texpainter
 		}
 
 		template<ControlId>
-		void onChanged(PaletteEditor& pal)
-		{
-			//			m_current_color = pal.selectedPalette()[pal.selectedColorIndex()];
-			m_img_view.focus();
-		}
-
-		template<ControlId>
 		void onMouseUp(Ui::ImageView& view, vec2_t pos_window, vec2_t pos_screen, int button);
 
 		template<ControlId>
@@ -151,13 +143,14 @@ namespace Texpainter
 		Ui::MenuBuilder<MainMenuItem, MainMenuItemTraits> m_menu;
 		Ui::Box m_selectors;
 		Ui::LabeledInput<Ui::Combobox> m_layer_selector;
-		Ui::LabeledInput<PaletteEditor> m_pal_editor;
+		Ui::LabeledInput<Ui::Combobox> m_palette_selector;
+		Ui::PaletteView m_pal_view;
 		Ui::ImageView m_img_view;
 
-
-		void update()
+		void updateLayerSelector()
 		{
 			auto& layer_selector = m_layer_selector.inputField();
+
 			layer_selector.clear();
 			std::ranges::for_each(
 			   m_current_document->layers().keysByIndex(),
@@ -165,8 +158,33 @@ namespace Texpainter
 
 			auto const& current_layer = m_current_document->currentLayer();
 			auto const current_layer_idx = m_current_document->layers().index(current_layer);
-
 			layer_selector.selected(static_cast<int>(current_layer_idx));
+		}
+
+		void updatePaletteSelector()
+		{
+			auto& pal_selector = m_palette_selector.inputField();
+
+			pal_selector.clear();
+			std::ranges::for_each(m_current_document->palettes().keys(),
+			                      [&pal_selector](auto const& name) { pal_selector.append(name.c_str()); });
+
+			auto const& current_pal_name = m_current_document->currentPalette();
+			auto const current_layer_idx = m_current_document->palettes().position(current_pal_name);
+			pal_selector.selected(static_cast<int>(current_layer_idx));
+
+			if(auto pal = m_current_document->palettes()[current_pal_name]; pal != nullptr)
+			{
+				m_pal_view.palette(*pal).highlightMode(m_current_document->currentColor(),
+				                                       Ui::PaletteView::HighlightMode::Read);
+			}
+		}
+
+
+		void update()
+		{
+			updateLayerSelector();
+			updatePaletteSelector();
 			doRender();
 		}
 

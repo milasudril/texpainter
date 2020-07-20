@@ -21,11 +21,7 @@ namespace Texpainter::Model
 	{
 	public:
 		using LayerStack = SortedSequence<std::string, Layer, LayerIndex>;
-
-		// TODO: Use a regular map (There is no need to keep the order of palettes intact)
-		// using PaletteCollection = DoubleKeyMap<Palette, std::string, PaletteIndex>;
-
-		using PaletteCollection = std::map<std::string, Palette>;
+		using PaletteCollection = SortedSequence<std::string, Palette, PaletteIndex>;
 
 		explicit Document(Size2d canvas_size): m_canvas_size{canvas_size}, m_dirty{false}
 		{
@@ -116,6 +112,7 @@ namespace Texpainter::Model
 		Document& currentPalette(std::string&& current_palette)
 		{
 			m_current_palette = std::move(current_palette);
+			m_current_color = ColorIndex{0};
 			m_dirty = true;
 			return *this;
 		}
@@ -148,12 +145,11 @@ namespace Texpainter::Model
 	inline Pixel currentColor(Document const& doc)
 	{
 		auto const& palettes = doc.palettes();
-		auto i = palettes.find(doc.currentPalette());
+		auto i = palettes[doc.currentPalette()];
 		constexpr auto default_color = Pixel{1.0f / 3, 1.0f / 3, 1.0f / 3, 1.0f};
-		if(i == std::end(palettes)) { return default_color; }
+		if(i == nullptr) { return default_color; }
 
-		return doc.currentColor() <= i->second.lastIndex() ? i->second[doc.currentColor()] :
-		                                                     default_color;
+		return doc.currentColor() <= i->lastIndex() ? (*i)[doc.currentColor()] : default_color;
 	}
 }
 

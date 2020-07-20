@@ -120,7 +120,7 @@ namespace Texpainter
 		Value const* operator[](Key const& key) const
 		{
 			auto i = m_map.find(key);
-			return i != std::end(m_map) ? &i->second : nullptr;
+			return i == std::end(m_map) ? nullptr : &i->second;
 		}
 
 		Value* operator[](Key const& key)
@@ -144,6 +144,12 @@ namespace Texpainter
 			auto i = std::ranges::find(m_seq, val_ptr);
 			return i == std::end(m_seq) ? IndexType{} :
 			                              IndexType{static_cast<size_t>(i - std::begin(m_seq))};
+		}
+
+		size_t position(Key const& key) const
+		{
+			auto i = m_map.find(key);
+			return i == std::end(m_map) ? static_cast<size_t>(-1) : std::distance(std::begin(m_map), i);
 		}
 
 		auto valuesByIndex() const
