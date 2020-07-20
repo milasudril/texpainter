@@ -155,6 +155,7 @@ namespace Texpainter
 		{
 			r_doc_owner.documentModify([&layer_name, &layer ](auto& doc) noexcept {
 				(void)doc.layersModify([ layer_name, &layer ](auto& layers) mutable noexcept {
+					// FIXME: Unique name generator...
 					layers.insert(std::make_pair(std::move(layer_name), std::move(layer)));
 					return true;
 				});
