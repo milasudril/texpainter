@@ -9,6 +9,7 @@
 #include "./menu_action.hpp"
 #include "./doc_menu_handler.hpp"
 #include "./layer_menu_handler.hpp"
+#include "./palette_menu_handler.hpp"
 #include "./palette_editor.hpp"
 
 #include "model/document.hpp"
@@ -37,6 +38,7 @@ namespace Texpainter
 		   m_rng{rng},
 		   m_doc_menu_handler{container, *this},
 		   m_layer_menu_handler{container, *this, m_rng},
+		   m_palette_menu_handler{container, *this, m_rng},
 		   m_rows{container, Ui::Box::Orientation::Vertical},
 		   m_menu{m_rows},
 		   m_selectors{m_rows, Ui::Box::Orientation::Horizontal},
@@ -110,12 +112,9 @@ namespace Texpainter
 		}
 
 		template<PaletteActionNew action>
-		void onActivated(Ui::MenuItem&)
+		void onActivated(Ui::MenuItem& item)
 		{
-			if constexpr(action == PaletteActionNew::Empty)
-			{ m_pal_editor.inputField().createEmptyPalette(); }
-			/*	else
-			 { m_pal_editor.generatePalette(); }*/
+			m_palette_menu_handler.onActivated<action>(item);
 		}
 
 		template<ControlId>
@@ -146,6 +145,7 @@ namespace Texpainter
 		PolymorphicRng m_rng;
 		DocMenuHandler<AppWindow> m_doc_menu_handler;
 		LayerMenuHandler<AppWindow> m_layer_menu_handler;
+		PaletteMenuHandler<AppWindow> m_palette_menu_handler;
 
 		Ui::Box m_rows;
 		Ui::MenuBuilder<MainMenuItem, MainMenuItemTraits> m_menu;
