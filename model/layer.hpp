@@ -18,6 +18,15 @@ namespace Texpainter::Model
 	class Layer
 	{
 	public:
+		explicit Layer(Image&& img):
+		   m_visible{true},
+		   m_loc{0.0, 0.0},
+		   m_rot{0},
+		   m_scale{1.0, 1.0},
+		   m_content{std::make_shared<Image>(std::move(img))}
+		{
+		}
+
 		explicit Layer(Size2d size, Pixel initial_color = Pixel{0.0f, 0.0f, 0.0f, 0.0f}):
 		   m_visible{true},
 		   m_loc{0.0, 0.0},

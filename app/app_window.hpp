@@ -34,7 +34,7 @@ namespace Texpainter
 		};
 
 		explicit AppWindow(Ui::Container& container, PolymorphicRng rng):
-			m_rng{rng},
+		   m_rng{rng},
 		   m_doc_menu_handler{container, *this},
 		   m_layer_menu_handler{container, *this, m_rng},
 		   m_rows{container, Ui::Box::Orientation::Vertical},
