@@ -138,6 +138,14 @@ namespace Texpainter
 			return m_seq[static_cast<size_t>(i)];
 		}
 
+		IndexType indexFromKey(Key const& key) const
+		{
+			auto val_ptr = (*this)[key];
+			auto i = std::ranges::find(m_seq, val_ptr);
+			return i == std::end(m_seq) ? IndexType{} : IndexType{i - std::begin(m_seq)};
+		}
+
+
 		auto valuesByKey() const
 		{
 		}
