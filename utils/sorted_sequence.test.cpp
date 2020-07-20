@@ -39,4 +39,3 @@ int main()
 	Testcases::texpainterSortedSequenceInsertDuplicate();
 	return 0;
 }
-
