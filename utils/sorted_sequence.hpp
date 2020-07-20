@@ -5,6 +5,7 @@
 
 #include "./iter_pair.hpp"
 #include "./pair_iterator.hpp"
+#include "./deref_iterator.hpp"
 
 #include <map>
 #include <memory>
@@ -36,6 +37,7 @@ namespace Texpainter
 				}
 
 			auto ret = m_map.insert(i, std::make_pair(std::move(val.first), std::move(val.second)));
+			m_key_seq.push_back(&ret->first);
 			m_seq.push_back(&ret->second);
 			return std::make_pair(ret, true);
 		}
@@ -69,8 +71,8 @@ namespace Texpainter
 					return false;
 				}
 
-			auto j = std::ranges::find(m_seq, &i->second);
-			m_seq.erase(j);
+			m_seq.erase(std::ranges::find(m_seq, &i->second));
+			m_key_seq.erase(std::ranges::find(m_key_seq, &i->first));
 			m_map.erase(i);
 			return true;
 		}
@@ -83,6 +85,7 @@ namespace Texpainter
 				}
 
 			std::swap(m_seq[static_cast<size_t>(index - 1)], m_seq[static_cast<size_t>(index)]);
+			std::swap(m_key_seq[static_cast<size_t>(index - 1)], m_key_seq[static_cast<size_t>(index)]);
 			return index - 1;
 		}
 
@@ -94,6 +97,7 @@ namespace Texpainter
 				}
 
 			std::swap(m_seq[static_cast<size_t>(index + 1)], m_seq[static_cast<size_t>(index)]);
+			std::swap(m_key_seq[static_cast<size_t>(index + 1)], m_key_seq[static_cast<size_t>(index)]);
 			return index + 1;
 		}
 
@@ -120,7 +124,7 @@ namespace Texpainter
 		Value const* operator[](Key const& key) const
 		{
 			auto i = m_map.find(key);
-			return i != std::end(m_map) ? &i->secondś : nullptr;
+			return i != std::end(m_map) ? &i->second : nullptr;
 		}
 
 		Value* operator[](Key const& key)
@@ -138,11 +142,22 @@ namespace Texpainter
 			return m_seq[static_cast<size_t>(i)];
 		}
 
-		IndexType indexFromKey(Key const& key) const
+		IndexType index(Key const& key) const
 		{
 			auto val_ptr = (*this)[key];
 			auto i = std::ranges::find(m_seq, val_ptr);
-			return i == std::end(m_seq) ? IndexType{} : IndexType{i - std::begin(m_seq)};
+			return i == std::end(m_seq) ? IndexType{} :
+			                              IndexType{static_cast<size_t>(i - std::begin(m_seq))};
+		}
+
+		auto valuesByIndex() const
+		{
+			return IterPair{DerefIterator{std::begin(m_seq)}, DerefIterator{std::end(m_seq)}};
+		}
+
+		auto keysByIndex() const
+		{
+			return IterPair{DerefIterator{std::begin(m_key_seq)}, DerefIterator{std::end(m_key_seq)}};
 		}
 
 
@@ -150,9 +165,6 @@ namespace Texpainter
 		{
 		}
 
-		auto valuesByIndex() const
-		{
-		}
 
 		auto keys() const
 		{
@@ -161,6 +173,7 @@ namespace Texpainter
 	private:
 		std::map<Key, Value> m_map;
 		std::vector<Value*> m_seq;
+		std::vector<Key const*> m_key_seq;
 	};
 }
 

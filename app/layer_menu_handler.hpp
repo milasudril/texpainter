@@ -154,11 +154,12 @@ namespace Texpainter
 		void insertNewLayer(std::string&& layer_name, Model::Layer&& layer)
 		{
 			r_doc_owner.documentModify([&layer_name, &layer ](auto& doc) noexcept {
-				return doc.layersModify([ layer_name, &layer ](auto& layers) mutable noexcept {
-					layers.insert(std::move(layer), std::move(layer_name), Model::LayerIndex{0});
+				(void)doc.layersModify([ layer_name, &layer ](auto& layers) mutable noexcept {
+					layers.insert(std::make_pair(std::move(layer_name), std::move(layer)));
 					return true;
 				});
 				doc.currentLayer(std::move(layer_name));
+				return true;
 			});
 		}
 	};

@@ -160,11 +160,13 @@ namespace Texpainter
 			auto& layer_selector = m_layer_selector.inputField();
 			layer_selector.clear();
 			std::ranges::for_each(
-			   m_current_document->layers().firstKey(),
+			   m_current_document->layers().keysByIndex(),
 			   [&layer_selector](auto const& name) { layer_selector.append(name.c_str()); });
 
-			// FIXME: Does not work with current map
-			// layer_selector.selected(static_cast<int>(currentLayerIndex(m_current_document->currentLayer())));
+			auto const& current_layer = m_current_document->currentLayer();
+			auto const current_layer_idx = m_current_document->layers().index(current_layer);
+
+			layer_selector.selected(static_cast<int>(current_layer_idx));
 			doRender();
 		}
 

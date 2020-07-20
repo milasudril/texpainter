@@ -16,11 +16,12 @@ namespace Texpainter::Model
 		{
 		}
 
-		explicit LayerIndex(uint32_t val): m_value{val}
+		explicit LayerIndex(size_t val): m_value{static_cast<element_type>(val)}
 		{
 		}
 
-		uint32_t value() const
+
+		element_type value() const
 		{
 			return m_value;
 		}
@@ -29,7 +30,7 @@ namespace Texpainter::Model
 
 		bool valid() const
 		{
-			return m_value != std::numeric_limits<uint32_t>::max();
+			return m_value != std::numeric_limits<element_type>::max();
 		}
 
 		LayerIndex& operator++()
@@ -44,8 +45,18 @@ namespace Texpainter::Model
 			return *this;
 		}
 
+		explicit operator size_t() const
+		{
+			return m_value;
+		}
+
+		explicit operator int() const
+		{
+			return static_cast<int>(m_value);
+		}
+
 	private:
-		uint32_t m_value;
+		element_type m_value;
 	};
 }
 

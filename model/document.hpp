@@ -9,7 +9,7 @@
 #include "./layer_index.hpp"
 #include "./palette.hpp"
 
-#include "utils/double_key_map.hpp"
+#include "utils/sorted_sequence.hpp"
 #include "utils/mutator.hpp"
 
 #include <string>
@@ -20,7 +20,7 @@ namespace Texpainter::Model
 	class Document
 	{
 	public:
-		using LayerStack = DoubleKeyMap<Layer, std::string, LayerIndex>;
+		using LayerStack = SortedSequence<std::string, Layer, LayerIndex>;
 
 		// TODO: Use a regular map (There is no need to keep the order of palettes intact)
 		// using PaletteCollection = DoubleKeyMap<Palette, std::string, PaletteIndex>;
@@ -56,12 +56,7 @@ namespace Texpainter::Model
 
 		auto layersByIndex() const
 		{
-			return m_layers.valuesBySecondKey();
-		}
-
-		auto layersByName() const
-		{
-			return m_layers.valuesByFirstKey();
+			return m_layers.valuesByIndex();
 		}
 
 		Document& layers(LayerStack&& layers_new)
