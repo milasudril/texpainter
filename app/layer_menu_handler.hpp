@@ -9,6 +9,7 @@
 #include "./size_input.hpp"
 #include "./layer_creator.hpp"
 
+#include "utils/polymorphic_rng.hpp"
 #include "model/document.hpp"
 #include "ui/dialog.hpp"
 
@@ -25,9 +26,10 @@ namespace Texpainter
 			NewFromCurrentColor
 		};
 
-		explicit LayerMenuHandler(Ui::Container& dialog_owner, DocOwner& doc_owner):
+		explicit LayerMenuHandler(Ui::Container& dialog_owner, DocOwner& doc_owner, PolymorphicRng rng):
 		   r_dlg_owner{dialog_owner},
-		   r_doc_owner{doc_owner}
+		   r_doc_owner{doc_owner},
+		   m_rng{rng}
 		{
 		}
 
@@ -97,6 +99,7 @@ namespace Texpainter
 	private:
 		Ui::Container& r_dlg_owner;
 		DocOwner& r_doc_owner;
+		PolymorphicRng m_rng;
 
 		std::unique_ptr<NewFromCurrentColor> m_new_from_color_dlg;
 

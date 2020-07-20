@@ -33,9 +33,10 @@ namespace Texpainter
 			Canvas
 		};
 
-		explicit AppWindow(Ui::Container& container):
+		explicit AppWindow(Ui::Container& container, PolymorphicRng rng):
+			m_rng{rng},
 		   m_doc_menu_handler{container, *this},
-		   m_layer_menu_handler{container, *this},
+		   m_layer_menu_handler{container, *this, m_rng},
 		   m_rows{container, Ui::Box::Orientation::Vertical},
 		   m_menu{m_rows},
 		   m_selectors{m_rows, Ui::Box::Orientation::Horizontal},
@@ -141,6 +142,8 @@ namespace Texpainter
 
 	private:
 		std::unique_ptr<Model::Document> m_current_document;
+
+		PolymorphicRng m_rng;
 		DocMenuHandler<AppWindow> m_doc_menu_handler;
 		LayerMenuHandler<AppWindow> m_layer_menu_handler;
 

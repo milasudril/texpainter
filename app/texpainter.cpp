@@ -4,6 +4,7 @@
 #include "./app_window.hpp"
 
 #include "model/layer_stack.hpp"
+#include "pcg-cpp/include/pcg_random.hpp"
 
 #include <gtk/gtk.h>
 
@@ -50,7 +51,8 @@ int main(int argc, char* argv[])
 	 img_view.image(canvas).minSize(Texpainter::Size2d{512, 512});
 #endif
 
-	Texpainter::AppWindow app{mainwin};
+	pcg64 rng;
+	Texpainter::AppWindow app{mainwin, Texpainter::PolymorphicRng{rng}};
 
 	MainwinEventHandler eh;
 	mainwin.eventHandler<0>(eh).show();
