@@ -1,10 +1,10 @@
 //@	{"targets":[{"name":"menu_app.hpp","type":"include"}]}
 
 #ifndef TEXPAINTER_MENUAPP_HPP
-	#define TEXPAITNER_MENUAPP_HPP
+#define TEXPAINTER_MENUAPP_HPP
 
-	#include "ui/menu_item.hpp"
-	#include "utils/empty.hpp"
+#include "ui/menu_item.hpp"
+#include "utils/empty.hpp"
 
 namespace Texpainter
 {
