@@ -17,9 +17,7 @@ namespace Texpainter
 	class IndexedSequence
 	{
 	public:
-		IndexedSequence(): m_index{std::make_unique<Index>()}
-		{
-		}
+		IndexedSequence(): m_index{std::make_unique<Index>()} {}
 
 		bool append(Name&& name, ValueType&& val)
 		{
@@ -29,8 +27,8 @@ namespace Texpainter
 					return false;
 				}
 
-			auto ip =
-			   m_index->m_name_to_index.insert(std::make_pair(std::move(name), IndexType{m_seq.size()}));
+			auto ip = m_index->m_name_to_index.insert(
+			    std::make_pair(std::move(name), IndexType{m_seq.size()}));
 			auto const& item = *ip.first;
 			m_index->m_index_to_name.append(&item.first);
 			m_seq.append(std::move(val));
@@ -38,10 +36,7 @@ namespace Texpainter
 		}
 
 
-		auto valuesInSequence() const
-		{
-			return IterPair{std::begin(m_seq), std::end(m_seq)};
-		}
+		auto valuesInSequence() const { return IterPair{std::begin(m_seq), std::end(m_seq)}; }
 
 		auto namesInSequence() const
 		{
@@ -65,16 +60,10 @@ namespace Texpainter
 		}
 
 
-		auto size() const
-		{
-			return m_seq.size();
-		}
+		auto size() const { return m_seq.size(); }
 
 
-		ValueType const* operator[](IndexType i) const
-		{
-			return &m_seq[i];
-		}
+		ValueType const* operator[](IndexType i) const { return &m_seq[i]; }
 
 		ValueType const* operator[](Name const& name) const
 		{

@@ -12,7 +12,7 @@
 #include "ui/button.hpp"
 
 #ifndef TEXPAINTER_SURFACECREATOR_HPP
-#define TEXPAINTER_SURFACECREATOR_HPP
+	#define TEXPAINTER_SURFACECREATOR_HPP
 
 namespace Texpainter
 {
@@ -39,10 +39,7 @@ namespace Texpainter
 		template<ControlId id>
 		void onClicked(Ui::Button&);
 
-		Model::Image generate(Size2d output_size)
-		{
-			return m_generator(output_size);
-		}
+		Model::Image generate(Size2d output_size) { return m_generator(output_size); }
 
 	private:
 		Model::Image m_preview;

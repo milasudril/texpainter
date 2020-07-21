@@ -17,25 +17,13 @@ namespace Texpainter
 		template<class T>
 		struct UniquePtrDeepConst
 		{
-			T const& operator*() const
-			{
-				return *m_handle;
-			}
+			T const& operator*() const { return *m_handle; }
 
-			T& operator*()
-			{
-				return *m_handle;
-			}
+			T& operator*() { return *m_handle; }
 
-			T* operator->()
-			{
-				return m_handle.get();
-			}
+			T* operator->() { return m_handle.get(); }
 
-			T const* operator->() const
-			{
-				return m_handle.get();
-			}
+			T const* operator->() const { return m_handle.get(); }
 
 			std::unique_ptr<T> m_handle;
 		};
@@ -44,31 +32,23 @@ namespace Texpainter
 		class DerefSecond
 		{
 		public:
-			using difference_type = intptr_t;
-			using value_type =
-			   std::remove_reference_t<decltype(*(std::declval<typename Iter::value_type>().second.first))>;
+			using difference_type   = intptr_t;
+			using value_type        = std::remove_reference_t<decltype(
+                *(std::declval<typename Iter::value_type>().second.first))>;
 			using iterator_category = std::bidirectional_iterator_tag;
 
 			DerefSecond() = default;
 
 			DerefSecond(DerefSecond const&) = default;
 
-			explicit DerefSecond(Iter i): m_i{i}
-			{
-			}
+			explicit DerefSecond(Iter i): m_i{i} {}
 
 			auto operator<=>(DerefSecond const& other) const = default;
 
 
-			auto& operator*() const
-			{
-				return *(m_i->second.first);
-			}
+			auto& operator*() const { return *(m_i->second.first); }
 
-			auto operator-> () const
-			{
-				return &(*(*this));
-			}
+			auto operator->() const { return &(*(*this)); }
 
 			DerefSecond& operator++()
 			{
@@ -97,10 +77,7 @@ namespace Texpainter
 			}
 
 
-			auto rawIterator() const
-			{
-				return m_i;
-			}
+			auto rawIterator() const { return m_i; }
 
 		private:
 			Iter m_i;
@@ -141,13 +118,13 @@ namespace Texpainter
 					return static_cast<InsertResult>(res);
 				}
 
-			auto ptr = std::make_unique<ValueType>(std::move(value));
+			auto ptr     = std::make_unique<ValueType>(std::move(value));
 			auto val_ins = &(*ptr);
 
 			auto ip1 = m_first_index.insert(
-			   std::make_pair(std::move(key_a), std::make_pair(std::move(ptr), nullptr)));
-			auto ip2 =
-			   m_second_index.insert(std::make_pair(std::move(key_b), std::make_pair(val_ins, nullptr)));
+			    std::make_pair(std::move(key_a), std::make_pair(std::move(ptr), nullptr)));
+			auto ip2 = m_second_index.insert(
+			    std::make_pair(std::move(key_b), std::make_pair(val_ins, nullptr)));
 			ip1.first->second.second = &ip2.first->first;
 			ip2.first->second.second = &ip1.first->first;
 
@@ -190,7 +167,7 @@ namespace Texpainter
 				{
 					auto i_prev = i;
 					--i_prev;
-					m_first_index.find(*(i->second.second))->second.second = &i_prev->first;
+					m_first_index.find(*(i->second.second))->second.second      = &i_prev->first;
 					m_first_index.find(*(i_prev->second.second))->second.second = &i->first;
 					std::swap(i_prev->second, i->second);
 				}
@@ -212,7 +189,7 @@ namespace Texpainter
 					return *this;
 				}
 
-			m_first_index.find(*(i->second.second))->second.second = &i_next->first;
+			m_first_index.find(*(i->second.second))->second.second      = &i_next->first;
 			m_first_index.find(*(i_next->second.second))->second.second = &i->first;
 			std::swap(i_next->second, i->second);
 			return *this;
@@ -233,7 +210,8 @@ namespace Texpainter
 					return InsertResult::NoError;
 				}
 
-			auto ip = m_first_index.insert(std::make_pair(std::move(key_new), std::move(i_old->second)));
+			auto ip =
+			    m_first_index.insert(std::make_pair(std::move(key_new), std::move(i_old->second)));
 			m_second_index.find(*(ip.first->second.second))->second.second = &ip.first->first;
 			m_first_index.erase(i_old);
 			return InsertResult::NoError;
@@ -254,8 +232,8 @@ namespace Texpainter
 					return InsertResult::NoError;
 				}
 
-			auto ip = m_second_index.insert(
-			   std::make_pair(std::move(key_new), std::make_pair(&(*i_old->second.first), &i_old->first)));
+			auto ip = m_second_index.insert(std::make_pair(
+			    std::move(key_new), std::make_pair(&(*i_old->second.first), &i_old->first)));
 			m_second_index.erase(*(i_old->second.second));
 			i_old->second.second = &ip.first->first;
 			return InsertResult::NoError;
@@ -285,10 +263,7 @@ namespace Texpainter
 		}
 
 
-		size_t size() const
-		{
-			return m_first_index.size();
-		}
+		size_t size() const { return m_first_index.size(); }
 
 
 		auto valuesByFirstKey() const

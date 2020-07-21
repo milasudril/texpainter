@@ -11,9 +11,7 @@ namespace Texpainter::Generators
 	class PointwiseTransform
 	{
 	public:
-		explicit PointwiseTransform(Function&& f): m_f{std::move(f)}
-		{
-		}
+		explicit PointwiseTransform(Function&& f): m_f{std::move(f)} {}
 
 		template<class T>
 		auto operator()(Span2d<T> in)

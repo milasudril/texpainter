@@ -29,7 +29,7 @@ namespace
 	{
 		if(buff.m_width != 0)
 		{
-			auto ret = buff.m_width;
+			auto ret     = buff.m_width;
 			buff.m_width = 0;
 			return ret;
 		}
@@ -40,13 +40,17 @@ namespace
 	void write(std::span<T> data, Buffer& buff)
 	{
 		buff.m_data.resize(sizeof(T) * std::size(data));
-		memcpy(static_cast<void*>(std::data(buff.m_data)), std::data(data), sizeof(T) * std::size(data));
+		memcpy(static_cast<void*>(std::data(buff.m_data)),
+		       std::data(data),
+		       sizeof(T) * std::size(data));
 	}
 
 	template<Texpainter::Trivial T>
 	void read(std::span<T> data, Buffer const& buff)
 	{
-		memcpy(static_cast<void*>(std::data(data)), std::data(buff.m_data), sizeof(T) * std::size(data));
+		memcpy(static_cast<void*>(std::data(data)),
+		       std::data(buff.m_data),
+		       sizeof(T) * std::size(data));
 	}
 }
 
@@ -59,7 +63,7 @@ namespace Testcases
 		assert(img.height() == 2);
 		assert(img.area() == 6);
 
-		auto ptr = img.pixels().begin();
+		auto ptr   = img.pixels().begin();
 		*(ptr + 0) = Texpainter::Model::red();
 		*(ptr + 1) = Texpainter::Model::green();
 		*(ptr + 2) = Texpainter::Model::blue();
@@ -86,7 +90,7 @@ namespace Testcases
 	{
 		Texpainter::Model::Image img{3u, 2u};
 
-		auto ptr = img.pixels().begin();
+		auto ptr   = img.pixels().begin();
 		*(ptr + 0) = Texpainter::Model::red();
 		*(ptr + 1) = Texpainter::Model::green();
 		*(ptr + 2) = Texpainter::Model::blue();

@@ -12,29 +12,21 @@ namespace Texpainter
 	class DerefIterator
 	{
 	public:
-		using difference_type = intptr_t;
-		using value_type = std::remove_cvref_t<decltype(**std::declval<Iter>())>;
+		using difference_type   = intptr_t;
+		using value_type        = std::remove_cvref_t<decltype(**std::declval<Iter>())>;
 		using iterator_category = std::bidirectional_iterator_tag;
 
 		DerefIterator() = default;
 
 		DerefIterator(DerefIterator const&) = default;
 
-		explicit DerefIterator(Iter i): m_i{i}
-		{
-		}
+		explicit DerefIterator(Iter i): m_i{i} {}
 
 		auto operator<=>(DerefIterator const& other) const = default;
 
-		auto& operator*() const
-		{
-			return *(*m_i);
-		}
+		auto& operator*() const { return *(*m_i); }
 
-		auto operator-> () const
-		{
-			return &(*(*this));
-		};
+		auto operator->() const { return &(*(*this)); };
 
 
 		DerefIterator& operator++()
@@ -63,10 +55,7 @@ namespace Texpainter
 			return tmp;
 		}
 
-		auto rawIterator() const
-		{
-			return m_i;
-		}
+		auto rawIterator() const { return m_i; }
 
 	private:
 		Iter m_i;

@@ -25,13 +25,13 @@ namespace Texpainter
 		template<class U>
 		using pointer_wrapper = std::unique_ptr<U, CallFree>;
 
-		explicit DataBlock(pointer_wrapper<T> ptr, uint32_t size): m_size{size}, m_ptr{std::move(ptr)}
+		explicit DataBlock(pointer_wrapper<T> ptr, uint32_t size)
+		    : m_size{size}
+		    , m_ptr{std::move(ptr)}
 		{
 		}
 
-		explicit DataBlock(uint32_t n): m_size{n}, m_ptr{allocMem<T>(n)}
-		{
-		}
+		explicit DataBlock(uint32_t n): m_size{n}, m_ptr{allocMem<T>(n)} {}
 
 		DataBlock(DataBlock const& other): DataBlock{other.size()}
 		{
@@ -48,40 +48,19 @@ namespace Texpainter
 		DataBlock(DataBlock&&) = default;
 		DataBlock& operator=(DataBlock&&) = default;
 
-		auto size() const
-		{
-			return m_size;
-		}
+		auto size() const { return m_size; }
 
-		auto begin() const
-		{
-			return m_ptr.get();
-		}
+		auto begin() const { return m_ptr.get(); }
 
-		auto end() const
-		{
-			return begin() + size();
-		}
+		auto end() const { return begin() + size(); }
 
-		auto begin()
-		{
-			return m_ptr.get();
-		}
+		auto begin() { return m_ptr.get(); }
 
-		auto end()
-		{
-			return begin() + size();
-		}
+		auto end() { return begin() + size(); }
 
-		auto data()
-		{
-			return begin();
-		}
+		auto data() { return begin(); }
 
-		auto data() const
-		{
-			return begin();
-		}
+		auto data() const { return begin(); }
 
 	private:
 		uint32_t m_size;

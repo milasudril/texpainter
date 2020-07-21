@@ -17,10 +17,7 @@ namespace
 
 		auto operator<=>(IndexType const&) const = default;
 
-		auto value() const
-		{
-			return m_value;
-		}
+		auto value() const { return m_value; }
 	};
 }
 
@@ -37,7 +34,8 @@ namespace Testcases
 		assert(seq.size() == 3);
 
 		{
-			std::array<double, 3> expected_vals{std::numbers::pi, std::numbers::phi, std::numbers::e};
+			std::array<double, 3> expected_vals{
+			    std::numbers::pi, std::numbers::phi, std::numbers::e};
 			assert(std::ranges::equal(seq.valuesInSequence(), expected_vals));
 		}
 

@@ -19,10 +19,7 @@ namespace Texpainter
 	class SortedSequence
 	{
 	public:
-		IndexType size() const
-		{
-			return IndexType{m_map.size()};
-		}
+		IndexType size() const { return IndexType{m_map.size()}; }
 
 		auto insert(std::pair<Key, Value>&& val)
 		{
@@ -53,7 +50,7 @@ namespace Texpainter
 					return false;
 				}
 
-			auto node = m_map.extract(i_old);
+			auto node  = m_map.extract(i_old);
 			node.key() = std::move(new_name);
 			m_map.insert(std::move(node));
 			return true;
@@ -81,7 +78,8 @@ namespace Texpainter
 				}
 
 			std::swap(m_seq[static_cast<size_t>(index - 1)], m_seq[static_cast<size_t>(index)]);
-			std::swap(m_key_seq[static_cast<size_t>(index - 1)], m_key_seq[static_cast<size_t>(index)]);
+			std::swap(m_key_seq[static_cast<size_t>(index - 1)],
+			          m_key_seq[static_cast<size_t>(index)]);
 			return index - 1;
 		}
 
@@ -93,7 +91,8 @@ namespace Texpainter
 				}
 
 			std::swap(m_seq[static_cast<size_t>(index + 1)], m_seq[static_cast<size_t>(index)]);
-			std::swap(m_key_seq[static_cast<size_t>(index + 1)], m_key_seq[static_cast<size_t>(index)]);
+			std::swap(m_key_seq[static_cast<size_t>(index + 1)],
+			          m_key_seq[static_cast<size_t>(index)]);
 			return index + 1;
 		}
 
@@ -102,7 +101,7 @@ namespace Texpainter
 			while(true)
 			{
 				auto const index_old = index;
-				index = moveForward(index);
+				index                = moveForward(index);
 				if(index == index_old) { return; }
 			}
 		}
@@ -112,7 +111,7 @@ namespace Texpainter
 			while(true)
 			{
 				auto const index_old = index;
-				index = moveBackward(index);
+				index                = moveBackward(index);
 				if(index == index_old) { return; }
 			}
 		}
@@ -123,33 +122,25 @@ namespace Texpainter
 			return i == std::end(m_map) ? nullptr : &i->second;
 		}
 
-		Value* operator[](Key const& key)
-		{
-			return const_cast<Value*>(std::as_const(*this)[key]);
-		}
+		Value* operator[](Key const& key) { return const_cast<Value*>(std::as_const(*this)[key]); }
 
-		Value const* operator[](IndexType i) const
-		{
-			return m_seq[static_cast<size_t>(i)];
-		}
+		Value const* operator[](IndexType i) const { return m_seq[static_cast<size_t>(i)]; }
 
-		Value* operator[](IndexType i)
-		{
-			return m_seq[static_cast<size_t>(i)];
-		}
+		Value* operator[](IndexType i) { return m_seq[static_cast<size_t>(i)]; }
 
 		IndexType index(Key const& key) const
 		{
 			auto val_ptr = (*this)[key];
-			auto i = std::ranges::find(m_seq, val_ptr);
-			return i == std::end(m_seq) ? IndexType{} :
-			                              IndexType{static_cast<size_t>(i - std::begin(m_seq))};
+			auto i       = std::ranges::find(m_seq, val_ptr);
+			return i == std::end(m_seq) ? IndexType{}
+			                            : IndexType{static_cast<size_t>(i - std::begin(m_seq))};
 		}
 
 		size_t position(Key const& key) const
 		{
 			auto i = m_map.find(key);
-			return i == std::end(m_map) ? static_cast<size_t>(-1) : std::distance(std::begin(m_map), i);
+			return i == std::end(m_map) ? static_cast<size_t>(-1)
+			                            : std::distance(std::begin(m_map), i);
 		}
 
 		auto valuesByIndex() const
@@ -159,17 +150,20 @@ namespace Texpainter
 
 		auto keysByIndex() const
 		{
-			return IterPair{DerefIterator{std::begin(m_key_seq)}, DerefIterator{std::end(m_key_seq)}};
+			return IterPair{DerefIterator{std::begin(m_key_seq)},
+			                DerefIterator{std::end(m_key_seq)}};
 		}
 
 		auto valuesByKey() const
 		{
-			return IterPair{PairSecondIterator{std::begin(m_map)}, PairSecondIterator{std::end(m_map)}};
+			return IterPair{PairSecondIterator{std::begin(m_map)},
+			                PairSecondIterator{std::end(m_map)}};
 		}
 
 		auto keys() const
 		{
-			return IterPair{PairFirstIterator{std::begin(m_map)}, PairFirstIterator{std::end(m_map)}};
+			return IterPair{PairFirstIterator{std::begin(m_map)},
+			                PairFirstIterator{std::end(m_map)}};
 		}
 
 	private:

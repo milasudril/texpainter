@@ -1,15 +1,15 @@
 //@	{"targets":[{"name":"menu_action.hpp","type":"include"}]}
 
 #ifndef TEXPAINTER_MENUACTION_HPP
-#define TEXPAITNER_MENUACTION_HPP
+	#define TEXPAITNER_MENUACTION_HPP
 
-#include "./menu_app.hpp"
-#include "./menu_file.hpp"
-#include "./menu_layer.hpp"
-#include "./menu_palette.hpp"
+	#include "./menu_app.hpp"
+	#include "./menu_file.hpp"
+	#include "./menu_layer.hpp"
+	#include "./menu_palette.hpp"
 
-#include "ui/menu_item.hpp"
-#include "ui/menu_builder.hpp"
+	#include "ui/menu_item.hpp"
+	#include "ui/menu_builder.hpp"
 
 namespace Texpainter
 {
@@ -32,10 +32,7 @@ namespace Texpainter
 	template<>
 	struct MainMenuItemTraits<MainMenuItem::Application>
 	{
-		static constexpr char const* displayName()
-		{
-			return "Application";
-		}
+		static constexpr char const* displayName() { return "Application"; }
 
 		using type = Ui::SubmenuBuilder<AppAction, AppActionTraits>;
 	};
@@ -43,10 +40,7 @@ namespace Texpainter
 	template<>
 	struct MainMenuItemTraits<MainMenuItem::File>
 	{
-		static constexpr char const* displayName()
-		{
-			return "Document";
-		}
+		static constexpr char const* displayName() { return "Document"; }
 
 		using type = Ui::SubmenuBuilder<FileAction, FileActionTraits>;
 	};
@@ -54,10 +48,7 @@ namespace Texpainter
 	template<>
 	struct MainMenuItemTraits<MainMenuItem::Layer>
 	{
-		static constexpr char const* displayName()
-		{
-			return "Layer";
-		}
+		static constexpr char const* displayName() { return "Layer"; }
 
 		using type = Ui::SubmenuBuilder<LayerAction, LayerActionTraits>;
 	};
@@ -68,10 +59,7 @@ namespace Texpainter
 	template<>
 	struct MainMenuItemTraits<MainMenuItem::Palette>
 	{
-		static constexpr char const* displayName()
-		{
-			return "Palette";
-		}
+		static constexpr char const* displayName() { return "Palette"; }
 
 		using type = Ui::SubmenuBuilder<PaletteAction, PaletteActionTraits>;
 	};

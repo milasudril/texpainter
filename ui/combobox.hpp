@@ -31,10 +31,7 @@ namespace Texpainter::Ui
 			return *this;
 		}
 
-		Combobox(Combobox&& obj) noexcept: m_impl(obj.m_impl)
-		{
-			obj.m_impl = nullptr;
-		}
+		Combobox(Combobox&& obj) noexcept: m_impl(obj.m_impl) { obj.m_impl = nullptr; }
 
 		Combobox& append(const char* option);
 
@@ -60,9 +57,7 @@ namespace Texpainter::Ui
 		Combobox& eventHandler(void* event_handler, EventHandlerFunc f);
 		class Impl;
 		Impl* m_impl;
-		Combobox(Impl& impl): m_impl(&impl)
-		{
-		}
+		Combobox(Impl& impl): m_impl(&impl) {}
 	};
 }
 

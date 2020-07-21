@@ -27,30 +27,21 @@ namespace Texpainter
 	struct LayerActionNewTraits<LayerActionNew::FromCurrentColor>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "From current color";
-		}
+		static constexpr char const* displayName() { return "From current color"; }
 	};
 
 	template<>
 	struct LayerActionNewTraits<LayerActionNew::FromFile>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "From file";
-		}
+		static constexpr char const* displayName() { return "From file"; }
 	};
 
 	template<>
 	struct LayerActionNewTraits<LayerActionNew::FromNoise>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "From noise";
-		}
+		static constexpr char const* displayName() { return "From noise"; }
 	};
 
 
@@ -84,30 +75,21 @@ namespace Texpainter
 	struct LayerActionTraits<LayerAction::New>
 	{
 		using type = Ui::SubmenuBuilder<LayerActionNew, LayerActionNewTraits>;
-		static constexpr char const* displayName()
-		{
-			return "New";
-		}
+		static constexpr char const* displayName() { return "New"; }
 	};
 
 	template<>
 	struct LayerActionTraits<LayerAction::Copy>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Create copy";
-		}
+		static constexpr char const* displayName() { return "Create copy"; }
 	};
 
 	template<>
 	struct LayerActionTraits<LayerAction::Link>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Create link";
-		}
+		static constexpr char const* displayName() { return "Create link"; }
 	};
 
 
@@ -115,30 +97,21 @@ namespace Texpainter
 	struct LayerActionTraits<LayerAction::LinkToCopy>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Convert link to copy";
-		}
+		static constexpr char const* displayName() { return "Convert link to copy"; }
 	};
 
 	template<>
 	struct LayerActionTraits<LayerAction::Rename>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Rename";
-		}
+		static constexpr char const* displayName() { return "Rename"; }
 	};
 
 	template<>
 	struct LayerActionTraits<LayerAction::Delete>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Delete";
-		}
+		static constexpr char const* displayName() { return "Delete"; }
 	};
 
 	enum class LayerActionClearTransformation : int
@@ -152,7 +125,7 @@ namespace Texpainter
 	constexpr auto end(Empty<LayerActionClearTransformation>)
 	{
 		return static_cast<LayerActionClearTransformation>(
-		   static_cast<int>(LayerActionClearTransformation::All) + 1);
+		    static_cast<int>(LayerActionClearTransformation::All) + 1);
 	}
 
 	template<LayerActionClearTransformation>
@@ -162,51 +135,36 @@ namespace Texpainter
 	struct LayerActionClearTransformationTraits<LayerActionClearTransformation::Rotation>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Rotation";
-		}
+		static constexpr char const* displayName() { return "Rotation"; }
 	};
 
 	template<>
 	struct LayerActionClearTransformationTraits<LayerActionClearTransformation::Location>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Location";
-		}
+		static constexpr char const* displayName() { return "Location"; }
 	};
 
 	template<>
 	struct LayerActionClearTransformationTraits<LayerActionClearTransformation::Scale>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Scale";
-		}
+		static constexpr char const* displayName() { return "Scale"; }
 	};
 
 	template<>
 	struct LayerActionClearTransformationTraits<LayerActionClearTransformation::All>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "All";
-		}
+		static constexpr char const* displayName() { return "All"; }
 	};
 
 	template<>
 	struct LayerActionTraits<LayerAction::ClearTransformation>
 	{
-		using type =
-		   Ui::SubmenuBuilder<LayerActionClearTransformation, LayerActionClearTransformationTraits>;
-		static constexpr char const* displayName()
-		{
-			return "Clear transformation";
-		}
+		using type = Ui::SubmenuBuilder<LayerActionClearTransformation,
+		                                LayerActionClearTransformationTraits>;
+		static constexpr char const* displayName() { return "Clear transformation"; }
 	};
 
 
@@ -214,40 +172,28 @@ namespace Texpainter
 	struct LayerActionTraits<LayerAction::MoveToTop>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Move to top";
-		}
+		static constexpr char const* displayName() { return "Move to top"; }
 	};
 
 	template<>
 	struct LayerActionTraits<LayerAction::MoveUp>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Move up";
-		}
+		static constexpr char const* displayName() { return "Move up"; }
 	};
 
 	template<>
 	struct LayerActionTraits<LayerAction::MoveDown>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Move down";
-		}
+		static constexpr char const* displayName() { return "Move down"; }
 	};
 
 	template<>
 	struct LayerActionTraits<LayerAction::MoveToBottom>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Move to bottom";
-		}
+		static constexpr char const* displayName() { return "Move to bottom"; }
 	};
 
 
@@ -255,30 +201,21 @@ namespace Texpainter
 	struct LayerActionTraits<LayerAction::EffectsAndBlendMode>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Effects and blend mode";
-		}
+		static constexpr char const* displayName() { return "Effects and blend mode"; }
 	};
 
 	template<>
 	struct LayerActionTraits<LayerAction::Isolate>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Isolate";
-		}
+		static constexpr char const* displayName() { return "Isolate"; }
 	};
 
 	template<>
 	struct LayerActionTraits<LayerAction::Hide>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Hide";
-		}
+		static constexpr char const* displayName() { return "Hide"; }
 	};
 }
 

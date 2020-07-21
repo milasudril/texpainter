@@ -10,9 +10,9 @@ namespace Texpainter
 {
 	inline vec2_t axisAlignedBoundingBox(vec2_t size, Angle ϴ)
 	{
-		auto const corner = size;
-		auto const rot_x = vec2_t{cos(ϴ), -sin(ϴ)};
-		auto const rot_y = vec2_t{sin(ϴ), cos(ϴ)};
+		auto const corner       = size;
+		auto const rot_x        = vec2_t{cos(ϴ), -sin(ϴ)};
+		auto const rot_y        = vec2_t{sin(ϴ), cos(ϴ)};
 		auto const corner_a_rot = transform(corner, rot_x, rot_y);
 		// Mirror in x axis (wroks due to symmetry)
 		auto const corner_b_rot = transform(corner * vec2_t{1.0, -1.0}, rot_x, rot_y);

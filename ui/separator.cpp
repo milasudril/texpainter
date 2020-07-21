@@ -20,14 +20,12 @@ Texpainter::Ui::Separator::Separator(Container& cnt, bool vertical) noexcept
 	m_impl = new Impl(cnt, vertical);
 }
 
-Texpainter::Ui::Separator::~Separator()
-{
-	delete m_impl;
-}
+Texpainter::Ui::Separator::~Separator() { delete m_impl; }
 
 Texpainter::Ui::Separator::Impl::Impl(Container& cnt, bool vertical): Separator(*this)
 {
-	auto widget = gtk_separator_new(vertical ? GTK_ORIENTATION_VERTICAL : GTK_ORIENTATION_HORIZONTAL);
+	auto widget =
+	    gtk_separator_new(vertical ? GTK_ORIENTATION_VERTICAL : GTK_ORIENTATION_HORIZONTAL);
 
 	m_handle = GTK_SEPARATOR(widget);
 	if(vertical)

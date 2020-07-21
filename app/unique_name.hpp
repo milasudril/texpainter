@@ -53,7 +53,7 @@ namespace Texpainter
 			while(true)
 			{
 				auto name_try = name_tmp + std::to_string(k);
-				auto i = used_names.insert(name_try);
+				auto i        = used_names.insert(name_try);
 				if(i.second) { return name_try; }
 				++k;
 			}

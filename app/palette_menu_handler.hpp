@@ -29,10 +29,12 @@ namespace Texpainter
 			NewGenerated
 		};
 
-		explicit PaletteMenuHandler(Ui::Container& dialog_owner, DocOwner& doc_owner, PolymorphicRng rng):
-		   r_dlg_owner{dialog_owner},
-		   r_doc_owner{doc_owner},
-		   m_rng{rng}
+		explicit PaletteMenuHandler(Ui::Container& dialog_owner,
+		                            DocOwner& doc_owner,
+		                            PolymorphicRng rng)
+		    : r_dlg_owner{dialog_owner}
+		    , r_doc_owner{doc_owner}
+		    , m_rng{rng}
 		{
 		}
 
@@ -58,8 +60,11 @@ namespace Texpainter
 		{
 			if(r_doc_owner.hasDocument())
 			{
-				m_new_empty_dlg = std::make_unique<PaletteCreatorDlg>(
-				   r_dlg_owner, "Create new palette", Ui::Box::Orientation::Horizontal, "Palette name: ");
+				m_new_empty_dlg =
+				    std::make_unique<PaletteCreatorDlg>(r_dlg_owner,
+				                                        "Create new palette",
+				                                        Ui::Box::Orientation::Horizontal,
+				                                        "Palette name: ");
 				m_new_empty_dlg->eventHandler<ControlId::NewEmpty>(*this);
 			}
 			else
@@ -94,10 +99,7 @@ namespace Texpainter
 			m_new_empty_dlg.reset();
 		}
 
-		void dismiss(Tag<ControlId::NewEmpty>, PaletteCreatorDlg&)
-		{
-			m_new_empty_dlg.reset();
-		}
+		void dismiss(Tag<ControlId::NewEmpty>, PaletteCreatorDlg&) { m_new_empty_dlg.reset(); }
 
 		void confirmPositive(Tag<ControlId::NewGenerated>, PaletteCreatorDlg&)
 		{
@@ -121,8 +123,8 @@ namespace Texpainter
 
 		void insertNewPalette(std::string&& palette_name, Model::Palette&& palette)
 		{
-			r_doc_owner.documentModify([&palette_name, &palette ](auto& doc) noexcept {
-				(void)doc.palettesModify([ palette_name, &palette ](auto& palettes) mutable noexcept {
+			r_doc_owner.documentModify([&palette_name, &palette](auto& doc) noexcept {
+				(void)doc.palettesModify([palette_name, &palette](auto& palettes) mutable noexcept {
 					// FIXME: Unique name generator...
 					palettes.insert(std::make_pair(std::move(palette_name), std::move(palette)));
 					return true;

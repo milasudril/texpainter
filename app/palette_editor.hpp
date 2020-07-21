@@ -40,12 +40,13 @@ namespace Texpainter
 
 
 	public:
-		explicit PaletteEditor(Ui::Container& owner):
-		   m_sel_color_index{0},
-		   r_eh{nullptr},
-		   m_container{owner, Ui::Box::Orientation::Horizontal},
-		   m_pal_selector{m_container},
-		   m_pal_view{m_container.insertMode(Ui::Box::InsertMode{2, Ui::Box::Fill | Ui::Box::Expand})}
+		explicit PaletteEditor(Ui::Container& owner)
+		    : m_sel_color_index{0}
+		    , r_eh{nullptr}
+		    , m_container{owner, Ui::Box::Orientation::Horizontal}
+		    , m_pal_selector{m_container}
+		    , m_pal_view{
+		          m_container.insertMode(Ui::Box::InsertMode{2, Ui::Box::Fill | Ui::Box::Expand})}
 		{
 			m_pal_selector.eventHandler<ControlId::PalSelector>(*this);
 			m_pal_view.eventHandler<ControlId::PalView>(*this);
@@ -55,11 +56,14 @@ namespace Texpainter
 		void createEmptyPalette()
 		{
 			m_pal_name_input =
-			   std::make_unique<PaletteNameInput>(m_container,
-			                                      "Create new palette",
-			                                      Texpainter::Ui::Box::Orientation::Horizontal,
-			                                      "Palette name:");
-			m_pal_name_input->eventHandler<ControlId::PalCreateEmpty>(*this).widget().inputField().focus();
+			    std::make_unique<PaletteNameInput>(m_container,
+			                                       "Create new palette",
+			                                       Texpainter::Ui::Box::Orientation::Horizontal,
+			                                       "Palette name:");
+			m_pal_name_input->eventHandler<ControlId::PalCreateEmpty>(*this)
+			    .widget()
+			    .inputField()
+			    .focus();
 		}
 
 		PaletteEditor& createEmptyPalette(char const* name)
@@ -74,7 +78,8 @@ namespace Texpainter
 		{
 			m_pal_selector.selected(index);
 			m_pal_view.palette(m_palettes[index])
-			   .highlightMode(Model::ColorIndex{0}, Texpainter::Ui::PaletteView::HighlightMode::Read);
+			    .highlightMode(Model::ColorIndex{0},
+			                   Texpainter::Ui::PaletteView::HighlightMode::Read);
 			m_sel_color_index = Model::ColorIndex{0};
 			return *this;
 		}
@@ -87,7 +92,7 @@ namespace Texpainter
 		template<auto id, class EventHandler>
 		PaletteEditor& eventHandler(EventHandler& eh)
 		{
-			r_eh = &eh;
+			r_eh   = &eh;
 			r_func = [](void* event_handler, PaletteEditor& self) {
 				reinterpret_cast<EventHandler*>(event_handler)->template onChanged<id>(self);
 			};
@@ -95,15 +100,9 @@ namespace Texpainter
 			return *this;
 		}
 
-		size_t paletteCount() const
-		{
-			return m_palettes.size();
-		}
+		size_t paletteCount() const { return m_palettes.size(); }
 
-		Model::ColorIndex selectedColorIndex() const
-		{
-			return m_sel_color_index;
-		}
+		Model::ColorIndex selectedColorIndex() const { return m_sel_color_index; }
 
 		template<ControlId>
 		void onChanged(Ui::Combobox&);
@@ -154,7 +153,7 @@ namespace Texpainter
 		std::unordered_set<std::string> m_used_pal_names;
 		std::unique_ptr<PaletteNameInput> m_pal_name_input;
 		std::array<Model::Pixel, 8> m_color_history;
-		pcg64 m_rng; // TODO:Should be global
+		pcg64 m_rng;  // TODO:Should be global
 		std::unique_ptr<ColorPicker> m_color_picker;
 	};
 
@@ -162,15 +161,15 @@ namespace Texpainter
 	inline void PaletteEditor::onChanged<PaletteEditor::ControlId::PalSelector>(Ui::Combobox& box)
 	{
 		m_pal_view.palette(m_palettes[m_pal_selector.selected()])
-		   .highlightMode(Model::ColorIndex{0}, Texpainter::Ui::PaletteView::HighlightMode::Read)
-		   .update();
+		    .highlightMode(Model::ColorIndex{0}, Texpainter::Ui::PaletteView::HighlightMode::Read)
+		    .update();
 		m_sel_color_index = Model::ColorIndex{0};
 		notify();
 	}
 
 	template<>
 	inline void PaletteEditor::onMouseUp<PaletteEditor::ControlId::PalView>(
-	   Texpainter::Ui::PaletteView& view, Model::ColorIndex index, int button)
+	    Texpainter::Ui::PaletteView& view, Model::ColorIndex index, int button)
 	{
 		if(std::size(m_palettes) == 0)
 		{
@@ -185,22 +184,27 @@ namespace Texpainter
 				case 3:
 				{
 					m_modified_pal_index = index;
-					m_pal_view.highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Write).update();
+					m_pal_view
+					    .highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Write)
+					    .update();
 					m_color_picker = std::make_unique<ColorPicker>(
-					   m_container,
-					   (std::string{"Select color number "} + std::to_string(index.value() + 1)).c_str(),
-					   PolymorphicRng{m_rng},
-					   "Recently used: ",
-					   m_color_history);
+					    m_container,
+					    (std::string{"Select color number "} + std::to_string(index.value() + 1))
+					        .c_str(),
+					    PolymorphicRng{m_rng},
+					    "Recently used: ",
+					    m_color_history);
 					m_color_picker->eventHandler<ControlId::ColorPicker>(*this).widget().value(
-					   selectedPalette()[index]);
+					    selectedPalette()[index]);
 				}
 				break;
 
 				case 1:
-					m_pal_view.highlightMode(m_sel_color_index, Texpainter::Ui::PaletteView::HighlightMode::None)
-					   .highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Read)
-					   .update();
+					m_pal_view
+					    .highlightMode(m_sel_color_index,
+					                   Texpainter::Ui::PaletteView::HighlightMode::None)
+					    .highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Read)
+					    .update();
 					m_sel_color_index = index;
 					notify();
 					break;
@@ -215,8 +219,8 @@ namespace Texpainter
 	}
 
 	template<>
-	inline void
-	PaletteEditor::confirmPositive<PaletteEditor::ControlId::PalCreateEmpty>(PaletteNameInput& input)
+	inline void PaletteEditor::confirmPositive<PaletteEditor::ControlId::PalCreateEmpty>(
+	    PaletteNameInput& input)
 	{
 		createEmptyPalette(input.widget().inputField().content());
 		m_pal_name_input.reset();
@@ -226,25 +230,27 @@ namespace Texpainter
 	template<>
 	inline void PaletteEditor::dismiss<PaletteEditor::ControlId::ColorPicker>(ColorPicker&)
 	{
-		m_pal_view.highlightMode(m_modified_pal_index, Texpainter::Ui::PaletteView::HighlightMode::None)
-		   .highlightMode(m_sel_color_index, Texpainter::Ui::PaletteView::HighlightMode::Read);
+		m_pal_view
+		    .highlightMode(m_modified_pal_index, Texpainter::Ui::PaletteView::HighlightMode::None)
+		    .highlightMode(m_sel_color_index, Texpainter::Ui::PaletteView::HighlightMode::Read);
 		m_color_picker.reset();
 	}
 
 	template<>
-	inline void
-	PaletteEditor::confirmPositive<PaletteEditor::ControlId::ColorPicker>(ColorPicker& picker)
+	inline void PaletteEditor::confirmPositive<PaletteEditor::ControlId::ColorPicker>(
+	    ColorPicker& picker)
 	{
-		auto color_new = picker.widget().value();
+		auto color_new                                              = picker.widget().value();
 		m_palettes[m_pal_selector.selected()][m_modified_pal_index] = color_new;
 
 		m_pal_view.palette(m_palettes[m_pal_selector.selected()])
-		   .highlightMode(m_modified_pal_index, Texpainter::Ui::PaletteView::HighlightMode::None)
-		   .highlightMode(m_sel_color_index, Texpainter::Ui::PaletteView::HighlightMode::Read)
-		   .update();
+		    .highlightMode(m_modified_pal_index, Texpainter::Ui::PaletteView::HighlightMode::None)
+		    .highlightMode(m_sel_color_index, Texpainter::Ui::PaletteView::HighlightMode::Read)
+		    .update();
 
-		std::rotate(
-		   std::rbegin(m_color_history), std::rbegin(m_color_history) + 1, std::rend(m_color_history));
+		std::rotate(std::rbegin(m_color_history),
+		            std::rbegin(m_color_history) + 1,
+		            std::rend(m_color_history));
 		m_color_history[0] = color_new;
 		m_color_picker.reset();
 		notify();

@@ -17,15 +17,9 @@ namespace Texpainter
 		{
 		}
 
-		constexpr auto width() const
-		{
-			return m_width;
-		}
+		constexpr auto width() const { return m_width; }
 
-		constexpr auto height() const
-		{
-			return m_height;
-		}
+		constexpr auto height() const { return m_height; }
 
 		constexpr auto area() const
 		{
@@ -42,10 +36,7 @@ namespace Texpainter
 		return a.width() == b.width() && a.width() == b.height();
 	}
 
-	constexpr inline bool operator!=(Size2d a, Size2d b)
-	{
-		return !(a == b);
-	}
+	constexpr inline bool operator!=(Size2d a, Size2d b) { return !(a == b); }
 
 	template<class OutputStream>
 	void write(Size2d size, OutputStream stream)

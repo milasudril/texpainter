@@ -18,13 +18,13 @@ namespace Testcases
 		auto a = dice(r);
 
 		// r holds a reference, not a copy
-		rng = std::mt19937{};
+		rng    = std::mt19937{};
 		auto b = dice(r);
 
 		assert(a == b);
 
 		// Wrapper returns the same value as original
-		rng = std::mt19937{};
+		rng    = std::mt19937{};
 		auto c = dice(rng);
 		assert(c == b);
 	}

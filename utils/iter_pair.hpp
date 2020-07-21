@@ -11,19 +11,11 @@ namespace Texpainter
 	class IterPair
 	{
 	public:
-		explicit IterPair(IterType begin, IterType end): m_begin{begin}, m_end{end}
-		{
-		}
+		explicit IterPair(IterType begin, IterType end): m_begin{begin}, m_end{end} {}
 
-		IterType begin() const
-		{
-			return m_begin;
-		}
+		IterType begin() const { return m_begin; }
 
-		IterType end() const
-		{
-			return m_end;
-		}
+		IterType end() const { return m_end; }
 
 	private:
 		IterType m_begin;

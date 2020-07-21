@@ -1,10 +1,10 @@
 //@	{"targets":[{"name":"menu_app.hpp","type":"include"}]}
 
 #ifndef TEXPAINTER_MENUAPP_HPP
-#define TEXPAITNER_MENUAPP_HPP
+	#define TEXPAITNER_MENUAPP_HPP
 
-#include "ui/menu_item.hpp"
-#include "utils/empty.hpp"
+	#include "ui/menu_item.hpp"
+	#include "utils/empty.hpp"
 
 namespace Texpainter
 {
@@ -27,30 +27,21 @@ namespace Texpainter
 	struct AppActionTraits<AppAction::Help>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Help";
-		}
+		static constexpr char const* displayName() { return "Help"; }
 	};
 
 	template<>
 	struct AppActionTraits<AppAction::About>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "About";
-		}
+		static constexpr char const* displayName() { return "About"; }
 	};
 
 	template<>
 	struct AppActionTraits<AppAction::Quit>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Quit";
-		}
+		static constexpr char const* displayName() { return "Quit"; }
 	};
 }
 

@@ -24,10 +24,7 @@ namespace Texpainter::Ui
 			return *this;
 		}
 
-		Menu(Menu&& obj) noexcept: m_impl(obj.m_impl)
-		{
-			obj.m_impl = nullptr;
-		}
+		Menu(Menu&& obj) noexcept: m_impl(obj.m_impl) { obj.m_impl = nullptr; }
 
 		Menu& add(void* handle) override;
 		Menu& show() override;
@@ -36,9 +33,7 @@ namespace Texpainter::Ui
 
 	protected:
 		class Impl;
-		explicit Menu(Menu::Impl& impl): m_impl(&impl)
-		{
-		}
+		explicit Menu(Menu::Impl& impl): m_impl(&impl) {}
 		Impl* m_impl;
 	};
 }

@@ -15,8 +15,8 @@ namespace Texpainter::Ui
 	class Box: public Container
 	{
 	public:
-		static constexpr unsigned short Fill = 1;
-		static constexpr unsigned short Expand = 2;
+		static constexpr unsigned short Fill         = 1;
+		static constexpr unsigned short Expand       = 2;
 		static constexpr unsigned short PositionBack = 4;
 		struct InsertMode
 		{
@@ -39,10 +39,7 @@ namespace Texpainter::Ui
 			return *this;
 		}
 
-		Box(Box&& obj) noexcept: m_impl(obj.m_impl)
-		{
-			obj.m_impl = nullptr;
-		}
+		Box(Box&& obj) noexcept: m_impl(obj.m_impl) { obj.m_impl = nullptr; }
 
 		Box& add(void* handle) override;
 		Box& show() override;
@@ -58,9 +55,7 @@ namespace Texpainter::Ui
 
 	protected:
 		class Impl;
-		explicit Box(Box::Impl& impl): m_impl(&impl)
-		{
-		}
+		explicit Box(Box::Impl& impl): m_impl(&impl) {}
 		Impl* m_impl;
 	};
 }

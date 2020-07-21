@@ -20,45 +20,31 @@ namespace Texpainter::Model
 	class Document
 	{
 	public:
-		using LayerStack = SortedSequence<std::string, Layer, LayerIndex>;
+		using LayerStack        = SortedSequence<std::string, Layer, LayerIndex>;
 		using PaletteCollection = SortedSequence<std::string, Palette, PaletteIndex>;
 
-		explicit Document(Size2d canvas_size): m_canvas_size{canvas_size}, m_dirty{false}
-		{
-		}
+		explicit Document(Size2d canvas_size): m_canvas_size{canvas_size}, m_dirty{false} {}
 
-		bool dirty() const
-		{
-			return m_dirty;
-		}
+		bool dirty() const { return m_dirty; }
 
-		Size2d canvasSize() const
-		{
-			return m_canvas_size;
-		}
+		Size2d canvasSize() const { return m_canvas_size; }
 
 		Document& canvasSize(Size2d size)
 		{
 			m_canvas_size = size;
-			m_dirty = true;
+			m_dirty       = true;
 			return *this;
 		}
 
 
-		LayerStack const& layers() const
-		{
-			return m_layers;
-		}
+		LayerStack const& layers() const { return m_layers; }
 
-		auto layersByIndex() const
-		{
-			return m_layers.valuesByIndex();
-		}
+		auto layersByIndex() const { return m_layers.valuesByIndex(); }
 
 		Document& layers(LayerStack&& layers_new)
 		{
 			m_layers = std::move(layers_new);
-			m_dirty = true;
+			m_dirty  = true;
 			return *this;
 		}
 
@@ -70,29 +56,23 @@ namespace Texpainter::Model
 		}
 
 
-		std::string const& currentLayer() const
-		{
-			return m_current_layer;
-		}
+		std::string const& currentLayer() const { return m_current_layer; }
 
 		Document& currentLayer(std::string&& current_layer)
 		{
 			assert(m_layers[current_layer] != nullptr);
 			m_current_layer = std::move(current_layer);
-			m_dirty = true;
+			m_dirty         = true;
 			return *this;
 		}
 
 
-		PaletteCollection const& palettes() const
-		{
-			return m_palettes;
-		}
+		PaletteCollection const& palettes() const { return m_palettes; }
 
 		Document& palettes(PaletteCollection&& palettes_new)
 		{
 			m_palettes = std::move(palettes_new);
-			m_dirty = true;
+			m_dirty    = true;
 			return *this;
 		}
 
@@ -104,29 +84,23 @@ namespace Texpainter::Model
 		}
 
 
-		std::string const& currentPalette() const
-		{
-			return m_current_palette;
-		}
+		std::string const& currentPalette() const { return m_current_palette; }
 
 		Document& currentPalette(std::string&& current_palette)
 		{
 			m_current_palette = std::move(current_palette);
-			m_current_color = ColorIndex{0};
-			m_dirty = true;
+			m_current_color   = ColorIndex{0};
+			m_dirty           = true;
 			return *this;
 		}
 
 
-		ColorIndex currentColor() const
-		{
-			return m_current_color;
-		}
+		ColorIndex currentColor() const { return m_current_color; }
 
 		Document& currentColor(ColorIndex i)
 		{
 			m_current_color = i;
-			m_dirty = true;
+			m_dirty         = true;
 			return *this;
 		}
 
@@ -144,8 +118,8 @@ namespace Texpainter::Model
 
 	inline Pixel currentColor(Document const& doc)
 	{
-		auto const& palettes = doc.palettes();
-		auto i = palettes[doc.currentPalette()];
+		auto const& palettes         = doc.palettes();
+		auto i                       = palettes[doc.currentPalette()];
 		constexpr auto default_color = Pixel{1.0f / 3, 1.0f / 3, 1.0f / 3, 1.0f};
 		if(i == nullptr) { return default_color; }
 

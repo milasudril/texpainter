@@ -29,10 +29,12 @@ namespace Texpainter
 			NewFromNoise
 		};
 
-		explicit LayerMenuHandler(Ui::Container& dialog_owner, DocOwner& doc_owner, PolymorphicRng rng):
-		   r_dlg_owner{dialog_owner},
-		   r_doc_owner{doc_owner},
-		   m_rng{rng}
+		explicit LayerMenuHandler(Ui::Container& dialog_owner,
+		                          DocOwner& doc_owner,
+		                          PolymorphicRng rng)
+		    : r_dlg_owner{dialog_owner}
+		    , r_doc_owner{doc_owner}
+		    , m_rng{rng}
 		{
 		}
 
@@ -58,10 +60,10 @@ namespace Texpainter
 		{
 			if(r_doc_owner.hasDocument())
 			{
-				auto const size_max = r_doc_owner.document().canvasSize();
+				auto const size_max     = r_doc_owner.document().canvasSize();
 				auto const size_default = Size2d{size_max.width() / 2, size_max.height() / 2};
-				m_new_from_color_dlg = std::make_unique<LayerCreatorDlg>(
-				   r_dlg_owner, "Create new layer from current color", size_default, size_max);
+				m_new_from_color_dlg    = std::make_unique<LayerCreatorDlg>(
+                    r_dlg_owner, "Create new layer from current color", size_default, size_max);
 				m_new_from_color_dlg->eventHandler<ControlId::NewFromCurrentColor>(*this);
 			}
 			else
@@ -74,10 +76,10 @@ namespace Texpainter
 		{
 			if(r_doc_owner.hasDocument())
 			{
-				auto const size_max = r_doc_owner.document().canvasSize();
+				auto const size_max     = r_doc_owner.document().canvasSize();
 				auto const size_default = Size2d{size_max.width() / 2, size_max.height() / 2};
-				m_new_from_noise = std::make_unique<LayerCreatorDlg>(
-				   r_dlg_owner, "Create new layer from noise", size_default, size_max);
+				m_new_from_noise        = std::make_unique<LayerCreatorDlg>(
+                    r_dlg_owner, "Create new layer from noise", size_default, size_max);
 				m_new_from_noise->eventHandler<ControlId::NewFromNoise>(*this);
 			}
 			else
@@ -137,10 +139,7 @@ namespace Texpainter
 			m_new_from_noise.reset();
 		}
 
-		void dismiss(Tag<ControlId::NewFromNoise>, LayerCreatorDlg&)
-		{
-			m_new_from_noise.reset();
-		}
+		void dismiss(Tag<ControlId::NewFromNoise>, LayerCreatorDlg&) { m_new_from_noise.reset(); }
 
 	private:
 		Ui::Container& r_dlg_owner;
@@ -153,8 +152,8 @@ namespace Texpainter
 
 		void insertNewLayer(std::string&& layer_name, Model::Layer&& layer)
 		{
-			r_doc_owner.documentModify([&layer_name, &layer ](auto& doc) noexcept {
-				(void)doc.layersModify([ layer_name, &layer ](auto& layers) mutable noexcept {
+			r_doc_owner.documentModify([&layer_name, &layer](auto& doc) noexcept {
+				(void)doc.layersModify([layer_name, &layer](auto& layers) mutable noexcept {
 					// FIXME: Unique name generator...
 					layers.insert(std::make_pair(std::move(layer_name), std::move(layer)));
 					return true;

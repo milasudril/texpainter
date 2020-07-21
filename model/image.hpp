@@ -20,13 +20,11 @@ namespace Texpainter::Model
 	class BasicImage
 	{
 	public:
-		explicit BasicImage(uint32_t width, uint32_t height): BasicImage{Size2d{width, height}}
-		{
-		}
+		explicit BasicImage(uint32_t width, uint32_t height): BasicImage{Size2d{width, height}} {}
 
-		explicit BasicImage(Size2d size):
-		   m_size(size),
-		   m_data{reinterpret_cast<PixelType*>(allocMem<PixelType>(area()))}
+		explicit BasicImage(Size2d size)
+		    : m_size(size)
+		    , m_data{reinterpret_cast<PixelType*>(allocMem<PixelType>(area()))}
 		{
 		}
 
@@ -41,56 +39,29 @@ namespace Texpainter::Model
 
 		BasicImage& operator=(BasicImage const&) = delete;
 
-		auto width() const
-		{
-			return m_size.width();
-		}
+		auto width() const { return m_size.width(); }
 
-		auto height() const
-		{
-			return m_size.height();
-		}
+		auto height() const { return m_size.height(); }
 
-		auto area() const
-		{
-			return m_size.area();
-		}
+		auto area() const { return m_size.area(); }
 
-		Size2d size() const
-		{
-			return Size2d{width(), height()};
-		}
+		Size2d size() const { return Size2d{width(), height()}; }
 
 
-		PixelType operator()(uint32_t x, uint32_t y) const
-		{
-			return *getAddress(x, y);
-		}
+		PixelType operator()(uint32_t x, uint32_t y) const { return *getAddress(x, y); }
 
 		PixelType& operator()(uint32_t x, uint32_t y)
 		{
 			return *const_cast<PixelType*>(std::as_const(*this).getAddress(x, y));
 		}
 
-		Span2d<PixelType const> pixels() const
-		{
-			return {m_data.get(), size()};
-		}
+		Span2d<PixelType const> pixels() const { return {m_data.get(), size()}; }
 
-		Span2d<PixelType> pixels()
-		{
-			return {m_data.get(), size()};
-		}
+		Span2d<PixelType> pixels() { return {m_data.get(), size()}; }
 
-		operator Span2d<PixelType>()
-		{
-			return pixels();
-		}
+		operator Span2d<PixelType>() { return pixels(); }
 
-		operator Span2d<PixelType const>() const
-		{
-			return pixels();
-		}
+		operator Span2d<PixelType const>() const { return pixels(); }
 
 	private:
 		Size2d m_size;

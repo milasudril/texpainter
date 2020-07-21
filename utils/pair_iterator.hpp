@@ -21,21 +21,13 @@ namespace Texpainter
 
 		PairIterator(PairIterator const&) = default;
 
-		explicit PairIterator(Iter i): m_i{i}
-		{
-		}
+		explicit PairIterator(Iter i): m_i{i} {}
 
 		auto operator<=>(PairIterator const& other) const = default;
 
-		auto& operator*() const
-		{
-			return std::get<item>(*m_i);
-		}
+		auto& operator*() const { return std::get<item>(*m_i); }
 
-		auto operator-> () const
-		{
-			return &(*(*this));
-		};
+		auto operator->() const { return &(*(*this)); };
 
 
 		PairIterator& operator++()
@@ -64,10 +56,7 @@ namespace Texpainter
 			return tmp;
 		}
 
-		auto rawIterator() const
-		{
-			return m_i;
-		}
+		auto rawIterator() const { return m_i; }
 
 	private:
 		Iter m_i;

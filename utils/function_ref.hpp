@@ -20,12 +20,12 @@ namespace Texpainter
 	public:
 		template<class Function,
 		         std::enable_if_t<!std::is_same_v<std::decay_t<Function>, FunctionRef>, int> = 0>
-		explicit FunctionRef(Function& f):
-		   r_handle{&f},
-		   r_func{[](void* handle, Args... args) {
-			   auto& self = *reinterpret_cast<Function*>(handle);
-			   return self(std::forward<Args>(args)...);
-		   }}
+		explicit FunctionRef(Function& f)
+		    : r_handle{&f}
+		    , r_func{[](void* handle, Args... args) {
+			    auto& self = *reinterpret_cast<Function*>(handle);
+			    return self(std::forward<Args>(args)...);
+		    }}
 		{
 		}
 
@@ -34,15 +34,9 @@ namespace Texpainter
 			return r_func(r_handle, std::forward<Args>(args)...);
 		}
 
-		decltype(auto) handle() const
-		{
-			return r_handle;
-		}
+		decltype(auto) handle() const { return r_handle; }
 
-		decltype(auto) function() const
-		{
-			return r_func;
-		}
+		decltype(auto) function() const { return r_func; }
 
 
 	private:

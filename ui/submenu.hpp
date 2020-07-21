@@ -16,9 +16,9 @@ namespace Texpainter::Ui
 	class Submenu
 	{
 	public:
-		explicit Submenu(Container& parent, char const* label = ""):
-		   m_menuitem{parent, label},
-		   m_menu{m_menuitem}
+		explicit Submenu(Container& parent, char const* label = "")
+		    : m_menuitem{parent, label}
+		    , m_menu{m_menuitem}
 		{
 		}
 
@@ -28,10 +28,7 @@ namespace Texpainter::Ui
 			return *this;
 		}
 
-		Menu& menu()
-		{
-			return m_menu;
-		}
+		Menu& menu() { return m_menu; }
 
 	private:
 		MenuItem m_menuitem;

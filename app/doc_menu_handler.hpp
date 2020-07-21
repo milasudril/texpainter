@@ -25,10 +25,10 @@ namespace Texpainter
 			SetCanvasSize
 		};
 
-		explicit DocMenuHandler(Ui::Container& dialog_owner, DocOwner& doc_owner):
-		   m_default_size{512, 512},
-		   r_dlg_owner{dialog_owner},
-		   r_doc_owner{doc_owner}
+		explicit DocMenuHandler(Ui::Container& dialog_owner, DocOwner& doc_owner)
+		    : m_default_size{512, 512}
+		    , r_dlg_owner{dialog_owner}
+		    , r_doc_owner{doc_owner}
 		{
 		}
 
@@ -56,7 +56,7 @@ namespace Texpainter
 			// if(documentHasBeenSaved)
 			{
 				m_new_dlg = std::make_unique<CanvasSizeDialog>(
-				   r_dlg_owner, "New document", m_default_size, Size2d{16384, 16384});
+				    r_dlg_owner, "New document", m_default_size, Size2d{16384, 16384});
 				m_new_dlg->eventHandler<ControlId::NewDocument>(*this);
 			}
 		}
@@ -66,7 +66,7 @@ namespace Texpainter
 			if(r_doc_owner.hasDocument())
 			{
 				m_canvas_dlg = std::make_unique<CanvasSizeDialog>(
-				   r_dlg_owner, "Set canvas size", m_default_size, Size2d{16384, 16384});
+				    r_dlg_owner, "Set canvas size", m_default_size, Size2d{16384, 16384});
 				m_canvas_dlg->eventHandler<ControlId::SetCanvasSize>(*this);
 			}
 			else
@@ -88,25 +88,19 @@ namespace Texpainter
 			r_doc_owner.document(Model::Document{m_default_size});
 		}
 
-		void dismiss(Tag<ControlId::NewDocument>, CanvasSizeDialog&)
-		{
-			m_new_dlg.reset();
-		}
+		void dismiss(Tag<ControlId::NewDocument>, CanvasSizeDialog&) { m_new_dlg.reset(); }
 
 		void confirmPositive(Tag<ControlId::SetCanvasSize>, CanvasSizeDialog& src)
 		{
 			m_default_size = src.widget().value();
 			m_canvas_dlg.reset();
-			r_doc_owner.documentModify([size = m_default_size](Model::Document & doc) noexcept {
+			r_doc_owner.documentModify([size = m_default_size](Model::Document& doc) noexcept {
 				doc.canvasSize(size);
 				return true;
 			});
 		}
 
-		void dismiss(Tag<ControlId::SetCanvasSize>, CanvasSizeDialog&)
-		{
-			m_canvas_dlg.reset();
-		}
+		void dismiss(Tag<ControlId::SetCanvasSize>, CanvasSizeDialog&) { m_canvas_dlg.reset(); }
 
 	private:
 		Size2d m_default_size;

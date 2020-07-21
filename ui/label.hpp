@@ -24,10 +24,7 @@ namespace Texpainter::Ui
 			return *this;
 		}
 
-		Label(Label&& obj) noexcept: m_impl(obj.m_impl)
-		{
-			obj.m_impl = nullptr;
-		}
+		Label(Label&& obj) noexcept: m_impl(obj.m_impl) { obj.m_impl = nullptr; }
 
 		Label& content(const char* text);
 
@@ -44,9 +41,7 @@ namespace Texpainter::Ui
 		class Impl;
 		Impl* m_impl;
 
-		explicit Label(Impl& impl): m_impl(&impl)
-		{
-		}
+		explicit Label(Impl& impl): m_impl(&impl) {}
 	};
 }
 

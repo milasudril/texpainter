@@ -19,7 +19,7 @@ namespace Texpainter
 	struct Tag
 	{
 		static constexpr auto value = action_id;
-		using value_type = decltype(action_id);
+		using value_type            = decltype(action_id);
 	};
 
 	// TODO: Add concept
@@ -40,10 +40,11 @@ namespace Texpainter
 
 		template<class ActionId, class Function, class... Args>
 		using dispatch_ret_type =
-		   std::result_of_t<Function(Tag<previous(end(Empty<ActionId>{}))>, Args&&...)>;
+		    std::result_of_t<Function(Tag<previous(end(Empty<ActionId>{}))>, Args&&...)>;
 
 		template<class ActionId, class Function, class... Args>
-		using DispatchFptr = dispatch_ret_type<ActionId, Function, Args...> (*)(Function&& f, Args...);
+		using DispatchFptr = dispatch_ret_type<ActionId, Function, Args...> (*)(Function&& f,
+		                                                                        Args...);
 
 
 		template<class ActionId>
@@ -54,7 +55,7 @@ namespace Texpainter
 
 		template<class ActionId, class Function, class... Args>
 		using FptrArray =
-		   std::array<DispatchFptr<ActionId, Function, Args...>, itemCount(Empty<ActionId>{})>;
+		    std::array<DispatchFptr<ActionId, Function, Args...>, itemCount(Empty<ActionId>{})>;
 
 		template<auto action_id>
 		struct GenVtable
@@ -64,7 +65,7 @@ namespace Texpainter
 			template<class Function, class... Args>
 			constexpr static void assign(FptrArray<ActionId, Function, Args...>& pointers)
 			{
-				constexpr auto current_id = previous(action_id);
+				constexpr auto current_id              = previous(action_id);
 				pointers[static_cast<int>(current_id)] = []<class... A>(auto f, A... args)
 				{
 					return f(Tag<current_id>{}, std::forward<Args>(args)...);
@@ -103,7 +104,8 @@ namespace Texpainter
 			{
 				constexpr auto current_id = previous(enum_item);
 				f(Tag<current_id>{});
-				if constexpr(static_cast<int>(current_id) != 0) { VisitEnumItem<current_id>::process(f); }
+				if constexpr(static_cast<int>(current_id) != 0)
+				{ VisitEnumItem<current_id>::process(f); }
 			}
 		};
 	}
@@ -118,7 +120,8 @@ namespace Texpainter
 	namespace detail
 	{
 		template<class EnumType, int enum_item, template<auto> class EnumItemTraits>
-		struct MakeTupleFromEnum: public MakeTupleFromEnum<EnumType, previous(enum_item), EnumItemTraits>
+		struct MakeTupleFromEnum
+		    : public MakeTupleFromEnum<EnumType, previous(enum_item), EnumItemTraits>
 		{
 		private:
 			using Base = MakeTupleFromEnum<EnumType, previous(enum_item), EnumItemTraits>;
@@ -128,7 +131,8 @@ namespace Texpainter
 			typename EnumItemTraits<CurrentIndex>::type m_value;
 
 			template<class... CtorArgs>
-			explicit MakeTupleFromEnum(CtorArgs&&... args): Base{args...}, m_value{args...}
+			explicit MakeTupleFromEnum(CtorArgs&&... args): Base{args...}
+			                                              , m_value{args...}
 			{
 			}
 		};
@@ -143,16 +147,13 @@ namespace Texpainter
 			{
 			}
 
-			static constexpr auto size()
-			{
-				return static_cast<size_t>(end(Empty<EnumType>{}));
-			}
+			static constexpr auto size() { return static_cast<size_t>(end(Empty<EnumType>{})); }
 		};
 	}
 
 	template<class EnumType, template<auto> class EnumItemTraits>
-	using TupleFromEnum =
-	   detail::MakeTupleFromEnum<EnumType, static_cast<int>(end(Empty<EnumType>{})), EnumItemTraits>;
+	using TupleFromEnum = detail::
+	    MakeTupleFromEnum<EnumType, static_cast<int>(end(Empty<EnumType>{})), EnumItemTraits>;
 
 	template<auto EnumType, template<auto> class EnumItemTraits>
 	constexpr auto const& get(TupleFromEnum<decltype(EnumType), EnumItemTraits> const& x)
@@ -160,7 +161,7 @@ namespace Texpainter
 		return static_cast<detail::MakeTupleFromEnum<decltype(EnumType),
 		                                             static_cast<int>(EnumType) + 1,
 		                                             EnumItemTraits> const&>(x)
-		   .m_value;
+		    .m_value;
 	}
 
 	template<auto EnumType, template<auto> class EnumItemTraits>
@@ -169,7 +170,7 @@ namespace Texpainter
 		return static_cast<detail::MakeTupleFromEnum<decltype(EnumType),
 		                                             static_cast<int>(EnumType) + 1,
 		                                             EnumItemTraits>&>(x)
-		   .m_value;
+		    .m_value;
 	}
 }
 

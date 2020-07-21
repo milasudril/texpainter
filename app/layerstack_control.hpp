@@ -15,8 +15,9 @@ namespace Texpainter
 {
 	class LayerStackControl
 	{
-		using CreateLayerDlg = Ui::Dialog<LayerCreator, Ui::DialogOkCancel, Ui::InitialFocus::NoChange>;
-		using TextInputDlg = Ui::Dialog<Ui::LabeledInput<Ui::TextEntry>>;
+		using CreateLayerDlg =
+		    Ui::Dialog<LayerCreator, Ui::DialogOkCancel, Ui::InitialFocus::NoChange>;
+		using TextInputDlg    = Ui::Dialog<Ui::LabeledInput<Ui::TextEntry>>;
 		using ConfirmationDlg = Ui::Dialog<Ui::Label, Ui::DialogYesNo>;
 
 	public:
@@ -32,29 +33,28 @@ namespace Texpainter
 			LayerHide
 		};
 
-		explicit LayerStackControl(Ui::Container& owner, Size2d canvas_size): m_canvas_size{canvas_size}
+		explicit LayerStackControl(Ui::Container& owner, Size2d canvas_size)
+		    : m_canvas_size{canvas_size}
 		{
 		}
 
-		LayerStackControl& layers(Model::LayerStack&& l, Sequence<std::string, Model::LayerIndex>&& n)
+		LayerStackControl& layers(Model::LayerStack&& l,
+		                          Sequence<std::string, Model::LayerIndex>&& n)
 		{
-			m_layers = std::move(l);
-			m_layer_names = std::move(n);
+			m_layers        = std::move(l);
+			m_layer_names   = std::move(n);
 			m_current_layer = m_layers.lastIndex();
 			return *this;
 		}
 
-		Model::LayerStack const& layers() const
-		{
-			return m_layers;
-		}
+		Model::LayerStack const& layers() const { return m_layers; }
 
 		LayerStackControl& add(std::string&& name, Model::Layer&& layer)
 		{
 			m_layer_names.append(std::move(name));
 			m_layers.append(std::move(layer));
 			auto const index = m_layer_names.size() - 1;
-			m_current_layer = Model::LayerIndex{static_cast<uint32_t>(index)};
+			m_current_layer  = Model::LayerIndex{static_cast<uint32_t>(index)};
 			return *this;
 		}
 
@@ -67,7 +67,8 @@ namespace Texpainter
 		template<class... Args>
 		LayerStackControl& paintCurrentLayer(Args&&... args)
 		{
-			if(m_current_layer.valid()) { m_layers[m_current_layer].paint(std::forward<Args>(args)...); }
+			if(m_current_layer.valid())
+			{ m_layers[m_current_layer].paint(std::forward<Args>(args)...); }
 			return *this;
 		}
 
@@ -78,12 +79,14 @@ namespace Texpainter
 		}
 
 		template<class ScaleConstraint>
-		LayerStackControl& scaleCurrentLayer(vec2_t loc, vec2_t origin, ScaleConstraint&& constraint)
+		LayerStackControl& scaleCurrentLayer(vec2_t loc,
+		                                     vec2_t origin,
+		                                     ScaleConstraint&& constraint)
 		{
 			if(m_current_layer.valid())
 			{
 				auto const layer_loc = m_layers[m_current_layer].location();
-				auto factor = constraint((loc - layer_loc) / (origin - layer_loc));
+				auto factor          = constraint((loc - layer_loc) / (origin - layer_loc));
 				m_layers[m_current_layer].scaleFactor(factor);
 			}
 			return *this;
@@ -95,7 +98,7 @@ namespace Texpainter
 			if(m_current_layer.valid())
 			{
 				auto const layer_loc = m_layers[m_current_layer].location();
-				auto const ϴ = constraint(Angle{loc - layer_loc});
+				auto const ϴ         = constraint(Angle{loc - layer_loc});
 				m_layers[m_current_layer].rotation(ϴ);
 			}
 			return *this;
@@ -106,7 +109,7 @@ namespace Texpainter
 		template<auto id, class EventHandler>
 		LayerStackControl& eventHandler(EventHandler& eh)
 		{
-			r_eh = &eh;
+			r_eh   = &eh;
 			r_func = [](void* event_handler, LayerStackControl& self) {
 				reinterpret_cast<EventHandler*>(event_handler)->template onChanged<id>(self);
 			};
@@ -172,8 +175,8 @@ namespace Texpainter
 	};
 
 	template<>
-	inline void
-	LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerCopy>(TextInputDlg& src)
+	inline void LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerCopy>(
+	    TextInputDlg& src)
 	{
 		if(m_current_layer.valid())
 		{
@@ -192,8 +195,8 @@ namespace Texpainter
 	}
 
 	template<>
-	inline void
-	LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerLink>(TextInputDlg& src)
+	inline void LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerLink>(
+	    TextInputDlg& src)
 	{
 		if(m_current_layer.valid())
 		{
@@ -212,8 +215,8 @@ namespace Texpainter
 	}
 
 	template<>
-	inline void
-	LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerDelete>(ConfirmationDlg&)
+	inline void LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerDelete>(
+	    ConfirmationDlg&)
 	{
 		auto const current_layer_new = [](auto const& layers, auto layer_index) {
 			if(layers.size() <= 1) { return Model::LayerIndex{}; }
@@ -231,8 +234,8 @@ namespace Texpainter
 	}
 
 	template<>
-	inline void
-	LayerStackControl::confirmNegative<LayerStackControl::ControlId::LayerDelete>(ConfirmationDlg&)
+	inline void LayerStackControl::confirmNegative<LayerStackControl::ControlId::LayerDelete>(
+	    ConfirmationDlg&)
 	{
 		m_delete_layer.reset();
 	}

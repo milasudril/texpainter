@@ -26,7 +26,7 @@ namespace Texpainter::Dft
 
 	enum class Direction : int
 	{
-		Forward = FFTW_FORWARD,
+		Forward  = FFTW_FORWARD,
 		Backward = FFTW_BACKWARD
 	};
 
@@ -35,24 +35,20 @@ namespace Texpainter::Dft
 	public:
 		explicit BasicPlan(Size2d size, Direction dir);
 
-		BasicPlan(): m_plan{nullptr}
-		{
-		}
+		BasicPlan(): m_plan{nullptr} {}
 
 		using sample_type = std::complex<double>;
 
 		void execute(sample_type const* input_buffer, sample_type* output_buffer) const
 		{
 			assert(valid());
-			auto input_buffer_ptr = reinterpret_cast<fftw_complex*>(const_cast<sample_type*>(input_buffer));
+			auto input_buffer_ptr =
+			    reinterpret_cast<fftw_complex*>(const_cast<sample_type*>(input_buffer));
 			auto output_buffer_ptr = reinterpret_cast<fftw_complex*>(output_buffer);
 			fftw_execute_dft(m_plan.get(), input_buffer_ptr, output_buffer_ptr);
 		}
 
-		bool valid() const
-		{
-			return m_plan != nullptr;
-		}
+		bool valid() const { return m_plan != nullptr; }
 
 	private:
 		using PlanType = std::remove_pointer_t<fftw_plan>;
@@ -63,13 +59,9 @@ namespace Texpainter::Dft
 	class Plan: public BasicPlan
 	{
 	public:
-		Plan(): BasicPlan{}
-		{
-		}
+		Plan(): BasicPlan{} {}
 
-		explicit Plan(Size2d size): BasicPlan{size, dir}
-		{
-		}
+		explicit Plan(Size2d size): BasicPlan{size, dir} {}
 	};
 }
 

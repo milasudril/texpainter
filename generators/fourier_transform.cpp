@@ -26,21 +26,21 @@ operator()(Span2d<double const> vals_in)
 
 	Model::BasicImage<std::complex<double>> ret{vals_in.size()};
 	s_engine.run<Dft::Direction::Forward>(
-	   vals_in.size(), input_buffer.pixels().data(), ret.pixels().data());
+	    vals_in.size(), input_buffer.pixels().data(), ret.pixels().data());
 	std::ranges::for_each(ret.pixels(), [area = vals_in.area()](auto& val) { return val /= area; });
 
 	return ret;
 }
 
-Texpainter::Model::BasicImage<double> Texpainter::Generators::FourierTransform::
-operator()(Span2d<std::complex<double> const> vals_in)
+Texpainter::Model::BasicImage<double> Texpainter::Generators::FourierTransform::operator()(
+    Span2d<std::complex<double> const> vals_in)
 {
 	auto const w = vals_in.width();
 	auto const h = vals_in.height();
 
 	Model::BasicImage<std::complex<double>> output_buffer{w, h};
 	s_engine.run<Dft::Direction::Backward>(
-	   vals_in.size(), vals_in.data(), output_buffer.pixels().data());
+	    vals_in.size(), vals_in.data(), output_buffer.pixels().data());
 
 	Texpainter::Model::BasicImage<double> ret{w, h};
 	auto sign_row = 1;

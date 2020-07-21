@@ -35,18 +35,19 @@ namespace Texpainter
 			Canvas
 		};
 
-		explicit AppWindow(Ui::Container& container, PolymorphicRng rng):
-		   m_rng{rng},
-		   m_doc_menu_handler{container, *this},
-		   m_layer_menu_handler{container, *this, m_rng},
-		   m_palette_menu_handler{container, *this, m_rng},
-		   m_rows{container, Ui::Box::Orientation::Vertical},
-		   m_menu{m_rows},
-		   m_selectors{m_rows, Ui::Box::Orientation::Horizontal},
-		   m_layer_selector{m_selectors, Ui::Box::Orientation::Horizontal, "Layer: "},
-		   m_palette_selector{m_selectors, Ui::Box::Orientation::Horizontal, "Palettes: "},
-		   m_pal_view{m_selectors.insertMode(Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand})},
-		   m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
+		explicit AppWindow(Ui::Container& container, PolymorphicRng rng)
+		    : m_rng{rng}
+		    , m_doc_menu_handler{container, *this}
+		    , m_layer_menu_handler{container, *this, m_rng}
+		    , m_palette_menu_handler{container, *this, m_rng}
+		    , m_rows{container, Ui::Box::Orientation::Vertical}
+		    , m_menu{m_rows}
+		    , m_selectors{m_rows, Ui::Box::Orientation::Horizontal}
+		    , m_layer_selector{m_selectors, Ui::Box::Orientation::Horizontal, "Layer: "}
+		    , m_palette_selector{m_selectors, Ui::Box::Orientation::Horizontal, "Palettes: "}
+		    , m_pal_view{m_selectors.insertMode(
+		          Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand})}
+		    , m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
 		{
 			//	m_img_view.eventHandler<ControlId::Canvas>(*this);
 			m_menu.eventHandler(*this);
@@ -67,15 +68,9 @@ namespace Texpainter
 			return res;
 		}
 
-		Model::Document const& document() const
-		{
-			return *m_current_document;
-		}
+		Model::Document const& document() const { return *m_current_document; }
 
-		bool hasDocument() const
-		{
-			return m_current_document != nullptr;
-		}
+		bool hasDocument() const { return m_current_document != nullptr; }
 
 
 		template<AppAction>
@@ -153,10 +148,10 @@ namespace Texpainter
 
 			layer_selector.clear();
 			std::ranges::for_each(
-			   m_current_document->layers().keysByIndex(),
-			   [&layer_selector](auto const& name) { layer_selector.append(name.c_str()); });
+			    m_current_document->layers().keysByIndex(),
+			    [&layer_selector](auto const& name) { layer_selector.append(name.c_str()); });
 
-			auto const& current_layer = m_current_document->currentLayer();
+			auto const& current_layer    = m_current_document->currentLayer();
 			auto const current_layer_idx = m_current_document->layers().index(current_layer);
 			layer_selector.selected(static_cast<int>(current_layer_idx));
 		}
@@ -166,11 +161,13 @@ namespace Texpainter
 			auto& pal_selector = m_palette_selector.inputField();
 
 			pal_selector.clear();
-			std::ranges::for_each(m_current_document->palettes().keys(),
-			                      [&pal_selector](auto const& name) { pal_selector.append(name.c_str()); });
+			std::ranges::for_each(
+			    m_current_document->palettes().keys(),
+			    [&pal_selector](auto const& name) { pal_selector.append(name.c_str()); });
 
 			auto const& current_pal_name = m_current_document->currentPalette();
-			auto const current_layer_idx = m_current_document->palettes().position(current_pal_name);
+			auto const current_layer_idx =
+			    m_current_document->palettes().position(current_pal_name);
 			pal_selector.selected(static_cast<int>(current_layer_idx));
 
 			if(auto pal = m_current_document->palettes()[current_pal_name]; pal != nullptr)
@@ -192,9 +189,10 @@ namespace Texpainter
 		{
 			Model::Image canvas{m_current_document->canvasSize()};
 			std::ranges::fill(canvas.pixels(), Model::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
-			std::ranges::for_each(m_current_document->layersByIndex(), [&canvas](auto const& layer) {
-				if(layer.visible()) { render(layer, canvas); }
-			});
+			std::ranges::for_each(m_current_document->layersByIndex(),
+			                      [&canvas](auto const& layer) {
+				                      if(layer.visible()) { render(layer, canvas); }
+			                      });
 
 			// TODO:	m_layerstack_ctrl.inputField().outlineCurrentLayer(canvas.pixels());
 			m_img_view.image(canvas);

@@ -33,12 +33,14 @@ namespace Testcases
 
 
 		{
-			std::array<double, 3> expected_vals{std::numbers::pi, std::numbers::phi, std::numbers::e};
+			std::array<double, 3> expected_vals{
+			    std::numbers::pi, std::numbers::phi, std::numbers::e};
 			assert(std::ranges::equal(map.valuesByFirstKey(), expected_vals));
 		}
 
 		{
-			std::array<double, 3> expected_vals{std::numbers::phi, std::numbers::e, std::numbers::pi};
+			std::array<double, 3> expected_vals{
+			    std::numbers::phi, std::numbers::e, std::numbers::pi};
 			assert(std::ranges::equal(map.valuesBySecondKey(), expected_vals));
 		}
 
@@ -103,8 +105,9 @@ namespace Testcases
 		map.insert(static_cast<double>(std::numbers::phi), 1, "Phi");
 		map.insert(static_cast<double>(std::numbers::e), 2, "e");
 
-		assert((map.insert(214.3, 2, "Foo")
-		        == Texpainter::DoubleKeyMap<double, int, std::string>::InsertResult::FirstKeyExists));
+		assert(
+		    (map.insert(214.3, 2, "Foo")
+		     == Texpainter::DoubleKeyMap<double, int, std::string>::InsertResult::FirstKeyExists));
 		assert(map.size() == 3);
 	}
 
@@ -116,8 +119,9 @@ namespace Testcases
 		map.insert(static_cast<double>(std::numbers::phi), 1, "Phi");
 		map.insert(static_cast<double>(std::numbers::e), 2, "e");
 
-		assert((map.insert(214.3, 4, "e")
-		        == Texpainter::DoubleKeyMap<double, int, std::string>::InsertResult::SecondKeyExists));
+		assert(
+		    (map.insert(214.3, 4, "e")
+		     == Texpainter::DoubleKeyMap<double, int, std::string>::InsertResult::SecondKeyExists));
 		assert(map.size() == 3);
 	}
 
@@ -129,8 +133,9 @@ namespace Testcases
 		map.insert(static_cast<double>(std::numbers::phi), 1, "Phi");
 		map.insert(static_cast<double>(std::numbers::e), 2, "e");
 
-		assert((map.insert(214.3, 2, "pi")
-		        == Texpainter::DoubleKeyMap<double, int, std::string>::InsertResult::BothKeysExist));
+		assert(
+		    (map.insert(214.3, 2, "pi")
+		     == Texpainter::DoubleKeyMap<double, int, std::string>::InsertResult::BothKeysExist));
 		assert(map.size() == 3);
 	}
 
@@ -143,7 +148,8 @@ namespace Testcases
 		map.insert(static_cast<double>(std::numbers::e), "e", 2);
 
 		{
-			std::array<double, 3> expected_vals{std::numbers::pi, std::numbers::phi, std::numbers::e};
+			std::array<double, 3> expected_vals{
+			    std::numbers::pi, std::numbers::phi, std::numbers::e};
 			assert(std::ranges::equal(map.valuesBySecondKey(), expected_vals));
 		}
 
@@ -153,7 +159,8 @@ namespace Testcases
 		assert(*map["pi"] == std::numbers::pi);
 
 		{
-			std::array<double, 3> expected_vals{std::numbers::phi, std::numbers::pi, std::numbers::e};
+			std::array<double, 3> expected_vals{
+			    std::numbers::phi, std::numbers::pi, std::numbers::e};
 			assert(std::ranges::equal(map.valuesBySecondKey(), expected_vals));
 		}
 
@@ -183,7 +190,8 @@ namespace Testcases
 		map.insert(static_cast<double>(std::numbers::e), "e", 2);
 
 		{
-			std::array<double, 3> expected_vals{std::numbers::pi, std::numbers::phi, std::numbers::e};
+			std::array<double, 3> expected_vals{
+			    std::numbers::pi, std::numbers::phi, std::numbers::e};
 			assert(std::ranges::equal(map.valuesBySecondKey(), expected_vals));
 		}
 
@@ -193,7 +201,8 @@ namespace Testcases
 		assert(*map["pi"] == std::numbers::pi);
 
 		{
-			std::array<double, 3> expected_vals{std::numbers::pi, std::numbers::e, std::numbers::phi};
+			std::array<double, 3> expected_vals{
+			    std::numbers::pi, std::numbers::e, std::numbers::phi};
 			assert(std::ranges::equal(map.valuesBySecondKey(), expected_vals));
 		}
 

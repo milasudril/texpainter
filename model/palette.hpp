@@ -14,27 +14,16 @@ namespace Texpainter::Model
 	class Palette
 	{
 	public:
-		auto begin() const
-		{
-			return std::begin(m_block);
-		}
+		auto begin() const { return std::begin(m_block); }
 
-		auto end() const
-		{
-			return std::end(m_block);
-		}
+		auto end() const { return std::end(m_block); }
 
-		auto size() const
-		{
-			return std::size(m_block);
-		}
+		auto size() const { return std::size(m_block); }
 
-		explicit Palette(DataBlock<Pixel>&& block): m_block{std::move(block)}
-		{
-		}
+		explicit Palette(DataBlock<Pixel>&& block): m_block{std::move(block)} {}
 
-		explicit Palette(std::span<Pixel const> src):
-		   m_block{static_cast<ColorIndex::element_type>(std::size(src))}
+		explicit Palette(std::span<Pixel const> src)
+		    : m_block{static_cast<ColorIndex::element_type>(std::size(src))}
 		{
 			std::copy_n(std::begin(src), std::size(m_block), std::begin(m_block));
 		}
@@ -45,25 +34,13 @@ namespace Texpainter::Model
 			std::ranges::fill(m_block, color_init);
 		}
 
-		auto operator[](ColorIndex index) const
-		{
-			return *(begin() + index.value());
-		}
+		auto operator[](ColorIndex index) const { return *(begin() + index.value()); }
 
-		auto& operator[](ColorIndex index)
-		{
-			return *(std::begin(m_block) + index.value());
-		}
+		auto& operator[](ColorIndex index) { return *(std::begin(m_block) + index.value()); }
 
-		operator DataBlock<Pixel> const&() const
-		{
-			return m_block;
-		}
+		operator DataBlock<Pixel> const &() const { return m_block; }
 
-		auto lastIndex() const
-		{
-			return ColorIndex{size() - 1};
-		}
+		auto lastIndex() const { return ColorIndex{size() - 1}; }
 
 	private:
 		DataBlock<Pixel> m_block;
