@@ -31,9 +31,7 @@ namespace Texpainter
 	public:
 		enum class ControlId : int
 		{
-			PaletteView,
-			LayerStackCtrl,
-			Canvas
+			PaletteSelector
 		};
 
 		explicit AppWindow(Ui::Container& container, PolymorphicRng rng)
@@ -64,6 +62,7 @@ namespace Texpainter
 		{
 			m_current_document = std::make_unique<Model::Document>(std::move(doc));
 			m_pal_view.eventHandler<0>(m_pal_view_eh);
+			m_palette_selector.inputField().eventHandler<ControlId::PaletteSelector>(*this);
 			update();
 			return *this;
 		}
@@ -118,6 +117,9 @@ namespace Texpainter
 		{
 			m_palette_menu_handler.onActivated<action>(item);
 		}
+
+		template<ControlId>
+		void onChanged(Ui::Combobox& src);
 
 		template<ControlId>
 		void onMouseUp(Ui::ImageView& view, vec2_t pos_window, vec2_t pos_screen, int button);
@@ -179,10 +181,17 @@ namespace Texpainter
 			    m_current_document->palettes().position(current_pal_name);
 			pal_selector.selected(static_cast<int>(current_layer_idx));
 
-			if(auto pal = m_current_document->palettes()[current_pal_name]; pal != nullptr)
+			if(auto pal = currentPalette(*m_current_document); pal != nullptr)
 			{
-				m_pal_view.palette(*pal).highlightMode(m_current_document->currentColor(),
-				                                       Ui::PaletteView::HighlightMode::Read);
+				m_pal_view.palette(*pal)
+				    .highlightMode(m_current_document->currentColor(),
+				                   Ui::PaletteView::HighlightMode::Read)
+				    .update();
+			}
+			else
+			{
+				Model::Pixel color{0.0f, 0.0f, 0.0f, 0.0f};
+				m_pal_view.palette(std::span{&color, 1}).update();
 			}
 		}
 
@@ -207,6 +216,21 @@ namespace Texpainter
 			m_img_view.image(canvas);
 		}
 	};
+
+	template<>
+	inline void AppWindow::onChanged<AppWindow::ControlId::PaletteSelector>(Ui::Combobox& src)
+	{
+		auto const index     = Model::PaletteIndex{static_cast<uint32_t>(src.selected())};
+		auto const& palettes = m_current_document->palettes();
+		auto pal_name        = palettes.key(index);
+		if(pal_name != nullptr)
+		{
+			m_current_document->currentPalette(std::string{*pal_name});
+			m_pal_view.palette(*palettes[index])
+			    .highlightMode(m_current_document->currentColor(),
+			                   Ui::PaletteView::HighlightMode::Read);
+		}
+	}
 }
 
 #endif

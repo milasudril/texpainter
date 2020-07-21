@@ -34,6 +34,8 @@ namespace Texpainter::Model
 			return *this;
 		}
 
+		explicit operator size_t() const { return m_value; }
+
 	private:
 		uint32_t m_value;
 	};

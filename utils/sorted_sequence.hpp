@@ -143,6 +143,12 @@ namespace Texpainter
 			                            : std::distance(std::begin(m_map), i);
 		}
 
+		Key const* key(IndexType i) const
+		{
+			return static_cast<size_t>(i) < m_key_seq.size() ? m_key_seq[static_cast<size_t>(i)]
+			                                                 : nullptr;
+		}
+
 		auto valuesByIndex() const
 		{
 			return IterPair{DerefIterator{std::begin(m_seq)}, DerefIterator{std::end(m_seq)}};
