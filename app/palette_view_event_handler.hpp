@@ -51,40 +51,42 @@ namespace Texpainter
 		template<auto>
 		void onMouseUp(Texpainter::Ui::PaletteView& pal_view, Model::ColorIndex index, int button)
 		{
-			switch(button)
+			if(auto const current_color = r_doc_owner.document().currentColor();
+			   current_color.valid() && colorIndexValid(r_doc_owner.document(), index))
 			{
-				case 1:
+				switch(button)
 				{
-					// save current color before touching it
-					auto const current_color = r_doc_owner.document().currentColor();
+					case 1:
+					{
+						(void)r_doc_owner.documentModify([this, index](auto& doc) {
+							doc.currentColor(index);
+							return false;
+						});
 
-					(void)r_doc_owner.documentModify([this, index](auto& doc) {
-						doc.currentColor(index);
-						return false;
-					});
-
-					// Update view
-					pal_view.highlightMode(current_color, Ui::PaletteView::HighlightMode::None)
-					    .highlightMode(index, Ui::PaletteView::HighlightMode::Read)
-					    .update();
+						pal_view.highlightMode(current_color, Ui::PaletteView::HighlightMode::None)
+						    .highlightMode(index, Ui::PaletteView::HighlightMode::Read)
+						    .update();
+					}
 					break;
+
+					case 3:
+						m_modified_index = index;
+						pal_view
+						    .highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Write)
+						    .update();
+						m_color_picker =
+						    std::make_unique<ColorPicker>(r_dlg_owner,
+						                                  (std::string{"Select color number "}
+						                                   + std::to_string(index.value() + 1))
+						                                      .c_str(),
+						                                  m_rng,
+						                                  "Recently used: ",
+						                                  m_color_history);
+						m_color_picker->widget().second = &pal_view;
+						m_color_picker->template eventHandler<0>(*this).widget().first.value(
+						    pal_view.color(index));
+						break;
 				}
-
-				case 3:
-					m_modified_index = index;
-					pal_view.highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Write)
-					    .update();
-					m_color_picker = std::make_unique<ColorPicker>(
-					    r_dlg_owner,
-					    (std::string{"Select color number "} + std::to_string(index.value() + 1))
-					        .c_str(),
-					    m_rng,
-					    "Recently used: ",
-					    m_color_history);
-					m_color_picker->widget().second = &pal_view;
-					m_color_picker->template eventHandler<0>(*this).widget().first.value(
-					    pal_view.color(index));
-					break;
 			}
 		}
 
@@ -110,6 +112,8 @@ namespace Texpainter
 			src.widget()
 			    .second->color(m_modified_index, color_new)
 			    .highlightMode(m_modified_index, Texpainter::Ui::PaletteView::HighlightMode::None)
+			    .highlightMode(r_doc_owner.document().currentColor(),
+			                   Texpainter::Ui::PaletteView::HighlightMode::Read)
 			    .update();
 
 			std::rotate(std::rbegin(m_color_history),
@@ -120,8 +124,15 @@ namespace Texpainter
 		}
 
 		template<auto>
-		void dismiss(ColorPicker&)
+		void dismiss(ColorPicker& src)
 		{
+			src.widget()
+			    .second
+			    ->highlightMode(m_modified_index, Texpainter::Ui::PaletteView::HighlightMode::None)
+			    .highlightMode(r_doc_owner.document().currentColor(),
+			                   Texpainter::Ui::PaletteView::HighlightMode::Read)
+			    .update();
+
 			m_color_picker.reset();
 		}
 

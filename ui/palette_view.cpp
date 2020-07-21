@@ -169,7 +169,7 @@ public:
 
 	void highlightMode(Model::ColorIndex index, HighlightMode mode)
 	{
-		*(m_highlight_mode.begin() + index.value()) = mode;
+		if(index.value() < m_colors.size()) { *(m_highlight_mode.begin() + index.value()) = mode; }
 	}
 
 	void minSize(Size2d size)
@@ -182,8 +182,11 @@ public:
 
 	void color(Model::ColorIndex index, Model::Pixel value)
 	{
-		m_colors[index] = value;
-		update();
+		if(index.value() < m_colors.size())
+		{
+			m_colors[index] = value;
+			update();
+		}
 	}
 
 

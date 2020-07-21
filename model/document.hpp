@@ -116,15 +116,27 @@ namespace Texpainter::Model
 		bool m_dirty;
 	};
 
+	inline Palette const* currentPalette(Document const& doc)
+	{
+		auto const& palettes = doc.palettes();
+		return palettes[doc.currentPalette()];
+	}
+
 	inline Pixel currentColor(Document const& doc)
 	{
-		auto const& palettes         = doc.palettes();
-		auto i                       = palettes[doc.currentPalette()];
+		auto i                       = currentPalette(doc);
 		constexpr auto default_color = Pixel{1.0f / 3, 1.0f / 3, 1.0f / 3, 1.0f};
 		if(i == nullptr) { return default_color; }
 
 		return doc.currentColor() <= i->lastIndex() ? (*i)[doc.currentColor()] : default_color;
 	}
+
+	inline bool colorIndexValid(Document const& doc, ColorIndex index)
+	{
+		auto i = currentPalette(doc);
+		return (i == nullptr) ? false : (index.value() < i->size()) ? true : false;
+	}
+
 }
 
 #endif
