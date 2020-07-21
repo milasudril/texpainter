@@ -180,6 +180,12 @@ public:
 
 	Model::Pixel color(Model::ColorIndex index) const { return m_colors[index]; }
 
+	void color(Model::ColorIndex index, Model::Pixel value)
+	{
+		m_colors[index] = value;
+		update();
+	}
+
 
 private:
 	void* r_eh;
@@ -337,4 +343,11 @@ Texpainter::Model::Pixel Texpainter::Ui::PaletteView::PaletteView::color(
     Model::ColorIndex index) const
 {
 	return m_impl->color(index);
+}
+
+Texpainter::Ui::PaletteView& Texpainter::Ui::PaletteView::color(Model::ColorIndex index,
+                                                                Model::Pixel value)
+{
+	m_impl->color(index, value);
+	return *this;
 }
