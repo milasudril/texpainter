@@ -9,7 +9,4 @@ namespace Testcases
 	static_assert(std::is_trivial_v<Texpainter::Model::Pixel>);
 }
 
-int main()
-{
-	return 0;
-}
+int main() { return 0; }

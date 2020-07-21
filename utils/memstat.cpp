@@ -22,7 +22,7 @@ namespace
 			Skip
 		};
 		auto state_current = State::Key;
-		auto pos_0 = buffer;
+		auto pos_0         = buffer;
 		while(buffer != buffer_end)
 		{
 			auto ch_in = *buffer;
@@ -33,10 +33,11 @@ namespace
 					switch(ch_in)
 					{
 						case ':':
-							if(std::string_view{pos_0, static_cast<size_t>(buffer - pos_0)} == "MemAvailable:")
+							if(std::string_view{pos_0, static_cast<size_t>(buffer - pos_0)}
+							   == "MemAvailable:")
 							{
 								state_current = State::Value;
-								pos_0 = buffer;
+								pos_0         = buffer;
 							}
 							else
 							{
@@ -51,8 +52,8 @@ namespace
 					switch(ch_in)
 					{
 						case '\n':
-							*(buffer - 1) = '\0';                            // To be able to use atoll
-							return 1024 * static_cast<size_t>(atoll(pos_0)); // Reports are in kB
+							*(buffer - 1) = '\0';  // To be able to use atoll
+							return 1024 * static_cast<size_t>(atoll(pos_0));  // Reports are in kB
 					}
 					break;
 
@@ -72,7 +73,7 @@ size_t Texpainter::getAvailableRam()
 {
 	int const fd = open("/proc/meminfo", O_RDONLY);
 	std::array<char, 4096> buffer{};
-	auto n = pread(fd, std::begin(buffer), std::size(buffer), 0);
+	auto n         = pread(fd, std::begin(buffer), std::size(buffer), 0);
 	auto mem_avail = get_mem_avail(std::begin(buffer), std::begin(buffer) + n);
 	close(fd);
 	return mem_avail;

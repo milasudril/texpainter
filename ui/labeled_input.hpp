@@ -18,33 +18,21 @@ namespace Texpainter::Ui
 		explicit LabeledInput(Container& container,
 		                      Box::Orientation orientation,
 		                      const char* label,
-		                      Args&&... args):
-		   m_box{container, orientation},
-		   m_label{m_box, label},
-		   m_input_field{m_box.insertMode(Box::InsertMode{0, Box::Expand | Box::Fill}),
-		                 std::forward<Args>(args)...}
+		                      Args&&... args)
+		    : m_box{container, orientation}
+		    , m_label{m_box, label}
+		    , m_input_field{m_box.insertMode(Box::InsertMode{0, Box::Expand | Box::Fill}),
+		                    std::forward<Args>(args)...}
 		{
 		}
 
-		LabelType& label()
-		{
-			return m_label;
-		}
+		LabelType& label() { return m_label; }
 
-		LabelType const& label() const
-		{
-			return m_label;
-		}
+		LabelType const& label() const { return m_label; }
 
-		Widget& inputField()
-		{
-			return m_input_field;
-		}
+		Widget& inputField() { return m_input_field; }
 
-		Widget const& inputField() const
-		{
-			return m_input_field;
-		}
+		Widget const& inputField() const { return m_input_field; }
 
 
 	private:

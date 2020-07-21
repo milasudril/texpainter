@@ -16,15 +16,9 @@ namespace Texpainter::Model
 	{
 		struct LinearRGBA
 		{
-			static constexpr auto toLinear(vec4_t a)
-			{
-				return a;
-			}
+			static constexpr auto toLinear(vec4_t a) { return a; }
 
-			static constexpr auto fromLinear(vec4_t a)
-			{
-				return a;
-			}
+			static constexpr auto fromLinear(vec4_t a) { return a; }
 		};
 
 		struct Gamma22
@@ -51,18 +45,17 @@ namespace Texpainter::Model
 	class BasicPixel
 	{
 	public:
-		constexpr explicit BasicPixel(vec4_t value): m_value{value}
-		{
-		}
+		constexpr explicit BasicPixel(vec4_t value): m_value{value} {}
 
 		template<class ColorProfileOther,
 		         std::enable_if_t<!std::is_same_v<ColorProfile, ColorProfileOther>, int> = 0>
-		constexpr explicit BasicPixel(BasicPixel<ColorProfileOther> x):
-		   m_value{ColorProfile::fromLinear(toLinear(x).value())}
+		constexpr explicit BasicPixel(BasicPixel<ColorProfileOther> x)
+		    : m_value{ColorProfile::fromLinear(toLinear(x).value())}
 		{
 		}
 
-		constexpr explicit BasicPixel(float r, float g, float b, float a = 1.0f): m_value{r, g, b, a}
+		constexpr explicit BasicPixel(float r, float g, float b, float a = 1.0f)
+		    : m_value{r, g, b, a}
 		{
 		}
 
@@ -94,37 +87,19 @@ namespace Texpainter::Model
 			return *this;
 		}
 
-		constexpr BasicPixel& value(vec4_t val)
-		{
-			return *this;
-		}
+		constexpr BasicPixel& value(vec4_t val) { return *this; }
 
 
-		constexpr float red() const
-		{
-			return m_value[0];
-		}
+		constexpr float red() const { return m_value[0]; }
 
-		constexpr float green() const
-		{
-			return m_value[1];
-		}
+		constexpr float green() const { return m_value[1]; }
 
-		constexpr float blue() const
-		{
-			return m_value[2];
-		}
+		constexpr float blue() const { return m_value[2]; }
 
-		constexpr float alpha() const
-		{
-			return m_value[3];
-		}
+		constexpr float alpha() const { return m_value[3]; }
 
 
-		constexpr auto value() const
-		{
-			return m_value;
-		}
+		constexpr auto value() const { return m_value; }
 
 		constexpr BasicPixel& operator+=(BasicPixel other)
 		{
@@ -222,45 +197,21 @@ namespace Texpainter::Model
 
 	using Pixel = BasicPixel<ColorProfiles::LinearRGBA>;
 
-	constexpr Pixel black()
-	{
-		return Pixel{0.0f, 0.0f, 0.0f};
-	}
+	constexpr Pixel black() { return Pixel{0.0f, 0.0f, 0.0f}; }
 
-	constexpr Pixel red()
-	{
-		return Pixel{1.0f, 0.0f, 0.0f};
-	}
+	constexpr Pixel red() { return Pixel{1.0f, 0.0f, 0.0f}; }
 
-	constexpr Pixel green()
-	{
-		return Pixel{0.0f, 1.0f, 0.0f};
-	}
+	constexpr Pixel green() { return Pixel{0.0f, 1.0f, 0.0f}; }
 
-	constexpr Pixel blue()
-	{
-		return Pixel{0.0f, 0.0f, 1.0f};
-	}
+	constexpr Pixel blue() { return Pixel{0.0f, 0.0f, 1.0f}; }
 
-	constexpr Pixel cyan()
-	{
-		return Pixel{0.0f, 1.0f, 1.0f};
-	}
+	constexpr Pixel cyan() { return Pixel{0.0f, 1.0f, 1.0f}; }
 
-	constexpr Pixel magenta()
-	{
-		return Pixel{1.0f, 0.0f, 1.0f};
-	}
+	constexpr Pixel magenta() { return Pixel{1.0f, 0.0f, 1.0f}; }
 
-	constexpr Pixel yellow()
-	{
-		return Pixel{1.0f, 1.0f, 0.0f};
-	}
+	constexpr Pixel yellow() { return Pixel{1.0f, 1.0f, 0.0f}; }
 
-	constexpr Pixel white()
-	{
-		return Pixel{1.0f, 1.0f, 1.0f};
-	}
+	constexpr Pixel white() { return Pixel{1.0f, 1.0f, 1.0f}; }
 
 	template<class ColorProfileA, class ColorProfileB>
 	constexpr auto distanceSquared(BasicPixel<ColorProfileA> a, BasicPixel<ColorProfileB> b)

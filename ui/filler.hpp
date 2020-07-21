@@ -24,18 +24,13 @@ namespace Texpainter::Ui
 			return *this;
 		}
 
-		Filler(Filler&& obj) noexcept: m_impl(obj.m_impl)
-		{
-			obj.m_impl = nullptr;
-		}
+		Filler(Filler&& obj) noexcept: m_impl(obj.m_impl) { obj.m_impl = nullptr; }
 
 	private:
 		class Impl;
 		Impl* m_impl;
 
-		Filler(Impl& impl): m_impl(&impl)
-		{
-		}
+		Filler(Impl& impl): m_impl(&impl) {}
 	};
 }
 

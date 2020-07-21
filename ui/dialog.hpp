@@ -16,143 +16,68 @@ namespace Texpainter::Ui
 {
 	struct DialogOkCancel
 	{
-		static constexpr const char* dismiss() noexcept
-		{
-			return "Cancel";
-		}
+		static constexpr const char* dismiss() noexcept { return "Cancel"; }
 
-		static constexpr const char* confirmPositive() noexcept
-		{
-			return "OK";
-		}
+		static constexpr const char* confirmPositive() noexcept { return "OK"; }
 
-		static constexpr const char* confirmNegative() noexcept
-		{
-			return nullptr;
-		}
+		static constexpr const char* confirmNegative() noexcept { return nullptr; }
 
-		static constexpr const char* user1() noexcept
-		{
-			return nullptr;
-		}
+		static constexpr const char* user1() noexcept { return nullptr; }
 
-		static constexpr const char* user2() noexcept
-		{
-			return nullptr;
-		}
+		static constexpr const char* user2() noexcept { return nullptr; }
 	};
 
 	struct DialogYesNo
 	{
-		static constexpr const char* dismiss() noexcept
-		{
-			return nullptr;
-		}
+		static constexpr const char* dismiss() noexcept { return nullptr; }
 
-		static constexpr const char* confirmPositive() noexcept
-		{
-			return "Yes";
-		}
+		static constexpr const char* confirmPositive() noexcept { return "Yes"; }
 
-		static constexpr const char* confirmNegative() noexcept
-		{
-			return "No";
-		}
+		static constexpr const char* confirmNegative() noexcept { return "No"; }
 
-		static constexpr const char* user1() noexcept
-		{
-			return nullptr;
-		}
+		static constexpr const char* user1() noexcept { return nullptr; }
 
-		static constexpr const char* user2() noexcept
-		{
-			return nullptr;
-		}
+		static constexpr const char* user2() noexcept { return nullptr; }
 	};
 
 	struct DialogCancel
 	{
-		static constexpr const char* dismiss() noexcept
-		{
-			return "Cancel";
-		}
+		static constexpr const char* dismiss() noexcept { return "Cancel"; }
 
-		static constexpr const char* confirmPositive() noexcept
-		{
-			return nullptr;
-		}
+		static constexpr const char* confirmPositive() noexcept { return nullptr; }
 
-		static constexpr const char* confirmNegative() noexcept
-		{
-			return nullptr;
-		}
+		static constexpr const char* confirmNegative() noexcept { return nullptr; }
 
-		static constexpr const char* user1() noexcept
-		{
-			return nullptr;
-		}
+		static constexpr const char* user1() noexcept { return nullptr; }
 
-		static constexpr const char* user2() noexcept
-		{
-			return nullptr;
-		}
+		static constexpr const char* user2() noexcept { return nullptr; }
 	};
 
 
 	struct DialogNull
 	{
-		static constexpr const char* dismiss() noexcept
-		{
-			return nullptr;
-		}
+		static constexpr const char* dismiss() noexcept { return nullptr; }
 
-		static constexpr const char* confirmPositive() noexcept
-		{
-			return nullptr;
-		}
+		static constexpr const char* confirmPositive() noexcept { return nullptr; }
 
-		static constexpr const char* confirmNegative() noexcept
-		{
-			return nullptr;
-		}
+		static constexpr const char* confirmNegative() noexcept { return nullptr; }
 
-		static constexpr const char* user1() noexcept
-		{
-			return nullptr;
-		}
+		static constexpr const char* user1() noexcept { return nullptr; }
 
-		static constexpr const char* user2() noexcept
-		{
-			return nullptr;
-		}
+		static constexpr const char* user2() noexcept { return nullptr; }
 	};
 
 	struct DialogOk
 	{
-		static constexpr const char* dismiss() noexcept
-		{
-			return nullptr;
-		}
+		static constexpr const char* dismiss() noexcept { return nullptr; }
 
-		static constexpr const char* confirmPositive() noexcept
-		{
-			return "OK";
-		}
+		static constexpr const char* confirmPositive() noexcept { return "OK"; }
 
-		static constexpr const char* confirmNegative() noexcept
-		{
-			return nullptr;
-		}
+		static constexpr const char* confirmNegative() noexcept { return nullptr; }
 
-		static constexpr const char* user1() noexcept
-		{
-			return nullptr;
-		}
+		static constexpr const char* user1() noexcept { return nullptr; }
 
-		static constexpr const char* user2() noexcept
-		{
-			return nullptr;
-		}
+		static constexpr const char* user2() noexcept { return nullptr; }
 	};
 
 	template<size_t N>
@@ -185,14 +110,15 @@ namespace Texpainter::Ui
 	template<>
 	inline std::array<Button, 4> buttons_create<4>(Container& cnt)
 	{
-		return std::array<Button, 4>{Button(cnt, ""), Button(cnt, ""), Button(cnt, ""), Button(cnt, "")};
+		return std::array<Button, 4>{
+		    Button(cnt, ""), Button(cnt, ""), Button(cnt, ""), Button(cnt, "")};
 	}
 
 	template<>
 	inline std::array<Button, 5> buttons_create<5>(Container& cnt)
 	{
 		return std::array<Button, 5>{
-		   Button(cnt, ""), Button(cnt, ""), Button(cnt, ""), Button(cnt, ""), Button(cnt, "")};
+		    Button(cnt, ""), Button(cnt, ""), Button(cnt, ""), Button(cnt, ""), Button(cnt, "")};
 	}
 
 	enum class InitialFocus : int
@@ -217,20 +143,21 @@ namespace Texpainter::Ui
 		};
 
 		Dialog& operator=(Dialog&&) = delete;
-		Dialog(Dialog&&) = delete;
+		Dialog(Dialog&&)            = delete;
 
 		template<class... WidgetParams>
-		Dialog(Container& owner, const char* title, WidgetParams&&... params):
-		   m_window(title, &owner),
-		   m_content(m_window, Box::Orientation::Vertical),
-		   m_widget(m_content.insertMode({2, Box::Fill | Box::Expand}),
-		            std::forward<WidgetParams>(params)...),
-		   m_buttons_outer(m_content.insertMode(Box::InsertMode{0, 0}), Box::Orientation::Horizontal),
-		   m_filler_l(m_buttons_outer.insertMode({0, Box::Fill | Box::Expand})),
-		   m_buttons_box(m_buttons_outer.insertMode({0, 0}), Box::Orientation::Horizontal),
-		   m_buttons(buttons_create<button_count()>(
-		      m_buttons_box.homogenous(true).insertMode(Box::InsertMode{2, Box::Fill | Box::Expand}))),
-		   m_filler_r(m_buttons_outer.insertMode({0, Box::Fill | Box::Expand}))
+		Dialog(Container& owner, const char* title, WidgetParams&&... params)
+		    : m_window(title, &owner)
+		    , m_content(m_window, Box::Orientation::Vertical)
+		    , m_widget(m_content.insertMode({2, Box::Fill | Box::Expand}),
+		               std::forward<WidgetParams>(params)...)
+		    , m_buttons_outer(m_content.insertMode(Box::InsertMode{0, 0}),
+		                      Box::Orientation::Horizontal)
+		    , m_filler_l(m_buttons_outer.insertMode({0, Box::Fill | Box::Expand}))
+		    , m_buttons_box(m_buttons_outer.insertMode({0, 0}), Box::Orientation::Horizontal)
+		    , m_buttons(buttons_create<button_count()>(m_buttons_box.homogenous(true).insertMode(
+		          Box::InsertMode{2, Box::Fill | Box::Expand})))
+		    , m_filler_r(m_buttons_outer.insertMode({0, Box::Fill | Box::Expand}))
 		{
 			if(has_dismiss())
 			{
@@ -279,15 +206,9 @@ namespace Texpainter::Ui
 			return *this;
 		}
 
-		Widget& widget() noexcept
-		{
-			return m_widget;
-		}
+		Widget& widget() noexcept { return m_widget; }
 
-		const Widget& widget() const noexcept
-		{
-			return m_widget;
-		}
+		const Widget& widget() const noexcept { return m_widget; }
 
 		template<ButtonId id>
 		void onClicked(Button& button)
@@ -319,14 +240,14 @@ namespace Texpainter::Ui
 		{
 			switch(scancode)
 			{
-				case 1: //	ESC
+				case 1:  //	ESC
 					if(has_dismiss()) { m_vtable.dismiss(r_cb_obj, *this); }
 					else
 					{
 						m_vtable.confirm_positive(r_cb_obj, *this);
 					}
 					break;
-				case 28: //	ENTER
+				case 28:  //	ENTER
 					m_vtable.confirm_positive(r_cb_obj, *this);
 					break;
 				default: break;
@@ -338,16 +259,10 @@ namespace Texpainter::Ui
 		{
 		}
 
-		void show()
-		{
-			m_window.show();
-		}
+		void show() { m_window.show(); }
 
 	private:
-		static constexpr bool has_dismiss() noexcept
-		{
-			return DialogTraits::dismiss() != nullptr;
-		}
+		static constexpr bool has_dismiss() noexcept { return DialogTraits::dismiss() != nullptr; }
 
 		static constexpr bool has_confirm_neg() noexcept
 		{
@@ -359,15 +274,9 @@ namespace Texpainter::Ui
 			return DialogTraits::confirmPositive() != nullptr;
 		}
 
-		static constexpr bool has_user_1() noexcept
-		{
-			return DialogTraits::user1() != nullptr;
-		}
+		static constexpr bool has_user_1() noexcept { return DialogTraits::user1() != nullptr; }
 
-		static constexpr bool has_user_2() noexcept
-		{
-			return DialogTraits::user2() != nullptr;
-		}
+		static constexpr bool has_user_2() noexcept { return DialogTraits::user2() != nullptr; }
 
 		static constexpr int button_count() noexcept
 		{
@@ -392,35 +301,17 @@ namespace Texpainter::Ui
 		class ButtonIndex
 		{
 		public:
-			static constexpr int dismiss() noexcept
-			{
-				return s_dismiss;
-			}
+			static constexpr int dismiss() noexcept { return s_dismiss; }
 
-			static constexpr int confirmPositive() noexcept
-			{
-				return s_confirm_positive;
-			}
+			static constexpr int confirmPositive() noexcept { return s_confirm_positive; }
 
-			static constexpr int confirmNegative() noexcept
-			{
-				return s_confirm_negative;
-			}
+			static constexpr int confirmNegative() noexcept { return s_confirm_negative; }
 
-			static constexpr int user1() noexcept
-			{
-				return s_user_1;
-			}
+			static constexpr int user1() noexcept { return s_user_1; }
 
-			static constexpr int user2() noexcept
-			{
-				return s_user_2;
-			}
+			static constexpr int user2() noexcept { return s_user_2; }
 
-			static constexpr auto id(int index)
-			{
-				return s_button_order[index];
-			}
+			static constexpr auto id(int index) { return s_button_order[index]; }
 
 		private:
 			template<ButtonId button>
@@ -438,11 +329,11 @@ namespace Texpainter::Ui
 				return -1;
 			}
 
-			static constexpr int s_dismiss = get<ButtonId::DISMISS>();
+			static constexpr int s_dismiss          = get<ButtonId::DISMISS>();
 			static constexpr int s_confirm_positive = get<ButtonId::CONFIRM_POSITIVE>();
 			static constexpr int s_confirm_negative = get<ButtonId::CONFIRM_NEGATIVE>();
-			static constexpr int s_user_1 = get<ButtonId::USER_1>();
-			static constexpr int s_user_2 = get<ButtonId::USER_2>();
+			static constexpr int s_user_1           = get<ButtonId::USER_1>();
+			static constexpr int s_user_2           = get<ButtonId::USER_2>();
 
 #ifdef _WIN32
 			static constexpr ButtonId s_button_order[] = {ButtonId::USER_1,
@@ -463,18 +354,13 @@ namespace Texpainter::Ui
 		template<int index, ButtonId id>
 		struct button_callback_assign_do
 		{
-			static void assign(Dialog& dlg)
-			{
-				dlg.m_buttons[index].template eventHandler<id>(dlg);
-			}
+			static void assign(Dialog& dlg) { dlg.m_buttons[index].template eventHandler<id>(dlg); }
 		};
 
 		template<ButtonId id>
 		struct button_callback_assign_do<-1, id>
 		{
-			static void assign(Dialog&)
-			{
-			}
+			static void assign(Dialog&) {}
 		};
 
 		template<int index, ButtonId id>
@@ -485,60 +371,43 @@ namespace Texpainter::Ui
 
 		using DialogCallback = void (*)(void* cb_obj, Dialog& self);
 
-		using Dismiss = AddMemberIf<has_dismiss(), DialogCallback, 0>;
+		using Dismiss    = AddMemberIf<has_dismiss(), DialogCallback, 0>;
 		using ConfirmNeg = AddMemberIf<has_confirm_neg(), DialogCallback, 1>;
 		using ConfirmPos = AddMemberIf<has_confirm_pos(), DialogCallback, 2>;
-		using User1 = AddMemberIf<has_user_1(), DialogCallback, 3>;
-		using User2 = AddMemberIf<has_user_2(), DialogCallback, 4>;
+		using User1      = AddMemberIf<has_user_1(), DialogCallback, 3>;
+		using User2      = AddMemberIf<has_user_2(), DialogCallback, 4>;
 
 		class Vtable: Dismiss, ConfirmNeg, ConfirmPos, User1, User2
 		{
 		public:
-			Vtable()
-			{
-			}
+			Vtable() {}
 			template<class IdTag, class Callback>
 			explicit Vtable(IdTag tag, Callback& cb) noexcept
 			{
 				Dismiss::value(call<tag.value, Dismiss, Callback, has_dismiss()>::callback);
-				ConfirmNeg::value(call<tag.value, ConfirmNeg, Callback, has_confirm_neg()>::callback);
-				ConfirmPos::value(call<tag.value, ConfirmPos, Callback, has_confirm_pos()>::callback);
+				ConfirmNeg::value(
+				    call<tag.value, ConfirmNeg, Callback, has_confirm_neg()>::callback);
+				ConfirmPos::value(
+				    call<tag.value, ConfirmPos, Callback, has_confirm_pos()>::callback);
 				User1::value(call<tag.value, User1, Callback, has_user_1()>::callback);
 				User2::value(call<tag.value, User2, Callback, has_user_2()>::callback);
 			}
 
-			void dismiss(void* cb_obj, Dialog& dlg)
-			{
-				Dismiss::value()(cb_obj, dlg);
-			}
+			void dismiss(void* cb_obj, Dialog& dlg) { Dismiss::value()(cb_obj, dlg); }
 
-			void confirm_negative(void* cb_obj, Dialog& dlg)
-			{
-				ConfirmNeg::value()(cb_obj, dlg);
-			}
+			void confirm_negative(void* cb_obj, Dialog& dlg) { ConfirmNeg::value()(cb_obj, dlg); }
 
-			void confirm_positive(void* cb_obj, Dialog& dlg)
-			{
-				ConfirmPos::value()(cb_obj, dlg);
-			}
+			void confirm_positive(void* cb_obj, Dialog& dlg) { ConfirmPos::value()(cb_obj, dlg); }
 
-			void user_1(void* cb_obj, Dialog& dlg)
-			{
-				User1::value()(cb_obj, dlg);
-			}
+			void user_1(void* cb_obj, Dialog& dlg) { User1::value()(cb_obj, dlg); }
 
-			void user_2(void* cb_obj, Dialog& dlg)
-			{
-				User2::value()(cb_obj, dlg);
-			}
+			void user_2(void* cb_obj, Dialog& dlg) { User2::value()(cb_obj, dlg); }
 
 		private:
 			template<auto id, class Action, class Callback, bool enable>
 			struct call
 			{
-				static void callback(void*, Dialog&)
-				{
-				}
+				static void callback(void*, Dialog&) {}
 			};
 
 			template<auto id, class Callback>

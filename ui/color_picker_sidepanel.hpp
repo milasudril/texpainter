@@ -24,14 +24,12 @@ namespace Texpainter::Ui
 		class Normalizer
 		{
 		public:
-			explicit Normalizer(float value, NormalizeFunc f): m_value{value}, r_f{f}
-			{
-			}
+			explicit Normalizer(float value, NormalizeFunc f): m_value{value}, r_f{f} {}
 
 			auto operator()(Model::Pixel pixel) const
 			{
 				auto alpha_tmp = pixel.alpha();
-				auto x_new = m_value * pixel / r_f(pixel);
+				auto x_new     = m_value * pixel / r_f(pixel);
 				x_new.alpha(alpha_tmp);
 				return x_new;
 			}
@@ -51,21 +49,21 @@ namespace Texpainter::Ui
 		ColorPickerSidepanel(ColorPickerSidepanel const&&) = delete;
 		ColorPickerSidepanel& operator=(ColorPickerSidepanel const&&) = delete;
 
-		explicit ColorPickerSidepanel(Container& container, ColorPicker& picker):
-		   r_picker{picker},
-		   m_box{container, Box::Orientation::Vertical},
-		   m_normalize_intensity{m_box, Box::Orientation::Vertical, "No intensity normalization"}
+		explicit ColorPickerSidepanel(Container& container, ColorPicker& picker)
+		    : r_picker{picker}
+		    , m_box{container, Box::Orientation::Vertical}
+		    , m_normalize_intensity{m_box, Box::Orientation::Vertical, "No intensity normalization"}
 		{
 			m_normalization_function = [](Model::Pixel) { return 1.0f; };
 			m_normalize_intensity.inputField()
-			   .content("0.5")
-			   .enabled(false)
-			   .eventHandler<ItemId::NormalizeIntensityValue>(*this);
+			    .content("0.5")
+			    .enabled(false)
+			    .eventHandler<ItemId::NormalizeIntensityValue>(*this);
 			m_normalize_intensity.label()
-			   .append("Normalize to max(RGB)")
-			   .append("Normalize to mean(RGB)")
-			   .selected(0)
-			   .eventHandler<ItemId::NormalizeIntensityMode>(*this);
+			    .append("Normalize to max(RGB)")
+			    .append("Normalize to mean(RGB)")
+			    .selected(0)
+			    .eventHandler<ItemId::NormalizeIntensityMode>(*this);
 		}
 
 		template<ItemId id>
@@ -76,10 +74,11 @@ namespace Texpainter::Ui
 
 		auto targetIntensity() const
 		{
-			return Normalizer{m_normalize_intensity.label().selected() == 0 ?
-			                     1.0f :
-			                     static_cast<float>(std::atof(m_normalize_intensity.inputField().content())),
-			                  m_normalization_function};
+			return Normalizer{
+			    m_normalize_intensity.label().selected() == 0
+			        ? 1.0f
+			        : static_cast<float>(std::atof(m_normalize_intensity.inputField().content())),
+			    m_normalization_function};
 		}
 
 	private:
@@ -90,25 +89,25 @@ namespace Texpainter::Ui
 	};
 
 	template<>
-	inline void ColorPickerSidepanel::onChanged<ColorPickerSidepanel::ItemId::NormalizeIntensityValue>(
-	   TextEntry& entry)
+	inline void ColorPickerSidepanel::onChanged<
+	    ColorPickerSidepanel::ItemId::NormalizeIntensityValue>(TextEntry& entry)
 	{
-		auto value = static_cast<float>(std::atof(entry.content()));
-		auto color = r_picker.value();
+		auto value            = static_cast<float>(std::atof(entry.content()));
+		auto color            = r_picker.value();
 		auto color_normalized = Normalizer{value, m_normalization_function}(color);
-		auto max_val = max(color_normalized);
+		auto max_val          = max(color_normalized);
 		if(max_val > 1.0f)
 		{
 			color_normalized /= max_val;
-			value = m_normalization_function(color_normalized);
+			value    = m_normalization_function(color_normalized);
 			auto str = std::to_string(value);
 			entry.content(str.c_str());
 		}
 	}
 
 	template<>
-	inline void ColorPickerSidepanel::onChanged<ColorPickerSidepanel::ItemId::NormalizeIntensityMode>(
-	   Combobox& box)
+	inline void ColorPickerSidepanel::onChanged<
+	    ColorPickerSidepanel::ItemId::NormalizeIntensityMode>(Combobox& box)
 	{
 		switch(box.selected())
 		{
@@ -121,7 +120,7 @@ namespace Texpainter::Ui
 				m_normalize_intensity.inputField().enabled(true).focus();
 				m_normalization_function = [](Model::Pixel x) { return max(x); };
 				onChanged<ColorPickerSidepanel::ItemId::NormalizeIntensityValue>(
-				   m_normalize_intensity.inputField());
+				    m_normalize_intensity.inputField());
 				break;
 
 			case 2:
@@ -129,7 +128,7 @@ namespace Texpainter::Ui
 				m_normalization_function = [](Model::Pixel x) { return intensity(x); };
 
 				onChanged<ColorPickerSidepanel::ItemId::NormalizeIntensityValue>(
-				   m_normalize_intensity.inputField());
+				    m_normalize_intensity.inputField());
 				break;
 		}
 	}

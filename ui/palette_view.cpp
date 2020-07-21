@@ -9,20 +9,20 @@
 
 namespace
 {
-	constexpr Texpainter::Model::BasicPixel<Texpainter::Model::ColorProfiles::Gamma22>
-	toRgbGamma22(Texpainter::Ui::PaletteView::HighlightMode mode)
+	constexpr Texpainter::Model::BasicPixel<Texpainter::Model::ColorProfiles::Gamma22> toRgbGamma22(
+	    Texpainter::Ui::PaletteView::HighlightMode mode)
 	{
 		switch(mode)
 		{
 			case Texpainter::Ui::PaletteView::HighlightMode::None:
 				return Texpainter::Model::BasicPixel<Texpainter::Model::ColorProfiles::Gamma22>{
-				   Texpainter::Model::Pixel{0.16f, 0.16f, 0.16f, 1.0f}};
+				    Texpainter::Model::Pixel{0.16f, 0.16f, 0.16f, 1.0f}};
 			case Texpainter::Ui::PaletteView::HighlightMode::Read:
 				return Texpainter::Model::BasicPixel<Texpainter::Model::ColorProfiles::Gamma22>{
-				   Texpainter::Model::Pixel{0.0f, 0.5f, 0.0f, 0.5f}};
+				    Texpainter::Model::Pixel{0.0f, 0.5f, 0.0f, 0.5f}};
 			case Texpainter::Ui::PaletteView::HighlightMode::Write:
 				return Texpainter::Model::BasicPixel<Texpainter::Model::ColorProfiles::Gamma22>{
-				   Texpainter::Model::Pixel{0.5f, 0.0f, 0.0f, 0.5f}};
+				    Texpainter::Model::Pixel{0.5f, 0.0f, 0.0f, 0.5f}};
 			default: abort();
 		}
 	}
@@ -30,22 +30,22 @@ namespace
 class Texpainter::Ui::PaletteView::Impl: private PaletteView
 {
 public:
-	explicit Impl(Container& cnt):
-	   PaletteView{*this},
-	   m_min_size{Size2d{32, 32}},
-	   m_n_cols{1},
-	   m_n_rows{1},
-	   m_colors{0},
-	   m_highlight_mode{0}
+	explicit Impl(Container& cnt)
+	    : PaletteView{*this}
+	    , m_min_size{Size2d{32, 32}}
+	    , m_n_cols{1}
+	    , m_n_rows{1}
+	    , m_colors{0}
+	    , m_highlight_mode{0}
 	{
 		auto widget = gtk_drawing_area_new();
 		g_object_ref_sink(widget);
 		cnt.add(widget);
 		m_handle = GTK_DRAWING_AREA(widget);
-		r_eh = nullptr;
+		r_eh     = nullptr;
 		gtk_widget_add_events(widget,
-		                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK
-		                         | GDK_KEY_PRESS_MASK | GDK_SCROLL_MASK);
+		                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK
+		                          | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_SCROLL_MASK);
 		g_signal_connect(G_OBJECT(widget), "draw", G_CALLBACK(draw_callback), this);
 		g_signal_connect(G_OBJECT(widget), "size-allocate", G_CALLBACK(size_callback), this);
 
@@ -54,7 +54,7 @@ public:
 		g_signal_connect(G_OBJECT(widget), "motion-notify-event", G_CALLBACK(on_mouse_move), this);
 
 		// TODO: Share with ImageView
-		m_background = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 32, 32);
+		m_background      = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 32, 32);
 		auto const stride = cairo_image_surface_get_stride(m_background);
 		cairo_surface_flush(m_background);
 		auto const data = cairo_image_surface_get_data(m_background);
@@ -66,7 +66,8 @@ public:
 				constexpr auto intensity_a = static_cast<uint8_t>(196);
 				constexpr auto intensity_b = static_cast<uint8_t>(175);
 
-				auto const i = (col < 16 && row < 16) || (col >= 16 && row >= 16) ? intensity_a : intensity_b;
+				auto const i =
+				    (col < 16 && row < 16) || (col >= 16 && row >= 16) ? intensity_a : intensity_b;
 
 				write_ptr[0] = i;
 				write_ptr[1] = i;
@@ -91,56 +92,64 @@ public:
 	{
 		cairo_set_source_surface(cr, m_background, 0.0, 0.0);
 		cairo_pattern_set_extend(cairo_get_source(cr), CAIRO_EXTEND_REPEAT);
-		cairo_rectangle(
-		   cr, 0.0, 0.0, m_n_cols * (dim.width() / m_n_cols), m_n_rows * (dim.height() / m_n_rows));
+		cairo_rectangle(cr,
+		                0.0,
+		                0.0,
+		                m_n_cols * (dim.width() / m_n_cols),
+		                m_n_rows * (dim.height() / m_n_rows));
 		cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
 		cairo_fill(cr);
 
 		cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
 		std::ranges::for_each(
-		   m_colors,
-		   [cr,
-		    item_width = dim.width() / m_n_cols - 4,
-		    item_height = dim.height() / m_n_rows - 4,
-		    cols = m_n_cols,
-		    k = 0](auto color) mutable {
-			   color *= Model::Pixel{color.alpha(), color.alpha(), color.alpha(), 1.0f};
-			   auto const color_conv = Model::BasicPixel<Model::ColorProfiles::Gamma22>{color};
-			   cairo_set_source_rgba(
-			      cr, color_conv.red(), color_conv.green(), color_conv.blue(), color_conv.alpha());
-			   cairo_rectangle(cr,
-			                   (k % cols) * (item_width + 4) + 2,
-			                   (k / cols) * (item_height + 4) + 2,
-			                   item_width,
-			                   item_height);
-			   cairo_fill(cr);
-			   ++k;
-		   });
+		    m_colors,
+		    [cr,
+		     item_width  = dim.width() / m_n_cols - 4,
+		     item_height = dim.height() / m_n_rows - 4,
+		     cols        = m_n_cols,
+		     k           = 0](auto color) mutable {
+			    color *= Model::Pixel{color.alpha(), color.alpha(), color.alpha(), 1.0f};
+			    auto const color_conv = Model::BasicPixel<Model::ColorProfiles::Gamma22>{color};
+			    cairo_set_source_rgba(cr,
+			                          color_conv.red(),
+			                          color_conv.green(),
+			                          color_conv.blue(),
+			                          color_conv.alpha());
+			    cairo_rectangle(cr,
+			                    (k % cols) * (item_width + 4) + 2,
+			                    (k / cols) * (item_height + 4) + 2,
+			                    item_width,
+			                    item_height);
+			    cairo_fill(cr);
+			    ++k;
+		    });
 
 		cairo_set_line_width(cr, 2);
-		std::ranges::for_each(
-		   m_highlight_mode,
-		   [cr,
-		    item_width = dim.width() / m_n_cols - 2,
-		    item_height = dim.height() / m_n_rows - 2,
-		    cols = m_n_cols,
-		    k = 0](auto mode) mutable {
-			   auto const color_conv = toRgbGamma22(mode);
-			   cairo_set_source_rgba(
-			      cr, color_conv.red(), color_conv.green(), color_conv.blue(), color_conv.alpha());
-			   cairo_rectangle(cr,
-			                   (k % cols) * (item_width + 2) + 1,
-			                   (k / cols) * (item_height + 2) + 1,
-			                   item_width,
-			                   item_height);
-			   cairo_stroke(cr);
-			   ++k;
-		   });
+		std::ranges::for_each(m_highlight_mode,
+		                      [cr,
+		                       item_width  = dim.width() / m_n_cols - 2,
+		                       item_height = dim.height() / m_n_rows - 2,
+		                       cols        = m_n_cols,
+		                       k           = 0](auto mode) mutable {
+			                      auto const color_conv = toRgbGamma22(mode);
+			                      cairo_set_source_rgba(cr,
+			                                            color_conv.red(),
+			                                            color_conv.green(),
+			                                            color_conv.blue(),
+			                                            color_conv.alpha());
+			                      cairo_rectangle(cr,
+			                                      (k % cols) * (item_width + 2) + 1,
+			                                      (k / cols) * (item_height + 2) + 1,
+			                                      item_width,
+			                                      item_height);
+			                      cairo_stroke(cr);
+			                      ++k;
+		                      });
 	}
 
 	void palette(std::span<Model::Pixel const> pal)
 	{
-		m_colors = Model::Palette{pal};
+		m_colors         = Model::Palette{pal};
 		m_highlight_mode = DataBlock<HighlightMode>{std::size(m_colors)};
 		std::ranges::fill(m_highlight_mode, HighlightMode::None);
 		recalculateWidgetSize();
@@ -169,10 +178,7 @@ public:
 		recalculateWidgetSize();
 	}
 
-	Model::Pixel color(size_t index) const
-	{
-		return m_colors[index];
-	}
+	Model::Pixel color(size_t index) const { return m_colors[index]; }
 
 
 private:
@@ -196,14 +202,14 @@ private:
 			}
 
 		auto widget = GTK_WIDGET(m_handle);
-		auto w = static_cast<uint32_t>(gtk_widget_get_allocated_width(widget));
+		auto w      = static_cast<uint32_t>(gtk_widget_get_allocated_width(widget));
 		if(w < m_min_size.width())
 		{
 			w = m_min_size.width();
 			gtk_widget_set_size_request(widget, w, -1);
 		}
 		auto width_item = 0.0f;
-		auto div = m_colors.size();
+		auto div        = m_colors.size();
 		while(width_item < m_min_size.width())
 		{
 			width_item = static_cast<float>(w) / static_cast<float>(div);
@@ -218,11 +224,12 @@ private:
 	size_t coordsToItem(vec2_t pos) const
 	{
 		auto const widget = GTK_WIDGET(m_handle);
-		auto const widget_size = vec2_t{static_cast<double>(gtk_widget_get_allocated_width(widget)),
-		                                static_cast<double>(gtk_widget_get_allocated_height(widget))};
+		auto const widget_size =
+		    vec2_t{static_cast<double>(gtk_widget_get_allocated_width(widget)),
+		           static_cast<double>(gtk_widget_get_allocated_height(widget))};
 
 		auto const item_size =
-		   widget_size / vec2_t{static_cast<double>(m_n_cols), static_cast<double>(m_n_rows)};
+		    widget_size / vec2_t{static_cast<double>(m_n_cols), static_cast<double>(m_n_rows)};
 		auto const col_row = pos / item_size;
 
 		auto const col = static_cast<int>(col_row[0]);
@@ -241,8 +248,8 @@ private:
 	{
 		auto w = gtk_widget_get_allocated_width(widget);
 		auto h = gtk_widget_get_allocated_height(widget);
-		reinterpret_cast<Impl*>(self)->render(Size2d{static_cast<uint32_t>(w), static_cast<uint32_t>(h)},
-		                                      cr);
+		reinterpret_cast<Impl*>(self)->render(
+		    Size2d{static_cast<uint32_t>(w), static_cast<uint32_t>(h)}, cr);
 		return FALSE;
 	}
 
@@ -251,9 +258,9 @@ private:
 		auto& obj = *reinterpret_cast<Impl*>(self);
 		if(obj.r_eh != nullptr)
 		{
-			auto event = reinterpret_cast<GdkEventButton const*>(e);
-			auto const index =
-			   obj.coordsToItem(vec2_t{static_cast<double>(event->x), static_cast<double>(event->y)});
+			auto event       = reinterpret_cast<GdkEventButton const*>(e);
+			auto const index = obj.coordsToItem(
+			    vec2_t{static_cast<double>(event->x), static_cast<double>(event->y)});
 			obj.m_vt.m_on_mouse_down(obj.r_eh, obj, index, event->button);
 			return FALSE;
 		}
@@ -265,9 +272,9 @@ private:
 		auto& obj = *reinterpret_cast<Impl*>(self);
 		if(obj.r_eh != nullptr)
 		{
-			auto event = reinterpret_cast<GdkEventButton const*>(e);
-			auto const index =
-			   obj.coordsToItem(vec2_t{static_cast<double>(event->x), static_cast<double>(event->y)});
+			auto event       = reinterpret_cast<GdkEventButton const*>(e);
+			auto const index = obj.coordsToItem(
+			    vec2_t{static_cast<double>(event->x), static_cast<double>(event->y)});
 			obj.m_vt.m_on_mouse_up(obj.r_eh, obj, index, event->button);
 			return FALSE;
 		}
@@ -279,9 +286,9 @@ private:
 		auto& obj = *reinterpret_cast<Impl*>(self);
 		if(obj.r_eh != nullptr)
 		{
-			auto event = reinterpret_cast<GdkEventMotion const*>(e);
-			auto const index =
-			   obj.coordsToItem(vec2_t{static_cast<double>(event->x), static_cast<double>(event->y)});
+			auto event       = reinterpret_cast<GdkEventMotion const*>(e);
+			auto const index = obj.coordsToItem(
+			    vec2_t{static_cast<double>(event->x), static_cast<double>(event->y)});
 			obj.m_vt.m_on_mouse_move(obj.r_eh, obj, index);
 			return FALSE;
 		}
@@ -289,14 +296,9 @@ private:
 	}
 };
 
-Texpainter::Ui::PaletteView::PaletteView(Container& cnt): m_impl{new Impl{cnt}}
-{
-}
+Texpainter::Ui::PaletteView::PaletteView(Container& cnt): m_impl{new Impl{cnt}} {}
 
-Texpainter::Ui::PaletteView::~PaletteView()
-{
-	delete m_impl;
-}
+Texpainter::Ui::PaletteView::~PaletteView() { delete m_impl; }
 
 Texpainter::Ui::PaletteView& Texpainter::Ui::PaletteView::palette(std::span<Model::Pixel const> pal)
 {
@@ -304,8 +306,8 @@ Texpainter::Ui::PaletteView& Texpainter::Ui::PaletteView::palette(std::span<Mode
 	return *this;
 }
 
-Texpainter::Ui::PaletteView&
-Texpainter::Ui::PaletteView::eventHandler(void* event_handler, EventHandlerVtable const& vtable)
+Texpainter::Ui::PaletteView& Texpainter::Ui::PaletteView::eventHandler(
+    void* event_handler, EventHandlerVtable const& vtable)
 {
 	m_impl->eventHandler(event_handler, vtable);
 	return *this;

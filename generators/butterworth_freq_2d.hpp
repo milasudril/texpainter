@@ -14,20 +14,21 @@ namespace Texpainter::Generators
 	class ButterworthFreq2dKernel
 	{
 	public:
-		explicit ButterworthFreq2dKernel(Size2d size, Angle ϴ, SpatialFrequency ω_c):
-		   m_O{size.width() / 2.0, size.height() / 2.0},
-		   m_rot_vec_ξ{cos(ϴ), -sin(ϴ)},
-		   m_rot_vec_η{sin(ϴ), cos(ϴ)},
-		   m_ω_c{ω_c}
+		explicit ButterworthFreq2dKernel(Size2d size, Angle ϴ, SpatialFrequency ω_c)
+		    : m_O{size.width() / 2.0, size.height() / 2.0}
+		    , m_rot_vec_ξ{cos(ϴ), -sin(ϴ)}
+		    , m_rot_vec_η{sin(ϴ), cos(ϴ)}
+		    , m_ω_c{ω_c}
 		{
 		}
 
 		auto operator()(auto col, auto row, auto val) const
 		{
-			auto ω = SpatialFrequency{vec2_t{static_cast<double>(col), static_cast<double>(row)} - m_O};
-			ω = transform(ω, m_rot_vec_ξ, m_rot_vec_η);
+			auto ω =
+			    SpatialFrequency{vec2_t{static_cast<double>(col), static_cast<double>(row)} - m_O};
+			ω             = transform(ω, m_rot_vec_ξ, m_rot_vec_η);
 			auto const Ϙω = ω / m_ω_c;
-			auto const H = 1.0 / (dot(Ϙω, Ϙω) + 1.0);
+			auto const H  = 1.0 / (dot(Ϙω, Ϙω) + 1.0);
 			return val * H;
 		}
 
@@ -41,8 +42,8 @@ namespace Texpainter::Generators
 	class ButterworthFreq2d
 	{
 	public:
-		explicit ButterworthFreq2d(Size2d size, Angle ϴ, SpatialFrequency ω_c):
-		   m_f{ButterworthFreq2dKernel{size, ϴ, ω_c}}
+		explicit ButterworthFreq2d(Size2d size, Angle ϴ, SpatialFrequency ω_c)
+		    : m_f{ButterworthFreq2dKernel{size, ϴ, ω_c}}
 		{
 		}
 

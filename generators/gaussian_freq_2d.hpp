@@ -15,20 +15,21 @@ namespace Texpainter::Generators
 	class GaussianFreq2dKernel
 	{
 	public:
-		explicit GaussianFreq2dKernel(Size2d size, Angle ϴ, SpatialFrequency ω_c):
-		   m_O{size.width() / 2.0, size.height() / 2.0},
-		   m_rot_vec_ξ{cos(ϴ), -sin(ϴ)},
-		   m_rot_vec_η{sin(ϴ), cos(ϴ)},
-		   m_ω_c{ω_c}
+		explicit GaussianFreq2dKernel(Size2d size, Angle ϴ, SpatialFrequency ω_c)
+		    : m_O{size.width() / 2.0, size.height() / 2.0}
+		    , m_rot_vec_ξ{cos(ϴ), -sin(ϴ)}
+		    , m_rot_vec_η{sin(ϴ), cos(ϴ)}
+		    , m_ω_c{ω_c}
 		{
 		}
 
 		auto operator()(auto col, auto row, auto val) const
 		{
-			auto ω = SpatialFrequency{vec2_t{static_cast<double>(col), static_cast<double>(row)} - m_O};
-			ω = transform(ω, m_rot_vec_ξ, m_rot_vec_η);
+			auto ω =
+			    SpatialFrequency{vec2_t{static_cast<double>(col), static_cast<double>(row)} - m_O};
+			ω             = transform(ω, m_rot_vec_ξ, m_rot_vec_η);
 			auto const Ϙω = ω / m_ω_c;
-			auto const H = exp(-0.5 * dot(Ϙω, Ϙω));
+			auto const H  = exp(-0.5 * dot(Ϙω, Ϙω));
 			return val * H;
 		}
 
@@ -42,8 +43,8 @@ namespace Texpainter::Generators
 	class GaussianFreq2d
 	{
 	public:
-		explicit GaussianFreq2d(Size2d size, Angle ϴ, SpatialFrequency ω_c):
-		   m_f{GaussianFreq2dKernel{size, ϴ, ω_c}}
+		explicit GaussianFreq2d(Size2d size, Angle ϴ, SpatialFrequency ω_c)
+		    : m_f{GaussianFreq2dKernel{size, ϴ, ω_c}}
 		{
 		}
 

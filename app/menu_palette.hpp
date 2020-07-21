@@ -1,10 +1,10 @@
 //@	{"targets":[{"name":"menu_palette.hpp","type":"include"}]}
 
 #ifndef TEXPAINTER_MENUPALETTE_HPP
-#define TEXPAITNER_MENUPALETTE_HPP
+	#define TEXPAITNER_MENUPALETTE_HPP
 
-#include "ui/menu_item.hpp"
-#include "ui/menu_builder.hpp"
+	#include "ui/menu_item.hpp"
+	#include "ui/menu_builder.hpp"
 
 namespace Texpainter
 {
@@ -26,20 +26,14 @@ namespace Texpainter
 	struct PaletteActionNewTraits<PaletteActionNew::Empty>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Empty";
-		}
+		static constexpr char const* displayName() { return "Empty"; }
 	};
 
 	template<>
 	struct PaletteActionNewTraits<PaletteActionNew::Generate>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Generate";
-		}
+		static constexpr char const* displayName() { return "Generate"; }
 	};
 
 	enum class PaletteAction : int
@@ -61,30 +55,21 @@ namespace Texpainter
 	struct PaletteActionTraits<PaletteAction::New>
 	{
 		using type = Ui::SubmenuBuilder<PaletteActionNew, PaletteActionNewTraits>;
-		static constexpr char const* displayName()
-		{
-			return "New";
-		}
+		static constexpr char const* displayName() { return "New"; }
 	};
 
 	template<>
 	struct PaletteActionTraits<PaletteAction::Load>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Load";
-		}
+		static constexpr char const* displayName() { return "Load"; }
 	};
 
 	template<>
 	struct PaletteActionTraits<PaletteAction::Store>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Store";
-		}
+		static constexpr char const* displayName() { return "Store"; }
 	};
 }
 

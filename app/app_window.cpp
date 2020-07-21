@@ -8,27 +8,27 @@ namespace
 	{
 		using Texpainter::Angle;
 		constexpr Angle snap_angles[] = {
-		   Angle{0.0 / 12, Angle::Turns{}},
-		   Angle{1.0 / 12, Angle::Turns{}},
-		   Angle{2.0 / 12, Angle::Turns{}},
-		   Angle{3.0 / 12, Angle::Turns{}},
-		   Angle{4.0 / 12, Angle::Turns{}},
-		   Angle{5.0 / 12, Angle::Turns{}},
-		   Angle{6.0 / 12, Angle::Turns{}},
-		   Angle{7.0 / 12, Angle::Turns{}},
-		   Angle{8.0 / 12, Angle::Turns{}},
-		   Angle{9.0 / 12, Angle::Turns{}},
-		   Angle{10.0 / 12, Angle::Turns{}},
-		   Angle{11.0 / 12, Angle::Turns{}},
-		   Angle{1.0 / 8, Angle::Turns{}},
-		   Angle{3.0 / 8, Angle::Turns{}},
-		   Angle{5.0 / 8, Angle::Turns{}},
-		   Angle{7.0 / 8, Angle::Turns{}},
-		   Angle{(1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}},
-		   Angle{(1.0 - 1.0 / std::numbers::phi), Angle::Turns{}},
-		   Angle{3.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}},
-		   Angle{4.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}},
-		   Angle{5.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}}};
+		    Angle{0.0 / 12, Angle::Turns{}},
+		    Angle{1.0 / 12, Angle::Turns{}},
+		    Angle{2.0 / 12, Angle::Turns{}},
+		    Angle{3.0 / 12, Angle::Turns{}},
+		    Angle{4.0 / 12, Angle::Turns{}},
+		    Angle{5.0 / 12, Angle::Turns{}},
+		    Angle{6.0 / 12, Angle::Turns{}},
+		    Angle{7.0 / 12, Angle::Turns{}},
+		    Angle{8.0 / 12, Angle::Turns{}},
+		    Angle{9.0 / 12, Angle::Turns{}},
+		    Angle{10.0 / 12, Angle::Turns{}},
+		    Angle{11.0 / 12, Angle::Turns{}},
+		    Angle{1.0 / 8, Angle::Turns{}},
+		    Angle{3.0 / 8, Angle::Turns{}},
+		    Angle{5.0 / 8, Angle::Turns{}},
+		    Angle{7.0 / 8, Angle::Turns{}},
+		    Angle{(1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}},
+		    Angle{(1.0 - 1.0 / std::numbers::phi), Angle::Turns{}},
+		    Angle{3.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}},
+		    Angle{4.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}},
+		    Angle{5.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}}};
 
 
 		constexpr auto snap = Texpainter::Snap{snap_angles};
@@ -96,13 +96,13 @@ namespace
 
 template<>
 void Texpainter::AppWindow::onMouseMove<Texpainter::AppWindow::ControlId::Canvas>(
-   Ui::ImageView& view, vec2_t pos_window, vec2_t pos_screen)
+    Ui::ImageView& view, vec2_t pos_window, vec2_t pos_screen)
 {
 	if(!m_painting) { return; }
 
 	auto const size = view.imageSize();
 	auto const offset =
-	   0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
+	    0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
 	auto const loc = pos_window - offset;
 
 	switch(m_paintmode)
@@ -125,15 +125,18 @@ void Texpainter::AppWindow::onMouseMove<Texpainter::AppWindow::ControlId::Canvas
 		{
 			if(m_keymask & KeymaskCtrl)
 			{
-				m_layerstack_ctrl.inputField().scaleCurrentLayer(loc, m_paint_start_pos, snap_scale_factor);
+				m_layerstack_ctrl.inputField().scaleCurrentLayer(
+				    loc, m_paint_start_pos, snap_scale_factor);
 			}
 			else if(m_keymask & KeymaskShift)
 			{
-				m_layerstack_ctrl.inputField().scaleCurrentLayer(loc, m_paint_start_pos, keep_aspect_ratio);
+				m_layerstack_ctrl.inputField().scaleCurrentLayer(
+				    loc, m_paint_start_pos, keep_aspect_ratio);
 			}
 			else
 			{
-				m_layerstack_ctrl.inputField().scaleCurrentLayer(loc, m_paint_start_pos, unity<vec2_t>);
+				m_layerstack_ctrl.inputField().scaleCurrentLayer(
+				    loc, m_paint_start_pos, unity<vec2_t>);
 			}
 			doRender();
 		}

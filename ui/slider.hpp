@@ -20,32 +20,29 @@ namespace Texpainter::Ui
 	public:
 		constexpr SliderValue() = default;
 
-		constexpr explicit SliderValue(double val): m_value{val}
-		{
-		}
+		constexpr explicit SliderValue(double val): m_value{val} {}
 
 		// SIGSEGV during compilation in gcc 10.1 [bug 96064]
 		// constexpr bool operator<=>(SliderValue const&) const = default;
 
-		constexpr double value() const
-		{
-			return m_value;
-		}
+		constexpr double value() const { return m_value; }
 
 	private:
 		double m_value;
 	};
 
-	inline constexpr SliderValue
-	logValue(double x, double min_exponent = -10.0, double max_exponent = 0.0)
+	inline constexpr SliderValue logValue(double x,
+	                                      double min_exponent = -10.0,
+	                                      double max_exponent = 0.0)
 	{
-		x = (x == 0.0) ? std::exp(min_exponent - 1.0) : x;
+		x              = (x == 0.0) ? std::exp(min_exponent - 1.0) : x;
 		auto const ret = (std::log2(x) - min_exponent) / (max_exponent - min_exponent);
 		return Texpainter::Ui::SliderValue{ret};
 	}
 
-	inline constexpr double
-	logValue(SliderValue val, double min_exponent = -10.0, double max_exponent = 0.0)
+	inline constexpr double logValue(SliderValue val,
+	                                 double min_exponent = -10.0,
+	                                 double max_exponent = 0.0)
 	{
 		auto const x = val.value();
 
@@ -81,10 +78,7 @@ namespace Texpainter::Ui
 			return *this;
 		}
 
-		Slider(Slider&& obj) noexcept: m_impl(obj.m_impl)
-		{
-			obj.m_impl = nullptr;
-		}
+		Slider(Slider&& obj) noexcept: m_impl(obj.m_impl) { obj.m_impl = nullptr; }
 
 		template<auto id, class EventHandler>
 		Slider& eventHandler(EventHandler& eh)
@@ -107,9 +101,7 @@ namespace Texpainter::Ui
 
 		class Impl;
 		Impl* m_impl;
-		explicit Slider(Impl& impl): m_impl(&impl)
-		{
-		}
+		explicit Slider(Impl& impl): m_impl(&impl) {}
 	};
 }
 

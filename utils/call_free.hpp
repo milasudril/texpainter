@@ -9,10 +9,7 @@ namespace Texpainter
 {
 	struct CallFree
 	{
-		void operator()(void* buffer)
-		{
-			free(buffer);
-		}
+		void operator()(void* buffer) { free(buffer); }
 	};
 }
 #endif

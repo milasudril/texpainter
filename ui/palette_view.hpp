@@ -27,27 +27,25 @@ namespace Texpainter::Ui
 			return *this;
 		}
 
-		PaletteView(PaletteView&& obj) noexcept: m_impl(obj.m_impl)
-		{
-			obj.m_impl = nullptr;
-		}
+		PaletteView(PaletteView&& obj) noexcept: m_impl(obj.m_impl) { obj.m_impl = nullptr; }
 
 		template<auto id, class EventHandler>
 		PaletteView& eventHandler(EventHandler& eh)
 		{
-			return eventHandler(&eh,
-			                    {[](void* event_handler, PaletteView& self, size_t index, int button) {
-				                     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				                     obj.template onMouseDown<id>(self, index, button);
-			                     },
-			                     [](void* event_handler, PaletteView& self, size_t index, int button) {
-				                     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				                     obj.template onMouseUp<id>(self, index, button);
-			                     },
-			                     [](void* event_handler, PaletteView& self, size_t index) {
-				                     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				                     obj.template onMouseMove<id>(self, index);
-			                     }});
+			return eventHandler(
+			    &eh,
+			    {[](void* event_handler, PaletteView& self, size_t index, int button) {
+				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				     obj.template onMouseDown<id>(self, index, button);
+			     },
+			     [](void* event_handler, PaletteView& self, size_t index, int button) {
+				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				     obj.template onMouseUp<id>(self, index, button);
+			     },
+			     [](void* event_handler, PaletteView& self, size_t index) {
+				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				     obj.template onMouseMove<id>(self, index);
+			     }});
 		}
 
 		PaletteView& palette(std::span<Model::Pixel const> predef_colors);
@@ -70,13 +68,14 @@ namespace Texpainter::Ui
 
 	private:
 		class Impl;
-		explicit PaletteView(Impl& impl): m_impl(&impl)
-		{
-		}
+		explicit PaletteView(Impl& impl): m_impl(&impl) {}
 		Impl* m_impl;
 		struct EventHandlerVtable
 		{
-			void (*m_on_mouse_down)(void* event_handler, PaletteView& self, size_t index, int button);
+			void (*m_on_mouse_down)(void* event_handler,
+			                        PaletteView& self,
+			                        size_t index,
+			                        int button);
 			void (*m_on_mouse_up)(void* event_handler, PaletteView& self, size_t index, int button);
 			void (*m_on_mouse_move)(void* event_handler, PaletteView& self, size_t index);
 		};

@@ -17,24 +17,21 @@ namespace Texpainter::Generators
 	public:
 		using Rng = std::mt19937;
 
-		CrackGenerator(Rng& rng):
-		   r_rng{rng},
-		   m_n_cracks{3},
-		   m_line_width{1.0f / 64.0f},
-		   m_line_width_growth{0.9f},
-		   m_noise_mod{0.5f},
-		   m_seg_length{1.0 / 64.0},
-		   m_branch_prob{0.125},
-		   m_max_length{0.5}
+		CrackGenerator(Rng& rng)
+		    : r_rng{rng}
+		    , m_n_cracks{3}
+		    , m_line_width{1.0f / 64.0f}
+		    , m_line_width_growth{0.9f}
+		    , m_noise_mod{0.5f}
+		    , m_seg_length{1.0 / 64.0}
+		    , m_branch_prob{0.125}
+		    , m_max_length{0.5}
 		{
 		}
 
 		Model::Image operator()(Size2d output_size);
 
-		int nCracks() const
-		{
-			return m_n_cracks;
-		}
+		int nCracks() const { return m_n_cracks; }
 
 		CrackGenerator nCracks(int value)
 		{
@@ -42,10 +39,7 @@ namespace Texpainter::Generators
 			return *this;
 		}
 
-		float lineWidth() const
-		{
-			return m_line_width;
-		}
+		float lineWidth() const { return m_line_width; }
 
 		CrackGenerator& lineWidth(float value)
 		{
@@ -53,10 +47,7 @@ namespace Texpainter::Generators
 			return *this;
 		}
 
-		float lineWidthGrowth() const
-		{
-			return m_line_width_growth;
-		}
+		float lineWidthGrowth() const { return m_line_width_growth; }
 
 		CrackGenerator& lineWidthGrowth(float value)
 		{
@@ -64,10 +55,7 @@ namespace Texpainter::Generators
 			return *this;
 		}
 
-		double segLength() const
-		{
-			return m_seg_length;
-		}
+		double segLength() const { return m_seg_length; }
 
 		CrackGenerator& segLength(double value)
 		{
@@ -75,10 +63,7 @@ namespace Texpainter::Generators
 			return *this;
 		}
 
-		double branchProb() const
-		{
-			return m_branch_prob;
-		}
+		double branchProb() const { return m_branch_prob; }
 
 		CrackGenerator& branchProb(double val)
 		{
@@ -86,10 +71,7 @@ namespace Texpainter::Generators
 			return *this;
 		}
 
-		double maxLength() const
-		{
-			return m_max_length;
-		}
+		double maxLength() const { return m_max_length; }
 
 		CrackGenerator& maxLength(double value)
 		{
@@ -97,10 +79,7 @@ namespace Texpainter::Generators
 			return *this;
 		}
 
-		float noiseMod() const
-		{
-			return m_noise_mod;
-		}
+		float noiseMod() const { return m_noise_mod; }
 
 		CrackGenerator& noiseMod(float val)
 		{

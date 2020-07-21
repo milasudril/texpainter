@@ -24,10 +24,7 @@ namespace Texpainter::Ui
 			return *this;
 		}
 
-		TextEntry(TextEntry&& obj) noexcept: m_impl(obj.m_impl)
-		{
-			obj.m_impl = nullptr;
-		}
+		TextEntry(TextEntry&& obj) noexcept: m_impl(obj.m_impl) { obj.m_impl = nullptr; }
 
 		template<auto id, class EventHandler>
 		TextEntry& eventHandler(EventHandler& eh)
@@ -58,9 +55,7 @@ namespace Texpainter::Ui
 
 		class Impl;
 		Impl* m_impl;
-		explicit TextEntry(Impl& impl): m_impl(&impl)
-		{
-		}
+		explicit TextEntry(Impl& impl): m_impl(&impl) {}
 	};
 }
 

@@ -18,8 +18,9 @@ namespace Texpainter
 {
 	class LayerStackControl
 	{
-		using CreateLayerDlg = Ui::Dialog<LayerCreator, Ui::DialogOkCancel, Ui::InitialFocus::NoChange>;
-		using TextInputDlg = Ui::Dialog<Ui::LabeledInput<Ui::TextEntry>>;
+		using CreateLayerDlg =
+		    Ui::Dialog<LayerCreator, Ui::DialogOkCancel, Ui::InitialFocus::NoChange>;
+		using TextInputDlg    = Ui::Dialog<Ui::LabeledInput<Ui::TextEntry>>;
 		using ConfirmationDlg = Ui::Dialog<Ui::Label, Ui::DialogYesNo>;
 
 	public:
@@ -35,27 +36,27 @@ namespace Texpainter
 			LayerHide
 		};
 
-		explicit LayerStackControl(Ui::Container& owner, Size2d canvas_size):
-		   m_canvas_size{canvas_size},
-		   m_root{owner, Ui::Box::Orientation::Vertical},
-		   m_row_1{m_root, Ui::Box::Orientation::Horizontal},
-		   m_layer_selector{m_row_1},
-		   m_layer_new{m_row_1, "＋"},
-		   m_separator_0{m_row_1},
-		   m_layer_copy{m_row_1, "Copy"},
-		   m_layer_link{m_row_1, "Link"},
-		   m_layer_delete{m_row_1, "−"},
-		   m_separator_1{m_row_1},
-		   m_layer_move_up{m_row_1, "↑"},
-		   m_layer_move_down{m_row_1, "↓"},
-		   m_separator_2{m_row_1},
-		   m_layer_solo{m_row_1, "Solo"},
-		   m_layer_hide{m_row_1, "Hide"},
-		   m_separator_3{m_row_1},
-		   m_blend_func{m_row_1, "f(x)"},
-		   m_row_2{m_root, Ui::Box::Orientation::Horizontal},
-		   m_status{m_row_2.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand}),
-		            "Click ＋ to create a new layer"}
+		explicit LayerStackControl(Ui::Container& owner, Size2d canvas_size)
+		    : m_canvas_size{canvas_size}
+		    , m_root{owner, Ui::Box::Orientation::Vertical}
+		    , m_row_1{m_root, Ui::Box::Orientation::Horizontal}
+		    , m_layer_selector{m_row_1}
+		    , m_layer_new{m_row_1, "＋"}
+		    , m_separator_0{m_row_1}
+		    , m_layer_copy{m_row_1, "Copy"}
+		    , m_layer_link{m_row_1, "Link"}
+		    , m_layer_delete{m_row_1, "−"}
+		    , m_separator_1{m_row_1}
+		    , m_layer_move_up{m_row_1, "↑"}
+		    , m_layer_move_down{m_row_1, "↓"}
+		    , m_separator_2{m_row_1}
+		    , m_layer_solo{m_row_1, "Solo"}
+		    , m_layer_hide{m_row_1, "Hide"}
+		    , m_separator_3{m_row_1}
+		    , m_blend_func{m_row_1, "f(x)"}
+		    , m_row_2{m_root, Ui::Box::Orientation::Horizontal}
+		    , m_status{m_row_2.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand}),
+		               "Click ＋ to create a new layer"}
 		{
 			m_layer_selector.eventHandler<ControlId::LayerSelector>(*this);
 			m_layer_new.eventHandler<ControlId::LayerNew>(*this);
@@ -68,19 +69,17 @@ namespace Texpainter
 			m_status.oneline(true).alignment(0.0f);
 		}
 
-		LayerStackControl& layers(Model::LayerStack&& l, Sequence<std::string, Model::LayerIndex>&& n)
+		LayerStackControl& layers(Model::LayerStack&& l,
+		                          Sequence<std::string, Model::LayerIndex>&& n)
 		{
-			m_layers = std::move(l);
-			m_layer_names = std::move(n);
+			m_layers        = std::move(l);
+			m_layer_names   = std::move(n);
 			m_current_layer = m_layers.lastIndex();
 			updateLayerSelector();
 			return *this;
 		}
 
-		Model::LayerStack const& layers() const
-		{
-			return m_layers;
-		}
+		Model::LayerStack const& layers() const { return m_layers; }
 
 		LayerStackControl& add(std::string&& name, Model::Layer&& layer)
 		{
@@ -88,7 +87,7 @@ namespace Texpainter
 			m_layer_names.append(std::move(name));
 			m_layers.append(std::move(layer));
 			auto const index = m_layer_names.size() - 1;
-			m_current_layer = Model::LayerIndex{static_cast<uint32_t>(index)};
+			m_current_layer  = Model::LayerIndex{static_cast<uint32_t>(index)};
 			updateLayerSelector();
 			showLayerInfo(m_current_layer);
 			return *this;
@@ -122,12 +121,14 @@ namespace Texpainter
 		}
 
 		template<class ScaleConstraint>
-		LayerStackControl& scaleCurrentLayer(vec2_t loc, vec2_t origin, ScaleConstraint&& constraint)
+		LayerStackControl& scaleCurrentLayer(vec2_t loc,
+		                                     vec2_t origin,
+		                                     ScaleConstraint&& constraint)
 		{
 			if(m_current_layer.valid())
 			{
 				auto const layer_loc = m_layers[m_current_layer].location();
-				auto factor = constraint((loc - layer_loc) / (origin - layer_loc));
+				auto factor          = constraint((loc - layer_loc) / (origin - layer_loc));
 				m_layers[m_current_layer].scaleFactor(factor);
 				showLayerInfo(m_current_layer);
 			}
@@ -140,7 +141,7 @@ namespace Texpainter
 			if(m_current_layer.valid())
 			{
 				auto const layer_loc = m_layers[m_current_layer].location();
-				auto const ϴ = constraint(Angle{loc - layer_loc});
+				auto const ϴ         = constraint(Angle{loc - layer_loc});
 				m_layers[m_current_layer].rotation(ϴ);
 				showLayerInfo(m_current_layer);
 			}
@@ -152,7 +153,7 @@ namespace Texpainter
 		template<auto id, class EventHandler>
 		LayerStackControl& eventHandler(EventHandler& eh)
 		{
-			r_eh = &eh;
+			r_eh   = &eh;
 			r_func = [](void* event_handler, LayerStackControl& self) {
 				reinterpret_cast<EventHandler*>(event_handler)->template onChanged<id>(self);
 			};
@@ -223,7 +224,7 @@ namespace Texpainter
 		{
 			m_layer_selector.clear();
 			std::ranges::for_each(std::ranges::reverse_view{m_layer_names},
-			                      [& layer_selector = m_layer_selector](auto const& item) {
+			                      [&layer_selector = m_layer_selector](auto const& item) {
 				                      layer_selector.append(item.c_str());
 			                      });
 			m_layer_selector.selected(m_layers.lastIndex().value() - m_current_layer.value());
@@ -284,8 +285,8 @@ namespace Texpainter
 	};
 
 	template<>
-	inline void
-	LayerStackControl::onChanged<LayerStackControl::ControlId::LayerSelector>(Ui::Combobox& src)
+	inline void LayerStackControl::onChanged<LayerStackControl::ControlId::LayerSelector>(
+	    Ui::Combobox& src)
 	{
 		auto const selected = static_cast<uint32_t>(src.selected());
 		if(selected < m_layers.size())
@@ -297,27 +298,29 @@ namespace Texpainter
 	}
 
 	template<>
-	inline void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerNew>(Ui::Button& btn)
+	inline void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerNew>(
+	    Ui::Button& btn)
 	{
 		m_create_layer = std::make_unique<CreateLayerDlg>(
-		   m_row_1,
-		   "Create layer",
-		   m_current_layer.valid() ? m_layers[m_current_layer].size() : m_canvas_size,
-		   m_canvas_size);
+		    m_row_1,
+		    "Create layer",
+		    m_current_layer.valid() ? m_layers[m_current_layer].size() : m_canvas_size,
+		    m_canvas_size);
 		m_create_layer->eventHandler<LayerStackControl::ControlId::LayerNew>(*this);
 	}
 
 	template<>
-	inline void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerCopy>(Ui::Button& btn)
+	inline void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerCopy>(
+	    Ui::Button& btn)
 	{
 		m_copy_layer = std::make_unique<TextInputDlg>(
-		   m_row_1, "Copy layer", Ui::Box::Orientation::Horizontal, "New name");
+		    m_row_1, "Copy layer", Ui::Box::Orientation::Horizontal, "New name");
 		m_copy_layer->eventHandler<LayerStackControl::ControlId::LayerCopy>(*this);
 	}
 
 	template<>
-	inline void
-	LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerCopy>(TextInputDlg& src)
+	inline void LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerCopy>(
+	    TextInputDlg& src)
 	{
 		if(m_current_layer.valid())
 		{
@@ -338,16 +341,17 @@ namespace Texpainter
 	}
 
 	template<>
-	inline void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerLink>(Ui::Button& btn)
+	inline void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerLink>(
+	    Ui::Button& btn)
 	{
 		m_link_layer = std::make_unique<TextInputDlg>(
-		   m_row_1, "Link layer", Ui::Box::Orientation::Horizontal, "New name");
+		    m_row_1, "Link layer", Ui::Box::Orientation::Horizontal, "New name");
 		m_link_layer->eventHandler<LayerStackControl::ControlId::LayerLink>(*this);
 	}
 
 	template<>
-	inline void
-	LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerLink>(TextInputDlg& src)
+	inline void LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerLink>(
+	    TextInputDlg& src)
 	{
 		if(m_current_layer.valid())
 		{
@@ -368,8 +372,8 @@ namespace Texpainter
 	}
 
 	template<>
-	inline void
-	LayerStackControl::onClicked<LayerStackControl::ControlId::LayerMoveUp>(Ui::Button& btn)
+	inline void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerMoveUp>(
+	    Ui::Button& btn)
 	{
 		if(m_current_layer.valid() && m_current_layer != m_layers.lastIndex())
 		{
@@ -384,8 +388,8 @@ namespace Texpainter
 	}
 
 	template<>
-	inline void
-	LayerStackControl::onClicked<LayerStackControl::ControlId::LayerMoveDown>(Ui::Button& btn)
+	inline void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerMoveDown>(
+	    Ui::Button& btn)
 	{
 		if(m_current_layer.valid() && m_current_layer != m_layers.firstIndex())
 		{
@@ -401,22 +405,23 @@ namespace Texpainter
 
 
 	template<>
-	inline void
-	LayerStackControl::onClicked<LayerStackControl::ControlId::LayerDelete>(Ui::Button& btn)
+	inline void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerDelete>(
+	    Ui::Button& btn)
 	{
 		if(m_current_layer.valid())
 		{
 			std::string msg{"Do you wish to delete `"};
 			msg += m_layer_names[m_current_layer];
 			msg += "`?";
-			m_delete_layer = std::make_unique<ConfirmationDlg>(m_row_1, "Deleting layer", msg.c_str());
+			m_delete_layer =
+			    std::make_unique<ConfirmationDlg>(m_row_1, "Deleting layer", msg.c_str());
 			m_delete_layer->eventHandler<ControlId::LayerDelete>(*this);
 		}
 	}
 
 	template<>
-	inline void
-	LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerDelete>(ConfirmationDlg&)
+	inline void LayerStackControl::confirmPositive<LayerStackControl::ControlId::LayerDelete>(
+	    ConfirmationDlg&)
 	{
 		auto const current_layer_new = [](auto const& layers, auto layer_index) {
 			if(layers.size() <= 1) { return Model::LayerIndex{}; }
@@ -437,15 +442,16 @@ namespace Texpainter
 	}
 
 	template<>
-	inline void
-	LayerStackControl::confirmNegative<LayerStackControl::ControlId::LayerDelete>(ConfirmationDlg&)
+	inline void LayerStackControl::confirmNegative<LayerStackControl::ControlId::LayerDelete>(
+	    ConfirmationDlg&)
 	{
 		m_delete_layer.reset();
 		m_layer_delete.state(false);
 	}
 
 	template<>
-	inline void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerHide>(Ui::Button& btn)
+	inline void LayerStackControl::onClicked<LayerStackControl::ControlId::LayerHide>(
+	    Ui::Button& btn)
 	{
 		if(m_current_layer.valid())
 		{

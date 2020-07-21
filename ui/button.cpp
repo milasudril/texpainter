@@ -7,7 +7,7 @@
 namespace
 {
 	static GtkCssProvider* s_smallstyle = nullptr;
-	static size_t s_style_refcount = 0;
+	static size_t s_style_refcount      = 0;
 }
 
 class Texpainter::Ui::Button::Impl: private Texpainter::Ui::Button
@@ -18,14 +18,11 @@ public:
 
 	void eventHandler(void* event_handler, EventHandlerFunc func)
 	{
-		r_eh = event_handler;
+		r_eh   = event_handler;
 		r_func = func;
 	}
 
-	const char* label() const noexcept
-	{
-		return gtk_button_get_label(GTK_BUTTON(m_handle));
-	}
+	const char* label() const noexcept { return gtk_button_get_label(GTK_BUTTON(m_handle)); }
 
 	void label(const char* text) noexcept
 	{
@@ -35,28 +32,23 @@ public:
 	void state(bool s) noexcept
 	{
 		auto eh = r_eh;
-		r_eh = nullptr;
+		r_eh    = nullptr;
 		gtk_toggle_button_set_active(m_handle, s);
 		r_eh = eh;
 	}
 
-	bool state() const noexcept
-	{
-		return gtk_toggle_button_get_active(m_handle);
-	}
+	bool state() const noexcept { return gtk_toggle_button_get_active(m_handle); }
 
-	void focus() noexcept
-	{
-		gtk_widget_grab_focus(GTK_WIDGET(m_handle));
-	}
+	void focus() noexcept { gtk_widget_grab_focus(GTK_WIDGET(m_handle)); }
 
 	void small(bool status)
 	{
 		auto context = gtk_widget_get_style_context(GTK_WIDGET(m_handle));
 		if(status)
 		{
-			gtk_style_context_add_provider(
-			   context, GTK_STYLE_PROVIDER(s_smallstyle), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION + 50);
+			gtk_style_context_add_provider(context,
+			                               GTK_STYLE_PROVIDER(s_smallstyle),
+			                               GTK_STYLE_PROVIDER_PRIORITY_APPLICATION + 50);
 		}
 		else
 		{
@@ -73,15 +65,9 @@ private:
 	static gboolean focus_in(GtkWidget* widget, GdkEvent* event, gpointer user_data);
 };
 
-Texpainter::Ui::Button::Button(Container& cnt, const char* label)
-{
-	m_impl = new Impl(cnt, label);
-}
+Texpainter::Ui::Button::Button(Container& cnt, const char* label) { m_impl = new Impl(cnt, label); }
 
-Texpainter::Ui::Button::~Button()
-{
-	delete m_impl;
-}
+Texpainter::Ui::Button::~Button() { delete m_impl; }
 
 Texpainter::Ui::Button& Texpainter::Ui::Button::eventHandler(void* event_handler,
                                                              EventHandlerFunc func)
@@ -90,10 +76,7 @@ Texpainter::Ui::Button& Texpainter::Ui::Button::eventHandler(void* event_handler
 	return *this;
 }
 
-const char* Texpainter::Ui::Button::label() const noexcept
-{
-	return m_impl->label();
-}
+const char* Texpainter::Ui::Button::label() const noexcept { return m_impl->label(); }
 
 Texpainter::Ui::Button& Texpainter::Ui::Button::label(const char* text)
 {
@@ -114,10 +97,7 @@ Texpainter::Ui::Button& Texpainter::Ui::Button::focus() noexcept
 }
 
 
-bool Texpainter::Ui::Button::state() const noexcept
-{
-	return m_impl->state();
-}
+bool Texpainter::Ui::Button::state() const noexcept { return m_impl->state(); }
 
 Texpainter::Ui::Button& Texpainter::Ui::Button::small(bool status) noexcept
 {
@@ -126,9 +106,9 @@ Texpainter::Ui::Button& Texpainter::Ui::Button::small(bool status) noexcept
 }
 
 
-Texpainter::Ui::Button::Impl::Impl(Container& cnt, const char* lab):
-   Texpainter::Ui::Button{*this},
-   r_eh{nullptr}
+Texpainter::Ui::Button::Impl::Impl(Container& cnt, const char* lab)
+    : Texpainter::Ui::Button{*this}
+    , r_eh{nullptr}
 {
 	auto widget = gtk_toggle_button_new();
 	g_signal_connect(widget, "clicked", G_CALLBACK(clicked), this);
@@ -138,7 +118,7 @@ Texpainter::Ui::Button::Impl::Impl(Container& cnt, const char* lab):
 	{
 		s_smallstyle = gtk_css_provider_new();
 		gtk_css_provider_load_from_data(
-		   s_smallstyle, "*{font-size:0.9em;padding:1px;min-height:0px}", -1, nullptr);
+		    s_smallstyle, "*{font-size:0.9em;padding:1px;min-height:0px}", -1, nullptr);
 	}
 	++s_style_refcount;
 
@@ -149,7 +129,7 @@ Texpainter::Ui::Button::Impl::Impl(Container& cnt, const char* lab):
 Texpainter::Ui::Button::Impl::~Impl()
 {
 	m_impl = nullptr;
-	r_eh = nullptr;
+	r_eh   = nullptr;
 	if(s_style_refcount != 0)
 	{
 		auto context = gtk_widget_get_style_context(GTK_WIDGET(m_handle));

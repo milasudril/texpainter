@@ -31,10 +31,7 @@ namespace Texpainter::Ui
 			return *this;
 		}
 
-		ColorPicker(ColorPicker&& obj) noexcept: m_impl(obj.m_impl)
-		{
-			obj.m_impl = nullptr;
-		}
+		ColorPicker(ColorPicker&& obj) noexcept: m_impl(obj.m_impl) { obj.m_impl = nullptr; }
 
 		Model::Pixel value() const noexcept;
 
@@ -51,9 +48,7 @@ namespace Texpainter::Ui
 
 	private:
 		class Impl;
-		explicit ColorPicker(Impl& impl): m_impl{&impl}
-		{
-		}
+		explicit ColorPicker(Impl& impl): m_impl{&impl} {}
 		Impl* m_impl;
 	};
 }

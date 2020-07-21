@@ -1,9 +1,9 @@
 //@	{"targets":[{"name":"menu_file.hpp","type":"include"}]}
 
 #ifndef TEXPAINTER_MENUFILE_HPP
-#define TEXPAITNER_MENUFILE_HPP
+	#define TEXPAITNER_MENUFILE_HPP
 
-#include "ui/menu_item.hpp"
+	#include "ui/menu_item.hpp"
 
 namespace Texpainter
 {
@@ -29,30 +29,21 @@ namespace Texpainter
 	struct FileActionTraits<FileAction::New>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "New";
-		}
+		static constexpr char const* displayName() { return "New"; }
 	};
 
 	template<>
 	struct FileActionTraits<FileAction::Open>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Open";
-		}
+		static constexpr char const* displayName() { return "Open"; }
 	};
 
 	template<>
 	struct FileActionTraits<FileAction::Save>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Save";
-		}
+		static constexpr char const* displayName() { return "Save"; }
 	};
 
 
@@ -60,30 +51,21 @@ namespace Texpainter
 	struct FileActionTraits<FileAction::SaveAs>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Save As";
-		}
+		static constexpr char const* displayName() { return "Save As"; }
 	};
 
 	template<>
 	struct FileActionTraits<FileAction::SaveCopy>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Save copy";
-		}
+		static constexpr char const* displayName() { return "Save copy"; }
 	};
 
 	template<>
 	struct FileActionTraits<FileAction::Export>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName()
-		{
-			return "Export";
-		}
+		static constexpr char const* displayName() { return "Export"; }
 	};
 }
 

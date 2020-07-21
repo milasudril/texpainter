@@ -19,7 +19,7 @@ namespace Texpainter
 	inline std::optional<unsigned int> toInt(char const* str)
 	{
 		char* end;
-		errno = 0;
+		errno    = 0;
 		auto val = strtol(str, &end, 10);
 		if(errno != 0 || *end != '\0' || val > std::numeric_limits<unsigned int>::max())
 		{ return std::optional<unsigned int>{}; }
@@ -37,7 +37,7 @@ namespace Texpainter
 	inline std::optional<float> toFloat(char const* str)
 	{
 		char* end;
-		errno = 0;
+		errno    = 0;
 		auto val = strtof(str, &end);
 		if(errno != 0 || *end != '\0') { return std::optional<float>{}; }
 

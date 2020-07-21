@@ -10,18 +10,18 @@ namespace Testcases
 {
 	void texpainterHsiToRgb()
 	{
-		auto const red_hsi = Texpainter::Model::Hsi{0.0f, 1.0f, 1.0f / 3.0f, 1.0f};
-		auto const yellow_hsi = Texpainter::Model::Hsi{1.0f / 6.0f, 1.0f, 1.0f / 3.0f, 1.0f};
-		auto const green_hsi = Texpainter::Model::Hsi{2.0f / 6.0f, 1.0f, 1.0f / 3.0f, 1.0f};
-		auto const cyan_hsi = Texpainter::Model::Hsi{3.0f / 6.0f, 1.0f, 1.0f / 3.0f, 1.0f};
-		auto const blue_hsi = Texpainter::Model::Hsi{4.0f / 6.0f, 1.0f, 1.0f / 3.0f, 1.0f};
+		auto const red_hsi     = Texpainter::Model::Hsi{0.0f, 1.0f, 1.0f / 3.0f, 1.0f};
+		auto const yellow_hsi  = Texpainter::Model::Hsi{1.0f / 6.0f, 1.0f, 1.0f / 3.0f, 1.0f};
+		auto const green_hsi   = Texpainter::Model::Hsi{2.0f / 6.0f, 1.0f, 1.0f / 3.0f, 1.0f};
+		auto const cyan_hsi    = Texpainter::Model::Hsi{3.0f / 6.0f, 1.0f, 1.0f / 3.0f, 1.0f};
+		auto const blue_hsi    = Texpainter::Model::Hsi{4.0f / 6.0f, 1.0f, 1.0f / 3.0f, 1.0f};
 		auto const magenta_hsi = Texpainter::Model::Hsi{5.0f / 6.0f, 1.0f, 1.0f / 3.0f, 1.0f};
 
-		auto const red_rgb = toRgb(red_hsi);
-		auto const yellow_rgb = toRgb(yellow_hsi);
-		auto const green_rgb = toRgb(green_hsi);
-		auto const cyan_rgb = toRgb(cyan_hsi);
-		auto const blue_rgb = toRgb(blue_hsi);
+		auto const red_rgb     = toRgb(red_hsi);
+		auto const yellow_rgb  = toRgb(yellow_hsi);
+		auto const green_rgb   = toRgb(green_hsi);
+		auto const cyan_rgb    = toRgb(cyan_hsi);
+		auto const blue_rgb    = toRgb(blue_hsi);
 		auto const magenta_rgb = toRgb(magenta_hsi);
 
 		assert(red_rgb.red() == 1.0f);
@@ -51,10 +51,10 @@ namespace Testcases
 
 	void texpainterRgbToHsi()
 	{
-		auto const red_rgb = Texpainter::Model::Pixel{1.0f, 0.0f, 0.0f, 1.0f};
+		auto const red_rgb     = Texpainter::Model::Pixel{1.0f, 0.0f, 0.0f, 1.0f};
 		auto const magenta_rgb = Texpainter::Model::Pixel{0.5f, 0.0f, 0.5f, 1.0f};
 
-		auto const red_hsi = toHsi(red_rgb);
+		auto const red_hsi     = toHsi(red_rgb);
 		auto const magenta_hsi = toHsi(magenta_rgb);
 
 

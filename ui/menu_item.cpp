@@ -12,34 +12,19 @@ public:
 
 	void eventHandler(void* event_handler, EventHandlerFunc func)
 	{
-		r_eh = event_handler;
+		r_eh   = event_handler;
 		r_func = func;
 	}
 
-	void label(char const* label)
-	{
-		gtk_menu_item_set_label(m_handle, label);
-	}
+	void label(char const* label) { gtk_menu_item_set_label(m_handle, label); }
 
-	void _add(GtkWidget* handle) noexcept
-	{
-		gtk_menu_item_set_submenu(m_handle, handle);
-	}
+	void _add(GtkWidget* handle) noexcept { gtk_menu_item_set_submenu(m_handle, handle); }
 
-	void _show() noexcept
-	{
-		gtk_widget_show_all(GTK_WIDGET(m_handle));
-	}
+	void _show() noexcept { gtk_widget_show_all(GTK_WIDGET(m_handle)); }
 
-	void _sensitive(bool val)
-	{
-		gtk_widget_set_sensitive(GTK_WIDGET(m_handle), val);
-	}
+	void _sensitive(bool val) { gtk_widget_set_sensitive(GTK_WIDGET(m_handle), val); }
 
-	void* _toplevel() const
-	{
-		return gtk_widget_get_toplevel(GTK_WIDGET(m_handle));
-	}
+	void* _toplevel() const { return gtk_widget_get_toplevel(GTK_WIDGET(m_handle)); }
 
 private:
 	void* r_eh;
@@ -58,14 +43,11 @@ Texpainter::Ui::MenuItem::MenuItem(Container& cnt, char const* label)
 	m_impl = new Impl(cnt, label);
 }
 
-Texpainter::Ui::MenuItem::~MenuItem()
-{
-	delete m_impl;
-}
+Texpainter::Ui::MenuItem::~MenuItem() { delete m_impl; }
 
 Texpainter::Ui::MenuItem::Impl::Impl(Container& cnt, char const* label): MenuItem{*this}
 {
-	r_eh = nullptr;
+	r_eh        = nullptr;
 	auto widget = gtk_menu_item_new_with_label(label);
 	g_signal_connect(widget, "activate", G_CALLBACK(activate), this);
 	m_handle = GTK_MENU_ITEM(widget);
@@ -110,7 +92,4 @@ Texpainter::Ui::MenuItem& Texpainter::Ui::MenuItem::sensitive(bool val)
 	return *this;
 }
 
-void* Texpainter::Ui::MenuItem::toplevel() const
-{
-	return m_impl->_toplevel();
-}
+void* Texpainter::Ui::MenuItem::toplevel() const { return m_impl->_toplevel(); }

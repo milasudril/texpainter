@@ -27,46 +27,31 @@ namespace Texpainter::Generators
 	template<FilterGraph id>
 	struct FilterGraphItemTraits
 	{
-		static constexpr char const* displayName()
-		{
-			return "None";
-		}
+		static constexpr char const* displayName() { return "None"; }
 	};
 
 	template<>
 	struct FilterGraphItemTraits<FilterGraph::Gaussian2d>
 	{
-		static constexpr char const* displayName()
-		{
-			return "2d gaussian";
-		}
+		static constexpr char const* displayName() { return "2d gaussian"; }
 	};
 
 	template<>
 	struct FilterGraphItemTraits<FilterGraph::Butt2d>
 	{
-		static constexpr char const* displayName()
-		{
-			return "2d 1st order Butterworth";
-		}
+		static constexpr char const* displayName() { return "2d 1st order Butterworth"; }
 	};
 
 	template<>
 	struct FilterGraphItemTraits<FilterGraph::Butt1d>
 	{
-		static constexpr char const* displayName()
-		{
-			return "1d 1st order Butterworth";
-		}
+		static constexpr char const* displayName() { return "1d 1st order Butterworth"; }
 	};
 
 	template<>
 	struct FilterGraphItemTraits<FilterGraph::Butt1dXThenY>
 	{
-		static constexpr char const* displayName()
-		{
-			return "1d 1st order Butterworth (x then y)";
-		}
+		static constexpr char const* displayName() { return "1d 1st order Butterworth (x then y)"; }
 	};
 
 	template<>
@@ -86,13 +71,13 @@ namespace Texpainter::Generators
 	class SurfaceGenerator
 	{
 	public:
-		using NoiseSource = GrayscaleNoise<>;
+		using NoiseSource  = GrayscaleNoise<>;
 		using Distribution = NoiseSource::Distribution;
 
-		SurfaceGenerator():
-		   m_filters{FilterGraph::Butt2d},
-		   m_orientation{0, Angle::Turns{}},
-		   m_cutoff_freq{vec2_t{0.25, 0.5}}
+		SurfaceGenerator()
+		    : m_filters{FilterGraph::Butt2d}
+		    , m_orientation{0, Angle::Turns{}}
+		    , m_cutoff_freq{vec2_t{0.25, 0.5}}
 		{
 		}
 
@@ -108,10 +93,7 @@ namespace Texpainter::Generators
 		Model::Image operator()(Tag<FilterGraph::Butt1dXThenY>, Size2d);
 		Model::Image operator()(Tag<FilterGraph::Butt1dXYSum>, Size2d);
 
-		FilterGraph filters() const
-		{
-			return m_filters;
-		}
+		FilterGraph filters() const { return m_filters; }
 
 		SurfaceGenerator& filters(FilterGraph f)
 		{
@@ -119,10 +101,7 @@ namespace Texpainter::Generators
 			return *this;
 		}
 
-		Angle orientation() const
-		{
-			return m_orientation;
-		}
+		Angle orientation() const { return m_orientation; }
 
 		SurfaceGenerator& orientation(Angle orientation)
 		{
@@ -130,10 +109,7 @@ namespace Texpainter::Generators
 			return *this;
 		}
 
-		SpatialFrequency cutoffFrequency() const
-		{
-			return m_cutoff_freq;
-		}
+		SpatialFrequency cutoffFrequency() const { return m_cutoff_freq; }
 
 		SurfaceGenerator& cutoffFrequency(SpatialFrequency f)
 		{

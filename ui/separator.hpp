@@ -16,7 +16,8 @@ namespace Texpainter::Ui
 	class Separator
 	{
 	public:
-		explicit Separator(Box& box): Separator{box, box.orientation() == Box::Orientation::Horizontal}
+		explicit Separator(Box& box)
+		    : Separator{box, box.orientation() == Box::Orientation::Horizontal}
 		{
 		}
 
@@ -29,17 +30,12 @@ namespace Texpainter::Ui
 			return *this;
 		}
 
-		Separator(Separator&& obj) noexcept: m_impl(obj.m_impl)
-		{
-			obj.m_impl = nullptr;
-		}
+		Separator(Separator&& obj) noexcept: m_impl(obj.m_impl) { obj.m_impl = nullptr; }
 
 	protected:
 		class Impl;
 		Impl* m_impl;
-		explicit Separator(Impl& impl): m_impl(&impl)
-		{
-		}
+		explicit Separator(Impl& impl): m_impl(&impl) {}
 	};
 }
 

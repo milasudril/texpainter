@@ -7,7 +7,7 @@
 namespace
 {
 	static GtkCssProvider* s_smallstyle = nullptr;
-	static size_t s_style_refcount = 0;
+	static size_t s_style_refcount      = 0;
 }
 
 class Texpainter::Ui::TextEntry::Impl: private TextEntry
@@ -18,19 +18,13 @@ public:
 
 	void eventHandler(void* event_handler, EventHandlerFunc func)
 	{
-		r_eh = event_handler;
+		r_eh   = event_handler;
 		r_func = func;
 	}
 
-	const char* content() const noexcept
-	{
-		return gtk_entry_get_text(m_handle);
-	}
+	const char* content() const noexcept { return gtk_entry_get_text(m_handle); }
 
-	void content(const char* text) noexcept
-	{
-		return gtk_entry_set_text(m_handle, text);
-	}
+	void content(const char* text) noexcept { return gtk_entry_set_text(m_handle, text); }
 
 	void width(int n) noexcept
 	{
@@ -43,8 +37,9 @@ public:
 		auto context = gtk_widget_get_style_context(GTK_WIDGET(m_handle));
 		if(status)
 		{
-			gtk_style_context_add_provider(
-			   context, GTK_STYLE_PROVIDER(s_smallstyle), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION + 50);
+			gtk_style_context_add_provider(context,
+			                               GTK_STYLE_PROVIDER(s_smallstyle),
+			                               GTK_STYLE_PROVIDER_PRIORITY_APPLICATION + 50);
 		}
 		else
 		{
@@ -52,15 +47,9 @@ public:
 		}
 	}
 
-	void alignment(float x)
-	{
-		gtk_entry_set_alignment(m_handle, x);
-	}
+	void alignment(float x) { gtk_entry_set_alignment(m_handle, x); }
 
-	void focus()
-	{
-		gtk_widget_grab_focus(GTK_WIDGET(m_handle));
-	}
+	void focus() { gtk_widget_grab_focus(GTK_WIDGET(m_handle)); }
 
 	void enabled(bool status)
 	{
@@ -75,15 +64,9 @@ private:
 	static gboolean focus_callback(GtkWidget* widget, GdkEvent* event, gpointer data);
 };
 
-Texpainter::Ui::TextEntry::TextEntry(Container& cnt)
-{
-	m_impl = new Impl(cnt);
-}
+Texpainter::Ui::TextEntry::TextEntry(Container& cnt) { m_impl = new Impl(cnt); }
 
-Texpainter::Ui::TextEntry::~TextEntry()
-{
-	delete m_impl;
-}
+Texpainter::Ui::TextEntry::~TextEntry() { delete m_impl; }
 
 Texpainter::Ui::TextEntry& Texpainter::Ui::TextEntry::eventHandler(void* event_handler,
                                                                    EventHandlerFunc func)
@@ -92,10 +75,7 @@ Texpainter::Ui::TextEntry& Texpainter::Ui::TextEntry::eventHandler(void* event_h
 	return *this;
 }
 
-const char* Texpainter::Ui::TextEntry::content() const noexcept
-{
-	return m_impl->content();
-}
+const char* Texpainter::Ui::TextEntry::content() const noexcept { return m_impl->content(); }
 
 Texpainter::Ui::TextEntry& Texpainter::Ui::TextEntry::content(const char* text)
 {
@@ -138,7 +118,7 @@ Texpainter::Ui::TextEntry::Impl::Impl(Container& cnt): TextEntry{*this}, r_eh{nu
 	{
 		s_smallstyle = gtk_css_provider_new();
 		gtk_css_provider_load_from_data(
-		   s_smallstyle, "*{font-size:0.8em;padding:1px;min-height:0px}", -1, nullptr);
+		    s_smallstyle, "*{font-size:0.8em;padding:1px;min-height:0px}", -1, nullptr);
 	}
 	++s_style_refcount;
 
@@ -148,7 +128,7 @@ Texpainter::Ui::TextEntry::Impl::Impl(Container& cnt): TextEntry{*this}, r_eh{nu
 Texpainter::Ui::TextEntry::Impl::~Impl()
 {
 	m_impl = nullptr;
-	r_eh = nullptr;
+	r_eh   = nullptr;
 
 	if(s_style_refcount != 0)
 	{

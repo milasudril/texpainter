@@ -16,11 +16,11 @@ namespace Texpainter::Generators
 	{
 	public:
 		using RandomGenerator = Rng;
-		using Distribution = Dist;
+		using Distribution    = Dist;
 
-		explicit GrayscaleNoise(Distribution dist = Distribution{}, Rng&& rng = Rng{}):
-		   m_rng{std::move(rng)},
-		   m_dist{dist}
+		explicit GrayscaleNoise(Distribution dist = Distribution{}, Rng&& rng = Rng{})
+		    : m_rng{std::move(rng)}
+		    , m_dist{dist}
 		{
 		}
 

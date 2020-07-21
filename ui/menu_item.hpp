@@ -24,10 +24,7 @@ namespace Texpainter::Ui
 			return *this;
 		}
 
-		MenuItem(MenuItem&& obj) noexcept: m_impl(obj.m_impl)
-		{
-			obj.m_impl = nullptr;
-		}
+		MenuItem(MenuItem&& obj) noexcept: m_impl(obj.m_impl) { obj.m_impl = nullptr; }
 
 		template<auto id, class EventHandler>
 		MenuItem& eventHandler(EventHandler& eh)
@@ -48,9 +45,7 @@ namespace Texpainter::Ui
 
 	protected:
 		class Impl;
-		explicit MenuItem(MenuItem::Impl& impl): m_impl(&impl)
-		{
-		}
+		explicit MenuItem(MenuItem::Impl& impl): m_impl(&impl) {}
 		Impl* m_impl;
 
 		using EventHandlerFunc = void (*)(void* event_handler, MenuItem& self);

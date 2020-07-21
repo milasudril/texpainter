@@ -9,13 +9,8 @@ namespace Texpainter
 	class AddMemberIf
 	{
 	public:
-		void value(const T&)
-		{
-		}
-		T value() const noexcept
-		{
-			return T{};
-		}
+		void value(const T&) {}
+		T value() const noexcept { return T{}; }
 	};
 
 	template<class T, int tag>
@@ -23,14 +18,8 @@ namespace Texpainter
 	{
 	public:
 		typedef T type;
-		const T& value() const noexcept
-		{
-			return m_value;
-		}
-		void value(const T& val)
-		{
-			m_value = val;
-		}
+		const T& value() const noexcept { return m_value; }
+		void value(const T& val) { m_value = val; }
 
 	private:
 		type m_value;

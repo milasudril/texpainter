@@ -18,12 +18,12 @@ namespace Texpainter::Model
 	class Layer
 	{
 	public:
-		explicit Layer(Size2d size):
-		   m_visible{true},
-		   m_loc{0.0, 0.0},
-		   m_rot{0},
-		   m_scale{1.0, 1.0},
-		   m_content{std::make_shared<Image>(size)}
+		explicit Layer(Size2d size)
+		    : m_visible{true}
+		    , m_loc{0.0, 0.0}
+		    , m_rot{0}
+		    , m_scale{1.0, 1.0}
+		    , m_content{std::make_shared<Image>(size)}
 		{
 			std::ranges::fill(m_content->pixels(), Pixel{0.0, 0.0, 0.0, 0.0});
 		}
@@ -38,10 +38,7 @@ namespace Texpainter::Model
 
 		Layer& operator=(Layer const& other) = delete;
 
-		Layer linkedLayer() const
-		{
-			return Layer{m_loc, m_rot, m_scale, m_content};
-		}
+		Layer linkedLayer() const { return Layer{m_loc, m_rot, m_scale, m_content}; }
 
 		Layer copiedLayer() const
 		{
@@ -50,15 +47,9 @@ namespace Texpainter::Model
 
 		Layer& paint(vec2_t origin, double radius, Pixel color);
 
-		Image const& content() const
-		{
-			return *m_content;
-		}
+		Image const& content() const { return *m_content; }
 
-		vec2_t location() const
-		{
-			return m_loc;
-		}
+		vec2_t location() const { return m_loc; }
 
 		Layer& location(vec2_t loc)
 		{
@@ -66,10 +57,7 @@ namespace Texpainter::Model
 			return *this;
 		}
 
-		Angle rotation() const
-		{
-			return m_rot;
-		}
+		Angle rotation() const { return m_rot; }
 
 		Layer& rotation(Angle rot)
 		{
@@ -77,10 +65,7 @@ namespace Texpainter::Model
 			return *this;
 		}
 
-		vec2_t scaleFactor() const
-		{
-			return m_scale;
-		}
+		vec2_t scaleFactor() const { return m_scale; }
 
 		Layer& scaleFactor(vec2_t val)
 		{
@@ -88,10 +73,7 @@ namespace Texpainter::Model
 			return *this;
 		}
 
-		bool visible() const
-		{
-			return m_visible;
-		}
+		bool visible() const { return m_visible; }
 
 		Layer& visible(bool val)
 		{
@@ -99,10 +81,7 @@ namespace Texpainter::Model
 			return *this;
 		}
 
-		auto size() const
-		{
-			return m_content->size();
-		}
+		auto size() const { return m_content->size(); }
 
 	private:
 		bool m_visible;
@@ -111,11 +90,11 @@ namespace Texpainter::Model
 		vec2_t m_scale;
 		std::shared_ptr<Image> m_content;
 
-		explicit Layer(vec2_t loc, Angle rot, vec2_t scale, std::shared_ptr<Image> const& content):
-		   m_loc{loc},
-		   m_rot{rot},
-		   m_scale{scale},
-		   m_content{content}
+		explicit Layer(vec2_t loc, Angle rot, vec2_t scale, std::shared_ptr<Image> const& content)
+		    : m_loc{loc}
+		    , m_rot{rot}
+		    , m_scale{scale}
+		    , m_content{content}
 		{
 		}
 	};
@@ -124,8 +103,8 @@ namespace Texpainter::Model
 	{
 		auto const size = layer.content().size();
 		auto const scaled_size =
-		   vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())}
-		   * layer.scaleFactor();
+		    vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())}
+		    * layer.scaleFactor();
 
 		return axisAlignedBoundingBox(scaled_size, layer.rotation());
 	}

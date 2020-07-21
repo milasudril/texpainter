@@ -11,65 +11,35 @@ namespace Texpainter
 	class Span2d
 	{
 	public:
-		constexpr explicit Span2d(T* ptr, uint32_t w, uint32_t h): Span2d{ptr, Size2d{w, h}}
-		{
-		}
+		constexpr explicit Span2d(T* ptr, uint32_t w, uint32_t h): Span2d{ptr, Size2d{w, h}} {}
 
-		constexpr Span2d(T* ptr, Size2d size): r_ptr{ptr}, m_size{size}
-		{
-		}
+		constexpr Span2d(T* ptr, Size2d size): r_ptr{ptr}, m_size{size} {}
 
 		template<class U>
-		constexpr explicit(!std::is_same_v<std::decay_t<U>, std::decay_t<T>>) Span2d(Span2d<U> other):
-		   r_ptr{other.data()},
-		   m_size{other.size()}
+		constexpr explicit(!std::is_same_v<std::decay_t<U>, std::decay_t<T>>)
+		    Span2d(Span2d<U> other)
+		    : r_ptr{other.data()}
+		    , m_size{other.size()}
 		{
 		}
 
-		constexpr auto begin() const
-		{
-			return r_ptr;
-		}
+		constexpr auto begin() const { return r_ptr; }
 
-		constexpr auto begin()
-		{
-			return r_ptr;
-		}
+		constexpr auto begin() { return r_ptr; }
 
-		constexpr auto end() const
-		{
-			return r_ptr + area();
-		}
+		constexpr auto end() const { return r_ptr + area(); }
 
-		constexpr auto end()
-		{
-			return r_ptr + area();
-		}
+		constexpr auto end() { return r_ptr + area(); }
 
-		constexpr auto data() const
-		{
-			return begin();
-		}
+		constexpr auto data() const { return begin(); }
 
-		constexpr auto data()
-		{
-			return begin();
-		}
+		constexpr auto data() { return begin(); }
 
-		constexpr auto width() const
-		{
-			return m_size.width();
-		}
+		constexpr auto width() const { return m_size.width(); }
 
-		constexpr auto height() const
-		{
-			return m_size.height();
-		}
+		constexpr auto height() const { return m_size.height(); }
 
-		constexpr auto area() const
-		{
-			return m_size.area();
-		}
+		constexpr auto area() const { return m_size.area(); }
 
 		constexpr T& operator()(uint32_t x, uint32_t y)
 		{
@@ -83,10 +53,7 @@ namespace Texpainter
 			return *(ptr + y * width() + x);
 		}
 
-		constexpr auto size() const
-		{
-			return m_size;
-		}
+		constexpr auto size() const { return m_size; }
 
 	private:
 		T* r_ptr;

@@ -15,8 +15,8 @@ namespace
 		std::array<uint8_t, 42868> ret{};
 		for(int k = 0; k < static_cast<int>(ret.size()); ++k)
 		{
-			ret[k] =
-			   static_cast<float>(255.0 * std::pow(static_cast<double>(k) / (ret.size() - 1), 1 / 2.2));
+			ret[k] = static_cast<float>(
+			    255.0 * std::pow(static_cast<double>(k) / (ret.size() - 1), 1 / 2.2));
 		}
 
 		return ret;
@@ -32,13 +32,14 @@ public:
 		auto widget = gtk_drawing_area_new();
 		g_object_ref_sink(widget);
 		cnt.add(widget);
-		m_handle = GTK_DRAWING_AREA(widget);
-		m_img_surface = nullptr;
-		r_eh = nullptr;
+		m_handle            = GTK_DRAWING_AREA(widget);
+		m_img_surface       = nullptr;
+		r_eh                = nullptr;
 		m_emit_mouse_events = false;
 		gtk_widget_add_events(widget,
-		                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK
-		                         | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_SCROLL_MASK);
+		                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK
+		                          | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK
+		                          | GDK_KEY_RELEASE_MASK | GDK_SCROLL_MASK);
 		g_signal_connect(G_OBJECT(widget), "draw", G_CALLBACK(draw_callback), this);
 		g_signal_connect(G_OBJECT(widget), "button-press-event", G_CALLBACK(on_mouse_down), this);
 		g_signal_connect(G_OBJECT(widget), "button-release-event", G_CALLBACK(on_mouse_up), this);
@@ -47,7 +48,7 @@ public:
 		g_signal_connect(G_OBJECT(widget), "key-release-event", G_CALLBACK(on_key_release), this);
 		gtk_widget_set_can_focus(widget, TRUE);
 
-		m_background = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 32, 32);
+		m_background      = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 32, 32);
 		auto const stride = cairo_image_surface_get_stride(m_background);
 		cairo_surface_flush(m_background);
 		auto const data = cairo_image_surface_get_data(m_background);
@@ -60,7 +61,8 @@ public:
 				constexpr auto intensity_a = gamma_22[static_cast<int>(9.0 * last_lut_entry / 16)];
 				constexpr auto intensity_b = gamma_22[static_cast<int>(7.0 * last_lut_entry / 16)];
 
-				auto const i = (col < 16 && row < 16) || (col >= 16 && row >= 16) ? intensity_a : intensity_b;
+				auto const i =
+				    (col < 16 && row < 16) || (col >= 16 && row >= 16) ? intensity_a : intensity_b;
 
 				write_ptr[0] = i;
 				write_ptr[1] = i;
@@ -104,13 +106,14 @@ public:
 	{
 		if(img.size() != m_size_current || m_img_surface == nullptr) [[unlikely]]
 			{
-				auto surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, img.width(), img.height());
+				auto surface =
+				    cairo_image_surface_create(CAIRO_FORMAT_ARGB32, img.width(), img.height());
 				if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) { return; }
 
 				if(surface == nullptr) { abort(); }
 
 				cairo_surface_destroy(m_img_surface);
-				m_img_surface = surface;
+				m_img_surface  = surface;
 				m_size_current = img.size();
 			}
 		update(img);
@@ -127,20 +130,11 @@ public:
 		gtk_widget_set_size_request(GTK_WIDGET(m_handle), size.width(), size.height());
 	}
 
-	Size2d imageSize() const noexcept
-	{
-		return m_size_current;
-	}
+	Size2d imageSize() const noexcept { return m_size_current; }
 
-	void focus()
-	{
-		gtk_widget_grab_focus(GTK_WIDGET(m_handle));
-	}
+	void focus() { gtk_widget_grab_focus(GTK_WIDGET(m_handle)); }
 
-	void alwaysEmitMouseEvents(bool status)
-	{
-		m_emit_mouse_events = status;
-	}
+	void alwaysEmitMouseEvents(bool status) { m_emit_mouse_events = status; }
 
 private:
 	void* r_eh;
@@ -157,8 +151,8 @@ private:
 		cairo_surface_flush(m_img_surface);
 		auto const data = cairo_image_surface_get_data(m_img_surface);
 		assert(data != nullptr);
-		auto const w = img.width();
-		auto const h = img.height();
+		auto const w  = img.width();
+		auto const h  = img.height();
 		auto read_ptr = std::data(img.pixels());
 		for(uint32_t row = 0; row < h; ++row)
 		{
@@ -166,7 +160,7 @@ private:
 			for(uint32_t col = 0; col < w; ++col)
 			{
 				constexpr auto last_lut_entry = static_cast<int>(gamma_22.size() - 1);
-				auto val = read_ptr->value();
+				auto val                      = read_ptr->value();
 				val *= vec4_t{val[3], val[3], val[3], 1.0f};
 
 				auto pixel_out = static_cast<float>(last_lut_entry) * val;
@@ -176,7 +170,7 @@ private:
 				                       static_cast<int>(pixel_out[2]),
 				                       static_cast<int>(pixel_out[3])};
 				auto constexpr max_val =
-				   vec4i_t{last_lut_entry, last_lut_entry, last_lut_entry, last_lut_entry};
+				    vec4i_t{last_lut_entry, last_lut_entry, last_lut_entry, last_lut_entry};
 
 				as_ints = min(as_ints, max_val);
 
@@ -194,7 +188,7 @@ private:
 	}
 
 
-	GtkDrawingArea* m_handle; // TODO: Should be a gl area
+	GtkDrawingArea* m_handle;  // TODO: Should be a gl area
 	static gboolean draw_callback(GtkWidget* widget, cairo_t* cr, gpointer self)
 	{
 		auto w = gtk_widget_get_allocated_width(widget);
@@ -257,11 +251,11 @@ private:
 
 	static gboolean on_key_press(GtkWidget* widget, GdkEvent* event, gpointer self)
 	{
-		auto obj = reinterpret_cast<Impl*>(self);
-		auto& key = event->key;
+		auto obj      = reinterpret_cast<Impl*>(self);
+		auto& key     = event->key;
 		auto scancode = key.hardware_keycode - 8;
 #ifndef __linux__
-#waring "Scancode key offset is not tested. Pressing esc should print 1"
+	#waring "Scancode key offset is not tested. Pressing esc should print 1"
 //	printf("%d\n", key.hardware_keycode - 8);
 #endif
 		if(obj->r_eh != nullptr) { obj->m_vt.on_key_down(obj->r_eh, *obj, scancode); }
@@ -270,11 +264,11 @@ private:
 
 	static gboolean on_key_release(GtkWidget* widget, GdkEvent* event, gpointer self)
 	{
-		auto obj = reinterpret_cast<Impl*>(self);
-		auto& key = event->key;
+		auto obj      = reinterpret_cast<Impl*>(self);
+		auto& key     = event->key;
 		auto scancode = key.hardware_keycode - 8;
 #ifndef __linux__
-#waring "Scancode key offset is not tested. Pressing esc should print 1"
+	#waring "Scancode key offset is not tested. Pressing esc should print 1"
 		printf("%d\n", key.hardware_keycode - 8);
 #endif
 		if(obj->r_eh != nullptr) { obj->m_vt.on_key_up(obj->r_eh, *obj, scancode); }
@@ -282,14 +276,9 @@ private:
 	}
 };
 
-Texpainter::Ui::ImageView::ImageView(Container& cnt): m_impl{new Impl{cnt}}
-{
-}
+Texpainter::Ui::ImageView::ImageView(Container& cnt): m_impl{new Impl{cnt}} {}
 
-Texpainter::Ui::ImageView::~ImageView()
-{
-	delete m_impl;
-}
+Texpainter::Ui::ImageView::~ImageView() { delete m_impl; }
 
 Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::image(Model::Image const& img)
 {

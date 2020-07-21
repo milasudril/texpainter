@@ -15,15 +15,9 @@ namespace
 		uint32_t m_n_elems;
 	};
 
-	void write(uint32_t val, Buffer& buff)
-	{
-		buff.m_n_elems = val;
-	}
+	void write(uint32_t val, Buffer& buff) { buff.m_n_elems = val; }
 
-	uint32_t read(Texpainter::Empty<uint32_t>, Buffer const& buff)
-	{
-		return buff.m_n_elems;
-	}
+	uint32_t read(Texpainter::Empty<uint32_t>, Buffer const& buff) { return buff.m_n_elems; }
 
 	template<Texpainter::Trivial T>
 	void write(std::span<T> data, Buffer& buff)

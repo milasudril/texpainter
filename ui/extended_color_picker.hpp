@@ -19,27 +19,18 @@ namespace Texpainter::Ui
 	{
 	public:
 		template<class... Args>
-		explicit ExtendedColorPicker(Container& container, Args&&... args):
-		   m_outer{container, Box::Orientation::Horizontal},
-		   m_picker{m_outer},
-		   m_sidepanel{m_outer, m_picker.self(), std::forward<Args>(args)...}
+		explicit ExtendedColorPicker(Container& container, Args&&... args)
+		    : m_outer{container, Box::Orientation::Horizontal}
+		    , m_picker{m_outer}
+		    , m_sidepanel{m_outer, m_picker.self(), std::forward<Args>(args)...}
 		{
 		}
 
-		Sidepanel const& sidepanel() const
-		{
-			return m_sidepanel;
-		}
+		Sidepanel const& sidepanel() const { return m_sidepanel; }
 
-		Sidepanel& sidepanel()
-		{
-			return m_sidepanel;
-		}
+		Sidepanel& sidepanel() { return m_sidepanel; }
 
-		auto value() const
-		{
-			return m_picker.value();
-		}
+		auto value() const { return m_picker.value(); }
 
 		ExtendedColorPicker& value(Model::Pixel val)
 		{

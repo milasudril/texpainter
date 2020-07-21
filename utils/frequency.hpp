@@ -11,19 +11,14 @@ namespace Texpainter
 	class BasicFrequency
 	{
 	public:
-		constexpr explicit BasicFrequency(BasicFrequency<double> ξ, BasicFrequency<double> η):
-		   BasicFrequency{vec2_t{ξ.value(), η.value()}}
+		constexpr explicit BasicFrequency(BasicFrequency<double> ξ, BasicFrequency<double> η)
+		    : BasicFrequency{vec2_t{ξ.value(), η.value()}}
 		{
 		}
 
-		constexpr explicit BasicFrequency(Rep val): m_val{val}
-		{
-		}
+		constexpr explicit BasicFrequency(Rep val): m_val{val} {}
 
-		constexpr Rep operator/(BasicFrequency other) const
-		{
-			return m_val / other.m_val;
-		}
+		constexpr Rep operator/(BasicFrequency other) const { return m_val / other.m_val; }
 
 		constexpr BasicFrequency& operator+=(BasicFrequency other)
 		{
@@ -49,20 +44,11 @@ namespace Texpainter
 			return *this;
 		}
 
-		constexpr auto ξ() const
-		{
-			return BasicFrequency<double>{m_val[0]};
-		}
+		constexpr auto ξ() const { return BasicFrequency<double>{m_val[0]}; }
 
-		constexpr auto η() const
-		{
-			return BasicFrequency<double>{m_val[1]};
-		}
+		constexpr auto η() const { return BasicFrequency<double>{m_val[1]}; }
 
-		constexpr auto value() const
-		{
-			return m_val;
-		}
+		constexpr auto value() const { return m_val; }
 
 
 	private:
@@ -103,7 +89,7 @@ namespace Texpainter
 		return f2 * c;
 	}
 
-	using Frequency = BasicFrequency<double>;
+	using Frequency        = BasicFrequency<double>;
 	using SpatialFrequency = BasicFrequency<vec2_t>;
 
 	inline constexpr Frequency dot(SpatialFrequency f, vec2_t v)
@@ -112,10 +98,7 @@ namespace Texpainter
 		return f.ξ() + f.η();
 	}
 
-	inline constexpr Frequency dot(vec2_t v, SpatialFrequency f)
-	{
-		return dot(f, v);
-	}
+	inline constexpr Frequency dot(vec2_t v, SpatialFrequency f) { return dot(f, v); }
 
 
 	inline constexpr SpatialFrequency transform(SpatialFrequency f, vec2_t ξ_vec, vec2_t η_vec)

@@ -17,13 +17,10 @@ namespace Texpainter
 		using Base::begin;
 		using Base::end;
 		using index_type = IndexType;
-		using size_type = typename IndexType::element_type;
+		using size_type  = typename IndexType::element_type;
 		using value_type = T;
 
-		auto size() const
-		{
-			return static_cast<size_type>(Base::size());
-		}
+		auto size() const { return static_cast<size_type>(Base::size()); }
 
 		auto& append(T&& layer)
 		{
@@ -38,15 +35,9 @@ namespace Texpainter
 			return *this;
 		}
 
-		static auto firstIndex()
-		{
-			return index_type{0};
-		}
+		static auto firstIndex() { return index_type{0}; }
 
-		auto lastIndex() const
-		{
-			return index_type{size() - 1};
-		}
+		auto lastIndex() const { return index_type{size() - 1}; }
 
 		auto& moveForward(index_type index)
 		{
@@ -70,15 +61,9 @@ namespace Texpainter
 			return *this;
 		}
 
-		auto& operator[](index_type index)
-		{
-			return *(begin() + index.value());
-		}
+		auto& operator[](index_type index) { return *(begin() + index.value()); }
 
-		auto const& operator[](index_type index) const
-		{
-			return *(begin() + index.value());
-		}
+		auto const& operator[](index_type index) const { return *(begin() + index.value()); }
 	};
 }
 

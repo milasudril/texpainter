@@ -14,10 +14,7 @@ namespace Texpainter::Geom
 	public:
 		using Scalar = decltype(std::declval<vec2_t>()[0]);
 
-		Scalar x() const
-		{
-			return m_val[0];
-		}
+		Scalar x() const { return m_val[0]; }
 
 		Position& x(Scalar c)
 		{
@@ -25,10 +22,7 @@ namespace Texpainter::Geom
 			return *this;
 		}
 
-		Scalar y() const
-		{
-			return m_val[1];
-		}
+		Scalar y() const { return m_val[1]; }
 
 		Position& y(Scalar c)
 		{

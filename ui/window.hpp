@@ -26,10 +26,7 @@ namespace Texpainter::Ui
 			return *this;
 		}
 
-		Window(Window&& obj) noexcept: m_impl(obj.m_impl)
-		{
-			obj.m_impl = nullptr;
-		}
+		Window(Window&& obj) noexcept: m_impl(obj.m_impl) { obj.m_impl = nullptr; }
 
 		Window& add(void* handle) override;
 		Window& show() override;
@@ -76,9 +73,7 @@ namespace Texpainter::Ui
 
 		class Impl;
 		Impl* m_impl;
-		explicit Window(Impl& impl): m_impl(&impl)
-		{
-		}
+		explicit Window(Impl& impl): m_impl(&impl) {}
 	};
 }
 

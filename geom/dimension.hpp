@@ -14,10 +14,7 @@ namespace Texpainter::Geom
 	public:
 		using Scalar = decltype(std::declval<vec2_t>()[0]);
 
-		Scalar width() const
-		{
-			return m_val[0];
-		}
+		Scalar width() const { return m_val[0]; }
 
 		Dimension& width(Scalar c)
 		{
@@ -25,10 +22,7 @@ namespace Texpainter::Geom
 			return *this;
 		}
 
-		Scalar height() const
-		{
-			return m_val[1];
-		}
+		Scalar height() const { return m_val[1]; }
 
 		Dimension& height(Scalar c)
 		{
@@ -42,10 +36,7 @@ namespace Texpainter::Geom
 			return *this;
 		}
 
-		auto offsetVector() const
-		{
-			return m_val;
-		}
+		auto offsetVector() const { return m_val; }
 
 	private:
 		vec2_t m_val;

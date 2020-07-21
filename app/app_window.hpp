@@ -36,19 +36,19 @@ namespace Texpainter
 			Canvas
 		};
 
-		explicit AppWindow(Ui::Container& container):
-		   m_canvas_size{512, 512},
-		   m_current_color{0.5f, 0.5f, 0.5f, 1.0f},
-		   m_painting{false},
-		   m_paintmode{PaintMode::Draw},
-		   m_keymask{0},
-		   m_rows{container, Ui::Box::Orientation::Vertical},
-		   m_menu{m_rows},
-		   m_pal_editor{m_rows, Ui::Box::Orientation::Horizontal, "Palettes: "},
-		   m_pal_separator{m_rows},
-		   m_layerstack_ctrl{m_rows, Ui::Box::Orientation::Horizontal, "Layers: ", m_canvas_size},
-		   m_layeres_separator{m_rows},
-		   m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
+		explicit AppWindow(Ui::Container& container)
+		    : m_canvas_size{512, 512}
+		    , m_current_color{0.5f, 0.5f, 0.5f, 1.0f}
+		    , m_painting{false}
+		    , m_paintmode{PaintMode::Draw}
+		    , m_keymask{0}
+		    , m_rows{container, Ui::Box::Orientation::Vertical}
+		    , m_menu{m_rows}
+		    , m_pal_editor{m_rows, Ui::Box::Orientation::Horizontal, "Palettes: "}
+		    , m_pal_separator{m_rows}
+		    , m_layerstack_ctrl{m_rows, Ui::Box::Orientation::Horizontal, "Layers: ", m_canvas_size}
+		    , m_layeres_separator{m_rows}
+		    , m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
 		{
 			m_pal_editor.inputField().eventHandler<ControlId::PaletteEd>(*this);
 			m_layerstack_ctrl.inputField().eventHandler<ControlId::LayerStackCtrl>(*this);
@@ -103,7 +103,7 @@ namespace Texpainter
 		bool m_painting;
 		PaintMode m_paintmode;
 		static constexpr uint32_t KeymaskShift = 0x1;
-		static constexpr uint32_t KeymaskCtrl = 0x2;
+		static constexpr uint32_t KeymaskCtrl  = 0x2;
 		uint32_t m_keymask;
 		vec2_t m_paint_start_pos;
 
@@ -131,23 +131,27 @@ namespace Texpainter
 	};
 
 	template<>
-	inline void AppWindow::onMouseUp<AppWindow::ControlId::Canvas>(Ui::ImageView&, vec2_t, vec2_t, int)
+	inline void AppWindow::onMouseUp<AppWindow::ControlId::Canvas>(Ui::ImageView&,
+	                                                               vec2_t,
+	                                                               vec2_t,
+	                                                               int)
 	{
 		m_painting = false;
 	}
 
 	template<>
-	inline void AppWindow::onKeyDown<AppWindow::ControlId::Canvas>(Ui::ImageView& view, int scancode)
+	inline void AppWindow::onKeyDown<AppWindow::ControlId::Canvas>(Ui::ImageView& view,
+	                                                               int scancode)
 	{
 		switch(scancode)
 		{
-			case 34: // G
+			case 34:  // G
 				m_paintmode = PaintMode::Grab;
 				break;
-			case 31: // S
+			case 31:  // S
 				m_paintmode = PaintMode::Scale;
 				break;
-			case 19: // R
+			case 19:  // R
 				m_paintmode = PaintMode::Rotate;
 				break;
 			case 29: m_keymask |= KeymaskCtrl; break;
@@ -173,18 +177,20 @@ namespace Texpainter
 	                                                                 vec2_t pos_screen,
 	                                                                 int button)
 	{
-		m_painting = true;
+		m_painting      = true;
 		auto const size = view.imageSize();
 		m_paint_start_pos =
-		   pos_window
-		   - 0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
+		    pos_window
+		    - 0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
 		switch(m_paintmode)
 		{
 			case PaintMode::Draw:
 			{
 				auto const offset =
-				   0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
-				m_layerstack_ctrl.inputField().paintCurrentLayer(pos_window - offset, 4.0, m_current_color);
+				    0.5
+				    * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
+				m_layerstack_ctrl.inputField().paintCurrentLayer(
+				    pos_window - offset, 4.0, m_current_color);
 				doRender();
 			}
 			break;

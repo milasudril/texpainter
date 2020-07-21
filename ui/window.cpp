@@ -13,10 +13,7 @@ public:
 	Impl(char const* ti, Container* owner);
 	~Impl();
 
-	char const* title() const noexcept
-	{
-		return m_title.c_str();
-	}
+	char const* title() const noexcept { return m_title.c_str(); }
 
 	void title(char const* title_new)
 	{
@@ -33,20 +30,11 @@ public:
 		gtk_container_add(GTK_CONTAINER(m_handle), handle);
 	}
 
-	void _show()
-	{
-		gtk_widget_show_all(GTK_WIDGET(m_handle));
-	}
+	void _show() { gtk_widget_show_all(GTK_WIDGET(m_handle)); }
 
-	void _sensitive(bool val)
-	{
-		gtk_widget_set_sensitive(GTK_WIDGET(m_handle), val);
-	}
+	void _sensitive(bool val) { gtk_widget_set_sensitive(GTK_WIDGET(m_handle), val); }
 
-	void* _toplevel() const
-	{
-		return m_handle;
-	}
+	void* _toplevel() const { return m_handle; }
 
 	void eventHandler(void* eh, EventHandlerVtable const& vtable)
 	{
@@ -54,20 +42,14 @@ public:
 		m_vt = vtable;
 	}
 
-	void modal(bool state)
-	{
-		gtk_window_set_modal(m_handle, state);
-	}
+	void modal(bool state) { gtk_window_set_modal(m_handle, state); }
 
 	void defaultSize(Size2d size)
 	{
 		gtk_window_set_default_size(m_handle, size.width(), size.height());
 	}
 
-	void resize(Size2d size)
-	{
-		gtk_window_resize(m_handle, size.width(), size.height());
-	}
+	void resize(Size2d size) { gtk_window_resize(m_handle, size.width(), size.height()); }
 
 
 private:
@@ -88,15 +70,9 @@ Texpainter::Ui::Window::Window(char const* title, Container* owner)
 	m_impl = new Impl(title, owner);
 }
 
-Texpainter::Ui::Window::~Window()
-{
-	delete m_impl;
-}
+Texpainter::Ui::Window::~Window() { delete m_impl; }
 
-char const* Texpainter::Ui::Window::title() const noexcept
-{
-	return m_impl->title();
-}
+char const* Texpainter::Ui::Window::title() const noexcept { return m_impl->title(); }
 
 Texpainter::Ui::Window& Texpainter::Ui::Window::title(char const* title_new)
 {
@@ -122,10 +98,7 @@ Texpainter::Ui::Window& Texpainter::Ui::Window::sensitive(bool val)
 	return *this;
 }
 
-void* Texpainter::Ui::Window::toplevel() const
-{
-	return m_impl->_toplevel();
-}
+void* Texpainter::Ui::Window::toplevel() const { return m_impl->_toplevel(); }
 
 Texpainter::Ui::Window& Texpainter::Ui::Window::eventHandler(void* event_handler,
                                                              EventHandlerVtable const& vt)
@@ -140,10 +113,10 @@ Texpainter::Ui::Window& Texpainter::Ui::Window::modal(bool state)
 	return *this;
 }
 
-Texpainter::Ui::Window::Impl::Impl(char const* ti, Container* owner):
-   Window{*this},
-   r_eh{nullptr},
-   r_focus_old{nullptr}
+Texpainter::Ui::Window::Impl::Impl(char const* ti, Container* owner)
+    : Window{*this}
+    , r_eh{nullptr}
+    , r_focus_old{nullptr}
 {
 	auto widget = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	g_signal_connect(widget, "delete-event", G_CALLBACK(delete_event), this);
@@ -158,27 +131,29 @@ Texpainter::Ui::Window::Impl::Impl(char const* ti, Container* owner):
 Texpainter::Ui::Window::Impl::~Impl()
 {
 	m_impl = nullptr;
-	r_eh = nullptr;
+	r_eh   = nullptr;
 	gtk_widget_destroy(GTK_WIDGET(m_handle));
 	if(m_icon != nullptr) { g_object_unref(m_icon); }
 }
 
-gboolean
-Texpainter::Ui::Window::Impl::delete_event(GtkWidget* widget, GdkEvent* event, void* user_data)
+gboolean Texpainter::Ui::Window::Impl::delete_event(GtkWidget* widget,
+                                                    GdkEvent* event,
+                                                    void* user_data)
 {
 	auto self = reinterpret_cast<Impl*>(user_data);
 	if(self->r_eh != nullptr) { self->m_vt.on_close(self->r_eh, *self); }
 	return TRUE;
 }
 
-gboolean
-Texpainter::Ui::Window::Impl::key_press(GtkWidget* widget, GdkEvent* event, void* user_data)
+gboolean Texpainter::Ui::Window::Impl::key_press(GtkWidget* widget,
+                                                 GdkEvent* event,
+                                                 void* user_data)
 {
-	auto self = reinterpret_cast<Impl*>(user_data);
-	auto& key = event->key;
+	auto self     = reinterpret_cast<Impl*>(user_data);
+	auto& key     = event->key;
 	auto scancode = key.hardware_keycode - 8;
 #ifndef __linux__
-#waring "Scancode key offset is not tested. Pressing esc should print 1"
+	#waring "Scancode key offset is not tested. Pressing esc should print 1"
 	printf("%d\n", key.hardware_keycode - 8);
 #endif
 	auto w = gtk_window_get_focus(GTK_WINDOW(widget));
@@ -187,15 +162,16 @@ Texpainter::Ui::Window::Impl::key_press(GtkWidget* widget, GdkEvent* event, void
 		self->r_focus_old = w;
 		switch(scancode)
 		{
-			case 1: //	ESC
+			case 1:  //	ESC
 				gtk_window_set_focus(GTK_WINDOW(widget), NULL);
 				if(self->r_eh != nullptr) { self->m_vt.on_key_down(self->r_eh, *self, scancode); }
 				break;
-			case 28:                                                      //	RETURN
-				if(gtk_window_get_transient_for(GTK_WINDOW(widget)) != NULL) //	Dialog box
+			case 28:                                                          //	RETURN
+				if(gtk_window_get_transient_for(GTK_WINDOW(widget)) != NULL)  //	Dialog box
 				{
 					gtk_window_set_focus(GTK_WINDOW(widget), NULL);
-					if(self->r_eh != nullptr) { self->m_vt.on_key_down(self->r_eh, *self, scancode); }
+					if(self->r_eh != nullptr)
+					{ self->m_vt.on_key_down(self->r_eh, *self, scancode); }
 				}
 				break;
 		}
@@ -210,16 +186,17 @@ Texpainter::Ui::Window::Impl::key_press(GtkWidget* widget, GdkEvent* event, void
 	return TRUE;
 }
 
-gboolean
-Texpainter::Ui::Window::Impl::key_release(GtkWidget* widget, GdkEvent* event, void* user_data)
+gboolean Texpainter::Ui::Window::Impl::key_release(GtkWidget* widget,
+                                                   GdkEvent* event,
+                                                   void* user_data)
 {
 	auto w = gtk_window_get_focus(GTK_WINDOW(widget));
 	if(w != NULL) { return FALSE; }
-	auto self = reinterpret_cast<Impl*>(user_data);
-	auto& key = event->key;
+	auto self     = reinterpret_cast<Impl*>(user_data);
+	auto& key     = event->key;
 	auto scancode = key.hardware_keycode - 8;
 #ifndef __linux__
-#waring "Scancode key offset is not tested. Pressing esc should print 1"
+	#waring "Scancode key offset is not tested. Pressing esc should print 1"
 	printf("%d\n", key.hardware_keycode - 8);
 #endif
 	if(self->r_eh != nullptr) { self->m_vt.on_key_up(self->r_eh, *self, scancode); }
@@ -239,7 +216,4 @@ Texpainter::Ui::Window& Texpainter::Ui::Window::resize(Size2d size)
 	return *this;
 }
 
-void Texpainter::Ui::Window::terminateApp()
-{
-	gtk_main_quit();
-}
+void Texpainter::Ui::Window::terminateApp() { gtk_main_quit(); }

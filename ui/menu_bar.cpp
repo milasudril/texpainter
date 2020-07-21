@@ -10,25 +10,13 @@ public:
 	Impl(Container& cnt);
 	~Impl();
 
-	void _add(GtkWidget* handle) noexcept
-	{
-		gtk_container_add(GTK_CONTAINER(m_handle), handle);
-	}
+	void _add(GtkWidget* handle) noexcept { gtk_container_add(GTK_CONTAINER(m_handle), handle); }
 
-	void _show() noexcept
-	{
-		gtk_widget_show_all(GTK_WIDGET(m_handle));
-	}
+	void _show() noexcept { gtk_widget_show_all(GTK_WIDGET(m_handle)); }
 
-	void _sensitive(bool val)
-	{
-		gtk_widget_set_sensitive(GTK_WIDGET(m_handle), val);
-	}
+	void _sensitive(bool val) { gtk_widget_set_sensitive(GTK_WIDGET(m_handle), val); }
 
-	void* _toplevel() const
-	{
-		return gtk_widget_get_toplevel(GTK_WIDGET(m_handle));
-	}
+	void* _toplevel() const { return gtk_widget_get_toplevel(GTK_WIDGET(m_handle)); }
 
 private:
 	GtkMenuBar* m_handle;
@@ -37,7 +25,7 @@ private:
 Texpainter::Ui::MenuBar::Impl::Impl(Container& cnt): MenuBar{*this}
 {
 	auto widget = gtk_menu_bar_new();
-	m_handle = GTK_MENU_BAR(widget);
+	m_handle    = GTK_MENU_BAR(widget);
 	cnt.add(widget);
 }
 
@@ -47,15 +35,9 @@ Texpainter::Ui::MenuBar::Impl::~Impl()
 	gtk_widget_destroy(GTK_WIDGET(m_handle));
 }
 
-Texpainter::Ui::MenuBar::MenuBar(Container& cnt)
-{
-	m_impl = new Impl(cnt);
-}
+Texpainter::Ui::MenuBar::MenuBar(Container& cnt) { m_impl = new Impl(cnt); }
 
-Texpainter::Ui::MenuBar::~MenuBar()
-{
-	delete m_impl;
-}
+Texpainter::Ui::MenuBar::~MenuBar() { delete m_impl; }
 
 Texpainter::Ui::MenuBar& Texpainter::Ui::MenuBar::add(void* handle)
 {
@@ -75,7 +57,4 @@ Texpainter::Ui::MenuBar& Texpainter::Ui::MenuBar::sensitive(bool val)
 	return *this;
 }
 
-void* Texpainter::Ui::MenuBar::toplevel() const
-{
-	return m_impl->_toplevel();
-}
+void* Texpainter::Ui::MenuBar::toplevel() const { return m_impl->_toplevel(); }

@@ -12,7 +12,7 @@ public:
 
 	void eventHandler(void* event_handler, EventHandlerFunc func)
 	{
-		r_eh = event_handler;
+		r_eh   = event_handler;
 		r_func = func;
 	}
 
@@ -23,8 +23,8 @@ public:
 
 	void value(SliderValue x) noexcept
 	{
-		auto r_eh_old = r_eh; // Disable event handler when changing value
-		r_eh = nullptr;
+		auto r_eh_old = r_eh;  // Disable event handler when changing value
+		r_eh          = nullptr;
 		gtk_range_set_value(GTK_RANGE(m_handle), x.value());
 		r_eh = r_eh_old;
 	}
@@ -43,15 +43,9 @@ private:
 	static gboolean changed_callback(GtkWidget* widget, gpointer data);
 };
 
-Texpainter::Ui::Slider::Slider(Container& cnt, bool vertical)
-{
-	m_impl = new Impl(cnt, vertical);
-}
+Texpainter::Ui::Slider::Slider(Container& cnt, bool vertical) { m_impl = new Impl(cnt, vertical); }
 
-Texpainter::Ui::Slider::~Slider()
-{
-	delete m_impl;
-}
+Texpainter::Ui::Slider::~Slider() { delete m_impl; }
 
 Texpainter::Ui::Slider& Texpainter::Ui::Slider::eventHandler(void* event_handler,
                                                              EventHandlerFunc f)
@@ -80,8 +74,8 @@ Texpainter::Ui::Slider& Texpainter::Ui::Slider::ticks(std::span<TickMark const> 
 Texpainter::Ui::Slider::Impl::Impl(Container& cnt, bool vertical): Slider{*this}, r_eh(nullptr)
 {
 	auto widget = gtk_scale_new_with_range(
-	   vertical ? GTK_ORIENTATION_VERTICAL : GTK_ORIENTATION_HORIZONTAL, 0, 1, 1e-3);
-	gtk_range_set_inverted(GTK_RANGE(widget), vertical); //	GTK draws the slider upside down
+	    vertical ? GTK_ORIENTATION_VERTICAL : GTK_ORIENTATION_HORIZONTAL, 0, 1, 1e-3);
+	gtk_range_set_inverted(GTK_RANGE(widget), vertical);  //	GTK draws the slider upside down
 	gtk_scale_set_draw_value(GTK_SCALE(widget), FALSE);
 	gtk_widget_set_size_request(widget, vertical ? 32 : 96, vertical ? 96 : 32);
 
@@ -94,7 +88,7 @@ Texpainter::Ui::Slider::Impl::Impl(Container& cnt, bool vertical): Slider{*this}
 Texpainter::Ui::Slider::Impl::~Impl()
 {
 	m_impl = nullptr;
-	r_eh = nullptr;
+	r_eh   = nullptr;
 	gtk_widget_destroy(GTK_WIDGET(m_handle));
 	g_object_unref(m_handle);
 }
