@@ -58,12 +58,12 @@ namespace Texpainter
 		{
 			//	m_img_view.eventHandler<ControlId::Canvas>(*this);
 			m_menu.eventHandler(*this);
-			m_pal_view.eventHandler<0>(m_pal_view_eh);
 		}
 
 		AppWindow& document(Model::Document&& doc)
 		{
 			m_current_document = std::make_unique<Model::Document>(std::move(doc));
+			m_pal_view.eventHandler<0>(m_pal_view_eh);
 			update();
 			return *this;
 		}
