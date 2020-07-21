@@ -2,7 +2,6 @@
 
 #include "./image_view.hpp"
 #include "model/image.hpp"
-#include "geom/dimension.hpp"
 
 #include <gtk/gtk.h>
 
@@ -84,7 +83,7 @@ public:
 		cairo_surface_destroy(m_background);
 	}
 
-	void render(Geom::Dimension dim, cairo_t* cr)
+	void render(Size2d dim, cairo_t* cr)
 	{
 		cairo_set_source_surface(cr, m_background, 0.0, 0.0);
 		cairo_pattern_set_extend(cairo_get_source(cr), CAIRO_EXTEND_REPEAT);
@@ -191,9 +190,9 @@ private:
 	GtkDrawingArea* m_handle;  // TODO: Should be a gl area
 	static gboolean draw_callback(GtkWidget* widget, cairo_t* cr, gpointer self)
 	{
-		auto w = gtk_widget_get_allocated_width(widget);
-		auto h = gtk_widget_get_allocated_height(widget);
-		reinterpret_cast<Impl*>(self)->render(Geom::Dimension{}.width(w).height(h), cr);
+		auto const w = static_cast<uint32_t>(gtk_widget_get_allocated_width(widget));
+		auto const h = static_cast<uint32_t>(gtk_widget_get_allocated_height(widget));
+		reinterpret_cast<Impl*>(self)->render(Size2d{w,h}, cr);
 		return FALSE;
 	}
 

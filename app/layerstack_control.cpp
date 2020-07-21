@@ -1,6 +1,6 @@
-//@	{
-//@	 "targets":[{"name":"layerstack_control.o", "type":"object"}]
-//@	}
+//	{
+//	 "targets":[{"name":"layerstack_control.o", "type":"object"}]
+//	}
 
 #include "./layerstack_control.hpp"
 

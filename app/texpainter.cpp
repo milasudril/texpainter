@@ -2,8 +2,6 @@
 
 
 #include "./app_window.hpp"
-
-#include "model/layer_stack.hpp"
 #include "pcg-cpp/include/pcg_random.hpp"
 
 #include <gtk/gtk.h>

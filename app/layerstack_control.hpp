@@ -1,7 +1,7 @@
-//@	{
-//@	 "targets":[{"name":"layerstack_control.hpp", "type":"include"}]
-//@	,"dependencies_extra":[{"ref":"layerstack_control.o","rel":"implementation"}]
-//@	}
+//	{
+//	 "targets":[{"name":"layerstack_control.hpp", "type":"include"}]
+//	,"dependencies_extra":[{"ref":"layerstack_control.o","rel":"implementation"}]
+//	}
 
 #ifndef TEXPAINTER_LAYERSTACKCONTROL_HPP
 #define TEXPAINTER_LAYERSTACKCONTROL_HPP
