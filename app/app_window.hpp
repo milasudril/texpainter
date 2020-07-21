@@ -10,6 +10,7 @@
 #include "./doc_menu_handler.hpp"
 #include "./layer_menu_handler.hpp"
 #include "./palette_menu_handler.hpp"
+#include "./palette_view_event_handler.hpp"
 
 #include "model/document.hpp"
 #include "utils/snap.hpp"
@@ -30,16 +31,22 @@ namespace Texpainter
 	public:
 		enum class ControlId : int
 		{
-			PaletteEd,
+			PaletteView,
 			LayerStackCtrl,
 			Canvas
 		};
 
 		explicit AppWindow(Ui::Container& container, PolymorphicRng rng)
-		    : m_rng{rng}
+		    :  // State
+		    m_rng{rng}
+
+		    // Event handlers
 		    , m_doc_menu_handler{container, *this}
 		    , m_layer_menu_handler{container, *this, m_rng}
 		    , m_palette_menu_handler{container, *this, m_rng}
+		    , m_pal_view_eh{container, *this, m_rng}
+
+		    // Widgets
 		    , m_rows{container, Ui::Box::Orientation::Vertical}
 		    , m_menu{m_rows}
 		    , m_selectors{m_rows, Ui::Box::Orientation::Horizontal}
@@ -51,6 +58,7 @@ namespace Texpainter
 		{
 			//	m_img_view.eventHandler<ControlId::Canvas>(*this);
 			m_menu.eventHandler(*this);
+			m_pal_view.eventHandler<0>(m_pal_view_eh);
 		}
 
 		AppWindow& document(Model::Document&& doc)
@@ -133,6 +141,7 @@ namespace Texpainter
 		DocMenuHandler<AppWindow> m_doc_menu_handler;
 		LayerMenuHandler<AppWindow> m_layer_menu_handler;
 		PaletteMenuHandler<AppWindow> m_palette_menu_handler;
+		PaletteViewEventHandler<AppWindow> m_pal_view_eh;
 
 		Ui::Box m_rows;
 		Ui::MenuBuilder<MainMenuItem, MainMenuItemTraits> m_menu;
