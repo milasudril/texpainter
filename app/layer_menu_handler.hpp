@@ -51,7 +51,8 @@ namespace Texpainter
 			Copy,
 			Link,
 			LinkToCopy,
-			Rename
+			Rename,
+			Delete
 		};
 
 		explicit LayerMenuHandler(Ui::Container& dialog_owner,
@@ -143,6 +144,18 @@ namespace Texpainter
 			}
 		}
 
+		void onActivated(Tag<LayerAction::Delete>, Ui::MenuItem&)
+		{
+			if(auto layer = currentLayer(r_doc_owner.document()); layer != nullptr)
+			{
+				m_delete_dlg = std::make_unique<ConfirmationDlg>(
+				    r_dlg_owner, "Delete layer", "Are you shure you want to delete current layer?");
+				m_delete_dlg->widget().layer      = layer;
+				m_delete_dlg->widget().layer_name = &r_doc_owner.document().currentLayer();
+				m_delete_dlg->template eventHandler<ControlId::Delete>(*this);
+			}
+		}
+
 		template<ControlId id, class Src>
 		void dismiss(Src& src)
 		{
@@ -161,6 +174,7 @@ namespace Texpainter
 			confirmNegative(Tag<id>{}, src);
 		}
 
+
 		void confirmPositive(Tag<ControlId::Copy>, NameInputDlg& src)
 		{
 			insertNewLayer(src.widget().inputField().content(), src.widget().layer->copiedLayer());
@@ -168,6 +182,7 @@ namespace Texpainter
 		}
 
 		void dismiss(Tag<ControlId::Link>, NameInputDlg&) { m_link_dlg.reset(); }
+
 
 		void confirmPositive(Tag<ControlId::Link>, NameInputDlg& src)
 		{
@@ -177,8 +192,8 @@ namespace Texpainter
 
 		void dismiss(Tag<ControlId::Copy>, NameInputDlg&) { m_copy_dlg.reset(); }
 
-		template<class Dlg>
-		void confirmPositive(Tag<ControlId::LinkToCopy>, Dlg& src)
+
+		void confirmPositive(Tag<ControlId::LinkToCopy>, ConfirmationDlg& src)
 		{
 			r_doc_owner.documentModify([current_layer = src.widget().layer_name](auto& doc) {
 				(void)doc.layersModify([current_layer](auto& layers) {
@@ -194,11 +209,11 @@ namespace Texpainter
 			m_link_to_copy_dlg.reset();
 		}
 
-		template<class Dlg>
-		void confirmNegative(Tag<ControlId::LinkToCopy>, Dlg&)
+		void confirmNegative(Tag<ControlId::LinkToCopy>, ConfirmationDlg&)
 		{
 			m_link_to_copy_dlg.reset();
 		}
+
 
 		void confirmPositive(Tag<ControlId::Rename>, NameInputDlg& src)
 		{
@@ -210,12 +225,26 @@ namespace Texpainter
 				});
 				return true;
 			});
-
-			insertNewLayer(src.widget().inputField().content(), src.widget().layer->linkedLayer());
 			m_rename_dlg.reset();
 		}
 
 		void dismiss(Tag<ControlId::Rename>, NameInputDlg& src) { m_rename_dlg.reset(); }
+
+
+		void confirmPositive(Tag<ControlId::Delete>, ConfirmationDlg& src)
+		{
+			r_doc_owner.documentModify([current_layer = src.widget().layer_name](auto& doc) {
+				(void)doc.layersModify([current_layer](auto& layers) {
+					layers.erase(*current_layer);
+					return true;
+				});
+				return true;
+			});
+			m_delete_dlg.reset();
+		}
+
+		void confirmNegative(Tag<ControlId::Delete>, ConfirmationDlg&) { m_delete_dlg.reset(); }
+
 
 		void onActivated(Tag<LayerActionNew::FromCurrentColor>, Ui::MenuItem&)
 		{
@@ -291,6 +320,7 @@ namespace Texpainter
 		std::unique_ptr<NameInputDlg> m_link_dlg;
 		std::unique_ptr<ConfirmationDlg> m_link_to_copy_dlg;
 		std::unique_ptr<NameInputDlg> m_rename_dlg;
+		std::unique_ptr<ConfirmationDlg> m_delete_dlg;
 
 		std::unique_ptr<LayerCreatorDlg> m_new_from_color_dlg;
 		std::unique_ptr<LayerCreatorDlg> m_new_from_noise;
