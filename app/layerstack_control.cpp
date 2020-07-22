@@ -35,7 +35,7 @@ namespace
 }
 
 Texpainter::LayerStackControl& Texpainter::LayerStackControl::outlineCurrentLayer(
-    Span2d<Model::Pixel> canvas)
+    Layer const& layer, Span2d<Pixel> ret)
 {
 	if(m_current_layer.valid())
 	{

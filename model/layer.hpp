@@ -125,6 +125,8 @@ namespace Texpainter::Model
 	}
 
 	void render(Layer const& layer, Span2d<Pixel> ret);
+
+	void outline(Layer const& layer, Span2d<Pixel> ret);
 }
 
 #endif

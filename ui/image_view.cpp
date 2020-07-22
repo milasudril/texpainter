@@ -192,7 +192,7 @@ private:
 	{
 		auto const w = static_cast<uint32_t>(gtk_widget_get_allocated_width(widget));
 		auto const h = static_cast<uint32_t>(gtk_widget_get_allocated_height(widget));
-		reinterpret_cast<Impl*>(self)->render(Size2d{w,h}, cr);
+		reinterpret_cast<Impl*>(self)->render(Size2d{w, h}, cr);
 		return FALSE;
 	}
 

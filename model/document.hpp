@@ -137,6 +137,12 @@ namespace Texpainter::Model
 		return (i == nullptr) ? false : (index.value() < i->size()) ? true : false;
 	}
 
+	inline Layer const* currentLayer(Document const& doc)
+	{
+		auto const& layers = doc.layers();
+		return layers[doc.currentLayer()];
+	}
+
 }
 
 #endif

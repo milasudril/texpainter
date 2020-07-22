@@ -31,6 +31,7 @@ namespace Texpainter
 	public:
 		enum class ControlId : int
 		{
+			LayerSelector,
 			PaletteSelector
 		};
 
@@ -62,6 +63,7 @@ namespace Texpainter
 		{
 			m_current_document = std::make_unique<Model::Document>(std::move(doc));
 			m_pal_view.eventHandler<0>(m_pal_view_eh);
+			m_layer_selector.inputField().eventHandler<ControlId::LayerSelector>(*this);
 			m_palette_selector.inputField().eventHandler<ControlId::PaletteSelector>(*this);
 			update();
 			return *this;
@@ -212,7 +214,8 @@ namespace Texpainter
 				                      if(layer.visible()) { render(layer, canvas); }
 			                      });
 
-			// TODO:	m_layerstack_ctrl.inputField().outlineCurrentLayer(canvas.pixels());
+			if(auto current_layer = currentLayer(*m_current_document); current_layer != nullptr)
+				[[likely]] { outline(*current_layer, canvas); }
 			m_img_view.image(canvas);
 		}
 	};
@@ -222,13 +225,24 @@ namespace Texpainter
 	{
 		auto const index     = Model::PaletteIndex{static_cast<uint32_t>(src.selected())};
 		auto const& palettes = m_current_document->palettes();
-		auto pal_name        = palettes.key(index);
-		if(pal_name != nullptr)
+		if(auto pal_name = palettes.key(index); pal_name != nullptr)
 		{
 			m_current_document->currentPalette(std::string{*pal_name});
 			m_pal_view.palette(*palettes[index])
 			    .highlightMode(m_current_document->currentColor(),
 			                   Ui::PaletteView::HighlightMode::Read);
+		}
+	}
+
+	template<>
+	inline void AppWindow::onChanged<AppWindow::ControlId::LayerSelector>(Ui::Combobox& src)
+	{
+		auto const index   = Model::LayerIndex{static_cast<uint32_t>(src.selected())};
+		auto const& layers = m_current_document->layers();
+		if(auto layer_name = layers.key(index); layer_name != nullptr)
+		{
+			m_current_document->currentLayer(std::string{*layer_name});
+			doRender();
 		}
 	}
 }
