@@ -50,7 +50,8 @@ namespace Texpainter
 			NewFromNoise,
 			Copy,
 			Link,
-			LinkToCopy
+			LinkToCopy,
+			Rename
 		};
 
 		explicit LayerMenuHandler(Ui::Container& dialog_owner,
@@ -128,6 +129,20 @@ namespace Texpainter
 			}
 		}
 
+		void onActivated(Tag<LayerAction::Rename>, Ui::MenuItem&)
+		{
+			if(auto layer = currentLayer(r_doc_owner.document()); layer != nullptr)
+			{
+				m_rename_dlg                      = std::make_unique<NameInputDlg>(r_dlg_owner,
+                                                              "Rename current layer",
+                                                              Ui::Box::Orientation::Horizontal,
+                                                              "Name: ");
+				m_rename_dlg->widget().layer      = layer;
+				m_rename_dlg->widget().layer_name = &r_doc_owner.document().currentLayer();
+				m_rename_dlg->template eventHandler<ControlId::Rename>(*this);
+			}
+		}
+
 		template<ControlId id, class Src>
 		void dismiss(Src& src)
 		{
@@ -184,6 +199,23 @@ namespace Texpainter
 		{
 			m_link_to_copy_dlg.reset();
 		}
+
+		void confirmPositive(Tag<ControlId::Rename>, NameInputDlg& src)
+		{
+			r_doc_owner.documentModify([current_layer = src.widget().layer_name,
+			                            new_name = src.widget().inputField().content()](auto& doc) {
+				(void)doc.layersModify([current_layer, new_name](auto& layers) {
+					layers.rename(*current_layer, new_name);
+					return true;
+				});
+				return true;
+			});
+
+			insertNewLayer(src.widget().inputField().content(), src.widget().layer->linkedLayer());
+			m_rename_dlg.reset();
+		}
+
+		void dismiss(Tag<ControlId::Rename>, NameInputDlg& src) { m_rename_dlg.reset(); }
 
 		void onActivated(Tag<LayerActionNew::FromCurrentColor>, Ui::MenuItem&)
 		{
@@ -258,6 +290,7 @@ namespace Texpainter
 		std::unique_ptr<NameInputDlg> m_copy_dlg;
 		std::unique_ptr<NameInputDlg> m_link_dlg;
 		std::unique_ptr<ConfirmationDlg> m_link_to_copy_dlg;
+		std::unique_ptr<NameInputDlg> m_rename_dlg;
 
 		std::unique_ptr<LayerCreatorDlg> m_new_from_color_dlg;
 		std::unique_ptr<LayerCreatorDlg> m_new_from_noise;
