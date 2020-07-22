@@ -41,7 +41,8 @@ namespace Texpainter
 		{
 			NewFromCurrentColor,
 			NewFromNoise,
-			Copy
+			Copy,
+			Link
 		};
 
 		explicit LayerMenuHandler(Ui::Container& dialog_owner,
@@ -90,6 +91,19 @@ namespace Texpainter
 			}
 		}
 
+		void onActivated(Tag<LayerAction::Link>, Ui::MenuItem&)
+		{
+			if(auto layer = currentLayer(r_doc_owner.document()); layer != nullptr)
+			{
+				m_link_dlg                  = std::make_unique<NameInputDlg>(r_dlg_owner,
+                                                            "Create link to current layer",
+                                                            Ui::Box::Orientation::Horizontal,
+                                                            "Name: ");
+				m_link_dlg->widget().second = layer;
+				m_link_dlg->template eventHandler<ControlId::Link>(*this);
+			}
+		}
+
 		template<ControlId id, class Src>
 		void dismiss(Src& src)
 		{
@@ -107,6 +121,15 @@ namespace Texpainter
 			insertNewLayer(src.widget().first.inputField().content(),
 			               src.widget().second->copiedLayer());
 			m_copy_dlg.reset();
+		}
+
+		void dismiss(Tag<ControlId::Link>, NameInputDlg&) { m_link_dlg.reset(); }
+
+		void confirmPositive(Tag<ControlId::Link>, NameInputDlg& src)
+		{
+			insertNewLayer(src.widget().first.inputField().content(),
+			               src.widget().second->linkedLayer());
+			m_link_dlg.reset();
 		}
 
 		void dismiss(Tag<ControlId::Copy>, NameInputDlg&) { m_copy_dlg.reset(); }
@@ -182,6 +205,7 @@ namespace Texpainter
 		PolymorphicRng m_rng;
 
 		std::unique_ptr<NameInputDlg> m_copy_dlg;
+		std::unique_ptr<NameInputDlg> m_link_dlg;
 
 		std::unique_ptr<LayerCreatorDlg> m_new_from_color_dlg;
 		std::unique_ptr<LayerCreatorDlg> m_new_from_noise;
