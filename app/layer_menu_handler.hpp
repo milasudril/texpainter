@@ -156,6 +156,20 @@ namespace Texpainter
 			}
 		}
 
+		void onActivated(Tag<LayerAction::MoveToTop>, Ui::MenuItem&)
+		{
+			r_doc_owner.documentModify([](auto& doc) {
+				return doc.layersModify([&doc](auto& layers) {
+					if(auto i = layers.index(doc.currentLayer()); i.valid())
+					{
+						layers.moveBack(i);
+						return true;
+					}
+					return false;
+				});
+			});
+		}
+
 		template<ControlId id, class Src>
 		void dismiss(Src& src)
 		{
@@ -202,7 +216,6 @@ namespace Texpainter
 				});
 
 				// Return false here because there are no changes to the ui
-				// the ui
 				return false;
 			});
 

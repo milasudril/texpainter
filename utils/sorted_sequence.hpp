@@ -85,15 +85,15 @@ namespace Texpainter
 
 		IndexType moveBackward(IndexType index)
 		{
-			if(index + 1 >= size()) [[unlikely]]
+			if(static_cast<size_t>(index) + 1 >= static_cast<size_t>(size())) [[unlikely]]
 				{
 					return index;
 				}
 
-			std::swap(m_seq[static_cast<size_t>(index + 1)], m_seq[static_cast<size_t>(index)]);
-			std::swap(m_key_seq[static_cast<size_t>(index + 1)],
+			std::swap(m_seq[static_cast<size_t>(index) + 1], m_seq[static_cast<size_t>(index)]);
+			std::swap(m_key_seq[static_cast<size_t>(index) + 1],
 			          m_key_seq[static_cast<size_t>(index)]);
-			return index + 1;
+			return IndexType{static_cast<size_t>(index) + 1};
 		}
 
 		void moveFront(IndexType index)
