@@ -219,8 +219,9 @@ namespace Texpainter
 		{
 			r_doc_owner.documentModify([current_layer = src.widget().layer_name,
 			                            new_name = src.widget().inputField().content()](auto& doc) {
-				(void)doc.layersModify([current_layer, new_name](auto& layers) {
+				(void)doc.layersModify([current_layer, new_name, &doc](auto& layers) {
 					layers.rename(*current_layer, new_name);
+					doc.currentLayer(new_name);
 					return true;
 				});
 				return true;
