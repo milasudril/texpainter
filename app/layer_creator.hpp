@@ -10,8 +10,6 @@
 #include "ui/labeled_input.hpp"
 #include "ui/text_entry.hpp"
 
-#include <stdexcept>
-
 namespace Texpainter
 {
 	class LayerCreator
@@ -29,19 +27,6 @@ namespace Texpainter
 		    , m_size{m_root, default_size, max_size}
 		{
 			m_name.inputField().focus();
-		}
-
-		std::pair<std::string, Model::Layer> create() const
-		{
-			auto size = m_size.value();
-			if(!isSupported<Model::Pixel>(size))
-			{
-				throw std::runtime_error{
-				    "A layer of this size cannot be created. The number of bytes required to "
-				    "create a layer of "
-				    "this size exeeds the largest supported integer value."};
-			}
-			return {m_name.inputField().content(), Model::Layer{size}};
 		}
 
 		struct LayerInfo

@@ -54,6 +54,12 @@ namespace Texpainter::Model
 			return Layer{m_loc, m_rot, m_scale, std::make_shared<Image>(*m_content)};
 		}
 
+		Layer& convertToCopy()
+		{
+			m_content = std::make_shared<Image>(*m_content);
+			return *this;
+		}
+
 		Layer& paint(vec2_t origin, double radius, Pixel color);
 
 		Layer& fill(Pixel color)

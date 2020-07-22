@@ -22,18 +22,25 @@ namespace Texpainter
 	template<class DocOwner>
 	class LayerMenuHandler
 	{
-		struct WrappedNameInput
+		template<class Widget>
+		struct WidgetWithLayerRef: public Widget
 		{
 			template<class... Args>
-			WrappedNameInput(Args&&... args): first{std::forward<Args>(args)...}
-			                                , second{nullptr}
+			WidgetWithLayerRef(Args&&... args)
+			    : Widget{std::forward<Args>(args)...}
+			    , layer{nullptr}
+			    , layer_name{nullptr}
 			{
 			}
-			Ui::LabeledInput<Ui::TextEntry> first;
-			Model::Layer const* second;
+
+			Model::Layer const* layer;
+			std::string const* layer_name;
 		};
 
-		using NameInputDlg    = Texpainter::Ui::Dialog<WrappedNameInput>;
+
+		using NameInputDlg =
+		    Texpainter::Ui::Dialog<WidgetWithLayerRef<Ui::LabeledInput<Ui::TextEntry>>>;
+		using ConfirmationDlg = Ui::Dialog<WidgetWithLayerRef<Ui::Label>, Ui::DialogYesNo>;
 		using LayerCreatorDlg = Ui::Dialog<LayerCreator>;
 
 	public:
@@ -42,7 +49,8 @@ namespace Texpainter
 			NewFromCurrentColor,
 			NewFromNoise,
 			Copy,
-			Link
+			Link,
+			LinkToCopy
 		};
 
 		explicit LayerMenuHandler(Ui::Container& dialog_owner,
@@ -86,7 +94,8 @@ namespace Texpainter
 			{
 				m_copy_dlg = std::make_unique<NameInputDlg>(
 				    r_dlg_owner, "Copy current layer", Ui::Box::Orientation::Horizontal, "Name: ");
-				m_copy_dlg->widget().second = layer;
+				m_copy_dlg->widget().layer      = layer;
+				m_copy_dlg->widget().layer_name = &r_doc_owner.document().currentLayer();
 				m_copy_dlg->template eventHandler<ControlId::Copy>(*this);
 			}
 		}
@@ -95,12 +104,27 @@ namespace Texpainter
 		{
 			if(auto layer = currentLayer(r_doc_owner.document()); layer != nullptr)
 			{
-				m_link_dlg                  = std::make_unique<NameInputDlg>(r_dlg_owner,
+				m_link_dlg                      = std::make_unique<NameInputDlg>(r_dlg_owner,
                                                             "Create link to current layer",
                                                             Ui::Box::Orientation::Horizontal,
                                                             "Name: ");
-				m_link_dlg->widget().second = layer;
+				m_link_dlg->widget().layer      = layer;
+				m_link_dlg->widget().layer_name = &r_doc_owner.document().currentLayer();
 				m_link_dlg->template eventHandler<ControlId::Link>(*this);
+			}
+		}
+
+		void onActivated(Tag<LayerAction::LinkToCopy>, Ui::MenuItem&)
+		{
+			if(auto layer = currentLayer(r_doc_owner.document()); layer != nullptr)
+			{
+				m_link_to_copy_dlg = std::make_unique<ConfirmationDlg>(
+				    r_dlg_owner,
+				    "Convert linked layer",
+				    "Are you shure you want to convert current layer to a static copy?");
+				m_link_to_copy_dlg->widget().layer      = layer;
+				m_link_to_copy_dlg->widget().layer_name = &r_doc_owner.document().currentLayer();
+				m_link_to_copy_dlg->template eventHandler<ControlId::LinkToCopy>(*this);
 			}
 		}
 
@@ -116,10 +140,15 @@ namespace Texpainter
 			confirmPositive(Tag<id>{}, src);
 		}
 
+		template<ControlId id, class Src>
+		void confirmNegative(Src& src)
+		{
+			confirmNegative(Tag<id>{}, src);
+		}
+
 		void confirmPositive(Tag<ControlId::Copy>, NameInputDlg& src)
 		{
-			insertNewLayer(src.widget().first.inputField().content(),
-			               src.widget().second->copiedLayer());
+			insertNewLayer(src.widget().inputField().content(), src.widget().layer->copiedLayer());
 			m_copy_dlg.reset();
 		}
 
@@ -127,12 +156,34 @@ namespace Texpainter
 
 		void confirmPositive(Tag<ControlId::Link>, NameInputDlg& src)
 		{
-			insertNewLayer(src.widget().first.inputField().content(),
-			               src.widget().second->linkedLayer());
+			insertNewLayer(src.widget().inputField().content(), src.widget().layer->linkedLayer());
 			m_link_dlg.reset();
 		}
 
 		void dismiss(Tag<ControlId::Copy>, NameInputDlg&) { m_copy_dlg.reset(); }
+
+		template<class Dlg>
+		void confirmPositive(Tag<ControlId::LinkToCopy>, Dlg& src)
+		{
+			r_doc_owner.documentModify([current_layer = src.widget().layer_name](auto& doc) {
+				(void)doc.layersModify([current_layer](auto& layers) {
+					layers[*current_layer]->convertToCopy();
+					return true;
+				});
+
+				// Return false here because there are no changes to the ui
+				// the ui
+				return false;
+			});
+
+			m_link_to_copy_dlg.reset();
+		}
+
+		template<class Dlg>
+		void confirmNegative(Tag<ControlId::LinkToCopy>, Dlg&)
+		{
+			m_link_to_copy_dlg.reset();
+		}
 
 		void onActivated(Tag<LayerActionNew::FromCurrentColor>, Ui::MenuItem&)
 		{
@@ -206,6 +257,7 @@ namespace Texpainter
 
 		std::unique_ptr<NameInputDlg> m_copy_dlg;
 		std::unique_ptr<NameInputDlg> m_link_dlg;
+		std::unique_ptr<ConfirmationDlg> m_link_to_copy_dlg;
 
 		std::unique_ptr<LayerCreatorDlg> m_new_from_color_dlg;
 		std::unique_ptr<LayerCreatorDlg> m_new_from_noise;
