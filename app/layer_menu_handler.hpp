@@ -234,8 +234,20 @@ namespace Texpainter
 		void confirmPositive(Tag<ControlId::Delete>, ConfirmationDlg& src)
 		{
 			r_doc_owner.documentModify([current_layer = src.widget().layer_name](auto& doc) {
-				(void)doc.layersModify([current_layer](auto& layers) {
+				(void)doc.layersModify([current_layer, &doc](auto& layers) {
+					auto i = layers.index(*current_layer);
+					if(i != Model::LayerIndex{0}) [[likely]]
+						{
+							--i;
+						}
+					else if(i.value() + 1 != layers.size().value())
+					{
+						++i;
+					}
+					auto current_layer_copy = *layers.key(i);
 					layers.erase(*current_layer);
+					if(layers.size() != Model::LayerIndex{0})
+					{ doc.currentLayer(std::move(current_layer_copy)); }
 					return true;
 				});
 				return true;
