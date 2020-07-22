@@ -21,6 +21,7 @@
 #include "ui/menu_builder.hpp"
 #include "ui/palette_view.hpp"
 #include "ui/combobox.hpp"
+#include "ui/separator.hpp"
 
 #include <numbers>
 
@@ -50,7 +51,10 @@ namespace Texpainter
 		    , m_menu{m_rows}
 		    , m_selectors{m_rows, Ui::Box::Orientation::Horizontal}
 		    , m_layer_selector{m_selectors, Ui::Box::Orientation::Horizontal, "Layer: "}
-		    , m_palette_selector{m_selectors, Ui::Box::Orientation::Horizontal, "Palettes: "}
+		    , m_layerpal_sep{m_selectors.insertMode(Ui::Box::InsertMode{4, 0})}
+		    , m_palette_selector{m_selectors.insertMode(Ui::Box::InsertMode{0, 0}),
+		                         Ui::Box::Orientation::Horizontal,
+		                         "Palettes: "}
 		    , m_pal_view{m_selectors.insertMode(
 		          Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand})}
 		    , m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
@@ -151,6 +155,7 @@ namespace Texpainter
 		Ui::MenuBuilder<MainMenuItem, MainMenuItemTraits> m_menu;
 		Ui::Box m_selectors;
 		Ui::LabeledInput<Ui::Combobox> m_layer_selector;
+		Ui::Separator m_layerpal_sep;
 		Ui::LabeledInput<Ui::Combobox> m_palette_selector;
 		Ui::PaletteView m_pal_view;
 		Ui::ImageView m_img_view;
