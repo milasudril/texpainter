@@ -170,6 +170,49 @@ namespace Texpainter
 			});
 		}
 
+		void onActivated(Tag<LayerAction::MoveUp>, Ui::MenuItem&)
+		{
+			r_doc_owner.documentModify([](auto& doc) {
+				return doc.layersModify([&doc](auto& layers) {
+					if(auto i = layers.index(doc.currentLayer()); i.valid())
+					{
+						layers.moveBackward(i);
+						return true;
+					}
+					return false;
+				});
+			});
+		}
+
+		void onActivated(Tag<LayerAction::MoveDown>, Ui::MenuItem&)
+		{
+			r_doc_owner.documentModify([](auto& doc) {
+				return doc.layersModify([&doc](auto& layers) {
+					if(auto i = layers.index(doc.currentLayer()); i.valid())
+					{
+						layers.moveForward(i);
+						return true;
+					}
+					return false;
+				});
+			});
+		}
+
+
+		void onActivated(Tag<LayerAction::MoveToBottom>, Ui::MenuItem&)
+		{
+			r_doc_owner.documentModify([](auto& doc) {
+				return doc.layersModify([&doc](auto& layers) {
+					if(auto i = layers.index(doc.currentLayer()); i.valid())
+					{
+						layers.moveFront(i);
+						return true;
+					}
+					return false;
+				});
+			});
+		}
+
 		template<ControlId id, class Src>
 		void dismiss(Src& src)
 		{
