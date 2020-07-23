@@ -34,7 +34,10 @@ namespace
 	}
 }
 
-Texpainter::Model::Layer& Texpainter::Model::Layer::paint(vec2_t origin, double radius, Pixel color)
+Texpainter::Model::Layer& Texpainter::Model::Layer::paint(vec2_t origin,
+                                                          float radius,
+                                                          BrushFunction brush,
+                                                          Pixel color)
 {
 	auto const w = m_content->width();
 	auto const h = m_content->height();
@@ -42,8 +45,9 @@ Texpainter::Model::Layer& Texpainter::Model::Layer::paint(vec2_t origin, double 
 	origin /= m_scale;
 	auto const offset = 0.5 * vec2_t{static_cast<double>(w), static_cast<double>(h)};
 	origin += offset - m_loc / m_scale;
-	auto const begin_coords = origin - vec2_t{radius, radius};
-	auto const end_coords   = origin + vec2_t{radius, radius};
+	auto const r_vec        = vec2_t{static_cast<double>(radius), static_cast<double>(radius)};
+	auto const begin_coords = origin - r_vec;
+	auto const end_coords   = origin + r_vec;
 	auto pixels             = m_content->pixels();
 
 	for(int row = static_cast<int>(begin_coords[1]); row <= static_cast<int>(end_coords[1]); ++row)
@@ -53,7 +57,7 @@ Texpainter::Model::Layer& Texpainter::Model::Layer::paint(vec2_t origin, double 
 		{
 			auto const loc_ret = vec2_t{static_cast<double>(col), static_cast<double>(row)};
 			auto d             = loc_ret - origin;
-			if(dot(d, d) < radius * radius) { pixels(col % w, row % h) = color; }
+			if(brush(radius, d)) { pixels(col % w, row % h) = color; }
 		}
 	}
 	return *this;

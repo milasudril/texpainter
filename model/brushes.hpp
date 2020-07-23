@@ -10,6 +10,8 @@
 
 #include <cstdint>
 
+#include <cstdio>
+
 namespace Texpainter::Model
 {
 	enum class BrushType : uint32_t
@@ -32,7 +34,7 @@ namespace Texpainter::Model
 		static bool test(float radius, vec2_t pos)
 		{
 			auto pos_abs = pos < 0 ? -pos : pos;
-			return static_cast<float>(pos_abs[0] + pos_abs[1] <= radius);
+			return pos_abs[0] + pos_abs[1] <= radius;
 		}
 
 		static constexpr char const* displayName() { return "⯁ Diamond"; }
@@ -44,7 +46,7 @@ namespace Texpainter::Model
 		static bool test(float radius, vec2_t pos)
 		{
 			auto d2 = dot(pos, pos);
-			return static_cast<float>(d2 <= radius * radius);
+			return d2 <= radius * radius;
 		}
 
 		static constexpr char const* displayName() { return "⏺ Circle"; }
@@ -57,7 +59,7 @@ namespace Texpainter::Model
 		{
 			auto pos_abs = pos < 0 ? -pos : pos;
 			auto pos_max = std::max(pos_abs[0], pos_abs[1]);
-			return static_cast<float>(pos_max <= radius);
+			return pos_max <= radius;
 		}
 
 		static constexpr char const* displayName() { return "⯀ Square"; }

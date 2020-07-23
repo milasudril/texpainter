@@ -3,13 +3,14 @@
 //@	,"dependencies_extra":[{"ref":"layer.o","rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_LAYER_HPP
-#define TEXPAINTER_LAYER_HPP
+#ifndef TEXPAINTER_MODEL_LAYER_HPP
+#define TEXPAINTER_MODEL_LAYER_HPP
 
 #include "utils/angle.hpp"
 #include "utils/rect.hpp"
 
-#include "image.hpp"
+#include "./image.hpp"
+#include "./brush.hpp"
 
 #include <memory>
 
@@ -60,7 +61,7 @@ namespace Texpainter::Model
 			return *this;
 		}
 
-		Layer& paint(vec2_t origin, double radius, Pixel color);
+		Layer& paint(vec2_t origin, float radius, BrushFunction brush, Pixel color);
 
 		Layer& fill(Pixel color)
 		{

@@ -211,7 +211,9 @@ namespace Texpainter
 		void updateBrushSelector()
 		{
 			auto brush = m_current_document->currentBrush();
-			m_brush_selector.inputField().selected(static_cast<int>(brush.type()));
+			auto brush_index = static_cast<int>(end(Empty<Model::BrushType>{})) - 1
+			    - static_cast<int>(brush.type());
+			m_brush_selector.inputField().selected(brush_index);
 			m_brush_size.value(Ui::logValue(brush.radius()));
 		}
 
@@ -271,12 +273,13 @@ namespace Texpainter
 			m_current_document->layersModify(
 			    [pos,
 			     radius         = m_current_document->currentBrush().radius(),
+			     brush          = Model::BrushFunction{m_current_document->currentBrush().type()},
 			     color          = currentColor(*m_current_document),
 			     &current_layer = m_current_document->currentLayer()](auto& layers) {
 				    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
 					    {
 						    auto const scale = static_cast<float>(std::sqrt(layer->size().area()));
-						    layer->paint(pos, scale * radius, color);
+						    layer->paint(pos, scale * radius, brush, color);
 					    }
 				    return true;
 			    });
@@ -301,7 +304,9 @@ namespace Texpainter
 	inline void AppWindow::onChanged<AppWindow::ControlId::BrushSelector>(Ui::Combobox& src)
 	{
 		auto brush = m_current_document->currentBrush();
-		brush.type(static_cast<Model::BrushType>(src.selected()));
+		auto brush_type = static_cast<Model::BrushType>(static_cast<int>(end(Empty<Model::BrushType>{})) - 1
+			    - src.selected());
+		brush.type(brush_type);
 		m_current_document->currentBrush(brush);
 	}
 
