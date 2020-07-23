@@ -22,6 +22,7 @@
 #include "ui/palette_view.hpp"
 #include "ui/combobox.hpp"
 #include "ui/separator.hpp"
+#include "ui/slider.hpp"
 
 #include <numbers>
 
@@ -34,6 +35,7 @@ namespace Texpainter
 		{
 			LayerSelector,
 			BrushSelector,
+			BrushSize,
 			PaletteSelector
 		};
 
@@ -56,6 +58,7 @@ namespace Texpainter
 		    , m_brush_selector{m_selectors.insertMode(Ui::Box::InsertMode{0, 0}),
 		                       Ui::Box::Orientation::Horizontal,
 		                       "Brush: "}
+		    , m_brush_size{m_selectors, false}
 		    , m_sep1{m_selectors.insertMode(Ui::Box::InsertMode{4, 0})}
 		    , m_palette_selector{m_selectors.insertMode(Ui::Box::InsertMode{0, 0}),
 		                         Ui::Box::Orientation::Horizontal,
@@ -78,6 +81,7 @@ namespace Texpainter
 			m_pal_view.eventHandler<0>(m_pal_view_eh);
 			m_layer_selector.inputField().eventHandler<ControlId::LayerSelector>(*this);
 			m_brush_selector.inputField().eventHandler<ControlId::BrushSelector>(*this);
+			m_brush_size.eventHandler<ControlId::BrushSize>(*this);
 			m_palette_selector.inputField().eventHandler<ControlId::PaletteSelector>(*this);
 			update();
 			return *this;
@@ -139,6 +143,9 @@ namespace Texpainter
 		void onChanged(Ui::Combobox& src);
 
 		template<ControlId>
+		void onChanged(Ui::Slider& src);
+
+		template<ControlId>
 		void onMouseUp(Ui::ImageView& view, vec2_t pos_window, vec2_t pos_screen, int button);
 
 		template<ControlId>
@@ -168,6 +175,7 @@ namespace Texpainter
 		Ui::LabeledInput<Ui::Combobox> m_layer_selector;
 		Ui::Separator m_sep0;
 		Ui::LabeledInput<Ui::Combobox> m_brush_selector;
+		Ui::Slider m_brush_size;
 		Ui::Separator m_sep1;
 		Ui::LabeledInput<Ui::Combobox> m_palette_selector;
 		Ui::PaletteView m_pal_view;
@@ -189,8 +197,9 @@ namespace Texpainter
 
 		void updateBrushSelector()
 		{
-			m_brush_selector.inputField().selected(
-			    static_cast<int>(m_current_document->currentBrush().type()));
+			auto brush = m_current_document->currentBrush();
+			m_brush_selector.inputField().selected(static_cast<int>(brush.type()));
+			m_brush_size.value(Ui::logValue(brush.radius()));
 		}
 
 		void updatePaletteSelector()
@@ -257,6 +266,7 @@ namespace Texpainter
 		}
 	}
 
+
 	template<>
 	inline void AppWindow::onChanged<AppWindow::ControlId::BrushSelector>(Ui::Combobox& src)
 	{
@@ -264,6 +274,15 @@ namespace Texpainter
 		brush.type(static_cast<Model::BrushType>(src.selected()));
 		m_current_document->currentBrush(brush);
 	}
+
+	template<>
+	inline void AppWindow::onChanged<AppWindow::ControlId::BrushSize>(Ui::Slider& src)
+	{
+		auto brush = m_current_document->currentBrush();
+		brush.radius(static_cast<float>(logValue(src.value())));
+		m_current_document->currentBrush(brush);
+	}
+
 
 	template<>
 	inline void AppWindow::onChanged<AppWindow::ControlId::PaletteSelector>(Ui::Combobox& src)
