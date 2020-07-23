@@ -16,7 +16,7 @@ namespace Texpainter
 		if(N > getAvailableRam() / 3)  // Divide by three to have some margin
 		{
 			throw std::runtime_error{
-			    "The system as insufficient memory available to complete the action."};
+			    "The system has insufficient memory available to complete the action."};
 		}
 
 		return reinterpret_cast<T*>(malloc(N));
