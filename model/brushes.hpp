@@ -54,7 +54,8 @@ namespace Texpainter::Model
 	{
 		static float intensity(float radius, vec2_t pos)
 		{
-			auto pos_max = std::max(pos[0], pos[1]);
+			auto pos_abs = pos < 0 ? -pos : pos;
+			auto pos_max = std::max(pos_abs[0], pos_abs[1]);
 			return static_cast<float>(pos_max <= radius);
 		}
 	};

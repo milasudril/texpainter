@@ -172,5 +172,4 @@ namespace Texpainter
 		    .m_value;
 	}
 }
-
 #endif
