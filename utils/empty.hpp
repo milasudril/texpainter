@@ -35,7 +35,7 @@ namespace Texpainter
 		template<class ActionId>
 		constexpr ActionId previous(ActionId a)
 		{
-			return ActionId{static_cast<int>(a) - 1};
+			return ActionId{static_cast<std::underlying_type_t<ActionId>>(a) - 1};
 		}
 
 		template<class ActionId, class Function, class... Args>
@@ -120,11 +120,10 @@ namespace Texpainter
 	namespace detail
 	{
 		template<class EnumType, int enum_item, template<auto> class EnumItemTraits>
-		struct MakeTupleFromEnum
-		    : public MakeTupleFromEnum<EnumType, previous(enum_item), EnumItemTraits>
+		struct MakeTupleFromEnum: public MakeTupleFromEnum<EnumType, enum_item - 1, EnumItemTraits>
 		{
 		private:
-			using Base = MakeTupleFromEnum<EnumType, previous(enum_item), EnumItemTraits>;
+			using Base = MakeTupleFromEnum<EnumType, enum_item - 1, EnumItemTraits>;
 			static constexpr auto CurrentIndex = previous(static_cast<EnumType>(enum_item));
 
 		public:
