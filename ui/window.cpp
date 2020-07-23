@@ -166,7 +166,8 @@ gboolean Texpainter::Ui::Window::Impl::key_press(GtkWidget* widget,
 				gtk_window_set_focus(GTK_WINDOW(widget), NULL);
 				if(self->r_eh != nullptr) { self->m_vt.on_key_down(self->r_eh, *self, scancode); }
 				break;
-			case 28:                                                          // RETURN
+			case 28:  // Return
+			case 96:
 				if(gtk_window_get_transient_for(GTK_WINDOW(widget)) != NULL)  // Dialog box
 				{
 					gtk_window_set_focus(GTK_WINDOW(widget), NULL);

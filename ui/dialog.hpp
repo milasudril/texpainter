@@ -248,8 +248,7 @@ namespace Texpainter::Ui
 					}
 					break;
 				case 28:  // ENTER
-					m_vtable.confirm_positive(r_cb_obj, *this);
-					break;
+				case 96: m_vtable.confirm_positive(r_cb_obj, *this); break;
 				default: break;
 			}
 		}
