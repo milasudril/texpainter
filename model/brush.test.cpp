@@ -12,10 +12,10 @@ namespace Testcases
 	{
 		Texpainter::Model::BrushFunction brush{Texpainter::Model::BrushType::Square};
 
-		assert((brush(1.0f, Texpainter::vec2_t{0.5, 0.5}) == 1.0f));
-		assert((brush(1.0f, Texpainter::vec2_t{1.5, 0.5}) == 0.0f));
-		assert((brush(1.0f, Texpainter::vec2_t{0.5, 1.5}) == 0.0f));
-		assert((brush(1.0f, Texpainter::vec2_t{0.5, -1.5}) == 0.0f));
+		assert((brush(true, Texpainter::vec2_t{0.5, 0.5}) == true));
+		assert((brush(true, Texpainter::vec2_t{1.5, 0.5}) == false));
+		assert((brush(true, Texpainter::vec2_t{0.5, 1.5}) == false));
+		assert((brush(true, Texpainter::vec2_t{0.5, -1.5}) == false));
 	}
 }
 

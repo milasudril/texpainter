@@ -23,16 +23,13 @@ namespace Texpainter::Model
 	{
 		return BrushType{static_cast<uint32_t>(BrushType::Square) + 1};
 	}
-
-	static_assert(static_cast<int>(end(Empty<BrushType>{})) == 3, "???");
-
 	template<BrushType>
 	struct BrushTraits;
 
 	template<>
 	struct BrushTraits<BrushType::Diamond>
 	{
-		static float intensity(float radius, vec2_t pos)
+		static bool test(float radius, vec2_t pos)
 		{
 			auto pos_abs = pos < 0 ? -pos : pos;
 			return static_cast<float>(pos_abs[0] + pos_abs[1] <= radius);
@@ -44,7 +41,7 @@ namespace Texpainter::Model
 	template<>
 	struct BrushTraits<BrushType::Circle>
 	{
-		static float intensity(float radius, vec2_t pos)
+		static bool test(float radius, vec2_t pos)
 		{
 			auto d2 = dot(pos, pos);
 			return static_cast<float>(d2 <= radius * radius);
@@ -56,7 +53,7 @@ namespace Texpainter::Model
 	template<>
 	struct BrushTraits<BrushType::Square>
 	{
-		static float intensity(float radius, vec2_t pos)
+		static bool test(float radius, vec2_t pos)
 		{
 			auto pos_abs = pos < 0 ? -pos : pos;
 			auto pos_max = std::max(pos_abs[0], pos_abs[1]);
