@@ -16,15 +16,15 @@ struct MainwinEventHandler
 	}
 
 	template<int>
-	void onKeyDown(Texpainter::Ui::Window&, int scancode)
+	void onKeyDown(Texpainter::Ui::Window&, Texpainter::Ui::Scancode key)
 	{
-		r_app.onKeyDown(scancode);
+		r_app.onKeyDown(key);
 	}
 
 	template<int>
-	void onKeyUp(Texpainter::Ui::Window&, int scancode)
+	void onKeyUp(Texpainter::Ui::Window&, Texpainter::Ui::Scancode key)
 	{
-		r_app.onKeyUp(scancode);
+		r_app.onKeyUp(key);
 	}
 
 	T& r_app;

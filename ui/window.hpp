@@ -7,6 +7,7 @@
 #define TEXPAINTER_UI_WINDOW_HPP
 
 #include "./container.hpp"
+#include "./scancode.hpp"
 
 #include "utils/size_2d.hpp"
 
@@ -44,13 +45,13 @@ namespace Texpainter::Ui
 				                     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
 				                     obj.template onClose<id>(self);
 			                     },
-			                     [](void* event_handler, Window& self, int scancode) {
+			                     [](void* event_handler, Window& self, Scancode key) {
 				                     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				                     obj.template onKeyDown<id>(self, scancode);
+				                     obj.template onKeyDown<id>(self, key);
 			                     },
-			                     [](void* event_handler, Window& self, int scancode) {
+			                     [](void* event_handler, Window& self, Scancode key) {
 				                     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				                     obj.template onKeyUp<id>(self, scancode);
+				                     obj.template onKeyUp<id>(self, key);
 			                     }});
 		}
 
@@ -66,8 +67,8 @@ namespace Texpainter::Ui
 		struct EventHandlerVtable
 		{
 			void (*on_close)(void* event_handler, Window& self);
-			void (*on_key_down)(void* event_handler, Window& self, int scancode);
-			void (*on_key_up)(void* event_handler, Window& self, int scancode);
+			void (*on_key_down)(void* event_handler, Window& self, Scancode key);
+			void (*on_key_up)(void* event_handler, Window& self, Scancode key);
 		};
 		Window& eventHandler(void* event_handler, EventHandlerVtable const& vtable);
 

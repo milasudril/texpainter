@@ -172,25 +172,25 @@ namespace Texpainter
 		{
 		}
 
-		void onKeyDown(int scancode)
+		void onKeyDown(Ui::Scancode key)
 		{
-			if(m_key_state.insert(std::make_pair(scancode, false)).second)
+			if(m_key_state.insert(std::make_pair(key, false)).second)
 			{
 				auto keys_end = m_key_state.keysByIndex().end();
 				--keys_end;
-				printf("%d\n", *keys_end);
+				printf("%d\n", keys_end->value());
 			}
 		}
 
-		void onKeyUp(int scancode)
+		void onKeyUp(Ui::Scancode key)
 		{
 
-			m_key_state.erase(scancode);
+			m_key_state.erase(key);
 			if(m_key_state.size() != 0)
 			{
 				auto keys_end = m_key_state.keysByIndex().end();
 				--keys_end;
-				printf("%d\n", *keys_end);
+				printf("%d\n", keys_end->value());
 			}
 		}
 
@@ -199,7 +199,7 @@ namespace Texpainter
 
 		PolymorphicRng m_rng;
 		uint32_t m_mouse_state;
-		SortedSequence<int, bool> m_key_state;
+		SortedSequence<Ui::Scancode, bool> m_key_state;
 		static constexpr auto MouseButtonLeft  = 0x1;
 		static constexpr auto MouseButtonRight = 0x4;
 

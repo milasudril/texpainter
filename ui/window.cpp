@@ -151,7 +151,7 @@ gboolean Texpainter::Ui::Window::Impl::key_press(GtkWidget* widget,
 {
 	auto self     = reinterpret_cast<Impl*>(user_data);
 	auto& key     = event->key;
-	auto scancode = key.hardware_keycode - 8;
+	auto scancode = Scancode{static_cast<uint8_t>(key.hardware_keycode - 8)};
 #ifndef __linux__
 	#waring "Scancode key offset is not tested. Pressing esc should print 1"
 	printf("%d\n", key.hardware_keycode - 8);
@@ -160,14 +160,14 @@ gboolean Texpainter::Ui::Window::Impl::key_press(GtkWidget* widget,
 	if(w != NULL)
 	{
 		self->r_focus_old = w;
-		switch(scancode)
+		switch(scancode.value())
 		{
 			case 1:  //	ESC
 				gtk_window_set_focus(GTK_WINDOW(widget), NULL);
 				if(self->r_eh != nullptr) { self->m_vt.on_key_down(self->r_eh, *self, scancode); }
 				break;
-			case 28:                                                          //	RETURN
-				if(gtk_window_get_transient_for(GTK_WINDOW(widget)) != NULL)  //	Dialog box
+			case 28:                                                          // RETURN
+				if(gtk_window_get_transient_for(GTK_WINDOW(widget)) != NULL)  // Dialog box
 				{
 					gtk_window_set_focus(GTK_WINDOW(widget), NULL);
 					if(self->r_eh != nullptr)
@@ -177,7 +177,7 @@ gboolean Texpainter::Ui::Window::Impl::key_press(GtkWidget* widget,
 		}
 		return FALSE;
 	}
-	if(scancode == 15 && self->r_focus_old != nullptr)
+	if(scancode == Scancode{15} && self->r_focus_old != nullptr)  // Tab
 	{
 		gtk_window_set_focus(GTK_WINDOW(widget), self->r_focus_old);
 		return TRUE;
@@ -194,7 +194,7 @@ gboolean Texpainter::Ui::Window::Impl::key_release(GtkWidget* widget,
 	if(w != NULL) { return FALSE; }
 	auto self     = reinterpret_cast<Impl*>(user_data);
 	auto& key     = event->key;
-	auto scancode = key.hardware_keycode - 8;
+	auto scancode = Scancode{static_cast<uint8_t>(key.hardware_keycode - 8)};
 #ifndef __linux__
 	#waring "Scancode key offset is not tested. Pressing esc should print 1"
 	printf("%d\n", key.hardware_keycode - 8);

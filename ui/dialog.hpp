@@ -236,18 +236,18 @@ namespace Texpainter::Ui
 		}
 
 		template<auto id>
-		void onKeyDown(Window& win, int scancode)
+		void onKeyDown(Window& win, Scancode scancode)
 		{
-			switch(scancode)
+			switch(scancode.value())
 			{
-				case 1:  //	ESC
+				case 1:  // ESC
 					if(has_dismiss()) { m_vtable.dismiss(r_cb_obj, *this); }
 					else
 					{
 						m_vtable.confirm_positive(r_cb_obj, *this);
 					}
 					break;
-				case 28:  //	ENTER
+				case 28:  // ENTER
 					m_vtable.confirm_positive(r_cb_obj, *this);
 					break;
 				default: break;
@@ -255,7 +255,7 @@ namespace Texpainter::Ui
 		}
 
 		template<auto id>
-		void onKeyUp(Window& win, int scancode)
+		void onKeyUp(Window& win, Scancode)
 		{
 		}
 
