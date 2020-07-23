@@ -37,6 +37,8 @@ namespace Texpainter::Model
 			auto pos_abs = pos < 0 ? -pos : pos;
 			return static_cast<float>(pos_abs[0] + pos_abs[1] <= radius);
 		}
+
+		static constexpr char const* displayName() { return "⯁ Diamond"; }
 	};
 
 	template<>
@@ -47,6 +49,8 @@ namespace Texpainter::Model
 			auto d2 = dot(pos, pos);
 			return static_cast<float>(d2 <= radius * radius);
 		}
+
+		static constexpr char const* displayName() { return "⏺ Circle"; }
 	};
 
 	template<>
@@ -58,6 +62,8 @@ namespace Texpainter::Model
 			auto pos_max = std::max(pos_abs[0], pos_abs[1]);
 			return static_cast<float>(pos_max <= radius);
 		}
+
+		static constexpr char const* displayName() { return "⯀ Square"; }
 	};
 }
 #endif

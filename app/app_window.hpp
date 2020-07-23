@@ -33,6 +33,7 @@ namespace Texpainter
 		enum class ControlId : int
 		{
 			LayerSelector,
+			BrushSelector,
 			PaletteSelector
 		};
 
@@ -51,14 +52,22 @@ namespace Texpainter
 		    , m_menu{m_rows}
 		    , m_selectors{m_rows, Ui::Box::Orientation::Horizontal}
 		    , m_layer_selector{m_selectors, Ui::Box::Orientation::Horizontal, "Layer: "}
-		    , m_layerpal_sep{m_selectors.insertMode(Ui::Box::InsertMode{4, 0})}
+		    , m_sep0{m_selectors.insertMode(Ui::Box::InsertMode{4, 0})}
+		    , m_brush_selector{m_selectors.insertMode(Ui::Box::InsertMode{0, 0}),
+		                       Ui::Box::Orientation::Horizontal,
+		                       "Brush: "}
+		    , m_sep1{m_selectors.insertMode(Ui::Box::InsertMode{4, 0})}
 		    , m_palette_selector{m_selectors.insertMode(Ui::Box::InsertMode{0, 0}),
 		                         Ui::Box::Orientation::Horizontal,
-		                         "Palettes: "}
+		                         "Palette: "}
 		    , m_pal_view{m_selectors.insertMode(
 		          Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand})}
 		    , m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
 		{
+			forEachEnumItem<Model::BrushType>(
+			    [&brush_sel = m_brush_selector.inputField()](auto tag) {
+				    brush_sel.append(Model::BrushTraits<tag.value>::displayName());
+			    });
 			//	m_img_view.eventHandler<ControlId::Canvas>(*this);
 			m_menu.eventHandler(*this);
 		}
@@ -68,6 +77,7 @@ namespace Texpainter
 			m_current_document = std::make_unique<Model::Document>(std::move(doc));
 			m_pal_view.eventHandler<0>(m_pal_view_eh);
 			m_layer_selector.inputField().eventHandler<ControlId::LayerSelector>(*this);
+			m_brush_selector.inputField().eventHandler<ControlId::BrushSelector>(*this);
 			m_palette_selector.inputField().eventHandler<ControlId::PaletteSelector>(*this);
 			update();
 			return *this;
@@ -156,7 +166,9 @@ namespace Texpainter
 		Ui::MenuBuilder<MainMenuItem, MainMenuItemTraits> m_menu;
 		Ui::Box m_selectors;
 		Ui::LabeledInput<Ui::Combobox> m_layer_selector;
-		Ui::Separator m_layerpal_sep;
+		Ui::Separator m_sep0;
+		Ui::LabeledInput<Ui::Combobox> m_brush_selector;
+		Ui::Separator m_sep1;
 		Ui::LabeledInput<Ui::Combobox> m_palette_selector;
 		Ui::PaletteView m_pal_view;
 		Ui::ImageView m_img_view;
@@ -173,6 +185,12 @@ namespace Texpainter
 			auto const& current_layer    = m_current_document->currentLayer();
 			auto const current_layer_idx = m_current_document->layers().index(current_layer);
 			layer_selector.selected(static_cast<int>(current_layer_idx));
+		}
+
+		void updateBrushSelector()
+		{
+			m_brush_selector.inputField().selected(
+			    static_cast<int>(m_current_document->currentBrush().type()));
 		}
 
 		void updatePaletteSelector()
@@ -207,6 +225,7 @@ namespace Texpainter
 		void update()
 		{
 			updateLayerSelector();
+			updateBrushSelector();
 			updatePaletteSelector();
 			doRender();
 		}
@@ -227,6 +246,26 @@ namespace Texpainter
 	};
 
 	template<>
+	inline void AppWindow::onChanged<AppWindow::ControlId::LayerSelector>(Ui::Combobox& src)
+	{
+		auto const index   = Model::LayerIndex{static_cast<uint32_t>(src.selected())};
+		auto const& layers = m_current_document->layers();
+		if(auto layer_name = layers.key(index); layer_name != nullptr)
+		{
+			m_current_document->currentLayer(std::string{*layer_name});
+			doRender();
+		}
+	}
+
+	template<>
+	inline void AppWindow::onChanged<AppWindow::ControlId::BrushSelector>(Ui::Combobox& src)
+	{
+		auto brush = m_current_document->currentBrush();
+		brush.type(static_cast<Model::BrushType>(src.selected()));
+		m_current_document->currentBrush(brush);
+	}
+
+	template<>
 	inline void AppWindow::onChanged<AppWindow::ControlId::PaletteSelector>(Ui::Combobox& src)
 	{
 		auto const index     = Model::PaletteIndex{static_cast<uint32_t>(src.selected())};
@@ -240,17 +279,6 @@ namespace Texpainter
 		}
 	}
 
-	template<>
-	inline void AppWindow::onChanged<AppWindow::ControlId::LayerSelector>(Ui::Combobox& src)
-	{
-		auto const index   = Model::LayerIndex{static_cast<uint32_t>(src.selected())};
-		auto const& layers = m_current_document->layers();
-		if(auto layer_name = layers.key(index); layer_name != nullptr)
-		{
-			m_current_document->currentLayer(std::string{*layer_name});
-			doRender();
-		}
-	}
 }
 
 #endif

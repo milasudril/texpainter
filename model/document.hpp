@@ -24,7 +24,12 @@ namespace Texpainter::Model
 		using LayerStack        = SortedSequence<std::string, Layer, LayerIndex>;
 		using PaletteCollection = SortedSequence<std::string, Palette, PaletteIndex>;
 
-		explicit Document(Size2d canvas_size): m_canvas_size{canvas_size}, m_current_brush{1.0f/64.0f, BrushType::Circle}, m_dirty{false} {}
+		explicit Document(Size2d canvas_size)
+		    : m_canvas_size{canvas_size}
+		    , m_current_brush{1.0f / 64.0f, BrushType::Circle}
+		    , m_dirty{false}
+		{
+		}
 
 		bool dirty() const { return m_dirty; }
 
@@ -104,14 +109,13 @@ namespace Texpainter::Model
 			m_dirty         = true;
 			return *this;
 		}
-		
-		BrushInfo currentBrush() const
-		{ return m_current_brush; }
-		
+
+		BrushInfo currentBrush() const { return m_current_brush; }
+
 		Document& currentBrush(BrushInfo brush)
 		{
 			m_current_brush = brush;
-			m_dirty = true;
+			m_dirty         = true;
 			return *this;
 		}
 
