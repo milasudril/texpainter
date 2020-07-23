@@ -172,15 +172,34 @@ namespace Texpainter
 		{
 		}
 
-		void onKeyDown(int scancode) { printf("KeuUp: %d\n", scancode); }
+		void onKeyDown(int scancode)
+		{
+			if(m_key_state.insert(std::make_pair(scancode, false)).second)
+			{
+				auto keys_end = m_key_state.keysByIndex().end();
+				--keys_end;
+				printf("%d\n", *keys_end);
+			}
+		}
 
-		void onKeyUp(int scancode) { printf("KeyDown: %d\n", scancode); }
+		void onKeyUp(int scancode)
+		{
+
+			m_key_state.erase(scancode);
+			if(m_key_state.size() != 0)
+			{
+				auto keys_end = m_key_state.keysByIndex().end();
+				--keys_end;
+				printf("%d\n", *keys_end);
+			}
+		}
 
 	private:
 		std::unique_ptr<Model::Document> m_current_document;
 
 		PolymorphicRng m_rng;
 		uint32_t m_mouse_state;
+		SortedSequence<int, bool> m_key_state;
 		static constexpr auto MouseButtonLeft  = 0x1;
 		static constexpr auto MouseButtonRight = 0x4;
 

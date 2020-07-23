@@ -10,8 +10,6 @@
 
 #include <cstdint>
 
-#include <cstdio>
-
 namespace Texpainter::Model
 {
 	enum class BrushType : uint32_t
