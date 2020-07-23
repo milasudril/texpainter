@@ -45,7 +45,7 @@ public:
 		g_signal_connect(G_OBJECT(widget), "motion-notify-event", G_CALLBACK(on_mouse_move), this);
 		g_signal_connect(G_OBJECT(widget), "key-press-event", G_CALLBACK(on_key_press), this);
 		g_signal_connect(G_OBJECT(widget), "key-release-event", G_CALLBACK(on_key_release), this);
-	//	gtk_widget_set_can_focus(widget, TRUE);
+		//	gtk_widget_set_can_focus(widget, TRUE);
 
 		m_background      = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 32, 32);
 		auto const stride = cairo_image_surface_get_stride(m_background);

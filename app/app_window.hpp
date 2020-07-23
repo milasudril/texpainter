@@ -67,7 +67,7 @@ namespace Texpainter
 		                         "Palette: "}
 		    , m_pal_view{m_selectors.insertMode(
 		          Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand})}
-			, m_layer_info{m_rows, ""}
+		    , m_layer_info{m_rows, ""}
 		    , m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
 
 
@@ -76,7 +76,9 @@ namespace Texpainter
 			    [&brush_sel = m_brush_selector.inputField()](auto tag) {
 				    brush_sel.append(Model::BrushTraits<tag.value>::displayName());
 			    });
-			m_layer_info.oneline(true).content("Open the \"Document\" menu to create or open a document").alignment(0.0f);
+			m_layer_info.oneline(true)
+			    .content("Open the \"Document\" menu to create or open a document")
+			    .alignment(0.0f);
 			m_menu.eventHandler(*this);
 		}
 
@@ -170,15 +172,9 @@ namespace Texpainter
 		{
 		}
 
-		void onKeyDown(int scancode)
-		{
-			printf("KeuUp: %d\n", scancode);
-		}
+		void onKeyDown(int scancode) { printf("KeuUp: %d\n", scancode); }
 
-		void onKeyUp(int scancode)
-		{
-			printf("KeyDown: %d\n", scancode);
-		}
+		void onKeyUp(int scancode) { printf("KeyDown: %d\n", scancode); }
 
 	private:
 		std::unique_ptr<Model::Document> m_current_document;
@@ -207,7 +203,6 @@ namespace Texpainter
 		Ui::ImageView m_img_view;
 
 
-
 		void updateLayerSelector()
 		{
 			auto& layer_selector = m_layer_selector.inputField();
@@ -224,9 +219,9 @@ namespace Texpainter
 
 		void updateBrushSelector()
 		{
-			auto brush = m_current_document->currentBrush();
+			auto brush       = m_current_document->currentBrush();
 			auto brush_index = static_cast<int>(end(Empty<Model::BrushType>{})) - 1
-			    - static_cast<int>(brush.type());
+			                   - static_cast<int>(brush.type());
 			m_brush_selector.inputField().selected(brush_index);
 			m_brush_size.value(Ui::logValue(brush.radius()));
 		}
@@ -261,14 +256,34 @@ namespace Texpainter
 
 		void updateLayerInfo()
 		{
-			if(auto current_layer = currentLayer(*m_document_curremt); current_layer!= nullptr) [[likely]]
-			{
-				std::string layer_info;
-
-			}
+			if(auto current_layer = currentLayer(*m_current_document); current_layer != nullptr)
+				[[likely]]
+				{
+					std::string layer_info;
+					auto const& layer = *current_layer;
+					std::string msg{"Layer "};
+					msg += std::to_string(
+					    m_current_document->layers().position(m_current_document->currentLayer()));
+					msg += ". Size: ";
+					msg += std::to_string(layer.size().width());
+					msg += "×";
+					msg += std::to_string(layer.size().height());
+					msg += " Position: (";
+					msg += std::to_string(layer.location()[0]);
+					msg += ", ";
+					msg += std::to_string(layer.location()[1]);
+					msg += ") Scale: (";
+					msg += std::to_string(layer.scaleFactor()[0]);
+					msg += ", ";
+					msg += std::to_string(layer.scaleFactor()[1]);
+					msg += ") Rotation: ";
+					msg += std::to_string(layer.rotation().turns());
+					m_layer_info.content(msg.c_str());
+				}
 			else
 			{
-				m_layer_info.content("Open the \"Layer\" menu to create a new layer").alignment(0.0f);
+				m_layer_info.content("Open the \"Layer\" menu to create a new layer")
+				    .alignment(0.0f);
 			}
 		}
 
@@ -323,6 +338,7 @@ namespace Texpainter
 		if(auto layer_name = layers.key(index); layer_name != nullptr)
 		{
 			m_current_document->currentLayer(std::string{*layer_name});
+			updateLayerInfo();
 			doRender();
 		}
 	}
@@ -331,9 +347,9 @@ namespace Texpainter
 	template<>
 	inline void AppWindow::onChanged<AppWindow::ControlId::BrushSelector>(Ui::Combobox& src)
 	{
-		auto brush = m_current_document->currentBrush();
-		auto brush_type = static_cast<Model::BrushType>(static_cast<int>(end(Empty<Model::BrushType>{})) - 1
-			    - src.selected());
+		auto brush      = m_current_document->currentBrush();
+		auto brush_type = static_cast<Model::BrushType>(
+		    static_cast<int>(end(Empty<Model::BrushType>{})) - 1 - src.selected());
 		brush.type(brush_type);
 		m_current_document->currentBrush(brush);
 	}
