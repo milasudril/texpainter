@@ -45,7 +45,7 @@ public:
 		g_signal_connect(G_OBJECT(widget), "motion-notify-event", G_CALLBACK(on_mouse_move), this);
 		g_signal_connect(G_OBJECT(widget), "key-press-event", G_CALLBACK(on_key_press), this);
 		g_signal_connect(G_OBJECT(widget), "key-release-event", G_CALLBACK(on_key_release), this);
-		gtk_widget_set_can_focus(widget, TRUE);
+	//	gtk_widget_set_can_focus(widget, TRUE);
 
 		m_background      = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 32, 32);
 		auto const stride = cairo_image_surface_get_stride(m_background);
@@ -187,7 +187,7 @@ private:
 	}
 
 
-	GtkDrawingArea* m_handle;  // TODO: Should be a gl area
+	GtkDrawingArea* m_handle;
 	static gboolean draw_callback(GtkWidget* widget, cairo_t* cr, gpointer self)
 	{
 		auto const w = static_cast<uint32_t>(gtk_widget_get_allocated_width(widget));
@@ -201,11 +201,13 @@ private:
 		auto& obj = *reinterpret_cast<Impl*>(self);
 		if(obj.r_eh != nullptr)
 		{
+#if 0
 			if(!gtk_widget_is_focus(w))
 			{
 				gtk_widget_grab_focus(w);
 				if(!obj.m_emit_mouse_events) { return FALSE; }
 			}
+#endif
 			auto event_button = reinterpret_cast<GdkEventButton const*>(e);
 			obj.m_vt.m_on_mouse_down(obj.r_eh,
 			                         obj,

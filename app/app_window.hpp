@@ -67,6 +67,7 @@ namespace Texpainter
 		                         "Palette: "}
 		    , m_pal_view{m_selectors.insertMode(
 		          Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand})}
+			, m_layer_info{m_rows, ""}
 		    , m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
 
 
@@ -75,6 +76,7 @@ namespace Texpainter
 			    [&brush_sel = m_brush_selector.inputField()](auto tag) {
 				    brush_sel.append(Model::BrushTraits<tag.value>::displayName());
 			    });
+			m_layer_info.oneline(true).content("Open the \"Document\" menu to create or open a document").alignment(0.0f);
 			m_menu.eventHandler(*this);
 		}
 
@@ -168,6 +170,16 @@ namespace Texpainter
 		{
 		}
 
+		void onKeyDown(int scancode)
+		{
+			printf("KeuUp: %d\n", scancode);
+		}
+
+		void onKeyUp(int scancode)
+		{
+			printf("KeyDown: %d\n", scancode);
+		}
+
 	private:
 		std::unique_ptr<Model::Document> m_current_document;
 
@@ -191,7 +203,9 @@ namespace Texpainter
 		Ui::Separator m_sep1;
 		Ui::LabeledInput<Ui::Combobox> m_palette_selector;
 		Ui::PaletteView m_pal_view;
+		Ui::Label m_layer_info;
 		Ui::ImageView m_img_view;
+
 
 
 		void updateLayerSelector()
@@ -245,12 +259,26 @@ namespace Texpainter
 			}
 		}
 
+		void updateLayerInfo()
+		{
+			if(auto current_layer = currentLayer(*m_document_curremt); current_layer!= nullptr) [[likely]]
+			{
+				std::string layer_info;
+
+			}
+			else
+			{
+				m_layer_info.content("Open the \"Layer\" menu to create a new layer").alignment(0.0f);
+			}
+		}
+
 
 		void update()
 		{
 			updateLayerSelector();
 			updateBrushSelector();
 			updatePaletteSelector();
+			updateLayerInfo();
 			doRender();
 		}
 

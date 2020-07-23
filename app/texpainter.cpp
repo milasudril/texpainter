@@ -6,6 +6,7 @@
 
 #include <gtk/gtk.h>
 
+template<class T>
 struct MainwinEventHandler
 {
 	template<int>
@@ -17,12 +18,16 @@ struct MainwinEventHandler
 	template<int>
 	void onKeyDown(Texpainter::Ui::Window&, int scancode)
 	{
+		r_app.onKeyDown(scancode);
 	}
 
 	template<int>
 	void onKeyUp(Texpainter::Ui::Window&, int scancode)
 	{
+		r_app.onKeyUp(scancode);
 	}
+
+	T& r_app;
 };
 
 int main(int argc, char* argv[])
@@ -52,7 +57,7 @@ int main(int argc, char* argv[])
 	pcg64 rng;
 	Texpainter::AppWindow app{mainwin, Texpainter::PolymorphicRng{rng}};
 
-	MainwinEventHandler eh;
+	MainwinEventHandler eh{app};
 	mainwin.eventHandler<0>(eh).show();
 	gtk_main();
 }
