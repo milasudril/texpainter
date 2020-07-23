@@ -23,6 +23,7 @@
 #include "ui/combobox.hpp"
 #include "ui/separator.hpp"
 #include "ui/slider.hpp"
+#include "ui/keyboard_state.hpp"
 
 #include <numbers>
 
@@ -174,24 +175,14 @@ namespace Texpainter
 
 		void onKeyDown(Ui::Scancode key)
 		{
-			if(m_key_state.insert(std::make_pair(key, false)).second)
-			{
-				auto keys_end = m_key_state.keysByIndex().end();
-				--keys_end;
-				printf("%d\n", keys_end->value());
-			}
+			m_key_state.press(key);
+			printf("%d\n", m_key_state.lastKey().value());
 		}
 
 		void onKeyUp(Ui::Scancode key)
 		{
-
-			m_key_state.erase(key);
-			if(m_key_state.size() != 0)
-			{
-				auto keys_end = m_key_state.keysByIndex().end();
-				--keys_end;
-				printf("%d\n", keys_end->value());
-			}
+			m_key_state.release(key);
+			printf("%d\n", m_key_state.lastKey().value());
 		}
 
 	private:
@@ -199,7 +190,7 @@ namespace Texpainter
 
 		PolymorphicRng m_rng;
 		uint32_t m_mouse_state;
-		SortedSequence<Ui::Scancode, bool> m_key_state;
+		Ui::KeyboardState m_key_state;
 		static constexpr auto MouseButtonLeft  = 0x1;
 		static constexpr auto MouseButtonRight = 0x4;
 
