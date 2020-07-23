@@ -36,12 +36,14 @@ namespace Texpainter
 			LayerSelector,
 			BrushSelector,
 			BrushSize,
-			PaletteSelector
+			PaletteSelector,
+			Canvas
 		};
 
 		explicit AppWindow(Ui::Container& container, PolymorphicRng rng)
 		    :  // State
 		    m_rng{rng}
+		    , m_mouse_state{0}
 
 		    // Event handlers
 		    , m_doc_menu_handler{container, *this}
@@ -66,12 +68,13 @@ namespace Texpainter
 		    , m_pal_view{m_selectors.insertMode(
 		          Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand})}
 		    , m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
+
+
 		{
 			forEachEnumItem<Model::BrushType>(
 			    [&brush_sel = m_brush_selector.inputField()](auto tag) {
 				    brush_sel.append(Model::BrushTraits<tag.value>::displayName());
 			    });
-			//	m_img_view.eventHandler<ControlId::Canvas>(*this);
 			m_menu.eventHandler(*this);
 		}
 
@@ -83,6 +86,7 @@ namespace Texpainter
 			m_brush_selector.inputField().eventHandler<ControlId::BrushSelector>(*this);
 			m_brush_size.eventHandler<ControlId::BrushSize>(*this);
 			m_palette_selector.inputField().eventHandler<ControlId::PaletteSelector>(*this);
+			m_img_view.eventHandler<ControlId::Canvas>(*this);
 			update();
 			return *this;
 		}
@@ -155,15 +159,23 @@ namespace Texpainter
 		void onMouseMove(Ui::ImageView& view, vec2_t pos_window, vec2_t pos_screen);
 
 		template<ControlId>
-		void onKeyDown(Ui::ImageView& view, int scancode);
+		void onKeyDown(Ui::ImageView& view, int scancode)
+		{
+		}
 
 		template<ControlId>
-		void onKeyUp(Ui::ImageView& view, int scancode);
+		void onKeyUp(Ui::ImageView& view, int scancode)
+		{
+		}
 
 	private:
 		std::unique_ptr<Model::Document> m_current_document;
 
 		PolymorphicRng m_rng;
+		uint32_t m_mouse_state;
+		static constexpr auto MouseButtonLeft  = 0x1;
+		static constexpr auto MouseButtonRight = 0x4;
+
 		DocMenuHandler<AppWindow> m_doc_menu_handler;
 		LayerMenuHandler<AppWindow> m_layer_menu_handler;
 		PaletteMenuHandler<AppWindow> m_palette_menu_handler;
@@ -180,6 +192,7 @@ namespace Texpainter
 		Ui::LabeledInput<Ui::Combobox> m_palette_selector;
 		Ui::PaletteView m_pal_view;
 		Ui::ImageView m_img_view;
+
 
 		void updateLayerSelector()
 		{
@@ -252,6 +265,23 @@ namespace Texpainter
 				[[likely]] { outline(*current_layer, canvas); }
 			m_img_view.image(canvas);
 		}
+
+		void paint(vec2_t pos)
+		{
+			m_current_document->layersModify(
+			    [pos,
+			     radius         = m_current_document->currentBrush().radius(),
+			     color          = currentColor(*m_current_document),
+			     &current_layer = m_current_document->currentLayer()](auto& layers) {
+				    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
+					    {
+						    auto const scale = static_cast<float>(std::sqrt(layer->size().area()));
+						    layer->paint(pos, scale * radius, color);
+					    }
+				    return true;
+			    });
+			doRender();
+		}
 	};
 
 	template<>
@@ -298,6 +328,46 @@ namespace Texpainter
 		}
 	}
 
+	namespace detail
+	{
+		inline vec2_t toLogicalCoordinates(Size2d size, vec2_t position)
+		{
+			auto const offset =
+			    0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
+			return position - offset;
+		}
+	}
+
+	template<>
+	inline void AppWindow::onMouseDown<AppWindow::ControlId::Canvas>(Ui::ImageView& view,
+	                                                                 vec2_t pos_window,
+	                                                                 vec2_t pos_screen,
+	                                                                 int button)
+	{
+		m_mouse_state |= 1 << (button - 1);
+		auto pos = detail::toLogicalCoordinates(view.imageSize(), pos_window);
+
+		if(m_mouse_state & MouseButtonLeft) { paint(pos); }
+	}
+
+	template<>
+	inline void AppWindow::onMouseUp<AppWindow::ControlId::Canvas>(Ui::ImageView& view,
+	                                                               vec2_t pos_window,
+	                                                               vec2_t pos_screen,
+	                                                               int button)
+	{
+		m_mouse_state &= ~(1 << (button - 1));
+	}
+
+	template<>
+	inline void AppWindow::onMouseMove<AppWindow::ControlId::Canvas>(Ui::ImageView& view,
+	                                                                 vec2_t pos_window,
+	                                                                 vec2_t pos_screen)
+	{
+		auto pos = detail::toLogicalCoordinates(view.imageSize(), pos_window);
+
+		if(m_mouse_state & MouseButtonLeft) { paint(pos); }
+	}
 }
 
 #endif
