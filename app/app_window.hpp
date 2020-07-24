@@ -94,9 +94,10 @@ namespace Texpainter
 			if(hasDocument()) { m_layer_menu_handler.onActivated<action>(item); }
 		}
 
-		template<LayerActionClearTransformation>
-		void onActivated(Ui::MenuItem&)
+		template<LayerActionClearTransformation action>
+		void onActivated(Ui::MenuItem& item)
 		{
+			if(hasDocument()) { m_layer_menu_handler.onActivated<action>(item); }
 		}
 
 		template<PaletteAction>

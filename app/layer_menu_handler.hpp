@@ -64,18 +64,24 @@ namespace Texpainter
 		{
 		}
 
+		template<LayerAction action>
+		void onActivated(Ui::MenuItem& item)
+		{
+			onActivated(Tag<action>{}, item);
+		}
+
 		template<LayerActionNew action>
 		void onActivated(Ui::MenuItem& item)
 		{
 			onActivated(Tag<action>{}, item);
 		}
 
-
-		template<LayerAction action>
+		template<LayerActionClearTransformation action>
 		void onActivated(Ui::MenuItem& item)
 		{
 			onActivated(Tag<action>{}, item);
 		}
+
 
 		template<LayerAction action>
 		void onActivated(Tag<action>, Ui::MenuItem&)
@@ -331,6 +337,65 @@ namespace Texpainter
 			m_new_from_noise        = std::make_unique<LayerCreatorDlg>(
                 r_dlg_owner, "Create new layer from noise", size_default, size_max);
 			m_new_from_noise->eventHandler<ControlId::NewFromNoise>(*this);
+		}
+
+
+		void onActivated(Tag<LayerActionClearTransformation::Location>, Ui::MenuItem&)
+		{
+			r_doc_owner.documentModify([](auto& doc) {
+				return doc.layersModify([&doc](auto& layers) {
+					if(auto layer = layers[doc.currentLayer()]; layer != nullptr)
+					{
+						layer->location(vec2_t{0.0, 0.0});
+						return true;
+					}
+					return false;
+				});
+			});
+		}
+
+		void onActivated(Tag<LayerActionClearTransformation::Rotation>, Ui::MenuItem&)
+		{
+			r_doc_owner.documentModify([](auto& doc) {
+				return doc.layersModify([&doc](auto& layers) {
+					if(auto layer = layers[doc.currentLayer()]; layer != nullptr)
+					{
+						layer->rotation(Angle{0.0, Angle::Turns{}});
+						return true;
+					}
+					return false;
+				});
+			});
+		}
+
+		void onActivated(Tag<LayerActionClearTransformation::Scale>, Ui::MenuItem&)
+		{
+			r_doc_owner.documentModify([](auto& doc) {
+				return doc.layersModify([&doc](auto& layers) {
+					if(auto layer = layers[doc.currentLayer()]; layer != nullptr)
+					{
+						layer->scaleFactor(vec2_t{1.0, 1.0});
+						return true;
+					}
+					return false;
+				});
+			});
+		}
+
+		void onActivated(Tag<LayerActionClearTransformation::All>, Ui::MenuItem&)
+		{
+			r_doc_owner.documentModify([](auto& doc) {
+				return doc.layersModify([&doc](auto& layers) {
+					if(auto layer = layers[doc.currentLayer()]; layer != nullptr)
+					{
+						layer->scaleFactor(vec2_t{1.0, 1.0})
+						    .rotation(Angle{0.0, Angle::Turns{}})
+						    .location(vec2_t{0.0, 0.0});
+						return true;
+					}
+					return false;
+				});
+			});
 		}
 
 
