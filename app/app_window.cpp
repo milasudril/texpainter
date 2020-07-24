@@ -181,8 +181,11 @@ void Texpainter::AppWindow::grab(vec2_t loc_current)
 
 void Texpainter::AppWindow::grabInit()
 {
-	if(auto layer = currentLayer(*m_current_document); layer != nullptr)
-	{ m_grab_state = GrabState{layer->location(), m_mouse_loc}; }
+	if(hasDocument())
+	{
+		if(auto layer = currentLayer(*m_current_document); layer != nullptr)
+		{ m_grab_state = GrabState{layer->location(), m_mouse_loc}; }
+	}
 }
 
 namespace
