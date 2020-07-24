@@ -6,6 +6,7 @@ Texpainter::AppWindow::AppWindow(Ui::Container& container, PolymorphicRng rng)
     :  // State
     m_rng{rng}
     , m_mouse_state{0}
+    , m_trans_mode{TransformationMode::Relative}
 
     // Event handlers
     , m_doc_menu_handler{container, *this}
@@ -184,7 +185,11 @@ void Texpainter::AppWindow::grabInit()
 	if(hasDocument())
 	{
 		if(auto layer = currentLayer(*m_current_document); layer != nullptr)
-		{ m_grab_state = GrabState{layer->location(), m_mouse_loc}; }
+		{
+			m_grab_state = m_trans_mode == TransformationMode::Absolute
+			                   ? GrabState{vec2_t{0.0, 0.0}, vec2_t{0.0, 0.0}}
+			                   : GrabState{layer->location(), m_mouse_loc};
+		}
 	}
 }
 
@@ -206,7 +211,23 @@ void Texpainter::AppWindow::onKeyDown(Ui::Scancode key)
 	switch(key.value())
 	{
 		case GrabKey.value(): grabInit(); break;
+		case AbsTransformKey.value():
+			m_trans_mode = TransformationMode::Absolute;
+			grabInit();
+			break;
 	}
+}
+
+void Texpainter::AppWindow::onKeyUp(Ui::Scancode key)
+{
+	m_key_state.release(key);  // No operation if key not in set
+
+	switch(key.value())
+	{
+		case AbsTransformKey.value(): m_trans_mode = TransformationMode::Relative; break;
+	}
+
+	printf("Release %u\n", key.value());
 }
 
 
