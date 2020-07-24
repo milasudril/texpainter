@@ -41,47 +41,7 @@ namespace Texpainter
 			Canvas
 		};
 
-		explicit AppWindow(Ui::Container& container, PolymorphicRng rng)
-		    :  // State
-		    m_rng{rng}
-		    , m_mouse_state{0}
-
-		    // Event handlers
-		    , m_doc_menu_handler{container, *this}
-		    , m_layer_menu_handler{container, *this, m_rng}
-		    , m_palette_menu_handler{container, *this, m_rng}
-		    , m_pal_view_eh{container, *this, m_rng}
-
-		    // Widgets
-		    , m_rows{container, Ui::Box::Orientation::Vertical}
-		    , m_menu{m_rows}
-		    , m_selectors{m_rows, Ui::Box::Orientation::Horizontal}
-		    , m_layer_selector{m_selectors, Ui::Box::Orientation::Horizontal, "Layer: "}
-		    , m_sep0{m_selectors.insertMode(Ui::Box::InsertMode{4, 0})}
-		    , m_brush_selector{m_selectors.insertMode(Ui::Box::InsertMode{0, 0}),
-		                       Ui::Box::Orientation::Horizontal,
-		                       "Brush: "}
-		    , m_brush_size{m_selectors, false}
-		    , m_sep1{m_selectors.insertMode(Ui::Box::InsertMode{4, 0})}
-		    , m_palette_selector{m_selectors.insertMode(Ui::Box::InsertMode{0, 0}),
-		                         Ui::Box::Orientation::Horizontal,
-		                         "Palette: "}
-		    , m_pal_view{m_selectors.insertMode(
-		          Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand})}
-		    , m_layer_info{m_rows, ""}
-		    , m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
-
-
-		{
-			forEachEnumItem<Model::BrushType>(
-			    [&brush_sel = m_brush_selector.inputField()](auto tag) {
-				    brush_sel.append(Model::BrushTraits<tag.value>::displayName());
-			    });
-			m_layer_info.oneline(true)
-			    .content("Open the \"Document\" menu to create or open a document")
-			    .alignment(0.0f);
-			m_menu.eventHandler(*this);
-		}
+		explicit AppWindow(Ui::Container& container, PolymorphicRng rng);
 
 		AppWindow& document(Model::Document&& doc)
 		{
@@ -213,131 +173,13 @@ namespace Texpainter
 		Ui::ImageView m_img_view;
 
 
-		void updateLayerSelector()
-		{
-			auto& layer_selector = m_layer_selector.inputField();
-
-			layer_selector.clear();
-			std::ranges::for_each(
-			    m_current_document->layers().keysByIndex(),
-			    [&layer_selector](auto const& name) { layer_selector.append(name.c_str()); });
-
-			auto const& current_layer    = m_current_document->currentLayer();
-			auto const current_layer_idx = m_current_document->layers().index(current_layer);
-			layer_selector.selected(static_cast<int>(current_layer_idx));
-		}
-
-		void updateBrushSelector()
-		{
-			auto brush       = m_current_document->currentBrush();
-			auto brush_index = static_cast<int>(end(Empty<Model::BrushType>{})) - 1
-			                   - static_cast<int>(brush.type());
-			m_brush_selector.inputField().selected(brush_index);
-			m_brush_size.value(Ui::logValue(brush.radius()));
-		}
-
-		void updatePaletteSelector()
-		{
-			auto& pal_selector = m_palette_selector.inputField();
-
-			pal_selector.clear();
-			std::ranges::for_each(
-			    m_current_document->palettes().keys(),
-			    [&pal_selector](auto const& name) { pal_selector.append(name.c_str()); });
-
-			auto const& current_pal_name = m_current_document->currentPalette();
-			auto const current_layer_idx =
-			    m_current_document->palettes().position(current_pal_name);
-			pal_selector.selected(static_cast<int>(current_layer_idx));
-
-			if(auto pal = currentPalette(*m_current_document); pal != nullptr)
-			{
-				m_pal_view.palette(*pal)
-				    .highlightMode(m_current_document->currentColor(),
-				                   Ui::PaletteView::HighlightMode::Read)
-				    .update();
-			}
-			else
-			{
-				Model::Pixel color{0.0f, 0.0f, 0.0f, 0.0f};
-				m_pal_view.palette(std::span{&color, 1}).update();
-			}
-		}
-
-		void updateLayerInfo()
-		{
-			if(auto current_layer = currentLayer(*m_current_document); current_layer != nullptr)
-				[[likely]]
-				{
-					std::string layer_info;
-					auto const& layer = *current_layer;
-					std::string msg{"Layer "};
-					msg += std::to_string(
-					    m_current_document->layers().position(m_current_document->currentLayer()));
-					msg += ". Size: ";
-					msg += std::to_string(layer.size().width());
-					msg += "×";
-					msg += std::to_string(layer.size().height());
-					msg += " Position: (";
-					msg += std::to_string(layer.location()[0]);
-					msg += ", ";
-					msg += std::to_string(layer.location()[1]);
-					msg += ") Scale: (";
-					msg += std::to_string(layer.scaleFactor()[0]);
-					msg += ", ";
-					msg += std::to_string(layer.scaleFactor()[1]);
-					msg += ") Rotation: ";
-					msg += std::to_string(layer.rotation().turns());
-					m_layer_info.content(msg.c_str());
-				}
-			else
-			{
-				m_layer_info.content("Open the \"Layer\" menu to create a new layer")
-				    .alignment(0.0f);
-			}
-		}
-
-
-		void update()
-		{
-			updateLayerSelector();
-			updateBrushSelector();
-			updatePaletteSelector();
-			updateLayerInfo();
-			doRender();
-		}
-
-		void doRender()
-		{
-			Model::Image canvas{m_current_document->canvasSize()};
-			std::ranges::fill(canvas.pixels(), Model::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
-			std::ranges::for_each(m_current_document->layersByIndex(),
-			                      [&canvas](auto const& layer) {
-				                      if(layer.visible()) { render(layer, canvas); }
-			                      });
-
-			if(auto current_layer = currentLayer(*m_current_document); current_layer != nullptr)
-				[[likely]] { outline(*current_layer, canvas); }
-			m_img_view.image(canvas);
-		}
-
-		void paint(vec2_t pos)
-		{
-			m_current_document->layersModify(
-			    [pos,
-			     radius         = m_current_document->currentBrush().radius(),
-			     brush          = Model::BrushFunction{m_current_document->currentBrush().type()},
-			     color          = currentColor(*m_current_document),
-			     &current_layer = m_current_document->currentLayer()](auto& layers) {
-				    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
-					    {
-						    auto const scale = static_cast<float>(std::sqrt(layer->size().area()));
-						    layer->paint(pos, scale * radius, brush, color);
-					    }
-				    return true;
-			    });
-			doRender();
-		}
+		void updateLayerSelector();
+		void updateBrushSelector();
+		void updatePaletteSelector();
+		void updateLayerInfo();
+		void update();
+		void doRender();
+		void paint(vec2_t pos);
 	};
 
 	template<>
