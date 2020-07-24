@@ -117,13 +117,13 @@ namespace Texpainter
 		void onChanged(Ui::Slider& src);
 
 		template<ControlId>
-		void onMouseUp(Ui::ImageView& view, vec2_t pos_window, vec2_t pos_screen, int button);
+		void onMouseUp(Ui::ImageView& view, vec2_t loc_window, vec2_t loc_screen, int button);
 
 		template<ControlId>
-		void onMouseDown(Ui::ImageView& view, vec2_t pos_window, vec2_t pos_screen, int button);
+		void onMouseDown(Ui::ImageView& view, vec2_t loc_window, vec2_t loc_screen, int button);
 
 		template<ControlId>
-		void onMouseMove(Ui::ImageView& view, vec2_t pos_window, vec2_t pos_screen);
+		void onMouseMove(Ui::ImageView& view, vec2_t loc_window, vec2_t loc_screen);
 
 		template<ControlId>
 		void onKeyDown(Ui::ImageView& view, int scancode)
@@ -135,10 +135,7 @@ namespace Texpainter
 		{
 		}
 
-		void onKeyDown(Ui::Scancode key)
-		{
-			if(key == GrabKey || key == RotateKey || key == ScaleKey) { m_key_state.press(key); }
-		}
+		void onKeyDown(Ui::Scancode key);
 
 		void onKeyUp(Ui::Scancode key)
 		{
@@ -152,6 +149,29 @@ namespace Texpainter
 		PolymorphicRng m_rng;
 		uint32_t m_mouse_state;
 		Ui::KeyboardState m_key_state;
+		vec2_t m_mouse_loc;
+
+		class GrabState
+		{
+		public:
+			GrabState() = default;
+
+			explicit GrabState(vec2_t layer_loc, vec2_t mouse_loc)
+			    : m_layer_loc{layer_loc}
+			    , m_mouse_loc{mouse_loc}
+			{
+			}
+
+			vec2_t location(vec2_t loc_current) const
+			{
+				return m_layer_loc + (loc_current - m_mouse_loc);
+			}
+
+		private:
+			vec2_t m_layer_loc;
+			vec2_t m_mouse_loc;
+		} m_grab_state;
+
 		static constexpr auto MouseButtonLeft  = 0x1;
 		static constexpr auto MouseButtonRight = 0x4;
 		static constexpr auto GrabKey          = Ui::Scancode{34};
@@ -183,8 +203,9 @@ namespace Texpainter
 		void updateLayerInfo();
 		void update();
 		void doRender();
-		void paint(vec2_t pos);
-		void grab(vec2_t pos);
+		void paint(vec2_t loc);
+		void grabInit();
+		void grab(vec2_t loc);
 	};
 
 	template<>

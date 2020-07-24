@@ -34,23 +34,23 @@ namespace Texpainter::Ui
 			    &eh,
 			    {[](void* event_handler,
 			        ImageView& self,
-			        vec2_t pos_window,
-			        vec2_t pos_screen,
+			        vec2_t loc_window,
+			        vec2_t loc_screen,
 			        int button) {
 				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				     obj.template onMouseDown<id>(self, pos_window, pos_screen, button);
+				     obj.template onMouseDown<id>(self, loc_window, loc_screen, button);
 			     },
 			     [](void* event_handler,
 			        ImageView& self,
-			        vec2_t pos_window,
-			        vec2_t pos_screen,
+			        vec2_t loc_window,
+			        vec2_t loc_screen,
 			        int button) {
 				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				     obj.template onMouseUp<id>(self, pos_window, pos_screen, button);
+				     obj.template onMouseUp<id>(self, loc_window, loc_screen, button);
 			     },
-			     [](void* event_handler, ImageView& self, vec2_t pos_window, vec2_t pos_screen) {
+			     [](void* event_handler, ImageView& self, vec2_t loc_window, vec2_t loc_screen) {
 				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				     obj.template onMouseMove<id>(self, pos_window, pos_screen);
+				     obj.template onMouseMove<id>(self, loc_window, loc_screen);
 			     },
 			     [](void* event_handler, ImageView& self, int scancode) {
 				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
@@ -80,18 +80,18 @@ namespace Texpainter::Ui
 		{
 			void (*m_on_mouse_down)(void* event_handler,
 			                        ImageView& self,
-			                        vec2_t pos_window,
-			                        vec2_t pos_screen,
+			                        vec2_t loc_window,
+			                        vec2_t loc_screen,
 			                        int button);
 			void (*m_on_mouse_up)(void* event_handler,
 			                      ImageView& self,
-			                      vec2_t pos_window,
-			                      vec2_t pos_screen,
+			                      vec2_t loc_window,
+			                      vec2_t loc_screen,
 			                      int button);
 			void (*m_on_mouse_move)(void* event_handler,
 			                        ImageView& self,
-			                        vec2_t pos_window,
-			                        vec2_t pos_screen);
+			                        vec2_t loc_window,
+			                        vec2_t loc_screen);
 			void (*on_key_down)(void* event_handler, ImageView& self, int scancode);
 			void (*on_key_up)(void* event_handler, ImageView& self, int scancode);
 		};

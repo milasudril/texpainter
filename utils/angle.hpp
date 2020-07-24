@@ -26,7 +26,7 @@ namespace Texpainter
 
 		constexpr Angle() = default;
 
-		constexpr explicit Angle(vec2_t pos): Angle{std::atan2(pos[1], pos[0]), Radians{}} {}
+		constexpr explicit Angle(vec2_t loc): Angle{std::atan2(loc[1], loc[0]), Radians{}} {}
 
 		constexpr explicit Angle(double α, Radians)
 		    : m_value{static_cast<uint32_t>(static_cast<int64_t>(0x1p31 * α / π))}

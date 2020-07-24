@@ -164,17 +164,25 @@ void Texpainter::AppWindow::paint(vec2_t loc)
 	doRender();
 }
 
-void Texpainter::AppWindow::grab(vec2_t loc)
+void Texpainter::AppWindow::grab(vec2_t loc_current)
 {
 	m_current_document->layersModify(
-	    [loc, &current_layer = m_current_document->currentLayer()](auto& layers) {
+	    [loc            = m_grab_state.location(loc_current),
+	     &current_layer = m_current_document->currentLayer()](auto& layers) {
 		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
 			    {
 				    layer->location(loc);
 			    }
 		    return true;
 	    });
+	updateLayerInfo();
 	doRender();
+}
+
+void Texpainter::AppWindow::grabInit()
+{
+	if(auto layer = currentLayer(*m_current_document); layer != nullptr)
+	{ m_grab_state = GrabState{layer->location(), m_mouse_loc}; }
 }
 
 namespace
@@ -188,18 +196,31 @@ namespace
 	}
 }
 
+
+void Texpainter::AppWindow::onKeyDown(Ui::Scancode key)
+{
+	if(key == GrabKey || key == RotateKey || key == ScaleKey) { m_key_state.press(key); }
+	switch(key.value())
+	{
+		case GrabKey.value(): grabInit(); break;
+	}
+}
+
+
 template<>
 void Texpainter::AppWindow::onMouseDown<Texpainter::AppWindow::ControlId::Canvas>(
     Ui::ImageView& view, vec2_t loc_window, vec2_t loc_screen, int button)
 {
 	m_mouse_state |= 1 << (button - 1);
-	auto loc = ::toLogicalCoordinates(view.imageSize(), loc_window);
+	auto loc    = ::toLogicalCoordinates(view.imageSize(), loc_window);
+	m_mouse_loc = loc;
 
 	if(m_mouse_state & MouseButtonLeft)
 	{
 		switch(m_key_state.lastKey().value())
 		{
 			case GrabKey.value(): grab(loc); break;
+
 			default: paint(loc);
 		}
 	}
@@ -218,7 +239,8 @@ template<>
 void Texpainter::AppWindow::onMouseMove<Texpainter::AppWindow::ControlId::Canvas>(
     Ui::ImageView& view, vec2_t loc_window, vec2_t loc_screen)
 {
-	auto loc = ::toLogicalCoordinates(view.imageSize(), loc_window);
+	auto loc    = ::toLogicalCoordinates(view.imageSize(), loc_window);
+	m_mouse_loc = loc;
 
 	if(m_mouse_state & MouseButtonLeft)
 	{
