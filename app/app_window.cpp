@@ -30,7 +30,9 @@ Texpainter::AppWindow::AppWindow(Ui::Container& container, PolymorphicRng rng)
                          Ui::Box::Orientation::Horizontal,
                          "Palette: "}
     , m_pal_view{m_selectors.insertMode(Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand})}
-    , m_layer_info{m_rows, ""}
+    , m_info{m_rows, Ui::Box::Orientation::Horizontal}
+    , m_layer_info{m_info.insertMode(Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand}), ""}
+    , m_paint_info{m_info, ""}
     , m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
 
 
@@ -41,6 +43,7 @@ Texpainter::AppWindow::AppWindow(Ui::Container& container, PolymorphicRng rng)
 	m_layer_info.oneline(true)
 	    .content("Open the \"Document\" menu to create or open a document")
 	    .alignment(0.0f);
+	m_paint_info.oneline(true).alignment(0.0f);
 	m_menu.eventHandler(*this);
 }
 
@@ -301,9 +304,15 @@ void Texpainter::AppWindow::rotate(vec2_t loc_current)
 	auto snapfun = m_mod_state.lastKey() == CtrlLeft ? [](Angle ϴ) { return snap(ϴ); }
 	                                                 : [](Angle ϴ) { return ϴ; };
 
+	auto const Θ  = m_rot_state.rotation(Angle{loc_current - layer->location()}, snapfun);
+	auto const ΔΘ = Θ - m_rot_state.initRotation();
+	std::string info;
+	info += "Rotate ΔΘ = ";
+	info += std::to_string(ΔΘ.turns());
+	m_paint_info.content(info.c_str());
+
 	m_current_document->layersModify(
-	    [rot            = m_rot_state.rotation(Angle{loc_current - layer->location()}, snapfun),
-	     &current_layer = m_current_document->currentLayer()](auto& layers) {
+	    [rot = Θ, &current_layer = m_current_document->currentLayer()](auto& layers) {
 		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
 			    {
 				    layer->rotation(rot);
@@ -312,6 +321,19 @@ void Texpainter::AppWindow::rotate(vec2_t loc_current)
 	    });
 	updateLayerInfo();
 	doRender();
+}
+
+void Texpainter::AppWindow::printIdleInfo(vec2_t mouse_loc)
+{
+	std::string info;
+	info += "LMB = paint | LMB + {'G' = grab (or move) | 'R' = rotate | 'S' = scale}. ";
+	if(m_trans_mode == TransformationMode::Absolute)
+	{ info += " Transformations are relative to the canvas."; }
+	else
+	{
+		info += "'A' enables canvas-relative transformations.";
+	}
+	m_paint_info.content(info.c_str());
 }
 
 
@@ -381,12 +403,14 @@ void Texpainter::AppWindow::onMouseUp<Texpainter::AppWindow::ControlId::Canvas>(
                                                                                 int button)
 {
 	m_mouse_state &= ~(1 << (button - 1));
+	m_paint_info.content("");
 }
 
 template<>
 void Texpainter::AppWindow::onMouseMove<Texpainter::AppWindow::ControlId::Canvas>(
     Ui::ImageView& view, vec2_t loc_window, vec2_t loc_screen)
 {
+	// FIXME: This function should not do anything unless there is a current layer.
 	auto loc = ::toLogicalCoordinates(view.imageSize(), loc_window);
 
 	if(m_mouse_state & MouseButtonLeft)
@@ -416,6 +440,7 @@ void Texpainter::AppWindow::onMouseMove<Texpainter::AppWindow::ControlId::Canvas
 				grabInit(loc);
 				scaleInit(loc);
 				rotateInit(loc);
+				printIdleInfo(loc);
 		}
 	}
 	else
@@ -423,6 +448,7 @@ void Texpainter::AppWindow::onMouseMove<Texpainter::AppWindow::ControlId::Canvas
 		grabInit(loc);
 		scaleInit(loc);
 		rotateInit(loc);
+		printIdleInfo(loc);
 	}
 }
 
@@ -533,15 +559,6 @@ void Texpainter::AppWindow::onMouseMove<Texpainter::AppWindow::ControlId::Canvas
 		}
 		break;
 
-		case PaintMode::Rotate:
-		{
-			if(m_keymask & KeymaskCtrl) { m_layerstack_ctrl.rotateCurrentLayer(loc, snap_angle); }
-			else
-			{
-				m_layerstack_ctrl.rotateCurrentLayer(loc, unity<Angle>);
-			}
-			doRender();
-		}
 	}
 }
 #endif

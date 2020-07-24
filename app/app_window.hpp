@@ -215,6 +215,8 @@ namespace Texpainter
 				return m_layer_rot + f(ϴ - m_mouse_rot);
 			}
 
+			Angle initRotation() const { return m_layer_rot; }
+
 		private:
 			Angle m_layer_rot;
 			Angle m_mouse_rot;
@@ -235,7 +237,9 @@ namespace Texpainter
 		Ui::Separator m_sep1;
 		Ui::LabeledInput<Ui::Combobox> m_palette_selector;
 		Ui::PaletteView m_pal_view;
+		Ui::Box m_info;
 		Ui::Label m_layer_info;
+		Ui::Label m_paint_info;
 		Ui::ImageView m_img_view;
 
 
@@ -256,6 +260,8 @@ namespace Texpainter
 
 		void rotateInit(vec2_t loc);
 		void rotate(vec2_t loc);
+
+		void printIdleInfo(vec2_t loc);
 	};
 
 	template<>
