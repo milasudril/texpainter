@@ -53,6 +53,7 @@ namespace Texpainter
 			m_palette_selector.inputField().eventHandler<ControlId::PaletteSelector>(*this);
 			m_img_view.eventHandler<ControlId::Canvas>(*this);
 			update();
+			m_rows.killFocus();
 			return *this;
 		}
 
@@ -61,6 +62,7 @@ namespace Texpainter
 		{
 			auto res = f(*m_current_document);
 			if(res) { update(); }
+			m_rows.killFocus();
 			return res;
 		}
 
@@ -141,7 +143,7 @@ namespace Texpainter
 		void onKeyUp(Ui::Scancode key)
 		{
 			m_key_state.release(key);  // No operation if key not in set
-			printf("Release %u\n", scancode.value());
+			printf("Release %u\n", key.value());
 		}
 
 	private:
@@ -195,6 +197,7 @@ namespace Texpainter
 			updateLayerInfo();
 			doRender();
 		}
+		m_rows.killFocus();
 	}
 
 
@@ -206,6 +209,7 @@ namespace Texpainter
 		    static_cast<int>(end(Empty<Model::BrushType>{})) - 1 - src.selected());
 		brush.type(brush_type);
 		m_current_document->currentBrush(brush);
+		m_rows.killFocus();
 	}
 
 	template<>
@@ -214,6 +218,7 @@ namespace Texpainter
 		auto brush = m_current_document->currentBrush();
 		brush.radius(static_cast<float>(logValue(src.value())));
 		m_current_document->currentBrush(brush);
+		m_rows.killFocus();
 	}
 
 
@@ -229,6 +234,7 @@ namespace Texpainter
 			    .highlightMode(m_current_document->currentColor(),
 			                   Ui::PaletteView::HighlightMode::Read);
 		}
+		m_rows.killFocus();
 	}
 
 	namespace detail
