@@ -164,6 +164,72 @@ void Texpainter::AppWindow::paint(vec2_t pos)
 	doRender();
 }
 
+void Texpainter::AppWindow::grab(vec2_t pos)
+{
+	m_current_document->layersModify(
+	    [pos, &current_layer = m_current_document->currentLayer()](auto& layers) {
+		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
+			    {
+				    layer->location(pos);
+			    }
+		    return true;
+	    });
+	doRender();
+}
+
+namespace
+{
+	Texpainter::vec2_t toLogicalCoordinates(Texpainter::Size2d size, Texpainter::vec2_t position)
+	{
+		auto const offset = 0.5
+		                    * Texpainter::vec2_t{static_cast<double>(size.width()),
+		                                         static_cast<double>(size.height())};
+		return position - offset;
+	}
+}
+
+template<>
+void Texpainter::AppWindow::onMouseDown<Texpainter::AppWindow::ControlId::Canvas>(
+    Ui::ImageView& view, vec2_t pos_window, vec2_t pos_screen, int button)
+{
+	m_mouse_state |= 1 << (button - 1);
+	auto pos = ::toLogicalCoordinates(view.imageSize(), pos_window);
+
+	if(m_mouse_state & MouseButtonLeft)
+	{
+		switch(m_key_state.lastKey().value())
+		{
+			case GrabKey.value(): grab(pos); break;
+			default: paint(pos);
+		}
+	}
+}
+
+template<>
+void Texpainter::AppWindow::onMouseUp<Texpainter::AppWindow::ControlId::Canvas>(Ui::ImageView& view,
+                                                                                vec2_t pos_window,
+                                                                                vec2_t pos_screen,
+                                                                                int button)
+{
+	m_mouse_state &= ~(1 << (button - 1));
+}
+
+template<>
+void Texpainter::AppWindow::onMouseMove<Texpainter::AppWindow::ControlId::Canvas>(
+    Ui::ImageView& view, vec2_t pos_window, vec2_t pos_screen)
+{
+	auto pos = ::toLogicalCoordinates(view.imageSize(), pos_window);
+
+	if(m_mouse_state & MouseButtonLeft)
+	{
+		switch(m_key_state.lastKey().value())
+		{
+			case GrabKey.value(): grab(pos); break;
+			default: paint(pos);
+		}
+	}
+}
+
 
 #if 0
 namespace

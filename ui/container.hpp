@@ -3,8 +3,6 @@
 #ifndef TEXPAINTER_UI_CONTAINER_HPP
 #define TEXPAINTER_UI_CONTAINER_HPP
 
-#include <gtk/gtk.h>
-
 namespace Texpainter::Ui
 {
 	class Container

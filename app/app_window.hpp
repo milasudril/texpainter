@@ -184,6 +184,7 @@ namespace Texpainter
 		void update();
 		void doRender();
 		void paint(vec2_t pos);
+		void grab(vec2_t pos);
 	};
 
 	template<>
@@ -235,47 +236,6 @@ namespace Texpainter
 			                   Ui::PaletteView::HighlightMode::Read);
 		}
 		m_rows.killFocus();
-	}
-
-	namespace detail
-	{
-		inline vec2_t toLogicalCoordinates(Size2d size, vec2_t position)
-		{
-			auto const offset =
-			    0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
-			return position - offset;
-		}
-	}
-
-	template<>
-	inline void AppWindow::onMouseDown<AppWindow::ControlId::Canvas>(Ui::ImageView& view,
-	                                                                 vec2_t pos_window,
-	                                                                 vec2_t pos_screen,
-	                                                                 int button)
-	{
-		m_mouse_state |= 1 << (button - 1);
-		auto pos = detail::toLogicalCoordinates(view.imageSize(), pos_window);
-
-		if(m_mouse_state & MouseButtonLeft) { paint(pos); }
-	}
-
-	template<>
-	inline void AppWindow::onMouseUp<AppWindow::ControlId::Canvas>(Ui::ImageView& view,
-	                                                               vec2_t pos_window,
-	                                                               vec2_t pos_screen,
-	                                                               int button)
-	{
-		m_mouse_state &= ~(1 << (button - 1));
-	}
-
-	template<>
-	inline void AppWindow::onMouseMove<AppWindow::ControlId::Canvas>(Ui::ImageView& view,
-	                                                                 vec2_t pos_window,
-	                                                                 vec2_t pos_screen)
-	{
-		auto pos = detail::toLogicalCoordinates(view.imageSize(), pos_window);
-
-		if(m_mouse_state & MouseButtonLeft) { paint(pos); }
 	}
 }
 
