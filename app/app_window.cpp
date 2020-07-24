@@ -221,8 +221,48 @@ void Texpainter::AppWindow::scale(vec2_t loc_current)
 	doRender();
 }
 
+
+void Texpainter::AppWindow::rotateInit(vec2_t mouse_loc)
+{
+	if(auto layer = currentLayer(*m_current_document); layer != nullptr)
+	{
+		m_rot_state = m_trans_mode == TransformationMode::Absolute
+		                  ? RotateState{Angle{0, Angle::Turns{}}, mouse_loc - layer->location()}
+		                  : RotateState{layer->rotation(), mouse_loc - layer->location()};
+	}
+}
+
+void Texpainter::AppWindow::rotate(vec2_t loc_current)
+{
+	auto layer = currentLayer(*m_current_document);
+	if(layer == nullptr) [[unlikely]]
+		{
+			return;
+		}
+	loc_current = loc_current - layer->location();
+	m_current_document->layersModify(
+	    [rot            = m_rot_state.rotation(loc_current),
+	     &current_layer = m_current_document->currentLayer()](auto& layers) {
+		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
+			    {
+				    layer->rotation(rot);
+			    }
+		    return true;
+	    });
+	updateLayerInfo();
+	doRender();
+}
+
+
 namespace
 {
+	constexpr auto MouseButtonLeft  = 0x1;
+	constexpr auto MouseButtonRight = 0x4;
+	constexpr auto AbsTransformKey  = Texpainter::Ui::Scancode{30};
+	constexpr auto GrabKey          = Texpainter::Ui::Scancode{34};
+	constexpr auto RotateKey        = Texpainter::Ui::Scancode{19};
+	constexpr auto ScaleKey         = Texpainter::Ui::Scancode{31};
+
 	Texpainter::vec2_t toLogicalCoordinates(Texpainter::Size2d size, Texpainter::vec2_t location)
 	{
 		auto const offset = 0.5
@@ -270,6 +310,8 @@ void Texpainter::AppWindow::onMouseDown<Texpainter::AppWindow::ControlId::Canvas
 
 			case ScaleKey.value(): scale(loc); break;
 
+			case RotateKey.value(): rotate(loc); break;
+
 			default: paint(loc);
 		}
 	}
@@ -297,23 +339,33 @@ void Texpainter::AppWindow::onMouseMove<Texpainter::AppWindow::ControlId::Canvas
 			case GrabKey.value():
 				grab(loc);
 				scaleInit(loc);
+				rotateInit(loc);
 				break;
 
 			case ScaleKey.value():
 				scale(loc);
 				grabInit(loc);
+				rotateInit(loc);
+				break;
+
+			case RotateKey.value():
+				rotate(loc);
+				grabInit(loc);
+				scaleInit(loc);
 				break;
 
 			default:
 				paint(loc);
 				grabInit(loc);
 				scaleInit(loc);
+				rotateInit(loc);
 		}
 	}
 	else
 	{
 		grabInit(loc);
 		scaleInit(loc);
+		rotateInit(loc);
 	}
 }
 

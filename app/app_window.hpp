@@ -197,12 +197,26 @@ namespace Texpainter
 			vec2_t m_mouse_loc;
 		} m_scale_state;
 
-		static constexpr auto MouseButtonLeft  = 0x1;
-		static constexpr auto MouseButtonRight = 0x4;
-		static constexpr auto AbsTransformKey  = Ui::Scancode{30};
-		static constexpr auto GrabKey          = Ui::Scancode{34};
-		static constexpr auto RotateKey        = Ui::Scancode{16};
-		static constexpr auto ScaleKey         = Ui::Scancode{31};
+		class RotateState
+		{
+		public:
+			RotateState() = default;
+
+			explicit RotateState(Angle layer_rot, vec2_t mouse_loc)
+			    : m_layer_rot{layer_rot}
+			    , m_mouse_rot{Angle{mouse_loc}}
+			{
+			}
+
+			Angle rotation(vec2_t loc_current) const
+			{
+				return m_layer_rot + Angle{loc_current} - m_mouse_rot;
+			}
+
+		private:
+			Angle m_layer_rot;
+			Angle m_mouse_rot;
+		} m_rot_state;
 
 		DocMenuHandler<AppWindow> m_doc_menu_handler;
 		LayerMenuHandler<AppWindow> m_layer_menu_handler;
@@ -237,6 +251,9 @@ namespace Texpainter
 
 		void scaleInit(vec2_t loc);
 		void scale(vec2_t loc);
+
+		void rotateInit(vec2_t loc);
+		void rotate(vec2_t loc);
 	};
 
 	template<>
