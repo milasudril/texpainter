@@ -236,9 +236,57 @@ void Texpainter::AppWindow::rotateInit(vec2_t mouse_loc)
 {
 	if(auto layer = currentLayer(*m_current_document); layer != nullptr)
 	{
-		m_rot_state = m_trans_mode == TransformationMode::Absolute
-		                  ? RotateState{Angle{0, Angle::Turns{}}, mouse_loc - layer->location()}
-		                  : RotateState{layer->rotation(), mouse_loc - layer->location()};
+		m_rot_state =
+		    m_trans_mode == TransformationMode::Absolute
+		        ? RotateState{Angle{0, Angle::Turns{}}, Angle{mouse_loc - layer->location()}}
+		        : RotateState{layer->rotation(), Angle{mouse_loc - layer->location()}};
+	}
+}
+
+namespace
+{
+	constexpr auto MouseButtonLeft  = 0x1;
+	constexpr auto MouseButtonRight = 0x4;
+	constexpr auto AbsTransformKey  = Texpainter::Ui::Scancode{30};
+	constexpr auto GrabKey          = Texpainter::Ui::Scancode{34};
+	constexpr auto RotateKey        = Texpainter::Ui::Scancode{19};
+	constexpr auto ScaleKey         = Texpainter::Ui::Scancode{31};
+	constexpr auto CtrlLeft         = Texpainter::Ui::Scancode{29};
+	constexpr auto ShiftLeft        = Texpainter::Ui::Scancode{42};
+}
+
+namespace
+{
+	constexpr Texpainter::Angle snap(Texpainter::Angle ϴ)
+	{
+		using Texpainter::Angle;
+		constexpr Angle snap_angles[] = {
+		    Angle{0.0 / 12, Angle::Turns{}},
+		    Angle{1.0 / 12, Angle::Turns{}},
+		    Angle{2.0 / 12, Angle::Turns{}},
+		    Angle{3.0 / 12, Angle::Turns{}},
+		    Angle{4.0 / 12, Angle::Turns{}},
+		    Angle{5.0 / 12, Angle::Turns{}},
+		    Angle{6.0 / 12, Angle::Turns{}},
+		    Angle{7.0 / 12, Angle::Turns{}},
+		    Angle{8.0 / 12, Angle::Turns{}},
+		    Angle{9.0 / 12, Angle::Turns{}},
+		    Angle{10.0 / 12, Angle::Turns{}},
+		    Angle{11.0 / 12, Angle::Turns{}},
+		    Angle{1.0 / 8, Angle::Turns{}},
+		    Angle{3.0 / 8, Angle::Turns{}},
+		    Angle{5.0 / 8, Angle::Turns{}},
+		    Angle{7.0 / 8, Angle::Turns{}},
+		    Angle{(1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}},
+		    Angle{(1.0 - 1.0 / std::numbers::phi), Angle::Turns{}},
+		    Angle{3.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}},
+		    Angle{4.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}},
+		    Angle{5.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}}};
+
+
+		constexpr auto snap = Texpainter::Snap{snap_angles};
+
+		return snap.nearestValue(ϴ);
 	}
 }
 
@@ -249,9 +297,12 @@ void Texpainter::AppWindow::rotate(vec2_t loc_current)
 		{
 			return;
 		}
-	loc_current = loc_current - layer->location();
+
+	auto snapfun = m_mod_state.lastKey() == CtrlLeft ? [](Angle ϴ) { return snap(ϴ); }
+	                                                 : [](Angle ϴ) { return ϴ; };
+
 	m_current_document->layersModify(
-	    [rot            = m_rot_state.rotation(loc_current),
+	    [rot            = m_rot_state.rotation(Angle{loc_current - layer->location()}, snapfun),
 	     &current_layer = m_current_document->currentLayer()](auto& layers) {
 		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
 			    {
@@ -266,13 +317,6 @@ void Texpainter::AppWindow::rotate(vec2_t loc_current)
 
 namespace
 {
-	constexpr auto MouseButtonLeft  = 0x1;
-	constexpr auto MouseButtonRight = 0x4;
-	constexpr auto AbsTransformKey  = Texpainter::Ui::Scancode{30};
-	constexpr auto GrabKey          = Texpainter::Ui::Scancode{34};
-	constexpr auto RotateKey        = Texpainter::Ui::Scancode{19};
-	constexpr auto ScaleKey         = Texpainter::Ui::Scancode{31};
-
 	Texpainter::vec2_t toLogicalCoordinates(Texpainter::Size2d size, Texpainter::vec2_t location)
 	{
 		auto const offset = 0.5
@@ -291,11 +335,14 @@ void Texpainter::AppWindow::onKeyDown(Ui::Scancode key)
 	if(key == AbsTransformKey) { m_trans_mode = TransformationMode::Absolute; }
 
 	if(key == GrabKey || key == RotateKey || key == ScaleKey) { m_key_state.press(key); }
+
+	if(key == CtrlLeft || key == ShiftLeft) { m_mod_state.press(key); }
 }
 
 void Texpainter::AppWindow::onKeyUp(Ui::Scancode key)
 {
 	m_key_state.release(key);  // No operation if key not in set
+	m_mod_state.release(key);
 
 	switch(key.value())
 	{
@@ -383,37 +430,7 @@ void Texpainter::AppWindow::onMouseMove<Texpainter::AppWindow::ControlId::Canvas
 #if 0
 namespace
 {
-	constexpr Texpainter::Angle snap_angle(Texpainter::Angle ϴ)
-	{
-		using Texpainter::Angle;
-		constexpr Angle snap_angles[] = {
-		   Angle{0.0 / 12, Angle::Turns{}},
-		   Angle{1.0 / 12, Angle::Turns{}},
-		   Angle{2.0 / 12, Angle::Turns{}},
-		   Angle{3.0 / 12, Angle::Turns{}},
-		   Angle{4.0 / 12, Angle::Turns{}},
-		   Angle{5.0 / 12, Angle::Turns{}},
-		   Angle{6.0 / 12, Angle::Turns{}},
-		   Angle{7.0 / 12, Angle::Turns{}},
-		   Angle{8.0 / 12, Angle::Turns{}},
-		   Angle{9.0 / 12, Angle::Turns{}},
-		   Angle{10.0 / 12, Angle::Turns{}},
-		   Angle{11.0 / 12, Angle::Turns{}},
-		   Angle{1.0 / 8, Angle::Turns{}},
-		   Angle{3.0 / 8, Angle::Turns{}},
-		   Angle{5.0 / 8, Angle::Turns{}},
-		   Angle{7.0 / 8, Angle::Turns{}},
-		   Angle{(1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}},
-		   Angle{(1.0 - 1.0 / std::numbers::phi), Angle::Turns{}},
-		   Angle{3.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}},
-		   Angle{4.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}},
-		   Angle{5.0 * (1.0 - 1.0 / std::numbers::phi) / 2.0, Angle::Turns{}}};
 
-
-		constexpr auto snap = Texpainter::Snap{snap_angles};
-
-		return snap.nearestValue(ϴ);
-	}
 
 	constexpr Texpainter::vec2_t snap_scale_factor(Texpainter::vec2_t v)
 	{

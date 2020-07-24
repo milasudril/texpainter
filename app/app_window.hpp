@@ -146,6 +146,7 @@ namespace Texpainter
 		PolymorphicRng m_rng;
 		uint32_t m_mouse_state;
 		Ui::KeyboardState m_key_state;
+		Ui::KeyboardState m_mod_state;
 		Ui::Scancode m_key_prev;
 
 		enum class TransformationMode : int
@@ -202,15 +203,16 @@ namespace Texpainter
 		public:
 			RotateState() = default;
 
-			explicit RotateState(Angle layer_rot, vec2_t mouse_loc)
+			explicit RotateState(Angle layer_rot, Angle mouse_rot)
 			    : m_layer_rot{layer_rot}
-			    , m_mouse_rot{Angle{mouse_loc}}
+			    , m_mouse_rot{mouse_rot}
 			{
 			}
 
-			Angle rotation(vec2_t loc_current) const
+			template<class SnapFunction>
+			Angle rotation(Angle ϴ, SnapFunction&& f) const
 			{
-				return m_layer_rot + Angle{loc_current} - m_mouse_rot;
+				return m_layer_rot + f(ϴ - m_mouse_rot);
 			}
 
 		private:
