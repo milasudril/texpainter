@@ -135,14 +135,13 @@ namespace Texpainter
 
 		void onKeyDown(Ui::Scancode key)
 		{
-			m_key_state.press(key);
-			printf("%d\n", m_key_state.lastKey().value());
+			if(key == GrabKey || key == RotateKey || key == ScaleKey) { m_key_state.press(key); }
 		}
 
 		void onKeyUp(Ui::Scancode key)
 		{
-			m_key_state.release(key);
-			printf("%d\n", m_key_state.lastKey().value());
+			m_key_state.release(key);  // No operation if key not in set
+			printf("Release %u\n", scancode.value());
 		}
 
 	private:
@@ -153,6 +152,9 @@ namespace Texpainter
 		Ui::KeyboardState m_key_state;
 		static constexpr auto MouseButtonLeft  = 0x1;
 		static constexpr auto MouseButtonRight = 0x4;
+		static constexpr auto GrabKey          = Ui::Scancode{34};
+		static constexpr auto RotateKey        = Ui::Scancode{16};
+		static constexpr auto ScaleKey         = Ui::Scancode{31};
 
 		DocMenuHandler<AppWindow> m_doc_menu_handler;
 		LayerMenuHandler<AppWindow> m_layer_menu_handler;
