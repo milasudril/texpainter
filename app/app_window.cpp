@@ -194,9 +194,14 @@ void Texpainter::AppWindow::scaleInit(vec2_t mouse_loc)
 {
 	if(auto layer = currentLayer(*m_current_document); layer != nullptr)
 	{
+		auto const ϴ     = layer->rotation();
+		auto const rot_x = vec2_t{cos(ϴ), sin(ϴ)};
+		auto const rot_y = vec2_t{-sin(ϴ), cos(ϴ)};
+		auto const v     = transform(mouse_loc - layer->location(), rot_x, rot_y);
+
 		m_scale_state = m_trans_mode == TransformationMode::Absolute
-		                    ? ScaleState{vec2_t{1.0, 1.0}, mouse_loc - layer->location()}
-		                    : ScaleState{layer->scaleFactor(), mouse_loc - layer->location()};
+		                    ? ScaleState{vec2_t{1.0, 1.0}, v}
+		                    : ScaleState{layer->scaleFactor(), v};
 	}
 }
 
@@ -207,9 +212,14 @@ void Texpainter::AppWindow::scale(vec2_t loc_current)
 		{
 			return;
 		}
-	loc_current = loc_current - layer->location();
+
+	auto const ϴ     = layer->rotation();
+	auto const rot_x = vec2_t{cos(ϴ), sin(ϴ)};
+	auto const rot_y = vec2_t{-sin(ϴ), cos(ϴ)};
+	auto const v     = transform(loc_current - layer->location(), rot_x, rot_y);
+
 	m_current_document->layersModify(
-	    [factor         = m_scale_state.scaleFactor(loc_current),
+	    [factor         = m_scale_state.scaleFactor(v),
 	     &current_layer = m_current_document->currentLayer()](auto& layers) {
 		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
 			    {

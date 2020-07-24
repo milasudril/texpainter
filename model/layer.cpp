@@ -42,7 +42,6 @@ Texpainter::Model::Layer& Texpainter::Model::Layer::paint(vec2_t origin,
 	auto const w = m_content->width();
 	auto const h = m_content->height();
 
-	//origin /= m_scale;
 	auto const offset = 0.5 * vec2_t{static_cast<double>(w), static_cast<double>(h)};
 	auto const ϴ      = m_rot;
 	auto const rot_x  = vec2_t{cos(ϴ), sin(ϴ)};
