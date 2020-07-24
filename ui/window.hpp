@@ -32,6 +32,8 @@ namespace Texpainter::Ui
 		Window& add(void* handle) override;
 		Window& show() override;
 		Window& sensitive(bool val) override;
+		Window& killFocus() override;
+
 		void* toplevel() const override;
 
 		const char* title() const noexcept;

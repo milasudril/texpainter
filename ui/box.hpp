@@ -44,6 +44,8 @@ namespace Texpainter::Ui
 		Box& add(void* handle) override;
 		Box& show() override;
 		Box& sensitive(bool val) override;
+		Box& killFocus() override;
+
 		void* toplevel() const override;
 
 		Box& homogenous(bool status) noexcept;

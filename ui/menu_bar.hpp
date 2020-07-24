@@ -29,6 +29,8 @@ namespace Texpainter::Ui
 		MenuBar& add(void* handle) override;
 		MenuBar& show() override;
 		MenuBar& sensitive(bool val) override;
+		MenuBar& killFocus() override { return *this; }
+
 		void* toplevel() const override;
 
 	protected:

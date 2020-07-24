@@ -36,6 +36,9 @@ public:
 
 	void* _toplevel() const { return m_handle; }
 
+	void _killFocus() { gtk_window_set_focus(GTK_WINDOW(_toplevel()), NULL); }
+
+
 	void eventHandler(void* eh, EventHandlerVtable const& vtable)
 	{
 		r_eh = eh;
@@ -95,6 +98,12 @@ Texpainter::Ui::Window& Texpainter::Ui::Window::show()
 Texpainter::Ui::Window& Texpainter::Ui::Window::sensitive(bool val)
 {
 	m_impl->_sensitive(val);
+	return *this;
+}
+
+Texpainter::Ui::Window& Texpainter::Ui::Window::killFocus()
+{
+	m_impl->_killFocus();
 	return *this;
 }
 

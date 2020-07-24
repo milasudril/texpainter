@@ -32,6 +32,8 @@ public:
 
 	void* _toplevel() const { return gtk_widget_get_toplevel(GTK_WIDGET(m_handle)); }
 
+	void _killFocus() { gtk_window_set_focus(GTK_WINDOW(_toplevel()), NULL); }
+
 	void homogenous(bool status) noexcept { gtk_box_set_homogeneous(m_handle, status); }
 
 
@@ -70,6 +72,12 @@ Texpainter::Ui::Box& Texpainter::Ui::Box::show()
 Texpainter::Ui::Box& Texpainter::Ui::Box::sensitive(bool val)
 {
 	m_impl->_sensitive(val);
+	return *this;
+}
+
+Texpainter::Ui::Box& Texpainter::Ui::Box::killFocus()
+{
+	m_impl->_killFocus();
 	return *this;
 }
 

@@ -29,6 +29,8 @@ namespace Texpainter::Ui
 		Menu& add(void* handle) override;
 		Menu& show() override;
 		Menu& sensitive(bool val) override;
+		Menu& killFocus() override { return *this; }
+
 		void* toplevel() const override;
 
 	protected:
