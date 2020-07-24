@@ -16,15 +16,7 @@ namespace Texpainter::Ui
 	class KeyboardState
 	{
 	public:
-		void press(Scancode key)
-		{
-			if(m_key_state.insert(std::make_pair(key, false)).second)
-			{
-				auto keys_end = m_key_state.keysByIndex().end();
-				--keys_end;
-				printf("%d\n", keys_end->value());
-			}
-		}
+		bool press(Scancode key) { return m_key_state.insert(std::make_pair(key, false)).second; }
 
 		void release(Scancode key) { m_key_state.erase(key); }
 

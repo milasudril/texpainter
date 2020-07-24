@@ -146,7 +146,8 @@ namespace Texpainter
 		PolymorphicRng m_rng;
 		uint32_t m_mouse_state;
 		Ui::KeyboardState m_key_state;
-		vec2_t m_mouse_loc;
+		Ui::Scancode m_key_prev;
+
 		enum class TransformationMode : int
 		{
 			Relative,
@@ -174,6 +175,27 @@ namespace Texpainter
 			vec2_t m_layer_loc;
 			vec2_t m_mouse_loc;
 		} m_grab_state;
+
+		class ScaleState
+		{
+		public:
+			ScaleState() = default;
+
+			explicit ScaleState(vec2_t layer_scale, vec2_t mouse_loc)
+			    : m_layer_scale{layer_scale}
+			    , m_mouse_loc{mouse_loc}
+			{
+			}
+
+			vec2_t scaleFactor(vec2_t loc_current) const
+			{
+				return m_layer_scale * loc_current / m_mouse_loc;
+			}
+
+		private:
+			vec2_t m_layer_scale;
+			vec2_t m_mouse_loc;
+		} m_scale_state;
 
 		static constexpr auto MouseButtonLeft  = 0x1;
 		static constexpr auto MouseButtonRight = 0x4;
@@ -207,9 +229,14 @@ namespace Texpainter
 		void updateLayerInfo();
 		void update();
 		void doRender();
+
 		void paint(vec2_t loc);
-		void grabInit();
+
+		void grabInit(vec2_t loc);
 		void grab(vec2_t loc);
+
+		void scaleInit(vec2_t loc);
+		void scale(vec2_t loc);
 	};
 
 	template<>

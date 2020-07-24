@@ -6,6 +6,7 @@ Texpainter::AppWindow::AppWindow(Ui::Container& container, PolymorphicRng rng)
     :  // State
     m_rng{rng}
     , m_mouse_state{0}
+    , m_key_prev{0xff}
     , m_trans_mode{TransformationMode::Relative}
 
     // Event handlers
@@ -164,6 +165,15 @@ void Texpainter::AppWindow::paint(vec2_t loc)
 	    });
 	doRender();
 }
+void Texpainter::AppWindow::grabInit(vec2_t mouse_loc)
+{
+	if(auto layer = currentLayer(*m_current_document); layer != nullptr)
+	{
+		m_grab_state = m_trans_mode == TransformationMode::Absolute
+		                   ? GrabState{vec2_t{0.0, 0.0}, vec2_t{0.0, 0.0}}
+		                   : GrabState{layer->location(), mouse_loc};
+	}
+}
 
 void Texpainter::AppWindow::grab(vec2_t loc_current)
 {
@@ -180,17 +190,35 @@ void Texpainter::AppWindow::grab(vec2_t loc_current)
 	doRender();
 }
 
-void Texpainter::AppWindow::grabInit()
+void Texpainter::AppWindow::scaleInit(vec2_t mouse_loc)
 {
-	if(hasDocument())
+	if(auto layer = currentLayer(*m_current_document); layer != nullptr)
 	{
-		if(auto layer = currentLayer(*m_current_document); layer != nullptr)
-		{
-			m_grab_state = m_trans_mode == TransformationMode::Absolute
-			                   ? GrabState{vec2_t{0.0, 0.0}, vec2_t{0.0, 0.0}}
-			                   : GrabState{layer->location(), m_mouse_loc};
-		}
+		m_scale_state = m_trans_mode == TransformationMode::Absolute
+		                    ? ScaleState{vec2_t{1.0, 1.0}, mouse_loc - layer->location()}
+		                    : ScaleState{layer->scaleFactor(), mouse_loc - layer->location()};
 	}
+}
+
+void Texpainter::AppWindow::scale(vec2_t loc_current)
+{
+	auto layer = currentLayer(*m_current_document);
+	if(layer == nullptr) [[unlikely]]
+		{
+			return;
+		}
+	loc_current = loc_current - layer->location();
+	m_current_document->layersModify(
+	    [factor         = m_scale_state.scaleFactor(loc_current),
+	     &current_layer = m_current_document->currentLayer()](auto& layers) {
+		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
+			    {
+				    layer->scaleFactor(factor);
+			    }
+		    return true;
+	    });
+	updateLayerInfo();
+	doRender();
 }
 
 namespace
@@ -207,15 +235,12 @@ namespace
 
 void Texpainter::AppWindow::onKeyDown(Ui::Scancode key)
 {
+	if(key == m_key_prev) { return; }
+	m_key_prev = key;
+
+	if(key == AbsTransformKey) { m_trans_mode = TransformationMode::Absolute; }
+
 	if(key == GrabKey || key == RotateKey || key == ScaleKey) { m_key_state.press(key); }
-	switch(key.value())
-	{
-		case GrabKey.value(): grabInit(); break;
-		case AbsTransformKey.value():
-			m_trans_mode = TransformationMode::Absolute;
-			grabInit();
-			break;
-	}
 }
 
 void Texpainter::AppWindow::onKeyUp(Ui::Scancode key)
@@ -226,8 +251,7 @@ void Texpainter::AppWindow::onKeyUp(Ui::Scancode key)
 	{
 		case AbsTransformKey.value(): m_trans_mode = TransformationMode::Relative; break;
 	}
-
-	printf("Release %u\n", key.value());
+	m_key_prev = Ui::Scancode{0xff};
 }
 
 
@@ -236,14 +260,15 @@ void Texpainter::AppWindow::onMouseDown<Texpainter::AppWindow::ControlId::Canvas
     Ui::ImageView& view, vec2_t loc_window, vec2_t loc_screen, int button)
 {
 	m_mouse_state |= 1 << (button - 1);
-	auto loc    = ::toLogicalCoordinates(view.imageSize(), loc_window);
-	m_mouse_loc = loc;
+	auto loc = ::toLogicalCoordinates(view.imageSize(), loc_window);
 
 	if(m_mouse_state & MouseButtonLeft)
 	{
 		switch(m_key_state.lastKey().value())
 		{
 			case GrabKey.value(): grab(loc); break;
+
+			case ScaleKey.value(): scale(loc); break;
 
 			default: paint(loc);
 		}
@@ -263,16 +288,32 @@ template<>
 void Texpainter::AppWindow::onMouseMove<Texpainter::AppWindow::ControlId::Canvas>(
     Ui::ImageView& view, vec2_t loc_window, vec2_t loc_screen)
 {
-	auto loc    = ::toLogicalCoordinates(view.imageSize(), loc_window);
-	m_mouse_loc = loc;
+	auto loc = ::toLogicalCoordinates(view.imageSize(), loc_window);
 
 	if(m_mouse_state & MouseButtonLeft)
 	{
 		switch(m_key_state.lastKey().value())
 		{
-			case GrabKey.value(): grab(loc); break;
-			default: paint(loc);
+			case GrabKey.value():
+				grab(loc);
+				scaleInit(loc);
+				break;
+
+			case ScaleKey.value():
+				scale(loc);
+				grabInit(loc);
+				break;
+
+			default:
+				paint(loc);
+				grabInit(loc);
+				scaleInit(loc);
 		}
+	}
+	else
+	{
+		grabInit(loc);
+		scaleInit(loc);
 	}
 }
 
