@@ -240,16 +240,16 @@ namespace Texpainter::Ui
 		{
 			switch(scancode.value())
 			{
-				case 1:  // ESC
+				case Scancodes::Escape.value():
 					if(has_dismiss()) { m_vtable.dismiss(r_cb_obj, *this); }
 					else
 					{
 						m_vtable.confirm_positive(r_cb_obj, *this);
 					}
 					break;
-				case 28:  // ENTER
-				case 96: m_vtable.confirm_positive(r_cb_obj, *this); break;
-				default: break;
+				case Scancodes::Return.value():
+				case Scancodes::ReturnNumpad.value():
+					m_vtable.confirm_positive(r_cb_obj, *this); break;
 			}
 		}
 

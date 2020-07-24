@@ -6,21 +6,29 @@
 #define TEXPAINTER_UI_SCANCODE_HPP
 
 #include <cstdint>
+#include <compare>
 
 namespace Texpainter::Ui
 {
 	class Scancode
 	{
 	public:
-		explicit Scancode(uint8_t val): m_value{val} {}
+		constexpr explicit Scancode(uint8_t val): m_value{val} {}
 
-		auto operator<=>(Scancode const&) const = default;
+		constexpr auto operator<=>(Scancode const&) const = default;
 
-		auto value() const { return m_value; }
+		constexpr auto value() const { return m_value; }
 
 	private:
 		uint8_t m_value;
 	};
+
+	namespace Scancodes
+	{
+		constexpr Scancode Return{28};
+		constexpr Scancode ReturnNumpad{96};
+		constexpr Scancode Escape{1};
+	}
 }
 
 #endif

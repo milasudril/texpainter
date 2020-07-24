@@ -2,7 +2,7 @@
 //@  "targets":[{"name":"window.o","type":"object","pkgconfig_libs":["gtk+-3.0"]}]
 //@	}
 
-#include "ui/window.hpp"
+#include "./window.hpp"
 
 #include <gtk/gtk.h>
 #include <string>
@@ -162,12 +162,12 @@ gboolean Texpainter::Ui::Window::Impl::key_press(GtkWidget* widget,
 		self->r_focus_old = w;
 		switch(scancode.value())
 		{
-			case 1:  //	ESC
+			case Scancodes::Escape.value():
 				gtk_window_set_focus(GTK_WINDOW(widget), NULL);
 				if(self->r_eh != nullptr) { self->m_vt.on_key_down(self->r_eh, *self, scancode); }
 				break;
-			case 28:  // Return
-			case 96:
+			case Scancodes::Return.value():
+			case Scancodes::ReturnNumpad.value():
 				if(gtk_window_get_transient_for(GTK_WINDOW(widget)) != NULL)  // Dialog box
 				{
 					gtk_window_set_focus(GTK_WINDOW(widget), NULL);
