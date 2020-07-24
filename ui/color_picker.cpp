@@ -33,13 +33,13 @@ namespace
 		return ret;
 	}
 
-	void draw_marker(Texpainter::vec2_t pos, Texpainter::Span2d<Texpainter::Model::Pixel> canvas)
+	void draw_marker(Texpainter::vec2_t loc, Texpainter::Span2d<Texpainter::Model::Pixel> canvas)
 	{
 		constexpr auto radius   = 2;
 		auto const w            = canvas.width();
 		auto const h            = canvas.height();
-		auto const begin_coords = pos - Texpainter::vec2_t{radius, radius};
-		auto const end_coords   = pos + Texpainter::vec2_t{radius, radius};
+		auto const begin_coords = loc - Texpainter::vec2_t{radius, radius};
+		auto const end_coords   = loc + Texpainter::vec2_t{radius, radius};
 
 		for(auto row = std::max(static_cast<int>(begin_coords[1]), 0);
 		    row <= std::min(static_cast<int>(end_coords[1]), static_cast<int>(h) - 1);
@@ -51,7 +51,7 @@ namespace
 			{
 				auto const loc_ret =
 				    Texpainter::vec2_t{static_cast<double>(col), static_cast<double>(row)};
-				auto d = loc_ret - pos;
+				auto d = loc_ret - loc;
 				if(Texpainter::dot(d, d) < radius * radius)
 				{
 					auto& pixel  = canvas(col, row);
@@ -236,13 +236,13 @@ public:
 	void onKeyUp(ImageView&, int);
 
 	template<ControlId>
-	void onMouseDown(ImageView& src, vec2_t pos_window, vec2_t pos_screen, int button);
+	void onMouseDown(ImageView& src, vec2_t loc_window, vec2_t loc_screen, int button);
 
 	template<ControlId>
-	void onMouseUp(ImageView& src, vec2_t pos_window, vec2_t pos_screen, int button);
+	void onMouseUp(ImageView& src, vec2_t loc_window, vec2_t loc_screen, int button);
 
 	template<ControlId>
-	void onMouseMove(ImageView& src, vec2_t pos_window, vec2_t pos_screen);
+	void onMouseMove(ImageView& src, vec2_t loc_window, vec2_t loc_screen);
 
 	template<ControlId>
 	void onClicked(Button& btn);
@@ -321,18 +321,18 @@ private:
 		m_current_color.inputField().palette(std::span{&rgb, 1}).update();
 	}
 
-	void updateHueSaturation(vec2_t pos_window)
+	void updateHueSaturation(vec2_t loc_window)
 	{
-		auto pos = pos_window / vec2_t{384.0, 384.0};
+		auto loc = loc_window / vec2_t{384.0, 384.0};
 		switch(m_key)
 		{
-			case 29: m_hsi.hue = std::clamp(pos[0], 0.0, 1.0); break;
+			case 29: m_hsi.hue = std::clamp(loc[0], 0.0, 1.0); break;
 
-			case 42: m_hsi.saturation = 1.0f - std::clamp(pos[1], 0.0, 1.0); break;
+			case 42: m_hsi.saturation = 1.0f - std::clamp(loc[1], 0.0, 1.0); break;
 
 			default:
-				m_hsi.hue        = std::clamp(pos[0], 0.0, 1.0);
-				m_hsi.saturation = 1.0f - std::clamp(pos[1], 0.0, 1.0);
+				m_hsi.hue        = std::clamp(loc[0], 0.0, 1.0);
+				m_hsi.saturation = 1.0f - std::clamp(loc[1], 0.0, 1.0);
 		}
 		update();
 	}
@@ -361,10 +361,10 @@ Texpainter::Ui::ColorPicker& Texpainter::Ui::ColorPicker::value(Model::Pixel col
 
 template<>
 void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseDown<ControlId::Colors>(
-    ImageView&, vec2_t pos_window, vec2_t, int button)
+    ImageView&, vec2_t loc_window, vec2_t, int button)
 {
 	m_btn_state |= (1 << button);
-	if(m_btn_state == 2) { updateHueSaturation(pos_window); }
+	if(m_btn_state == 2) { updateHueSaturation(loc_window); }
 }
 
 template<>
@@ -378,9 +378,9 @@ void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseUp<ControlId::Colors
 
 template<>
 void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseMove<ControlId::Colors>(
-    ImageView& view, vec2_t pos_window, vec2_t)
+    ImageView& view, vec2_t loc_window, vec2_t)
 {
-	if(m_btn_state == 2) { updateHueSaturation(pos_window); }
+	if(m_btn_state == 2) { updateHueSaturation(loc_window); }
 }
 
 template<>

@@ -6,13 +6,13 @@
 
 namespace
 {
-	void draw_marker(Texpainter::vec2_t pos, Texpainter::Span2d<Texpainter::Model::Pixel> canvas)
+	void draw_marker(Texpainter::vec2_t loc, Texpainter::Span2d<Texpainter::Model::Pixel> canvas)
 	{
 		constexpr auto radius   = 2;
 		auto const w            = canvas.width();
 		auto const h            = canvas.height();
-		auto const begin_coords = pos - Texpainter::vec2_t{radius, radius};
-		auto const end_coords   = pos + Texpainter::vec2_t{radius, radius};
+		auto const begin_coords = loc - Texpainter::vec2_t{radius, radius};
+		auto const end_coords   = loc + Texpainter::vec2_t{radius, radius};
 
 		for(int row = static_cast<int>(begin_coords[1]); row <= static_cast<int>(end_coords[1]);
 		    ++row)
@@ -22,7 +22,7 @@ namespace
 			{
 				auto const loc_ret =
 				    Texpainter::vec2_t{static_cast<double>(col), static_cast<double>(row)};
-				auto d = loc_ret - pos;
+				auto d = loc_ret - loc;
 				if(Texpainter::dot(d, d) < radius * radius)
 				{
 					auto& pixel = canvas(col % w, row % h);

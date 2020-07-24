@@ -136,7 +136,7 @@ namespace Texpainter
 			                            : IndexType{static_cast<size_t>(i - std::begin(m_seq))};
 		}
 
-		size_t position(Key const& key) const
+		size_t location(Key const& key) const
 		{
 			auto i = m_map.find(key);
 			return i == std::end(m_map) ? static_cast<size_t>(-1)

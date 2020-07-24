@@ -230,7 +230,7 @@ private:
 		gtk_widget_set_size_request(widget, -1, m_n_rows * m_min_size.height());
 	}
 
-	Model::ColorIndex coordsToItem(vec2_t pos) const
+	Model::ColorIndex coordsToItem(vec2_t loc) const
 	{
 		auto const widget = GTK_WIDGET(m_handle);
 		auto const widget_size =
@@ -239,7 +239,7 @@ private:
 
 		auto const item_size =
 		    widget_size / vec2_t{static_cast<double>(m_n_cols), static_cast<double>(m_n_rows)};
-		auto const col_row = pos / item_size;
+		auto const col_row = loc / item_size;
 
 		auto const col = static_cast<int>(col_row[0]);
 		auto const row = static_cast<int>(col_row[1]);

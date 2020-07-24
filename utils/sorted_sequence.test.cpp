@@ -50,7 +50,7 @@ namespace Testcases
 			assert(*seq["Phi"] == std::numbers::phi);
 			assert(*seq[1] == std::numbers::phi);
 			assert(seq.index("Phi") == 1);
-			assert(seq.position("pi") == 2);
+			assert(seq.location("pi") == 2);
 		}
 	}
 

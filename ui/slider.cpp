@@ -32,7 +32,7 @@ public:
 	void ticks(std::span<TickMark const> marks)
 	{
 		std::ranges::for_each(marks, [scale = m_handle](auto item) {
-			gtk_scale_add_mark(scale, item.position.value(), GTK_POS_RIGHT, item.text);
+			gtk_scale_add_mark(scale, item.location.value(), GTK_POS_RIGHT, item.text);
 		});
 	}
 

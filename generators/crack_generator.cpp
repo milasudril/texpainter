@@ -34,14 +34,14 @@ namespace
 			auto const w = std::max(line_width_from + t_i * line_width_delta, 2.0);
 			for(int n_i = -static_cast<int>(w); n_i < static_cast<int>(w + 0.5); ++n_i)
 			{
-				auto const pos =
+				auto const loc =
 				    from + static_cast<double>(t_i) * t + static_cast<double>(n_i) * 0.5 * n;
-				auto pos_x       = static_cast<int>(pos[0]);
-				auto pos_y       = static_cast<int>(pos[1]);
-				auto const n_pos = static_cast<double>(n_i) / w;
+				auto loc_x       = static_cast<int>(loc[0]);
+				auto loc_y       = static_cast<int>(loc[1]);
+				auto const n_loc = static_cast<double>(n_i) / w;
 				auto val         = noise_mod * max_depth(rng)
-				           + (1.0f - noise_mod) * (1.0f - static_cast<float>(n_pos * n_pos));
-				img(pos_x % img.width(), pos_y % img.height()) =
+				           + (1.0f - noise_mod) * (1.0f - static_cast<float>(n_loc * n_loc));
+				img(loc_x % img.width(), loc_y % img.height()) =
 				    Texpainter::Model::Pixel{val, val, val, 1.0};
 			}
 		}
@@ -59,8 +59,8 @@ namespace
 Texpainter::Model::Image Texpainter::Generators::CrackGenerator::operator()(Size2d output_size)
 {
 	auto size = sqrt(output_size.area());
-	std::uniform_int_distribution<uint32_t> init_pos_x{0, output_size.width() - 1};
-	std::uniform_int_distribution<uint32_t> init_pos_y{0, output_size.height() - 1};
+	std::uniform_int_distribution<uint32_t> init_loc_x{0, output_size.width() - 1};
+	std::uniform_int_distribution<uint32_t> init_loc_y{0, output_size.height() - 1};
 	std::exponential_distribution<double> seg_length_dist{1.0 / (m_seg_length * size)};
 
 	std::uniform_int_distribution<uint32_t> dir_dist_init{0, std::numeric_limits<uint32_t>::max()};
@@ -92,12 +92,12 @@ Texpainter::Model::Image Texpainter::Generators::CrackGenerator::operator()(Size
 
 		{
 			auto dir_init = Angle{static_cast<uint32_t>(dir_dist_init(r_rng))};
-			auto pos_init = vec2_t{static_cast<double>(init_pos_x(r_rng)),
-			                       static_cast<double>(init_pos_y(r_rng))};
+			auto loc_init = vec2_t{static_cast<double>(init_loc_x(r_rng)),
+			                       static_cast<double>(init_loc_y(r_rng))};
 
-			segs.push(LineSeg{pos_init, dir_init, line_width, 1});
+			segs.push(LineSeg{loc_init, dir_init, line_width, 1});
 
-			segs.push(LineSeg{pos_init, dir_init + Angle{0.5, Angle::Turns{}}, line_width, 1});
+			segs.push(LineSeg{loc_init, dir_init + Angle{0.5, Angle::Turns{}}, line_width, 1});
 		}
 
 		while(!segs.empty())

@@ -65,7 +65,7 @@ namespace Texpainter::Ui
 	public:
 		struct TickMark
 		{
-			SliderValue position;
+			SliderValue location;
 			char const* text;
 		};
 

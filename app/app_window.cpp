@@ -74,7 +74,7 @@ void Texpainter::AppWindow::updatePaletteSelector()
 	                      [&pal_selector](auto const& name) { pal_selector.append(name.c_str()); });
 
 	auto const& current_pal_name = m_current_document->currentPalette();
-	auto const current_layer_idx = m_current_document->palettes().position(current_pal_name);
+	auto const current_layer_idx = m_current_document->palettes().location(current_pal_name);
 	pal_selector.selected(static_cast<int>(current_layer_idx));
 
 	if(auto pal = currentPalette(*m_current_document); pal != nullptr)
@@ -98,7 +98,7 @@ void Texpainter::AppWindow::updateLayerInfo()
 			auto const& layer = *current_layer;
 			std::string msg{"Layer "};
 			msg += std::to_string(
-			    m_current_document->layers().position(m_current_document->currentLayer()));
+			    m_current_document->layers().location(m_current_document->currentLayer()));
 			msg += ". Size: ";
 			msg += std::to_string(layer.size().width());
 			msg += "×";
@@ -146,10 +146,10 @@ void Texpainter::AppWindow::doRender()
 	m_img_view.image(canvas);
 }
 
-void Texpainter::AppWindow::paint(vec2_t pos)
+void Texpainter::AppWindow::paint(vec2_t loc)
 {
 	m_current_document->layersModify(
-	    [pos,
+	    [loc,
 	     radius         = m_current_document->currentBrush().radius(),
 	     brush          = Model::BrushFunction{m_current_document->currentBrush().type()},
 	     color          = currentColor(*m_current_document),
@@ -157,20 +157,20 @@ void Texpainter::AppWindow::paint(vec2_t pos)
 		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
 			    {
 				    auto const scale = static_cast<float>(std::sqrt(layer->size().area()));
-				    layer->paint(pos, scale * radius, brush, color);
+				    layer->paint(loc, scale * radius, brush, color);
 			    }
 		    return true;
 	    });
 	doRender();
 }
 
-void Texpainter::AppWindow::grab(vec2_t pos)
+void Texpainter::AppWindow::grab(vec2_t loc)
 {
 	m_current_document->layersModify(
-	    [pos, &current_layer = m_current_document->currentLayer()](auto& layers) {
+	    [loc, &current_layer = m_current_document->currentLayer()](auto& layers) {
 		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
 			    {
-				    layer->location(pos);
+				    layer->location(loc);
 			    }
 		    return true;
 	    });
@@ -179,36 +179,36 @@ void Texpainter::AppWindow::grab(vec2_t pos)
 
 namespace
 {
-	Texpainter::vec2_t toLogicalCoordinates(Texpainter::Size2d size, Texpainter::vec2_t position)
+	Texpainter::vec2_t toLogicalCoordinates(Texpainter::Size2d size, Texpainter::vec2_t location)
 	{
 		auto const offset = 0.5
 		                    * Texpainter::vec2_t{static_cast<double>(size.width()),
 		                                         static_cast<double>(size.height())};
-		return position - offset;
+		return location - offset;
 	}
 }
 
 template<>
 void Texpainter::AppWindow::onMouseDown<Texpainter::AppWindow::ControlId::Canvas>(
-    Ui::ImageView& view, vec2_t pos_window, vec2_t pos_screen, int button)
+    Ui::ImageView& view, vec2_t loc_window, vec2_t loc_screen, int button)
 {
 	m_mouse_state |= 1 << (button - 1);
-	auto pos = ::toLogicalCoordinates(view.imageSize(), pos_window);
+	auto loc = ::toLogicalCoordinates(view.imageSize(), loc_window);
 
 	if(m_mouse_state & MouseButtonLeft)
 	{
 		switch(m_key_state.lastKey().value())
 		{
-			case GrabKey.value(): grab(pos); break;
-			default: paint(pos);
+			case GrabKey.value(): grab(loc); break;
+			default: paint(loc);
 		}
 	}
 }
 
 template<>
 void Texpainter::AppWindow::onMouseUp<Texpainter::AppWindow::ControlId::Canvas>(Ui::ImageView& view,
-                                                                                vec2_t pos_window,
-                                                                                vec2_t pos_screen,
+                                                                                vec2_t loc_window,
+                                                                                vec2_t loc_screen,
                                                                                 int button)
 {
 	m_mouse_state &= ~(1 << (button - 1));
@@ -216,16 +216,16 @@ void Texpainter::AppWindow::onMouseUp<Texpainter::AppWindow::ControlId::Canvas>(
 
 template<>
 void Texpainter::AppWindow::onMouseMove<Texpainter::AppWindow::ControlId::Canvas>(
-    Ui::ImageView& view, vec2_t pos_window, vec2_t pos_screen)
+    Ui::ImageView& view, vec2_t loc_window, vec2_t loc_screen)
 {
-	auto pos = ::toLogicalCoordinates(view.imageSize(), pos_window);
+	auto loc = ::toLogicalCoordinates(view.imageSize(), loc_window);
 
 	if(m_mouse_state & MouseButtonLeft)
 	{
 		switch(m_key_state.lastKey().value())
 		{
-			case GrabKey.value(): grab(pos); break;
-			default: paint(pos);
+			case GrabKey.value(): grab(loc); break;
+			default: paint(loc);
 		}
 	}
 }
@@ -326,14 +326,14 @@ namespace
 
 template<>
 void Texpainter::AppWindow::onMouseMove<Texpainter::AppWindow::ControlId::Canvas>(
-   Ui::ImageView& view, vec2_t pos_window, vec2_t pos_screen)
+   Ui::ImageView& view, vec2_t loc_window, vec2_t loc_screen)
 {
 	if(!m_painting) { return; }
 
 	auto const size = view.imageSize();
 	auto const offset =
 	   0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
-	auto const loc = pos_window - offset;
+	auto const loc = loc_window - offset;
 
 	switch(m_paintmode)
 	{
