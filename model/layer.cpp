@@ -42,13 +42,13 @@ Texpainter::Model::Layer& Texpainter::Model::Layer::paint(vec2_t origin,
 	auto const w = m_content->width();
 	auto const h = m_content->height();
 
-	origin /= m_scale;
+	//origin /= m_scale;
 	auto const offset = 0.5 * vec2_t{static_cast<double>(w), static_cast<double>(h)};
 	auto const ϴ      = m_rot;
 	auto const rot_x  = vec2_t{cos(ϴ), sin(ϴ)};
 	auto const rot_y  = vec2_t{-sin(ϴ), cos(ϴ)};
-	origin            = transform(origin * m_scale, rot_x, rot_y) / m_scale;
-	origin += offset - m_loc / m_scale;
+	origin            = transform(origin - m_loc, rot_x, rot_y) / m_scale + offset;
+
 	auto const r_vec        = vec2_t{static_cast<double>(radius), static_cast<double>(radius)};
 	auto const begin_coords = origin - r_vec;
 	auto const end_coords   = origin + r_vec;
