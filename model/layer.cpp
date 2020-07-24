@@ -44,6 +44,10 @@ Texpainter::Model::Layer& Texpainter::Model::Layer::paint(vec2_t origin,
 
 	origin /= m_scale;
 	auto const offset = 0.5 * vec2_t{static_cast<double>(w), static_cast<double>(h)};
+	auto const ϴ      = m_rot;
+	auto const rot_x  = vec2_t{cos(ϴ), sin(ϴ)};
+	auto const rot_y  = vec2_t{-sin(ϴ), cos(ϴ)};
+	origin            = transform(origin * m_scale, rot_x, rot_y) / m_scale;
 	origin += offset - m_loc / m_scale;
 	auto const r_vec        = vec2_t{static_cast<double>(radius), static_cast<double>(radius)};
 	auto const begin_coords = origin - r_vec;
