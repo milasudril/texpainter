@@ -4,6 +4,7 @@
 #define TEXPAINTER_COLORINDEX_HPP
 
 #include <cstdint>
+#include <compare>
 
 namespace Texpainter::Model
 {
@@ -12,23 +13,23 @@ namespace Texpainter::Model
 	public:
 		using element_type = uint32_t;
 
-		ColorIndex(): m_value{std::numeric_limits<uint32_t>::max()} {}
+		constexpr ColorIndex(): m_value{std::numeric_limits<uint32_t>::max()} {}
 
-		explicit ColorIndex(uint32_t val): m_value{val} {}
+		constexpr explicit ColorIndex(uint32_t val): m_value{val} {}
 
-		uint32_t value() const { return m_value; }
+		constexpr uint32_t value() const { return m_value; }
 
-		auto operator<=>(ColorIndex const&) const = default;
+		constexpr auto operator<=>(ColorIndex const&) const = default;
 
-		bool valid() const { return m_value != std::numeric_limits<uint32_t>::max(); }
+		constexpr bool valid() const { return m_value != std::numeric_limits<uint32_t>::max(); }
 
-		ColorIndex& operator++()
+		constexpr ColorIndex& operator++()
 		{
 			++m_value;
 			return *this;
 		}
 
-		ColorIndex& operator--()
+		constexpr ColorIndex& operator--()
 		{
 			--m_value;
 			return *this;

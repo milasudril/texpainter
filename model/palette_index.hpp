@@ -4,6 +4,7 @@
 #define TEXPAINTER_PALETTEINDEX_HPP
 
 #include <cstdint>
+#include <compare>
 
 namespace Texpainter::Model
 {
@@ -12,29 +13,29 @@ namespace Texpainter::Model
 	public:
 		using element_type = uint32_t;
 
-		PaletteIndex(): m_value{std::numeric_limits<uint32_t>::max()} {}
+		constexpr PaletteIndex(): m_value{std::numeric_limits<uint32_t>::max()} {}
 
-		explicit PaletteIndex(uint32_t val): m_value{val} {}
+		constexpr explicit PaletteIndex(uint32_t val): m_value{val} {}
 
-		uint32_t value() const { return m_value; }
+		constexpr uint32_t value() const { return m_value; }
 
-		auto operator<=>(PaletteIndex const&) const = default;
+		constexpr auto operator<=>(PaletteIndex const&) const = default;
 
-		bool valid() const { return m_value != std::numeric_limits<uint32_t>::max(); }
+		constexpr bool valid() const { return m_value != std::numeric_limits<uint32_t>::max(); }
 
-		PaletteIndex& operator++()
+		constexpr PaletteIndex& operator++()
 		{
 			++m_value;
 			return *this;
 		}
 
-		PaletteIndex& operator--()
+		constexpr PaletteIndex& operator--()
 		{
 			--m_value;
 			return *this;
 		}
 
-		explicit operator size_t() const { return m_value; }
+		constexpr explicit operator size_t() const { return m_value; }
 
 	private:
 		uint32_t m_value;

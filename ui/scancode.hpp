@@ -13,6 +13,8 @@ namespace Texpainter::Ui
 	class Scancode
 	{
 	public:
+		using element_type = uint8_t;
+
 		constexpr explicit Scancode(uint8_t val): m_value{val} {}
 
 		constexpr auto operator<=>(Scancode const&) const = default;

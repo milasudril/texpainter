@@ -249,7 +249,8 @@ namespace Texpainter::Ui
 					break;
 				case Scancodes::Return.value():
 				case Scancodes::ReturnNumpad.value():
-					m_vtable.confirm_positive(r_cb_obj, *this); break;
+					m_vtable.confirm_positive(r_cb_obj, *this);
+					break;
 			}
 		}
 
