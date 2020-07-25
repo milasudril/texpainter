@@ -6,6 +6,9 @@
 #include <cstdlib>
 #include <cstdio>
 #include <optional>
+#include <cerrno>
+#include <limits>
+#include <array>
 
 namespace Texpainter
 {

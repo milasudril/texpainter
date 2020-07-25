@@ -3,7 +3,10 @@
 #ifndef TEXPAINTER_UTILS_VECT_HPP
 #define TEXPAINTER_UTILS_VECT_HPP
 
+#include "./numconv.hpp"
+
 #include <cmath>
+#include <string>
 
 namespace Texpainter
 {
@@ -29,6 +32,19 @@ namespace Texpainter
 
 	constexpr auto min(vec4_t a, vec4_t b) { return a < b ? a : b; }
 
+	inline std::string toString(vec2_t v)
+	{
+		auto const x = toArray(static_cast<float>(v[0]));
+		auto const y = toArray(static_cast<float>(v[1]));
+
+		auto ret = std::string{"("};
+		ret += x.data();
+		ret += ", ";
+		ret += y.data();
+		ret += ")";
+
+		return ret;
+	}
 }
 
 #endif

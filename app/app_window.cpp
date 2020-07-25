@@ -177,9 +177,21 @@ void Texpainter::AppWindow::grabInit(vec2_t mouse_loc, Model::Layer const& curre
 
 void Texpainter::AppWindow::grab(vec2_t loc_current)
 {
+	auto layer = currentLayer(*m_current_document);
+	if(layer == nullptr) [[unlikely]]
+		{
+			return;
+		}
+
+	auto const 𝒙  = m_grab_state.location(loc_current);
+	auto const Δ𝒙 = 𝒙 - m_grab_state.initLocation();
+	std::string info;
+	info += "Grab Δ𝒙 = ";
+	info += toString(Δ𝒙);
+	m_paint_info.content(info.c_str());
+
 	m_current_document->layersModify(
-	    [loc            = m_grab_state.location(loc_current),
-	     &current_layer = m_current_document->currentLayer()](auto& layers) {
+	    [loc = 𝒙, &current_layer = m_current_document->currentLayer()](auto& layers) {
 		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
 			    {
 				    layer->location(loc);

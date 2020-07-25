@@ -172,6 +172,8 @@ namespace Texpainter
 				return m_layer_loc + (loc_current - m_mouse_loc);
 			}
 
+			vec2_t initLocation() const { return m_layer_loc; }
+
 		private:
 			vec2_t m_layer_loc;
 			vec2_t m_mouse_loc;
