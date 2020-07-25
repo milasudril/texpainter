@@ -203,11 +203,11 @@ void Texpainter::AppWindow::scaleInit(vec2_t mouse_loc, Model::Layer const& curr
 	auto const ϴ     = current_layer.rotation();
 	auto const rot_x = vec2_t{cos(ϴ), sin(ϴ)};
 	auto const rot_y = vec2_t{-sin(ϴ), cos(ϴ)};
-	auto const v     = transform(mouse_loc - current_layer.location(), rot_x, rot_y);
+	auto const 𝒙     = transform(mouse_loc - current_layer.location(), rot_x, rot_y);
 
 	m_scale_state = m_trans_mode == TransformationMode::Absolute
-	                    ? ScaleState{vec2_t{1.0, 1.0}, v}
-	                    : ScaleState{current_layer.scaleFactor(), v};
+	                    ? ScaleState{vec2_t{1.0, 1.0}, 𝒙}
+	                    : ScaleState{current_layer.scaleFactor(), 𝒙};
 }
 
 void Texpainter::AppWindow::scale(vec2_t loc_current)
@@ -221,11 +221,17 @@ void Texpainter::AppWindow::scale(vec2_t loc_current)
 	auto const ϴ     = layer->rotation();
 	auto const rot_x = vec2_t{cos(ϴ), sin(ϴ)};
 	auto const rot_y = vec2_t{-sin(ϴ), cos(ϴ)};
-	auto const v     = transform(loc_current - layer->location(), rot_x, rot_y);
+	auto const 𝒙     = transform(loc_current - layer->location(), rot_x, rot_y);
+
+	auto const 𝐬  = m_scale_state.scaleFactor(𝒙);
+	auto const Ϙ𝐬 = 𝐬 / m_scale_state.initScale();
+	std::string info;
+	info += "Grab Ϙ𝐬 = ";
+	info += toString(Ϙ𝐬);
+	m_paint_info.content(info.c_str());
 
 	m_current_document->layersModify(
-	    [factor         = m_scale_state.scaleFactor(v),
-	     &current_layer = m_current_document->currentLayer()](auto& layers) {
+	    [factor = 𝐬, &current_layer = m_current_document->currentLayer()](auto& layers) {
 		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
 			    {
 				    layer->scaleFactor(factor);
