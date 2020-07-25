@@ -168,14 +168,11 @@ void Texpainter::AppWindow::paint(vec2_t loc)
 	    });
 	doRender();
 }
-void Texpainter::AppWindow::grabInit(vec2_t mouse_loc)
+void Texpainter::AppWindow::grabInit(vec2_t mouse_loc, Model::Layer const& current_layer)
 {
-	if(auto layer = currentLayer(*m_current_document); layer != nullptr)
-	{
-		m_grab_state = m_trans_mode == TransformationMode::Absolute
-		                   ? GrabState{vec2_t{0.0, 0.0}, vec2_t{0.0, 0.0}}
-		                   : GrabState{layer->location(), mouse_loc};
-	}
+	m_grab_state = m_trans_mode == TransformationMode::Absolute
+	                   ? GrabState{vec2_t{0.0, 0.0}, vec2_t{0.0, 0.0}}
+	                   : GrabState{current_layer.location(), mouse_loc};
 }
 
 void Texpainter::AppWindow::grab(vec2_t loc_current)
@@ -193,19 +190,16 @@ void Texpainter::AppWindow::grab(vec2_t loc_current)
 	doRender();
 }
 
-void Texpainter::AppWindow::scaleInit(vec2_t mouse_loc)
+void Texpainter::AppWindow::scaleInit(vec2_t mouse_loc, Model::Layer const& current_layer)
 {
-	if(auto layer = currentLayer(*m_current_document); layer != nullptr)
-	{
-		auto const ϴ     = layer->rotation();
-		auto const rot_x = vec2_t{cos(ϴ), sin(ϴ)};
-		auto const rot_y = vec2_t{-sin(ϴ), cos(ϴ)};
-		auto const v     = transform(mouse_loc - layer->location(), rot_x, rot_y);
+	auto const ϴ     = current_layer.rotation();
+	auto const rot_x = vec2_t{cos(ϴ), sin(ϴ)};
+	auto const rot_y = vec2_t{-sin(ϴ), cos(ϴ)};
+	auto const v     = transform(mouse_loc - current_layer.location(), rot_x, rot_y);
 
-		m_scale_state = m_trans_mode == TransformationMode::Absolute
-		                    ? ScaleState{vec2_t{1.0, 1.0}, v}
-		                    : ScaleState{layer->scaleFactor(), v};
-	}
+	m_scale_state = m_trans_mode == TransformationMode::Absolute
+	                    ? ScaleState{vec2_t{1.0, 1.0}, v}
+	                    : ScaleState{current_layer.scaleFactor(), v};
 }
 
 void Texpainter::AppWindow::scale(vec2_t loc_current)
@@ -235,15 +229,12 @@ void Texpainter::AppWindow::scale(vec2_t loc_current)
 }
 
 
-void Texpainter::AppWindow::rotateInit(vec2_t mouse_loc)
+void Texpainter::AppWindow::rotateInit(vec2_t mouse_loc, Model::Layer const& current_layer)
 {
-	if(auto layer = currentLayer(*m_current_document); layer != nullptr)
-	{
-		m_rot_state =
-		    m_trans_mode == TransformationMode::Absolute
-		        ? RotateState{Angle{0, Angle::Turns{}}, Angle{mouse_loc - layer->location()}}
-		        : RotateState{layer->rotation(), Angle{mouse_loc - layer->location()}};
-	}
+	m_rot_state =
+	    m_trans_mode == TransformationMode::Absolute
+	        ? RotateState{Angle{0, Angle::Turns{}}, Angle{mouse_loc - current_layer.location()}}
+	        : RotateState{current_layer.rotation(), Angle{mouse_loc - current_layer.location()}};
 }
 
 namespace
@@ -323,17 +314,31 @@ void Texpainter::AppWindow::rotate(vec2_t loc_current)
 	doRender();
 }
 
-void Texpainter::AppWindow::printIdleInfo(vec2_t mouse_loc)
+void Texpainter::AppWindow::printIdleInfo()
 {
-	std::string info;
-	info += "LMB = paint | LMB + {'G' = grab (or move) | 'R' = rotate | 'S' = scale}. ";
+	std::string infostring{"LMB = "};
+	switch(m_key_state.lastKey().value())
+	{
+		case GrabKey.value(): infostring += "grab"; break;
+
+		case ScaleKey.value():
+			infostring += "scale | LMB + 'G' + {Shift = Fix aspect ratio | Ctrl = Fixed ratios}";
+			break;
+
+		case RotateKey.value(): infostring += "rotate | LMB + 'R' + {Ctrl = Fixed angles}"; break;
+
+		default:
+			infostring += "LMB = paint | LMB + {'G' = grab (or move) | 'R' = rotate | 'S' = scale}";
+	}
+	infostring += ". ";
 	if(m_trans_mode == TransformationMode::Absolute)
-	{ info += " Transformations are relative to the canvas."; }
+	{ infostring += "Transformations are relative to the canvas"; }
 	else
 	{
-		info += "'A' enables canvas-relative transformations.";
+		infostring += "'A' enables canvas-relative transformations";
 	}
-	m_paint_info.content(info.c_str());
+	infostring += ".";
+	m_paint_info.content(infostring.c_str());
 }
 
 
@@ -359,6 +364,8 @@ void Texpainter::AppWindow::onKeyDown(Ui::Scancode key)
 	if(key == GrabKey || key == RotateKey || key == ScaleKey) { m_key_state.press(key); }
 
 	if(key == CtrlLeft || key == ShiftLeft) { m_mod_state.press(key); }
+
+	if(m_layer_selector.inputField().selected() != -1) { printIdleInfo(); };
 }
 
 void Texpainter::AppWindow::onKeyUp(Ui::Scancode key)
@@ -371,6 +378,8 @@ void Texpainter::AppWindow::onKeyUp(Ui::Scancode key)
 		case AbsTransformKey.value(): m_trans_mode = TransformationMode::Relative; break;
 	}
 	m_key_prev = Ui::Scancode{0xff};
+
+	if(m_layer_selector.inputField().selected() != -1) { printIdleInfo(); }
 }
 
 
@@ -403,52 +412,52 @@ void Texpainter::AppWindow::onMouseUp<Texpainter::AppWindow::ControlId::Canvas>(
                                                                                 int button)
 {
 	m_mouse_state &= ~(1 << (button - 1));
-	m_paint_info.content("");
+	printIdleInfo();
 }
 
 template<>
 void Texpainter::AppWindow::onMouseMove<Texpainter::AppWindow::ControlId::Canvas>(
     Ui::ImageView& view, vec2_t loc_window, vec2_t loc_screen)
 {
-	// FIXME: This function should not do anything unless there is a current layer.
-	auto loc = ::toLogicalCoordinates(view.imageSize(), loc_window);
-
-	if(m_mouse_state & MouseButtonLeft)
+	if(auto layer = currentLayer(*m_current_document); layer != nullptr)
 	{
-		switch(m_key_state.lastKey().value())
+		auto loc = ::toLogicalCoordinates(view.imageSize(), loc_window);
+		if(m_mouse_state & MouseButtonLeft)
 		{
-			case GrabKey.value():
-				grab(loc);
-				scaleInit(loc);
-				rotateInit(loc);
-				break;
+			switch(m_key_state.lastKey().value())
+			{
+				case GrabKey.value():
+					grab(loc);
+					scaleInit(loc, *layer);
+					rotateInit(loc, *layer);
+					break;
 
-			case ScaleKey.value():
-				scale(loc);
-				grabInit(loc);
-				rotateInit(loc);
-				break;
+				case ScaleKey.value():
+					scale(loc);
+					grabInit(loc, *layer);
+					rotateInit(loc, *layer);
+					break;
 
-			case RotateKey.value():
-				rotate(loc);
-				grabInit(loc);
-				scaleInit(loc);
-				break;
+				case RotateKey.value():
+					rotate(loc);
+					grabInit(loc, *layer);
+					scaleInit(loc, *layer);
+					break;
 
-			default:
-				paint(loc);
-				grabInit(loc);
-				scaleInit(loc);
-				rotateInit(loc);
-				printIdleInfo(loc);
+				default:
+					paint(loc);
+					grabInit(loc, *layer);
+					scaleInit(loc, *layer);
+					rotateInit(loc, *layer);
+			}
 		}
-	}
-	else
-	{
-		grabInit(loc);
-		scaleInit(loc);
-		rotateInit(loc);
-		printIdleInfo(loc);
+		else
+		{
+			printIdleInfo();
+			grabInit(loc, *layer);
+			scaleInit(loc, *layer);
+			rotateInit(loc, *layer);
+		}
 	}
 }
 

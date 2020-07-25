@@ -252,16 +252,16 @@ namespace Texpainter
 
 		void paint(vec2_t loc);
 
-		void grabInit(vec2_t loc);
+		void grabInit(vec2_t loc, Model::Layer const& current_layer);
 		void grab(vec2_t loc);
 
-		void scaleInit(vec2_t loc);
+		void scaleInit(vec2_t loc, Model::Layer const& current_layer);
 		void scale(vec2_t loc);
 
-		void rotateInit(vec2_t loc);
+		void rotateInit(vec2_t loc, Model::Layer const& current_layer);
 		void rotate(vec2_t loc);
 
-		void printIdleInfo(vec2_t loc);
+		void printIdleInfo();
 	};
 
 	template<>
