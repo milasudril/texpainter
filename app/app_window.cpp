@@ -6,6 +6,7 @@ Texpainter::AppWindow::AppWindow(Ui::Container& container, PolymorphicRng rng)
     :  // State
     m_rng{rng}
     , m_mouse_state{0}
+    , m_mod_state{0}
     , m_key_prev{0xff}
     , m_trans_mode{TransformationMode::Relative}
 
@@ -210,7 +211,6 @@ void Texpainter::AppWindow::scaleInit(vec2_t mouse_loc, Model::Layer const& curr
 	                    : ScaleState{current_layer.scaleFactor(), 𝒙};
 }
 
-#if 0
 namespace
 {
 	constexpr Texpainter::vec2_t snap_factors(Texpainter::vec2_t v)
@@ -261,10 +261,23 @@ namespace
 	{
 		auto const factor = Texpainter::length(v);
 
-		return Texpainter::vec2_t{factor, factor};
+		return Texpainter::signum(v) * Texpainter::vec2_t{factor, factor} / std::numbers::sqrt2;
 	}
 };
-#endif
+
+namespace
+{
+	constexpr auto MouseButtonLeft  = 0x1;
+	constexpr auto MouseButtonRight = 0x4;
+	constexpr auto AbsTransformKey  = Texpainter::Ui::Scancode{30};
+	constexpr auto GrabKey          = Texpainter::Ui::Scancode{34};
+	constexpr auto RotateKey        = Texpainter::Ui::Scancode{19};
+	constexpr auto ScaleKey         = Texpainter::Ui::Scancode{31};
+	constexpr auto CtrlLeft         = Texpainter::Ui::Scancode{29};
+	constexpr auto ShiftLeft        = Texpainter::Ui::Scancode{42};
+	constexpr auto CtrlLeftMask     = 0x1;
+	constexpr auto ShiftLeftMask    = 0x2;
+}
 
 void Texpainter::AppWindow::scale(vec2_t loc_current)
 {
@@ -279,10 +292,22 @@ void Texpainter::AppWindow::scale(vec2_t loc_current)
 	auto const rot_y = vec2_t{-sin(ϴ), cos(ϴ)};
 	auto const 𝒙     = transform(loc_current - layer->location(), rot_x, rot_y);
 
-	auto const 𝐬  = m_scale_state.scaleFactor(𝒙);
+	auto snapfun = static_cast<vec2_t (*)(vec2_t)>([](vec2_t 𝐬) { return 𝐬; });
+	switch(m_mod_state)
+	{
+		case ShiftLeftMask: snapfun = keep_aspect_ratio; break;
+
+		case CtrlLeftMask: snapfun = snap_factors; break;
+
+		case ShiftLeftMask | CtrlLeftMask:
+			snapfun = [](vec2_t 𝐬) { return snap_factors(keep_aspect_ratio(𝐬)); };
+			break;
+	}
+
+	auto const 𝐬  = m_scale_state.scaleFactor(𝒙, snapfun);
 	auto const Ϙ𝐬 = 𝐬 / m_scale_state.initScale();
 	std::string info;
-	info += "Grab Ϙ𝐬 = ";
+	info += "Scale Ϙ𝐬 = ";
 	info += toString(Ϙ𝐬);
 	m_paint_info.content(info.c_str());
 
@@ -305,20 +330,6 @@ void Texpainter::AppWindow::rotateInit(vec2_t mouse_loc, Model::Layer const& cur
 	    m_trans_mode == TransformationMode::Absolute
 	        ? RotateState{Angle{0, Angle::Turns{}}, Angle{mouse_loc - current_layer.location()}}
 	        : RotateState{current_layer.rotation(), Angle{mouse_loc - current_layer.location()}};
-}
-
-namespace
-{
-	constexpr auto MouseButtonLeft  = 0x1;
-	constexpr auto MouseButtonRight = 0x4;
-	constexpr auto AbsTransformKey  = Texpainter::Ui::Scancode{30};
-	constexpr auto GrabKey          = Texpainter::Ui::Scancode{34};
-	constexpr auto RotateKey        = Texpainter::Ui::Scancode{19};
-	constexpr auto ScaleKey         = Texpainter::Ui::Scancode{31};
-	constexpr auto CtrlLeft         = Texpainter::Ui::Scancode{29};
-	constexpr auto ShiftLeft        = Texpainter::Ui::Scancode{42};
-	constexpr auto CtrlLeftMask     = 0x1;
-	constexpr auto ShiftLeftMask    = 0x1;
 }
 
 namespace

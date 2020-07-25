@@ -190,9 +190,10 @@ namespace Texpainter
 			{
 			}
 
-			vec2_t scaleFactor(vec2_t loc_current) const
+			template<class SnapFunction>
+			vec2_t scaleFactor(vec2_t loc_current, SnapFunction&& f) const
 			{
-				return m_layer_scale * loc_current / m_mouse_loc;
+				return m_layer_scale * f(loc_current / m_mouse_loc);
 			}
 
 			vec2_t initScale() const { return m_layer_scale; }

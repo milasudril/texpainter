@@ -30,6 +30,13 @@ namespace Texpainter
 
 	constexpr auto min(vec4_t a, vec4_t b) { return a < b ? a : b; }
 
+	constexpr vec2_t signum(vec2_t x)
+	{
+		auto const mask        = x < 0;
+		auto const mask_double = vec2_t{static_cast<double>(mask[0]), static_cast<double>(mask[1])};
+		return mask_double * vec2_t{1.0, 1.0} + (1.0 + mask_double) * vec2_t{1.0, 1.0};
+	}
+
 	inline std::string toString(vec2_t v)
 	{
 		auto ret = std::string{"("};
