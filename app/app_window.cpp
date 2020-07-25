@@ -411,7 +411,7 @@ void Texpainter::AppWindow::printIdleInfo()
 		case RotateKey.value(): infostring += "rotate | LMB + 'R' + {Ctrl = Fixed angles}"; break;
 
 		default:
-			infostring += "LMB = paint | LMB + {'G' = grab (or move) | 'R' = rotate | 'S' = scale}";
+			infostring += "paint | LMB + {'G' = grab (or move) | 'R' = rotate | 'S' = scale}";
 	}
 	infostring += ". ";
 	if(m_trans_mode == TransformationMode::Absolute)
