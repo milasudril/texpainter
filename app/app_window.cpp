@@ -108,15 +108,11 @@ void Texpainter::AppWindow::updateLayerInfo()
 			msg += std::to_string(layer.size().width());
 			msg += "×";
 			msg += std::to_string(layer.size().height());
-			msg += " Position: (";
-			msg += std::to_string(layer.location()[0]);
-			msg += ", ";
-			msg += std::to_string(layer.location()[1]);
-			msg += ") Scale: (";
-			msg += std::to_string(layer.scaleFactor()[0]);
-			msg += ", ";
-			msg += std::to_string(layer.scaleFactor()[1]);
-			msg += ") Rotation: ";
+			msg += " Position: ";
+			msg += toString(layer.location());
+			msg += " Scale: ";
+			msg += toString(layer.scaleFactor());
+			msg += " Rotation: ";
 			msg += std::to_string(layer.rotation().turns());
 			m_layer_info.content(msg.c_str());
 		}

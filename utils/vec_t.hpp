@@ -3,8 +3,6 @@
 #ifndef TEXPAINTER_UTILS_VECT_HPP
 #define TEXPAINTER_UTILS_VECT_HPP
 
-#include "./numconv.hpp"
-
 #include <cmath>
 #include <string>
 
@@ -34,13 +32,10 @@ namespace Texpainter
 
 	inline std::string toString(vec2_t v)
 	{
-		auto const x = toArray(static_cast<float>(v[0]));
-		auto const y = toArray(static_cast<float>(v[1]));
-
 		auto ret = std::string{"("};
-		ret += x.data();
+		ret += std::to_string(v[0]);
 		ret += ", ";
-		ret += y.data();
+		ret += std::to_string(v[1]);
 		ret += ")";
 
 		return ret;
