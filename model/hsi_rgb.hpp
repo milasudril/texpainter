@@ -19,7 +19,7 @@ namespace Texpainter::Model
 		float alpha;
 	};
 
-	Pixel toRgb(Hsi const& hsi)
+	inline Pixel toRgb(Hsi const& hsi)
 	{
 		auto tmp = [](Hsi const& hsi) {
 			auto const h = static_cast<float>(6.0f * hsi.hue);

@@ -227,7 +227,9 @@ private:
 		++div;
 		m_n_cols = div;
 		m_n_rows = m_colors.size() / div + ((m_colors.size() % div) != 0);
-		gtk_widget_set_size_request(widget, -1, m_n_rows * m_min_size.height());
+		gtk_widget_set_size_request(widget,
+		                            std::max(-1, static_cast<int>(m_min_size.width())),
+		                            m_n_rows * m_min_size.height());
 	}
 
 	Model::ColorIndex coordsToItem(vec2_t loc) const

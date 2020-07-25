@@ -112,7 +112,8 @@ namespace Texpainter::Model
 		vec2_t m_scale;
 		std::shared_ptr<Image> m_content;
 
-		explicit Layer(bool vis, vec2_t loc, Angle rot, vec2_t scale, std::shared_ptr<Image> const& content)
+		explicit Layer(
+		    bool vis, vec2_t loc, Angle rot, vec2_t scale, std::shared_ptr<Image> const& content)
 		    : m_visible{vis}
 		    , m_loc{loc}
 		    , m_rot{rot}
