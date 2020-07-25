@@ -317,6 +317,8 @@ namespace
 	constexpr auto ScaleKey         = Texpainter::Ui::Scancode{31};
 	constexpr auto CtrlLeft         = Texpainter::Ui::Scancode{29};
 	constexpr auto ShiftLeft        = Texpainter::Ui::Scancode{42};
+	constexpr auto CtrlLeftMask     = 0x1;
+	constexpr auto ShiftLeftMask    = 0x1;
 }
 
 namespace
@@ -362,8 +364,8 @@ void Texpainter::AppWindow::rotate(vec2_t loc_current)
 			return;
 		}
 
-	auto snapfun = m_mod_state.lastKey() == CtrlLeft ? [](Angle ϴ) { return snap(ϴ); }
-	                                                 : [](Angle ϴ) { return ϴ; };
+	auto snapfun =
+	    (m_mod_state & CtrlLeftMask) ? [](Angle ϴ) { return snap(ϴ); } : [](Angle ϴ) { return ϴ; };
 
 	auto const Θ  = m_rot_state.rotation(Angle{loc_current - layer->location()}, snapfun);
 	auto const ΔΘ = Θ - m_rot_state.initRotation();
@@ -429,11 +431,14 @@ void Texpainter::AppWindow::onKeyDown(Ui::Scancode key)
 	if(key == m_key_prev) { return; }
 	m_key_prev = key;
 
-	if(key == AbsTransformKey) { m_trans_mode = TransformationMode::Absolute; }
-
 	if(key == GrabKey || key == RotateKey || key == ScaleKey) { m_key_state.press(key); }
 
-	if(key == CtrlLeft || key == ShiftLeft) { m_mod_state.press(key); }
+	switch(key.value())
+	{
+		case AbsTransformKey.value(): m_trans_mode = TransformationMode::Absolute; break;
+		case CtrlLeft.value(): m_mod_state |= CtrlLeftMask; break;
+		case ShiftLeft.value(): m_mod_state |= ShiftLeftMask; break;
+	}
 
 	if(m_layer_selector.inputField().selected() != -1) { printIdleInfo(); };
 }
@@ -441,11 +446,12 @@ void Texpainter::AppWindow::onKeyDown(Ui::Scancode key)
 void Texpainter::AppWindow::onKeyUp(Ui::Scancode key)
 {
 	m_key_state.release(key);  // No operation if key not in set
-	m_mod_state.release(key);
 
 	switch(key.value())
 	{
 		case AbsTransformKey.value(): m_trans_mode = TransformationMode::Relative; break;
+		case CtrlLeft.value(): m_mod_state &= (~CtrlLeftMask); break;
+		case ShiftLeft.value(): m_mod_state &= (~ShiftLeftMask); break;
 	}
 	m_key_prev = Ui::Scancode{0xff};
 
@@ -465,11 +471,8 @@ void Texpainter::AppWindow::onMouseDown<Texpainter::AppWindow::ControlId::Canvas
 		switch(m_key_state.lastKey().value())
 		{
 			case GrabKey.value(): grab(loc); break;
-
 			case ScaleKey.value(): scale(loc); break;
-
 			case RotateKey.value(): rotate(loc); break;
-
 			default: paint(loc);
 		}
 	}

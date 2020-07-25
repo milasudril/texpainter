@@ -146,7 +146,7 @@ namespace Texpainter
 		PolymorphicRng m_rng;
 		uint32_t m_mouse_state;
 		Ui::KeyboardState m_key_state;
-		Ui::KeyboardState m_mod_state;
+		uint32_t m_mod_state;
 		Ui::Scancode m_key_prev;
 
 		enum class TransformationMode : int
