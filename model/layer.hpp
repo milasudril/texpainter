@@ -48,11 +48,11 @@ namespace Texpainter::Model
 
 		Layer& operator=(Layer const& other) = delete;
 
-		Layer linkedLayer() const { return Layer{m_loc, m_rot, m_scale, m_content}; }
+		Layer linkedLayer() const { return Layer{m_visible, m_loc, m_rot, m_scale, m_content}; }
 
 		Layer copiedLayer() const
 		{
-			return Layer{m_loc, m_rot, m_scale, std::make_shared<Image>(*m_content)};
+			return Layer{m_visible, m_loc, m_rot, m_scale, std::make_shared<Image>(*m_content)};
 		}
 
 		Layer& convertToCopy()
@@ -112,8 +112,9 @@ namespace Texpainter::Model
 		vec2_t m_scale;
 		std::shared_ptr<Image> m_content;
 
-		explicit Layer(vec2_t loc, Angle rot, vec2_t scale, std::shared_ptr<Image> const& content)
-		    : m_loc{loc}
+		explicit Layer(bool vis, vec2_t loc, Angle rot, vec2_t scale, std::shared_ptr<Image> const& content)
+		    : m_visible{vis}
+		    , m_loc{loc}
 		    , m_rot{rot}
 		    , m_scale{scale}
 		    , m_content{content}
