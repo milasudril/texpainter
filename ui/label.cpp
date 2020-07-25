@@ -62,6 +62,16 @@ public:
 	void alignment(float x)
 	{
 		m_alignment_x = x;
+		if(x < 1.0f / 3.0f) { pango_layout_set_alignment(m_content, PANGO_ALIGN_LEFT); }
+		else if(x >= 2.0f / 3.0f)
+		{
+			pango_layout_set_alignment(m_content, PANGO_ALIGN_RIGHT);
+		}
+		else
+		{
+			pango_layout_set_alignment(m_content, PANGO_ALIGN_CENTER);
+		}
+
 		gtk_widget_queue_draw(GTK_WIDGET(m_handle));
 	}
 
@@ -75,7 +85,6 @@ private:
 	bool m_oneline;
 	static gboolean draw(GtkWidget* object, cairo_t* cr, void* obj);
 	static void size_changed(GtkWidget* widget, GtkAllocation* allocation, void* obj);
-	static void screen_changed(GtkWidget* widget, GdkScreen* previous_screen, void* obj);
 };
 
 Texpainter::Ui::Label::Label(Container& cnt, const char* text) { m_impl = new Impl(cnt, text); }
@@ -105,9 +114,8 @@ Texpainter::Ui::Label& Texpainter::Ui::Label::alignment(float x)
 
 Texpainter::Ui::Label::Impl::Impl(Container& cnt, const char* text): Label{*this}
 {
-	m_oneline     = false;
-	m_alignment_x = 0.5f;
-	auto widget   = gtk_drawing_area_new();
+	m_oneline   = false;
+	auto widget = gtk_drawing_area_new();
 
 	m_handle = GTK_DRAWING_AREA(widget);
 	g_object_ref_sink(m_handle);
@@ -122,10 +130,10 @@ Texpainter::Ui::Label::Impl::Impl(Container& cnt, const char* text): Label{*this
 
 	g_signal_connect(m_handle, "draw", G_CALLBACK(draw), this);
 	g_signal_connect(widget, "size-allocate", G_CALLBACK(size_changed), this);
-	g_signal_connect(widget, "screen-changed", G_CALLBACK(screen_changed), this);
 
 
 	m_content = gtk_widget_create_pango_layout(widget, text);
+	alignment(0.0f);
 	pango_layout_set_wrap(m_content, PANGO_WRAP_WORD);  //	We can always word wrap now...
 	pango_layout_get_pixel_extents(m_content, NULL, &m_content_rect);
 
@@ -163,7 +171,8 @@ void Texpainter::Ui::Label::Impl::size_changed(GtkWidget* widget,
 	auto self = reinterpret_cast<Impl*>(obj);
 	auto w    = gtk_widget_get_allocated_width(widget);
 
-	pango_layout_set_width(self->m_content, PANGO_SCALE * w);
+	if(!self->m_oneline) { pango_layout_set_width(self->m_content, PANGO_SCALE * w); }
+	pango_layout_get_pixel_extents(self->m_content, NULL, &self->m_content_rect);
 }
 
 
@@ -174,41 +183,10 @@ gboolean Texpainter::Ui::Label::Impl::draw(GtkWidget* widget, cairo_t* cr, void*
 	auto h       = static_cast<double>(gtk_widget_get_allocated_height(widget));
 	auto w       = static_cast<double>(gtk_widget_get_allocated_width(widget));
 
-
-	PangoRectangle painted;
-	pango_layout_get_extents(self->m_content, &painted, NULL);
-	auto scale = static_cast<double>(PANGO_SCALE);
-	;
-	auto x =
-	    std::max(0.0, -painted.x / scale + self->m_alignment_x * w - 0.5 * painted.width / scale);
+	auto x = self->m_content_rect.x + self->m_alignment_x * (w - self->m_content_rect.width);
 	auto y = -self->m_content_rect.y + 0.5 * (h - self->m_content_rect.height);
 	gtk_render_layout(context, cr, x, y, self->m_content);
 	return TRUE;
-}
-
-void Texpainter::Ui::Label::Impl::screen_changed(GtkWidget* widget,
-                                                 GdkScreen* previous_screen,
-                                                 void* obj)
-{
-	auto self = reinterpret_cast<Impl*>(obj);
-	if(self->m_impl != nullptr)
-	{
-		auto text    = pango_layout_get_text(self->m_content);
-		auto content = gtk_widget_create_pango_layout(GTK_WIDGET(self->m_handle), text);
-		pango_layout_set_wrap(content, PANGO_WRAP_WORD);  //	We can always word wrap now...
-		pango_layout_get_pixel_extents(content, NULL, &self->m_content_rect);
-
-		//	Change with so the rendered text is at most 500 px
-		auto w = std::min(self->m_content_rect.width, 500);
-		pango_layout_set_width(content, PANGO_SCALE * w);
-		pango_layout_get_pixel_extents(content, NULL, &self->m_content_rect);
-
-		//	Request size based on the size of the layout
-		gtk_widget_set_size_request(GTK_WIDGET(self->m_handle), w, self->m_content_rect.height);
-
-		g_object_unref(self->m_content);
-		self->m_content = content;
-	}
 }
 
 Texpainter::Ui::Label& Texpainter::Ui::Label::oneline(bool status)

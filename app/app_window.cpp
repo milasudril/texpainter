@@ -31,8 +31,8 @@ Texpainter::AppWindow::AppWindow(Ui::Container& container, PolymorphicRng rng)
                          "Palette: "}
     , m_pal_view{m_selectors.insertMode(Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand})}
     , m_info{m_rows, Ui::Box::Orientation::Horizontal}
-    , m_layer_info{m_info.insertMode(Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand}), ""}
-    , m_paint_info{m_info, ""}
+    , m_layer_info{m_info, ""}
+    , m_paint_info{m_info.insertMode(Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand}), ""}
     , m_img_view{m_rows.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
 
 
@@ -43,7 +43,7 @@ Texpainter::AppWindow::AppWindow(Ui::Container& container, PolymorphicRng rng)
 	m_layer_info.oneline(true)
 	    .content("Open the \"Document\" menu to create or open a document")
 	    .alignment(0.0f);
-	m_paint_info.oneline(true).alignment(0.0f);
+	m_paint_info.oneline(true).alignment(1.0f);
 	m_menu.eventHandler(*this);
 }
 
