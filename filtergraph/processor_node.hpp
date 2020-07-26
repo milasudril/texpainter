@@ -21,25 +21,37 @@ namespace Texpainter::FilterGraph
 		constexpr auto operator<=>(ProcParamValue const&) const = default;
 	};
 
+
+	enum class PixelType : int
+	{
+		RGBA,
+		GrayscaleReal,
+		GrayscaleComplex
+	};
+
+	using ProcArgumentType = std::variant<Span2d<Model::Pixel const>,
+	                                           Span2d<double const>,
+	                                           Span2d<std::complex<double> const>>;
+
+	using ProcResultType = std::variant<Model::BasicImage<Model::Pixel>,
+	                                         Model::BasicImage<double>,
+	                                         Model::BasicImage<std::complex<double>>>;
+
 	class ProcessorNode
 	{
 	public:
-		using argument_type = std::variant<Span2d<Model::Pixel const>,
-		                                   Span2d<double const>,
-		                                   Span2d<std::complex<double> const>>;
+		using argument_type = ProcArgumentType;
 
-		using result_type = std::variant<Model::BasicImage<Model::Pixel>,
-		                                 Model::BasicImage<double>,
-		                                 Model::BasicImage<std::complex<double>>>;
+		using result_type = ProcResultType;
 
 
 		ProcessorNode(): m_proc{std::make_unique<ProcessorDummy>()} {}
 
-		template<class Processor,
-		         std::enable_if_t<!std::is_same_v<ProcessorNode, std::decay_t<Processor>>, int> = 0>
-		explicit ProcessorNode(Processor&& proc)
+		template<class Proc,
+		         std::enable_if_t<!std::is_same_v<ProcessorNode, std::decay_t<Proc>>, int> = 0>
+		explicit ProcessorNode(Proc&& proc)
 		    : m_inputs(proc.inputCount())  // Must use old-style ctor here to get the correct size
-		    , m_proc{std::make_unique<Processor>(std::forward<Processor>(proc))}
+		    , m_proc{std::make_unique<ProcessorImpl<std::decay_t<Proc>>>(std::forward<Proc>(proc))}
 		{
 		}
 
@@ -71,8 +83,7 @@ namespace Texpainter::FilterGraph
 			return *this;
 		}
 
-		size_t inputCount() const
-		{ return m_inputs.size(); }
+		size_t inputCount() const { return m_inputs.size(); }
 
 
 		ProcessorNode& set(std::string_view param_name, ProcParamValue val)
