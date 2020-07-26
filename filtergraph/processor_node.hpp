@@ -6,7 +6,6 @@
 #define TEXPAINTER_FILTERPIPE_PROCESSORNODE_HPP
 
 #include "model/image.hpp"
-#include "utils/unique_function.hpp"
 
 #include <complex>
 #include <vector>
@@ -25,6 +24,11 @@ namespace Texpainter::FilterPipe
 		using result_type = std::variant<Model::Image,
 		                                 Model::BasicImage<double>,
 		                                 Model::BasicImage<std::complex<double>>>;
+
+		struct ProcParamValue
+		{
+			double m_value;
+		};
 
 
 		ProcessorNode()
@@ -71,6 +75,16 @@ namespace Texpainter::FilterPipe
 		}
 
 
+		ProcessorNode& set(std::string_view param_name, ProcParamValue val)
+		{
+			m_proc->set(param_name, val);
+			return *this;
+		}
+
+
+		ProcParamValue get(std::string_view param_name) const { return m_proc->get(param_name); }
+
+
 	private:
 		mutable std::vector<return_type> m_result_cache;
 
@@ -96,7 +110,61 @@ namespace Texpainter::FilterPipe
 		};
 
 		std::vector<SourceNode> m_inputs;
-		UniqueFunction m_proc;
+
+		class Processor
+		{
+		public:
+			virtual std::vector<return_type> operator()(std::span<argument_type const>) const = 0;
+			virtual ProcParamValue get(std::string_view param_name) const                     = 0;
+			virtual Processor& set(std::string_view param_name, ProcParamValue value)         = 0;
+			virtual ~Processor() = default;
+		};
+		std::unique_ptr<Processor> m_proc;
+
+
+		template<class Proc>
+		class ProcessorImpl: public Processor
+		{
+		public:
+			template<class T,
+			         std::enable_if_t<!std::is_same_v<ProcessorImpl, std::decay_t<T>>, int> = 0>
+			explicit Processor(T&& proc): m_proc{std::move{proc}}
+			{
+			}
+
+			std::vector<return_type> operator()(std::span<argument_type const> args) const override
+			{
+				return m_proc(args);
+			}
+
+			ProcParamValue get(std::string_view param_name) const override
+			{
+				return m_proc.get(param_name);
+			}
+
+			ProcessorImpl& set(std::string_view param_name, ProcParamValue value) override
+			{
+				(void)m_proc.set(param_name, value);
+				return *this;
+			}
+
+		private:
+			Proc m_proc;
+		};
+
+		template<class Proc>
+		class ProcessorDummy: public Processor
+		{
+		public:
+			std::vector<return_type> operator()(std::span<argument_type const> args) const
+			{
+				return std::vector<return_type>{};
+			}
+
+			ProcParamValue get(std::string_view) const override { return ProcParamValue{0.0}; }
+
+			ProcessorImpl& set(std::string_view, ProcParamValue) override { return *this; }
+		};
 	};
 }
 
