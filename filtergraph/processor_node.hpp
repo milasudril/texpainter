@@ -30,12 +30,12 @@ namespace Texpainter::FilterGraph
 	};
 
 	using ProcArgumentType = std::variant<Span2d<Model::Pixel const>,
-	                                           Span2d<double const>,
-	                                           Span2d<std::complex<double> const>>;
+	                                      Span2d<double const>,
+	                                      Span2d<std::complex<double> const>>;
 
 	using ProcResultType = std::variant<Model::BasicImage<Model::Pixel>,
-	                                         Model::BasicImage<double>,
-	                                         Model::BasicImage<std::complex<double>>>;
+	                                    Model::BasicImage<double>,
+	                                    Model::BasicImage<std::complex<double>>>;
 
 	class ProcessorNode
 	{
