@@ -12,8 +12,15 @@
 #include <vector>
 #include <variant>
 
-namespace Texpainter::FilterPipe
+namespace Texpainter::FilterGraph
 {
+	struct ProcParamValue
+	{
+		double m_value;
+
+		constexpr auto operator<=>(ProcParamValue const&) const = default;
+	};
+
 	class ProcessorNode
 	{
 	public:
@@ -24,11 +31,6 @@ namespace Texpainter::FilterPipe
 		using result_type = std::variant<Model::BasicImage<Model::Pixel>,
 		                                 Model::BasicImage<double>,
 		                                 Model::BasicImage<std::complex<double>>>;
-
-		struct ProcParamValue
-		{
-			double m_value;
-		};
 
 
 		ProcessorNode(): m_proc{std::make_unique<ProcessorDummy>()} {}
@@ -69,13 +71,15 @@ namespace Texpainter::FilterPipe
 			return *this;
 		}
 
+		size_t inputCount() const
+		{ return m_inputs.size(); }
+
 
 		ProcessorNode& set(std::string_view param_name, ProcParamValue val)
 		{
 			m_proc->set(param_name, val);
 			return *this;
 		}
-
 
 		ProcParamValue get(std::string_view param_name) const { return m_proc->get(param_name); }
 
