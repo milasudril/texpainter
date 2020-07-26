@@ -31,18 +31,13 @@ namespace Texpainter::FilterPipe
 		};
 
 
-		ProcessorNode()
-		    : m_proc{[](std::span<argument_type const>) {
-			    return std::vector<result_type> {}
-		    }}
-		{
-		}
+		ProcessorNode(): m_proc{std::make_unique<ProcessorDummy>()} {}
 
 		template<class Processor,
 		         std::enable_if_t<!std::is_same_v<ProcessorNode, std::decay_t<Processor>>, int> = 0>
 		explicit ProcessorNode(Processor&& proc)
 		    : m_inputs(proc.inputCount())  // Must use old-style ctor here to get the correct size
-		    , m_proc{std::forward<Processor>(proc)}
+		    , m_proc{std::make_unique<Processor>(std::forward<Processor>(proc))}
 		{
 		}
 
@@ -61,10 +56,10 @@ namespace Texpainter::FilterPipe
 
 
 		ProcessorNode& connect(size_t socket,
-		                       std::shared_ptr<ProcessorNode const>&& other,
+		                       std::reference_wrapper<ProcessorNode const> other,
 		                       size_t other_socket)
 		{
-			m_inputs[socket] = SourceNode{std::move(other), other_socket};
+			m_inputs[socket] = SourceNode{other, other_socket};
 			return *this;
 		}
 
@@ -87,15 +82,22 @@ namespace Texpainter::FilterPipe
 
 	private:
 		mutable std::vector<return_type> m_result_cache;
+		static ProcessorNode s_default_node;
 
 		class SourceNode
 		{
 		public:
-			SourceNode(): m_processor{std::make_shared<ProcessorNode>(), 0} {}
+			SourceNode(): r_processor{s_default_node, 0} {}
+
+			explicit SourceNode(std::reference_wrapper<ProcessorNode const> node, size_t index)
+			    : r_processor{node}
+			    , m_index{index}
+			{
+			}
 
 			decltype(auto) operator()() const
 			{
-				if(auto res = (*m_processor)(); m_index < std::size(res)) [[likely]]
+				if(auto res = r_processor(); m_index < std::size(res)) [[likely]]
 					{
 						return argument_type{
 						    std::visit([](auto const& val) { return val.pixels(); }, res[m_index])};
@@ -105,7 +107,7 @@ namespace Texpainter::FilterPipe
 			}
 
 		private:
-			std::shared_ptr<ProcessorNode const> m_processor;
+			std::reference_wrapper<ProcessorNode const> r_processor;
 			size_t m_index;
 		};
 
