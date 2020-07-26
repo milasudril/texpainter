@@ -6,7 +6,7 @@
 #define TEXPAINTER_FILTERPIPE_PROCESSORNODE_HPP
 
 #include "model/image.hpp"
-#include "utility/unique_function.hpp"
+#include "utils/unique_function.hpp"
 
 #include <complex>
 #include <vector>

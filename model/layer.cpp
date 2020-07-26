@@ -25,7 +25,7 @@ namespace
 				auto d = loc_ret - loc;
 				if(Texpainter::dot(d, d) < radius * radius)
 				{
-					auto& pixel = canvas(col % w, row % h);
+					auto& pixel = canvas((col + w) % w, (row + h) % h);
 					pixel       = Texpainter::Model::Pixel{1.0f, 1.0f, 1.0f, 1.0f} - pixel;
 					pixel.alpha(1.0f);
 				}
@@ -60,7 +60,7 @@ Texpainter::Model::Layer& Texpainter::Model::Layer::paint(vec2_t origin,
 		{
 			auto const loc_ret = vec2_t{static_cast<double>(col), static_cast<double>(row)};
 			auto d             = loc_ret - origin;
-			if(brush(radius, d)) { pixels(col % w, row % h) = color; }
+			if(brush(radius, d)) { pixels((col + w) % w, (row + h) % h) = color; }
 		}
 	}
 	return *this;
@@ -120,7 +120,8 @@ void Texpainter::Model::render(Layer const& layer, Span2d<Pixel> ret)
 			{
 				auto const src_pixel =
 				    src(static_cast<uint32_t>(src_pos[0]), static_cast<uint32_t>(src_pos[1]));
-				auto& ret_pixel = ret(col % ret.width(), row % ret.height());
+				auto& ret_pixel =
+				    ret((col + ret.width()) % ret.width(), (row + ret.height()) % ret.height());
 				ret_pixel = src_pixel.alpha() * src_pixel + (1.0f - src_pixel.alpha()) * ret_pixel;
 			}
 		}
