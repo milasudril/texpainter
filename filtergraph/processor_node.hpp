@@ -1,5 +1,6 @@
 //@	{
-//@	 "targets":[{"name":"processor_node.hpp","type":"include"}]
+//@	 "targets":[{"name":"processor_node.hpp", "type":"include"}]
+//@	,"dependencies_extra":[{"ref":"processor_node.o", "rel":"implementation"}]
 //@	}
 
 #ifndef TEXPAINTER_FILTERPIPE_PROCESSORNODE_HPP
@@ -16,12 +17,11 @@ namespace Texpainter::FilterPipe
 	class ProcessorNode
 	{
 	public:
-		using argument_type = std::variant<std::false_type,
-		                                   Span2d<Model::Pixel const>,
-		                                   Span2d<double>,
-		                                   Span2d<std::complex<double>>>;
+		using argument_type = std::variant<Span2d<Model::Pixel const>,
+		                                   Span2d<double const>,
+		                                   Span2d<std::complex<double> const>>;
 
-		using result_type = std::variant<Model::Image,
+		using result_type = std::variant<Model::BasicImage<Model::Pixel>,
 		                                 Model::BasicImage<double>,
 		                                 Model::BasicImage<std::complex<double>>>;
 
@@ -42,15 +42,15 @@ namespace Texpainter::FilterPipe
 		}
 
 
-		std::vector<return_type> const& operator()() const
+		std::vector<result_type> const& operator()() const
 		{
-			if(m_result.size() != 0) { return m_result; }
+			if(m_result_cache.size() != 0) { return m_result_cache; }
 
 			std::vector<argument_type> args;
 			std::ranges::transform(
 			    m_inputs, std::back_inserter(args), [](auto const& val) { return val(); });
 
-			m_result_cache = m_proc(args);
+			m_result_cache = (*m_proc)(args);
 			return m_result_cache;
 		}
 
@@ -81,13 +81,13 @@ namespace Texpainter::FilterPipe
 
 
 	private:
-		mutable std::vector<return_type> m_result_cache;
+		mutable std::vector<result_type> m_result_cache;
 		static ProcessorNode s_default_node;
 
 		class SourceNode
 		{
 		public:
-			SourceNode(): r_processor{s_default_node, 0} {}
+			SourceNode(): r_processor{s_default_node}, m_index{0} {}
 
 			explicit SourceNode(std::reference_wrapper<ProcessorNode const> node, size_t index)
 			    : r_processor{node}
@@ -95,15 +95,16 @@ namespace Texpainter::FilterPipe
 			{
 			}
 
-			decltype(auto) operator()() const
+			argument_type operator()() const
 			{
 				if(auto res = r_processor(); m_index < std::size(res)) [[likely]]
 					{
-						return argument_type{
-						    std::visit([](auto const& val) { return val.pixels(); }, res[m_index])};
+						return std::visit(
+						    [](auto const& val) { return argument_type{val.pixels()}; },
+						    res[m_index]);
 					}
 
-				return argument_type{std::false_type{}};
+				return argument_type{};
 			}
 
 		private:
@@ -116,7 +117,7 @@ namespace Texpainter::FilterPipe
 		class Processor
 		{
 		public:
-			virtual std::vector<return_type> operator()(std::span<argument_type const>) const = 0;
+			virtual std::vector<result_type> operator()(std::span<argument_type const>) const = 0;
 			virtual ProcParamValue get(std::string_view param_name) const                     = 0;
 			virtual Processor& set(std::string_view param_name, ProcParamValue value)         = 0;
 			virtual ~Processor() = default;
@@ -130,11 +131,11 @@ namespace Texpainter::FilterPipe
 		public:
 			template<class T,
 			         std::enable_if_t<!std::is_same_v<ProcessorImpl, std::decay_t<T>>, int> = 0>
-			explicit Processor(T&& proc): m_proc{std::move{proc}}
+			explicit ProcessorImpl(T&& proc): m_proc{std::move(proc)}
 			{
 			}
 
-			std::vector<return_type> operator()(std::span<argument_type const> args) const override
+			std::vector<result_type> operator()(std::span<argument_type const> args) const override
 			{
 				return m_proc(args);
 			}
@@ -154,18 +155,17 @@ namespace Texpainter::FilterPipe
 			Proc m_proc;
 		};
 
-		template<class Proc>
 		class ProcessorDummy: public Processor
 		{
 		public:
-			std::vector<return_type> operator()(std::span<argument_type const> args) const
+			std::vector<result_type> operator()(std::span<argument_type const> args) const
 			{
-				return std::vector<return_type>{};
+				return std::vector<result_type>{};
 			}
 
 			ProcParamValue get(std::string_view) const override { return ProcParamValue{0.0}; }
 
-			ProcessorImpl& set(std::string_view, ProcParamValue) override { return *this; }
+			ProcessorDummy& set(std::string_view, ProcParamValue) override { return *this; }
 		};
 	};
 }
