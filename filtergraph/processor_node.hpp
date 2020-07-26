@@ -22,7 +22,7 @@ namespace Texpainter::FilterGraph
 	};
 
 
-	enum class PixelType : int
+	enum class PixelType : size_t
 	{
 		RGBA,
 		GrayscaleReal,
@@ -33,9 +33,19 @@ namespace Texpainter::FilterGraph
 	                                      Span2d<double const>,
 	                                      Span2d<std::complex<double> const>>;
 
+	inline PixelType pixelType(ProcArgumentType const& x)
+	{
+		return static_cast<PixelType>(x.index());
+	}
+
 	using ProcResultType = std::variant<Model::BasicImage<Model::Pixel>,
 	                                    Model::BasicImage<double>,
 	                                    Model::BasicImage<std::complex<double>>>;
+
+	inline PixelType pixelType(ProcResultType const& x)
+	{
+		return static_cast<PixelType>(x.index());
+	}
 
 	class ProcessorNode
 	{
@@ -61,9 +71,10 @@ namespace Texpainter::FilterGraph
 			if(m_result_cache.size() != 0) { return m_result_cache; }
 
 			std::vector<argument_type> args;
-			std::ranges::transform(
-			    m_inputs, std::back_inserter(args), [](auto const& val) { return val(); });
-
+			std::ranges::transform(m_inputs, std::back_inserter(args), [](auto const& val) {
+				auto const& ret = val();
+				return ret;
+			});
 			m_result_cache = (*m_proc)(args);
 			return m_result_cache;
 		}
@@ -112,10 +123,12 @@ namespace Texpainter::FilterGraph
 
 			argument_type operator()() const
 			{
-				if(auto res = r_processor(); m_index < std::size(res)) [[likely]]
+				if(auto const& res = r_processor(); m_index < std::size(res)) [[likely]]
 					{
 						return std::visit(
-						    [](auto const& val) { return argument_type{val.pixels()}; },
+						    [](auto const& val) {
+							    return argument_type{val.pixels()};
+						    },
 						    res[m_index]);
 					}
 

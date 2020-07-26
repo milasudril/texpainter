@@ -9,6 +9,43 @@
 
 namespace
 {
+	class InputProcessor
+	{
+	public:
+		InputProcessor(size_t& req_count): r_req_count{req_count} {}
+
+		std::vector<Texpainter::FilterGraph::ProcResultType> operator()(
+		    std::span<Texpainter::FilterGraph::ProcArgumentType const>) const
+		{
+			Texpainter::Model::Image ret_a{1, 1};
+			ret_a.pixels()(0, 0) = Texpainter::Model::Pixel{0.0f, 1.0f, 0.0f, 0.0f};
+
+			Texpainter::Model::Image ret_b{1, 1};
+			ret_b.pixels()(0, 0) = Texpainter::Model::Pixel{0.0f, 0.0f, 1.0f, 0.0f};
+
+			++r_req_count;
+			return std::vector<Texpainter::FilterGraph::ProcResultType>{std::move(ret_a),
+			                                                            std::move(ret_b)};
+		}
+
+		Texpainter::FilterGraph::ProcParamValue get(std::string_view) const
+		{
+			return Texpainter::FilterGraph::ProcParamValue{0.0};
+		}
+
+		InputProcessor& set(std::string_view, Texpainter::FilterGraph::ProcParamValue)
+		{
+			return *this;
+		}
+
+		size_t inputCount() const { return 0; }
+
+	private:
+		std::map<std::string, double, std::less<>> m_params;
+
+		size_t& r_req_count;
+	};
+
 	class TestProcessor
 	{
 	public:
@@ -18,7 +55,21 @@ namespace
 		std::vector<Texpainter::FilterGraph::ProcResultType> operator()(
 		    std::span<Texpainter::FilterGraph::ProcArgumentType const> args) const
 		{
-			return std::vector<Texpainter::FilterGraph::ProcResultType>{};
+			using namespace Texpainter;
+
+			std::vector<Texpainter::FilterGraph::ProcResultType> ret{};
+			assert(std::size(args) == 2);
+			for(int k = 0; k < 2; ++k)
+			{
+				if(auto val = std::get_if<Span2d<Model::Pixel const>>(&args[k]); val != nullptr)
+				{
+					Texpainter::Model::Image img{1, 1};
+					img.pixels()(0, 0) =
+					    Texpainter::Model::Pixel{1.0f, 0.0f, 0.0f, 1.0f} + (*val)(0, 0);
+					ret.push_back(std::move(img));
+				}
+			}
+			return ret;
 		}
 
 		Texpainter::FilterGraph::ProcParamValue get(std::string_view param_name) const
@@ -62,12 +113,37 @@ namespace Testcases
 		assert(node.inputCount() == 2);
 		node.set("Foo", Texpainter::FilterGraph::ProcParamValue{0.5});
 		assert(node.get("Foo") == Texpainter::FilterGraph::ProcParamValue{0.5});
+
+		size_t req_count = 0;
+
+		Texpainter::FilterGraph::ProcessorNode src{InputProcessor{req_count}};
+		node.connect(0, src, 0);
+		node.connect(1, src, 1);
+
+		auto res = node();
+		assert(std::size(res) == 2);
+		assert(req_count == 1);
+
+		auto res_0 = get_if<Texpainter::Model::Image>(&res[0]);
+		auto res_1 = get_if<Texpainter::Model::Image>(&res[1]);
+		assert(res_0 != nullptr);
+		assert(res_1 != nullptr);
+
+		assert(res_0->pixels()(0, 0).red() == 1.0f);
+		assert(res_0->pixels()(0, 0).green() == 1.0f);
+		assert(res_0->pixels()(0, 0).blue() == 0.0f);
+		assert(res_0->pixels()(0, 0).alpha() == 1.0f);
+
+		assert(res_1->pixels()(0, 0).red() == 1.0f);
+		assert(res_1->pixels()(0, 0).green() == 0.0f);
+		assert(res_1->pixels()(0, 0).blue() == 1.0f);
+		assert(res_1->pixels()(0, 0).alpha() == 1.0f);
 	}
 };
 
 int main()
 {
-	Testcases::filtergraphProcessorNodeDummy();
+	//	Testcases::filtergraphProcessorNodeDummy();
 
 	Testcases::filtergraphProcessorNodeGetOutput();
 	return 0;
