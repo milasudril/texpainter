@@ -64,7 +64,11 @@ namespace Texpainter::FilterPipe
 			return *this;
 		}
 
-		ProcessorNode& disconnect(size_t socket) { m_inputs[socket] = SourceNode{}; }
+		ProcessorNode& disconnect(size_t socket)
+		{
+			m_inputs[socket] = SourceNode{};
+			return *this;
+		}
 
 
 	private:
