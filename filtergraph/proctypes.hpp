@@ -94,23 +94,28 @@ namespace Texpainter::FilterGraph
 			std::as_const(a).paramNames()
 		}
 		->std::same_as<std::span<std::string_view const>>;
+
 		{
 			std::as_const(a).paramValues()
 		}
 		->std::same_as<std::vector<ProcParamValue>>;
+
 		{a.set(std::declval<std::string_view>(), std::declval<ProcParamValue>())};
 		{
 			std::as_const(a).get(std::declval<std::string_view>())
 		}
 		->std::same_as<ProcParamValue>;
+
 		{
 			std::as_const(a).inputPorts()
 		}
 		->std::same_as<std::span<std::string_view const>>;
+
 		{
 			std::as_const(a).outputPorts()
 		}
 		->std::same_as<std::span<std::string_view const>>;
+
 		{
 			std::as_const(a)(std::declval<std::span<ProcArgumentType const>>())
 		}
