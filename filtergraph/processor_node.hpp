@@ -120,15 +120,11 @@ namespace Texpainter::FilterGraph
 		std::unique_ptr<Processor> m_proc;
 
 
-		template<class Proc>
+		template<ImageProcessor Proc>
 		class ProcessorImpl: public Processor
 		{
 		public:
-			template<class T,
-			         std::enable_if_t<!std::is_same_v<ProcessorImpl, std::decay_t<T>>, int> = 0>
-			explicit ProcessorImpl(T&& proc): m_proc{std::move(proc)}
-			{
-			}
+			explicit ProcessorImpl(Proc&& proc): m_proc{std::move(proc)} {}
 
 			std::vector<result_type> operator()(std::span<argument_type const> args) const override
 			{

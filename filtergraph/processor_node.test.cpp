@@ -14,6 +14,28 @@ namespace
 	public:
 		InputProcessor(size_t& req_count): r_req_count{req_count} {}
 
+		std::span<std::string_view const> paramNames() const
+		{
+			return std::span<std::string_view>{};
+		}
+
+		std::vector<Texpainter::FilterGraph::ProcParamValue> paramValues() const
+		{
+			return std::vector<Texpainter::FilterGraph::ProcParamValue>{};
+		}
+
+		std::span<std::string_view const> inputPorts() const
+		{
+			return std::span<std::string_view>{};
+		}
+
+		std::span<std::string_view const> outputPorts() const
+		{
+			constexpr std::string_view ret[] = {"Output 1", "Output 2"};
+			return ret;
+		}
+
+
 		std::vector<Texpainter::FilterGraph::ProcResultType> operator()(
 		    std::span<Texpainter::FilterGraph::ProcArgumentType const>) const
 		{
@@ -41,8 +63,6 @@ namespace
 		size_t inputCount() const { return 0; }
 
 	private:
-		std::map<std::string, double, std::less<>> m_params;
-
 		size_t& r_req_count;
 	};
 
@@ -50,6 +70,33 @@ namespace
 	{
 	public:
 		size_t inputCount() const { return 2; }
+
+		std::span<std::string_view const> paramNames() const
+		{
+			constexpr std::string_view ret[] = {"Bar", "Foo"};
+			return ret;
+		}
+
+		std::vector<Texpainter::FilterGraph::ProcParamValue> paramValues() const
+		{
+			std::vector<Texpainter::FilterGraph::ProcParamValue> ret;
+			std::ranges::transform(m_params, std::back_inserter(ret), [](auto val) {
+				return Texpainter::FilterGraph::ProcParamValue{val.second};
+			});
+			return ret;
+		}
+
+		std::span<std::string_view const> inputPorts() const
+		{
+			constexpr std::string_view ret[] = {"Input 1", "Input 2"};
+			return ret;
+		}
+
+		std::span<std::string_view const> outputPorts() const
+		{
+			constexpr std::string_view ret[] = {"Output 1", "Output 2"};
+			return ret;
+		}
 
 
 		std::vector<Texpainter::FilterGraph::ProcResultType> operator()(
