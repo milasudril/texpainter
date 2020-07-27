@@ -55,13 +55,13 @@ namespace
 		std::vector<Texpainter::FilterGraph::ProcResultType> operator()(
 		    std::span<Texpainter::FilterGraph::ProcArgumentType const> args) const
 		{
-			using namespace Texpainter;
-
 			std::vector<Texpainter::FilterGraph::ProcResultType> ret{};
 			assert(std::size(args) == 2);
 			for(int k = 0; k < 2; ++k)
 			{
-				if(auto val = std::get_if<Span2d<Model::Pixel const>>(&args[k]); val != nullptr)
+				if(auto val =
+				       std::get_if<Texpainter::Span2d<Texpainter::Model::Pixel const>>(&args[k]);
+				   val != nullptr)
 				{
 					Texpainter::Model::Image img{1, 1};
 					img.pixels()(0, 0) =
@@ -117,8 +117,10 @@ namespace Testcases
 		size_t req_count = 0;
 
 		Texpainter::FilterGraph::ProcessorNode src{InputProcessor{req_count}};
-		node.connect(0, src, 0);
-		node.connect(1, src, 1);
+		node.connect(
+		    Texpainter::FilterGraph::InputPort{0}, src, Texpainter::FilterGraph::OutputPort{0});
+		node.connect(
+		    Texpainter::FilterGraph::InputPort{1}, src, Texpainter::FilterGraph::OutputPort{1});
 
 		auto res = node();
 		assert(std::size(res) == 2);

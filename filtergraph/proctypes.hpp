@@ -16,17 +16,48 @@ namespace Texpainter::FilterGraph
 	class ProcParamValue
 	{
 	public:
-		explicit constexpr ProcParamValue(double val): m_value{val}
-		{}
+		explicit constexpr ProcParamValue(double val): m_value{val} {}
 
 		constexpr auto operator<=>(ProcParamValue const&) const = default;
 
-		constexpr double value() const
-		{ return m_value; }
+		constexpr double value() const { return m_value; }
 
 	private:
 		double m_value;
 	};
+
+	enum class PortType : int
+	{
+		Input,
+		Output
+	};
+
+	template<PortType type>
+	class Port
+	{
+	public:
+		explicit constexpr Port(uint32_t val): m_value{val} {}
+
+		constexpr uint32_t value() const { return m_value; }
+
+	private:
+		uint32_t m_value;
+	};
+
+	template<PortType type>
+	constexpr bool operator==(Port<type> a, Port<type> b)
+	{
+		return a.value() == b.value();
+	}
+
+	template<PortType type>
+	constexpr bool operator!=(Port<type> a, Port<type> b)
+	{
+		return !(a == b);
+	}
+
+	using InputPort  = Port<PortType::Input>;
+	using OutputPort = Port<PortType::Output>;
 
 
 	enum class PixelType : size_t

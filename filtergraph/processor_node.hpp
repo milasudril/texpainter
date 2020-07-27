@@ -49,17 +49,17 @@ namespace Texpainter::FilterGraph
 		}
 
 
-		ProcessorNode& connect(size_t socket,
+		ProcessorNode& connect(InputPort input,
 		                       std::reference_wrapper<ProcessorNode const> other,
-		                       size_t other_socket)
+		                       OutputPort output)
 		{
-			m_inputs[socket] = SourceNode{other, other_socket};
+			m_inputs[input.value()] = SourceNode{other, output};
 			return *this;
 		}
 
-		ProcessorNode& disconnect(size_t socket)
+		ProcessorNode& disconnect(InputPort input)
 		{
-			m_inputs[socket] = SourceNode{};
+			m_inputs[input.value()] = SourceNode{};
 			return *this;
 		}
 
@@ -82,9 +82,9 @@ namespace Texpainter::FilterGraph
 		class SourceNode
 		{
 		public:
-			SourceNode(): r_processor{s_default_node}, m_index{0} {}
+			SourceNode(): r_processor{s_default_node}, m_index{OutputPort{0}} {}
 
-			explicit SourceNode(std::reference_wrapper<ProcessorNode const> node, size_t index)
+			explicit SourceNode(std::reference_wrapper<ProcessorNode const> node, OutputPort index)
 			    : r_processor{node}
 			    , m_index{index}
 			{
@@ -92,11 +92,11 @@ namespace Texpainter::FilterGraph
 
 			argument_type operator()() const
 			{
-				if(auto const& res = r_processor(); m_index < std::size(res)) [[likely]]
+				if(auto const& res = r_processor(); m_index.value() < std::size(res)) [[likely]]
 					{
 						return std::visit(
 						    [](auto const& val) { return argument_type{val.pixels()}; },
-						    res[m_index]);
+						    res[m_index.value()]);
 					}
 
 				return argument_type{};
@@ -104,7 +104,7 @@ namespace Texpainter::FilterGraph
 
 		private:
 			std::reference_wrapper<ProcessorNode const> r_processor;
-			size_t m_index;
+			OutputPort m_index;
 		};
 
 		std::vector<SourceNode> m_inputs;
