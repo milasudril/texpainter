@@ -6,6 +6,8 @@
 #ifndef TEXPAINTER_FILTERPIPE_PROCESSORNODE_HPP
 #define TEXPAINTER_FILTERPIPE_PROCESSORNODE_HPP
 
+#include "./proctypes.hpp"
+
 #include "model/image.hpp"
 
 #include <complex>
@@ -14,39 +16,6 @@
 
 namespace Texpainter::FilterGraph
 {
-	struct ProcParamValue
-	{
-		double m_value;
-
-		constexpr auto operator<=>(ProcParamValue const&) const = default;
-	};
-
-
-	enum class PixelType : size_t
-	{
-		RGBA,
-		GrayscaleReal,
-		GrayscaleComplex
-	};
-
-	using ProcArgumentType = std::variant<Span2d<Model::Pixel const>,
-	                                      Span2d<double const>,
-	                                      Span2d<std::complex<double> const>>;
-
-	inline PixelType pixelType(ProcArgumentType const& x)
-	{
-		return static_cast<PixelType>(x.index());
-	}
-
-	using ProcResultType = std::variant<Model::BasicImage<Model::Pixel>,
-	                                    Model::BasicImage<double>,
-	                                    Model::BasicImage<std::complex<double>>>;
-
-	inline PixelType pixelType(ProcResultType const& x)
-	{
-		return static_cast<PixelType>(x.index());
-	}
-
 	class ProcessorNode
 	{
 	public:
@@ -126,9 +95,7 @@ namespace Texpainter::FilterGraph
 				if(auto const& res = r_processor(); m_index < std::size(res)) [[likely]]
 					{
 						return std::visit(
-						    [](auto const& val) {
-							    return argument_type{val.pixels()};
-						    },
+						    [](auto const& val) { return argument_type{val.pixels()}; },
 						    res[m_index]);
 					}
 
