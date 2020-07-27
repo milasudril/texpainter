@@ -83,7 +83,7 @@ namespace
 		TestProcessor& set(std::string_view param_name,
 		                   Texpainter::FilterGraph::ProcParamValue value)
 		{
-			m_params[std::string{param_name}] = value.m_value;
+			m_params[std::string{param_name}] = value.value();
 			return *this;
 		}
 

@@ -13,11 +13,19 @@
 
 namespace Texpainter::FilterGraph
 {
-	struct ProcParamValue
+	class ProcParamValue
 	{
-		double m_value;
+	public:
+		explicit constexpr ProcParamValue(double val): m_value{val}
+		{}
 
 		constexpr auto operator<=>(ProcParamValue const&) const = default;
+
+		constexpr double value() const
+		{ return m_value; }
+
+	private:
+		double m_value;
 	};
 
 
