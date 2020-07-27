@@ -150,14 +150,14 @@ namespace Testcases
 
 		assert(&node.set("Foo", Texpainter::FilterGraph::ProcParamValue{0.5}) == &node);
 		assert(node.get("Foo") == Texpainter::FilterGraph::ProcParamValue{0.0});
-		assert(node.inputCount() == 0);
+		assert(node.inputPorts().size() == 0);
 	}
 
 	void filtergraphProcessorNodeGetOutput()
 	{
 		Texpainter::FilterGraph::ProcessorNode node{TestProcessor{}};
 
-		assert(node.inputCount() == 2);
+		assert(node.inputPorts().size() == 2);
 		node.set("Foo", Texpainter::FilterGraph::ProcParamValue{0.5});
 		assert(node.get("Foo") == Texpainter::FilterGraph::ProcParamValue{0.5});
 

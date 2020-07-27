@@ -29,7 +29,8 @@ namespace Texpainter::FilterGraph
 		template<class Proc,
 		         std::enable_if_t<!std::is_same_v<ProcessorNode, std::decay_t<Proc>>, int> = 0>
 		explicit ProcessorNode(Proc&& proc)
-		    : m_inputs(proc.inputCount())  // Must use old-style ctor here to get the correct size
+		    : m_inputs(
+		        proc.inputPorts().size())  // Must use old-style ctor here to get the correct size
 		    , m_proc{std::make_unique<ProcessorImpl<std::decay_t<Proc>>>(std::forward<Proc>(proc))}
 		{
 		}
@@ -48,6 +49,9 @@ namespace Texpainter::FilterGraph
 			return m_result_cache;
 		}
 
+		std::span<std::string_view const> inputPorts() const { return m_proc->inputPorts(); }
+
+		std::span<std::string_view const> outputPorts() const { return m_proc->outputPorts(); }
 
 		ProcessorNode& connect(InputPort input,
 		                       std::reference_wrapper<ProcessorNode const> other,
@@ -63,8 +67,10 @@ namespace Texpainter::FilterGraph
 			return *this;
 		}
 
-		size_t inputCount() const { return m_inputs.size(); }
 
+		std::span<std::string_view const> paramNames() const { return m_proc->paramNames(); }
+
+		std::vector<ProcParamValue> paramValues() const { return m_proc->paramValues(); }
 
 		ProcessorNode& set(std::string_view param_name, ProcParamValue val)
 		{
