@@ -13,6 +13,8 @@
 #include <complex>
 #include <vector>
 #include <variant>
+#include <map>
+#include <set>
 
 namespace Texpainter::FilterGraph
 {
@@ -57,12 +59,14 @@ namespace Texpainter::FilterGraph
 		                       std::reference_wrapper<ProcessorNode const> other,
 		                       OutputPort output)
 		{
+			other.get().r_consumers[this].insert(input);
 			m_inputs[input.value()] = SourceNode{other, output};
 			return *this;
 		}
 
 		ProcessorNode& disconnect(InputPort input)
 		{
+			m_inputs[input.value()].processor().r_consumers.find(this)->second.erase(input);
 			m_inputs[input.value()] = SourceNode{};
 			return *this;
 		}
@@ -79,6 +83,24 @@ namespace Texpainter::FilterGraph
 		}
 
 		ProcParamValue get(std::string_view param_name) const { return m_proc->get(param_name); }
+
+		~ProcessorNode()
+		{
+			std::ranges::for_each(r_consumers, [](auto const& item) {
+				std::ranges::for_each(item.second, [proc = item.first](auto port) {
+					// NOTE: Do not call disconnect here. This would screw up iterators.
+					//       Also, r_consumers will be destroyed anywas.
+					proc->m_inputs[port.value()] = SourceNode{};
+				});
+			});
+
+			// NOTE: Remember to also disconnect all inputs. Otherwise, there will
+			//       be dead pointers left in the producer.
+			for(size_t k = 0; k < m_inputs.size(); ++k)
+			{
+				disconnect(InputPort{static_cast<uint32_t>(k)});
+			}
+		}
 
 
 	private:
@@ -108,12 +130,26 @@ namespace Texpainter::FilterGraph
 				return argument_type{};
 			}
 
+			ProcessorNode const& processor() const { return r_processor.get(); }
+
 		private:
 			std::reference_wrapper<ProcessorNode const> r_processor;
 			OutputPort m_index;
 		};
 
 		std::vector<SourceNode> m_inputs;
+
+		struct InputPortCompare
+		{
+			constexpr bool operator()(InputPort a, InputPort b) const
+			{
+				return a.value() < b.value();
+			}
+		};
+
+		// NOTE: Using mutable here is not a very good solution, but allows treating producer nodes
+		//       as const from the consumer side.
+		mutable std::map<ProcessorNode*, std::set<InputPort, InputPortCompare>> r_consumers;
 
 		class Processor
 		{

@@ -111,8 +111,8 @@ namespace
 				   val != nullptr)
 				{
 					Texpainter::Model::Image img{1, 1};
-					img.pixels()(0, 0) =
-					    Texpainter::Model::Pixel{1.0f, 0.0f, 0.0f, 1.0f} + (*val)(0, 0);
+					img.pixels()(0, 0) = Texpainter::Model::Pixel{1.0f, 0.0f, 0.0f, 1.0f};
+					if(val->area() != 0) { img.pixels()(0, 0) += (*val)(0, 0); }
 					ret.push_back(std::move(img));
 				}
 			}
@@ -165,9 +165,9 @@ namespace Testcases
 
 		Texpainter::FilterGraph::ProcessorNode src{InputProcessor{req_count}};
 		node.connect(
-		    Texpainter::FilterGraph::InputPort{0}, src, Texpainter::FilterGraph::OutputPort{0});
-		node.connect(
-		    Texpainter::FilterGraph::InputPort{1}, src, Texpainter::FilterGraph::OutputPort{1});
+		        Texpainter::FilterGraph::InputPort{0}, src, Texpainter::FilterGraph::OutputPort{0})
+		    .connect(
+		        Texpainter::FilterGraph::InputPort{1}, src, Texpainter::FilterGraph::OutputPort{1});
 
 		auto res = node();
 		assert(std::size(res) == 2);
@@ -188,12 +188,68 @@ namespace Testcases
 		assert(res_1->pixels()(0, 0).blue() == 1.0f);
 		assert(res_1->pixels()(0, 0).alpha() == 1.0f);
 	}
+
+	void filtergraphProcessorNodeDestroySourceGetOutput()
+	{
+		Texpainter::FilterGraph::ProcessorNode node{TestProcessor{}};
+
+		assert(node.inputPorts().size() == 2);
+		node.set("Foo", Texpainter::FilterGraph::ProcParamValue{0.5});
+		assert(node.get("Foo") == Texpainter::FilterGraph::ProcParamValue{0.5});
+
+		size_t req_count = 0;
+
+		{
+			Texpainter::FilterGraph::ProcessorNode src{InputProcessor{req_count}};
+			node.connect(Texpainter::FilterGraph::InputPort{0},
+			             src,
+			             Texpainter::FilterGraph::OutputPort{0})
+			    .connect(Texpainter::FilterGraph::InputPort{1},
+			             src,
+			             Texpainter::FilterGraph::OutputPort{1});
+		}
+
+		auto res = node();
+		assert(std::size(res) == 2);
+		assert(req_count == 0);
+
+		auto res_0 = get_if<Texpainter::Model::Image>(&res[0]);
+		auto res_1 = get_if<Texpainter::Model::Image>(&res[1]);
+		assert(res_0 != nullptr);
+		assert(res_1 != nullptr);
+
+		assert(res_0->pixels()(0, 0).red() == 1.0f);
+		assert(res_0->pixels()(0, 0).green() == 0.0f);
+		assert(res_0->pixels()(0, 0).blue() == 0.0f);
+		assert(res_0->pixels()(0, 0).alpha() == 1.0f);
+
+		assert(res_1->pixels()(0, 0).red() == 1.0f);
+		assert(res_1->pixels()(0, 0).green() == 0.0f);
+		assert(res_1->pixels()(0, 0).blue() == 0.0f);
+		assert(res_1->pixels()(0, 0).alpha() == 1.0f);
+	}
+
+	void filtergraphProcessorNodeDestroyCycle()
+	{
+		Texpainter::FilterGraph::ProcessorNode node_1{TestProcessor{}};
+		Texpainter::FilterGraph::ProcessorNode node_2{TestProcessor{}};
+		Texpainter::FilterGraph::ProcessorNode node_3{TestProcessor{}};
+
+		node_1.connect(
+		    Texpainter::FilterGraph::InputPort{0}, node_2, Texpainter::FilterGraph::OutputPort{0});
+		node_2.connect(
+		    Texpainter::FilterGraph::InputPort{0}, node_3, Texpainter::FilterGraph::OutputPort{0});
+		node_3.connect(
+		    Texpainter::FilterGraph::InputPort{0}, node_1, Texpainter::FilterGraph::OutputPort{0});
+	}
 };
 
 int main()
 {
-	//	Testcases::filtergraphProcessorNodeDummy();
-
+	Testcases::filtergraphProcessorNodeDummy();
 	Testcases::filtergraphProcessorNodeGetOutput();
+	Testcases::filtergraphProcessorNodeDestroySourceGetOutput();
+	Testcases::filtergraphProcessorNodeDestroyCycle();
+
 	return 0;
 }
