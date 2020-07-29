@@ -41,13 +41,13 @@ namespace Texpainter::FilterGraph
 		{
 			if(args.size() != 1) [[unlikely]]
 				{
-					return std::vector<ProcResultType>{Model::Image{Size2d{1, 1}}};
+					return std::vector<ProcResultType>{};
 				}
 
 			if(auto args_0 = std::get_if<Span2d<Model::Pixel const>>(&args[0]); args_0 != nullptr)
 				[[likely]] { return std::vector<ProcResultType>{Model::Image{*args_0}}; }
 
-			return std::vector<ProcResultType>{Model::Image{Size2d{1, 1}}};
+			return std::vector<ProcResultType>{};
 		}
 	};
 }

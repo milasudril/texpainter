@@ -24,8 +24,13 @@ namespace Texpainter::FilterGraph
 		{
 			m_input_node = ProcessorNode{ImageSource{source}};
 			auto ret     = m_output_node();
+			if(ret.size() != 1) [[unlikely]]  // Should only have one output
+				{
+					Model::Image ret{source.size()};
+					std::ranges::fill(ret.pixels(), Model::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
+				}
 
-			// NOTE: OutputNode always returns one Model::Image
+			// NOTE: OutputNode always returns Model::Image
 			return *std::get_if<Model::Image>(&ret[0]);
 		}
 
