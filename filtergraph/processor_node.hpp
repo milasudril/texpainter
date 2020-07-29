@@ -3,8 +3,8 @@
 //@	,"dependencies_extra":[{"ref":"processor_node.o", "rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_FILTERPIPE_PROCESSORNODE_HPP
-#define TEXPAINTER_FILTERPIPE_PROCESSORNODE_HPP
+#ifndef TEXPAINTER_FILTERGRAPH_PROCESSORNODE_HPP
+#define TEXPAINTER_FILTERGRAPH_PROCESSORNODE_HPP
 
 #include "./proctypes.hpp"
 
