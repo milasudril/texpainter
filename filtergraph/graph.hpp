@@ -14,10 +14,9 @@ namespace Texpainter::FilterGraph
 	class Graph
 	{
 	public:
-		using NodeId = std::string
+		using NodeId = std::string;
 
-		    Model::Image
-		    process(Span2d<Model::Pixel const> source) const
+		Model::Image process(Span2d<Model::Pixel const> source) const
 		{
 			m_input_node = ProcessorNode{ImageSource{source}};
 			return m_output_node();

@@ -25,6 +25,7 @@ namespace Texpainter::FilterGraph
 
 		using result_type = ProcResultType;
 
+		ProcessorNode(ProcessorNode&&) = delete;
 
 		ProcessorNode(): m_proc{std::make_unique<ProcessorDummy>()} {}
 
@@ -39,16 +40,15 @@ namespace Texpainter::FilterGraph
 
 		bool dirty() const
 		{
-			return m_result_cache.size() == 0 || std::ranges::any_of(m_inputs, [](auto const& item) {
-				   return item.processor().dirty();
-			   });
+			return m_result_cache.size() == 0
+			       || std::ranges::any_of(
+			           m_inputs, [](auto const& item) { return item.processor().dirty(); });
 		}
 
 
 		std::vector<result_type> const& operator()() const
 		{
-			if(!dirty())
-			{ return m_result_cache; }
+			if(!dirty()) { return m_result_cache; }
 
 			std::vector<argument_type> args;
 			std::ranges::transform(m_inputs, std::back_inserter(args), [](auto const& val) {
