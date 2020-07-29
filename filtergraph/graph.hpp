@@ -34,15 +34,15 @@ namespace Texpainter::FilterGraph
 			return *std::get_if<Model::Image>(&ret[0]);
 		}
 
-		Graph& connect(NodeId node, InputPort sink, OutputPort src)
+		Graph& connectInput(NodeId node, InputPort sink)
 		{
-			m_nodes[node].connect(sink, m_input_node, src);
+			m_nodes[node].connect(sink, m_input_node, OutputPort{0});
 			return *this;
 		}
 
-		Graph& connect(InputPort sink, NodeId node, OutputPort src)
+		Graph& connectOutput(NodeId node, OutputPort src)
 		{
-			m_output_node.connect(sink, m_nodes[node], src);
+			m_output_node.connect(InputPort{0}, m_nodes[node], src);
 			return *this;
 		}
 
@@ -51,6 +51,20 @@ namespace Texpainter::FilterGraph
 			m_nodes[a].connect(sink, m_nodes[b], src);
 			return *this;
 		}
+
+
+		Graph& disconnectOutput()
+		{
+			m_output_node.disconnect(InputPort{0});
+			return *this;
+		}
+
+		Graph& disconnect(NodeId a, InputPort sink)
+		{
+			m_nodes[a].disconnect(sink);
+			return *this;
+		}
+
 
 		template<ImageProcessor T>
 		std::pair<NodeId const, ProcessorNode>& insert(T&& obj)
@@ -61,6 +75,18 @@ namespace Texpainter::FilterGraph
 		}
 
 		auto nodes() const { return IterPair{std::begin(m_nodes), std::end(m_nodes)}; }
+
+		auto get(NodeId id, std::string_view paramname) const
+		{
+			// Assume that id exists
+			return m_nodes.find(id)->second.get(paramname);
+		}
+
+		void set(NodeId id, std::string_view paramname, ProcParamValue val)
+		{
+			// Assume that id exists
+			m_nodes.find(id)->second.set(paramname, val);
+		}
 
 		auto currentId() const { return m_current_id; }
 

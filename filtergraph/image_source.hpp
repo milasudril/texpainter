@@ -11,7 +11,7 @@ namespace Texpainter::FilterGraph
 	class ImageSource
 	{
 	public:
-		explicit ImageSource(Span2d<PixelType const> pixels):r_pixels{pixels}{}
+		explicit ImageSource(Span2d<PixelType const> pixels): r_pixels{pixels} {}
 
 		std::span<std::string_view const> paramNames() const
 		{
