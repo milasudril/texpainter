@@ -20,6 +20,11 @@ namespace Texpainter::Model
 	class BasicImage
 	{
 	public:
+		explicit BasicImage(Span2d<PixelType const> src): BasicImage{src.size()}
+		{
+			memcpy(m_data.get(), src.data(), area() * sizeof(PixelType));
+		}
+
 		explicit BasicImage(uint32_t width, uint32_t height): BasicImage{Size2d{width, height}} {}
 
 		explicit BasicImage(Size2d size)
