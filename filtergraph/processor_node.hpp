@@ -37,10 +37,18 @@ namespace Texpainter::FilterGraph
 		{
 		}
 
+		bool dirty() const
+		{
+			return m_result_cache.size() == 0 || std::ranges::any_of(m_inputs, [](auto const& item) {
+				   return item.processor().dirty();
+			   });
+		}
+
 
 		std::vector<result_type> const& operator()() const
 		{
-			if(m_result_cache.size() != 0) { return m_result_cache; }
+			if(!dirty())
+			{ return m_result_cache; }
 
 			std::vector<argument_type> args;
 			std::ranges::transform(m_inputs, std::back_inserter(args), [](auto const& val) {
@@ -61,6 +69,7 @@ namespace Texpainter::FilterGraph
 		{
 			other.get().r_consumers[this].insert(input);
 			m_inputs[input.value()] = SourceNode{other, output};
+			m_result_cache.clear();
 			return *this;
 		}
 
@@ -68,6 +77,7 @@ namespace Texpainter::FilterGraph
 		{
 			m_inputs[input.value()].processor().r_consumers.find(this)->second.erase(input);
 			m_inputs[input.value()] = SourceNode{};
+			m_result_cache.clear();
 			return *this;
 		}
 
@@ -79,6 +89,7 @@ namespace Texpainter::FilterGraph
 		ProcessorNode& set(std::string_view param_name, ProcParamValue val)
 		{
 			m_proc->set(param_name, val);
+			m_result_cache.clear();
 			return *this;
 		}
 
