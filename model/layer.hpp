@@ -11,6 +11,7 @@
 #include "pixel_store/image.hpp"
 #include "utils/angle.hpp"
 #include "utils/rect.hpp"
+#include "filtergraph/graph.hpp"
 
 #include <memory>
 
@@ -25,6 +26,7 @@ namespace Texpainter::Model
 		    , m_rot{0}
 		    , m_scale{1.0, 1.0}
 		    , m_content{std::make_shared<PixelStore::Image>(std::move(img))}
+		    , m_graph{std::make_unique<FilterGraph::Graph>()}
 		{
 		}
 
@@ -35,6 +37,7 @@ namespace Texpainter::Model
 		    , m_rot{0}
 		    , m_scale{1.0, 1.0}
 		    , m_content{std::make_shared<PixelStore::Image>(size)}
+		    , m_graph{std::make_unique<FilterGraph::Graph>()}
 		{
 			fill(initial_color);
 		}
@@ -107,12 +110,16 @@ namespace Texpainter::Model
 
 		auto size() const { return m_content->size(); }
 
+		FilterGraph::Graph const& filterGraph() const
+		{ return *m_graph; }
+
 	private:
 		bool m_visible;
 		vec2_t m_loc;
 		Angle m_rot;
 		vec2_t m_scale;
 		std::shared_ptr<PixelStore::Image> m_content;
+		std::unique_ptr<FilterGraph::Graph> m_graph;
 
 		explicit Layer(bool vis,
 		               vec2_t loc,

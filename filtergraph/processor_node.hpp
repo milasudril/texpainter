@@ -38,6 +38,15 @@ namespace Texpainter::FilterGraph
 		{
 		}
 
+		template<class Proc,
+		         std::enable_if_t<!std::is_same_v<ProcessorNode, std::decay_t<Proc>>, int> = 0>
+		 ProcessorNode& replaceWith(Proc&& proc)
+		{
+			m_inputs = std::vector<SourceNode>(proc.inputPorts().size());
+			m_proc = std::make_unique<ProcessorImpl<std::decay_t<Proc>>>(std::forward<Proc>(proc));
+			return *this;
+		}
+
 		bool dirty() const
 		{
 			return m_result_cache.size() == 0

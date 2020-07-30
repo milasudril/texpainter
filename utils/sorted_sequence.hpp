@@ -29,7 +29,7 @@ namespace Texpainter
 					return std::make_pair(i, false);
 				}
 
-			auto ret = m_map.insert(i, std::make_pair(std::move(val.first), std::move(val.second)));
+			auto ret = m_map.insert(i, std::move(val));
 			m_key_seq.push_back(&ret->first);
 			m_seq.push_back(&ret->second);
 			return std::make_pair(ret, true);
