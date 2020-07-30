@@ -4,6 +4,7 @@
 #define TEXPAINTER_IMAGE_HPP
 
 #include "./pixel.hpp"
+
 #include "utils/span_2d.hpp"
 #include "utils/call_free.hpp"
 #include "utils/trivial.hpp"
@@ -14,7 +15,7 @@
 #include <span>
 #include <cstring>
 
-namespace Texpainter::Model
+namespace Texpainter::PixelStore
 {
 	template<Trivial PixelType>
 	class BasicImage

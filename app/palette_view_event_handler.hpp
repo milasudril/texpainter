@@ -44,12 +44,14 @@ namespace Texpainter
 		}
 
 		template<auto>
-		void onMouseDown(Texpainter::Ui::PaletteView& view, Model::ColorIndex, int)
+		void onMouseDown(Texpainter::Ui::PaletteView& view, PixelStore::ColorIndex, int)
 		{
 		}
 
 		template<auto>
-		void onMouseUp(Texpainter::Ui::PaletteView& pal_view, Model::ColorIndex index, int button)
+		void onMouseUp(Texpainter::Ui::PaletteView& pal_view,
+		               PixelStore::ColorIndex index,
+		               int button)
 		{
 			if(auto const current_color = r_doc_owner.document().currentColor();
 			   current_color.valid() && colorIndexValid(r_doc_owner.document(), index))
@@ -91,7 +93,7 @@ namespace Texpainter
 		}
 
 		template<auto>
-		void onMouseMove(Texpainter::Ui::PaletteView&, Model::ColorIndex)
+		void onMouseMove(Texpainter::Ui::PaletteView&, PixelStore::ColorIndex)
 		{
 		}
 
@@ -140,8 +142,8 @@ namespace Texpainter
 		Ui::Container& r_dlg_owner;
 		DocOwner& r_doc_owner;
 		PolymorphicRng m_rng;
-		Model::ColorIndex m_modified_index;
-		std::array<Model::Pixel, 8> m_color_history;
+		PixelStore::ColorIndex m_modified_index;
+		std::array<PixelStore::Pixel, 8> m_color_history;
 
 		std::unique_ptr<ColorPicker> m_color_picker;
 	};

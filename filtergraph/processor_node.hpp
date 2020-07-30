@@ -8,7 +8,7 @@
 
 #include "./proctypes.hpp"
 
-#include "model/image.hpp"
+#include "pixel_store/image.hpp"
 
 #include <complex>
 #include <vector>

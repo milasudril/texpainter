@@ -5,7 +5,7 @@
 
 #include "./pointwise_transform.hpp"
 
-#include "model/image.hpp"
+#include "pixel_store/image.hpp"
 #include "utils/angle.hpp"
 
 #include <cmath>
@@ -48,7 +48,8 @@ namespace Texpainter::Generators
 		{
 		}
 
-		Model::BasicImage<std::complex<double>> operator()(Span2d<std::complex<double> const> in)
+		PixelStore::BasicImage<std::complex<double>> operator()(
+		    Span2d<std::complex<double> const> in)
 		{
 			return m_f(in);
 		}

@@ -40,10 +40,10 @@ int main(int argc, char* argv[])
 
 #if 0
 	Texpainter::Model::Layer test{Texpainter::Size2d{256, 256}};
-	std::ranges::fill(test.content().pixels(), Texpainter::Model::Pixel{0.5f, 0.25f, 0.25f, 1.0f});
+	std::ranges::fill(test.content().pixels(), Texpainter::PixelStore::Pixel{0.5f, 0.25f, 0.25f, 1.0f});
 
-	Texpainter::Model::Image canvas{Texpainter::Size2d{512, 512}};
-	 std::ranges::fill(canvas.pixels(), Texpainter::Model::Pixel{0.25f, 0.50f, 0.25f, 1.0f});
+	Texpainter::PixelStore::Image canvas{Texpainter::Size2d{512, 512}};
+	 std::ranges::fill(canvas.pixels(), Texpainter::PixelStore::Pixel{0.25f, 0.50f, 0.25f, 1.0f});
 
 	 render(test.location(Texpainter::vec2_t{0.0, 0.0})
 	           .rotation(Texpainter::Angle{-0.08333, Texpainter::Angle::Turns{}})

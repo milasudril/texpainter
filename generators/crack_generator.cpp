@@ -4,7 +4,7 @@
 
 #include "./crack_generator.hpp"
 
-#include "model/image.hpp"
+#include "pixel_store/image.hpp"
 #include "utils/angle.hpp"
 
 #include <random>
@@ -15,7 +15,7 @@
 namespace
 {
 	template<class Rng>
-	void draw_line(Texpainter::Span2d<Texpainter::Model::Pixel> img,
+	void draw_line(Texpainter::Span2d<Texpainter::PixelStore::Pixel> img,
 	               Texpainter::vec2_t from,
 	               Texpainter::vec2_t to,
 	               double line_width_from,
@@ -42,7 +42,7 @@ namespace
 				auto val         = noise_mod * max_depth(rng)
 				           + (1.0f - noise_mod) * (1.0f - static_cast<float>(n_loc * n_loc));
 				img(loc_x % img.width(), loc_y % img.height()) =
-				    Texpainter::Model::Pixel{val, val, val, 1.0};
+				    Texpainter::PixelStore::Pixel{val, val, val, 1.0};
 			}
 		}
 	}
@@ -56,7 +56,7 @@ namespace
 	};
 }
 
-Texpainter::Model::Image Texpainter::Generators::CrackGenerator::operator()(Size2d output_size)
+Texpainter::PixelStore::Image Texpainter::Generators::CrackGenerator::operator()(Size2d output_size)
 {
 	auto size = sqrt(output_size.area());
 	std::uniform_int_distribution<uint32_t> init_loc_x{0, output_size.width() - 1};
@@ -79,8 +79,8 @@ Texpainter::Model::Image Texpainter::Generators::CrackGenerator::operator()(Size
 
 	auto const branch_prob = m_branch_prob;
 	std::bernoulli_distribution branch{branch_prob};
-	Model::Image ret{output_size};
-	std::ranges::fill(ret.pixels(), Model::Pixel{0.0, 0.0, 0.0, 1.0f});
+	PixelStore::Image ret{output_size};
+	std::ranges::fill(ret.pixels(), PixelStore::Pixel{0.0, 0.0, 0.0, 1.0f});
 	auto const line_width        = static_cast<float>(m_line_width * size);
 	auto const max_length        = m_max_length;
 	auto const line_width_growth = m_line_width_growth;

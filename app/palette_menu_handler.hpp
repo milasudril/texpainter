@@ -99,7 +99,7 @@ namespace Texpainter
 		void confirmPositive(Tag<ControlId::NewEmpty>, PaletteCreateDlg& src)
 		{
 			auto palette_name = src.widget().inputField().content();
-			insertNewPalette(std::move(palette_name), Model::Palette{23});
+			insertNewPalette(std::move(palette_name), PixelStore::Palette{23});
 			m_new_empty_dlg.reset();
 		}
 
@@ -109,19 +109,20 @@ namespace Texpainter
 		void confirmPositive(Tag<ControlId::NewGenerated>, PaletteGenerateDlg& src)
 		{
 			auto palette_info = src.widget().value();
-			Model::Palette pal{23};
+			PixelStore::Palette pal{23};
 			std::ranges::for_each(palette_info.colors, [&pal, k = 0u](auto val) mutable {
 				auto hsi = toHsi(val);
 				for(int l = 0; l < 5; ++l)
 				{
-					pal[Model::ColorIndex{k}] = toRgb(hsi);
+					pal[PixelStore::ColorIndex{k}] = toRgb(hsi);
 					++k;
 					hsi.intensity /= 2.0f;
 				}
 			});
-			pal[Model::ColorIndex{20}] = toRgb(Model::Hsi{0.0f, 0.0f, 1.0f / 3.0, 1.0f});
-			pal[Model::ColorIndex{21}] = toRgb(Model::Hsi{0.0f, 0.0f, 1.0f / (128.0f * 3.0), 1.0f});
-			pal[Model::ColorIndex{22}] = Model::Pixel{0.0f, 0.0f, 0.0f, 0.0f};
+			pal[PixelStore::ColorIndex{20}] = toRgb(PixelStore::Hsi{0.0f, 0.0f, 1.0f / 3.0, 1.0f});
+			pal[PixelStore::ColorIndex{21}] =
+			    toRgb(PixelStore::Hsi{0.0f, 0.0f, 1.0f / (128.0f * 3.0), 1.0f});
+			pal[PixelStore::ColorIndex{22}] = PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f};
 			insertNewPalette(std::move(palette_info.name), std::move(pal));
 			m_new_generated_dlg.reset();
 		}
@@ -140,7 +141,7 @@ namespace Texpainter
 		std::unique_ptr<PaletteGenerateDlg> m_new_generated_dlg;
 
 
-		void insertNewPalette(std::string&& palette_name, Model::Palette&& palette)
+		void insertNewPalette(std::string&& palette_name, PixelStore::Palette&& palette)
 		{
 			r_doc_owner.documentModify([&palette_name, &palette](auto& doc) noexcept {
 				(void)doc.palettesModify([palette_name, &palette](auto& palettes) mutable noexcept {

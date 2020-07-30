@@ -5,7 +5,7 @@
 #ifndef TEXPAINTER_FILTERGRAPH_HPP
 #define TEXPAINTER_FILTERGRAPH_HPP
 
-#include "model/image.hpp"
+#include "pixel_store/image.hpp"
 
 #include <compare>
 #include <cstddef>
@@ -69,7 +69,7 @@ namespace Texpainter::FilterGraph
 		GrayscaleComplex
 	};
 
-	using ProcArgumentType = std::variant<Span2d<Model::Pixel const>,
+	using ProcArgumentType = std::variant<Span2d<PixelStore::Pixel const>,
 	                                      Span2d<double const>,
 	                                      Span2d<std::complex<double> const>>;
 
@@ -78,9 +78,9 @@ namespace Texpainter::FilterGraph
 		return static_cast<PixelType>(x.index());
 	}
 
-	using ProcResultType = std::variant<Model::BasicImage<Model::Pixel>,
-	                                    Model::BasicImage<double>,
-	                                    Model::BasicImage<std::complex<double>>>;
+	using ProcResultType = std::variant<PixelStore::BasicImage<PixelStore::Pixel>,
+	                                    PixelStore::BasicImage<double>,
+	                                    PixelStore::BasicImage<std::complex<double>>>;
 
 	inline PixelType pixelType(ProcResultType const& x)
 	{

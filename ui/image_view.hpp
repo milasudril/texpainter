@@ -7,7 +7,7 @@
 #define TEXPAINTER_UI_IMAGEVIEW_HPP
 
 #include "./container.hpp"
-#include "model/image.hpp"
+#include "pixel_store/image.hpp"
 
 #include <utility>
 
@@ -62,7 +62,7 @@ namespace Texpainter::Ui
 			     }});
 		}
 
-		ImageView& image(Model::Image const& img);
+		ImageView& image(PixelStore::Image const& img);
 
 		ImageView& minSize(Size2d size);
 

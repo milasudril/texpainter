@@ -4,7 +4,7 @@
 #define TEXPAINTER_GENERATORS_GRAYSCALENOISE_HPP
 
 #include "utils/size_2d.hpp"
-#include "model/image.hpp"
+#include "pixel_store/image.hpp"
 
 #include <random>
 #include <algorithm>
@@ -36,9 +36,9 @@ namespace Texpainter::Generators
 			return *this;
 		}
 
-		Model::BasicImage<double> operator()(Size2d size)
+		PixelStore::BasicImage<double> operator()(Size2d size)
 		{
-			Model::BasicImage<double> ret{size};
+			PixelStore::BasicImage<double> ret{size};
 			std::ranges::generate(ret.pixels(), [this]() { return m_dist(m_rng); });
 			return ret;
 		}

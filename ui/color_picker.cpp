@@ -11,7 +11,7 @@
 #include "./button.hpp"
 #include "./palette_view.hpp"
 
-#include "model/hsi_rgb.hpp"
+#include "pixel_store/hsi_rgb.hpp"
 #include "utils/numconv.hpp"
 
 #include <gtk/gtk.h>
@@ -21,19 +21,20 @@
 
 namespace
 {
-	Texpainter::Model::Image gen_colors(float intensity, float alpha, Texpainter::Size2d size)
+	Texpainter::PixelStore::Image gen_colors(float intensity, float alpha, Texpainter::Size2d size)
 	{
-		Texpainter::Model::Image ret{size};
+		Texpainter::PixelStore::Image ret{size};
 		generate(ret.pixels(), [intensity, alpha, size](auto col, auto row) {
 			auto x   = static_cast<float>(col) / size.width();
 			auto y   = 1.0f - static_cast<float>(row) / size.height();
-			auto ret = toRgb(Texpainter::Model::Hsi{x, y, intensity, alpha});
+			auto ret = toRgb(Texpainter::PixelStore::Hsi{x, y, intensity, alpha});
 			return ret;
 		});
 		return ret;
 	}
 
-	void draw_marker(Texpainter::vec2_t loc, Texpainter::Span2d<Texpainter::Model::Pixel> canvas)
+	void draw_marker(Texpainter::vec2_t loc,
+	                 Texpainter::Span2d<Texpainter::PixelStore::Pixel> canvas)
 	{
 		constexpr auto radius   = 2;
 		auto const w            = canvas.width();
@@ -56,8 +57,8 @@ namespace
 				{
 					auto& pixel  = canvas(col, row);
 					auto const i = intensity(pixel);
-					pixel        = i >= 1.0f ? Texpainter::Model::Pixel{0.0f, 0.0f, 0.0f, 1.0f}
-					                  : Texpainter::Model::Pixel{1.0f, 1.0f, 1.0f, 1.0f};
+					pixel        = i >= 1.0f ? Texpainter::PixelStore::Pixel{0.0f, 0.0f, 0.0f, 1.0f}
+					                  : Texpainter::PixelStore::Pixel{1.0f, 1.0f, 1.0f, 1.0f};
 					pixel.alpha(1.0f);
 				}
 			}
@@ -109,7 +110,7 @@ namespace
 		return ret;
 	}
 
-	std::array<char, 8> rgb_to_hex(Texpainter::Model::Pixel rgb)
+	std::array<char, 8> rgb_to_hex(Texpainter::PixelStore::Pixel rgb)
 	{
 		std::array<char, 8> ret{};
 		if(rgb.red() > 1.0f || rgb.green() > 1.0f || rgb.blue() > 1.0f) [[unlikely]]
@@ -120,7 +121,8 @@ namespace
 		else
 		{
 			auto const rgb_g22 =
-			    Texpainter::Model::BasicPixel<Texpainter::Model::ColorProfiles::Gamma22>{rgb};
+			    Texpainter::PixelStore::BasicPixel<Texpainter::PixelStore::ColorProfiles::Gamma22>{
+			        rgb};
 			auto const val = 255.0f * rgb_g22.value();
 			sprintf(ret.data(),
 			        "%02X%02X%02X",
@@ -151,12 +153,12 @@ namespace
 		return std::optional<uint8_t>{};
 	}
 
-	std::optional<Texpainter::Model::Pixel> hex_to_rgb(char const* str)
+	std::optional<Texpainter::PixelStore::Pixel> hex_to_rgb(char const* str)
 	{
 		auto const n = strlen(str);
 		if(n != 6) [[unlikely]]
 			{
-				return std::optional<Texpainter::Model::Pixel>{};
+				return std::optional<Texpainter::PixelStore::Pixel>{};
 			}
 
 		std::array<uint8_t, 4> vals{};
@@ -169,7 +171,7 @@ namespace
 			auto lsb = hexdigit_to_number(lsb_digit);
 			if(!(msb.has_value() && lsb.has_value())) [[unlikely]]
 				{
-					return std::optional<Texpainter::Model::Pixel>{};
+					return std::optional<Texpainter::PixelStore::Pixel>{};
 				}
 
 			vals[k] = (*msb << 4) | (*lsb);
@@ -177,8 +179,8 @@ namespace
 			str += 2;
 		}
 
-		return Texpainter::Model::Pixel{
-		    Texpainter::Model::BasicPixel<Texpainter::Model::ColorProfiles::Gamma22>{
+		return Texpainter::PixelStore::Pixel{
+		    Texpainter::PixelStore::BasicPixel<Texpainter::PixelStore::ColorProfiles::Gamma22>{
 		        Texpainter::vec4_t{static_cast<float>(vals[0]),
 		                           static_cast<float>(vals[1]),
 		                           static_cast<float>(vals[2]),
@@ -210,12 +212,12 @@ public:
 	Impl(Container& cnt,
 	     PolymorphicRng rng,
 	     char const* predef_label,
-	     std::span<Model::Pixel const> predef_colors);
+	     std::span<PixelStore::Pixel const> predef_colors);
 	~Impl();
 
-	Model::Pixel value() const { return toRgb(m_hsi); }
+	PixelStore::Pixel value() const { return toRgb(m_hsi); }
 
-	void value(Model::Pixel val)
+	void value(PixelStore::Pixel val)
 	{
 		m_hsi = toHsi(val);
 		m_intensity.inputField().value(logValue(m_hsi.intensity, -16));
@@ -249,15 +251,15 @@ public:
 
 
 	template<ControlId>
-	void onMouseDown(Texpainter::Ui::PaletteView& view, Model::ColorIndex, int)
+	void onMouseDown(Texpainter::Ui::PaletteView& view, PixelStore::ColorIndex, int)
 	{
 	}
 
 	template<ControlId>
-	void onMouseUp(Texpainter::Ui::PaletteView&, Model::ColorIndex, int);
+	void onMouseUp(Texpainter::Ui::PaletteView&, PixelStore::ColorIndex, int);
 
 	template<ControlId>
-	void onMouseMove(Texpainter::Ui::PaletteView&, Model::ColorIndex)
+	void onMouseMove(Texpainter::Ui::PaletteView&, PixelStore::ColorIndex)
 	{
 	}
 
@@ -265,8 +267,8 @@ public:
 	void onChanged(Texpainter::Ui::TextEntry&);
 
 private:
-	Model::Hsi m_hsi;
-	Model::Image m_colors_cache;
+	PixelStore::Hsi m_hsi;
+	PixelStore::Image m_colors_cache;
 	PolymorphicRng m_rng;
 
 	uint32_t m_btn_state;
@@ -341,19 +343,19 @@ private:
 Texpainter::Ui::ColorPicker::ColorPicker(Container& cnt,
                                          PolymorphicRng rng,
                                          char const* predef_label,
-                                         std::span<Model::Pixel const> predef_colors)
+                                         std::span<PixelStore::Pixel const> predef_colors)
 {
 	m_impl = new Impl(cnt, rng, predef_label, predef_colors);
 }
 
 Texpainter::Ui::ColorPicker::~ColorPicker() { delete m_impl; }
 
-Texpainter::Model::Pixel Texpainter::Ui::ColorPicker::value() const noexcept
+Texpainter::PixelStore::Pixel Texpainter::Ui::ColorPicker::value() const noexcept
 {
 	return m_impl->value();
 }
 
-Texpainter::Ui::ColorPicker& Texpainter::Ui::ColorPicker::value(Model::Pixel color)
+Texpainter::Ui::ColorPicker& Texpainter::Ui::ColorPicker::value(PixelStore::Pixel color)
 {
 	m_impl->value(color);
 	return *this;
@@ -417,12 +419,12 @@ void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onClicked<ControlId::Random
 {
 	std::uniform_real_distribution U{0.0f, 1.0f};
 	btn.state(false);
-	value(Model::Pixel{U(m_rng), U(m_rng), U(m_rng), U(m_rng)});
+	value(PixelStore::Pixel{U(m_rng), U(m_rng), U(m_rng), U(m_rng)});
 }
 
 template<>
 void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseUp<ControlId::PredefColors>(
-    Texpainter::Ui::PaletteView& src, Model::ColorIndex index, int button)
+    Texpainter::Ui::PaletteView& src, PixelStore::ColorIndex index, int button)
 {
 	if(button == 1) { value(src.color(index)); }
 }
@@ -546,7 +548,7 @@ void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onChanged<ControlId::Alpha>
 Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt,
                                         PolymorphicRng rng,
                                         char const* predef_label,
-                                        std::span<Model::Pixel const> predef_colors)
+                                        std::span<PixelStore::Pixel const> predef_colors)
     : Texpainter::Ui::ColorPicker{*this}
     , m_colors_cache{Size2d{384, 384}}
     , m_rng{rng}
@@ -585,12 +587,12 @@ Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt,
 {
 	m_btn_state = 0;
 	m_key       = 0;
-	std::ranges::fill(m_colors_cache.pixels(), Model::Pixel{0.0f, 0.0f, 0.0f, 1.0f});
+	std::ranges::fill(m_colors_cache.pixels(), PixelStore::Pixel{0.0f, 0.0f, 0.0f, 1.0f});
 	m_colors.inputField()
 	    .minSize(Size2d{384, 384})
 	    .eventHandler<ControlId::Colors>(*this)
 	    .alwaysEmitMouseEvents(true);
-	value(Model::Pixel{0.5f, 0.5f, 0.5f, 1.0f});
+	value(PixelStore::Pixel{0.5f, 0.5f, 0.5f, 1.0f});
 	m_intensity.inputField().eventHandler<ControlId::Intensity>(*this).ticks(intensity_tickmarks);
 	m_alpha.inputField().eventHandler<ControlId::Alpha>(*this);
 
@@ -610,8 +612,8 @@ Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt,
 	m_predef_colors.inputField()
 	    .palette(predef_colors)
 	    .eventHandler<ControlId::PredefColors>(*this);
-	Model::Palette pal{1};
-	pal[Model::ColorIndex{0}] = toRgb(m_hsi);
+	PixelStore::Palette pal{1};
+	pal[PixelStore::ColorIndex{0}] = toRgb(m_hsi);
 	m_current_color.inputField().palette(pal).minSize(Size2d{48, 48}).update();
 }
 

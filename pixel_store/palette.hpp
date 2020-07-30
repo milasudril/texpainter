@@ -5,11 +5,12 @@
 
 #include "./pixel.hpp"
 #include "./color_index.hpp"
+
 #include "utils/datablock.hpp"
 
 #include <algorithm>
 
-namespace Texpainter::Model
+namespace Texpainter::PixelStore
 {
 	class Palette
 	{
@@ -49,7 +50,8 @@ namespace Texpainter::Model
 	template<class OutputStream>
 	void write(Palette const& pal, OutputStream stream)
 	{
-		write(static_cast<Texpainter::DataBlock<Texpainter::Model::Pixel> const&>(pal), stream);
+		write(static_cast<Texpainter::DataBlock<Texpainter::PixelStore::Pixel> const&>(pal),
+		      stream);
 	}
 
 	template<class InputStream>

@@ -3,7 +3,7 @@
 #ifndef TEXPAINTER_GENERATORS_POINTWISETRANSFORM_HPP
 #define TEXPAINTER_GENERATORS_POINTWISETRANSFORM_HPP
 
-#include "model/image.hpp"
+#include "pixel_store/image.hpp"
 
 namespace Texpainter::Generators
 {
@@ -16,7 +16,7 @@ namespace Texpainter::Generators
 		template<class T>
 		auto operator()(Span2d<T> in)
 		{
-			Model::BasicImage<std::remove_const_t<T>> ret{in.size()};
+			PixelStore::BasicImage<std::remove_const_t<T>> ret{in.size()};
 			transform(in, ret.pixels(), m_f);
 			return ret;
 		}

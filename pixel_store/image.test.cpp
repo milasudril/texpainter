@@ -58,29 +58,29 @@ namespace Testcases
 {
 	void texpainterImageCreateFromDataBlock()
 	{
-		Texpainter::Model::Image img{3u, 2u};
+		Texpainter::PixelStore::Image img{3u, 2u};
 		assert(img.width() == 3);
 		assert(img.height() == 2);
 		assert(img.area() == 6);
 
 		auto ptr   = img.pixels().begin();
-		*(ptr + 0) = Texpainter::Model::red();
-		*(ptr + 1) = Texpainter::Model::green();
-		*(ptr + 2) = Texpainter::Model::blue();
-		*(ptr + 3) = Texpainter::Model::cyan();
-		*(ptr + 4) = Texpainter::Model::magenta();
-		*(ptr + 5) = Texpainter::Model::yellow();
+		*(ptr + 0) = Texpainter::PixelStore::red();
+		*(ptr + 1) = Texpainter::PixelStore::green();
+		*(ptr + 2) = Texpainter::PixelStore::blue();
+		*(ptr + 3) = Texpainter::PixelStore::cyan();
+		*(ptr + 4) = Texpainter::PixelStore::magenta();
+		*(ptr + 5) = Texpainter::PixelStore::yellow();
 
-		assert(distanceSquared(img(0, 0), Texpainter::Model::red()) == 0.0f);
-		assert(distanceSquared(img(1, 0), Texpainter::Model::green()) == 0.0f);
-		assert(distanceSquared(img(2, 0), Texpainter::Model::blue()) == 0.0f);
-		assert(distanceSquared(img(0, 1), Texpainter::Model::cyan()) == 0.0f);
-		assert(distanceSquared(img(1, 1), Texpainter::Model::magenta()) == 0.0f);
-		assert(distanceSquared(img(2, 1), Texpainter::Model::yellow()) == 0.0f);
+		assert(distanceSquared(img(0, 0), Texpainter::PixelStore::red()) == 0.0f);
+		assert(distanceSquared(img(1, 0), Texpainter::PixelStore::green()) == 0.0f);
+		assert(distanceSquared(img(2, 0), Texpainter::PixelStore::blue()) == 0.0f);
+		assert(distanceSquared(img(0, 1), Texpainter::PixelStore::cyan()) == 0.0f);
+		assert(distanceSquared(img(1, 1), Texpainter::PixelStore::magenta()) == 0.0f);
+		assert(distanceSquared(img(2, 1), Texpainter::PixelStore::yellow()) == 0.0f);
 	}
 	void texpainterImageCreateEmpty()
 	{
-		Texpainter::Model::Image img{3u, 2u};
+		Texpainter::PixelStore::Image img{3u, 2u};
 		assert(img.width() == 3);
 		assert(img.height() == 2);
 	}
@@ -88,15 +88,15 @@ namespace Testcases
 
 	void texpainterImageWriteRead()
 	{
-		Texpainter::Model::Image img{3u, 2u};
+		Texpainter::PixelStore::Image img{3u, 2u};
 
 		auto ptr   = img.pixels().begin();
-		*(ptr + 0) = Texpainter::Model::red();
-		*(ptr + 1) = Texpainter::Model::green();
-		*(ptr + 2) = Texpainter::Model::blue();
-		*(ptr + 3) = Texpainter::Model::cyan();
-		*(ptr + 4) = Texpainter::Model::magenta();
-		*(ptr + 5) = Texpainter::Model::yellow();
+		*(ptr + 0) = Texpainter::PixelStore::red();
+		*(ptr + 1) = Texpainter::PixelStore::green();
+		*(ptr + 2) = Texpainter::PixelStore::blue();
+		*(ptr + 3) = Texpainter::PixelStore::cyan();
+		*(ptr + 4) = Texpainter::PixelStore::magenta();
+		*(ptr + 5) = Texpainter::PixelStore::yellow();
 
 		Buffer buffer{};
 		write(std::as_const(img), std::ref(buffer));

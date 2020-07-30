@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"image_view.o","type":"object","pkgconfig_libs":["gtk+-3.0"]}]}
 
 #include "./image_view.hpp"
-#include "model/image.hpp"
+#include "pixel_store/image.hpp"
 
 #include <gtk/gtk.h>
 
@@ -101,7 +101,7 @@ public:
 			}
 	}
 
-	void image(Model::Image const& img)
+	void image(PixelStore::Image const& img)
 	{
 		if(img.size() != m_size_current || m_img_surface == nullptr) [[unlikely]]
 			{
@@ -144,7 +144,7 @@ private:
 	cairo_surface_t* m_img_surface;
 	Size2d m_size_current;
 
-	void update(Model::Image const& img)
+	void update(PixelStore::Image const& img)
 	{
 		auto const stride = cairo_image_surface_get_stride(m_img_surface);
 		cairo_surface_flush(m_img_surface);
@@ -281,7 +281,7 @@ Texpainter::Ui::ImageView::ImageView(Container& cnt): m_impl{new Impl{cnt}} {}
 
 Texpainter::Ui::ImageView::~ImageView() { delete m_impl; }
 
-Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::image(Model::Image const& img)
+Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::image(PixelStore::Image const& img)
 {
 	m_impl->image(img);
 	return *this;

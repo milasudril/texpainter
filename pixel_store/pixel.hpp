@@ -10,7 +10,7 @@
 #include <cmath>
 #include <algorithm>
 
-namespace Texpainter::Model
+namespace Texpainter::PixelStore
 {
 	namespace ColorProfiles
 	{

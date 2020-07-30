@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <compare>
 
-namespace Texpainter::Model
+namespace Texpainter::PixelStore
 {
 	class ColorIndex
 	{

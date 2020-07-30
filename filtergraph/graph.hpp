@@ -20,18 +20,18 @@ namespace Texpainter::FilterGraph
 		Graph(): m_output_node{OutputNode{}} {}
 
 		template<class PixelType>
-		Model::Image process(Span2d<PixelType const> source) const
+		PixelStore::Image process(Span2d<PixelType const> source) const
 		{
 			m_input_node = ProcessorNode{ImageSource{source}};
 			auto ret     = m_output_node();
 			if(ret.size() != 1) [[unlikely]]  // Should only have one output
 				{
-					Model::Image ret{source.size()};
-					std::ranges::fill(ret.pixels(), Model::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
+					PixelStore::Image ret{source.size()};
+					std::ranges::fill(ret.pixels(), PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
 				}
 
-			// NOTE: OutputNode always returns Model::Image
-			return *std::get_if<Model::Image>(&ret[0]);
+			// NOTE: OutputNode always returns PixelStore::Image
+			return *std::get_if<PixelStore::Image>(&ret[0]);
 		}
 
 		Graph& connectInput(NodeId node, InputPort sink)

@@ -67,13 +67,13 @@ namespace Texpainter
 		}
 
 
-		Model::Image generate(Size2d output_size) { return m_generator(output_size); }
+		PixelStore::Image generate(Size2d output_size) { return m_generator(output_size); }
 
 		template<ControlId>
 		void onChanged(Ui::Slider&);
 
 	private:
-		Model::Image m_preview;
+		PixelStore::Image m_preview;
 		Generators::CrackGenerator m_generator;
 
 		Ui::Box m_root;

@@ -8,7 +8,7 @@
 
 #include "generators/fourier_transform.hpp"
 #include "generators/grayscale_noise.hpp"
-#include "model/image.hpp"
+#include "pixel_store/image.hpp"
 #include "utils/angle.hpp"
 #include "utils/frequency.hpp"
 
@@ -81,17 +81,17 @@ namespace Texpainter::Generators
 		{
 		}
 
-		Model::Image operator()(Size2d output_size)
+		PixelStore::Image operator()(Size2d output_size)
 		{
 			return select(m_filters, *this, output_size);
 		}
 
-		Model::Image operator()(Tag<FilterGraph::None>, Size2d);
-		Model::Image operator()(Tag<FilterGraph::Butt2d>, Size2d);
-		Model::Image operator()(Tag<FilterGraph::Gaussian2d>, Size2d);
-		Model::Image operator()(Tag<FilterGraph::Butt1d>, Size2d);
-		Model::Image operator()(Tag<FilterGraph::Butt1dXThenY>, Size2d);
-		Model::Image operator()(Tag<FilterGraph::Butt1dXYSum>, Size2d);
+		PixelStore::Image operator()(Tag<FilterGraph::None>, Size2d);
+		PixelStore::Image operator()(Tag<FilterGraph::Butt2d>, Size2d);
+		PixelStore::Image operator()(Tag<FilterGraph::Gaussian2d>, Size2d);
+		PixelStore::Image operator()(Tag<FilterGraph::Butt1d>, Size2d);
+		PixelStore::Image operator()(Tag<FilterGraph::Butt1dXThenY>, Size2d);
+		PixelStore::Image operator()(Tag<FilterGraph::Butt1dXYSum>, Size2d);
 
 		FilterGraph filters() const { return m_filters; }
 

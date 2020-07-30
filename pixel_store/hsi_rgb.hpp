@@ -9,7 +9,7 @@
 
 #include <cmath>
 
-namespace Texpainter::Model
+namespace Texpainter::PixelStore
 {
 	struct Hsi
 	{

@@ -402,7 +402,7 @@ namespace Texpainter
 		void confirmPositive(Tag<ControlId::NewFromCurrentColor>, LayerCreatorDlg& src)
 		{
 			auto layer_info = src.widget().value();
-			if(!isSupported<Model::Pixel>(layer_info.size)) [[unlikely]]
+			if(!isSupported<PixelStore::Pixel>(layer_info.size)) [[unlikely]]
 				{
 					// FIXME:
 					//   "A layer of this size cannot be created. The number of bytes required to create a layer
@@ -424,7 +424,7 @@ namespace Texpainter
 		void confirmPositive(Tag<ControlId::NewFromNoise>, LayerCreatorDlg& src)
 		{
 			auto layer_info = src.widget().value();
-			if(!isSupported<Model::Pixel>(layer_info.size)) [[unlikely]]
+			if(!isSupported<PixelStore::Pixel>(layer_info.size)) [[unlikely]]
 				{
 					// FIXME:
 					//   "A layer of this size cannot be created. The number of bytes required to create a layer
@@ -433,10 +433,10 @@ namespace Texpainter
 					return;
 				}
 
-			Model::Image noise{layer_info.size};
+			PixelStore::Image noise{layer_info.size};
 			std::ranges::generate(noise.pixels(), [rng = m_rng]() mutable {
 				std::uniform_real_distribution U{0.0f, 1.0f};
-				return Model::Pixel{U(rng), U(rng), U(rng), U(rng)};
+				return PixelStore::Pixel{U(rng), U(rng), U(rng), U(rng)};
 			});
 
 			insertNewLayer(std::move(layer_info.name), Model::Layer{std::move(noise)});

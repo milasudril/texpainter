@@ -37,7 +37,7 @@ namespace Texpainter::FilterGraph
 
 		std::vector<ProcResultType> operator()(std::span<ProcArgumentType const>) const
 		{
-			return std::vector<ProcResultType>{Model::BasicImage<PixelType>{r_pixels}};
+			return std::vector<ProcResultType>{PixelStore::BasicImage<PixelType>{r_pixels}};
 		}
 
 	private:

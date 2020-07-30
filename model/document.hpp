@@ -3,13 +3,13 @@
 #ifndef TEXPAINTER_DOCUMENT_HPP
 #define TEXPAINTER_DOCUMENT_HPP
 
-#include "./color_index.hpp"
 #include "./palette_index.hpp"
 #include "./layer.hpp"
 #include "./layer_index.hpp"
-#include "./palette.hpp"
 #include "./brush.hpp"
 
+#include "pixel_store/palette.hpp"
+#include "pixel_store/color_index.hpp"
 #include "utils/sorted_sequence.hpp"
 #include "utils/mutator.hpp"
 
@@ -22,7 +22,7 @@ namespace Texpainter::Model
 	{
 	public:
 		using LayerStack        = SortedSequence<std::string, Layer, LayerIndex>;
-		using PaletteCollection = SortedSequence<std::string, Palette, PaletteIndex>;
+		using PaletteCollection = SortedSequence<std::string, PixelStore::Palette, PaletteIndex>;
 
 		explicit Document(Size2d canvas_size)
 		    : m_canvas_size{canvas_size}
@@ -95,15 +95,15 @@ namespace Texpainter::Model
 		Document& currentPalette(std::string&& current_palette)
 		{
 			m_current_palette = std::move(current_palette);
-			m_current_color   = ColorIndex{0};
+			m_current_color   = PixelStore::ColorIndex{0};
 			m_dirty           = true;
 			return *this;
 		}
 
 
-		ColorIndex currentColor() const { return m_current_color; }
+		PixelStore::ColorIndex currentColor() const { return m_current_color; }
 
-		Document& currentColor(ColorIndex i)
+		Document& currentColor(PixelStore::ColorIndex i)
 		{
 			m_current_color = i;
 			m_dirty         = true;
@@ -123,7 +123,7 @@ namespace Texpainter::Model
 		Size2d m_canvas_size;
 		LayerStack m_layers;
 		PaletteCollection m_palettes;
-		ColorIndex m_current_color;
+		PixelStore::ColorIndex m_current_color;
 
 		std::string m_current_layer;
 		std::string m_current_palette;
@@ -132,22 +132,22 @@ namespace Texpainter::Model
 		bool m_dirty;
 	};
 
-	inline Palette const* currentPalette(Document const& doc)
+	inline PixelStore::Palette const* currentPalette(Document const& doc)
 	{
 		auto const& palettes = doc.palettes();
 		return palettes[doc.currentPalette()];
 	}
 
-	inline Pixel currentColor(Document const& doc)
+	inline PixelStore::Pixel currentColor(Document const& doc)
 	{
 		auto i                       = currentPalette(doc);
-		constexpr auto default_color = Pixel{1.0f / 3, 1.0f / 3, 1.0f / 3, 1.0f};
+		constexpr auto default_color = PixelStore::Pixel{1.0f / 3, 1.0f / 3, 1.0f / 3, 1.0f};
 		if(i == nullptr) { return default_color; }
 
 		return doc.currentColor() <= i->lastIndex() ? (*i)[doc.currentColor()] : default_color;
 	}
 
-	inline bool colorIndexValid(Document const& doc, ColorIndex index)
+	inline bool colorIndexValid(Document const& doc, PixelStore::ColorIndex index)
 	{
 		auto i = currentPalette(doc);
 		return (i == nullptr) ? false : (index.value() < i->size()) ? true : false;

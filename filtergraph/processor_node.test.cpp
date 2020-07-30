@@ -44,12 +44,12 @@ namespace
 		    std::span<Texpainter::FilterGraph::ProcArgumentType const>) const
 		{
 			auto const color_a = m_params.at("color_a");
-			Texpainter::Model::Image ret_a{1, 1};
-			ret_a.pixels()(0, 0) = Texpainter::Model::Pixel{0.0f, color_a, 0.0f, 0.0f};
+			Texpainter::PixelStore::Image ret_a{1, 1};
+			ret_a.pixels()(0, 0) = Texpainter::PixelStore::Pixel{0.0f, color_a, 0.0f, 0.0f};
 
 			auto const color_b = m_params.at("color_b");
-			Texpainter::Model::Image ret_b{1, 1};
-			ret_b.pixels()(0, 0) = Texpainter::Model::Pixel{0.0f, 0.0f, color_b, 0.0f};
+			Texpainter::PixelStore::Image ret_b{1, 1};
+			ret_b.pixels()(0, 0) = Texpainter::PixelStore::Pixel{0.0f, 0.0f, color_b, 0.0f};
 
 			++r_req_count;
 			return std::vector<Texpainter::FilterGraph::ProcResultType>{std::move(ret_a),
@@ -114,12 +114,12 @@ namespace
 			assert(std::size(args) == 2);
 			for(int k = 0; k < 2; ++k)
 			{
-				if(auto val =
-				       std::get_if<Texpainter::Span2d<Texpainter::Model::Pixel const>>(&args[k]);
+				if(auto val = std::get_if<Texpainter::Span2d<Texpainter::PixelStore::Pixel const>>(
+				       &args[k]);
 				   val != nullptr)
 				{
-					Texpainter::Model::Image img{1, 1};
-					img.pixels()(0, 0) = Texpainter::Model::Pixel{1.0f, 0.0f, 0.0f, 1.0f};
+					Texpainter::PixelStore::Image img{1, 1};
+					img.pixels()(0, 0) = Texpainter::PixelStore::Pixel{1.0f, 0.0f, 0.0f, 1.0f};
 					if(val->area() != 0) { img.pixels()(0, 0) += (*val)(0, 0); }
 					ret.push_back(std::move(img));
 				}
@@ -181,8 +181,8 @@ namespace Testcases
 		assert(std::size(res) == 2);
 		assert(req_count == 1);
 
-		auto res_0 = get_if<Texpainter::Model::Image>(&res[0]);
-		auto res_1 = get_if<Texpainter::Model::Image>(&res[1]);
+		auto res_0 = get_if<Texpainter::PixelStore::Image>(&res[0]);
+		auto res_1 = get_if<Texpainter::PixelStore::Image>(&res[1]);
 		assert(res_0 != nullptr);
 		assert(res_1 != nullptr);
 
@@ -221,8 +221,8 @@ namespace Testcases
 		assert(std::size(res) == 2);
 		assert(req_count == 0);
 
-		auto res_0 = get_if<Texpainter::Model::Image>(&res[0]);
-		auto res_1 = get_if<Texpainter::Model::Image>(&res[1]);
+		auto res_0 = get_if<Texpainter::PixelStore::Image>(&res[0]);
+		auto res_1 = get_if<Texpainter::PixelStore::Image>(&res[1]);
 		assert(res_0 != nullptr);
 		assert(res_1 != nullptr);
 
@@ -271,8 +271,8 @@ namespace Testcases
 		auto& res = node();
 
 		assert(!node.dirty());
-		auto res_0 = get_if<Texpainter::Model::Image>(&res[0]);
-		auto res_1 = get_if<Texpainter::Model::Image>(&res[1]);
+		auto res_0 = get_if<Texpainter::PixelStore::Image>(&res[0]);
+		auto res_1 = get_if<Texpainter::PixelStore::Image>(&res[1]);
 		assert(res_0->pixels()(0, 0).green() == 1.0f);
 		assert(res_1->pixels()(0, 0).blue() == 1.0f);
 
@@ -281,8 +281,8 @@ namespace Testcases
 		src.set("color_b", Texpainter::FilterGraph::ProcParamValue{0.25});
 		assert(node.dirty());
 		node();
-		res_0 = get_if<Texpainter::Model::Image>(&res[0]);
-		res_1 = get_if<Texpainter::Model::Image>(&res[1]);
+		res_0 = get_if<Texpainter::PixelStore::Image>(&res[0]);
+		res_1 = get_if<Texpainter::PixelStore::Image>(&res[1]);
 		assert(!node.dirty());
 		assert(res_0->pixels()(0, 0).green() == 0.75f);
 		assert(res_1->pixels()(0, 0).blue() == 0.25f);

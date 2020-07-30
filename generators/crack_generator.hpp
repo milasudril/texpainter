@@ -6,7 +6,7 @@
 #ifndef TEXPAINTER_CRACKGENERATOR_HPP
 #define TEXPAINTER_CRACKGENERATOR_HPP
 
-#include "model/image.hpp"
+#include "pixel_store/image.hpp"
 
 #include <random>
 
@@ -29,7 +29,7 @@ namespace Texpainter::Generators
 		{
 		}
 
-		Model::Image operator()(Size2d output_size);
+		PixelStore::Image operator()(Size2d output_size);
 
 		int nCracks() const { return m_n_cracks; }
 

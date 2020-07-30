@@ -91,7 +91,7 @@ void Texpainter::AppWindow::updatePaletteSelector()
 	}
 	else
 	{
-		Model::Pixel color{0.0f, 0.0f, 0.0f, 0.0f};
+		PixelStore::Pixel color{0.0f, 0.0f, 0.0f, 0.0f};
 		m_pal_view.palette(std::span{&color, 1}).update();
 	}
 }
@@ -135,8 +135,8 @@ void Texpainter::AppWindow::update()
 
 void Texpainter::AppWindow::doRender()
 {
-	Model::Image canvas{m_current_document->canvasSize()};
-	std::ranges::fill(canvas.pixels(), Model::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
+	PixelStore::Image canvas{m_current_document->canvasSize()};
+	std::ranges::fill(canvas.pixels(), PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
 	std::ranges::for_each(m_current_document->layersByIndex(), [&canvas](auto const& layer) {
 		if(layer.visible()) { render(layer, canvas); }
 	});

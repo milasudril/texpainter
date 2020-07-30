@@ -8,7 +8,7 @@
 
 #include "./container.hpp"
 
-#include "model/palette.hpp"
+#include "pixel_store/palette.hpp"
 #include "utils/size_2d.hpp"
 
 #include <utility>
@@ -34,22 +34,28 @@ namespace Texpainter::Ui
 		{
 			return eventHandler(
 			    &eh,
-			    {[](void* event_handler, PaletteView& self, Model::ColorIndex index, int button) {
+			    {[](void* event_handler,
+			        PaletteView& self,
+			        PixelStore::ColorIndex index,
+			        int button) {
 				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
 				     obj.template onMouseDown<id>(self, index, button);
 			     },
-			     [](void* event_handler, PaletteView& self, Model::ColorIndex index, int button) {
+			     [](void* event_handler,
+			        PaletteView& self,
+			        PixelStore::ColorIndex index,
+			        int button) {
 				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
 				     obj.template onMouseUp<id>(self, index, button);
 			     },
-			     [](void* event_handler, PaletteView& self, Model::ColorIndex index) {
+			     [](void* event_handler, PaletteView& self, PixelStore::ColorIndex index) {
 				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
 				     obj.template onMouseMove<id>(self, index);
 			     }});
 		}
 
-		PaletteView& palette(std::span<Model::Pixel const> predef_colors);
-		std::span<Model::Pixel const> palette() const;
+		PaletteView& palette(std::span<PixelStore::Pixel const> predef_colors);
+		std::span<PixelStore::Pixel const> palette() const;
 		PaletteView& update();
 
 		enum class HighlightMode
@@ -59,10 +65,10 @@ namespace Texpainter::Ui
 			Write
 		};
 
-		PaletteView& color(Model::ColorIndex index, Model::Pixel value);
-		Model::Pixel color(Model::ColorIndex index) const;
+		PaletteView& color(PixelStore::ColorIndex index, PixelStore::Pixel value);
+		PixelStore::Pixel color(PixelStore::ColorIndex index) const;
 
-		PaletteView& highlightMode(Model::ColorIndex index, HighlightMode mode);
+		PaletteView& highlightMode(PixelStore::ColorIndex index, HighlightMode mode);
 
 		PaletteView& minSize(Size2d size);
 
@@ -74,15 +80,15 @@ namespace Texpainter::Ui
 		{
 			void (*m_on_mouse_down)(void* event_handler,
 			                        PaletteView& self,
-			                        Model::ColorIndex index,
+			                        PixelStore::ColorIndex index,
 			                        int button);
 			void (*m_on_mouse_up)(void* event_handler,
 			                      PaletteView& self,
-			                      Model::ColorIndex index,
+			                      PixelStore::ColorIndex index,
 			                      int button);
 			void (*m_on_mouse_move)(void* event_handler,
 			                        PaletteView& self,
-			                        Model::ColorIndex index);
+			                        PixelStore::ColorIndex index);
 		};
 		PaletteView& eventHandler(void* event_handler, EventHandlerVtable const& vtable);
 	};

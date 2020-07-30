@@ -40,12 +40,12 @@ namespace Testcases
 {
 	void texpainterPaletteCreateFromDataBlock()
 	{
-		Texpainter::DataBlock<Texpainter::Model::Pixel> dblock{3};
-		*(std::data(dblock) + 0) = Texpainter::Model::red();
-		*(std::data(dblock) + 1) = Texpainter::Model::green();
-		*(std::data(dblock) + 2) = Texpainter::Model::blue();
+		Texpainter::DataBlock<Texpainter::PixelStore::Pixel> dblock{3};
+		*(std::data(dblock) + 0) = Texpainter::PixelStore::red();
+		*(std::data(dblock) + 1) = Texpainter::PixelStore::green();
+		*(std::data(dblock) + 2) = Texpainter::PixelStore::blue();
 
-		Texpainter::Model::Palette pal{std::move(dblock)};
+		Texpainter::PixelStore::Palette pal{std::move(dblock)};
 		assert(std::size(pal) == 3);
 		assert(pal[0].red() == 1.0f);
 		assert(pal[0].green() == 0.0f);
@@ -60,7 +60,7 @@ namespace Testcases
 
 	void texpainterPaletteCreateEmpty()
 	{
-		Texpainter::Model::Palette pal{3};
+		Texpainter::PixelStore::Palette pal{3};
 		assert(std::size(pal) == 3);
 		assert(pal[0].red() == 0.0f);
 		assert(pal[0].green() == 0.0f);
@@ -78,9 +78,9 @@ namespace Testcases
 
 	void texpainterPaletteWriteRead()
 	{
-		Texpainter::Model::Palette pal{2};
-		pal[0] = Texpainter::Model::red();
-		pal[1] = Texpainter::Model::green();
+		Texpainter::PixelStore::Palette pal{2};
+		pal[0] = Texpainter::PixelStore::red();
+		pal[1] = Texpainter::PixelStore::green();
 
 		Buffer buffer{};
 		write(std::as_const(pal), std::ref(buffer));
@@ -91,7 +91,7 @@ namespace Testcases
 		assert(pal_2.size() == pal.size());
 		assert(memcmp(std::begin(pal),
 		              std::begin(pal),
-		              std::size(pal) * sizeof(Texpainter::Model::Pixel))
+		              std::size(pal) * sizeof(Texpainter::PixelStore::Pixel))
 		       == 0);
 	}
 }

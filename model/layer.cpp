@@ -6,7 +6,8 @@
 
 namespace
 {
-	void draw_marker(Texpainter::vec2_t loc, Texpainter::Span2d<Texpainter::Model::Pixel> canvas)
+	void draw_marker(Texpainter::vec2_t loc,
+	                 Texpainter::Span2d<Texpainter::PixelStore::Pixel> canvas)
 	{
 		constexpr auto radius   = 2;
 		auto const w            = canvas.width();
@@ -26,7 +27,7 @@ namespace
 				if(Texpainter::dot(d, d) < radius * radius)
 				{
 					auto& pixel = canvas((col + w) % w, (row + h) % h);
-					pixel       = Texpainter::Model::Pixel{1.0f, 1.0f, 1.0f, 1.0f} - pixel;
+					pixel       = Texpainter::PixelStore::Pixel{1.0f, 1.0f, 1.0f, 1.0f} - pixel;
 					pixel.alpha(1.0f);
 				}
 			}
@@ -37,7 +38,7 @@ namespace
 Texpainter::Model::Layer& Texpainter::Model::Layer::paint(vec2_t origin,
                                                           float radius,
                                                           BrushFunction brush,
-                                                          Pixel color)
+                                                          PixelStore::Pixel color)
 {
 	auto const w = m_content->width();
 	auto const h = m_content->height();
@@ -66,7 +67,7 @@ Texpainter::Model::Layer& Texpainter::Model::Layer::paint(vec2_t origin,
 	return *this;
 }
 
-void Texpainter::Model::outline(Layer const& layer, Span2d<Model::Pixel> canvas)
+void Texpainter::Model::outline(Layer const& layer, Span2d<PixelStore::Pixel> canvas)
 {
 	auto const w      = canvas.width();
 	auto const h      = canvas.height();
@@ -89,7 +90,7 @@ void Texpainter::Model::outline(Layer const& layer, Span2d<Model::Pixel> canvas)
 	draw_marker(origin + transform(box_layer * vec2_t{1.0, -1.0}, rot_x, rot_y), canvas);
 }
 
-void Texpainter::Model::render(Layer const& layer, Span2d<Pixel> ret)
+void Texpainter::Model::render(Layer const& layer, Span2d<PixelStore::Pixel> ret)
 {
 	auto const ϴ            = layer.rotation();
 	auto const rot_x        = vec2_t{cos(ϴ), sin(ϴ)};

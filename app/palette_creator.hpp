@@ -5,8 +5,8 @@
 
 #include "./size_input.hpp"
 
-#include "model/palette.hpp"
-#include "model/hsi_rgb.hpp"
+#include "pixel_store/palette.hpp"
+#include "pixel_store/hsi_rgb.hpp"
 #include "ui/box.hpp"
 #include "ui/labeled_input.hpp"
 #include "ui/text_entry.hpp"
@@ -56,7 +56,7 @@ namespace Texpainter
 		struct PaletteInfo
 		{
 			std::string name;
-			std::array<Model::Pixel, 4> colors;
+			std::array<PixelStore::Pixel, 4> colors;
 		};
 
 		explicit PaletteCreator(Ui::Container& container)
@@ -101,7 +101,7 @@ namespace Texpainter
 		Ui::LabeledInput<SliderWithPalView> m_deco_3;
 		Ui::LabeledInput<Ui::Slider> m_saturation;
 
-		std::array<Model::Pixel, 4> generateColors() const
+		std::array<PixelStore::Pixel, 4> generateColors() const
 		{
 			auto const base_hue =
 			    static_cast<float>(linValue(m_base_hue.inputField().slider().value()));
@@ -121,11 +121,11 @@ namespace Texpainter
 
 			auto const saturation = static_cast<float>(linValue(m_saturation.inputField().value()));
 
-			std::array<Model::Pixel, 4> colors;
+			std::array<PixelStore::Pixel, 4> colors;
 			std::ranges::for_each(colors, [saturation, hue, k = 0](auto& value) mutable {
 				auto constexpr intensity = 1.0f / 3.0f;
 				auto constexpr alpha     = 1.0f;
-				value                    = toRgb(Model::Hsi{hue[k], saturation, intensity, alpha});
+				value = toRgb(PixelStore::Hsi{hue[k], saturation, intensity, alpha});
 				++k;
 			});
 
