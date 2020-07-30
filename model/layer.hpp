@@ -110,8 +110,7 @@ namespace Texpainter::Model
 
 		auto size() const { return m_content->size(); }
 
-		FilterGraph::Graph const& filterGraph() const
-		{ return *m_graph; }
+		FilterGraph::Graph const& filterGraph() const { return *m_graph; }
 
 	private:
 		bool m_visible;

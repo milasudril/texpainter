@@ -17,16 +17,13 @@ namespace Texpainter::FilterGraph
 	class Graph
 	{
 	public:
-		Graph(): m_output_node{OutputNode{}}
-		{
-			connectOutput(m_input_node, OutputPort{0});
-		}
+		Graph(): m_output_node{OutputNode{}} { connectOutput(m_input_node, OutputPort{0}); }
 
 		template<class PixelType>
 		PixelStore::Image process(Span2d<PixelType const> source) const
 		{
 			m_input_node.replaceWith(ImageSource{source});
-			auto ret     = m_output_node();
+			auto ret = m_output_node();
 			if(ret.size() != 1) [[unlikely]]  // Should only have one output
 				{
 					PixelStore::Image ret{source.size()};

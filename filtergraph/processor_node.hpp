@@ -40,7 +40,7 @@ namespace Texpainter::FilterGraph
 
 		template<class Proc,
 		         std::enable_if_t<!std::is_same_v<ProcessorNode, std::decay_t<Proc>>, int> = 0>
-		 ProcessorNode& replaceWith(Proc&& proc)
+		ProcessorNode& replaceWith(Proc&& proc)
 		{
 			m_inputs = std::vector<SourceNode>(proc.inputPorts().size());
 			m_proc = std::make_unique<ProcessorImpl<std::decay_t<Proc>>>(std::forward<Proc>(proc));
@@ -181,6 +181,7 @@ namespace Texpainter::FilterGraph
 			virtual std::vector<ProcParamValue> paramValues() const                           = 0;
 			virtual ProcParamValue get(std::string_view param_name) const                     = 0;
 			virtual Processor& set(std::string_view param_name, ProcParamValue value)         = 0;
+			virtual std::unique_ptr<Processor> clone() const                                  = 0;
 			virtual ~Processor() = default;
 		};
 		std::unique_ptr<Processor> m_proc;
@@ -228,6 +229,11 @@ namespace Texpainter::FilterGraph
 				return *this;
 			}
 
+			std::unique_ptr<Processor> clone() const override
+			{
+				return std::make_unique<ProcessorImpl>(*this);
+			}
+
 
 		private:
 			Proc m_proc;
@@ -264,6 +270,11 @@ namespace Texpainter::FilterGraph
 			ProcParamValue get(std::string_view) const override { return ProcParamValue{0.0}; }
 
 			ProcessorDummy& set(std::string_view, ProcParamValue) override { return *this; }
+
+			std::unique_ptr<Processor> clone() const override
+			{
+				return std::make_unique<ProcessorDummy>(*this);
+			}
 		};
 	};
 }
