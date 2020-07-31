@@ -27,6 +27,7 @@ namespace Texpainter::FilterGraph
 			r_input = &m_nodes[InputNodeId]; // Create an empty node as input node
 			r_output = &m_nodes.insert(std::make_pair(OutputNodeId, OutputNode{})).first->second;
 			connect(NodeId{1}, InputPort{0}, NodeId{0}, OutputPort{0});
+			m_current_id = NodeId{2};
 		}
 
 		Graph(Graph const& other)
@@ -54,6 +55,9 @@ namespace Texpainter::FilterGraph
 				        });
 				    ++result_iter;
 			    });
+			r_input = &m_nodes.find(InputNodeId)->second;
+			r_output = &m_nodes.find(OutputNodeId)->second;
+			m_current_id = other.m_current_id;
 		}
 
 		template<class PixelType>
