@@ -22,8 +22,59 @@ namespace Texpainter::FilterGraph
 	{
 	public:
 		using argument_type = ProcArgumentType;
+		using result_type   = ProcResultType;
 
-		using result_type = ProcResultType;
+		class Processor
+		{
+		public:
+			virtual std::vector<result_type> operator()(std::span<argument_type const>) const = 0;
+			virtual std::span<std::string_view const> inputPorts() const                      = 0;
+			virtual std::span<std::string_view const> outputPorts() const                     = 0;
+			virtual std::span<std::string_view const> paramNames() const                      = 0;
+			virtual std::vector<ProcParamValue> paramValues() const                           = 0;
+			virtual ProcParamValue get(std::string_view param_name) const                     = 0;
+			virtual Processor& set(std::string_view param_name, ProcParamValue value)         = 0;
+			virtual std::unique_ptr<Processor> clone() const                                  = 0;
+			virtual ~Processor() = default;
+		};
+
+		class SourceNode
+		{
+		public:
+			SourceNode(): r_processor{s_default_node}, m_index{OutputPort{0}} {}
+
+			explicit SourceNode(std::reference_wrapper<ProcessorNode const> node, OutputPort index)
+			    : r_processor{node}
+			    , m_index{index}
+			{
+			}
+
+			argument_type operator()() const
+			{
+				if(auto const& res = r_processor(); m_index.value() < std::size(res)) [[likely]]
+					{
+						return std::visit(
+						    [](auto const& val) { return argument_type{val.pixels()}; },
+						    res[m_index.value()]);
+					}
+
+				return argument_type{};
+			}
+
+			ProcessorNode const& processor() const { return r_processor.get(); }
+
+			OutputPort port() const { return m_index; }
+
+		private:
+			std::reference_wrapper<ProcessorNode const> r_processor;
+			OutputPort m_index;
+		};
+
+		explicit ProcessorNode(std::unique_ptr<Processor>&& proc)
+		    : m_inputs(proc->inputPorts().size())
+		    , m_proc{std::move(proc)}
+		{
+		}
 
 		ProcessorNode(ProcessorNode&&) = delete;
 
@@ -38,11 +89,14 @@ namespace Texpainter::FilterGraph
 		{
 		}
 
+		auto disconnectedCopy() const { return m_proc->clone(); }
+
 		template<class Proc,
 		         std::enable_if_t<!std::is_same_v<ProcessorNode, std::decay_t<Proc>>, int> = 0>
 		ProcessorNode& replaceWith(Proc&& proc)
 		{
 			m_inputs = std::vector<SourceNode>(proc.inputPorts().size());
+			m_result_cache.clear();
 			m_proc = std::make_unique<ProcessorImpl<std::decay_t<Proc>>>(std::forward<Proc>(proc));
 			return *this;
 		}
@@ -90,6 +144,7 @@ namespace Texpainter::FilterGraph
 			return *this;
 		}
 
+		std::span<SourceNode const> inputs() const { return m_inputs; }
 
 		std::span<std::string_view const> paramNames() const { return m_proc->paramNames(); }
 
@@ -122,40 +177,9 @@ namespace Texpainter::FilterGraph
 			}
 		}
 
-
 	private:
 		mutable std::vector<result_type> m_result_cache;
 		static ProcessorNode s_default_node;
-
-		class SourceNode
-		{
-		public:
-			SourceNode(): r_processor{s_default_node}, m_index{OutputPort{0}} {}
-
-			explicit SourceNode(std::reference_wrapper<ProcessorNode const> node, OutputPort index)
-			    : r_processor{node}
-			    , m_index{index}
-			{
-			}
-
-			argument_type operator()() const
-			{
-				if(auto const& res = r_processor(); m_index.value() < std::size(res)) [[likely]]
-					{
-						return std::visit(
-						    [](auto const& val) { return argument_type{val.pixels()}; },
-						    res[m_index.value()]);
-					}
-
-				return argument_type{};
-			}
-
-			ProcessorNode const& processor() const { return r_processor.get(); }
-
-		private:
-			std::reference_wrapper<ProcessorNode const> r_processor;
-			OutputPort m_index;
-		};
 
 		std::vector<SourceNode> m_inputs;
 
@@ -171,21 +195,7 @@ namespace Texpainter::FilterGraph
 		//       as const from the consumer side.
 		mutable std::map<ProcessorNode*, std::set<InputPort, InputPortCompare>> r_consumers;
 
-		class Processor
-		{
-		public:
-			virtual std::vector<result_type> operator()(std::span<argument_type const>) const = 0;
-			virtual std::span<std::string_view const> inputPorts() const                      = 0;
-			virtual std::span<std::string_view const> outputPorts() const                     = 0;
-			virtual std::span<std::string_view const> paramNames() const                      = 0;
-			virtual std::vector<ProcParamValue> paramValues() const                           = 0;
-			virtual ProcParamValue get(std::string_view param_name) const                     = 0;
-			virtual Processor& set(std::string_view param_name, ProcParamValue value)         = 0;
-			virtual std::unique_ptr<Processor> clone() const                                  = 0;
-			virtual ~Processor() = default;
-		};
 		std::unique_ptr<Processor> m_proc;
-
 
 		template<ImageProcessor Proc>
 		class ProcessorImpl: public Processor

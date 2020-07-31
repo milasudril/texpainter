@@ -3,5 +3,20 @@
 //@	}
 
 #include "./graph.hpp"
+#include "./image_source.hpp"
 
-int main() { return 0; }
+namespace Testcases
+{
+	void texpainterFilterGraphGraphInsert()
+	{
+		Texpainter::FilterGraph::Graph g;
+		Texpainter::PixelStore::Image img{1, 1};
+		g.insert(Texpainter::FilterGraph::ImageSource<Texpainter::PixelStore::Pixel>{img.pixels()});
+	}
+}
+
+int main()
+{
+	Testcases::texpainterFilterGraphGraphInsert();
+	return 0;
+}

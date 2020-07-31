@@ -12,12 +12,48 @@
 
 #include "utils/iter_pair.hpp"
 
+#include <algorithm>
+
 namespace Texpainter::FilterGraph
 {
 	class Graph
 	{
 	public:
-		Graph(): m_output_node{OutputNode{}} { connectOutput(m_input_node, OutputPort{0}); }
+		Graph(): m_output_node{OutputNode{}}
+		{
+			m_output_node.connect(InputPort{0}, m_input_node, OutputPort{0});
+		}
+
+		Graph(Graph const& other)
+		{
+			std::ranges::for_each(other.m_nodes, [&result = m_nodes](auto const& item) {
+				result.insert(std::make_pair(item.first, item.second.disconnectedCopy()));
+			});
+
+			std::map<ProcessorNode const*, NodeId> ptr_to_id;
+			std::ranges::transform(
+			    other.m_nodes, std::inserter(ptr_to_id, std::end(ptr_to_id)), [](auto const& item) {
+				    return std::make_pair(&item.second, item.first);
+			    });
+
+			std::ranges::for_each(
+			    other.m_nodes,
+			    [&result = m_nodes, result_iter = std::begin(m_nodes), &ptr_to_id](
+			        auto const& item) mutable {
+				    std::ranges::for_each(
+				        item.second.inputs(),
+				        [&result, &result_iter, &ptr_to_id, k = 0u](auto const& connection) mutable {
+					        if(auto i = ptr_to_id.find(&connection.processor());
+					           i != std::end(ptr_to_id))
+					        {
+						        auto& node = result.find(i->second)->second;
+						        result_iter->second.connect(InputPort{k}, node, connection.port());
+					        }
+					        ++k;
+				        });
+				    ++result_iter;
+			    });
+		}
 
 		template<class PixelType>
 		PixelStore::Image process(Span2d<PixelType const> source) const
@@ -32,12 +68,6 @@ namespace Texpainter::FilterGraph
 
 			// NOTE: OutputNode always returns PixelStore::Image
 			return *std::get_if<PixelStore::Image>(&ret[0]);
-		}
-
-		Graph& connectOutput(ProcessorNode const& node, OutputPort src)
-		{
-			m_output_node.connect(InputPort{0}, node, src);
-			return *this;
 		}
 
 		Graph& connectInput(NodeId node, InputPort sink)
@@ -73,11 +103,11 @@ namespace Texpainter::FilterGraph
 
 
 		template<ImageProcessor T>
-		std::pair<NodeId const, ProcessorNode>& insert(T&& obj)
+		NodeId insert(T&& obj)
 		{
 			auto i = m_nodes.insert(std::make_pair(m_current_id, std::forward<T>(obj)));
 			++m_current_id;
-			return *i.first;
+			return i.first->first;
 		}
 
 		auto nodes() const { return IterPair{std::begin(m_nodes), std::end(m_nodes)}; }
