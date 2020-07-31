@@ -15,6 +15,8 @@ namespace Texpainter::FilterGraph
 	class NodeId
 	{
 	public:
+		constexpr explicit NodeId(uint64_t val): m_value{val}{}
+
 		constexpr NodeId(): m_value{0} {}
 
 		constexpr uint64_t value() const { return m_value; }

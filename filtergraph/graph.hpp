@@ -19,9 +19,14 @@ namespace Texpainter::FilterGraph
 	class Graph
 	{
 	public:
-		Graph(): m_output_node{OutputNode{}}
+		static constexpr NodeId InputNodeId{0};
+		static constexpr NodeId OutputNodeId{1};
+
+		Graph()
 		{
-			m_output_node.connect(InputPort{0}, m_input_node, OutputPort{0});
+			r_input = &m_nodes[InputNodeId]; // Create an empty node as input node
+			r_output = &m_nodes.insert(std::make_pair(OutputNodeId, OutputNode{})).first->second;
+			connect(NodeId{1}, InputPort{0}, NodeId{0}, OutputPort{0});
 		}
 
 		Graph(Graph const& other)
@@ -43,12 +48,8 @@ namespace Texpainter::FilterGraph
 				    std::ranges::for_each(
 				        item.second.inputs(),
 				        [&result, &result_iter, &ptr_to_id, k = 0u](auto const& connection) mutable {
-					        if(auto i = ptr_to_id.find(&connection.processor());
-					           i != std::end(ptr_to_id))
-					        {
-						        auto& node = result.find(i->second)->second;
-						        result_iter->second.connect(InputPort{k}, node, connection.port());
-					        }
+							auto& node = result.find(ptr_to_id.find(&connection.processor())->second)->second;
+					        result_iter->second.connect(InputPort{k}, node, connection.port());
 					        ++k;
 				        });
 				    ++result_iter;
@@ -58,8 +59,8 @@ namespace Texpainter::FilterGraph
 		template<class PixelType>
 		PixelStore::Image process(Span2d<PixelType const> source) const
 		{
-			m_input_node.replaceWith(ImageSource{source});
-			auto ret = m_output_node();
+			r_input->replaceWith(ImageSource{source});
+			auto ret = (*r_output)();
 			if(ret.size() != 1) [[unlikely]]  // Should only have one output
 				{
 					PixelStore::Image ret{source.size()};
@@ -70,28 +71,9 @@ namespace Texpainter::FilterGraph
 			return *std::get_if<PixelStore::Image>(&ret[0]);
 		}
 
-		Graph& connectInput(NodeId node, InputPort sink)
-		{
-			m_nodes[node].connect(sink, m_input_node, OutputPort{0});
-			return *this;
-		}
-
-		Graph& connectOutput(NodeId node, OutputPort src)
-		{
-			m_output_node.connect(InputPort{0}, m_nodes[node], src);
-			return *this;
-		}
-
 		Graph& connect(NodeId a, InputPort sink, NodeId b, OutputPort src)
 		{
 			m_nodes[a].connect(sink, m_nodes[b], src);
-			return *this;
-		}
-
-
-		Graph& disconnectOutput()
-		{
-			m_output_node.disconnect(InputPort{0});
 			return *this;
 		}
 
@@ -127,8 +109,8 @@ namespace Texpainter::FilterGraph
 		auto currentId() const { return m_current_id; }
 
 	private:
-		mutable ProcessorNode m_input_node;
-		ProcessorNode m_output_node;
+		ProcessorNode* r_input;
+		ProcessorNode* r_output;
 		std::map<NodeId, ProcessorNode> m_nodes;
 		NodeId m_current_id;
 	};
