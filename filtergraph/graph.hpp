@@ -24,7 +24,7 @@ namespace Texpainter::FilterGraph
 
 		Graph()
 		{
-			r_input = &m_nodes[InputNodeId]; // Create an empty node as input node
+			r_input  = &m_nodes[InputNodeId];  // Create an empty node as input node
 			r_output = &m_nodes.insert(std::make_pair(OutputNodeId, OutputNode{})).first->second;
 			connect(NodeId{1}, InputPort{0}, NodeId{0}, OutputPort{0});
 			m_current_id = NodeId{2};
@@ -48,15 +48,18 @@ namespace Texpainter::FilterGraph
 			        auto const& item) mutable {
 				    std::ranges::for_each(
 				        item.second.inputs(),
-				        [&result, &result_iter, &ptr_to_id, k = 0u](auto const& connection) mutable {
-							auto& node = result.find(ptr_to_id.find(&connection.processor())->second)->second;
+				        [&result, &result_iter, &ptr_to_id, k = 0u](
+				            auto const& connection) mutable {
+					        auto& node =
+					            result.find(ptr_to_id.find(&connection.processor())->second)
+					                ->second;
 					        result_iter->second.connect(InputPort{k}, node, connection.port());
 					        ++k;
 				        });
 				    ++result_iter;
 			    });
-			r_input = &m_nodes.find(InputNodeId)->second;
-			r_output = &m_nodes.find(OutputNodeId)->second;
+			r_input      = &m_nodes.find(InputNodeId)->second;
+			r_output     = &m_nodes.find(OutputNodeId)->second;
 			m_current_id = other.m_current_id;
 		}
 

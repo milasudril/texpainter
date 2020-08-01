@@ -52,12 +52,19 @@ namespace Texpainter::Model
 
 		Layer& operator=(Layer const& other) = delete;
 
-		Layer linkedLayer() const { return Layer{m_visible, m_loc, m_rot, m_scale, m_content}; }
+		Layer linkedLayer() const
+		{
+			return Layer{m_visible, m_loc, m_rot, m_scale, m_content, *m_graph};
+		}
 
 		Layer copiedLayer() const
 		{
-			return Layer{
-			    m_visible, m_loc, m_rot, m_scale, std::make_shared<PixelStore::Image>(*m_content)};
+			return Layer{m_visible,
+			             m_loc,
+			             m_rot,
+			             m_scale,
+			             std::make_shared<PixelStore::Image>(*m_content),
+			             *m_graph};
 		}
 
 		Layer& convertToCopy()
@@ -124,12 +131,14 @@ namespace Texpainter::Model
 		               vec2_t loc,
 		               Angle rot,
 		               vec2_t scale,
-		               std::shared_ptr<PixelStore::Image> const& content)
+		               std::shared_ptr<PixelStore::Image> const& content,
+		               FilterGraph::Graph const& graph)
 		    : m_visible{vis}
 		    , m_loc{loc}
 		    , m_rot{rot}
 		    , m_scale{scale}
 		    , m_content{content}
+		    , m_graph{std::make_unique<FilterGraph::Graph>(graph)}
 		{
 		}
 	};

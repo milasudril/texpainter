@@ -97,9 +97,7 @@ void Texpainter::Model::render(Layer const& layer, Span2d<PixelStore::Pixel> ret
 	auto const rot_y        = vec2_t{-sin(ϴ), cos(ϴ)};
 	auto const scale_factor = 1.0 / layer.scaleFactor();
 
-	// TODO: (when filter graph always exists)
-	// auto const src = layer.filterGraph().process(layer.content().pixels());
-	auto const src = layer.content().pixels();
+	auto const src = layer.filterGraph().process(layer.content().pixels());
 	auto const origin_src =
 	    0.5 * vec2_t{static_cast<double>(src.width()), static_cast<double>(src.height())};
 	auto const loc_src_ret_coord =
