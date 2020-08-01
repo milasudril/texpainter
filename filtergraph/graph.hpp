@@ -63,11 +63,17 @@ namespace Texpainter::FilterGraph
 
 
 		template<ImageProcessor T>
-		NodeId insert(T&& obj)
+		std::pair<NodeId, std::reference_wrapper<ProcessorNode const>> insert(T&& obj)
 		{
 			auto i = m_nodes.insert(std::make_pair(m_current_id, std::forward<T>(obj)));
 			++m_current_id;
-			return i.first->first;
+			return std::make_pair(i.first->first, std::ref(i.first->second));
+		}
+
+		Graph& erase(NodeId id)
+		{
+			m_nodes.erase(id);
+			return *this;
 		}
 
 		auto nodes() const { return IterPair{std::begin(m_nodes), std::end(m_nodes)}; }

@@ -40,7 +40,6 @@ namespace
 			        });
 		    });
 	}
-
 }
 
 Texpainter::FilterGraph::Graph::Graph(Graph const& other)
