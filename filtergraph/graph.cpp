@@ -29,8 +29,7 @@ namespace
 	                      Texpainter::FilterGraph::Graph& g2)
 	{
 		std::ranges::for_each(
-		    g1.nodes(),
-		    [&g2, ptr_to_id = map_objects_to_node_id(g1)](auto const& item) {
+		    g1.nodes(), [&g2, ptr_to_id = map_objects_to_node_id(g1)](auto const& item) {
 			    std::ranges::for_each(
 			        item.second.inputs(),
 			        [&g2, &ptr_to_id, id_a = item.first, k = 0u](auto const& conn) mutable {
