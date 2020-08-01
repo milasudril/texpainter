@@ -1,5 +1,6 @@
 //@	{
 //@	 "targets":[{"name":"graph.hpp", "type":"include"}]
+//@	,"dependencies_extra":[{"ref":"graph.o", "rel":"implementation"}]
 //@	}
 
 #ifndef TEXPAINTER_FILTERGRAPH_GRAPH_HPP
@@ -30,38 +31,7 @@ namespace Texpainter::FilterGraph
 			m_current_id = NodeId{2};
 		}
 
-		Graph(Graph const& other)
-		{
-			std::ranges::for_each(other.m_nodes, [&result = m_nodes](auto const& item) {
-				result.insert(std::make_pair(item.first, item.second.disconnectedCopy()));
-			});
-
-			std::map<ProcessorNode const*, NodeId> ptr_to_id;
-			std::ranges::transform(
-			    other.m_nodes, std::inserter(ptr_to_id, std::end(ptr_to_id)), [](auto const& item) {
-				    return std::make_pair(&item.second, item.first);
-			    });
-
-			std::ranges::for_each(
-			    other.m_nodes,
-			    [&result = m_nodes, result_iter = std::begin(m_nodes), &ptr_to_id](
-			        auto const& item) mutable {
-				    std::ranges::for_each(
-				        item.second.inputs(),
-				        [&result, &result_iter, &ptr_to_id, k = 0u](
-				            auto const& connection) mutable {
-					        auto& node =
-					            result.find(ptr_to_id.find(&connection.processor())->second)
-					                ->second;
-					        result_iter->second.connect(InputPort{k}, node, connection.port());
-					        ++k;
-				        });
-				    ++result_iter;
-			    });
-			r_input      = &m_nodes.find(InputNodeId)->second;
-			r_output     = &m_nodes.find(OutputNodeId)->second;
-			m_current_id = other.m_current_id;
-		}
+		Graph(Graph const& other);
 
 		template<class PixelType>
 		PixelStore::Image process(Span2d<PixelType const> source) const
@@ -77,6 +47,7 @@ namespace Texpainter::FilterGraph
 			// NOTE: OutputNode always returns PixelStore::Image
 			return *std::get_if<PixelStore::Image>(&ret[0]);
 		}
+
 
 		Graph& connect(NodeId a, InputPort sink, NodeId b, OutputPort src)
 		{
@@ -114,6 +85,12 @@ namespace Texpainter::FilterGraph
 		}
 
 		auto currentId() const { return m_current_id; }
+
+		auto node(NodeId id) const
+		{
+			auto ret = m_nodes.find(id);
+			return ret != std::end(m_nodes) ? &ret->second : nullptr;
+		}
 
 	private:
 		ProcessorNode* r_input;
