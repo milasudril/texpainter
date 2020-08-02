@@ -13,7 +13,6 @@ public:
 	void _add(GtkWidget* handle) noexcept
 	{
 		auto frame = GTK_FRAME(gtk_frame_new(nullptr));
-		printf("%p\n", frame);
 		gtk_frame_set_shadow_type(frame, GTK_SHADOW_OUT);
 		gtk_widget_set_events(GTK_WIDGET(frame),
 		                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK

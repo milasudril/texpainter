@@ -23,11 +23,13 @@ int main(int argc, char* argv[])
 	Texpainter::Ui::WidgetCanvas canvas{mainwin};
 
 	pcg64 rng;
+	auto widget_2 = canvas.insert<Texpainter::Ui::Label>(Texpainter::vec2_t{250, 250}, "Hej");
 	auto widget = canvas.insert<Texpainter::Ui::ColorPicker>(
 	    Texpainter::vec2_t{200, 200},
 	    Texpainter::PolymorphicRng{rng},
 	    "Foobar",
 	    std::span<Texpainter::PixelStore::Pixel const>{});
+
 
 	mainwin.show();
 
