@@ -46,9 +46,8 @@ public:
 		cnt.add(widget);
 		m_handle = GTK_DRAWING_AREA(widget);
 		r_eh     = nullptr;
-		gtk_widget_add_events(widget,
-		                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK
-		                          | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_SCROLL_MASK);
+		gtk_widget_add_events(
+		    widget, GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 		g_signal_connect(G_OBJECT(widget), "draw", G_CALLBACK(draw_callback), this);
 		g_signal_connect(G_OBJECT(widget), "size-allocate", G_CALLBACK(size_callback), this);
 
