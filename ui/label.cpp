@@ -128,6 +128,9 @@ Texpainter::Ui::Label::Impl::Impl(Container& cnt, const char* text): Label{*this
 	}
 	++s_style_refcount;
 
+	gtk_widget_set_events(GTK_WIDGET(widget),
+	                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK
+	                          | GDK_BUTTON_RELEASE_MASK);
 	g_signal_connect(m_handle, "draw", G_CALLBACK(draw), this);
 	g_signal_connect(widget, "size-allocate", G_CALLBACK(size_changed), this);
 

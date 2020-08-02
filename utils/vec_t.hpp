@@ -30,6 +30,13 @@ namespace Texpainter
 
 	constexpr auto min(vec4_t a, vec4_t b) { return a < b ? a : b; }
 
+	constexpr auto max(vec4i_t a, vec4i_t b) { return a > b ? a : b; }
+
+	constexpr auto max(vec4_t a, vec4_t b) { return a > b ? a : b; }
+
+	constexpr auto max(vec2_t a, vec2_t b) { return a > b ? a : b; }
+
+
 	constexpr vec2_t signum(vec2_t x)
 	{
 		auto const mask        = x < 0;
