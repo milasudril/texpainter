@@ -5,6 +5,9 @@
 #include "ui/window.hpp"
 #include "ui/widget_canvas.hpp"
 #include "ui/label.hpp"
+#include "ui/color_picker.hpp"
+
+#include "pcg-cpp/include/pcg_random.hpp"
 
 #include <gtk/gtk.h>
 
@@ -19,7 +22,12 @@ int main(int argc, char* argv[])
 
 	Texpainter::Ui::WidgetCanvas canvas{mainwin};
 
-	auto widget = canvas.insert<Texpainter::Ui::Label>(Texpainter::vec2_t{200, 200}, "Foobar");
+	pcg64 rng;
+	auto widget = canvas.insert<Texpainter::Ui::ColorPicker>(
+	    Texpainter::vec2_t{200, 200},
+	    Texpainter::PolymorphicRng{rng},
+	    "Foobar",
+	    std::span<Texpainter::PixelStore::Pixel const>{});
 
 	mainwin.show();
 

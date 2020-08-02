@@ -278,9 +278,9 @@ private:
 			auto const index = obj.coordsToItem(
 			    vec2_t{static_cast<double>(event->x), static_cast<double>(event->y)});
 			obj.m_vt.m_on_mouse_down(obj.r_eh, obj, index, event->button);
-			return FALSE;
+			return TRUE;
 		}
-		return TRUE;
+		return FALSE;
 	}
 
 	static gboolean on_mouse_up(GtkWidget*, GdkEvent* e, gpointer self)
@@ -292,9 +292,9 @@ private:
 			auto const index = obj.coordsToItem(
 			    vec2_t{static_cast<double>(event->x), static_cast<double>(event->y)});
 			obj.m_vt.m_on_mouse_up(obj.r_eh, obj, index, event->button);
-			return FALSE;
+			return TRUE;
 		}
-		return TRUE;
+		return FALSE;
 	}
 
 	static gboolean on_mouse_move(GtkWidget*, GdkEvent* e, gpointer self)
@@ -306,9 +306,9 @@ private:
 			auto const index = obj.coordsToItem(
 			    vec2_t{static_cast<double>(event->x), static_cast<double>(event->y)});
 			obj.m_vt.m_on_mouse_move(obj.r_eh, obj, index);
-			return FALSE;
+			return TRUE;
 		}
-		return TRUE;
+		return FALSE;
 	}
 };
 

@@ -214,9 +214,9 @@ private:
 			                         vec2_t{event_button->x, event_button->y},
 			                         vec2_t{event_button->x_root, event_button->y_root},
 			                         event_button->button);
-			return FALSE;
+			return TRUE;
 		}
-		return TRUE;
+		return FALSE;
 	}
 
 	static gboolean on_mouse_up(GtkWidget*, GdkEvent* e, gpointer self)
@@ -230,9 +230,9 @@ private:
 			                       vec2_t{event_button->x, event_button->y},
 			                       vec2_t{event_button->x_root, event_button->y_root},
 			                       event_button->button);
-			return FALSE;
+			return TRUE;
 		}
-		return TRUE;
+		return FALSE;
 	}
 
 	static gboolean on_mouse_move(GtkWidget*, GdkEvent* e, gpointer self)

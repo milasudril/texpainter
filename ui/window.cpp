@@ -174,7 +174,8 @@ gboolean Texpainter::Ui::Window::Impl::key_press(GtkWidget* widget,
 			case Scancodes::Escape.value():
 				gtk_window_set_focus(GTK_WINDOW(widget), NULL);
 				if(self->r_eh != nullptr) { self->m_vt.on_key_down(self->r_eh, *self, scancode); }
-				break;
+				return TRUE;
+
 			case Scancodes::Return.value():
 			case Scancodes::ReturnNumpad.value():
 				if(gtk_window_get_transient_for(GTK_WINDOW(widget)) != NULL)  // Dialog box
@@ -183,17 +184,21 @@ gboolean Texpainter::Ui::Window::Impl::key_press(GtkWidget* widget,
 					if(self->r_eh != nullptr)
 					{ self->m_vt.on_key_down(self->r_eh, *self, scancode); }
 				}
-				break;
+				return TRUE;
+			default: return FALSE;
 		}
-		return FALSE;
 	}
 	if(scancode == Scancode{15} && self->r_focus_old != nullptr)  // Tab
 	{
 		gtk_window_set_focus(GTK_WINDOW(widget), self->r_focus_old);
 		return TRUE;
 	}
-	if(self->r_eh != nullptr) { self->m_vt.on_key_down(self->r_eh, *self, scancode); }
-	return TRUE;
+	if(self->r_eh != nullptr)
+	{
+		self->m_vt.on_key_down(self->r_eh, *self, scancode);
+		return TRUE;
+	}
+	return FALSE;
 }
 
 gboolean Texpainter::Ui::Window::Impl::key_release(GtkWidget* widget,
