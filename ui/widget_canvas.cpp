@@ -19,13 +19,22 @@ public:
 		                          | GDK_BUTTON_RELEASE_MASK);
 		g_signal_connect(GTK_WIDGET(frame), "button-press-event", G_CALLBACK(button_press), this);
 		g_signal_connect(
-		    GTK_WIDGET(frame), "button-release-event", G_CALLBACK(button_relase), this);
+		    GTK_WIDGET(frame), "button-release-event", G_CALLBACK(button_release), this);
 		gtk_widget_set_margin_start(handle, 4);
 		gtk_widget_set_margin_end(handle, 4);
-		gtk_widget_set_margin_top(handle, 2);
-		gtk_widget_set_margin_bottom(handle, 2);
+		gtk_widget_set_margin_top(handle, 4);
+		gtk_widget_set_margin_bottom(handle, 4);
 		gtk_container_add(GTK_CONTAINER(frame), handle);
-		gtk_fixed_put(GTK_FIXED(m_handle), GTK_WIDGET(frame), m_insert_loc[0], m_insert_loc[1]);
+
+		auto fixed_layout = GTK_FIXED(gtk_fixed_new());
+		gtk_widget_set_events(GTK_WIDGET(fixed_layout),
+		                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK
+		                          | GDK_BUTTON_RELEASE_MASK);
+		g_signal_connect(fixed_layout, "motion-notify-event", G_CALLBACK(mouse_move), this);
+
+		gtk_fixed_put(fixed_layout, GTK_WIDGET(frame), m_insert_loc[0], m_insert_loc[1]);
+		gtk_overlay_add_overlay(m_handle, GTK_WIDGET(fixed_layout));
+		gtk_overlay_set_overlay_pass_through(m_handle, GTK_WIDGET(fixed_layout), TRUE);
 	}
 
 	void _show() noexcept { gtk_widget_show_all(GTK_WIDGET(m_handle)); }
@@ -37,24 +46,25 @@ public:
 	void insertLocation(vec2_t loc) { m_insert_loc = loc; }
 
 private:
-	GtkFixed* m_handle;
+	GtkOverlay* m_handle;
 	vec2_t m_insert_loc;
 
 	GtkWidget* m_moving;
 	vec2_t m_loc_init;
 	vec2_t m_click_loc;
 
-	static gboolean mouse_move(GtkWidget*, GdkEvent* event, gpointer user_data)
+	static gboolean mouse_move(GtkWidget* widget, GdkEvent* event, gpointer user_data)
 	{
 		auto self = reinterpret_cast<Impl*>(user_data);
 		if(self->m_moving != nullptr)
 		{
-			auto event_move = reinterpret_cast<GdkEventMotion const*>(event);
+			auto fixed_layout = GTK_FIXED(widget);
+			auto event_move   = reinterpret_cast<GdkEventMotion const*>(event);
 			auto loc_new =
 			    self->m_loc_init
 			    + (Texpainter::vec2_t{event_move->x_root, event_move->y_root} - self->m_click_loc);
 			loc_new = Texpainter::max(loc_new, vec2_t{0.0, 0.0});
-			gtk_fixed_move(self->m_handle, self->m_moving, loc_new[0], loc_new[1]);
+			gtk_fixed_move(fixed_layout, self->m_moving, loc_new[0], loc_new[1]);
 			return TRUE;
 		}
 		return FALSE;
@@ -62,20 +72,21 @@ private:
 
 	static gboolean button_press(GtkWidget* widget, GdkEvent* event, gpointer user_data)
 	{
-		auto self = reinterpret_cast<Impl*>(user_data);
-
+		auto self         = reinterpret_cast<Impl*>(user_data);
+		auto fixed_layout = gtk_widget_get_ancestor(widget, GTK_TYPE_FIXED);
+		gtk_overlay_reorder_overlay(self->m_handle, fixed_layout, -1);
 		self->m_moving = widget;
 
 		{
 			GValue val_x{};
 			g_value_init(&val_x, G_TYPE_INT);
 			gtk_container_child_get_property(
-			    GTK_CONTAINER(self->m_handle), self->m_moving, "x", &val_x);
+			    GTK_CONTAINER(fixed_layout), self->m_moving, "x", &val_x);
 
 			GValue val_y{};
 			g_value_init(&val_y, G_TYPE_INT);
 			gtk_container_child_get_property(
-			    GTK_CONTAINER(self->m_handle), self->m_moving, "y", &val_y);
+			    GTK_CONTAINER(fixed_layout), self->m_moving, "y", &val_y);
 
 			self->m_loc_init = vec2_t{static_cast<double>(g_value_get_int(&val_x)),
 			                          static_cast<double>(g_value_get_int(&val_y))};
@@ -89,7 +100,7 @@ private:
 		return FALSE;
 	}
 
-	static gboolean button_relase(GtkWidget* widget, GdkEvent* event, gpointer user_data)
+	static gboolean button_release(GtkWidget* widget, GdkEvent* event, gpointer user_data)
 	{
 		auto self      = reinterpret_cast<Impl*>(user_data);
 		self->m_moving = nullptr;
@@ -99,12 +110,8 @@ private:
 
 Texpainter::Ui::WidgetCanvas::Impl::Impl(Container& cnt): WidgetCanvas{*this}
 {
-	auto widget = gtk_fixed_new();
-	m_handle    = GTK_FIXED(widget);
-	gtk_widget_set_events(GTK_WIDGET(m_handle),
-	                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK
-	                          | GDK_BUTTON_RELEASE_MASK);
-	g_signal_connect(widget, "motion-notify-event", G_CALLBACK(mouse_move), this);
+	auto widget = gtk_overlay_new();
+	m_handle    = GTK_OVERLAY(widget);
 	cnt.add(widget);
 	m_insert_loc = vec2_t{0.0, 0.0};
 	m_moving     = nullptr;
