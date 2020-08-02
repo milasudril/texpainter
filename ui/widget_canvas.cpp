@@ -13,6 +13,7 @@ public:
 	void _add(GtkWidget* handle) noexcept
 	{
 		auto frame = GTK_FRAME(gtk_frame_new(nullptr));
+		printf("%p\n", frame);
 		gtk_frame_set_shadow_type(frame, GTK_SHADOW_OUT);
 		gtk_widget_set_events(GTK_WIDGET(frame),
 		                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK
@@ -41,7 +42,8 @@ private:
 	vec2_t m_insert_loc;
 
 	GtkWidget* m_moving;
-	vec2_t m_move_origin;
+	vec2_t m_loc_init;
+	vec2_t m_click_loc;
 
 	static gboolean mouse_move(GtkWidget*, GdkEvent* event, gpointer user_data)
 	{
@@ -49,14 +51,11 @@ private:
 		if(self->m_moving != nullptr)
 		{
 			auto event_move = reinterpret_cast<GdkEventMotion const*>(event);
-			auto w          = gtk_widget_get_allocated_width(self->m_moving);
-			auto h          = gtk_widget_get_allocated_height(self->m_moving);
-
-			auto dx = Texpainter::vec2_t{event_move->x_root, event_move->y_root}
-			          - self->m_move_origin
-			          - 0.5 * Texpainter::vec2_t{static_cast<double>(w), static_cast<double>(h)};
-			dx = Texpainter::max(dx, vec2_t{0.0, 0.0});
-			gtk_fixed_move(self->m_handle, self->m_moving, dx[0], dx[1]);
+			auto loc_new =
+			    self->m_loc_init
+			    + (Texpainter::vec2_t{event_move->x_root, event_move->y_root} - self->m_click_loc);
+			loc_new = Texpainter::max(loc_new, vec2_t{0.0, 0.0});
+			gtk_fixed_move(self->m_handle, self->m_moving, loc_new[0], loc_new[1]);
 			return TRUE;
 		}
 		return FALSE;
@@ -64,12 +63,30 @@ private:
 
 	static gboolean button_press(GtkWidget* widget, GdkEvent* event, gpointer user_data)
 	{
-		auto self      = reinterpret_cast<Impl*>(user_data);
+		auto self = reinterpret_cast<Impl*>(user_data);
+
 		self->m_moving = widget;
-		int x{};
-		int y{};
-		gdk_window_get_origin(gtk_widget_get_window(GTK_WIDGET(self->m_handle)), &x, &y);
-		self->m_move_origin = Texpainter::vec2_t{static_cast<double>(x), static_cast<double>(y)};
+
+		{
+			GValue val_x{};
+			g_value_init(&val_x, G_TYPE_INT);
+			gtk_container_child_get_property(
+			    GTK_CONTAINER(self->m_handle), self->m_moving, "x", &val_x);
+
+			GValue val_y{};
+			g_value_init(&val_y, G_TYPE_INT);
+			gtk_container_child_get_property(
+			    GTK_CONTAINER(self->m_handle), self->m_moving, "y", &val_y);
+
+			self->m_loc_init = vec2_t{static_cast<double>(g_value_get_int(&val_x)),
+			                          static_cast<double>(g_value_get_int(&val_y))};
+		}
+
+		{
+			auto e = reinterpret_cast<GdkEventButton const*>(event);
+			self->m_click_loc =
+			    vec2_t{static_cast<double>(e->x_root), static_cast<double>(e->y_root)};
+		}
 		return FALSE;
 	}
 
