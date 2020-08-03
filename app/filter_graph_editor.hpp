@@ -13,10 +13,11 @@ namespace Texpainter
 	class FilterGraphEditor
 	{
 	public:
-		FilterGraphEditor(Ui::Container& owner, FilterGraph::Graph& graph):
-		 r_graph{graph}
-		,m_canvas{owner}
-		{}
+		FilterGraphEditor(Ui::Container& owner, FilterGraph::Graph& graph)
+		    : r_graph{graph}
+		    , m_canvas{owner}
+		{
+		}
 
 	private:
 		FilterGraph::Graph& r_graph;

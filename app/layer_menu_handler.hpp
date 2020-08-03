@@ -221,7 +221,7 @@ namespace Texpainter
 
 		void onActivated(Tag<LayerAction::EffectsAndBlendMode>, Ui::MenuItem&)
 		{
-		// TODO:	r_dlg_owner.modifyFxAndBlendMode();
+			r_doc_owner.showFxBlendEditor();
 		}
 
 		template<ControlId id, class Src>

@@ -11,6 +11,7 @@
 #include "./layer_menu_handler.hpp"
 #include "./palette_menu_handler.hpp"
 #include "./palette_view_event_handler.hpp"
+#include "./filter_graph_editor.hpp"
 
 #include "model/document.hpp"
 #include "utils/snap.hpp"
@@ -31,6 +32,8 @@ namespace Texpainter
 {
 	class AppWindow
 	{
+		using FxBlendEditorDlg = Ui::Dialog<FilterGraphEditor>;
+
 	public:
 		enum class ControlId : int
 		{
@@ -140,6 +143,23 @@ namespace Texpainter
 
 		void onKeyUp(Ui::Scancode key);
 
+		void showFxBlendEditor()
+		{
+			Model::Layer* layer{};
+			m_current_document->layersModify(
+			    [&current_layer = m_current_document->currentLayer(), &layer](auto& layers) {
+				    layer = layers[current_layer];
+				    return false;
+			    });
+
+			if(layer != nullptr)
+			{
+				m_fx_blend_editor_dlg = std::make_unique<FxBlendEditorDlg>(
+				    m_rows, "Effects and blend mode", layer->filterGraph());
+			}
+		}
+
+
 	private:
 		std::unique_ptr<Model::Document> m_current_document;
 
@@ -246,6 +266,8 @@ namespace Texpainter
 		Ui::Label m_layer_info;
 		Ui::Label m_paint_info;
 		Ui::ImageView m_img_view;
+
+		std::unique_ptr<FxBlendEditorDlg> m_fx_blend_editor_dlg;
 
 
 		void updateLayerSelector();
