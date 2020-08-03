@@ -26,8 +26,8 @@ namespace Texpainter
 	class FixedFlatmap
 	{
 	public:
-		using key_type   = std::remove_reference_t<decltype(Keys::items[0])>;
-		using value_type = Value;
+		using key_type    = std::remove_reference_t<decltype(Keys::items[0])>;
+		using mapped_type = Value;
 
 		static constexpr auto size() { return std::size(Keys::items); }
 
@@ -37,25 +37,61 @@ namespace Texpainter
 
 		constexpr auto values() { return m_vals; }
 
-		constexpr auto find(key_type const& key) const
+		static constexpr auto keyIndex(key_type const& key)
 		{
 			auto i = std::ranges::lower_bound(s_keys, key, Compare{});
 			if(i != std::end(s_keys) && !Compare{}(key, *i)) [[likely]]
 				{
-					return std::begin(m_vals) + (i - std::begin(s_keys));
+					return static_cast<size_t>(i - std::begin(s_keys));
 				}
 
-			return static_cast<value_type const*>(nullptr);
+			return std::numeric_limits<size_t>::max();
+		}
+
+		template<auto key>
+		constexpr auto find() const
+		{
+			constexpr auto i = keyIndex(key);
+			static_assert(i != std::numeric_limits<size_t>::max(), "Key not found");
+			return std::begin(m_vals) + i;
+		}
+
+		template<auto key>
+		constexpr auto find()
+		{
+			return const_cast<mapped_type*>(std::as_const(*this).template find<key>());
+		}
+
+		constexpr auto find(key_type const& key) const
+		{
+			if(auto i = keyIndex(key); i != std::numeric_limits<size_t>()) [[likely]]
+				{
+					return std::begin(m_vals) + i;
+				}
+			return static_cast<mapped_type const*>(nullptr);
 		}
 
 		constexpr auto find(key_type const& key)
 		{
-			return const_cast<value_type*>(std::as_const(*this).find(key));
+			return const_cast<mapped_type*>(std::as_const(*this).find(key));
 		}
 
 	private:
 		static constexpr auto s_keys = fixed_flatmap_detail::sort(Keys::items, Compare{});
-		std::array<value_type, size()> m_vals;
+		std::array<mapped_type, size()> m_vals;
+	};
+
+
+	template<size_t N>
+	class Str
+	{
+	public:
+		constexpr Str(char const (&val)[N]): value{} { std::ranges::copy(val, value); }
+
+		constexpr operator std::string_view() const { return value; }
+
+	private:
+		char value[N];
 	};
 }
 
