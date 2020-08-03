@@ -165,8 +165,8 @@ namespace Texpainter
 		void onActivated(Tag<LayerAction::MoveToTop>, Ui::MenuItem&)
 		{
 			r_doc_owner.documentModify([](auto& doc) {
-				return doc.layersModify([&doc](auto& layers) {
-					if(auto i = layers.index(doc.currentLayer()); i.valid())
+				return doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+					if(auto i = layers.index(current_layer); i.valid())
 					{
 						layers.moveBack(i);
 						return true;
@@ -179,8 +179,8 @@ namespace Texpainter
 		void onActivated(Tag<LayerAction::MoveUp>, Ui::MenuItem&)
 		{
 			r_doc_owner.documentModify([](auto& doc) {
-				return doc.layersModify([&doc](auto& layers) {
-					if(auto i = layers.index(doc.currentLayer()); i.valid())
+				return doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+					if(auto i = layers.index(current_layer); i.valid())
 					{
 						layers.moveBackward(i);
 						return true;
@@ -193,8 +193,8 @@ namespace Texpainter
 		void onActivated(Tag<LayerAction::MoveDown>, Ui::MenuItem&)
 		{
 			r_doc_owner.documentModify([](auto& doc) {
-				return doc.layersModify([&doc](auto& layers) {
-					if(auto i = layers.index(doc.currentLayer()); i.valid())
+				return doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+					if(auto i = layers.index(current_layer); i.valid())
 					{
 						layers.moveForward(i);
 						return true;
@@ -208,8 +208,8 @@ namespace Texpainter
 		void onActivated(Tag<LayerAction::MoveToBottom>, Ui::MenuItem&)
 		{
 			r_doc_owner.documentModify([](auto& doc) {
-				return doc.layersModify([&doc](auto& layers) {
-					if(auto i = layers.index(doc.currentLayer()); i.valid())
+				return doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+					if(auto i = layers.index(current_layer); i.valid())
 					{
 						layers.moveFront(i);
 						return true;
@@ -217,6 +217,11 @@ namespace Texpainter
 					return false;
 				});
 			});
+		}
+
+		void onActivated(Tag<LayerAction::EffectsAndBlendMode>, Ui::MenuItem&)
+		{
+		// TODO:	r_dlg_owner.modifyFxAndBlendMode();
 		}
 
 		template<ControlId id, class Src>
@@ -343,8 +348,8 @@ namespace Texpainter
 		void onActivated(Tag<LayerActionClearTransformation::Location>, Ui::MenuItem&)
 		{
 			r_doc_owner.documentModify([](auto& doc) {
-				return doc.layersModify([&doc](auto& layers) {
-					if(auto layer = layers[doc.currentLayer()]; layer != nullptr)
+				return doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+					if(auto layer = layers[current_layer]; layer != nullptr)
 					{
 						layer->location(vec2_t{0.0, 0.0});
 						return true;
@@ -357,8 +362,8 @@ namespace Texpainter
 		void onActivated(Tag<LayerActionClearTransformation::Rotation>, Ui::MenuItem&)
 		{
 			r_doc_owner.documentModify([](auto& doc) {
-				return doc.layersModify([&doc](auto& layers) {
-					if(auto layer = layers[doc.currentLayer()]; layer != nullptr)
+				return doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+					if(auto layer = layers[current_layer]; layer != nullptr)
 					{
 						layer->rotation(Angle{0.0, Angle::Turns{}});
 						return true;
@@ -371,8 +376,8 @@ namespace Texpainter
 		void onActivated(Tag<LayerActionClearTransformation::Scale>, Ui::MenuItem&)
 		{
 			r_doc_owner.documentModify([](auto& doc) {
-				return doc.layersModify([&doc](auto& layers) {
-					if(auto layer = layers[doc.currentLayer()]; layer != nullptr)
+				return doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+					if(auto layer = layers[current_layer]; layer != nullptr)
 					{
 						layer->scaleFactor(vec2_t{1.0, 1.0});
 						return true;
@@ -385,8 +390,8 @@ namespace Texpainter
 		void onActivated(Tag<LayerActionClearTransformation::All>, Ui::MenuItem&)
 		{
 			r_doc_owner.documentModify([](auto& doc) {
-				return doc.layersModify([&doc](auto& layers) {
-					if(auto layer = layers[doc.currentLayer()]; layer != nullptr)
+				return doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+					if(auto layer = layers[current_layer]; layer != nullptr)
 					{
 						layer->scaleFactor(vec2_t{1.0, 1.0})
 						    .rotation(Angle{0.0, Angle::Turns{}})
