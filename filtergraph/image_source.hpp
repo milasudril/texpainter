@@ -18,7 +18,10 @@ namespace Texpainter::FilterGraph
 			return std::span<std::string_view const>{};
 		}
 
-		std::vector<ProcParamValue> paramValues() const { return std::vector<ProcParamValue>{}; }
+		std::span<ProcParamValue const> paramValues() const
+		{
+			return std::span<ProcParamValue const>{};
+		}
 
 		void set(std::string_view, ProcParamValue) {}
 

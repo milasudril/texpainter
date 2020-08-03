@@ -31,7 +31,7 @@ namespace Texpainter::FilterGraph
 			virtual std::span<std::string_view const> inputPorts() const                      = 0;
 			virtual std::span<std::string_view const> outputPorts() const                     = 0;
 			virtual std::span<std::string_view const> paramNames() const                      = 0;
-			virtual std::vector<ProcParamValue> paramValues() const                           = 0;
+			virtual std::span<ProcParamValue const> paramValues() const                       = 0;
 			virtual ProcParamValue get(std::string_view param_name) const                     = 0;
 			virtual Processor& set(std::string_view param_name, ProcParamValue value)         = 0;
 			virtual std::unique_ptr<Processor> clone() const                                  = 0;
@@ -122,9 +122,9 @@ namespace Texpainter::FilterGraph
 			return m_result_cache;
 		}
 
-		std::span<std::string_view const> inputPorts() const { return m_proc->inputPorts(); }
+		auto inputPorts() const { return m_proc->inputPorts(); }
 
-		std::span<std::string_view const> outputPorts() const { return m_proc->outputPorts(); }
+		auto outputPorts() const { return m_proc->outputPorts(); }
 
 		ProcessorNode& connect(InputPort input,
 		                       std::reference_wrapper<ProcessorNode const> other,
@@ -146,9 +146,9 @@ namespace Texpainter::FilterGraph
 
 		std::span<SourceNode const> inputs() const { return m_inputs; }
 
-		std::span<std::string_view const> paramNames() const { return m_proc->paramNames(); }
+		auto paramNames() const { return m_proc->paramNames(); }
 
-		std::vector<ProcParamValue> paramValues() const { return m_proc->paramValues(); }
+		auto paramValues() const { return m_proc->paramValues(); }
 
 		ProcessorNode& set(std::string_view param_name, ProcParamValue val)
 		{
@@ -223,7 +223,7 @@ namespace Texpainter::FilterGraph
 				return m_proc.paramNames();
 			}
 
-			std::vector<ProcParamValue> paramValues() const override
+			std::span<ProcParamValue const> paramValues() const override
 			{
 				return m_proc.paramValues();
 			}
@@ -272,9 +272,9 @@ namespace Texpainter::FilterGraph
 				return std::span<std::string_view const>{};
 			}
 
-			std::vector<ProcParamValue> paramValues() const override
+			std::span<ProcParamValue const> paramValues() const override
 			{
-				return std::vector<ProcParamValue>{};
+				return std::span<ProcParamValue const>{};
 			}
 
 			ProcParamValue get(std::string_view) const override { return ProcParamValue{0.0}; }

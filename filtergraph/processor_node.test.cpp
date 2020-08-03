@@ -23,9 +23,9 @@ namespace
 			return std::span<std::string_view>{};
 		}
 
-		std::vector<Texpainter::FilterGraph::ProcParamValue> paramValues() const
+		std::span<Texpainter::FilterGraph::ProcParamValue const> paramValues() const
 		{
-			return std::vector<Texpainter::FilterGraph::ProcParamValue>{};
+			return std::span<Texpainter::FilterGraph::ProcParamValue const>{};
 		}
 
 		std::span<std::string_view const> inputPorts() const
@@ -85,13 +85,9 @@ namespace
 			return ret;
 		}
 
-		std::vector<Texpainter::FilterGraph::ProcParamValue> paramValues() const
+		std::span<Texpainter::FilterGraph::ProcParamValue const> paramValues() const
 		{
-			std::vector<Texpainter::FilterGraph::ProcParamValue> ret;
-			std::ranges::transform(m_params, std::back_inserter(ret), [](auto val) {
-				return Texpainter::FilterGraph::ProcParamValue{val.second};
-			});
-			return ret;
+			return std::span<Texpainter::FilterGraph::ProcParamValue const>{};
 		}
 
 		std::span<std::string_view const> inputPorts() const

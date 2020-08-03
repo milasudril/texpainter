@@ -98,7 +98,7 @@ namespace Texpainter::FilterGraph
 		{
 			std::as_const(a).paramValues()
 		}
-		->std::same_as<std::vector<ProcParamValue>>;
+		->std::same_as<std::span<ProcParamValue const>>;
 
 		{a.set(std::declval<std::string_view>(), std::declval<ProcParamValue>())};
 		{
