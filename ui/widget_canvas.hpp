@@ -12,12 +12,18 @@
 
 #include <utility>
 #include <memory>
+#include <functional>
 
 namespace Texpainter::Ui
 {
-	class WidgetCanvas: public Container
+	class WidgetCanvas: private Container
 	{
+		class WidgetDeleter;
+
 	public:
+		template<class WidgetType>
+		using WidgetHandle = std::unique_ptr<WidgetType, WidgetDeleter>;
+
 		explicit WidgetCanvas(Container& parent);
 		~WidgetCanvas();
 
@@ -32,8 +38,9 @@ namespace Texpainter::Ui
 		template<class WidgetType, class... WidgetParams>
 		decltype(auto) insert(vec2_t loc, WidgetParams&&... params)
 		{
-			return std::make_unique<WidgetType>(this->insertLocation(loc),
-			                                    std::forward<WidgetParams>(params)...);
+			auto ptr =
+			    new WidgetType{this->insertLocation(loc), std::forward<WidgetParams>(params)...};
+			return WidgetHandle<WidgetType>{ptr, WidgetDeleter{*m_impl}};
 		}
 
 		WidgetCanvas& insertLocation(vec2_t location);
@@ -49,6 +56,25 @@ namespace Texpainter::Ui
 		class Impl;
 		explicit WidgetCanvas(WidgetCanvas::Impl& impl): m_impl(&impl) {}
 		Impl* m_impl;
+
+	private:
+		class WidgetDeleter
+		{
+		public:
+			explicit WidgetDeleter(std::reference_wrapper<Impl> impl) noexcept;
+
+			template<class WidgetType>
+			void operator()(WidgetType* widget) noexcept
+			{
+				delete widget;
+				do_cleanup();
+			}
+
+		private:
+			std::reference_wrapper<Impl> r_impl;
+			uint64_t m_cookie;
+			void do_cleanup() noexcept;
+		};
 	};
 }
 

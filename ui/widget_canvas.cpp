@@ -4,6 +4,9 @@
 
 #include <gtk/gtk.h>
 
+#include <map>
+#include <cassert>
+
 class Texpainter::Ui::WidgetCanvas::Impl: private WidgetCanvas
 {
 public:
@@ -33,6 +36,7 @@ public:
 		g_signal_connect(fixed_layout, "motion-notify-event", G_CALLBACK(mouse_move), this);
 
 		gtk_fixed_put(fixed_layout, GTK_WIDGET(frame), m_insert_loc[0], m_insert_loc[1]);
+		m_floats[m_current_cookie] = fixed_layout;
 		gtk_overlay_add_overlay(m_handle, GTK_WIDGET(fixed_layout));
 		gtk_overlay_set_overlay_pass_through(m_handle, GTK_WIDGET(fixed_layout), TRUE);
 	}
@@ -45,6 +49,18 @@ public:
 
 	void insertLocation(vec2_t loc) { m_insert_loc = loc; }
 
+	uint64_t currentCookie() const { return m_current_cookie; }
+
+	void nextCookie() { ++m_current_cookie; }
+
+	void removeParentsFor(uint64_t cookie)
+	{
+		auto i = m_floats.find(cookie);
+		assert(i != std::end(m_floats));
+		gtk_widget_destroy(GTK_WIDGET(i->second));
+		m_floats.erase(i);
+	}
+
 private:
 	GtkOverlay* m_handle;
 	vec2_t m_insert_loc;
@@ -52,6 +68,9 @@ private:
 	GtkWidget* m_moving;
 	vec2_t m_loc_init;
 	vec2_t m_click_loc;
+	uint64_t m_current_cookie;
+
+	std::map<uint64_t, GtkFixed*> m_floats;
 
 	static gboolean mouse_move(GtkWidget* widget, GdkEvent* event, gpointer user_data)
 	{
@@ -108,13 +127,28 @@ private:
 	}
 };
 
+Texpainter::Ui::WidgetCanvas::WidgetDeleter::WidgetDeleter(
+    std::reference_wrapper<Impl> impl) noexcept
+    : r_impl{impl}
+    , m_cookie{r_impl.get().currentCookie()}
+{
+	r_impl.get().nextCookie();
+}
+
+void Texpainter::Ui::WidgetCanvas::WidgetDeleter::do_cleanup() noexcept
+{
+	r_impl.get().removeParentsFor(m_cookie);
+}
+
+
 Texpainter::Ui::WidgetCanvas::Impl::Impl(Container& cnt): WidgetCanvas{*this}
 {
 	auto widget = gtk_overlay_new();
 	m_handle    = GTK_OVERLAY(widget);
 	cnt.add(widget);
-	m_insert_loc = vec2_t{0.0, 0.0};
-	m_moving     = nullptr;
+	m_insert_loc     = vec2_t{0.0, 0.0};
+	m_moving         = nullptr;
+	m_current_cookie = 0;
 }
 
 Texpainter::Ui::WidgetCanvas::Impl::~Impl()
