@@ -107,12 +107,12 @@ namespace Texpainter::FilterGraph
 		->std::same_as<ProcParamValue>;
 
 		{
-			std::as_const(a).inputPorts()
+			T::inputPorts()
 		}
 		->std::same_as<std::span<std::string_view const>>;
 
 		{
-			std::as_const(a).outputPorts()
+			T::outputPorts()
 		}
 		->std::same_as<std::span<std::string_view const>>;
 

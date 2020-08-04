@@ -15,6 +15,8 @@ namespace Texpainter::FilterGraph
 	class OutputNode
 	{
 	public:
+		static constexpr std::string_view s_input_port_names[] = {"Pixels"};
+
 		std::span<std::string_view const> paramNames() const
 		{
 			return std::span<std::string_view const>{};
@@ -29,13 +31,12 @@ namespace Texpainter::FilterGraph
 
 		ProcParamValue get(std::string_view) const { return ProcParamValue{0.0}; }
 
-		std::span<std::string_view const> inputPorts() const
+		static constexpr std::span<std::string_view const> inputPorts()
 		{
-			constexpr std::string_view ret[] = {"Image"};
-			return std::span<std::string_view const>{ret, 1};
+			return std::span<std::string_view const>{s_input_port_names, 1};
 		}
 
-		std::span<std::string_view const> outputPorts() const
+		static constexpr std::span<std::string_view const> outputPorts()
 		{
 			return std::span<std::string_view const>{};
 		}
@@ -54,10 +55,7 @@ namespace Texpainter::FilterGraph
 			return std::vector<ProcResultType>{};
 		}
 
-		static constexpr std::string_view name()
-		{
-			return "Layer output";
-		}
+		static constexpr std::string_view name() { return "Layer output"; }
 	};
 }
 

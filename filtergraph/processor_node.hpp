@@ -35,6 +35,7 @@ namespace Texpainter::FilterGraph
 			virtual ProcParamValue get(std::string_view param_name) const                     = 0;
 			virtual Processor& set(std::string_view param_name, ProcParamValue value)         = 0;
 			virtual std::unique_ptr<Processor> clone() const                                  = 0;
+			virtual std::string_view name() const                                             = 0;
 			virtual ~Processor() = default;
 		};
 
@@ -159,6 +160,8 @@ namespace Texpainter::FilterGraph
 
 		ProcParamValue get(std::string_view param_name) const { return m_proc->get(param_name); }
 
+		std::string_view name() const { return m_proc->name(); }
+
 		~ProcessorNode()
 		{
 			std::ranges::for_each(r_consumers, [](auto const& item) {
@@ -244,6 +247,8 @@ namespace Texpainter::FilterGraph
 				return std::make_unique<ProcessorImpl>(*this);
 			}
 
+			std::string_view name() const override { return Proc::name(); }
+
 
 		private:
 			Proc m_proc;
@@ -285,6 +290,8 @@ namespace Texpainter::FilterGraph
 			{
 				return std::make_unique<ProcessorDummy>(*this);
 			}
+
+			std::string_view name() const override { return "*empty*"; }
 		};
 	};
 }

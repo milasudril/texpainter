@@ -10,6 +10,8 @@ namespace Texpainter::FilterGraph
 	template<class PixelType>
 	class ImageSource
 	{
+		static constexpr std::string_view s_output_port_names[] = {"Pixels"};
+
 	public:
 		explicit ImageSource(Span2d<PixelType const> pixels): r_pixels{pixels} {}
 
@@ -27,13 +29,12 @@ namespace Texpainter::FilterGraph
 
 		ProcParamValue get(std::string_view) const { return ProcParamValue{0.0}; }
 
-		std::span<std::string_view const> outputPorts() const
+		static constexpr std::span<std::string_view const> outputPorts()
 		{
-			constexpr std::string_view ret[] = {"Output"};
-			return std::span<std::string_view const>{ret, 1};
+			return std::span<std::string_view const>{s_output_port_names, 1};
 		}
 
-		std::span<std::string_view const> inputPorts() const
+		static constexpr std::span<std::string_view const> inputPorts()
 		{
 			return std::span<std::string_view const>{};
 		}
@@ -43,10 +44,7 @@ namespace Texpainter::FilterGraph
 			return std::vector<ProcResultType>{PixelStore::BasicImage<PixelType>{r_pixels}};
 		}
 
-		static constexpr std::string_view name()
-		{
-			return "Layer input";
-		}
+		static constexpr std::string_view name() { return "Layer input"; }
 
 	private:
 		Span2d<PixelType const> r_pixels;

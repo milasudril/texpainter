@@ -11,6 +11,8 @@ namespace
 {
 	class InputProcessor
 	{
+		static constexpr std::string_view s_output_port_names[] = {"Output 1", "Output 2"};
+
 	public:
 		InputProcessor(size_t& req_count): r_req_count{req_count}
 		{
@@ -28,15 +30,14 @@ namespace
 			return std::span<Texpainter::FilterGraph::ProcParamValue const>{};
 		}
 
-		std::span<std::string_view const> inputPorts() const
+		static constexpr std::span<std::string_view const> inputPorts()
 		{
 			return std::span<std::string_view>{};
 		}
 
-		std::span<std::string_view const> outputPorts() const
+		static constexpr std::span<std::string_view const> outputPorts()
 		{
-			constexpr std::string_view ret[] = {"Output 1", "Output 2"};
-			return ret;
+			return s_output_port_names;
 		}
 
 
@@ -69,10 +70,7 @@ namespace
 
 		size_t inputCount() const { return 0; }
 
-		static constexpr std::string_view name()
-		{
-			return "Input proc";
-		}
+		static constexpr std::string_view name() { return "Input proc"; }
 
 
 	private:
@@ -82,6 +80,9 @@ namespace
 
 	class TestProcessor
 	{
+		static constexpr std::string_view s_output_port_names[] = {"Output 1", "Output 2"};
+		static constexpr std::string_view s_input_port_names[]  = {"Input 1", "Input 2"};
+
 	public:
 		size_t inputCount() const { return 2; }
 
@@ -96,16 +97,14 @@ namespace
 			return std::span<Texpainter::FilterGraph::ProcParamValue const>{};
 		}
 
-		std::span<std::string_view const> inputPorts() const
+		static constexpr std::span<std::string_view const> inputPorts()
 		{
-			constexpr std::string_view ret[] = {"Input 1", "Input 2"};
-			return ret;
+			return s_input_port_names;
 		}
 
-		std::span<std::string_view const> outputPorts() const
+		static constexpr std::span<std::string_view const> outputPorts()
 		{
-			constexpr std::string_view ret[] = {"Output 1", "Output 2"};
-			return ret;
+			return s_output_port_names;
 		}
 
 
@@ -144,10 +143,7 @@ namespace
 			return *this;
 		}
 
-		static constexpr std::string_view name()
-		{
-			return "Test proc";
-		}
+		static constexpr std::string_view name() { return "Test proc"; }
 
 	private:
 		std::map<std::string, double, std::less<>> m_params;
