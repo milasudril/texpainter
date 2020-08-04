@@ -28,14 +28,14 @@ namespace Texpainter::FilterGraph
 		{
 		public:
 			virtual std::vector<result_type> operator()(std::span<argument_type const>) const = 0;
-			virtual std::span<char const* const> inputPorts() const                      = 0;
-			virtual std::span<char const* const> outputPorts() const                     = 0;
-			virtual std::span<char const* const> paramNames() const                      = 0;
+			virtual std::span<char const* const> inputPorts() const                           = 0;
+			virtual std::span<char const* const> outputPorts() const                          = 0;
+			virtual std::span<char const* const> paramNames() const                           = 0;
 			virtual std::span<ProcParamValue const> paramValues() const                       = 0;
 			virtual ProcParamValue get(std::string_view param_name) const                     = 0;
 			virtual Processor& set(std::string_view param_name, ProcParamValue value)         = 0;
 			virtual std::unique_ptr<Processor> clone() const                                  = 0;
-			virtual char const* name() const                                             = 0;
+			virtual char const* name() const                                                  = 0;
 			virtual ~Processor() = default;
 		};
 
@@ -211,20 +211,14 @@ namespace Texpainter::FilterGraph
 				return m_proc(args);
 			}
 
-			std::span<char const* const> inputPorts() const override
-			{
-				return m_proc.inputPorts();
-			}
+			std::span<char const* const> inputPorts() const override { return m_proc.inputPorts(); }
 
 			std::span<char const* const> outputPorts() const override
 			{
 				return m_proc.outputPorts();
 			}
 
-			std::span<char const* const> paramNames() const override
-			{
-				return m_proc.paramNames();
-			}
+			std::span<char const* const> paramNames() const override { return m_proc.paramNames(); }
 
 			std::span<ProcParamValue const> paramValues() const override
 			{

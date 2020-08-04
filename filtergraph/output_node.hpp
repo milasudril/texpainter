@@ -14,8 +14,8 @@ namespace Texpainter::FilterGraph
 	class OutputNode
 	{
 		static constexpr char const* s_input_port_names[] = {"Pixels"};
-	public:
 
+	public:
 		static constexpr std::span<char const* const> paramNames()
 		{
 			return std::span<char const* const>{};

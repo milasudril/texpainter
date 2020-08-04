@@ -125,7 +125,6 @@ namespace Texpainter::FilterGraph
 			std::as_const(a)(std::declval<std::span<ProcArgumentType const>>())
 		}
 		->std::same_as<std::vector<ProcResultType>>;
-
 	};
 }
 

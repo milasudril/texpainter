@@ -38,13 +38,12 @@ namespace Texpainter
 				                       return ret;
 			                       });
 
-			std::ranges::transform(
-			    r_node.get().paramNames(),
-			    std::back_inserter(m_params_input),
-			    [&params = m_params](auto name) {
-				    return Ui::LabeledInput<Ui::Slider>{
-				        params, Ui::Box::Orientation::Vertical, name, false};
-			    });
+			std::ranges::transform(r_node.get().paramNames(),
+			                       std::back_inserter(m_params_input),
+			                       [&params = m_params](auto name) {
+				                       return Ui::LabeledInput<Ui::Slider>{
+				                           params, Ui::Box::Orientation::Vertical, name, false};
+			                       });
 
 			std::ranges::transform(r_node.get().outputPorts(),
 			                       std::back_inserter(m_output_labels),
