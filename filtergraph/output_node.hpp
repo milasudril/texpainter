@@ -31,7 +31,7 @@ namespace Texpainter::FilterGraph
 
 		std::span<std::string_view const> inputPorts() const
 		{
-			constexpr std::string_view ret[] = {"Output"};
+			constexpr std::string_view ret[] = {"Image"};
 			return std::span<std::string_view const>{ret, 1};
 		}
 
@@ -52,6 +52,11 @@ namespace Texpainter::FilterGraph
 				[[likely]] { return std::vector<ProcResultType>{PixelStore::Image{*args_0}}; }
 
 			return std::vector<ProcResultType>{};
+		}
+
+		static constexpr std::string_view name()
+		{
+			return "Layer output";
 		}
 	};
 }

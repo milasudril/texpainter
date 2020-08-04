@@ -69,6 +69,12 @@ namespace
 
 		size_t inputCount() const { return 0; }
 
+		static constexpr std::string_view name()
+		{
+			return "Input proc";
+		}
+
+
 	private:
 		std::map<std::string, float, std::less<>> m_params;
 		size_t& r_req_count;
@@ -136,6 +142,11 @@ namespace
 		{
 			m_params[std::string{param_name}] = value.value();
 			return *this;
+		}
+
+		static constexpr std::string_view name()
+		{
+			return "Test proc";
 		}
 
 	private:
