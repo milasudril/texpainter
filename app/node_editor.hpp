@@ -19,7 +19,7 @@ namespace Texpainter
 		           std::reference_wrapper<FilterGraph::ProcessorNode const> node)
 		    : r_node{node}
 		    , m_root{owner, Ui::Box::Orientation::Vertical}
-		    , m_name{m_root, node.get().name().data()}
+		    , m_name{m_root, node.get().name()}
 		    , m_content{m_root, Ui::Box::Orientation::Horizontal}
 		    , m_inputs{m_content.insertMode(Ui::Box::InsertMode{0, 0}),
 		               Ui::Box::Orientation::Vertical}
@@ -33,7 +33,7 @@ namespace Texpainter
 			std::ranges::transform(r_node.get().inputPorts(),
 			                       std::back_inserter(m_input_labels),
 			                       [&inputs = m_inputs](auto name) {
-				                       auto ret = Ui::Label{inputs, name.data()};
+				                       auto ret = Ui::Label{inputs, name};
 				                       ret.alignment(0.0);
 				                       return ret;
 			                       });
@@ -43,13 +43,13 @@ namespace Texpainter
 			    std::back_inserter(m_params_input),
 			    [&params = m_params](auto name) {
 				    return Ui::LabeledInput<Ui::Slider>{
-				        params, Ui::Box::Orientation::Vertical, name.data(), false};
+				        params, Ui::Box::Orientation::Vertical, name, false};
 			    });
 
 			std::ranges::transform(r_node.get().outputPorts(),
 			                       std::back_inserter(m_output_labels),
 			                       [&outputs = m_outputs](auto name) {
-				                       auto ret = Ui::Label{outputs, name.data()};
+				                       auto ret = Ui::Label{outputs, name};
 				                       ret.alignment(1.0);
 				                       return ret;
 			                       });

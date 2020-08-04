@@ -11,7 +11,7 @@ namespace
 {
 	class InputProcessor
 	{
-		static constexpr std::string_view s_output_port_names[] = {"Output 1", "Output 2"};
+		static constexpr char const* s_output_port_names[] = {"Output 1", "Output 2"};
 
 	public:
 		InputProcessor(size_t& req_count): r_req_count{req_count}
@@ -20,9 +20,9 @@ namespace
 			set("color_b", Texpainter::FilterGraph::ProcParamValue{1.0});
 		}
 
-		std::span<std::string_view const> paramNames() const
+		static constexpr std::span<char const* const> paramNames()
 		{
-			return std::span<std::string_view>{};
+			return std::span<char const* const>{};
 		}
 
 		std::span<Texpainter::FilterGraph::ProcParamValue const> paramValues() const
@@ -30,12 +30,12 @@ namespace
 			return std::span<Texpainter::FilterGraph::ProcParamValue const>{};
 		}
 
-		static constexpr std::span<std::string_view const> inputPorts()
+		static constexpr std::span<char const* const> inputPorts()
 		{
-			return std::span<std::string_view>{};
+			return std::span<char const* const>{};
 		}
 
-		static constexpr std::span<std::string_view const> outputPorts()
+		static constexpr std::span<char const* const> outputPorts()
 		{
 			return s_output_port_names;
 		}
@@ -70,7 +70,7 @@ namespace
 
 		size_t inputCount() const { return 0; }
 
-		static constexpr std::string_view name() { return "Input proc"; }
+		static constexpr char const* name() { return "Input proc"; }
 
 
 	private:
@@ -80,16 +80,16 @@ namespace
 
 	class TestProcessor
 	{
-		static constexpr std::string_view s_output_port_names[] = {"Output 1", "Output 2"};
-		static constexpr std::string_view s_input_port_names[]  = {"Input 1", "Input 2"};
+		static constexpr char const* s_output_port_names[] = {"Output 1", "Output 2"};
+		static constexpr char const* s_input_port_names[]  = {"Input 1", "Input 2"};
+		static constexpr char const* s_param_names[]  = {"Foo", "Bar"};
 
 	public:
 		size_t inputCount() const { return 2; }
 
-		std::span<std::string_view const> paramNames() const
+		static constexpr std::span<char const* const> paramNames()
 		{
-			constexpr std::string_view ret[] = {"Bar", "Foo"};
-			return ret;
+			return s_param_names;
 		}
 
 		std::span<Texpainter::FilterGraph::ProcParamValue const> paramValues() const
@@ -97,12 +97,12 @@ namespace
 			return std::span<Texpainter::FilterGraph::ProcParamValue const>{};
 		}
 
-		static constexpr std::span<std::string_view const> inputPorts()
+		static constexpr std::span<char const* const> inputPorts()
 		{
 			return s_input_port_names;
 		}
 
-		static constexpr std::span<std::string_view const> outputPorts()
+		static constexpr std::span<char const* const> outputPorts()
 		{
 			return s_output_port_names;
 		}
@@ -143,7 +143,7 @@ namespace
 			return *this;
 		}
 
-		static constexpr std::string_view name() { return "Test proc"; }
+		static constexpr char const* name() { return "Test proc"; }
 
 	private:
 		std::map<std::string, double, std::less<>> m_params;

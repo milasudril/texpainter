@@ -7,19 +7,18 @@
 
 #include "./proctypes.hpp"
 
-#include <string_view>
 #include <vector>
 
 namespace Texpainter::FilterGraph
 {
 	class OutputNode
 	{
+		static constexpr char const* s_input_port_names[] = {"Pixels"};
 	public:
-		static constexpr std::string_view s_input_port_names[] = {"Pixels"};
 
-		std::span<std::string_view const> paramNames() const
+		static constexpr std::span<char const* const> paramNames()
 		{
-			return std::span<std::string_view const>{};
+			return std::span<char const* const>{};
 		}
 
 		std::span<ProcParamValue const> paramValues() const
@@ -31,14 +30,14 @@ namespace Texpainter::FilterGraph
 
 		ProcParamValue get(std::string_view) const { return ProcParamValue{0.0}; }
 
-		static constexpr std::span<std::string_view const> inputPorts()
+		static constexpr std::span<char const* const> inputPorts()
 		{
-			return std::span<std::string_view const>{s_input_port_names, 1};
+			return std::span<char const* const>{s_input_port_names};
 		}
 
-		static constexpr std::span<std::string_view const> outputPorts()
+		static constexpr std::span<char const* const> outputPorts()
 		{
-			return std::span<std::string_view const>{};
+			return std::span<char const* const>{};
 		}
 
 		std::vector<ProcResultType> operator()(std::span<ProcArgumentType const> args) const
@@ -55,7 +54,7 @@ namespace Texpainter::FilterGraph
 			return std::vector<ProcResultType>{};
 		}
 
-		static constexpr std::string_view name() { return "Layer output"; }
+		static constexpr char const* name() { return "Layer output"; }
 	};
 }
 

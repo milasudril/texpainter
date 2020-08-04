@@ -91,9 +91,24 @@ namespace Texpainter::FilterGraph
 	concept ImageProcessor = requires(T a)
 	{
 		{
-			std::as_const(a).paramNames()
+			T::name()
 		}
-		->std::same_as<std::span<std::string_view const>>;
+		->std::same_as<char const*>;
+
+		{
+			T::paramNames()
+		}
+		->std::same_as<std::span<char const* const>>;
+
+		{
+			T::inputPorts()
+		}
+		->std::same_as<std::span<char const* const>>;
+
+		{
+			T::outputPorts()
+		}
+		->std::same_as<std::span<char const* const>>;
 
 		{
 			std::as_const(a).paramValues()
@@ -107,24 +122,10 @@ namespace Texpainter::FilterGraph
 		->std::same_as<ProcParamValue>;
 
 		{
-			T::inputPorts()
-		}
-		->std::same_as<std::span<std::string_view const>>;
-
-		{
-			T::outputPorts()
-		}
-		->std::same_as<std::span<std::string_view const>>;
-
-		{
 			std::as_const(a)(std::declval<std::span<ProcArgumentType const>>())
 		}
 		->std::same_as<std::vector<ProcResultType>>;
 
-		{
-			T::name()
-		}
-		->std::same_as<std::string_view>;
 	};
 }
 
