@@ -9,6 +9,7 @@
 #include "ui/label.hpp"
 #include "ui/box.hpp"
 #include "ui/slider.hpp"
+#include "ui/filled_shape.hpp"
 
 namespace Texpainter
 {
@@ -33,8 +34,9 @@ namespace Texpainter
 			std::ranges::transform(r_node.get().inputPorts(),
 			                       std::back_inserter(m_input_labels),
 			                       [&inputs = m_inputs](auto name) {
-				                       auto ret = Ui::Label{inputs, name};
-				                       ret.alignment(0.0);
+				                       auto ret = Ui::LabeledInput<Ui::FilledShape>{
+				                           inputs, Ui::Box::Orientation::Horizontal, name};
+				                       ret.label().alignment(0.0);
 				                       return ret;
 			                       });
 
@@ -48,8 +50,9 @@ namespace Texpainter
 			std::ranges::transform(r_node.get().outputPorts(),
 			                       std::back_inserter(m_output_labels),
 			                       [&outputs = m_outputs](auto name) {
-				                       auto ret = Ui::Label{outputs, name};
-				                       ret.alignment(1.0);
+				                       auto ret = Ui::LabeledInput<Ui::FilledShape>{
+				                           outputs, Ui::Box::Orientation::Horizontal, name};
+				                       ret.label().alignment(1.0);
 				                       return ret;
 			                       });
 		}
@@ -64,9 +67,9 @@ namespace Texpainter
 		Ui::Box m_params;
 		Ui::Box m_outputs;
 
-		std::vector<Ui::Label> m_input_labels;
+		std::vector<Ui::LabeledInput<Ui::FilledShape>> m_input_labels;
 		std::vector<Ui::LabeledInput<Ui::Slider>> m_params_input;
-		std::vector<Ui::Label> m_output_labels;
+		std::vector<Ui::LabeledInput<Ui::FilledShape>> m_output_labels;
 	};
 }
 
