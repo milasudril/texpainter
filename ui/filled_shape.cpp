@@ -29,10 +29,11 @@ private:
 		auto const w = gtk_widget_get_allocated_width(widget);
 		auto const h = gtk_widget_get_allocated_height(widget);
 
-		auto const size       = vec2_t{static_cast<double>(w), static_cast<double>(h)};
-		auto const O          = size / 2.0;
-		auto const upper_left = O - size * vec2_t{self->m_radius, self->m_radius} / 2.0;
-		auto const d          = size * vec2_t{self->m_radius, self->m_radius};
+		auto const size = vec2_t{static_cast<double>(w), static_cast<double>(h)};
+		auto const O    = size / 2.0;
+		auto const upper_left =
+		    O - size * (vec2_t{self->m_radius, self->m_radius} + self->m_loc) / 2.0;
+		auto const d = size * vec2_t{self->m_radius, self->m_radius};
 		cairo_rectangle(cr, upper_left[0], upper_left[1], d[0], d[1]);
 		cairo_fill(cr);
 
