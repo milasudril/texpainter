@@ -34,7 +34,7 @@ namespace Texpainter
 			std::ranges::transform(r_node.get().inputPorts(),
 			                       std::back_inserter(m_input_labels),
 			                       [&inputs = m_inputs](auto name) {
-				                       auto ret = Ui::LabeledInput<Ui::FilledShape>{
+				                       auto ret = Ui::ReversedLabeledInput<Ui::FilledShape>{
 				                           inputs, Ui::Box::Orientation::Horizontal, name};
 				                       ret.label().alignment(0.0);
 				                       return ret;
@@ -67,7 +67,7 @@ namespace Texpainter
 		Ui::Box m_params;
 		Ui::Box m_outputs;
 
-		std::vector<Ui::LabeledInput<Ui::FilledShape>> m_input_labels;
+		std::vector<Ui::ReversedLabeledInput<Ui::FilledShape>> m_input_labels;
 		std::vector<Ui::LabeledInput<Ui::Slider>> m_params_input;
 		std::vector<Ui::LabeledInput<Ui::FilledShape>> m_output_labels;
 	};

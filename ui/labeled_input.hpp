@@ -10,7 +10,7 @@
 
 namespace Texpainter::Ui
 {
-	template<class Widget, class LabelType = Label>
+	template<class Widget, class LabelType = Label, bool Reversed = false>
 	class LabeledInput
 	{
 	public:
@@ -18,28 +18,57 @@ namespace Texpainter::Ui
 		explicit LabeledInput(Container& container,
 		                      Box::Orientation orientation,
 		                      const char* label,
-		                      Args&&... args)
+		                      Args&&... args) requires(!Reversed)
 		    : m_box{container, orientation}
-		    , m_label{m_box, label}
-		    , m_input_field{m_box.insertMode(Box::InsertMode{0, Box::Expand | Box::Fill}),
-		                    std::forward<Args>(args)...}
+		    , m_widgets{LabelType{m_box, label},
+		                Widget{m_box.insertMode(Box::InsertMode{0, Box::Expand | Box::Fill}),
+		                       std::forward<Args>(args)...}}
 		{
 		}
 
-		LabelType& label() { return m_label; }
+		template<class... Args>
+		explicit LabeledInput(Container& container,
+		                      Box::Orientation orientation,
+		                      const char* label,
+		                      Args&&... args) requires(Reversed)
+		    : m_box{container, orientation}
+		    , m_widgets{
+		          Widget{m_box, std::forward<Args>(args)...},
+		          LabelType{m_box.insertMode(Box::InsertMode{0, Box::Expand | Box::Fill}), label}}
+		{
+		}
 
-		LabelType const& label() const { return m_label; }
+		LabelType& label() { return const_cast<LabelType&>(std::as_const(*this).label()); }
 
-		Widget& inputField() { return m_input_field; }
+		LabelType const& label() const
+		{
+			if constexpr(Reversed) { return m_widgets.second; }
+			else
+			{
+				return m_widgets.first;
+			}
+		}
 
-		Widget const& inputField() const { return m_input_field; }
+		Widget& inputField() { return const_cast<Widget&>(std::as_const(*this).inputField()); }
+
+		Widget const& inputField() const
+		{
+			if constexpr(Reversed) { return m_widgets.first; }
+			else
+			{
+				return m_widgets.second;
+			}
+		}
 
 
 	private:
 		Box m_box;
-		LabelType m_label;
-		Widget m_input_field;
+		std::conditional_t<Reversed, std::pair<Widget, LabelType>, std::pair<LabelType, Widget>>
+		    m_widgets;
 	};
+
+	template<class Widget, class LabelType = Label>
+	using ReversedLabeledInput = LabeledInput<Widget, LabelType, true>;
 }
 
 #endif
