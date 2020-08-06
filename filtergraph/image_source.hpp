@@ -7,10 +7,23 @@
 
 namespace Texpainter::FilterGraph
 {
+	namespace detail
+	{
+		template<class T>
+		struct MapPixelType;
+
+		template<>
+		struct MapPixelType<PixelStore::Pixel>
+		{
+			static constexpr auto value = PixelType::RGBA;
+		};
+	}
+
 	template<class PixelType>
 	class ImageSource
 	{
-		static constexpr char const* s_output_port_names[] = {"Pixels"};
+		static constexpr PortInfo s_output_ports[] = {
+		    PortInfo{detail::MapPixelType<PixelType>::value, "Pixels"}};
 
 	public:
 		explicit ImageSource(Span2d<PixelType const> pixels): r_pixels{pixels} {}
@@ -29,14 +42,14 @@ namespace Texpainter::FilterGraph
 
 		ProcParamValue get(std::string_view) const { return ProcParamValue{0.0}; }
 
-		static constexpr std::span<char const* const> outputPorts()
+		static constexpr std::span<PortInfo const> outputPorts()
 		{
-			return std::span<char const* const>{s_output_port_names};
+			return std::span<PortInfo const>{s_output_ports};
 		}
 
-		static constexpr std::span<char const* const> inputPorts()
+		static constexpr std::span<PortInfo const> inputPorts()
 		{
-			return std::span<char const* const>{};
+			return std::span<PortInfo const>{};
 		}
 
 		std::vector<ProcResultType> operator()(std::span<ProcArgumentType const>) const

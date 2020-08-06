@@ -13,6 +13,25 @@
 
 namespace Texpainter
 {
+	namespace detail
+	{
+		constexpr PixelStore::Pixel portColor(FilterGraph::PixelType type)
+		{
+			switch(type)
+			{
+				case FilterGraph::PixelType::RGBA: return PixelStore::Pixel{0.5f, 0.5f, 0.0f, 1.0f};
+
+				case FilterGraph::PixelType::GrayscaleReal:
+					return PixelStore::Pixel{0.33f, 0.33f, 0.33f, 1.0f};
+
+				case FilterGraph::PixelType::GrayscaleComplex:
+					return PixelStore::Pixel{0.25f, 0.25f, 1.0f, 1.0f};
+			}
+			__builtin_unreachable();
+		}
+	}
+
+
 	class NodeEditor
 	{
 	public:
@@ -32,23 +51,21 @@ namespace Texpainter
 		{
 			constexpr auto box_radius = 1.0 - 1.0 / std::numbers::phi;
 			constexpr auto box_offset = vec2_t{box_radius, 0.0};
-			constexpr auto box_color  = PixelStore::Pixel{0.5f, 0.5f, 0.5f, 1.0f};
 
 			m_name.alignment(0.5);
-			std::ranges::transform(
-			    r_node.get().inputPorts(),
-			    std::back_inserter(m_input_labels),
-			    [&inputs = m_inputs, box_radius, box_offset, box_color](auto name) {
-				    auto ret =
-				        Ui::ReversedLabeledInput<Ui::FilledShape>{inputs,
-				                                                  Ui::Box::Orientation::Horizontal,
-				                                                  name,
-				                                                  box_color,
-				                                                  box_radius,
-				                                                  box_offset};
-				    ret.label().alignment(0.0);
-				    return ret;
-			    });
+			std::ranges::transform(r_node.get().inputPorts(),
+			                       std::back_inserter(m_input_labels),
+			                       [&inputs = m_inputs, box_radius, box_offset](auto portinfo) {
+				                       auto ret = Ui::ReversedLabeledInput<Ui::FilledShape>{
+				                           inputs,
+				                           Ui::Box::Orientation::Horizontal,
+				                           portinfo.name,
+				                           detail::portColor(portinfo.type),
+				                           box_radius,
+				                           box_offset};
+				                       ret.label().alignment(0.0);
+				                       return ret;
+			                       });
 
 			std::ranges::transform(r_node.get().paramNames(),
 			                       std::back_inserter(m_params_input),
@@ -57,19 +74,19 @@ namespace Texpainter
 				                           params, Ui::Box::Orientation::Vertical, name, false};
 			                       });
 
-			std::ranges::transform(
-			    r_node.get().outputPorts(),
-			    std::back_inserter(m_output_labels),
-			    [&outputs = m_outputs, box_radius, box_offset, box_color](auto name) {
-				    auto ret = Ui::LabeledInput<Ui::FilledShape>{outputs,
-				                                                 Ui::Box::Orientation::Horizontal,
-				                                                 name,
-				                                                 box_color,
-				                                                 box_radius,
-				                                                 -box_offset};
-				    ret.label().alignment(1.0);
-				    return ret;
-			    });
+			std::ranges::transform(r_node.get().outputPorts(),
+			                       std::back_inserter(m_output_labels),
+			                       [&outputs = m_outputs, box_radius, box_offset](auto portinfo) {
+				                       auto ret = Ui::LabeledInput<Ui::FilledShape>{
+				                           outputs,
+				                           Ui::Box::Orientation::Horizontal,
+				                           portinfo.name,
+				                           detail::portColor(portinfo.type),
+				                           box_radius,
+				                           -box_offset};
+				                       ret.label().alignment(1.0);
+				                       return ret;
+			                       });
 		}
 
 	private:

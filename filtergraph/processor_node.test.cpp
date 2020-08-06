@@ -11,7 +11,10 @@ namespace
 {
 	class InputProcessor
 	{
-		static constexpr char const* s_output_port_names[] = {"Output 1", "Output 2"};
+		static constexpr Texpainter::FilterGraph::PortInfo s_output_ports[] = {
+		    Texpainter::FilterGraph::PortInfo{Texpainter::FilterGraph::PixelType::RGBA, "Output 1"},
+		    Texpainter::FilterGraph::PortInfo{Texpainter::FilterGraph::PixelType::RGBA,
+		                                      "Output 2"}};
 
 	public:
 		InputProcessor(size_t& req_count): r_req_count{req_count}
@@ -30,12 +33,15 @@ namespace
 			return std::span<Texpainter::FilterGraph::ProcParamValue const>{};
 		}
 
-		static constexpr std::span<char const* const> inputPorts()
+		static constexpr std::span<Texpainter::FilterGraph::PortInfo const> inputPorts()
 		{
-			return std::span<char const* const>{};
+			return std::span<Texpainter::FilterGraph::PortInfo const>{};
 		}
 
-		static constexpr std::span<char const* const> outputPorts() { return s_output_port_names; }
+		static constexpr std::span<Texpainter::FilterGraph::PortInfo const> outputPorts()
+		{
+			return s_output_ports;
+		}
 
 
 		std::vector<Texpainter::FilterGraph::ProcResultType> operator()(
@@ -77,9 +83,14 @@ namespace
 
 	class TestProcessor
 	{
-		static constexpr char const* s_output_port_names[] = {"Output 1", "Output 2"};
-		static constexpr char const* s_input_port_names[]  = {"Input 1", "Input 2"};
-		static constexpr char const* s_param_names[]       = {"Foo", "Bar"};
+		static constexpr Texpainter::FilterGraph::PortInfo s_output_ports[] = {
+		    Texpainter::FilterGraph::PortInfo{Texpainter::FilterGraph::PixelType::RGBA, "Output 1"},
+		    Texpainter::FilterGraph::PortInfo{Texpainter::FilterGraph::PixelType::RGBA,
+		                                      "Output 2"}};
+		static constexpr Texpainter::FilterGraph::PortInfo s_input_ports[] = {
+		    Texpainter::FilterGraph::PortInfo{Texpainter::FilterGraph::PixelType::RGBA, "Input 1"},
+		    Texpainter::FilterGraph::PortInfo{Texpainter::FilterGraph::PixelType::RGBA, "Input 2"}};
+		static constexpr char const* s_param_names[] = {"Foo", "Bar"};
 
 	public:
 		size_t inputCount() const { return 2; }
@@ -91,9 +102,15 @@ namespace
 			return std::span<Texpainter::FilterGraph::ProcParamValue const>{};
 		}
 
-		static constexpr std::span<char const* const> inputPorts() { return s_input_port_names; }
+		static constexpr std::span<Texpainter::FilterGraph::PortInfo const> inputPorts()
+		{
+			return s_input_ports;
+		}
 
-		static constexpr std::span<char const* const> outputPorts() { return s_output_port_names; }
+		static constexpr std::span<Texpainter::FilterGraph::PortInfo const> outputPorts()
+		{
+			return s_output_ports;
+		}
 
 
 		std::vector<Texpainter::FilterGraph::ProcResultType> operator()(

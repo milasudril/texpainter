@@ -13,7 +13,7 @@ namespace Texpainter::FilterGraph
 {
 	class OutputNode
 	{
-		static constexpr char const* s_input_port_names[] = {"Pixels"};
+		static constexpr PortInfo s_input_ports[] = {{PixelType::RGBA, "Pixels"}};
 
 	public:
 		static constexpr std::span<char const* const> paramNames()
@@ -30,14 +30,14 @@ namespace Texpainter::FilterGraph
 
 		ProcParamValue get(std::string_view) const { return ProcParamValue{0.0}; }
 
-		static constexpr std::span<char const* const> inputPorts()
+		static constexpr std::span<PortInfo const> inputPorts()
 		{
-			return std::span<char const* const>{s_input_port_names};
+			return std::span<PortInfo const>{s_input_ports};
 		}
 
-		static constexpr std::span<char const* const> outputPorts()
+		static constexpr std::span<PortInfo const> outputPorts()
 		{
-			return std::span<char const* const>{};
+			return std::span<PortInfo const>{};
 		}
 
 		std::vector<ProcResultType> operator()(std::span<ProcArgumentType const> args) const

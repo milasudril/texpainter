@@ -69,6 +69,12 @@ namespace Texpainter::FilterGraph
 		GrayscaleComplex
 	};
 
+	struct PortInfo
+	{
+		PixelType type;
+		char const* name;
+	};
+
 	using ProcArgumentType = std::variant<Span2d<PixelStore::Pixel const>,
 	                                      Span2d<double const>,
 	                                      Span2d<std::complex<double> const>>;
@@ -103,12 +109,12 @@ namespace Texpainter::FilterGraph
 		{
 			T::inputPorts()
 		}
-		->std::same_as<std::span<char const* const>>;
+		->std::same_as<std::span<PortInfo const>>;
 
 		{
 			T::outputPorts()
 		}
-		->std::same_as<std::span<char const* const>>;
+		->std::same_as<std::span<PortInfo const>>;
 
 		{
 			std::as_const(a).paramValues()
