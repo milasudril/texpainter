@@ -16,7 +16,7 @@
 
 namespace Texpainter::Ui
 {
-	class WidgetCanvas: private Container
+	class WidgetCanvasDetail: private Container
 	{
 		class WidgetDeleter;
 
@@ -27,39 +27,36 @@ namespace Texpainter::Ui
 		template<class WidgetType>
 		using WidgetHandle = std::unique_ptr<WidgetType, WidgetDeleter>;
 
-		explicit WidgetCanvas(Container& parent);
-		~WidgetCanvas();
+		explicit WidgetCanvasDetail(Container& parent);
+		~WidgetCanvasDetail();
 
-		WidgetCanvas& operator=(WidgetCanvas&& obj) noexcept
+		WidgetCanvasDetail& operator=(WidgetCanvasDetail&& obj) noexcept
 		{
 			std::swap(obj.m_impl, m_impl);
 			return *this;
 		}
 
-		WidgetCanvas(WidgetCanvas&& obj) noexcept: m_impl(obj.m_impl) { obj.m_impl = nullptr; }
-
-		template<class WidgetType, class Id, class... WidgetParams>
-		decltype(auto) insert(Id id, vec2_t loc, WidgetParams&&... params)
+		WidgetCanvasDetail(WidgetCanvasDetail&& obj) noexcept: m_impl(obj.m_impl)
 		{
-			auto ptr = new WidgetType{clientId(ClientId{id}).insertLocation(loc),
-			                          std::forward<WidgetParams>(params)...};
-			return WidgetHandle<WidgetType>{ptr, WidgetDeleter{*m_impl}};
+			obj.m_impl = nullptr;
 		}
 
-		WidgetCanvas& insertLocation(vec2_t location);
-		WidgetCanvas& clientId(ClientId id);
+		WidgetCanvasDetail& insertLocation(vec2_t location);
+		WidgetCanvasDetail& clientId(ClientId id);
 
-		WidgetCanvas& add(void* handle) override;
-		WidgetCanvas& show() override;
-		WidgetCanvas& sensitive(bool val) override;
-		WidgetCanvas& killFocus() override { return *this; }
+		WidgetCanvasDetail& add(void* handle) override;
+		WidgetCanvasDetail& show() override;
+		WidgetCanvasDetail& sensitive(bool val) override;
+		WidgetCanvasDetail& killFocus() override { return *this; }
 
 
 		void* toplevel() const override;
 
+		Container& asContainer() { return *this; }
+
 	protected:
 		class Impl;
-		explicit WidgetCanvas(WidgetCanvas::Impl& impl): m_impl(&impl) {}
+		explicit WidgetCanvasDetail(WidgetCanvasDetail::Impl& impl): m_impl(&impl) {}
 		Impl* m_impl;
 
 		class WidgetId
@@ -103,6 +100,7 @@ namespace Texpainter::Ui
 			size_t m_value;
 		};
 
+
 	private:
 		class WidgetDeleter
 		{
@@ -121,6 +119,40 @@ namespace Texpainter::Ui
 			WidgetId m_id;
 			void do_cleanup() noexcept;
 		};
+	};
+
+	template<class ClientIdType>
+	class WidgetCanvas: private WidgetCanvasDetail
+	{
+	public:
+		using WidgetCanvasDetail::WidgetCanvasDetail;
+
+		template<class WidgetType>
+		using WidgetHandle = WidgetCanvasDetail::WidgetHandle<WidgetType>;
+
+		template<class WidgetType, class... WidgetParams>
+		decltype(auto) insert(ClientIdType id, vec2_t loc, WidgetParams&&... params)
+		{
+			auto ptr = new WidgetType{clientId(ClientId{id}).insertLocation(loc).asContainer(),
+			                          std::forward<WidgetParams>(params)...};
+			return WidgetHandle<WidgetType>{ptr, WidgetDeleter{*m_impl}};
+		}
+
+		template<auto id, class EventHandler>
+		WidgetCanvas& eventHandler(EventHandler& eh)
+		{
+			return eventHandler(&eh,
+			                    [](void* event_handler,
+			                       WidgetCanvas& self,
+			                       vec2_t loc_window,
+			                       vec2_t loc_screen,
+			                       int button,
+			                       ClientId widget) {
+				                    auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				                    obj.template onMouseDown<id>(
+				                        self, loc_window, loc_screen, button, widget);
+			                    });
+		}
 	};
 }
 

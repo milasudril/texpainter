@@ -32,8 +32,10 @@ namespace Texpainter
 
 	private:
 		FilterGraph::Graph& r_graph;
-		Ui::WidgetCanvas m_canvas;
-		std::map<FilterGraph::NodeId, Ui::WidgetCanvas::WidgetHandle<NodeEditor>> m_node_editors;
+		Ui::WidgetCanvas<FilterGraph::NodeId> m_canvas;
+		std::map<FilterGraph::NodeId,
+		         Ui::WidgetCanvas<FilterGraph::NodeId>::WidgetHandle<NodeEditor>>
+		    m_node_editors;
 	};
 }
 

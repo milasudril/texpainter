@@ -8,7 +8,7 @@
 #include <cassert>
 
 
-class Texpainter::Ui::WidgetCanvas::Impl: private WidgetCanvas
+class Texpainter::Ui::WidgetCanvasDetail::Impl: private WidgetCanvasDetail
 {
 public:
 	Impl(Container& cnt);
@@ -144,7 +144,7 @@ private:
 	}
 };
 
-Texpainter::Ui::WidgetCanvas::WidgetDeleter::WidgetDeleter(
+Texpainter::Ui::WidgetCanvasDetail::WidgetDeleter::WidgetDeleter(
     std::reference_wrapper<Impl> impl) noexcept
     : r_impl{impl}
     , m_id{r_impl.get().currentId()}
@@ -152,13 +152,13 @@ Texpainter::Ui::WidgetCanvas::WidgetDeleter::WidgetDeleter(
 	r_impl.get().nextId();
 }
 
-void Texpainter::Ui::WidgetCanvas::WidgetDeleter::do_cleanup() noexcept
+void Texpainter::Ui::WidgetCanvasDetail::WidgetDeleter::do_cleanup() noexcept
 {
 	r_impl.get().removeParentsFor(m_id);
 }
 
 
-Texpainter::Ui::WidgetCanvas::Impl::Impl(Container& cnt): WidgetCanvas{*this}
+Texpainter::Ui::WidgetCanvasDetail::Impl::Impl(Container& cnt): WidgetCanvasDetail{*this}
 {
 	auto widget = gtk_overlay_new();
 	m_handle    = GTK_OVERLAY(widget);
@@ -167,43 +167,43 @@ Texpainter::Ui::WidgetCanvas::Impl::Impl(Container& cnt): WidgetCanvas{*this}
 	m_moving     = nullptr;
 }
 
-Texpainter::Ui::WidgetCanvas::Impl::~Impl()
+Texpainter::Ui::WidgetCanvasDetail::Impl::~Impl()
 {
 	m_impl = nullptr;
 	gtk_widget_destroy(GTK_WIDGET(m_handle));
 }
 
-Texpainter::Ui::WidgetCanvas::WidgetCanvas(Container& cnt) { m_impl = new Impl(cnt); }
+Texpainter::Ui::WidgetCanvasDetail::WidgetCanvasDetail(Container& cnt) { m_impl = new Impl(cnt); }
 
-Texpainter::Ui::WidgetCanvas::~WidgetCanvas() { delete m_impl; }
+Texpainter::Ui::WidgetCanvasDetail::~WidgetCanvasDetail() { delete m_impl; }
 
-Texpainter::Ui::WidgetCanvas& Texpainter::Ui::WidgetCanvas::add(void* handle)
+Texpainter::Ui::WidgetCanvasDetail& Texpainter::Ui::WidgetCanvasDetail::add(void* handle)
 {
 	m_impl->_add(GTK_WIDGET(handle));
 	return *this;
 }
 
-Texpainter::Ui::WidgetCanvas& Texpainter::Ui::WidgetCanvas::insertLocation(vec2_t loc)
+Texpainter::Ui::WidgetCanvasDetail& Texpainter::Ui::WidgetCanvasDetail::insertLocation(vec2_t loc)
 {
 	m_impl->insertLocation(loc);
 	return *this;
 }
 
-Texpainter::Ui::WidgetCanvas& Texpainter::Ui::WidgetCanvas::show()
+Texpainter::Ui::WidgetCanvasDetail& Texpainter::Ui::WidgetCanvasDetail::show()
 {
 	m_impl->_show();
 	return *this;
 }
 
-Texpainter::Ui::WidgetCanvas& Texpainter::Ui::WidgetCanvas::sensitive(bool val)
+Texpainter::Ui::WidgetCanvasDetail& Texpainter::Ui::WidgetCanvasDetail::sensitive(bool val)
 {
 	m_impl->_sensitive(val);
 	return *this;
 }
 
-void* Texpainter::Ui::WidgetCanvas::toplevel() const { return m_impl->_toplevel(); }
+void* Texpainter::Ui::WidgetCanvasDetail::toplevel() const { return m_impl->_toplevel(); }
 
-Texpainter::Ui::WidgetCanvas& Texpainter::Ui::WidgetCanvas::clientId(ClientId id)
+Texpainter::Ui::WidgetCanvasDetail& Texpainter::Ui::WidgetCanvasDetail::clientId(ClientId id)
 {
 	m_impl->clientId(id);
 	return *this;
