@@ -35,9 +35,11 @@ public:
 		                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK
 		                          | GDK_BUTTON_RELEASE_MASK);
 		g_signal_connect(fixed_layout, "motion-notify-event", G_CALLBACK(mouse_move), this);
+		g_signal_connect(fixed_layout, "button-press-event", G_CALLBACK(button_press_fixed), this);
 
 		gtk_fixed_put(fixed_layout, GTK_WIDGET(frame), m_insert_loc[0], m_insert_loc[1]);
-		m_floats[m_current_id] = fixed_layout;
+		m_floats[m_current_id]  = fixed_layout;
+		m_clients[fixed_layout] = m_client_id;
 		gtk_overlay_add_overlay(m_handle, GTK_WIDGET(fixed_layout));
 		gtk_overlay_set_overlay_pass_through(m_handle, GTK_WIDGET(fixed_layout), TRUE);
 	}
@@ -58,9 +60,12 @@ public:
 	{
 		auto i = m_floats.find(id);
 		assert(i != std::end(m_floats));
+		m_clients.erase(i->second);
 		gtk_widget_destroy(GTK_WIDGET(i->second));
 		m_floats.erase(i);
 	}
+
+	void clientId(ClientId id) { m_client_id = id; }
 
 private:
 	GtkOverlay* m_handle;
@@ -70,8 +75,10 @@ private:
 	vec2_t m_loc_init;
 	vec2_t m_click_loc;
 	WidgetId m_current_id;
+	ClientId m_client_id;
 
 	std::map<WidgetId, GtkFixed*> m_floats;
+	std::map<GtkFixed*, ClientId> m_clients;
 
 	static gboolean mouse_move(GtkWidget* widget, GdkEvent* event, gpointer user_data)
 	{
@@ -120,6 +127,15 @@ private:
 		return FALSE;
 	}
 
+	static gboolean button_press_fixed(GtkWidget* widget, GdkEvent* event, gpointer user_data)
+	{
+		auto self = reinterpret_cast<Impl*>(user_data);
+		auto i    = self->m_clients.find(GTK_FIXED(widget));
+		assert(i != std::end(self->m_clients));
+		printf("%zu\n", i->second.value());
+		return FALSE;
+	}
+
 	static gboolean button_release(GtkWidget* widget, GdkEvent* event, gpointer user_data)
 	{
 		auto self      = reinterpret_cast<Impl*>(user_data);
@@ -147,8 +163,8 @@ Texpainter::Ui::WidgetCanvas::Impl::Impl(Container& cnt): WidgetCanvas{*this}
 	auto widget = gtk_overlay_new();
 	m_handle    = GTK_OVERLAY(widget);
 	cnt.add(widget);
-	m_insert_loc     = vec2_t{0.0, 0.0};
-	m_moving         = nullptr;
+	m_insert_loc = vec2_t{0.0, 0.0};
+	m_moving     = nullptr;
 }
 
 Texpainter::Ui::WidgetCanvas::Impl::~Impl()
@@ -186,3 +202,9 @@ Texpainter::Ui::WidgetCanvas& Texpainter::Ui::WidgetCanvas::sensitive(bool val)
 }
 
 void* Texpainter::Ui::WidgetCanvas::toplevel() const { return m_impl->_toplevel(); }
+
+Texpainter::Ui::WidgetCanvas& Texpainter::Ui::WidgetCanvas::clientId(ClientId id)
+{
+	m_impl->clientId(id);
+	return *this;
+}

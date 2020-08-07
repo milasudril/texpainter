@@ -25,7 +25,8 @@ namespace Texpainter
 			    std::inserter(m_node_editors, std::end(m_node_editors)),
 			    [&canvas = m_canvas](auto const& node) {
 				    return std::make_pair(
-				        node.first, canvas.insert<NodeEditor>(vec2_t{50.0, 50.0}, node.second));
+				        node.first,
+				        canvas.insert<NodeEditor>(node.first, vec2_t{50.0, 50.0}, node.second));
 			    });
 		}
 

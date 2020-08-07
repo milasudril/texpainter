@@ -20,6 +20,9 @@ namespace Texpainter::Ui
 	{
 		class WidgetDeleter;
 
+	protected:
+		class ClientId;
+
 	public:
 		template<class WidgetType>
 		using WidgetHandle = std::unique_ptr<WidgetType, WidgetDeleter>;
@@ -35,20 +38,22 @@ namespace Texpainter::Ui
 
 		WidgetCanvas(WidgetCanvas&& obj) noexcept: m_impl(obj.m_impl) { obj.m_impl = nullptr; }
 
-		template<class WidgetType, class... WidgetParams>
-		decltype(auto) insert(vec2_t loc, WidgetParams&&... params)
+		template<class WidgetType, class Id, class... WidgetParams>
+		decltype(auto) insert(Id id, vec2_t loc, WidgetParams&&... params)
 		{
-			auto ptr =
-			    new WidgetType{this->insertLocation(loc), std::forward<WidgetParams>(params)...};
+			auto ptr = new WidgetType{clientId(ClientId{id}).insertLocation(loc),
+			                          std::forward<WidgetParams>(params)...};
 			return WidgetHandle<WidgetType>{ptr, WidgetDeleter{*m_impl}};
 		}
 
 		WidgetCanvas& insertLocation(vec2_t location);
+		WidgetCanvas& clientId(ClientId id);
 
 		WidgetCanvas& add(void* handle) override;
 		WidgetCanvas& show() override;
 		WidgetCanvas& sensitive(bool val) override;
 		WidgetCanvas& killFocus() override { return *this; }
+
 
 		void* toplevel() const override;
 
@@ -60,7 +65,7 @@ namespace Texpainter::Ui
 		class WidgetId
 		{
 		public:
-			constexpr WidgetId():m_value{0}{}
+			constexpr WidgetId(): m_value{0} {}
 
 			constexpr auto operator<=>(WidgetId const&) const = default;
 
@@ -72,6 +77,30 @@ namespace Texpainter::Ui
 
 		private:
 			uint64_t m_value;
+		};
+
+		class ClientId
+		{
+		public:
+			ClientId() = default;
+
+			template<class T>
+			constexpr explicit ClientId(T val) requires(
+			    (std::is_integral_v<T> || std::is_enum_v<T>)&&sizeof(val) <= sizeof(size_t))
+			    : m_value{val}
+			{
+			}
+
+			template<class T>
+			constexpr explicit ClientId(T val) requires (sizeof(val)<=sizeof(size_t) && requires(T x){{x.value()}->std::convertible_to<size_t>;}):
+			m_value{val.value()}
+			{
+			}
+
+			constexpr size_t value() const { return m_value; }
+
+		private:
+			size_t m_value;
 		};
 
 	private:
