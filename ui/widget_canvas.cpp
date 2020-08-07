@@ -7,6 +7,7 @@
 #include <map>
 #include <cassert>
 
+
 class Texpainter::Ui::WidgetCanvas::Impl: private WidgetCanvas
 {
 public:
@@ -36,7 +37,7 @@ public:
 		g_signal_connect(fixed_layout, "motion-notify-event", G_CALLBACK(mouse_move), this);
 
 		gtk_fixed_put(fixed_layout, GTK_WIDGET(frame), m_insert_loc[0], m_insert_loc[1]);
-		m_floats[m_current_cookie] = fixed_layout;
+		m_floats[m_current_id] = fixed_layout;
 		gtk_overlay_add_overlay(m_handle, GTK_WIDGET(fixed_layout));
 		gtk_overlay_set_overlay_pass_through(m_handle, GTK_WIDGET(fixed_layout), TRUE);
 	}
@@ -49,13 +50,13 @@ public:
 
 	void insertLocation(vec2_t loc) { m_insert_loc = loc; }
 
-	uint64_t currentCookie() const { return m_current_cookie; }
+	auto currentId() const { return m_current_id; }
 
-	void nextCookie() { ++m_current_cookie; }
+	void nextId() { ++m_current_id; }
 
-	void removeParentsFor(uint64_t cookie)
+	void removeParentsFor(WidgetId id)
 	{
-		auto i = m_floats.find(cookie);
+		auto i = m_floats.find(id);
 		assert(i != std::end(m_floats));
 		gtk_widget_destroy(GTK_WIDGET(i->second));
 		m_floats.erase(i);
@@ -68,9 +69,9 @@ private:
 	GtkWidget* m_moving;
 	vec2_t m_loc_init;
 	vec2_t m_click_loc;
-	uint64_t m_current_cookie;
+	WidgetId m_current_id;
 
-	std::map<uint64_t, GtkFixed*> m_floats;
+	std::map<WidgetId, GtkFixed*> m_floats;
 
 	static gboolean mouse_move(GtkWidget* widget, GdkEvent* event, gpointer user_data)
 	{
@@ -130,14 +131,14 @@ private:
 Texpainter::Ui::WidgetCanvas::WidgetDeleter::WidgetDeleter(
     std::reference_wrapper<Impl> impl) noexcept
     : r_impl{impl}
-    , m_cookie{r_impl.get().currentCookie()}
+    , m_id{r_impl.get().currentId()}
 {
-	r_impl.get().nextCookie();
+	r_impl.get().nextId();
 }
 
 void Texpainter::Ui::WidgetCanvas::WidgetDeleter::do_cleanup() noexcept
 {
-	r_impl.get().removeParentsFor(m_cookie);
+	r_impl.get().removeParentsFor(m_id);
 }
 
 
@@ -148,7 +149,6 @@ Texpainter::Ui::WidgetCanvas::Impl::Impl(Container& cnt): WidgetCanvas{*this}
 	cnt.add(widget);
 	m_insert_loc     = vec2_t{0.0, 0.0};
 	m_moving         = nullptr;
-	m_current_cookie = 0;
 }
 
 Texpainter::Ui::WidgetCanvas::Impl::~Impl()
