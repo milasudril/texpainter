@@ -15,7 +15,15 @@ namespace Texpainter
 {
 	class FilterGraphEditor
 	{
+		using Canvas = Ui::WidgetCanvas<FilterGraph::NodeId>;
+
 	public:
+		enum class ControlId : int
+		{
+			NodeEditors
+		};
+
+
 		FilterGraphEditor(Ui::Container& owner, FilterGraph::Graph& graph)
 		    : r_graph{graph}
 		    , m_canvas{owner}
@@ -28,15 +36,25 @@ namespace Texpainter
 				        node.first,
 				        canvas.insert<NodeEditor>(node.first, vec2_t{50.0, 50.0}, node.second));
 			    });
+
+			m_canvas.eventHandler<ControlId::NodeEditors>(*this);
 		}
+
+		template<ControlId>
+		void onMouseDown(Canvas& src, vec2_t, vec2_t, int button, FilterGraph::NodeId);
 
 	private:
 		FilterGraph::Graph& r_graph;
-		Ui::WidgetCanvas<FilterGraph::NodeId> m_canvas;
-		std::map<FilterGraph::NodeId,
-		         Ui::WidgetCanvas<FilterGraph::NodeId>::WidgetHandle<NodeEditor>>
-		    m_node_editors;
+		Canvas m_canvas;
+		std::map<FilterGraph::NodeId, Canvas::WidgetHandle<NodeEditor>> m_node_editors;
 	};
+
+	template<>
+	inline void FilterGraphEditor::onMouseDown<FilterGraphEditor::ControlId::NodeEditors>(
+	    Canvas& src, vec2_t, vec2_t, int button, FilterGraph::NodeId node)
+	{
+		if(button == 3) { printf("%zu\n", node.value()); }
+	}
 }
 
 #endif

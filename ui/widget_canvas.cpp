@@ -67,6 +67,13 @@ public:
 
 	void clientId(ClientId id) { m_client_id = id; }
 
+	void eventHandler(void* event_handler, EventHandlerFunc func)
+	{
+		r_eh   = event_handler;
+		r_func = func;
+	}
+
+
 private:
 	GtkOverlay* m_handle;
 	vec2_t m_insert_loc;
@@ -76,6 +83,8 @@ private:
 	vec2_t m_click_loc;
 	WidgetId m_current_id;
 	ClientId m_client_id;
+	void* r_eh;
+	EventHandlerFunc r_func;
 
 	std::map<WidgetId, GtkFixed*> m_floats;
 	std::map<GtkFixed*, ClientId> m_clients;
@@ -130,9 +139,20 @@ private:
 	static gboolean button_press_fixed(GtkWidget* widget, GdkEvent* event, gpointer user_data)
 	{
 		auto self = reinterpret_cast<Impl*>(user_data);
-		auto i    = self->m_clients.find(GTK_FIXED(widget));
-		assert(i != std::end(self->m_clients));
-		printf("%zu\n", i->second.value());
+		if(self->r_eh != nullptr)
+		{
+			auto i = self->m_clients.find(GTK_FIXED(widget));
+			if(i != std::end(self->m_clients))
+			{
+				auto e = reinterpret_cast<GdkEventButton const*>(event);
+				self->r_func(self->r_eh,
+				             *self,
+				             vec2_t{e->x, e->y},
+				             vec2_t{e->x_root, e->y_root},
+				             e->button,
+				             i->second);
+			}
+		}
 		return FALSE;
 	}
 
@@ -165,10 +185,12 @@ Texpainter::Ui::WidgetCanvasDetail::Impl::Impl(Container& cnt): WidgetCanvasDeta
 	cnt.add(widget);
 	m_insert_loc = vec2_t{0.0, 0.0};
 	m_moving     = nullptr;
+	r_eh         = nullptr;
 }
 
 Texpainter::Ui::WidgetCanvasDetail::Impl::~Impl()
 {
+	r_eh   = nullptr;
 	m_impl = nullptr;
 	gtk_widget_destroy(GTK_WIDGET(m_handle));
 }
@@ -207,4 +229,9 @@ Texpainter::Ui::WidgetCanvasDetail& Texpainter::Ui::WidgetCanvasDetail::clientId
 {
 	m_impl->clientId(id);
 	return *this;
+}
+
+void Texpainter::Ui::WidgetCanvasDetail::eventHandler(void* event_handler, EventHandlerFunc func)
+{
+	m_impl->eventHandler(event_handler, func);
 }

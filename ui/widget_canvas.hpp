@@ -100,6 +100,10 @@ namespace Texpainter::Ui
 			size_t m_value;
 		};
 
+		using EventHandlerFunc =
+		    void (*)(void*, WidgetCanvasDetail&, vec2_t, vec2_t, int, ClientId);
+
+		void eventHandler(void*, EventHandlerFunc);
 
 	private:
 		class WidgetDeleter
@@ -141,17 +145,22 @@ namespace Texpainter::Ui
 		template<auto id, class EventHandler>
 		WidgetCanvas& eventHandler(EventHandler& eh)
 		{
-			return eventHandler(&eh,
-			                    [](void* event_handler,
-			                       WidgetCanvas& self,
-			                       vec2_t loc_window,
-			                       vec2_t loc_screen,
-			                       int button,
-			                       ClientId widget) {
-				                    auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				                    obj.template onMouseDown<id>(
-				                        self, loc_window, loc_screen, button, widget);
-			                    });
+			WidgetCanvasDetail::eventHandler(
+			    &eh,
+			    [](void* event_handler,
+			       WidgetCanvasDetail& self,
+			       vec2_t loc_window,
+			       vec2_t loc_screen,
+			       int button,
+			       ClientId widget) {
+				    auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				    obj.template onMouseDown<id>(static_cast<WidgetCanvas&>(self),
+				                                 loc_window,
+				                                 loc_screen,
+				                                 button,
+				                                 ClientIdType{widget.value()});
+			    });
+			return *this;
 		}
 	};
 }
