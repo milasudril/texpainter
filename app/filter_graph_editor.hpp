@@ -70,9 +70,19 @@ namespace Texpainter
 
 	template<>
 	inline void FilterGraphEditor::onMove<FilterGraphEditor::ControlId::NodeEditors>(
-	    Canvas& src, Ui::WidgetCoordinates loc, FilterGraph::NodeId node)
+	    Canvas& src, Ui::WidgetCoordinates loc, FilterGraph::NodeId id)
 	{
-		printf("%zu moved to %.7e %.7e\n", node.value(), loc.x(), loc.y());
+		printf("%zu moved to %.7f %.7f\n", id.value(), loc.x(), loc.y());
+		auto const& node = *(m_node_editors.find(id)->second);
+		std::ranges::for_each(node.inputs(), [](auto const& item) {
+			auto loc = item.inputField().location();
+			printf("  %s (%.7f %.7f)\n", item.label().content(), loc.x(), loc.y());
+		});
+
+		std::ranges::for_each(node.outputs(), [](auto const& item) {
+			auto loc = item.inputField().location();
+			printf("  %s (%.7f %.7f)\n", item.label().content(), loc.x(), loc.y());
+		});
 	}
 
 }

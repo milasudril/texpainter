@@ -89,6 +89,11 @@ namespace Texpainter
 			                       });
 		}
 
+		auto const& inputs() const { return m_input_labels; }
+
+		auto const& outputs() const { return m_output_labels; }
+
+
 	private:
 		std::reference_wrapper<FilterGraph::ProcessorNode const> r_node;
 
