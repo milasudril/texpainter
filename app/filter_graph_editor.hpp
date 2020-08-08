@@ -34,7 +34,7 @@ namespace Texpainter
 			    [&canvas = m_canvas](auto const& node) {
 				    return std::make_pair(
 				        node.first,
-				        canvas.insert<NodeEditor>(node.first, vec2_t{50.0, 50.0}, node.second));
+				        canvas.insert<NodeEditor>(node.first, Ui::WidgetCoordinates{50.0, 50.0}, node.second));
 			    });
 
 			m_canvas.eventHandler<ControlId::NodeEditors>(*this);

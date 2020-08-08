@@ -12,6 +12,13 @@ namespace Texpainter::Ui
 	public:
 		constexpr explicit WidgetCoordinates(double x, double y):m_value{x, y}{}
 		
+		constexpr double x() const
+		{return m_value[0];}
+		
+		constexpr double y() const
+		{return m_value[1];}
+		
+		
 	private:
 		vec2_t m_value;
 	};

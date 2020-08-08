@@ -37,7 +37,7 @@ public:
 		g_signal_connect(fixed_layout, "motion-notify-event", G_CALLBACK(mouse_move), this);
 		g_signal_connect(fixed_layout, "button-press-event", G_CALLBACK(button_press_fixed), this);
 
-		gtk_fixed_put(fixed_layout, GTK_WIDGET(frame), m_insert_loc[0], m_insert_loc[1]);
+		gtk_fixed_put(fixed_layout, GTK_WIDGET(frame), m_insert_loc.x(), m_insert_loc.y()					);
 		m_floats[m_current_id]  = fixed_layout;
 		m_clients[fixed_layout] = m_client_id;
 		gtk_overlay_add_overlay(m_handle, GTK_WIDGET(fixed_layout));
@@ -50,7 +50,7 @@ public:
 
 	void* _toplevel() const { return gtk_widget_get_toplevel(GTK_WIDGET(m_handle)); }
 
-	void insertLocation(vec2_t loc) { m_insert_loc = loc; }
+	void insertLocation(WidgetCoordinates loc) { m_insert_loc = loc; }
 
 	auto currentId() const { return m_current_id; }
 
@@ -76,7 +76,7 @@ public:
 
 private:
 	GtkOverlay* m_handle;
-	vec2_t m_insert_loc;
+	WidgetCoordinates m_insert_loc;
 
 	GtkWidget* m_moving;
 	vec2_t m_loc_init;
@@ -178,12 +178,11 @@ void Texpainter::Ui::WidgetCanvasDetail::WidgetDeleter::do_cleanup() noexcept
 }
 
 
-Texpainter::Ui::WidgetCanvasDetail::Impl::Impl(Container& cnt): WidgetCanvasDetail{*this}
+Texpainter::Ui::WidgetCanvasDetail::Impl::Impl(Container& cnt): WidgetCanvasDetail{*this}, m_insert_loc{0.0, 0.0}
 {
 	auto widget = gtk_overlay_new();
 	m_handle    = GTK_OVERLAY(widget);
 	cnt.add(widget);
-	m_insert_loc = vec2_t{0.0, 0.0};
 	m_moving     = nullptr;
 	r_eh         = nullptr;
 }
@@ -205,7 +204,7 @@ Texpainter::Ui::WidgetCanvasDetail& Texpainter::Ui::WidgetCanvasDetail::add(void
 	return *this;
 }
 
-Texpainter::Ui::WidgetCanvasDetail& Texpainter::Ui::WidgetCanvasDetail::insertLocation(vec2_t loc)
+Texpainter::Ui::WidgetCanvasDetail& Texpainter::Ui::WidgetCanvasDetail::insertLocation(WidgetCoordinates loc)
 {
 	m_impl->insertLocation(loc);
 	return *this;

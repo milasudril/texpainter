@@ -7,8 +7,7 @@
 #define TEXPAINTER_UI_WIDGETCANVAS_HPP
 
 #include "./container.hpp"
-
-#include "utils/vec_t.hpp"
+#include "./widget_coordinates.hpp"
 
 #include <utility>
 #include <memory>
@@ -41,7 +40,7 @@ namespace Texpainter::Ui
 			obj.m_impl = nullptr;
 		}
 
-		WidgetCanvasDetail& insertLocation(vec2_t location);
+		WidgetCanvasDetail& insertLocation(WidgetCoordinates location);
 		WidgetCanvasDetail& clientId(ClientId id);
 
 		WidgetCanvasDetail& add(void* handle) override;
@@ -135,7 +134,7 @@ namespace Texpainter::Ui
 		using WidgetHandle = WidgetCanvasDetail::WidgetHandle<WidgetType>;
 
 		template<class WidgetType, class... WidgetParams>
-		decltype(auto) insert(ClientIdType id, vec2_t loc, WidgetParams&&... params)
+		decltype(auto) insert(ClientIdType id, WidgetCoordinates loc, WidgetParams&&... params)
 		{
 			auto ptr = new WidgetType{clientId(ClientId{id}).insertLocation(loc).asContainer(),
 			                          std::forward<WidgetParams>(params)...};
