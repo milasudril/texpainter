@@ -28,20 +28,25 @@ namespace Texpainter
 		    : r_graph{graph}
 		    , m_canvas{owner}
 		{
-			std::ranges::transform(
-			    r_graph.nodes(),
-			    std::inserter(m_node_editors, std::end(m_node_editors)),
-			    [&canvas = m_canvas](auto const& node) {
-				    return std::make_pair(
-				        node.first,
-				        canvas.insert<NodeEditor>(node.first, Ui::WidgetCoordinates{50.0, 50.0}, node.second));
-			    });
+			std::ranges::transform(r_graph.nodes(),
+			                       std::inserter(m_node_editors, std::end(m_node_editors)),
+			                       [&canvas = m_canvas](auto const& node) {
+				                       return std::make_pair(node.first,
+				                                             canvas.insert<NodeEditor>(
+				                                                 node.first,
+				                                                 Ui::WidgetCoordinates{50.0, 50.0},
+				                                                 node.second));
+			                       });
 
 			m_canvas.eventHandler<ControlId::NodeEditors>(*this);
 		}
 
 		template<ControlId>
-		void onMouseDown(Canvas& src, vec2_t, vec2_t, int button, FilterGraph::NodeId);
+		void onMouseDown(Canvas& src,
+		                 Ui::WidgetCoordinates,
+		                 Ui::ScreenCoordinates,
+		                 int button,
+		                 FilterGraph::NodeId);
 
 	private:
 		FilterGraph::Graph& r_graph;
@@ -51,7 +56,11 @@ namespace Texpainter
 
 	template<>
 	inline void FilterGraphEditor::onMouseDown<FilterGraphEditor::ControlId::NodeEditors>(
-	    Canvas& src, vec2_t, vec2_t, int button, FilterGraph::NodeId node)
+	    Canvas& src,
+	    Ui::WidgetCoordinates,
+	    Ui::ScreenCoordinates,
+	    int button,
+	    FilterGraph::NodeId node)
 	{
 		if(button == 3) { printf("%zu\n", node.value()); }
 	}

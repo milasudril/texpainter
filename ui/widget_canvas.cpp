@@ -1,6 +1,7 @@
 //@	{"targets":[{"name":"widget_canvas.o","type":"object","pkgconfig_libs":["gtk+-3.0"]}]}
 
 #include "./widget_canvas.hpp"
+#include "./screen_coordinates.hpp"
 
 #include <gtk/gtk.h>
 
@@ -37,7 +38,7 @@ public:
 		g_signal_connect(fixed_layout, "motion-notify-event", G_CALLBACK(mouse_move), this);
 		g_signal_connect(fixed_layout, "button-press-event", G_CALLBACK(button_press_fixed), this);
 
-		gtk_fixed_put(fixed_layout, GTK_WIDGET(frame), m_insert_loc.x(), m_insert_loc.y()					);
+		gtk_fixed_put(fixed_layout, GTK_WIDGET(frame), m_insert_loc.x(), m_insert_loc.y());
 		m_floats[m_current_id]  = fixed_layout;
 		m_clients[fixed_layout] = m_client_id;
 		gtk_overlay_add_overlay(m_handle, GTK_WIDGET(fixed_layout));
@@ -79,8 +80,8 @@ private:
 	WidgetCoordinates m_insert_loc;
 
 	GtkWidget* m_moving;
-	vec2_t m_loc_init;
-	vec2_t m_click_loc;
+	WidgetCoordinates m_loc_init;
+	ScreenCoordinates m_click_loc;
 	WidgetId m_current_id;
 	ClientId m_client_id;
 	void* r_eh;
@@ -98,9 +99,9 @@ private:
 			auto event_move   = reinterpret_cast<GdkEventMotion const*>(event);
 			auto loc_new =
 			    self->m_loc_init
-			    + (Texpainter::vec2_t{event_move->x_root, event_move->y_root} - self->m_click_loc);
-			loc_new = Texpainter::max(loc_new, vec2_t{0.0, 0.0});
-			gtk_fixed_move(fixed_layout, self->m_moving, loc_new[0], loc_new[1]);
+			    + (ScreenCoordinates{event_move->x_root, event_move->y_root} - self->m_click_loc);
+			loc_new = max(loc_new, WidgetCoordinates{0.0, 0.0});
+			gtk_fixed_move(fixed_layout, self->m_moving, loc_new.x(), loc_new.y());
 			return TRUE;
 		}
 		return FALSE;
@@ -124,14 +125,14 @@ private:
 			gtk_container_child_get_property(
 			    GTK_CONTAINER(fixed_layout), self->m_moving, "y", &val_y);
 
-			self->m_loc_init = vec2_t{static_cast<double>(g_value_get_int(&val_x)),
-			                          static_cast<double>(g_value_get_int(&val_y))};
+			self->m_loc_init = WidgetCoordinates{static_cast<double>(g_value_get_int(&val_x)),
+			                                     static_cast<double>(g_value_get_int(&val_y))};
 		}
 
 		{
 			auto e = reinterpret_cast<GdkEventButton const*>(event);
 			self->m_click_loc =
-			    vec2_t{static_cast<double>(e->x_root), static_cast<double>(e->y_root)};
+			    ScreenCoordinates{static_cast<double>(e->x_root), static_cast<double>(e->y_root)};
 		}
 		return FALSE;
 	}
@@ -147,8 +148,8 @@ private:
 				auto e = reinterpret_cast<GdkEventButton const*>(event);
 				self->r_func(self->r_eh,
 				             *self,
-				             vec2_t{e->x, e->y},
-				             vec2_t{e->x_root, e->y_root},
+				             WidgetCoordinates{e->x, e->y},
+				             ScreenCoordinates{e->x_root, e->y_root},
 				             e->button,
 				             i->second);
 			}
@@ -178,13 +179,15 @@ void Texpainter::Ui::WidgetCanvasDetail::WidgetDeleter::do_cleanup() noexcept
 }
 
 
-Texpainter::Ui::WidgetCanvasDetail::Impl::Impl(Container& cnt): WidgetCanvasDetail{*this}, m_insert_loc{0.0, 0.0}
+Texpainter::Ui::WidgetCanvasDetail::Impl::Impl(Container& cnt)
+    : WidgetCanvasDetail{*this}
+    , m_insert_loc{0.0, 0.0}
 {
 	auto widget = gtk_overlay_new();
 	m_handle    = GTK_OVERLAY(widget);
 	cnt.add(widget);
-	m_moving     = nullptr;
-	r_eh         = nullptr;
+	m_moving = nullptr;
+	r_eh     = nullptr;
 }
 
 Texpainter::Ui::WidgetCanvasDetail::Impl::~Impl()
@@ -204,7 +207,8 @@ Texpainter::Ui::WidgetCanvasDetail& Texpainter::Ui::WidgetCanvasDetail::add(void
 	return *this;
 }
 
-Texpainter::Ui::WidgetCanvasDetail& Texpainter::Ui::WidgetCanvasDetail::insertLocation(WidgetCoordinates loc)
+Texpainter::Ui::WidgetCanvasDetail& Texpainter::Ui::WidgetCanvasDetail::insertLocation(
+    WidgetCoordinates loc)
 {
 	m_impl->insertLocation(loc);
 	return *this;
