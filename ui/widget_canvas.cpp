@@ -68,10 +68,10 @@ public:
 
 	void clientId(ClientId id) { m_client_id = id; }
 
-	void eventHandler(void* event_handler, EventHandlerFunc func)
+	void eventHandler(void* event_handler, EventHandlerVtable const& vt)
 	{
-		r_eh   = event_handler;
-		r_func = func;
+		r_eh = event_handler;
+		m_vt = vt;
 	}
 
 
@@ -85,7 +85,7 @@ private:
 	WidgetId m_current_id;
 	ClientId m_client_id;
 	void* r_eh;
-	EventHandlerFunc r_func;
+	EventHandlerVtable m_vt;
 
 	std::map<WidgetId, GtkFixed*> m_floats;
 	std::map<GtkFixed*, ClientId> m_clients;
@@ -102,6 +102,11 @@ private:
 			    + (ScreenCoordinates{event_move->x_root, event_move->y_root} - self->m_click_loc);
 			loc_new = max(loc_new, WidgetCoordinates{0.0, 0.0});
 			gtk_fixed_move(fixed_layout, self->m_moving, loc_new.x(), loc_new.y());
+			if(self->r_eh != nullptr)
+			{
+				if(auto i = self->m_clients.find(fixed_layout); i != std::end(self->m_clients))
+				{ self->m_vt.on_move(self->r_eh, *self, loc_new, i->second); }
+			}
 			return TRUE;
 		}
 		return FALSE;
@@ -142,16 +147,15 @@ private:
 		auto self = reinterpret_cast<Impl*>(user_data);
 		if(self->r_eh != nullptr)
 		{
-			auto i = self->m_clients.find(GTK_FIXED(widget));
-			if(i != std::end(self->m_clients))
+			if(auto i = self->m_clients.find(GTK_FIXED(widget)); i != std::end(self->m_clients))
 			{
 				auto e = reinterpret_cast<GdkEventButton const*>(event);
-				self->r_func(self->r_eh,
-				             *self,
-				             WidgetCoordinates{e->x, e->y},
-				             ScreenCoordinates{e->x_root, e->y_root},
-				             e->button,
-				             i->second);
+				self->m_vt.on_mouse_down(self->r_eh,
+				                         *self,
+				                         WidgetCoordinates{e->x, e->y},
+				                         ScreenCoordinates{e->x_root, e->y_root},
+				                         e->button,
+				                         i->second);
 			}
 		}
 		return FALSE;
@@ -234,7 +238,8 @@ Texpainter::Ui::WidgetCanvasDetail& Texpainter::Ui::WidgetCanvasDetail::clientId
 	return *this;
 }
 
-void Texpainter::Ui::WidgetCanvasDetail::eventHandler(void* event_handler, EventHandlerFunc func)
+void Texpainter::Ui::WidgetCanvasDetail::eventHandler(void* event_handler,
+                                                      EventHandlerVtable const& vt)
 {
-	m_impl->eventHandler(event_handler, func);
+	m_impl->eventHandler(event_handler, vt);
 }

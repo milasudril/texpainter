@@ -48,6 +48,9 @@ namespace Texpainter
 		                 int button,
 		                 FilterGraph::NodeId);
 
+		template<ControlId>
+		void onMove(Canvas& src, Ui::WidgetCoordinates, FilterGraph::NodeId);
+
 	private:
 		FilterGraph::Graph& r_graph;
 		Canvas m_canvas;
@@ -64,6 +67,14 @@ namespace Texpainter
 	{
 		if(button == 3) { printf("%zu\n", node.value()); }
 	}
+
+	template<>
+	inline void FilterGraphEditor::onMove<FilterGraphEditor::ControlId::NodeEditors>(
+	    Canvas& src, Ui::WidgetCoordinates loc, FilterGraph::NodeId node)
+	{
+		printf("%zu moved to %.7e %.7e\n", node.value(), loc.x(), loc.y());
+	}
+
 }
 
 #endif
