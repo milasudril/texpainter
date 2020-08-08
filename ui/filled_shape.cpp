@@ -11,6 +11,18 @@ public:
 	Impl(Container& cnt, PixelStore::Pixel color, double radius, vec2_t location);
 	~Impl();
 
+	ToplevelCoordinates location() const
+	{
+		int x;
+		int y;
+		auto widget = GTK_WIDGET(m_handle);
+		gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &x, &y);
+		auto const w = static_cast<double>(gtk_widget_get_allocated_width(widget));
+		auto const h = static_cast<double>(gtk_widget_get_allocated_height(widget));
+		return ToplevelCoordinates{static_cast<double>(x), static_cast<double>(y)}
+		       + 0.5 * (vec2_t{w, h} + m_loc);
+	}
+
 private:
 	PixelStore::Pixel m_color;
 	double m_radius;
@@ -32,7 +44,7 @@ private:
 		auto const size = vec2_t{static_cast<double>(w), static_cast<double>(h)};
 		auto const O    = size / 2.0;
 		auto const upper_left =
-		    O - size * (vec2_t{self->m_radius, self->m_radius} + self->m_loc) / 2.0;
+		    O + size * (self->m_loc - vec2_t{self->m_radius, self->m_radius}) / 2.0;
 		auto const d = size * vec2_t{self->m_radius, self->m_radius};
 		cairo_rectangle(cr, upper_left[0], upper_left[1], d[0], d[1]);
 		cairo_fill(cr);
@@ -79,4 +91,9 @@ Texpainter::Ui::FilledShape::Impl::~Impl()
 {
 	m_impl = nullptr;
 	gtk_widget_destroy(GTK_WIDGET(m_handle));
+}
+
+Texpainter::Ui::ToplevelCoordinates Texpainter::Ui::FilledShape::location() const
+{
+	return m_impl->location();
 }

@@ -50,7 +50,7 @@ namespace Texpainter
 		                Ui::Box::Orientation::Vertical}
 		{
 			constexpr auto box_radius = 1.0 - 1.0 / std::numbers::phi;
-			constexpr auto box_offset = vec2_t{box_radius, 0.0};
+			constexpr auto box_offset = vec2_t{0.5, 0.0};
 
 			m_name.alignment(0.5);
 			std::ranges::transform(r_node.get().inputPorts(),
@@ -62,7 +62,7 @@ namespace Texpainter
 				                           portinfo.name,
 				                           detail::portColor(portinfo.type),
 				                           box_radius,
-				                           box_offset};
+				                           -box_offset};
 				                       ret.label().alignment(0.0);
 				                       return ret;
 			                       });
@@ -83,7 +83,7 @@ namespace Texpainter
 				                           portinfo.name,
 				                           detail::portColor(portinfo.type),
 				                           box_radius,
-				                           -box_offset};
+				                           box_offset};
 				                       ret.label().alignment(1.0);
 				                       return ret;
 			                       });

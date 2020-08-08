@@ -8,6 +8,7 @@
 
 #include "./container.hpp"
 #include "./box.hpp"
+#include "./toplevel_coordinates.hpp"
 
 #include "pixel_store/pixel.hpp"
 
@@ -36,6 +37,8 @@ namespace Texpainter::Ui
 
 		template<auto id, class EventHandler>
 		FilledShape& eventHandler(EventHandler& eh);
+
+		ToplevelCoordinates location() const;
 
 	protected:
 		class Impl;
