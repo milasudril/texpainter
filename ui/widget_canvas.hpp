@@ -59,23 +59,6 @@ namespace Texpainter::Ui
 		explicit WidgetCanvasDetail(WidgetCanvasDetail::Impl& impl): m_impl(&impl) {}
 		Impl* m_impl;
 
-		class WidgetId
-		{
-		public:
-			constexpr WidgetId(): m_value{0} {}
-
-			constexpr auto operator<=>(WidgetId const&) const = default;
-
-			constexpr WidgetId& operator++()
-			{
-				++m_value;
-				return *this;
-			}
-
-		private:
-			uint64_t m_value;
-		};
-
 		class ClientId
 		{
 		public:
@@ -124,7 +107,7 @@ namespace Texpainter::Ui
 
 		private:
 			std::reference_wrapper<Impl> r_impl;
-			WidgetId m_id;
+			ClientId m_id;
 			void do_cleanup() noexcept;
 		};
 	};
