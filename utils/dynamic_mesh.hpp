@@ -61,7 +61,10 @@ namespace Texpainter
 			assert(m_verts.find(b) != std::end(m_verts));
 
 			if(auto ip = m_segs.insert(std::make_pair(a, b)); ip.second)
-			{ m_seg_refs.push_back(std::ref(*ip.first)); }
+			{
+				m_seg_refs[a].push_back(std::ref(*ip.first));
+				m_seg_refs[b].push_back(std::ref(*ip.first));
+			}
 			return *this;
 		}
 

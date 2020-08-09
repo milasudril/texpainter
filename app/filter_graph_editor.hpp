@@ -52,7 +52,6 @@ namespace Texpainter
 				        add_ports_from(item.second->inputs(), port_id_start, connections);
 				    map_node_to_ports(
 				        port_id_start, input_ports_end, input_port_map, item.second->node());
-
 				    auto output_ports_end =
 				        add_ports_from(item.second->outputs(), input_ports_end, connections);
 				    map_node_to_ports(
@@ -61,18 +60,27 @@ namespace Texpainter
 				    port_id = output_ports_end;
 			    });
 
-#if 0
-			std::ranges::for_each(r_graph.nodes(),
-			                      [&connections  = m_connections,
-			                       &ports_to_node = std::as_const(m_ports_to_node),
-			                       &graph        = std::as_const(r_graph)](auto const& item) {
+			std::ranges::for_each(
+			    r_graph.nodes(),
+			    [&connections     = m_connections,
+			     &input_port_map  = std::as_const(m_input_port_map),
+			     &output_port_map = std::as_const(m_output_port_map)](auto const& item) {
+				    auto i = input_port_map.find(&item.second);
+				    assert(i != std::end(input_port_map));
+				    std::ranges::for_each(
+				        item.second.inputs(),
+				        [&connections,
+				         &output_port_map,
+				         &inputs = i->second,
+				         input   = static_cast<size_t>(0)](auto source) mutable {
+					        // Fixme: processor can be "dummy"
+					        auto o = output_port_map.find(&source.processor());
+					        assert(o != std::end(output_port_map));
+					        connections.connect(inputs[input], (o->second)[source.port().value()]);
+					        ++input;
+				        });
+			    });
 
-									   std::ranges::for_each(item.second.inputs(), [&node = item.second](auto source){
-											connections.connect(ports[node][k], ports[source.processor()][source.port()]);
-									});
-//									  add_connections(item.first, ports_to_node, connections);
-			                      });
-#endif
 			m_canvas.eventHandler<ControlId::NodeEditors>(*this);
 		}
 
@@ -153,7 +161,6 @@ namespace Texpainter
 			printf("  %s (%.7f %.7f)\n", item.label().content(), loc.x(), loc.y());
 		});
 	}
-
 }
 
 #endif
