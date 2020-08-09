@@ -3,8 +3,12 @@
 //@	}
 
 #include "./line_segment_renderer.hpp"
+#include "./widget_coordinates.hpp"
 
 #include <gtk/gtk.h>
+
+#include <vector>
+#include <algorithm>
 
 class Texpainter::Ui::LineSegmentRenderer::Impl: public LineSegmentRenderer
 {
@@ -17,16 +21,46 @@ public:
 		m_handle = GTK_DRAWING_AREA(widget);
 	}
 
+	~Impl()
+	{
+		m_impl = nullptr;
+		gtk_widget_destroy(GTK_WIDGET(m_handle));
+	}
+
+	void lineSegments(std::span<std::pair<ToplevelCoordinates, ToplevelCoordinates> const> segs)
+	{
+		std::vector<std::pair<ToplevelCoordinates, ToplevelCoordinates>> res;
+		std::ranges::copy(segs, std::back_inserter(res));
+		m_segs = std::move(res);
+	}
+
 private:
+	std::vector<std::pair<ToplevelCoordinates, ToplevelCoordinates>> m_segs;
+
 	GtkDrawingArea* m_handle;
 
-	static gboolean draw_callback(GtkWidget* widget, cairo_t* cr, gpointer self)
+	static gboolean draw_callback(GtkWidget* widget, cairo_t* cr, gpointer obj)
 	{
+		int x{};
+		int y{};
+		cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 1.0);
+		cairo_set_line_width(cr, 2.0);
+		gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &x, &y);
+		auto self = reinterpret_cast<Impl*>(obj);
+		std::ranges::for_each(self->m_segs, [cr, O = ToplevelCoordinates{static_cast<double>(x), static_cast<double>(y)}](auto const& vals) {
+			auto a = vals.first - O;
+			auto b = vals.second - O;
+			cairo_move_to(cr, a[0], a[1]);
+			cairo_line_to(cr, b[0], b[1]);
+			cairo_stroke(cr);
+		});
+#if 0
 		auto const w = static_cast<uint32_t>(gtk_widget_get_allocated_width(widget));
 		auto const h = static_cast<uint32_t>(gtk_widget_get_allocated_height(widget));
 		cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, .25);
 		cairo_rectangle(cr, 0, 0, w, h);
 		cairo_fill(cr);
+#endif
 		return FALSE;
 	}
 };
@@ -34,3 +68,9 @@ private:
 Texpainter::Ui::LineSegmentRenderer::LineSegmentRenderer(Container& cnt): m_impl{new Impl{cnt}} {}
 
 Texpainter::Ui::LineSegmentRenderer::~LineSegmentRenderer() { delete m_impl; }
+
+Texpainter::Ui::LineSegmentRenderer& Texpainter::Ui::LineSegmentRenderer::lineSegments(std::span<std::pair<ToplevelCoordinates, ToplevelCoordinates> const> segs)
+{
+	m_impl->lineSegments(segs);
+	return *this;
+}

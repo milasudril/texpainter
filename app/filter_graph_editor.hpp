@@ -84,6 +84,7 @@ namespace Texpainter
 			    });
 
 			m_canvas.eventHandler<ControlId::NodeEditors>(*this);
+			m_linesegs->lineSegments(resolveLineSegs(m_connections));
 		}
 
 		template<ControlId>
