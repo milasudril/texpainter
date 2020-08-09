@@ -39,8 +39,9 @@ public:
 		g_signal_connect(fixed_layout, "button-press-event", G_CALLBACK(button_press_fixed), this);
 
 		gtk_fixed_put(fixed_layout, GTK_WIDGET(frame), m_insert_loc.x(), m_insert_loc.y());
-		m_floats[m_current_id]  = fixed_layout;
+		m_floats[m_client_id]   = fixed_layout;
 		m_clients[fixed_layout] = m_client_id;
+
 		gtk_overlay_add_overlay(m_handle, GTK_WIDGET(fixed_layout));
 		gtk_overlay_set_overlay_pass_through(m_handle, GTK_WIDGET(fixed_layout), TRUE);
 	}
@@ -53,11 +54,7 @@ public:
 
 	void insertLocation(WidgetCoordinates loc) { m_insert_loc = loc; }
 
-	auto currentId() const { return m_current_id; }
-
-	void nextId() { ++m_current_id; }
-
-	void removeParentsFor(WidgetId id)
+	void removeParentsFor(ClientId id)
 	{
 		auto i = m_floats.find(id);
 		assert(i != std::end(m_floats));
@@ -67,6 +64,8 @@ public:
 	}
 
 	void clientId(ClientId id) { m_client_id = id; }
+
+	ClientId clientId() const { return m_client_id; }
 
 	void eventHandler(void* event_handler, EventHandlerVtable const& vt)
 	{
@@ -82,12 +81,16 @@ private:
 	GtkWidget* m_moving;
 	WidgetCoordinates m_loc_init;
 	ScreenCoordinates m_click_loc;
-	WidgetId m_current_id;
 	ClientId m_client_id;
 	void* r_eh;
 	EventHandlerVtable m_vt;
 
-	std::map<WidgetId, GtkFixed*> m_floats;
+	struct ClientIdCompare
+	{
+		bool operator()(ClientId a, ClientId b) const { return a.value() < b.value(); }
+	};
+
+	std::map<ClientId, GtkFixed*, ClientIdCompare> m_floats;
 	std::map<GtkFixed*, ClientId> m_clients;
 
 	static gboolean mouse_move(GtkWidget* widget, GdkEvent* event, gpointer user_data)
@@ -172,9 +175,8 @@ private:
 Texpainter::Ui::WidgetCanvasDetail::WidgetDeleter::WidgetDeleter(
     std::reference_wrapper<Impl> impl) noexcept
     : r_impl{impl}
-    , m_id{r_impl.get().currentId()}
+    , m_id{r_impl.get().clientId()}
 {
-	r_impl.get().nextId();
 }
 
 void Texpainter::Ui::WidgetCanvasDetail::WidgetDeleter::do_cleanup() noexcept
