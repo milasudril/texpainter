@@ -9,6 +9,7 @@
 
 #include "filtergraph/graph.hpp"
 #include "ui/widget_canvas.hpp"
+#include "utils/dynamic_mesh.hpp"
 
 
 namespace Texpainter
@@ -26,6 +27,7 @@ namespace Texpainter
 
 		FilterGraphEditor(Ui::Container& owner, FilterGraph::Graph& graph)
 		    : r_graph{graph}
+		    , m_current_port_id{0}
 		    , m_canvas{owner}
 		{
 			std::ranges::transform(r_graph.nodes(),
@@ -37,6 +39,12 @@ namespace Texpainter
 				                                                 Ui::WidgetCoordinates{50.0, 50.0},
 				                                                 node.second));
 			                       });
+
+			std::ranges::for_each(
+			    m_node_editors,
+			    [&port_id = m_current_port_id, &connections = m_connections](auto const& node) {
+				    add_ports_from(*node.second, port_id, connections);
+			    });
 
 			m_canvas.eventHandler<ControlId::NodeEditors>(*this);
 		}
@@ -53,8 +61,30 @@ namespace Texpainter
 
 	private:
 		FilterGraph::Graph& r_graph;
+		uint64_t m_current_port_id;
+		DynamicMesh<uint64_t, Ui::ToplevelCoordinates> m_connections;
+
 		Canvas m_canvas;
 		std::map<FilterGraph::NodeId, Canvas::WidgetHandle<NodeEditor>> m_node_editors;
+
+		template<class PortCollection>
+		static void add_ports_from(PortCollection const& ports,
+		                           uint64_t& port_id,
+		                           DynamicMesh<uint64_t, Ui::ToplevelCoordinates>& connections)
+		{
+			std::ranges::for_each(ports, [&connections, &port_id](auto const& port) {
+				connections.insert(std::make_pair(port_id, port.inputField().location()));
+				++port_id;
+			});
+		}
+
+		static void add_ports_from(NodeEditor const& node_edit,
+		                           uint64_t& port_id,
+		                           DynamicMesh<uint64_t, Ui::ToplevelCoordinates>& connections)
+		{
+			add_ports_from(node_edit.inputs(), port_id, connections);
+			add_ports_from(node_edit.outputs(), port_id, connections);
+		}
 	};
 
 	template<>

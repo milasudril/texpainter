@@ -31,7 +31,7 @@ namespace Texpainter
 				}
 
 			auto ret = m_verts.insert(i, std::move(val));
-			m_seg_refs.insert(std::make_pair(ret.first->first, SegRefArray{}));
+			m_seg_refs.insert(std::make_pair(ret->first, SegRefArray{}));
 			return std::make_pair(ret, true);
 		}
 
@@ -86,7 +86,7 @@ namespace Texpainter
 	std::vector<std::pair<Point, Point>> resolveLineSegs(DynamicMesh<VertexId, Point> const& mesh)
 	{
 		std::vector<std::pair<Point, Point>> ret;
-		std::ranges::transform(mesh.lineSegs(), std::back_inserter(ret), [&mesh](auto seg){
+		std::ranges::transform(mesh.lineSegs(), std::back_inserter(ret), [&mesh](auto seg) {
 			return std::make_pair(mesh.location(seg.first), mesh.location(seg.second));
 		});
 		return ret;

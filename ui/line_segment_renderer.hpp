@@ -21,7 +21,8 @@ namespace Texpainter::Ui
 			return *this;
 		}
 
-		LineSegmentRenderer& lineSegments(std::span<std::pair<ToplevelCoordinats, ToplevelCoordinates> const>);
+		LineSegmentRenderer& lineSegments(
+		    std::span<std::pair<ToplevelCoordinats, ToplevelCoordinates> const>);
 
 	protected:
 		class Impl;
