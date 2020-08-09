@@ -153,17 +153,27 @@ namespace Texpainter
 	inline void FilterGraphEditor::onMove<FilterGraphEditor::ControlId::NodeEditors>(
 	    Canvas& src, Ui::WidgetCoordinates loc, FilterGraph::NodeId id)
 	{
-		printf("%zu moved to %.7f %.7f\n", id.value(), loc.x(), loc.y());
-		auto const& node = *(m_node_editors.find(id)->second);
-		std::ranges::for_each(node.inputs(), [](auto const& item) {
-			auto loc = item.inputField().location();
-			printf("  %s (%.7f %.7f)\n", item.label().content(), loc.x(), loc.y());
-		});
+		auto const& node_edit = *(m_node_editors.find(id)->second);
 
-		std::ranges::for_each(node.outputs(), [](auto const& item) {
-			auto loc = item.inputField().location();
-			printf("  %s (%.7f %.7f)\n", item.label().content(), loc.x(), loc.y());
-		});
+		auto i = m_input_port_map.find(&node_edit.node().get());
+		assert(i != std::end(m_input_port_map));
+		std::ranges::for_each(
+		    node_edit.inputs(),
+		    [&connections = m_connections, &ids = i->second, k = static_cast<size_t>(0)](
+		        auto const& item) mutable {
+			    connections.moveTo(ids[k], item.inputField().location());
+			    ++k;
+		    });
+
+		auto o = m_output_port_map.find(&node_edit.node().get());
+		assert(o != std::end(m_output_port_map));
+		std::ranges::for_each(
+		    node_edit.outputs(),
+		    [&connections = m_connections, &ids = i->second, k = static_cast<size_t>(0)](
+		        auto const& item) mutable {
+			    connections.moveTo(ids[k], item.inputField().location());
+			    ++k;
+		    });
 	}
 }
 

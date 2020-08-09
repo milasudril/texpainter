@@ -47,13 +47,16 @@ private:
 		cairo_set_line_width(cr, 2.0);
 		gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &x, &y);
 		auto self = reinterpret_cast<Impl*>(obj);
-		std::ranges::for_each(self->m_segs, [cr, O = ToplevelCoordinates{static_cast<double>(x), static_cast<double>(y)}](auto const& vals) {
-			auto a = vals.first - O;
-			auto b = vals.second - O;
-			cairo_move_to(cr, a[0], a[1]);
-			cairo_line_to(cr, b[0], b[1]);
-			cairo_stroke(cr);
-		});
+		std::ranges::for_each(
+		    self->m_segs,
+		    [cr, O = ToplevelCoordinates{static_cast<double>(x), static_cast<double>(y)}](
+		        auto const& vals) {
+			    auto a = vals.first - O;
+			    auto b = vals.second - O;
+			    cairo_move_to(cr, a[0], a[1]);
+			    cairo_line_to(cr, b[0], b[1]);
+			    cairo_stroke(cr);
+		    });
 #if 0
 		auto const w = static_cast<uint32_t>(gtk_widget_get_allocated_width(widget));
 		auto const h = static_cast<uint32_t>(gtk_widget_get_allocated_height(widget));
@@ -69,7 +72,8 @@ Texpainter::Ui::LineSegmentRenderer::LineSegmentRenderer(Container& cnt): m_impl
 
 Texpainter::Ui::LineSegmentRenderer::~LineSegmentRenderer() { delete m_impl; }
 
-Texpainter::Ui::LineSegmentRenderer& Texpainter::Ui::LineSegmentRenderer::lineSegments(std::span<std::pair<ToplevelCoordinates, ToplevelCoordinates> const> segs)
+Texpainter::Ui::LineSegmentRenderer& Texpainter::Ui::LineSegmentRenderer::lineSegments(
+    std::span<std::pair<ToplevelCoordinates, ToplevelCoordinates> const> segs)
 {
 	m_impl->lineSegments(segs);
 	return *this;
