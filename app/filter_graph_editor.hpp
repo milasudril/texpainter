@@ -11,6 +11,7 @@
 #include "ui/widget_canvas.hpp"
 #include "utils/dynamic_mesh.hpp"
 
+#include <cassert>
 
 namespace Texpainter
 {
@@ -44,15 +45,23 @@ namespace Texpainter
 			    m_node_editors,
 			    [&port_id      = m_current_port_id,
 			     &connections  = m_connections,
-			     &port_to_node = m_port_to_node](auto const& node) {
-				    auto new_port_id = add_ports_from(*node.second, port_id, connections);
-				    map_ports_to_node(port_id, new_port_id, port_to_node, node.first);
+			     &port_to_node = m_port_to_node](auto const& item) {
+				    auto new_port_id = add_ports_from(*item.second, port_id, connections);
+				    map_ports_to_node(port_id, new_port_id, port_to_node, item.second->node());
 				    port_id = new_port_id;
 			    });
 #if 0
-			std::ranges::for_each(m_connections,[&connections = m_connections](auto const& item) {
-				connections.connect(item.first, );
-			};
+			std::ranges::for_each(m_connections,
+			                      [&connections  = m_connections,
+			                       &port_to_node = std::as_const(m_port_to_node),
+			                       &graph        = std::as_const(r_graph)](auto const& item) {
+				                      auto i = port_to_node.find(item.first);
+				                      assert(i != std::end(port_to_node));
+				                      auto node = graph.node(i->second);
+				                      assert(node != nullptr);
+									  auto inputs = node->inputs();
+				                      connections.connect(item.first);
+			                      });
 #endif
 
 			m_canvas.eventHandler<ControlId::NodeEditors>(*this);
@@ -72,7 +81,7 @@ namespace Texpainter
 		FilterGraph::Graph& r_graph;
 		uint64_t m_current_port_id;
 		DynamicMesh<uint64_t, Ui::ToplevelCoordinates> m_connections;
-		std::map<uint64_t, FilterGraph::NodeId> m_port_to_node;
+		std::map<uint64_t, std::reference_wrapper<FilterGraph::ProcessorNode const>> m_port_to_node;
 
 		Canvas m_canvas;
 		std::map<FilterGraph::NodeId, Canvas::WidgetHandle<NodeEditor>> m_node_editors;
@@ -97,14 +106,16 @@ namespace Texpainter
 			return port_id_start;
 		}
 
-		static void map_ports_to_node(uint64_t first_port,
-		                              uint64_t after_last_port,
-		                              std::map<uint64_t, FilterGraph::NodeId>& port_to_node,
-		                              FilterGraph::NodeId id)
+		static void map_ports_to_node(
+		    uint64_t first_port,
+		    uint64_t after_last_port,
+		    std::map<uint64_t, std::reference_wrapper<FilterGraph::ProcessorNode const>>&
+		        port_to_node,
+		    std::reference_wrapper<FilterGraph::ProcessorNode const> node)
 		{
 			while(first_port != after_last_port)
 			{
-				port_to_node[first_port] = id;
+				port_to_node.insert(std::make_pair(first_port, node));
 				++first_port;
 			}
 		}
