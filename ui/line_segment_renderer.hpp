@@ -1,11 +1,15 @@
 //@	{
 //@	 "targets":[{"name":"line_segment_renderer.hpp","type":"include"}]
+//@	,"dependencies_extra":[{"ref":"line_segment_renderer.o", "rel":"implementation"}]
 //@	}
 
 #ifndef TEXPAINTER_UI_LINESEGMENTRENDERER_HPP
 #define TEXPAINTER_UI_LINESEGMENTRENDERER_HPP
 
 #include "./toplevel_coordinates.hpp"
+#include "./container.hpp"
+
+#include <span>
 
 namespace Texpainter::Ui
 {
@@ -22,7 +26,7 @@ namespace Texpainter::Ui
 		}
 
 		LineSegmentRenderer& lineSegments(
-		    std::span<std::pair<ToplevelCoordinats, ToplevelCoordinates> const>);
+		    std::span<std::pair<ToplevelCoordinates, ToplevelCoordinates> const>);
 
 	protected:
 		class Impl;
