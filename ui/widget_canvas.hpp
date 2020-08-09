@@ -24,6 +24,12 @@ namespace Texpainter::Ui
 		class ClientId;
 
 	public:
+		enum class InsertMode : int
+		{
+			Fixed,
+			Movable
+		};
+
 		template<class WidgetType>
 		using WidgetHandle = std::unique_ptr<WidgetType, WidgetDeleter>;
 
@@ -42,6 +48,7 @@ namespace Texpainter::Ui
 		}
 
 		WidgetCanvasDetail& insertLocation(WidgetCoordinates location);
+		WidgetCanvasDetail& insertMode(InsertMode mode);
 		WidgetCanvasDetail& clientId(ClientId id);
 
 		WidgetCanvasDetail& add(void* handle) override;
@@ -124,9 +131,19 @@ namespace Texpainter::Ui
 		template<class WidgetType, class... WidgetParams>
 		decltype(auto) insert(ClientIdType id, WidgetCoordinates loc, WidgetParams&&... params)
 		{
-			auto ptr = new WidgetType{clientId(ClientId{id}).insertLocation(loc).asContainer(),
+			auto ptr = new WidgetType{clientId(ClientId{id})
+			                              .insertLocation(loc)
+			                              .insertMode(InsertMode::Movable)
+			                              .asContainer(),
 			                          std::forward<WidgetParams>(params)...};
 			return WidgetHandle<WidgetType>{ptr, WidgetDeleter{*m_impl}};
+		}
+
+		template<class WidgetType, class... WidgetParams>
+		decltype(auto) insert(WidgetParams&&... params)
+		{
+			return std::make_unique<WidgetType>(insertMode(InsertMode::Fixed).asContainer(),
+			                                    std::forward<WidgetParams>(params)...);
 		}
 
 		template<auto id, class EventHandler>

@@ -9,6 +9,7 @@
 
 #include "filtergraph/graph.hpp"
 #include "ui/widget_canvas.hpp"
+#include "ui/line_segment_renderer.hpp"
 #include "utils/dynamic_mesh.hpp"
 
 #include <cassert>
@@ -31,6 +32,7 @@ namespace Texpainter
 		    , m_current_port_id{0}
 		    , m_canvas{owner}
 		{
+			m_linesegs = m_canvas.insert<Ui::LineSegmentRenderer>();
 			std::ranges::transform(r_graph.nodes(),
 			                       std::inserter(m_node_editors, std::end(m_node_editors)),
 			                       [&canvas = m_canvas](auto const& node) {
@@ -102,6 +104,7 @@ namespace Texpainter
 		std::map<FilterGraph::ProcessorNode const*, std::vector<uint64_t>> m_output_port_map;
 
 		Canvas m_canvas;
+		std::unique_ptr<Ui::LineSegmentRenderer> m_linesegs;
 		std::map<FilterGraph::NodeId, Canvas::WidgetHandle<NodeEditor>> m_node_editors;
 
 		template<class PortCollection>

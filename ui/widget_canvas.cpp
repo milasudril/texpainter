@@ -17,33 +17,41 @@ public:
 
 	void _add(GtkWidget* handle) noexcept
 	{
-		auto frame = GTK_FRAME(gtk_frame_new(nullptr));
-		gtk_frame_set_shadow_type(frame, GTK_SHADOW_OUT);
-		gtk_widget_set_events(GTK_WIDGET(frame),
-		                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK
-		                          | GDK_BUTTON_RELEASE_MASK);
-		g_signal_connect(GTK_WIDGET(frame), "button-press-event", G_CALLBACK(button_press), this);
-		g_signal_connect(
-		    GTK_WIDGET(frame), "button-release-event", G_CALLBACK(button_release), this);
-		gtk_widget_set_margin_start(handle, 4);
-		gtk_widget_set_margin_end(handle, 4);
-		gtk_widget_set_margin_top(handle, 4);
-		gtk_widget_set_margin_bottom(handle, 4);
-		gtk_container_add(GTK_CONTAINER(frame), handle);
+		switch(m_ins_mode)
+		{
+			case InsertMode::Fixed: gtk_overlay_add_overlay(m_handle, handle); break;
+			case InsertMode::Movable:
+				auto frame = GTK_FRAME(gtk_frame_new(nullptr));
+				gtk_frame_set_shadow_type(frame, GTK_SHADOW_OUT);
+				gtk_widget_set_events(GTK_WIDGET(frame),
+				                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK
+				                          | GDK_BUTTON_RELEASE_MASK);
+				g_signal_connect(
+				    GTK_WIDGET(frame), "button-press-event", G_CALLBACK(button_press), this);
+				g_signal_connect(
+				    GTK_WIDGET(frame), "button-release-event", G_CALLBACK(button_release), this);
+				gtk_widget_set_margin_start(handle, 4);
+				gtk_widget_set_margin_end(handle, 4);
+				gtk_widget_set_margin_top(handle, 4);
+				gtk_widget_set_margin_bottom(handle, 4);
+				gtk_container_add(GTK_CONTAINER(frame), handle);
 
-		auto fixed_layout = GTK_FIXED(gtk_fixed_new());
-		gtk_widget_set_events(GTK_WIDGET(fixed_layout),
-		                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK
-		                          | GDK_BUTTON_RELEASE_MASK);
-		g_signal_connect(fixed_layout, "motion-notify-event", G_CALLBACK(mouse_move), this);
-		g_signal_connect(fixed_layout, "button-press-event", G_CALLBACK(button_press_fixed), this);
+				auto fixed_layout = GTK_FIXED(gtk_fixed_new());
+				gtk_widget_set_events(GTK_WIDGET(fixed_layout),
+				                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK
+				                          | GDK_BUTTON_RELEASE_MASK);
+				g_signal_connect(fixed_layout, "motion-notify-event", G_CALLBACK(mouse_move), this);
+				g_signal_connect(
+				    fixed_layout, "button-press-event", G_CALLBACK(button_press_fixed), this);
 
-		gtk_fixed_put(fixed_layout, GTK_WIDGET(frame), m_insert_loc.x(), m_insert_loc.y());
-		m_floats[m_client_id]   = fixed_layout;
-		m_clients[fixed_layout] = m_client_id;
+				gtk_fixed_put(fixed_layout, GTK_WIDGET(frame), m_insert_loc.x(), m_insert_loc.y());
+				m_floats[m_client_id]   = fixed_layout;
+				m_clients[fixed_layout] = m_client_id;
 
-		gtk_overlay_add_overlay(m_handle, GTK_WIDGET(fixed_layout));
-		gtk_overlay_set_overlay_pass_through(m_handle, GTK_WIDGET(fixed_layout), TRUE);
+				gtk_overlay_add_overlay(m_handle, GTK_WIDGET(fixed_layout));
+				gtk_overlay_set_overlay_pass_through(m_handle, GTK_WIDGET(fixed_layout), TRUE);
+				break;
+		}
 	}
 
 	void _show() noexcept { gtk_widget_show_all(GTK_WIDGET(m_handle)); }
@@ -73,10 +81,13 @@ public:
 		m_vt = vt;
 	}
 
+	void insertMode(InsertMode mode) { m_ins_mode = mode; }
+
 
 private:
 	GtkOverlay* m_handle;
 	WidgetCoordinates m_insert_loc;
+	InsertMode m_ins_mode;
 
 	GtkWidget* m_moving;
 	WidgetCoordinates m_loc_init;
@@ -188,6 +199,7 @@ void Texpainter::Ui::WidgetCanvasDetail::WidgetDeleter::do_cleanup() noexcept
 Texpainter::Ui::WidgetCanvasDetail::Impl::Impl(Container& cnt)
     : WidgetCanvasDetail{*this}
     , m_insert_loc{0.0, 0.0}
+    , m_ins_mode{InsertMode::Fixed}
 {
 	auto widget = gtk_overlay_new();
 	m_handle    = GTK_OVERLAY(widget);
@@ -244,4 +256,10 @@ void Texpainter::Ui::WidgetCanvasDetail::eventHandler(void* event_handler,
                                                       EventHandlerVtable const& vt)
 {
 	m_impl->eventHandler(event_handler, vt);
+}
+
+Texpainter::Ui::WidgetCanvasDetail& Texpainter::Ui::WidgetCanvasDetail::insertMode(InsertMode mode)
+{
+	m_impl->insertMode(mode);
+	return *this;
 }
