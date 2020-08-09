@@ -13,14 +13,17 @@ public:
 
 	ToplevelCoordinates location() const
 	{
-		int x;
-		int y;
+		int x{};
+		int y{};
 		auto widget = GTK_WIDGET(m_handle);
 		gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &x, &y);
 		auto const w = static_cast<double>(gtk_widget_get_allocated_width(widget));
 		auto const h = static_cast<double>(gtk_widget_get_allocated_height(widget));
+
+		auto const size = vec2_t{w, h};
+
 		return ToplevelCoordinates{static_cast<double>(x), static_cast<double>(y)}
-		       + 0.5 * (vec2_t{w, h} + m_loc);
+		       + 0.5 * (size + size * m_loc);
 	}
 
 private:

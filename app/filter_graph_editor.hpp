@@ -42,49 +42,7 @@ namespace Texpainter
 				                                                 Ui::WidgetCoordinates{50.0, 50.0},
 				                                                 node.second));
 			                       });
-
-			std::ranges::for_each(
-			    m_node_editors,
-			    [&port_id         = m_current_port_id,
-			     &connections     = m_connections,
-			     &input_port_map  = m_input_port_map,
-			     &output_port_map = m_output_port_map](auto const& item) {
-				    auto port_id_start = port_id;
-				    auto input_ports_end =
-				        add_ports_from(item.second->inputs(), port_id_start, connections);
-				    map_node_to_ports(
-				        port_id_start, input_ports_end, input_port_map, item.second->node());
-				    auto output_ports_end =
-				        add_ports_from(item.second->outputs(), input_ports_end, connections);
-				    map_node_to_ports(
-				        input_ports_end, output_ports_end, output_port_map, item.second->node());
-
-				    port_id = output_ports_end;
-			    });
-
-			std::ranges::for_each(
-			    r_graph.nodes(),
-			    [&connections     = m_connections,
-			     &input_port_map  = std::as_const(m_input_port_map),
-			     &output_port_map = std::as_const(m_output_port_map)](auto const& item) {
-				    auto i = input_port_map.find(&item.second);
-				    assert(i != std::end(input_port_map));
-				    std::ranges::for_each(
-				        item.second.inputs(),
-				        [&connections,
-				         &output_port_map,
-				         &inputs = i->second,
-				         input   = static_cast<size_t>(0)](auto source) mutable {
-					        // Fixme: processor can be "dummy"
-					        auto o = output_port_map.find(&source.processor());
-					        assert(o != std::end(output_port_map));
-					        connections.connect(inputs[input], (o->second)[source.port().value()]);
-					        ++input;
-				        });
-			    });
-
 			m_canvas.eventHandler<ControlId::NodeEditors>(*this);
-			m_linesegs->lineSegments(resolveLineSegs(m_connections));
 		}
 
 		template<ControlId>
@@ -136,6 +94,49 @@ namespace Texpainter
 			}
 			ports.insert(std::make_pair(&node.get(), std::move(tmp)));
 		}
+
+		void init()
+		{
+			std::ranges::for_each(
+			    m_node_editors,
+			    [&port_id         = m_current_port_id,
+			     &connections     = m_connections,
+			     &input_port_map  = m_input_port_map,
+			     &output_port_map = m_output_port_map](auto const& item) {
+				    auto port_id_start = port_id;
+				    auto input_ports_end =
+				        add_ports_from(item.second->inputs(), port_id_start, connections);
+				    map_node_to_ports(
+				        port_id_start, input_ports_end, input_port_map, item.second->node());
+				    auto output_ports_end =
+				        add_ports_from(item.second->outputs(), input_ports_end, connections);
+				    map_node_to_ports(
+				        input_ports_end, output_ports_end, output_port_map, item.second->node());
+
+				    port_id = output_ports_end;
+			    });
+
+			std::ranges::for_each(
+			    r_graph.nodes(),
+			    [&connections     = m_connections,
+			     &input_port_map  = std::as_const(m_input_port_map),
+			     &output_port_map = std::as_const(m_output_port_map)](auto const& item) {
+				    auto i = input_port_map.find(&item.second);
+				    assert(i != std::end(input_port_map));
+				    std::ranges::for_each(
+				        item.second.inputs(),
+				        [&connections,
+				         &output_port_map,
+				         &inputs = i->second,
+				         input   = static_cast<size_t>(0)](auto source) mutable {
+					        // Fixme: processor can be "dummy"
+					        auto o = output_port_map.find(&source.processor());
+					        assert(o != std::end(output_port_map));
+					        connections.connect(inputs[input], (o->second)[source.port().value()]);
+					        ++input;
+				        });
+			    });
+		}
 	};
 
 	template<>
@@ -153,27 +154,35 @@ namespace Texpainter
 	inline void FilterGraphEditor::onMove<FilterGraphEditor::ControlId::NodeEditors>(
 	    Canvas& src, Ui::WidgetCoordinates loc, FilterGraph::NodeId id)
 	{
-		auto const& node_edit = *(m_node_editors.find(id)->second);
+		if(m_current_port_id == 0) [[unlikely]]
+			{
+				init();
+			}
+		auto node_edit_iter = m_node_editors.find(id);
+		assert(node_edit_iter != std::end(m_node_editors));
+
+		auto const& node_edit = *(node_edit_iter->second);
 
 		auto i = m_input_port_map.find(&node_edit.node().get());
 		assert(i != std::end(m_input_port_map));
-		std::ranges::for_each(
-		    node_edit.inputs(),
-		    [&connections = m_connections, &ids = i->second, k = static_cast<size_t>(0)](
-		        auto const& item) mutable {
-			    connections.moveTo(ids[k], item.inputField().location());
-			    ++k;
-		    });
+		std::ranges::for_each(node_edit.inputs(),
+		                      [&connections = m_connections,
+		                       &ids         = i->second,
+		                       k            = static_cast<size_t>(0)](auto const& item) mutable {
+			                      connections.moveTo(ids[k], item.inputField().location());
+			                      ++k;
+		                      });
 
 		auto o = m_output_port_map.find(&node_edit.node().get());
 		assert(o != std::end(m_output_port_map));
-		std::ranges::for_each(
-		    node_edit.outputs(),
-		    [&connections = m_connections, &ids = i->second, k = static_cast<size_t>(0)](
-		        auto const& item) mutable {
-			    connections.moveTo(ids[k], item.inputField().location());
-			    ++k;
-		    });
+		std::ranges::for_each(node_edit.outputs(),
+		                      [&connections = m_connections,
+		                       &ids         = o->second,
+		                       k            = static_cast<size_t>(0)](auto const& item) mutable {
+			                      connections.moveTo(ids[k], item.inputField().location());
+			                      ++k;
+		                      });
+		m_linesegs->lineSegments(resolveLineSegs(m_connections));
 	}
 }
 
