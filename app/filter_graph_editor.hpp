@@ -50,20 +50,19 @@ namespace Texpainter
 				    map_ports_to_node(port_id, new_port_id, ports_to_node, item.second->node());
 				    port_id = new_port_id;
 			    });
+
 #if 0
-			std::ranges::for_each(m_connections,
+			std::ranges::for_each(r_graph.nodes(),
 			                      [&connections  = m_connections,
 			                       &ports_to_node = std::as_const(m_ports_to_node),
 			                       &graph        = std::as_const(r_graph)](auto const& item) {
-				                      auto i = ports_to_node.find(item.first);
-				                      assert(i != std::end(port_to_node));
-				                      auto node = graph.node(i->second);
-				                      assert(node != nullptr);
-									  auto inputs = node->inputs();
-									  add_connections(item.first, ports_to_node, connections);
+
+									   std::ranges::for_each(item.second.inputs(), [&node = item.second](auto source){
+											connections.connect(ports[node][k], ports[source.processor()][source.port()]);
+									});
+//									  add_connections(item.first, ports_to_node, connections);
 			                      });
 #endif
-
 			m_canvas.eventHandler<ControlId::NodeEditors>(*this);
 		}
 
@@ -119,6 +118,11 @@ namespace Texpainter
 				++first_port;
 			}
 		}
+
+		static void add_connections(uint64_t port_id,
+std::map<uint64_t, std::reference_wrapper<FilterGraph::ProcessorNode const>> const& ports_to_node,
+		                               DynamicMesh<uint64_t, Ui::ToplevelCoordinates>& connections)
+		{}
 	};
 
 	template<>
