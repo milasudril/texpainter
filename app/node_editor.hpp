@@ -10,6 +10,7 @@
 #include "ui/box.hpp"
 #include "ui/slider.hpp"
 #include "ui/filled_shape.hpp"
+#include "ui/labeled_input.hpp"
 
 namespace Texpainter
 {
