@@ -6,7 +6,7 @@
 #ifndef TEXPAINTER_FILTERGRAPH_GRAPH_HPP
 #define TEXPAINTER_FILTERGRAPH_GRAPH_HPP
 
-#include "./processor_node.hpp"
+#include "./node.hpp"
 #include "./node_id.hpp"
 #include "./image_source.hpp"
 #include "./output_node.hpp"
@@ -63,7 +63,7 @@ namespace Texpainter::FilterGraph
 
 
 		template<ImageProcessor T>
-		std::pair<NodeId, std::reference_wrapper<ProcessorNode const>> insert(T&& obj)
+		std::pair<NodeId, std::reference_wrapper<Node const>> insert(T&& obj)
 		{
 			auto i = m_nodes.insert(std::make_pair(m_current_id, std::forward<T>(obj)));
 			++m_current_id;
@@ -99,9 +99,9 @@ namespace Texpainter::FilterGraph
 		}
 
 	private:
-		ProcessorNode* r_input;
-		ProcessorNode* r_output;
-		std::map<NodeId, ProcessorNode> m_nodes;
+		Node* r_input;
+		Node* r_output;
+		std::map<NodeId, Node> m_nodes;
 		NodeId m_current_id;
 	};
 }

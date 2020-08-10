@@ -1,8 +1,8 @@
 //@	{
-//@	 "targets":[{"name":"processor_node.test", "type":"application", "autorun":1}]
+//@	 "targets":[{"name":"node.test", "type":"application", "autorun":1}]
 //@	}
 
-#include "./processor_node.hpp"
+#include "./node.hpp"
 
 #include <cassert>
 #include <map>
@@ -157,9 +157,9 @@ namespace
 
 namespace Testcases
 {
-	void filtergraphProcessorNodeDummy()
+	void filtergraphNodeDummy()
 	{
-		Texpainter::FilterGraph::ProcessorNode node;
+		Texpainter::FilterGraph::Node node;
 
 		auto res = node();
 		assert(res.size() == 0);
@@ -169,9 +169,9 @@ namespace Testcases
 		assert(node.inputPorts().size() == 0);
 	}
 
-	void filtergraphProcessorNodeGetOutput()
+	void filtergraphNodeGetOutput()
 	{
-		Texpainter::FilterGraph::ProcessorNode node{TestProcessor{}};
+		Texpainter::FilterGraph::Node node{TestProcessor{}};
 
 		assert(node.inputPorts().size() == 2);
 		node.set("Foo", Texpainter::FilterGraph::ProcParamValue{0.5});
@@ -179,7 +179,7 @@ namespace Testcases
 
 		size_t req_count = 0;
 
-		Texpainter::FilterGraph::ProcessorNode src{InputProcessor{req_count}};
+		Texpainter::FilterGraph::Node src{InputProcessor{req_count}};
 		node.connect(
 		        Texpainter::FilterGraph::InputPort{0}, src, Texpainter::FilterGraph::OutputPort{0})
 		    .connect(
@@ -205,9 +205,9 @@ namespace Testcases
 		assert(res_1->pixels()(0, 0).alpha() == 1.0f);
 	}
 
-	void filtergraphProcessorNodeDestroySourceGetOutput()
+	void filtergraphNodeDestroySourceGetOutput()
 	{
-		Texpainter::FilterGraph::ProcessorNode node{TestProcessor{}};
+		Texpainter::FilterGraph::Node node{TestProcessor{}};
 
 		assert(node.inputPorts().size() == 2);
 		node.set("Foo", Texpainter::FilterGraph::ProcParamValue{0.5});
@@ -216,7 +216,7 @@ namespace Testcases
 		size_t req_count = 0;
 
 		{
-			Texpainter::FilterGraph::ProcessorNode src{InputProcessor{req_count}};
+			Texpainter::FilterGraph::Node src{InputProcessor{req_count}};
 			node.connect(Texpainter::FilterGraph::InputPort{0},
 			             src,
 			             Texpainter::FilterGraph::OutputPort{0})
@@ -245,11 +245,11 @@ namespace Testcases
 		assert(res_1->pixels()(0, 0).alpha() == 1.0f);
 	}
 
-	void filtergraphProcessorNodeDestroyCycle()
+	void filtergraphNodeDestroyCycle()
 	{
-		Texpainter::FilterGraph::ProcessorNode node_1{TestProcessor{}};
-		Texpainter::FilterGraph::ProcessorNode node_2{TestProcessor{}};
-		Texpainter::FilterGraph::ProcessorNode node_3{TestProcessor{}};
+		Texpainter::FilterGraph::Node node_1{TestProcessor{}};
+		Texpainter::FilterGraph::Node node_2{TestProcessor{}};
+		Texpainter::FilterGraph::Node node_3{TestProcessor{}};
 
 		node_1.connect(
 		    Texpainter::FilterGraph::InputPort{0}, node_2, Texpainter::FilterGraph::OutputPort{0});
@@ -259,9 +259,9 @@ namespace Testcases
 		    Texpainter::FilterGraph::InputPort{0}, node_1, Texpainter::FilterGraph::OutputPort{0});
 	}
 
-	void filtergraphProcessorNodeModifyInput()
+	void filtergraphNodeModifyInput()
 	{
-		Texpainter::FilterGraph::ProcessorNode node{TestProcessor{}};
+		Texpainter::FilterGraph::Node node{TestProcessor{}};
 
 		assert(node.inputPorts().size() == 2);
 		node.set("Foo", Texpainter::FilterGraph::ProcParamValue{0.5});
@@ -269,7 +269,7 @@ namespace Testcases
 
 		size_t req_count = 0;
 
-		Texpainter::FilterGraph::ProcessorNode src{InputProcessor{req_count}};
+		Texpainter::FilterGraph::Node src{InputProcessor{req_count}};
 		node.connect(
 		        Texpainter::FilterGraph::InputPort{0}, src, Texpainter::FilterGraph::OutputPort{0})
 		    .connect(
@@ -299,10 +299,10 @@ namespace Testcases
 
 int main()
 {
-	Testcases::filtergraphProcessorNodeDummy();
-	Testcases::filtergraphProcessorNodeGetOutput();
-	Testcases::filtergraphProcessorNodeDestroySourceGetOutput();
-	Testcases::filtergraphProcessorNodeDestroyCycle();
-	Testcases::filtergraphProcessorNodeModifyInput();
+	Testcases::filtergraphNodeDummy();
+	Testcases::filtergraphNodeGetOutput();
+	Testcases::filtergraphNodeDestroySourceGetOutput();
+	Testcases::filtergraphNodeDestroyCycle();
+	Testcases::filtergraphNodeModifyInput();
 	return 0;
 }

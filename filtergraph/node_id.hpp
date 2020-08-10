@@ -5,9 +5,6 @@
 #ifndef TEXPAINTER_FILTERGRAPH_NODEID_HPP
 #define TEXPAINTER_FILTERGRAPH_NODEID_HPP
 
-#include "./processor_node.hpp"
-#include "./node_id.hpp"
-
 #include <compare>
 
 namespace Texpainter::FilterGraph

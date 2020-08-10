@@ -5,6 +5,8 @@
 #ifndef TEXPAINTER_FILTERGRAPH_IMAGESOURCE_HPP
 #define TEXPAINTER_FILTERGRAPH_IMAGESOURCE_HPP
 
+#include "./proctypes.hpp"
+
 namespace Texpainter::FilterGraph
 {
 	namespace detail

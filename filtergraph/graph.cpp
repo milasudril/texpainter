@@ -8,7 +8,7 @@ namespace
 {
 	auto map_objects_to_node_id(Texpainter::FilterGraph::Graph const& g)
 	{
-		std::map<Texpainter::FilterGraph::ProcessorNode const*, Texpainter::FilterGraph::NodeId>
+		std::map<Texpainter::FilterGraph::Node const*, Texpainter::FilterGraph::NodeId>
 		    ret;
 		std::ranges::transform(g.nodes(), std::inserter(ret, std::end(ret)), [](auto const& item) {
 			return std::make_pair(&item.second, item.first);
@@ -18,7 +18,7 @@ namespace
 
 	auto copy_nodes(Texpainter::FilterGraph::Graph const& g)
 	{
-		std::map<Texpainter::FilterGraph::NodeId, Texpainter::FilterGraph::ProcessorNode> ret;
+		std::map<Texpainter::FilterGraph::NodeId, Texpainter::FilterGraph::Node> ret;
 		std::ranges::for_each(g.nodes(), [&ret](auto const& item) {
 			ret.insert(std::make_pair(item.first, item.second.disconnectedCopy()));
 		});

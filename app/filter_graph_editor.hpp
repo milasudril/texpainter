@@ -68,8 +68,8 @@ namespace Texpainter
 		FilterGraph::Graph& r_graph;
 		uint64_t m_current_port_id;
 		DynamicMesh<uint64_t, Ui::ToplevelCoordinates> m_connections;
-		std::map<FilterGraph::ProcessorNode const*, std::vector<uint64_t>> m_input_port_map;
-		std::map<FilterGraph::ProcessorNode const*, std::vector<uint64_t>> m_output_port_map;
+		std::map<FilterGraph::Node const*, std::vector<uint64_t>> m_input_port_map;
+		std::map<FilterGraph::Node const*, std::vector<uint64_t>> m_output_port_map;
 		FilterGraph::NodeId m_sel_node;
 
 		Canvas m_canvas;

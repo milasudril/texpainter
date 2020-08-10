@@ -1,10 +1,10 @@
 //@	{
-//@	 "targets":[{"name":"processor_node.hpp", "type":"include"}]
-//@	,"dependencies_extra":[{"ref":"processor_node.o", "rel":"implementation"}]
+//@	 "targets":[{"name":"node.hpp", "type":"include"}]
+//@	,"dependencies_extra":[{"ref":"node.o", "rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_FILTERGRAPH_PROCESSORNODE_HPP
-#define TEXPAINTER_FILTERGRAPH_PROCESSORNODE_HPP
+#ifndef TEXPAINTER_FILTERGRAPH_NODE_HPP
+#define TEXPAINTER_FILTERGRAPH_NODE_HPP
 
 #include "./proctypes.hpp"
 
@@ -18,7 +18,7 @@
 
 namespace Texpainter::FilterGraph
 {
-	class ProcessorNode
+	class Node
 	{
 	public:
 		using argument_type = ProcArgumentType;
@@ -44,7 +44,7 @@ namespace Texpainter::FilterGraph
 		public:
 			SourceNode(): r_processor{s_default_node}, m_index{OutputPort{0}} {}
 
-			explicit SourceNode(std::reference_wrapper<ProcessorNode const> node, OutputPort index)
+			explicit SourceNode(std::reference_wrapper<Node const> node, OutputPort index)
 			    : r_processor{node}
 			    , m_index{index}
 			{
@@ -62,28 +62,28 @@ namespace Texpainter::FilterGraph
 				return argument_type{};
 			}
 
-			ProcessorNode const& processor() const { return r_processor.get(); }
+			Node const& processor() const { return r_processor.get(); }
 
 			OutputPort port() const { return m_index; }
 
 		private:
-			std::reference_wrapper<ProcessorNode const> r_processor;
+			std::reference_wrapper<Node const> r_processor;
 			OutputPort m_index;
 		};
 
-		explicit ProcessorNode(std::unique_ptr<Processor>&& proc)
+		explicit Node(std::unique_ptr<Processor>&& proc)
 		    : m_inputs(proc->inputPorts().size())
 		    , m_proc{std::move(proc)}
 		{
 		}
 
-		ProcessorNode(ProcessorNode&&) = delete;
+		Node(Node&&) = delete;
 
-		ProcessorNode(): m_proc{std::make_unique<ProcessorDummy>()} {}
+		Node(): m_proc{std::make_unique<ProcessorDummy>()} {}
 
 		template<class Proc,
-		         std::enable_if_t<!std::is_same_v<ProcessorNode, std::decay_t<Proc>>, int> = 0>
-		explicit ProcessorNode(Proc&& proc)
+		         std::enable_if_t<!std::is_same_v<Node, std::decay_t<Proc>>, int> = 0>
+		explicit Node(Proc&& proc)
 		    : m_inputs(
 		        proc.inputPorts().size())  // Must use old-style ctor here to get the correct size
 		    , m_proc{std::make_unique<ProcessorImpl<std::decay_t<Proc>>>(std::forward<Proc>(proc))}
@@ -93,8 +93,8 @@ namespace Texpainter::FilterGraph
 		auto disconnectedCopy() const { return m_proc->clone(); }
 
 		template<class Proc,
-		         std::enable_if_t<!std::is_same_v<ProcessorNode, std::decay_t<Proc>>, int> = 0>
-		ProcessorNode& replaceWith(Proc&& proc)
+		         std::enable_if_t<!std::is_same_v<Node, std::decay_t<Proc>>, int> = 0>
+		Node& replaceWith(Proc&& proc)
 		{
 			m_inputs = std::vector<SourceNode>(proc.inputPorts().size());
 			m_result_cache.clear();
@@ -127,8 +127,8 @@ namespace Texpainter::FilterGraph
 
 		auto outputPorts() const { return m_proc->outputPorts(); }
 
-		ProcessorNode& connect(InputPort input,
-		                       std::reference_wrapper<ProcessorNode const> other,
+		Node& connect(InputPort input,
+		                       std::reference_wrapper<Node const> other,
 		                       OutputPort output)
 		{
 			other.get().r_consumers[this].insert(input);
@@ -137,7 +137,7 @@ namespace Texpainter::FilterGraph
 			return *this;
 		}
 
-		ProcessorNode& disconnect(InputPort input)
+		Node& disconnect(InputPort input)
 		{
 			m_inputs[input.value()].processor().r_consumers.find(this)->second.erase(input);
 			m_inputs[input.value()] = SourceNode{};
@@ -151,7 +151,7 @@ namespace Texpainter::FilterGraph
 
 		auto paramValues() const { return m_proc->paramValues(); }
 
-		ProcessorNode& set(std::string_view param_name, ProcParamValue val)
+		Node& set(std::string_view param_name, ProcParamValue val)
 		{
 			m_proc->set(param_name, val);
 			m_result_cache.clear();
@@ -162,7 +162,7 @@ namespace Texpainter::FilterGraph
 
 		auto name() const { return m_proc->name(); }
 
-		~ProcessorNode()
+		~Node()
 		{
 			std::ranges::for_each(r_consumers, [](auto const& item) {
 				std::ranges::for_each(item.second, [proc = item.first](auto port) {
@@ -182,7 +182,7 @@ namespace Texpainter::FilterGraph
 
 	private:
 		mutable std::vector<result_type> m_result_cache;
-		static ProcessorNode s_default_node;
+		static Node s_default_node;
 
 		std::vector<SourceNode> m_inputs;
 
@@ -196,7 +196,7 @@ namespace Texpainter::FilterGraph
 
 		// NOTE: Using mutable here is not a very good solution, but allows treating producer nodes
 		//       as const from the consumer side.
-		mutable std::map<ProcessorNode*, std::set<InputPort, InputPortCompare>> r_consumers;
+		mutable std::map<Node*, std::set<InputPort, InputPortCompare>> r_consumers;
 
 		std::unique_ptr<Processor> m_proc;
 

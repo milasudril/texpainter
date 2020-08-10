@@ -23,8 +23,8 @@ namespace
 	void map_node_to_ports(
 	    uint64_t first_port,
 	    uint64_t after_last_port,
-	    std::map<Texpainter::FilterGraph::ProcessorNode const*, std::vector<uint64_t>>& ports,
-	    std::reference_wrapper<Texpainter::FilterGraph::ProcessorNode const> node)
+	    std::map<Texpainter::FilterGraph::Node const*, std::vector<uint64_t>>& ports,
+	    std::reference_wrapper<Texpainter::FilterGraph::Node const> node)
 	{
 		std::vector<uint64_t> tmp;
 		while(first_port != after_last_port)

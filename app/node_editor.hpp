@@ -5,7 +5,7 @@
 #ifndef TEXPAINTER_NODEEDITOR_HPP
 #define TEXPAINTER_NODEEDITOR_HPP
 
-#include "filtergraph/processor_node.hpp"
+#include "filtergraph/node.hpp"
 #include "ui/label.hpp"
 #include "ui/box.hpp"
 #include "ui/slider.hpp"
@@ -37,7 +37,7 @@ namespace Texpainter
 	{
 	public:
 		NodeEditor(Ui::Container& owner,
-		           std::reference_wrapper<FilterGraph::ProcessorNode const> node)
+		           std::reference_wrapper<FilterGraph::Node const> node)
 		    : r_node{node}
 		    , m_root{owner, Ui::Box::Orientation::Vertical}
 		    , m_name{m_root, node.get().name()}
@@ -98,7 +98,7 @@ namespace Texpainter
 
 
 	private:
-		std::reference_wrapper<FilterGraph::ProcessorNode const> r_node;
+		std::reference_wrapper<FilterGraph::Node const> r_node;
 
 		Ui::Box m_root;
 		Ui::Label m_name;
