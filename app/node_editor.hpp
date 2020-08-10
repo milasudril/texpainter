@@ -52,7 +52,7 @@ namespace Texpainter
 			constexpr auto box_radius = 1.0 - 1.0 / std::numbers::phi;
 			constexpr auto box_offset = vec2_t{0.5, 0.0};
 
-			m_name.alignment(0.5);
+			m_name.oneline(true).alignment(0.5);
 			std::ranges::transform(r_node.get().inputPorts(),
 			                       std::back_inserter(m_input_labels),
 			                       [&inputs = m_inputs, box_radius, box_offset](auto portinfo) {
@@ -63,7 +63,7 @@ namespace Texpainter
 				                           detail::portColor(portinfo.type),
 				                           box_radius,
 				                           -box_offset};
-				                       ret.label().alignment(0.0);
+				                       ret.label().oneline(true).alignment(0.0);
 				                       return ret;
 			                       });
 
@@ -84,7 +84,7 @@ namespace Texpainter
 				                           detail::portColor(portinfo.type),
 				                           box_radius,
 				                           box_offset};
-				                       ret.label().alignment(1.0);
+				                       ret.label().oneline(true).alignment(1.0);
 				                       return ret;
 			                       });
 		}

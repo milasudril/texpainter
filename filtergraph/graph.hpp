@@ -13,6 +13,8 @@
 
 #include "utils/iter_pair.hpp"
 
+#include "imgproc/rgba_to_4_gray/rgba_to_4_gray.hpp"
+
 #include <algorithm>
 
 namespace Texpainter::FilterGraph
@@ -27,8 +29,11 @@ namespace Texpainter::FilterGraph
 		{
 			r_input  = &m_nodes[InputNodeId];  // Create an empty node as input node
 			r_output = &m_nodes.insert(std::make_pair(OutputNodeId, OutputNode{})).first->second;
-			connect(NodeId{1}, InputPort{0}, NodeId{0}, OutputPort{0});
 			m_current_id = NodeId{2};
+
+			insert(RgbaTo4Gray::ImageProcessor{});
+
+			connect(NodeId{1}, InputPort{0}, NodeId{0}, OutputPort{0});
 		}
 
 		Graph(Graph const& other);

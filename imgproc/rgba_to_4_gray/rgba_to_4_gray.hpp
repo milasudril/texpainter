@@ -18,7 +18,7 @@ namespace RgbaTo4Gray
 
 	class ImageProcessor
 	{
-		static constexpr PortInfo s_input_ports[] = {PixelType::RGBA, "Red"};
+		static constexpr PortInfo s_input_ports[] = {PixelType::RGBA, "Pixels"};
 
 		static constexpr PortInfo s_output_ports[] = {PortInfo{PixelType::GrayscaleReal, "Red"},
 		                                              PortInfo{PixelType::GrayscaleReal, "Green"},
@@ -44,7 +44,7 @@ namespace RgbaTo4Gray
 
 		static constexpr std::span<PortInfo const> inputPorts()
 		{
-			return std::span<PortInfo const>{};
+			return std::span<PortInfo const>{s_input_ports};
 		}
 
 		std::vector<RetVal> operator()(std::span<Arg const>) const;

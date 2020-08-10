@@ -71,9 +71,11 @@ void Texpainter::FilterGraphEditor::init()
 		                           input   = static_cast<size_t>(0)](auto source) mutable {
 			                          // Fixme: processor can be "dummy"
 			                          auto o = output_port_map.find(&source.processor());
-			                          assert(o != std::end(output_port_map));
-			                          connections.connect(inputs[input],
-			                                              (o->second)[source.port().value()]);
+			                          if(o != std::end(output_port_map))
+			                          {
+				                          connections.connect(inputs[input],
+				                                              (o->second)[source.port().value()]);
+			                          }
 			                          ++input;
 		                          });
 	                      });
