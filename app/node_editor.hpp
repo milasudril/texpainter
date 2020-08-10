@@ -36,8 +36,7 @@ namespace Texpainter
 	class NodeEditor
 	{
 	public:
-		NodeEditor(Ui::Container& owner,
-		           std::reference_wrapper<FilterGraph::Node const> node)
+		NodeEditor(Ui::Container& owner, std::reference_wrapper<FilterGraph::Node const> node)
 		    : r_node{node}
 		    , m_root{owner, Ui::Box::Orientation::Vertical}
 		    , m_name{m_root, node.get().name()}

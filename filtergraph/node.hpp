@@ -24,7 +24,7 @@ namespace Texpainter::FilterGraph
 		using argument_type = ProcArgumentType;
 		using result_type   = ProcResultType;
 
-		class Processor
+		class AbstractImageProcessor
 		{
 		public:
 			virtual std::vector<result_type> operator()(std::span<argument_type const>) const = 0;
@@ -33,10 +33,11 @@ namespace Texpainter::FilterGraph
 			virtual std::span<char const* const> paramNames() const                           = 0;
 			virtual std::span<ProcParamValue const> paramValues() const                       = 0;
 			virtual ProcParamValue get(std::string_view param_name) const                     = 0;
-			virtual Processor& set(std::string_view param_name, ProcParamValue value)         = 0;
-			virtual std::unique_ptr<Processor> clone() const                                  = 0;
+			virtual AbstractImageProcessor& set(std::string_view param_name,
+			                                    ProcParamValue value)                         = 0;
+			virtual std::unique_ptr<AbstractImageProcessor> clone() const                     = 0;
 			virtual char const* name() const                                                  = 0;
-			virtual ~Processor() = default;
+			virtual ~AbstractImageProcessor() = default;
 		};
 
 		class SourceNode
@@ -71,7 +72,7 @@ namespace Texpainter::FilterGraph
 			OutputPort m_index;
 		};
 
-		explicit Node(std::unique_ptr<Processor>&& proc)
+		explicit Node(std::unique_ptr<AbstractImageProcessor>&& proc)
 		    : m_inputs(proc->inputPorts().size())
 		    , m_proc{std::move(proc)}
 		{
@@ -79,26 +80,26 @@ namespace Texpainter::FilterGraph
 
 		Node(Node&&) = delete;
 
-		Node(): m_proc{std::make_unique<ProcessorDummy>()} {}
+		Node(): m_proc{std::make_unique<DummyImageProcessor>()} {}
 
-		template<class Proc,
-		         std::enable_if_t<!std::is_same_v<Node, std::decay_t<Proc>>, int> = 0>
+		template<class Proc, std::enable_if_t<!std::is_same_v<Node, std::decay_t<Proc>>, int> = 0>
 		explicit Node(Proc&& proc)
 		    : m_inputs(
 		        proc.inputPorts().size())  // Must use old-style ctor here to get the correct size
-		    , m_proc{std::make_unique<ProcessorImpl<std::decay_t<Proc>>>(std::forward<Proc>(proc))}
+		    , m_proc{std::make_unique<ImageProcessorWrapper<std::decay_t<Proc>>>(
+		          std::forward<Proc>(proc))}
 		{
 		}
 
 		auto disconnectedCopy() const { return m_proc->clone(); }
 
-		template<class Proc,
-		         std::enable_if_t<!std::is_same_v<Node, std::decay_t<Proc>>, int> = 0>
+		template<class Proc, std::enable_if_t<!std::is_same_v<Node, std::decay_t<Proc>>, int> = 0>
 		Node& replaceWith(Proc&& proc)
 		{
 			m_inputs = std::vector<SourceNode>(proc.inputPorts().size());
 			m_result_cache.clear();
-			m_proc = std::make_unique<ProcessorImpl<std::decay_t<Proc>>>(std::forward<Proc>(proc));
+			m_proc = std::make_unique<ImageProcessorWrapper<std::decay_t<Proc>>>(
+			    std::forward<Proc>(proc));
 			return *this;
 		}
 
@@ -127,9 +128,7 @@ namespace Texpainter::FilterGraph
 
 		auto outputPorts() const { return m_proc->outputPorts(); }
 
-		Node& connect(InputPort input,
-		                       std::reference_wrapper<Node const> other,
-		                       OutputPort output)
+		Node& connect(InputPort input, std::reference_wrapper<Node const> other, OutputPort output)
 		{
 			other.get().r_consumers[this].insert(input);
 			m_inputs[input.value()] = SourceNode{other, output};
@@ -198,13 +197,13 @@ namespace Texpainter::FilterGraph
 		//       as const from the consumer side.
 		mutable std::map<Node*, std::set<InputPort, InputPortCompare>> r_consumers;
 
-		std::unique_ptr<Processor> m_proc;
+		std::unique_ptr<AbstractImageProcessor> m_proc;
 
 		template<ImageProcessor Proc>
-		class ProcessorImpl: public Processor
+		class ImageProcessorWrapper: public AbstractImageProcessor
 		{
 		public:
-			explicit ProcessorImpl(Proc&& proc): m_proc{std::move(proc)} {}
+			explicit ImageProcessorWrapper(Proc&& proc): m_proc{std::move(proc)} {}
 
 			std::vector<result_type> operator()(std::span<argument_type const> args) const override
 			{
@@ -227,15 +226,15 @@ namespace Texpainter::FilterGraph
 				return m_proc.get(param_name);
 			}
 
-			ProcessorImpl& set(std::string_view param_name, ProcParamValue value) override
+			ImageProcessorWrapper& set(std::string_view param_name, ProcParamValue value) override
 			{
 				m_proc.set(param_name, value);
 				return *this;
 			}
 
-			std::unique_ptr<Processor> clone() const override
+			std::unique_ptr<AbstractImageProcessor> clone() const override
 			{
-				return std::make_unique<ProcessorImpl>(*this);
+				return std::make_unique<ImageProcessorWrapper>(*this);
 			}
 
 			char const* name() const override { return Proc::name(); }
@@ -245,7 +244,7 @@ namespace Texpainter::FilterGraph
 			Proc m_proc;
 		};
 
-		class ProcessorDummy: public Processor
+		class DummyImageProcessor: public AbstractImageProcessor
 		{
 		public:
 			std::vector<result_type> operator()(std::span<argument_type const> args) const
@@ -275,11 +274,11 @@ namespace Texpainter::FilterGraph
 
 			ProcParamValue get(std::string_view) const override { return ProcParamValue{0.0}; }
 
-			ProcessorDummy& set(std::string_view, ProcParamValue) override { return *this; }
+			DummyImageProcessor& set(std::string_view, ProcParamValue) override { return *this; }
 
-			std::unique_ptr<Processor> clone() const override
+			std::unique_ptr<AbstractImageProcessor> clone() const override
 			{
-				return std::make_unique<ProcessorDummy>(*this);
+				return std::make_unique<DummyImageProcessor>(*this);
 			}
 
 			char const* name() const override { return "*empty*"; }
