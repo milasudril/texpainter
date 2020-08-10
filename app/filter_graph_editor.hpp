@@ -11,6 +11,8 @@
 #include "filtergraph/graph.hpp"
 #include "ui/widget_canvas.hpp"
 #include "ui/line_segment_renderer.hpp"
+#include "ui/menu.hpp"
+#include "ui/menu_item.hpp"
 #include "utils/dynamic_mesh.hpp"
 
 #include <cassert>
@@ -24,7 +26,8 @@ namespace Texpainter
 	public:
 		enum class ControlId : int
 		{
-			NodeEditors
+			NodeEditors,
+			CopyNode
 		};
 
 
@@ -32,6 +35,7 @@ namespace Texpainter
 		    : r_graph{graph}
 		    , m_current_port_id{0}
 		    , m_canvas{owner}
+		    , m_node_copy{m_node_menu, "Copy"}
 		{
 			m_linesegs = m_canvas.insert<Ui::LineSegmentRenderer>();
 			std::ranges::transform(r_graph.nodes(),
@@ -44,6 +48,7 @@ namespace Texpainter
 				                                                 node.second));
 			                       });
 			m_canvas.eventHandler<ControlId::NodeEditors>(*this);
+			m_node_copy.eventHandler<ControlId::CopyNode>(*this);
 		}
 
 		template<ControlId>
@@ -56,16 +61,23 @@ namespace Texpainter
 		template<ControlId>
 		void onMove(Canvas& src, Ui::WidgetCoordinates, FilterGraph::NodeId);
 
+		template<ControlId>
+		void onActivated(Ui::MenuItem& src);
+
 	private:
 		FilterGraph::Graph& r_graph;
 		uint64_t m_current_port_id;
 		DynamicMesh<uint64_t, Ui::ToplevelCoordinates> m_connections;
 		std::map<FilterGraph::ProcessorNode const*, std::vector<uint64_t>> m_input_port_map;
 		std::map<FilterGraph::ProcessorNode const*, std::vector<uint64_t>> m_output_port_map;
+		FilterGraph::NodeId m_sel_node;
 
 		Canvas m_canvas;
 		std::unique_ptr<Ui::LineSegmentRenderer> m_linesegs;
 		std::map<FilterGraph::NodeId, Canvas::WidgetHandle<NodeEditor>> m_node_editors;
+		Ui::Menu m_node_menu;
+		Ui::MenuItem m_node_copy;
+
 
 		void init();
 	};
@@ -78,7 +90,11 @@ namespace Texpainter
 	    int button,
 	    FilterGraph::NodeId node)
 	{
-		if(button == 3) { printf("%zu\n", node.value()); }
+		if(button == 3)
+		{
+			m_sel_node = node;
+			m_node_menu.show().popupAtCursor();
+		}
 	}
 
 	template<>
@@ -114,6 +130,13 @@ namespace Texpainter
 			                      ++k;
 		                      });
 		m_linesegs->lineSegments(resolveLineSegs(m_connections));
+	}
+
+	template<>
+	inline void FilterGraphEditor::onActivated<FilterGraphEditor::ControlId::CopyNode>(
+	    Ui::MenuItem&)
+	{
+		printf("Copy node %zu\n", m_sel_node.value());
 	}
 }
 

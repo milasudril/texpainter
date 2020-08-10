@@ -7,6 +7,7 @@
 #define TEXPAINTER_UI_MENU_HPP
 
 #include "./container.hpp"
+#include "menu_item.hpp"
 
 #include <utility>
 
@@ -15,7 +16,9 @@ namespace Texpainter::Ui
 	class Menu: public Container
 	{
 	public:
-		explicit Menu(Container& parent);
+		Menu(): Menu{nullptr} {}
+
+		explicit Menu(MenuItem& parent): Menu{static_cast<Container*>(&parent)} {}
 		~Menu();
 
 		Menu& operator=(Menu&& obj) noexcept
@@ -33,10 +36,15 @@ namespace Texpainter::Ui
 
 		void* toplevel() const override;
 
+		Menu& popupAtCursor();
+
 	protected:
 		class Impl;
 		explicit Menu(Menu::Impl& impl): m_impl(&impl) {}
 		Impl* m_impl;
+
+	private:
+		explicit Menu(Container* parent);
 	};
 }
 

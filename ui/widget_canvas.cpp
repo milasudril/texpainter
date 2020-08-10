@@ -128,30 +128,34 @@ private:
 
 	static gboolean button_press(GtkWidget* widget, GdkEvent* event, gpointer user_data)
 	{
-		auto self         = reinterpret_cast<Impl*>(user_data);
-		auto fixed_layout = gtk_widget_get_ancestor(widget, GTK_TYPE_FIXED);
-		gtk_overlay_reorder_overlay(self->m_handle, fixed_layout, -1);
-		self->m_moving = widget;
-
+		auto e = reinterpret_cast<GdkEventButton const*>(event);
+		if(e->button == 1)
 		{
-			GValue val_x{};
-			g_value_init(&val_x, G_TYPE_INT);
-			gtk_container_child_get_property(
-			    GTK_CONTAINER(fixed_layout), self->m_moving, "x", &val_x);
+			auto self         = reinterpret_cast<Impl*>(user_data);
+			auto fixed_layout = gtk_widget_get_ancestor(widget, GTK_TYPE_FIXED);
+			gtk_overlay_reorder_overlay(self->m_handle, fixed_layout, -1);
+			self->m_moving = widget;
 
-			GValue val_y{};
-			g_value_init(&val_y, G_TYPE_INT);
-			gtk_container_child_get_property(
-			    GTK_CONTAINER(fixed_layout), self->m_moving, "y", &val_y);
+			{
+				GValue val_x{};
+				g_value_init(&val_x, G_TYPE_INT);
+				gtk_container_child_get_property(
+				    GTK_CONTAINER(fixed_layout), self->m_moving, "x", &val_x);
 
-			self->m_loc_init = WidgetCoordinates{static_cast<double>(g_value_get_int(&val_x)),
-			                                     static_cast<double>(g_value_get_int(&val_y))};
-		}
+				GValue val_y{};
+				g_value_init(&val_y, G_TYPE_INT);
+				gtk_container_child_get_property(
+				    GTK_CONTAINER(fixed_layout), self->m_moving, "y", &val_y);
 
-		{
-			auto e = reinterpret_cast<GdkEventButton const*>(event);
-			self->m_click_loc =
-			    ScreenCoordinates{static_cast<double>(e->x_root), static_cast<double>(e->y_root)};
+				self->m_loc_init = WidgetCoordinates{static_cast<double>(g_value_get_int(&val_x)),
+				                                     static_cast<double>(g_value_get_int(&val_y))};
+			}
+
+			{
+				self->m_click_loc = ScreenCoordinates{static_cast<double>(e->x_root),
+				                                      static_cast<double>(e->y_root)};
+			}
+			return TRUE;
 		}
 		return FALSE;
 	}

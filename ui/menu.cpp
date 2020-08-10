@@ -7,7 +7,7 @@
 class Texpainter::Ui::Menu::Impl: private Menu
 {
 public:
-	Impl(Container& cnt);
+	Impl(Container* cnt);
 	~Impl();
 
 	void _add(GtkWidget* handle) noexcept
@@ -22,16 +22,18 @@ public:
 
 	void* _toplevel() const { return gtk_widget_get_toplevel(GTK_WIDGET(m_handle)); }
 
+	void popupAtCursor() { gtk_menu_popup_at_pointer(m_handle, nullptr); }
+
 private:
 	GtkMenu* m_handle;
 	size_t m_k;
 };
 
-Texpainter::Ui::Menu::Impl::Impl(Container& cnt): Menu{*this}, m_k{0}
+Texpainter::Ui::Menu::Impl::Impl(Container* cnt): Menu{*this}, m_k{0}
 {
 	auto widget = gtk_menu_new();
 	m_handle    = GTK_MENU(widget);
-	cnt.add(widget);
+	if(cnt != nullptr) { cnt->add(widget); }
 }
 
 Texpainter::Ui::Menu::Impl::~Impl()
@@ -40,7 +42,7 @@ Texpainter::Ui::Menu::Impl::~Impl()
 	gtk_widget_destroy(GTK_WIDGET(m_handle));
 }
 
-Texpainter::Ui::Menu::Menu(Container& cnt) { m_impl = new Impl(cnt); }
+Texpainter::Ui::Menu::Menu(Container* cnt) { m_impl = new Impl(cnt); }
 
 Texpainter::Ui::Menu::~Menu() { delete m_impl; }
 
@@ -59,6 +61,12 @@ Texpainter::Ui::Menu& Texpainter::Ui::Menu::show()
 Texpainter::Ui::Menu& Texpainter::Ui::Menu::sensitive(bool val)
 {
 	m_impl->_sensitive(val);
+	return *this;
+}
+
+Texpainter::Ui::Menu& Texpainter::Ui::Menu::popupAtCursor()
+{
+	m_impl->popupAtCursor();
 	return *this;
 }
 
