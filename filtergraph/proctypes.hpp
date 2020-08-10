@@ -15,12 +15,12 @@
 
 namespace Texpainter::FilterGraph
 {
-	class ProcParamValue
+	class ParamValue
 	{
 	public:
-		explicit constexpr ProcParamValue(double val): m_value{val} {}
+		explicit constexpr ParamValue(double val): m_value{val} {}
 
-		constexpr auto operator<=>(ProcParamValue const&) const = default;
+		constexpr auto operator<=>(ParamValue const&) const = default;
 
 		constexpr double value() const { return m_value; }
 
@@ -75,23 +75,17 @@ namespace Texpainter::FilterGraph
 		char const* name;
 	};
 
-	using ProcArgumentType = std::variant<Span2d<PixelStore::Pixel const>,
-	                                      Span2d<double const>,
-	                                      Span2d<std::complex<double> const>>;
+	using ImgProcArg = std::variant<Span2d<PixelStore::Pixel const>,
+	                                Span2d<double const>,
+	                                Span2d<std::complex<double> const>>;
 
-	inline PixelType pixelType(ProcArgumentType const& x)
-	{
-		return static_cast<PixelType>(x.index());
-	}
+	inline PixelType pixelType(ImgProcArg const& x) { return static_cast<PixelType>(x.index()); }
 
-	using ProcResultType = std::variant<PixelStore::BasicImage<PixelStore::Pixel>,
-	                                    PixelStore::BasicImage<double>,
-	                                    PixelStore::BasicImage<std::complex<double>>>;
+	using ImgProcRetval = std::variant<PixelStore::BasicImage<PixelStore::Pixel>,
+	                                   PixelStore::BasicImage<double>,
+	                                   PixelStore::BasicImage<std::complex<double>>>;
 
-	inline PixelType pixelType(ProcResultType const& x)
-	{
-		return static_cast<PixelType>(x.index());
-	}
+	inline PixelType pixelType(ImgProcRetval const& x) { return static_cast<PixelType>(x.index()); }
 
 	template<class T>
 	concept ImageProcessor = requires(T a)
@@ -119,18 +113,18 @@ namespace Texpainter::FilterGraph
 		{
 			std::as_const(a).paramValues()
 		}
-		->std::same_as<std::span<ProcParamValue const>>;
+		->std::same_as<std::span<ParamValue const>>;
 
-		{a.set(std::declval<std::string_view>(), std::declval<ProcParamValue>())};
+		{a.set(std::declval<std::string_view>(), std::declval<ParamValue>())};
 		{
 			std::as_const(a).get(std::declval<std::string_view>())
 		}
-		->std::same_as<ProcParamValue>;
+		->std::same_as<ParamValue>;
 
 		{
-			std::as_const(a)(std::declval<std::span<ProcArgumentType const>>())
+			std::as_const(a)(std::declval<std::span<ImgProcArg const>>())
 		}
-		->std::same_as<std::vector<ProcResultType>>;
+		->std::same_as<std::vector<ImgProcRetval>>;
 	};
 }
 

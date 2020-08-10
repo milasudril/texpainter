@@ -84,7 +84,7 @@ namespace Texpainter::FilterGraph
 			return m_nodes.find(id)->second.get(paramname);
 		}
 
-		void set(NodeId id, std::string_view paramname, ProcParamValue val)
+		void set(NodeId id, std::string_view paramname, ParamValue val)
 		{
 			// Assume that id exists
 			m_nodes.find(id)->second.set(paramname, val);

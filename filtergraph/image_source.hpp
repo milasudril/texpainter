@@ -35,14 +35,11 @@ namespace Texpainter::FilterGraph
 			return std::span<char const* const>{};
 		}
 
-		std::span<ProcParamValue const> paramValues() const
-		{
-			return std::span<ProcParamValue const>{};
-		}
+		std::span<ParamValue const> paramValues() const { return std::span<ParamValue const>{}; }
 
-		void set(std::string_view, ProcParamValue) {}
+		void set(std::string_view, ParamValue) {}
 
-		ProcParamValue get(std::string_view) const { return ProcParamValue{0.0}; }
+		ParamValue get(std::string_view) const { return ParamValue{0.0}; }
 
 		static constexpr std::span<PortInfo const> outputPorts()
 		{
@@ -54,9 +51,9 @@ namespace Texpainter::FilterGraph
 			return std::span<PortInfo const>{};
 		}
 
-		std::vector<ProcResultType> operator()(std::span<ProcArgumentType const>) const
+		std::vector<ImgProcRetval> operator()(std::span<ImgProcArg const>) const
 		{
-			return std::vector<ProcResultType>{PixelStore::BasicImage<PixelType>{r_pixels}};
+			return std::vector<ImgProcRetval>{PixelStore::BasicImage<PixelType>{r_pixels}};
 		}
 
 		static constexpr char const* name() { return "Layer input"; }

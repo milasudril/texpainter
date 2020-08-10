@@ -21,14 +21,11 @@ namespace Texpainter::FilterGraph
 			return std::span<char const* const>{};
 		}
 
-		std::span<ProcParamValue const> paramValues() const
-		{
-			return std::span<ProcParamValue const>{};
-		}
+		std::span<ParamValue const> paramValues() const { return std::span<ParamValue const>{}; }
 
-		void set(std::string_view, ProcParamValue) {}
+		void set(std::string_view, ParamValue) {}
 
-		ProcParamValue get(std::string_view) const { return ProcParamValue{0.0}; }
+		ParamValue get(std::string_view) const { return ParamValue{0.0}; }
 
 		static constexpr std::span<PortInfo const> inputPorts()
 		{
@@ -40,18 +37,18 @@ namespace Texpainter::FilterGraph
 			return std::span<PortInfo const>{};
 		}
 
-		std::vector<ProcResultType> operator()(std::span<ProcArgumentType const> args) const
+		std::vector<ImgProcRetval> operator()(std::span<ImgProcArg const> args) const
 		{
 			if(args.size() != 1) [[unlikely]]
 				{
-					return std::vector<ProcResultType>{};
+					return std::vector<ImgProcRetval>{};
 				}
 
 			if(auto args_0 = std::get_if<Span2d<PixelStore::Pixel const>>(&args[0]);
 			   args_0 != nullptr)
-				[[likely]] { return std::vector<ProcResultType>{PixelStore::Image{*args_0}}; }
+				[[likely]] { return std::vector<ImgProcRetval>{PixelStore::Image{*args_0}}; }
 
-			return std::vector<ProcResultType>{};
+			return std::vector<ImgProcRetval>{};
 		}
 
 		static constexpr char const* name() { return "Layer output"; }

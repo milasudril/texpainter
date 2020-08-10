@@ -21,22 +21,21 @@ namespace Texpainter::FilterGraph
 	class Node
 	{
 	public:
-		using argument_type = ProcArgumentType;
-		using result_type   = ProcResultType;
+		using argument_type = ImgProcArg;
+		using result_type   = ImgProcRetval;
 
 		class AbstractImageProcessor
 		{
 		public:
-			virtual std::vector<result_type> operator()(std::span<argument_type const>) const = 0;
-			virtual std::span<PortInfo const> inputPorts() const                              = 0;
-			virtual std::span<PortInfo const> outputPorts() const                             = 0;
-			virtual std::span<char const* const> paramNames() const                           = 0;
-			virtual std::span<ProcParamValue const> paramValues() const                       = 0;
-			virtual ProcParamValue get(std::string_view param_name) const                     = 0;
-			virtual AbstractImageProcessor& set(std::string_view param_name,
-			                                    ProcParamValue value)                         = 0;
-			virtual std::unique_ptr<AbstractImageProcessor> clone() const                     = 0;
-			virtual char const* name() const                                                  = 0;
+			virtual std::vector<result_type> operator()(std::span<argument_type const>) const  = 0;
+			virtual std::span<PortInfo const> inputPorts() const                               = 0;
+			virtual std::span<PortInfo const> outputPorts() const                              = 0;
+			virtual std::span<char const* const> paramNames() const                            = 0;
+			virtual std::span<ParamValue const> paramValues() const                            = 0;
+			virtual ParamValue get(std::string_view param_name) const                          = 0;
+			virtual AbstractImageProcessor& set(std::string_view param_name, ParamValue value) = 0;
+			virtual std::unique_ptr<AbstractImageProcessor> clone() const                      = 0;
+			virtual char const* name() const                                                   = 0;
 			virtual ~AbstractImageProcessor() = default;
 		};
 
@@ -150,14 +149,14 @@ namespace Texpainter::FilterGraph
 
 		auto paramValues() const { return m_proc->paramValues(); }
 
-		Node& set(std::string_view param_name, ProcParamValue val)
+		Node& set(std::string_view param_name, ParamValue val)
 		{
 			m_proc->set(param_name, val);
 			m_result_cache.clear();
 			return *this;
 		}
 
-		ProcParamValue get(std::string_view param_name) const { return m_proc->get(param_name); }
+		ParamValue get(std::string_view param_name) const { return m_proc->get(param_name); }
 
 		auto name() const { return m_proc->name(); }
 
@@ -216,17 +215,17 @@ namespace Texpainter::FilterGraph
 
 			std::span<char const* const> paramNames() const override { return m_proc.paramNames(); }
 
-			std::span<ProcParamValue const> paramValues() const override
+			std::span<ParamValue const> paramValues() const override
 			{
 				return m_proc.paramValues();
 			}
 
-			ProcParamValue get(std::string_view param_name) const override
+			ParamValue get(std::string_view param_name) const override
 			{
 				return m_proc.get(param_name);
 			}
 
-			ImageProcessorWrapper& set(std::string_view param_name, ProcParamValue value) override
+			ImageProcessorWrapper& set(std::string_view param_name, ParamValue value) override
 			{
 				m_proc.set(param_name, value);
 				return *this;
@@ -267,14 +266,14 @@ namespace Texpainter::FilterGraph
 				return std::span<char const* const>{};
 			}
 
-			std::span<ProcParamValue const> paramValues() const override
+			std::span<ParamValue const> paramValues() const override
 			{
-				return std::span<ProcParamValue const>{};
+				return std::span<ParamValue const>{};
 			}
 
-			ProcParamValue get(std::string_view) const override { return ProcParamValue{0.0}; }
+			ParamValue get(std::string_view) const override { return ParamValue{0.0}; }
 
-			DummyImageProcessor& set(std::string_view, ProcParamValue) override { return *this; }
+			DummyImageProcessor& set(std::string_view, ParamValue) override { return *this; }
 
 			std::unique_ptr<AbstractImageProcessor> clone() const override
 			{

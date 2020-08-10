@@ -19,8 +19,8 @@ namespace
 	public:
 		InputProcessor(size_t& req_count): r_req_count{req_count}
 		{
-			set("color_a", Texpainter::FilterGraph::ProcParamValue{1.0});
-			set("color_b", Texpainter::FilterGraph::ProcParamValue{1.0});
+			set("color_a", Texpainter::FilterGraph::ParamValue{1.0});
+			set("color_b", Texpainter::FilterGraph::ParamValue{1.0});
 		}
 
 		static constexpr std::span<char const* const> paramNames()
@@ -28,9 +28,9 @@ namespace
 			return std::span<char const* const>{};
 		}
 
-		std::span<Texpainter::FilterGraph::ProcParamValue const> paramValues() const
+		std::span<Texpainter::FilterGraph::ParamValue const> paramValues() const
 		{
-			return std::span<Texpainter::FilterGraph::ProcParamValue const>{};
+			return std::span<Texpainter::FilterGraph::ParamValue const>{};
 		}
 
 		static constexpr std::span<Texpainter::FilterGraph::PortInfo const> inputPorts()
@@ -44,8 +44,8 @@ namespace
 		}
 
 
-		std::vector<Texpainter::FilterGraph::ProcResultType> operator()(
-		    std::span<Texpainter::FilterGraph::ProcArgumentType const>) const
+		std::vector<Texpainter::FilterGraph::ImgProcRetval> operator()(
+		    std::span<Texpainter::FilterGraph::ImgProcArg const>) const
 		{
 			auto const color_a = m_params.at("color_a");
 			Texpainter::PixelStore::Image ret_a{1, 1};
@@ -56,16 +56,16 @@ namespace
 			ret_b.pixels()(0, 0) = Texpainter::PixelStore::Pixel{0.0f, 0.0f, color_b, 0.0f};
 
 			++r_req_count;
-			return std::vector<Texpainter::FilterGraph::ProcResultType>{std::move(ret_a),
-			                                                            std::move(ret_b)};
+			return std::vector<Texpainter::FilterGraph::ImgProcRetval>{std::move(ret_a),
+			                                                           std::move(ret_b)};
 		}
 
-		Texpainter::FilterGraph::ProcParamValue get(std::string_view) const
+		Texpainter::FilterGraph::ParamValue get(std::string_view) const
 		{
-			return Texpainter::FilterGraph::ProcParamValue{0.0};
+			return Texpainter::FilterGraph::ParamValue{0.0};
 		}
 
-		InputProcessor& set(std::string_view param, Texpainter::FilterGraph::ProcParamValue val)
+		InputProcessor& set(std::string_view param, Texpainter::FilterGraph::ParamValue val)
 		{
 			m_params[std::string{param}] = static_cast<float>(val.value());
 			return *this;
@@ -97,9 +97,9 @@ namespace
 
 		static constexpr std::span<char const* const> paramNames() { return s_param_names; }
 
-		std::span<Texpainter::FilterGraph::ProcParamValue const> paramValues() const
+		std::span<Texpainter::FilterGraph::ParamValue const> paramValues() const
 		{
-			return std::span<Texpainter::FilterGraph::ProcParamValue const>{};
+			return std::span<Texpainter::FilterGraph::ParamValue const>{};
 		}
 
 		static constexpr std::span<Texpainter::FilterGraph::PortInfo const> inputPorts()
@@ -113,10 +113,10 @@ namespace
 		}
 
 
-		std::vector<Texpainter::FilterGraph::ProcResultType> operator()(
-		    std::span<Texpainter::FilterGraph::ProcArgumentType const> args) const
+		std::vector<Texpainter::FilterGraph::ImgProcRetval> operator()(
+		    std::span<Texpainter::FilterGraph::ImgProcArg const> args) const
 		{
-			std::vector<Texpainter::FilterGraph::ProcResultType> ret{};
+			std::vector<Texpainter::FilterGraph::ImgProcRetval> ret{};
 			assert(std::size(args) == 2);
 			for(int k = 0; k < 2; ++k)
 			{
@@ -133,16 +133,14 @@ namespace
 			return ret;
 		}
 
-		Texpainter::FilterGraph::ProcParamValue get(std::string_view param_name) const
+		Texpainter::FilterGraph::ParamValue get(std::string_view param_name) const
 		{
 			auto i = m_params.find(param_name);
-			if(i != std::end(m_params))
-			{ return Texpainter::FilterGraph::ProcParamValue{i->second}; }
-			return Texpainter::FilterGraph::ProcParamValue{0.0};
+			if(i != std::end(m_params)) { return Texpainter::FilterGraph::ParamValue{i->second}; }
+			return Texpainter::FilterGraph::ParamValue{0.0};
 		}
 
-		TestProcessor& set(std::string_view param_name,
-		                   Texpainter::FilterGraph::ProcParamValue value)
+		TestProcessor& set(std::string_view param_name, Texpainter::FilterGraph::ParamValue value)
 		{
 			m_params[std::string{param_name}] = value.value();
 			return *this;
@@ -164,8 +162,8 @@ namespace Testcases
 		auto res = node();
 		assert(res.size() == 0);
 
-		assert(&node.set("Foo", Texpainter::FilterGraph::ProcParamValue{0.5}) == &node);
-		assert(node.get("Foo") == Texpainter::FilterGraph::ProcParamValue{0.0});
+		assert(&node.set("Foo", Texpainter::FilterGraph::ParamValue{0.5}) == &node);
+		assert(node.get("Foo") == Texpainter::FilterGraph::ParamValue{0.0});
 		assert(node.inputPorts().size() == 0);
 	}
 
@@ -174,8 +172,8 @@ namespace Testcases
 		Texpainter::FilterGraph::Node node{TestProcessor{}};
 
 		assert(node.inputPorts().size() == 2);
-		node.set("Foo", Texpainter::FilterGraph::ProcParamValue{0.5});
-		assert(node.get("Foo") == Texpainter::FilterGraph::ProcParamValue{0.5});
+		node.set("Foo", Texpainter::FilterGraph::ParamValue{0.5});
+		assert(node.get("Foo") == Texpainter::FilterGraph::ParamValue{0.5});
 
 		size_t req_count = 0;
 
@@ -210,8 +208,8 @@ namespace Testcases
 		Texpainter::FilterGraph::Node node{TestProcessor{}};
 
 		assert(node.inputPorts().size() == 2);
-		node.set("Foo", Texpainter::FilterGraph::ProcParamValue{0.5});
-		assert(node.get("Foo") == Texpainter::FilterGraph::ProcParamValue{0.5});
+		node.set("Foo", Texpainter::FilterGraph::ParamValue{0.5});
+		assert(node.get("Foo") == Texpainter::FilterGraph::ParamValue{0.5});
 
 		size_t req_count = 0;
 
@@ -264,8 +262,8 @@ namespace Testcases
 		Texpainter::FilterGraph::Node node{TestProcessor{}};
 
 		assert(node.inputPorts().size() == 2);
-		node.set("Foo", Texpainter::FilterGraph::ProcParamValue{0.5});
-		assert(node.get("Foo") == Texpainter::FilterGraph::ProcParamValue{0.5});
+		node.set("Foo", Texpainter::FilterGraph::ParamValue{0.5});
+		assert(node.get("Foo") == Texpainter::FilterGraph::ParamValue{0.5});
 
 		size_t req_count = 0;
 
@@ -285,8 +283,8 @@ namespace Testcases
 		assert(res_1->pixels()(0, 0).blue() == 1.0f);
 
 
-		src.set("color_a", Texpainter::FilterGraph::ProcParamValue{0.75});
-		src.set("color_b", Texpainter::FilterGraph::ProcParamValue{0.25});
+		src.set("color_a", Texpainter::FilterGraph::ParamValue{0.75});
+		src.set("color_b", Texpainter::FilterGraph::ParamValue{0.25});
 		assert(node.dirty());
 		node();
 		res_0 = get_if<Texpainter::PixelStore::Image>(&res[0]);
