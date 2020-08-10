@@ -1,10 +1,10 @@
 //@	{
-//@	 "targets":[{"name":"rgba_to_4_gray.o", "type":"object"}]
+//@	 "targets":[{"name":"rgba_split.o", "type":"object"}]
 //@	}
 
-#include "./rgba_to_4_gray.hpp"
+#include "./rgba_split.hpp"
 
-std::vector<RgbaTo4Gray::RetVal> RgbaTo4Gray::ImageProcessor::operator()(
+std::vector<RgbaSplit::RetVal> RgbaSplit::ImageProcessor::operator()(
     std::span<Arg const> args) const
 {
 	if(auto src = std::get_if<Texpainter::Span2d<Texpainter::PixelStore::Pixel const>>(args.data());
@@ -28,8 +28,8 @@ std::vector<RgbaTo4Gray::RetVal> RgbaTo4Gray::ImageProcessor::operator()(
 			}
 		}
 
-		return std::vector<RgbaTo4Gray::RetVal>{
+		return std::vector<RgbaSplit::RetVal>{
 		    std::move(red), std::move(green), std::move(blue), std::move(alpha)};
 	}
-	return std::vector<RgbaTo4Gray::RetVal>{};
+	return std::vector<RgbaSplit::RetVal>{};
 }

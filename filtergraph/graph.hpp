@@ -13,7 +13,8 @@
 
 #include "utils/iter_pair.hpp"
 
-#include "imgproc/rgba_to_4_gray/rgba_to_4_gray.hpp"
+#include "imgproc/rgba_split/rgba_split.hpp"
+#include "imgproc/rgba_combine/rgba_combine.hpp"
 
 #include <algorithm>
 
@@ -31,9 +32,17 @@ namespace Texpainter::FilterGraph
 			r_output = &m_nodes.insert(std::make_pair(OutputNodeId, OutputNode{})).first->second;
 			m_current_id = NodeId{2};
 
-			insert(RgbaTo4Gray::ImageProcessor{});
+			insert(RgbaSplit::ImageProcessor{});
+			insert(RgbaCombine::ImageProcessor{});
 
-			connect(NodeId{1}, InputPort{0}, NodeId{0}, OutputPort{0});
+			connect(NodeId{2}, InputPort{0}, NodeId{0}, OutputPort{0});
+
+			connect(NodeId{3}, InputPort{0}, NodeId{2}, OutputPort{1});
+			connect(NodeId{3}, InputPort{1}, NodeId{2}, OutputPort{2});
+			connect(NodeId{3}, InputPort{2}, NodeId{2}, OutputPort{0});
+			connect(NodeId{3}, InputPort{3}, NodeId{2}, OutputPort{3});
+
+			connect(NodeId{1}, InputPort{0}, NodeId{3}, OutputPort{0});
 		}
 
 		Graph(Graph const& other);

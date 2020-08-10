@@ -1,14 +1,14 @@
 //@	{
-//@	 "targets":[{"name":"rgba_to_4_gray.hpp", "type":"include"}]
-//@	,"dependencies_extra":[{"ref":"rgba_to_4_gray.o","rel":"implementation"}]
+//@	 "targets":[{"name":"rgba_split.hpp", "type":"include"}]
+//@	,"dependencies_extra":[{"ref":"rgba_split.o","rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_IMGPROC_RGBATO4GRAY_RGBATO4GRAY_HPP
-#define TEXPAINTER_IMGPROC_RGBATO4GRAY_RGBATO4GRAY_HPP
+#ifndef TEXPAINTER_IMGPROC_RGBASPLIT_RGBASPLIT_HPP
+#define TEXPAINTER_IMGPROC_RGBASPLIT_RGBASPLIT_HPP
 
 #include "filtergraph/proctypes.hpp"
 
-namespace RgbaTo4Gray
+namespace RgbaSplit
 {
 	using PortInfo   = Texpainter::FilterGraph::PortInfo;
 	using PixelType  = Texpainter::FilterGraph::PixelType;
