@@ -2,8 +2,8 @@
 //@	 "targets":[{"name":"proctypes.hpp", "type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_FILTERGRAPH_HPP
-#define TEXPAINTER_FILTERGRAPH_HPP
+#ifndef TEXPAINTER_FILTERGRAPH_PROCTYPES_HPP
+#define TEXPAINTER_FILTERGRAPH_PROCTYPES_HPP
 
 #include "pixel_store/image.hpp"
 
