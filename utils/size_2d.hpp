@@ -33,7 +33,7 @@ namespace Texpainter
 
 	constexpr inline bool operator==(Size2d a, Size2d b)
 	{
-		return a.width() == b.width() && a.width() == b.height();
+		return a.width() == b.width() && a.height() == b.height();
 	}
 
 	constexpr inline bool operator!=(Size2d a, Size2d b) { return !(a == b); }

@@ -11,15 +11,19 @@ namespace Testcases
 {
 	void texpainterFilterGraphNodeArgumentGetPointers()
 	{
+		Texpainter::Size2d size{12, 24};
 		int foo          = 123;
 		char const* cstr = "Hej";
-		Texpainter::FilterGraph::NodeArgument test{&foo, cstr};
+		Texpainter::FilterGraph::NodeArgument test{size, {&foo, cstr}};
 
-		auto vals = test.inputs<int, char>();
+		assert(test.size() == size);
+		auto vals = test.inputs<int, char, double>();
 		assert(std::get<0>(vals) == &foo);
 		assert(std::get<1>(vals) == cstr);
 		assert(*std::get<0>(vals) == 123);
 		assert(strcmp(std::get<1>(vals), cstr) == 0);
+		assert(std::get<2>(vals) == nullptr);
+
 	}
 }
 
