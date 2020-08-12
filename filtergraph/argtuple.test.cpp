@@ -4,6 +4,8 @@
 
 #include "./argtuple.hpp"
 
+#include <cassert>
+
 constexpr auto types = std::array<Texpainter::FilterGraph::PixelType, 3>{
     Texpainter::FilterGraph::PixelType::GrayscaleReal,
     Texpainter::FilterGraph::PixelType::GrayscaleComplex,
@@ -21,4 +23,26 @@ static_assert(
 static_assert(std::is_same_v<decltype(Texpainter::FilterGraph::get<2>(args)),
                              Texpainter::PixelStore::Pixel const*>);
 
-int main() { return 0; }
+namespace Testcases
+{
+	void texpainterFilterGraphArgTupleGetValues()
+	{
+		double x;
+		std::complex<double> y;
+		Texpainter::PixelStore::Pixel z;
+		MyArgTuple args;
+		Texpainter::FilterGraph::get<0>(args) = &x;
+		Texpainter::FilterGraph::get<1>(args) = &y;
+		Texpainter::FilterGraph::get<2>(args) = &z;
+
+		assert(Texpainter::FilterGraph::get<0>(args) == &x);
+		assert(Texpainter::FilterGraph::get<1>(args) == &y);
+		assert(Texpainter::FilterGraph::get<2>(args) == &z);
+	}
+}
+
+int main()
+{
+	Testcases::texpainterFilterGraphArgTupleGetValues();
+	return 0;
+}
