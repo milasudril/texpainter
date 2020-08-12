@@ -69,6 +69,28 @@ namespace Texpainter::FilterGraph
 		GrayscaleComplex
 	};
 
+	template<PixelType id>
+	struct PixelTypeToType;
+
+	template<>
+	struct PixelTypeToType<PixelType::RGBA>
+	{
+		using type = PixelStore::Pixel;
+	};
+
+	template<>
+	struct PixelTypeToType<PixelType::GrayscaleReal>
+	{
+		using type = double;
+	};
+
+	template<>
+	struct PixelTypeToType<PixelType::GrayscaleComplex>
+	{
+		using type = std::complex<double>;
+	};
+
+
 	struct PortInfo
 	{
 		PixelType type;

@@ -36,6 +36,7 @@ namespace Texpainter::FilterGraph
 		{
 		}
 
+		// Template argument must be a tuple-like thing
 		template<class... ArgTypes>
 		auto inputs() const
 		{

@@ -23,7 +23,6 @@ namespace Testcases
 		assert(*std::get<0>(vals) == 123);
 		assert(strcmp(std::get<1>(vals), cstr) == 0);
 		assert(std::get<2>(vals) == nullptr);
-
 	}
 }
 
