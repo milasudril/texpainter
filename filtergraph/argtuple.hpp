@@ -29,20 +29,26 @@ namespace Texpainter::FilterGraph
 	}
 
 	template<auto types>
-	using ArgTuple = detail::GenArgTuple<types, types.size()>;
-
-
-	template<size_t index, auto types>
-	auto& get(ArgTuple<types>& t)
+	class ArgTuple
 	{
-		return static_cast<detail::GenArgTuple<types, index + 1>&>(t).value;
-	}
+	public:
+		static constexpr auto size() { return types.size(); }
 
-	template<size_t index, auto types>
-	auto get(ArgTuple<types> const& t)
-	{
-		return static_cast<detail::GenArgTuple<types, index + 1> const&>(t).value;
-	}
+		template<size_t index>
+		constexpr auto& get()
+		{
+			return static_cast<detail::GenArgTuple<types, index + 1>&>(m_data).value;
+		}
+
+		template<size_t index>
+		constexpr auto get() const
+		{
+			return static_cast<detail::GenArgTuple<types, index + 1> const&>(m_data).value;
+		}
+
+	private:
+		detail::GenArgTuple<types, types.size()> m_data;
+	};
 }
 
 #endif

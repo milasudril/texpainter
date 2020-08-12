@@ -1,28 +1,34 @@
 //@	{
-//@	 "targets":[{"name":"node_argument.test", "type":"application", "autorun":1}]
+//	 "targets":[{"name":"node_argument.test", "type":"application", "autorun":1}]
 //@	}
 
 #include "./node_argument.hpp"
 
+#include "./argtuple.hpp"
+
 #include <cassert>
 #include <cstring>
+
+constexpr auto types = std::array<Texpainter::FilterGraph::PixelType, 3>{
+    Texpainter::FilterGraph::PixelType::GrayscaleReal,
+    Texpainter::FilterGraph::PixelType::GrayscaleComplex,
+    Texpainter::FilterGraph::PixelType::RGBA,
+};
+
+using MyArgTuple = Texpainter::FilterGraph::ArgTuple<types>;
 
 namespace Testcases
 {
 	void texpainterFilterGraphNodeArgumentGetPointers()
 	{
-		Texpainter::Size2d size{12, 24};
-		int foo          = 123;
-		char const* cstr = "Hej";
-		Texpainter::FilterGraph::NodeArgument test{size, {&foo, cstr}};
+		Texpainter::FilterGraph::RealValue x;
+		Texpainter::FilterGraph::ComplexValue y;
+		Texpainter::PixelStore::Pixel z;
+		Texpainter::Size2d size{23, 56};
+		Texpainter::FilterGraph::NodeArgument test{size, {&x, &y, &z}};
 
 		assert(test.size() == size);
-		auto vals = test.inputs<int, char, double>();
-		assert(std::get<0>(vals) == &foo);
-		assert(std::get<1>(vals) == cstr);
-		assert(*std::get<0>(vals) == 123);
-		assert(strcmp(std::get<1>(vals), cstr) == 0);
-		assert(std::get<2>(vals) == nullptr);
+		auto vals = test.inputs<MyArgTuple>();
 	}
 }
 

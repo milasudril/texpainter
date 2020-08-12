@@ -27,21 +27,16 @@ namespace Texpainter::FilterGraph
 	public:
 		static constexpr size_t MaxNumInputs = 4;
 
-		template<class... ArgTypes>
-		using ArgTuple = std::tuple<std::add_pointer_t<std::add_const_t<ArgTypes>>...>;
-
 		explicit NodeArgument(Size2d size, std::array<void const*, MaxNumInputs> const& inputs)
 		    : m_size{size}
 		    , r_inputs{inputs}
 		{
 		}
 
-		// Template argument must be a tuple-like thing
-		template<class... ArgTypes>
+		template<class T>
 		auto inputs() const
 		{
-			static_assert(sizeof...(ArgTypes) <= MaxNumInputs);
-			ArgTuple<ArgTypes...> ret{};
+			T ret{};
 			std::apply(
 			    [this, index = 0](auto&... args) mutable {
 				    (..., detail::do_cast(args, r_inputs[index++]));
