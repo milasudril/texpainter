@@ -69,6 +69,9 @@ namespace Texpainter::FilterGraph
 		GrayscaleComplex
 	};
 
+	using RealValue    = double;
+	using ComplexValue = std::complex<RealValue>;
+
 	template<PixelType id>
 	struct PixelTypeToType;
 
@@ -81,13 +84,13 @@ namespace Texpainter::FilterGraph
 	template<>
 	struct PixelTypeToType<PixelType::GrayscaleReal>
 	{
-		using type = double;
+		using type = RealValue;
 	};
 
 	template<>
 	struct PixelTypeToType<PixelType::GrayscaleComplex>
 	{
-		using type = std::complex<double>;
+		using type = ComplexValue;
 	};
 
 
