@@ -1,5 +1,5 @@
 //@	{
-//	 "targets":[{"name":"node_argument.test", "type":"application", "autorun":1}]
+//@	 "targets":[{"name":"node_argument.test", "type":"application", "autorun":1}]
 //@	}
 
 #include "./node_argument.hpp"
@@ -29,6 +29,9 @@ namespace Testcases
 
 		assert(test.size() == size);
 		auto vals = test.inputs<MyArgTuple>();
+		assert(vals.get<0>() == &x);
+		assert(vals.get<1>() == &y);
+		assert(vals.get<2>() == &z);
 	}
 }
 
