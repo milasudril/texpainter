@@ -16,34 +16,75 @@ namespace Texpainter::FilterGraph
 	namespace detail
 	{
 		template<auto types, size_t index = types.size()>
-		struct GenInArgTuple: GenInArgTuple<types, index - 1>
+		class GenInArgTuple: public GenInArgTuple<types, index - 1>
 		{
-			using type = typename PixelTypeToType<types[index - 1]>::type;
-			std::add_pointer_t<std::add_const_t<type>> value;
+		private:
+			using type_ = typename PixelTypeToType<types[index - 1]>::type;
+
+		public:
+			using type = std::add_pointer_t<std::add_const_t<type_>>;
+
+			constexpr GenInArgTuple() = default;
+
+			template<class... Args>
+			constexpr GenInArgTuple(type val, Args&&... args)
+			    : GenInArgTuple<types, index - 1>{std::forward<Args>(args)...}
+			    , value{val}
+			{
+			}
+
+			type value;
 		};
 
 		template<auto types>
-		struct GenInArgTuple<types, 0>
+		class GenInArgTuple<types, 0>
 		{
 		};
 
 		template<auto types, size_t index = types.size()>
-		struct GenOutArgTuple: GenOutArgTuple<types, index - 1>
+		class GenOutArgTuple: public GenOutArgTuple<types, index - 1>
 		{
-			using type = typename PixelTypeToType<types[index - 1]>::type;
-			std::add_pointer_t<type> value;
+		private:
+			using type_ = typename PixelTypeToType<types[index - 1]>::type;
+
+		public:
+			using type = std::add_pointer_t<type_>;
+
+			constexpr GenOutArgTuple() = default;
+
+			template<class... Args>
+			constexpr GenOutArgTuple(type val, Args&&... args)
+			    : GenOutArgTuple<types, index - 1>{std::forward<Args>(args)...}
+			    , value{val}
+			{
+			}
+
+			type value;
 		};
 
 		template<auto types>
-		struct GenOutArgTuple<types, 0>
+		class GenOutArgTuple<types, 0>
 		{
 		};
+	}
+
+	template<size_t N>
+	constexpr auto portTypes(std::array<PortInfo, N> const& ports)
+	{
+		std::array<PixelType, N> ret{};
+		std::ranges::transform(ports, std::begin(ret), [](auto val) { return val.type; });
+		return ret;
 	}
 
 	template<auto types>
 	class InArgTuple
 	{
 	public:
+		template<class... Args>
+		constexpr explicit InArgTuple(Args&&... args): m_data{std::forward<Args>(args)...}
+		{
+		}
+
 		static constexpr auto size() { return types.size(); }
 
 		template<size_t index>
@@ -66,6 +107,11 @@ namespace Texpainter::FilterGraph
 	class OutArgTuple
 	{
 	public:
+		template<class... Args>
+		constexpr explicit OutArgTuple(Args&&... args): m_data{std::forward<Args>(args)...}
+		{
+		}
+
 		static constexpr auto size() { return types.size(); }
 
 		template<size_t index>

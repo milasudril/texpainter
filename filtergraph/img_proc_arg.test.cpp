@@ -37,6 +37,9 @@ namespace
 			return std::vector<Texpainter::FilterGraph::ImgProcRetval>{};
 		}
 	};
+
+	using InArgs  = Texpainter::FilterGraph::InArgTuple<portTypes(ImgProcStub::inputPorts())>;
+	using OutArgs = Texpainter::FilterGraph::OutArgTuple<portTypes(ImgProcStub::outputPorts())>;
 }
 
 namespace Testcases
@@ -53,11 +56,11 @@ namespace Testcases
 		std::array<Texpainter::FilterGraph::RealValue, size.area()> output2{};
 		std::array<Texpainter::PixelStore::Pixel, size.area()> output3{};
 
-		Texpainter::FilterGraph::NodeArgument const na{
+
+		Texpainter::FilterGraph::ImgProcArg2<ImgProcStub> const obj{
 		    size,
-		    {std::begin(input1), std::begin(input2), std::begin(input3)},
-		    {std::begin(output1), std::begin(output2), std::begin(output3)}};
-		Texpainter::FilterGraph::ImgProcArg2<ImgProcStub> const obj{na};
+		    InArgs{std::begin(input3), std::begin(input2), std::begin(input1)},
+		    OutArgs{std::begin(output3), std::begin(output2), std::begin(output1)}};
 
 		assert(obj.size() == size);
 
@@ -78,7 +81,6 @@ namespace Testcases
 		    std::is_same_v<decltype(obj.input<1>()), Texpainter::FilterGraph::RealValue const*>);
 		static_assert(
 		    std::is_same_v<decltype(obj.input<2>()), Texpainter::FilterGraph::ComplexValue const*>);
-
 
 		auto ptr = obj.output<0>();
 		*ptr     = Texpainter::FilterGraph::ComplexValue{1, 2};
