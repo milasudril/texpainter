@@ -15,7 +15,7 @@ constexpr auto types = std::array<Texpainter::FilterGraph::PixelType, 3>{
     Texpainter::FilterGraph::PixelType::RGBA,
 };
 
-using MyInArgTuple = Texpainter::FilterGraph::InArgTuple<types>;
+using MyInArgTuple  = Texpainter::FilterGraph::InArgTuple<types>;
 using MyOutArgTuple = Texpainter::FilterGraph::OutArgTuple<types>;
 
 namespace Testcases
@@ -26,8 +26,8 @@ namespace Testcases
 		Texpainter::FilterGraph::ComplexValue const b{};
 		Texpainter::PixelStore::Pixel const c{};
 
-		Texpainter::FilterGraph::RealValue  x{};
-		Texpainter::FilterGraph::ComplexValue  y{};
+		Texpainter::FilterGraph::RealValue x{};
+		Texpainter::FilterGraph::ComplexValue y{};
 		Texpainter::PixelStore::Pixel z{};
 
 		Texpainter::Size2d size{23, 56};

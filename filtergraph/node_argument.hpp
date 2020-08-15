@@ -45,13 +45,12 @@ namespace Texpainter::FilterGraph
 	class NodeArgument
 	{
 	public:
-		static constexpr size_t MaxNumInputs = 4;
+		static constexpr size_t MaxNumInputs  = 4;
 		static constexpr size_t MaxNumOutputs = 4;
 
 		explicit NodeArgument(Size2d size,
-			std::array<void const*, MaxNumInputs> const& inputs,
-			std::array<void*, MaxNumOutputs> const& outputs
- 							)
+		                      std::array<void const*, MaxNumInputs> const& inputs,
+		                      std::array<void*, MaxNumOutputs> const& outputs)
 		    : m_size{size}
 		    , r_inputs{inputs}
 		    , r_outputs{outputs}

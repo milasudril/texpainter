@@ -22,7 +22,7 @@ namespace Texpainter::FilterGraph
 		constexpr auto port_types(PortArray ports)
 		{
 			std::array<PixelType, ports.size()> ret{};
-			std::ranges::transform(ports, std::begin(ret),  [](auto val){ return val.type; });
+			std::ranges::transform(ports, std::begin(ret), [](auto val) { return val.type; });
 			return ret;
 		}
 	}
@@ -34,6 +34,7 @@ namespace Texpainter::FilterGraph
 		explicit ImgProcArg2(NodeArgument const& node_args)
 		    : m_size{node_args.size()}
 		    , m_inputs{node_args.inputs<std::decay_t<decltype(m_inputs)>>()}
+		    , m_outputs{node_args.outputs<std::decay_t<decltype(m_outputs)>>()}
 		{
 		}
 
@@ -49,6 +50,18 @@ namespace Texpainter::FilterGraph
 		auto input() const
 		{
 			return m_inputs.template get<index>();
+		}
+
+		template<size_t index>
+		auto& output(uint32_t col, uint32_t row) const
+		{
+			return m_outputs.template get<index>()[row * m_size.width() + col];
+		}
+
+		template<size_t index>
+		auto output() const
+		{
+			return m_outputs.template get<index>();
 		}
 
 	private:

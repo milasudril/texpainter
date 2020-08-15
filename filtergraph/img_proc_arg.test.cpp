@@ -49,14 +49,15 @@ namespace Testcases
 		    1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
 		std::array<Texpainter::FilterGraph::ComplexValue, size.area()> const input3{};
 
-		std::array<Texpainter::PixelStore::Pixel, size.area()> output1{};
+		std::array<Texpainter::FilterGraph::ComplexValue, size.area()> output1{};
 		std::array<Texpainter::FilterGraph::RealValue, size.area()> output2{};
-		std::array<Texpainter::FilterGraph::ComplexValue, size.area()> output3{};
+		std::array<Texpainter::PixelStore::Pixel, size.area()> output3{};
 
-		Texpainter::FilterGraph::NodeArgument na{size, {std::begin(input1), std::begin(input2), std::begin(input3)}
-			,{std::begin(output1), std::begin(output2), std::begin(output3)}
-		};
-		Texpainter::FilterGraph::ImgProcArg2<ImgProcStub> obj{na};
+		Texpainter::FilterGraph::NodeArgument const na{
+		    size,
+		    {std::begin(input1), std::begin(input2), std::begin(input3)},
+		    {std::begin(output1), std::begin(output2), std::begin(output3)}};
+		Texpainter::FilterGraph::ImgProcArg2<ImgProcStub> const obj{na};
 
 		assert(obj.size() == size);
 
@@ -77,6 +78,13 @@ namespace Testcases
 		    std::is_same_v<decltype(obj.input<1>()), Texpainter::FilterGraph::RealValue const*>);
 		static_assert(
 		    std::is_same_v<decltype(obj.input<2>()), Texpainter::FilterGraph::ComplexValue const*>);
+
+
+		auto ptr = obj.output<0>();
+		*ptr     = Texpainter::FilterGraph::ComplexValue{1, 2};
+		static_assert(std::is_same_v<decltype(ptr), Texpainter::FilterGraph::ComplexValue*>);
+		assert((*ptr == Texpainter::FilterGraph::ComplexValue{1, 2}));
+		assert(ptr == std::begin(output1));
 	}
 }
 
