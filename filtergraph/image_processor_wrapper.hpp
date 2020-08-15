@@ -22,13 +22,17 @@ namespace Texpainter::FilterGraph
 		std::array<Memblock, 4> operator()(NodeArgument const& arg) const
 		{
 			std::array<Memblock, 4> ret{};
+#if 0
 			std::ranges::transform(Proc::outputPorts(), ret, [size = arg.size()](auto port) {
 				// FIXME: port is not constexpr
 				auto elem_size = sizeof(PixelTypeToType<port.type>);
 				return Memblock{size.area() * elem_size};
 			});
+#endif
+			using InputArgs  = typename ImgProcArg2<Proc>::InputArgs;
+			using OutputArgs = typename ImgProcArg2<Proc>::OutputArgs;
 
-			m_proc(ImgProcArg2<Proc>{arg, ret});
+			m_proc(ImgProcArg2<Proc>{arg.size(), arg.inputs<InputArgs>(), OutputArgs{ret}});
 
 			return ret;
 		}

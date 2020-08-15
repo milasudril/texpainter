@@ -18,9 +18,10 @@ namespace Texpainter::FilterGraph
 	class ImgProcArg2
 	{
 	public:
-		explicit ImgProcArg2(Size2d size,
-		                     InArgTuple<portTypes(ImgProc::inputPorts())> const& inputs,
-		                     OutArgTuple<portTypes(ImgProc::outputPorts())> const& outputs)
+		using InputArgs  = InArgTuple<portTypes(ImgProc::inputPorts())>;
+		using OutputArgs = OutArgTuple<portTypes(ImgProc::outputPorts())>;
+
+		explicit ImgProcArg2(Size2d size, InputArgs const& inputs, OutputArgs const& outputs)
 		    : m_size{size}
 		    , m_inputs{inputs}
 		    , m_outputs{outputs}
@@ -55,8 +56,8 @@ namespace Texpainter::FilterGraph
 
 	private:
 		Size2d m_size;
-		InArgTuple<portTypes(ImgProc::inputPorts())> m_inputs;
-		OutArgTuple<portTypes(ImgProc::outputPorts())> m_outputs;
+		InputArgs m_inputs;
+		OutputArgs m_outputs;
 	};
 }
 
