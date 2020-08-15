@@ -1,5 +1,5 @@
 //@	{
-//@	 "targets":[{"name":"imageprocessorwrapper.hpp", "type":"include"}]
+//@	 "targets":[{"name":"image_processor_wrapper.hpp", "type":"include"}]
 //@	}
 
 #ifndef TEXPAINTER_FILTERGRAPH_IMAGEPROCESSORWRAPPER_HPP

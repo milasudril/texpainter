@@ -146,11 +146,6 @@ namespace Texpainter::FilterGraph
 			std::as_const(a).get(std::declval<std::string_view>())
 		}
 		->std::same_as<ParamValue>;
-
-		{
-			std::as_const(a)(std::declval<std::span<ImgProcArg const>>())
-		}
-		->std::same_as<std::vector<ImgProcRetval>>;
 	};
 }
 

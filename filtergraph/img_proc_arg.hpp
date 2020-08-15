@@ -14,7 +14,7 @@
 
 namespace Texpainter::FilterGraph
 {
-	template<ImageProcessor ImgProc>
+	template<class ImgProc>
 	class ImgProcArg2
 	{
 	public:
