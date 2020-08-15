@@ -70,6 +70,7 @@ namespace Texpainter::FilterGraph
 		GrayscaleComplex
 	};
 
+	using RgbaValue    = Texpainter::PixelStore::Pixel;
 	using RealValue    = double;
 	using ComplexValue = std::complex<RealValue>;
 
@@ -79,7 +80,7 @@ namespace Texpainter::FilterGraph
 	template<>
 	struct PixelTypeToType<PixelType::RGBA>
 	{
-		using type = PixelStore::Pixel;
+		using type = RgbaValue;
 	};
 
 	template<>

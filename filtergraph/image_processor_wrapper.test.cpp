@@ -10,24 +10,27 @@ namespace
 {
 	struct ImgProcStub
 	{
-		static constexpr std::array<Texpainter::FilterGraph::PortInfo, 3> inputPorts()
+		static constexpr auto inputPorts()
 		{
 			return std::array<Texpainter::FilterGraph::PortInfo, 3>{
-				{{Texpainter::FilterGraph::PixelType::RGBA, "Input 1"},
-				{Texpainter::FilterGraph::PixelType::GrayscaleReal, "Input 2"},
-				{Texpainter::FilterGraph::PixelType::GrayscaleComplex, "Input 3"}}};
+			    {{Texpainter::FilterGraph::PixelType::RGBA, "Input 1"},
+			     {Texpainter::FilterGraph::PixelType::GrayscaleReal, "Input 2"},
+			     {Texpainter::FilterGraph::PixelType::GrayscaleComplex, "Input 3"}}};
 		}
 
-		static constexpr std::array<Texpainter::FilterGraph::PortInfo, 3> outputPorts()
+		static constexpr auto outputPorts()
 		{
 			return std::array<Texpainter::FilterGraph::PortInfo, 3>{
-				{{Texpainter::FilterGraph::PixelType::GrayscaleComplex, "Output 1"},
-				{Texpainter::FilterGraph::PixelType::GrayscaleReal, "Output 2"},
-				{Texpainter::FilterGraph::PixelType::RGBA, "Output 3"}}};
+			    {{Texpainter::FilterGraph::PixelType::GrayscaleComplex, "Output 1"},
+			     {Texpainter::FilterGraph::PixelType::GrayscaleReal, "Output 2"},
+			     {Texpainter::FilterGraph::PixelType::RGBA, "Output 3"}}};
 		}
 
 		static constexpr char const* name() { return "Stub"; }
-		static constexpr std::span<char const* const> paramNames() { return std::span<char const* const>{}; }
+		static constexpr auto paramNames()
+		{
+			return std::span<char const* const>{};
+		}
 		void set(std::string_view, Texpainter::FilterGraph::ParamValue) {}
 		auto get(std::string_view) const { return Texpainter::FilterGraph::ParamValue{0.0f}; }
 		auto paramValues() const { return std::span<Texpainter::FilterGraph::ParamValue const>{}; }
@@ -51,16 +54,24 @@ namespace Testcases
 	void texpaitnerFilterGraphImageProcessorWrapperCall()
 	{
 		using ImgProcArg = Texpainter::FilterGraph::ImgProcArg2<ImgProcStub>;
-		ImgProcArg args{Texpainter::Size2d{1,2}, ImgProcArg::InputArgs{}, ImgProcArg::OutputArgs{}};
+		ImgProcArg args{
+		    Texpainter::Size2d{1, 2}, ImgProcArg::InputArgs{}, ImgProcArg::OutputArgs{}};
 		Texpainter::FilterGraph::ImageProcessorWrapper obj{ImgProcStub{&args}};
 
 		Texpainter::Size2d size{3, 2};
 		Texpainter::FilterGraph::NodeArgument na{size, {{nullptr, nullptr, nullptr}}};
 		auto ret = obj(na);
+		assert(args.size() == size);
 		assert(ret[0].get() == args.output<0>());
 		assert(ret[1].get() == args.output<1>());
 		assert(ret[2].get() == args.output<2>());
+		static_assert(std::is_same_v<decltype(args.output<0>()), Texpainter::FilterGraph::ComplexValue*>);
+		static_assert(std::is_same_v<decltype(args.output<1>()), Texpainter::FilterGraph::RealValue*>);
+		static_assert(std::is_same_v<decltype(args.output<2>()), Texpainter::FilterGraph::RgbaValue*>);
 
+		static_assert(std::is_same_v<decltype(args.input<0>()), Texpainter::FilterGraph::RgbaValue const*>);
+		static_assert(std::is_same_v<decltype(args.input<1>()), Texpainter::FilterGraph::RealValue const*>);
+		static_assert(std::is_same_v<decltype(args.input<2>()), Texpainter::FilterGraph::ComplexValue const*>);
 	}
 }
 
