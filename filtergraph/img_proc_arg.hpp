@@ -18,12 +18,11 @@ namespace Texpainter::FilterGraph
 {
 	namespace detail
 	{
-		template<ImageProcessor proc>
-		constexpr auto input_types()
+		template<class PortArray>
+		constexpr auto port_types(PortArray ports)
 		{
-			std::array<PixelType, proc::inputPorts().size()> ret{};
-			std::ranges::transform(
-			    proc::inputPorts(), std::begin(ret), [](auto val) { return val.type; });
+			std::array<PixelType, ports.size()> ret{};
+			std::ranges::transform(ports, std::begin(ret),  [](auto val){ return val.type; });
 			return ret;
 		}
 	}
@@ -54,7 +53,8 @@ namespace Texpainter::FilterGraph
 
 	private:
 		Size2d m_size;
-		InArgTuple<detail::input_types<ImgProc>()> m_inputs;
+		InArgTuple<detail::port_types(ImgProc::inputPorts())> m_inputs;
+		OutArgTuple<detail::port_types(ImgProc::outputPorts())> m_outputs;
 	};
 }
 
