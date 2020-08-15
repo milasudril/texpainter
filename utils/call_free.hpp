@@ -1,4 +1,4 @@
-//@	{"targets":[{"name":"memblock.hpp", "type":"include"}]}
+//@	{"targets":[{"name":"call_free.hpp", "type":"include"}]}
 
 #ifndef TEXPAINTER_UTILS_CALLFREE_HPP
 #define TEXPAINTER_UTILS_CALLFREE_HPP
