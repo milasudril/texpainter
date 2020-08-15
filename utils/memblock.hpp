@@ -12,6 +12,8 @@ namespace Texpainter
 	class Memblock
 	{
 	public:
+		Memblock(): m_block{nullptr} {}
+
 		explicit Memblock(size_t size): m_block{malloc(size)} {}
 
 		~Memblock()
