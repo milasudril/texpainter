@@ -54,7 +54,7 @@ namespace Texpainter::FilterGraph
 
 	private:
 		Size2d m_size;
-		ArgTuple<detail::input_types<ImgProc>()> m_inputs;
+		InArgTuple<detail::input_types<ImgProc>()> m_inputs;
 	};
 }
 

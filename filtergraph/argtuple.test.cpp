@@ -12,7 +12,7 @@ constexpr auto types = std::array<Texpainter::FilterGraph::PixelType, 3>{
     Texpainter::FilterGraph::PixelType::RGBA,
 };
 
-using MyArgTuple = Texpainter::FilterGraph::ArgTuple<types>;
+using MyArgTuple = Texpainter::FilterGraph::InArgTuple<types>;
 
 constexpr auto args = MyArgTuple{};
 

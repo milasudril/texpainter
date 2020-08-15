@@ -44,12 +44,18 @@ namespace Testcases
 	void texpainterFilterGraphImgProcArgTest()
 	{
 		constexpr Texpainter::Size2d size{3, 2};
-		std::array<Texpainter::PixelStore::Pixel, size.area()> input1{};
-		std::array<Texpainter::FilterGraph::RealValue, size.area()> input2{
+		std::array<Texpainter::PixelStore::Pixel, size.area()> const input1{};
+		std::array<Texpainter::FilterGraph::RealValue, size.area()> const input2{
 		    1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
-		std::array<Texpainter::FilterGraph::ComplexValue, size.area()> input3{};
+		std::array<Texpainter::FilterGraph::ComplexValue, size.area()> const input3{};
 
-		Texpainter::FilterGraph::NodeArgument na{size, {&input1, &input2, &input3}};
+		std::array<Texpainter::PixelStore::Pixel, size.area()> output1{};
+		std::array<Texpainter::FilterGraph::RealValue, size.area()> output2{};
+		std::array<Texpainter::FilterGraph::ComplexValue, size.area()> output3{};
+
+		Texpainter::FilterGraph::NodeArgument na{size, {std::begin(input1), std::begin(input2), std::begin(input3)}
+			,{std::begin(output1), std::begin(output2), std::begin(output3)}
+		};
 		Texpainter::FilterGraph::ImgProcArg2<ImgProcStub> obj{na};
 
 		assert(obj.size() == size);
