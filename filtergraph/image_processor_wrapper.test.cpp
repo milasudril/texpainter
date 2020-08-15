@@ -4,6 +4,8 @@
 
 #include "./image_processor_wrapper.hpp"
 
+#include <cassert>
+
 struct ImgProcStub
 {
 	static constexpr auto inputPorts()
@@ -33,18 +35,25 @@ struct ImgProcStub
 		return std::vector<Texpainter::FilterGraph::ImgProcRetval>{};
 	}
 
-	void operator()(auto const&) const {}
+	void operator()(auto const& args) const
+	{
+		*called_with_size = args.size();
+	}
+
+	Texpainter::Size2d* called_with_size;
 };
 
 namespace Testcases
 {
 	void texpaitnerFilterGraphImageProcessorWrapperCall()
 	{
-		Texpainter::FilterGraph::ImageProcessorWrapper obj{ImgProcStub{}};
-		Texpainter::Size2d size{1, 2};
+		Texpainter::Size2d size_out{1, 1};
+		Texpainter::FilterGraph::ImageProcessorWrapper obj{ImgProcStub{&size_out}};
 
+		Texpainter::Size2d size{3, 2};
 		Texpainter::FilterGraph::NodeArgument na{size, {{nullptr, nullptr, nullptr}}};
 		auto ret = obj(na);
+		assert(size_out == size);
 	}
 }
 
