@@ -12,6 +12,7 @@
 #include <variant>
 #include <string_view>
 #include <span>
+#include <ranges>
 
 namespace Texpainter::FilterGraph
 {
@@ -128,12 +129,12 @@ namespace Texpainter::FilterGraph
 		{
 			T::inputPorts()
 		}
-		->std::same_as<std::span<PortInfo const>>;
+		->std::ranges::random_access_range;
 
 		{
 			T::outputPorts()
 		}
-		->std::same_as<std::span<PortInfo const>>;
+		->std::ranges::random_access_range;
 
 		{
 			std::as_const(a).paramValues()

@@ -21,9 +21,9 @@ namespace Texpainter::FilterGraph
 		template<ImageProcessor proc>
 		constexpr auto input_types()
 		{
-			std::array<PixelType, proc::inputs().size()> ret{};
+			std::array<PixelType, proc::inputPorts().size()> ret{};
 			std::ranges::transform(
-			    proc::inputs().inputs(), ret, [](auto val) { return val.type; });
+			    proc::inputPorts(), std::begin(ret), [](auto val) { return val.type; });
 			return ret;
 		}
 	}
@@ -44,6 +44,12 @@ namespace Texpainter::FilterGraph
 		auto input(uint32_t col, uint32_t row) const
 		{
 			return m_inputs.template get<index>()[row * m_size.width() + col];
+		}
+
+		template<size_t index>
+		auto input() const
+		{
+			return m_inputs.template get<index>();
 		}
 
 	private:

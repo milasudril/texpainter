@@ -18,7 +18,7 @@ namespace RgbaCombine
 
 	class ImageProcessor
 	{
-		static constexpr PortInfo s_output_ports[] = {PixelType::RGBA, "Pixels"};
+		static constexpr PortInfo s_output_ports[] = {{PixelType::RGBA, "Pixels"}};
 
 		static constexpr PortInfo s_input_ports[] = {PortInfo{PixelType::GrayscaleReal, "Red"},
 		                                             PortInfo{PixelType::GrayscaleReal, "Green"},
