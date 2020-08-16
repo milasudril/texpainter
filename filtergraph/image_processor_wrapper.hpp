@@ -96,6 +96,8 @@ namespace Texpainter::FilterGraph
 
 		char const* name() const override { return Proc::name(); }
 
+		Proc const& processor() const { return m_proc; }
+
 	private:
 		Proc m_proc;
 	};

@@ -42,10 +42,10 @@ namespace
 
 		void operator()(Texpainter::FilterGraph::ImgProcArg2<ImgProcStub> const& args) const
 		{
-			*args_result = args;
+			args_result = &args;
 		}
 
-		mutable Texpainter::FilterGraph::ImgProcArg2<ImgProcStub>* args_result;
+		mutable Texpainter::FilterGraph::ImgProcArg2<ImgProcStub> const* args_result;
 	};
 }
 
@@ -53,10 +53,7 @@ namespace Testcases
 {
 	void texpaitnerFilterGraphImageProcessorWrapperCall()
 	{
-		using ImgProcArg = Texpainter::FilterGraph::ImgProcArg2<ImgProcStub>;
-		ImgProcArg args{
-		    Texpainter::Size2d{1, 2}, ImgProcArg::InputArgs{}, ImgProcArg::OutputArgs{}};
-		Texpainter::FilterGraph::ImageProcessorWrapper obj{ImgProcStub{&args}};
+		Texpainter::FilterGraph::ImageProcessorWrapper obj{ImgProcStub{}};
 
 		Texpainter::Size2d size{3, 2};
 
@@ -70,7 +67,7 @@ namespace Testcases
 		Testutils::MallocHook::init();
 		auto ret = obj(na);
 		Testutils::MallocHook::disarm();
-
+		auto args = *obj.processor().args_result;
 		assert(args.size() == size);
 		assert(ret[0].get() == args.output<0>());
 		assert(ret[1].get() == args.output<1>());
