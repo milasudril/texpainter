@@ -34,7 +34,7 @@ namespace
 		void set(Texpainter::FilterGraph::ParamName name, Texpainter::FilterGraph::ParamValue val)
 		{
 			param_name_asked_for = &name;
-			param_value_set = val;
+			param_value_set      = val;
 		}
 
 		auto get(Texpainter::FilterGraph::ParamName name) const
@@ -61,7 +61,8 @@ namespace
 		    Texpainter::FilterGraph::ParamValue{3}};
 
 
-		mutable Texpainter::FilterGraph::ImgProcArg2<InterfaceDescriptor> const* args_result{nullptr};
+		mutable Texpainter::FilterGraph::ImgProcArg2<InterfaceDescriptor> const* args_result{
+		    nullptr};
 		mutable Texpainter::FilterGraph::ParamName* param_name_asked_for{nullptr};
 		mutable Texpainter::FilterGraph::ParamValue param_value_set{0};
 	};
@@ -162,7 +163,8 @@ namespace Testcases
 	void texpainterFilterGraphImageProcessorWrapperSetParamValue()
 	{
 		Texpainter::FilterGraph::ImageProcessorWrapper obj{ImgProcStub{}};
-		obj.set(Texpainter::FilterGraph::ParamName{"Hej"}, Texpainter::FilterGraph::ParamValue{128});
+		obj.set(Texpainter::FilterGraph::ParamName{"Hej"},
+		        Texpainter::FilterGraph::ParamValue{128});
 		auto asked_for = *obj.processor().param_name_asked_for;
 		auto value_set = obj.processor().param_value_set;
 		assert((asked_for == Texpainter::FilterGraph::ParamName{"Hej"}));
