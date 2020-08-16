@@ -70,11 +70,11 @@ namespace Texpainter::FilterGraph
 			return ret;
 		}
 
-		std::span<PortInfo const> inputPorts() const override { return m_proc.inputPorts(); }
+		std::span<PortInfo const> inputPorts() const override { return s_input_ports; }
 
-		std::span<PortInfo const> outputPorts() const override { return m_proc.outputPorts(); }
+		std::span<PortInfo const> outputPorts() const override { return s_output_ports; }
 
-		std::span<char const* const> paramNames() const override { return m_proc.paramNames(); }
+		std::span<ParamName const> paramNames() const override { return s_param_names; }
 
 		std::span<ParamValue const> paramValues() const override { return m_proc.paramValues(); }
 
@@ -100,6 +100,9 @@ namespace Texpainter::FilterGraph
 
 	private:
 		Proc m_proc;
+		static constexpr auto s_input_ports  = Proc::inputPorts();
+		static constexpr auto s_output_ports = Proc::outputPorts();
+		static constexpr auto s_param_names  = Proc::paramNames();
 	};
 }
 

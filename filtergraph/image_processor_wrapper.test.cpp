@@ -30,7 +30,10 @@ namespace
 		}
 
 		static constexpr char const* name() { return "Stub"; }
-		static constexpr auto paramNames() { return std::span<char const* const>{}; }
+		static constexpr auto paramNames()
+		{
+			return std::array<Texpainter::FilterGraph::ParamName, 3>{"Foo", "Bar", "Kaka"};
+		}
 		void set(std::string_view, Texpainter::FilterGraph::ParamValue) {}
 		auto get(std::string_view) const { return Texpainter::FilterGraph::ParamValue{0.0f}; }
 		auto paramValues() const { return std::span<Texpainter::FilterGraph::ParamValue const>{}; }
@@ -68,6 +71,7 @@ namespace Testcases
 		auto ret = obj(na);
 		Testutils::MallocHook::disarm();
 		auto args = *obj.processor().args_result;
+
 		assert(args.size() == size);
 		assert(ret[0].get() == args.output<0>());
 		assert(ret[1].get() == args.output<1>());
@@ -100,10 +104,64 @@ namespace Testcases
 		static_assert(std::is_same_v<decltype(args.input<2>()),
 		                             Texpainter::FilterGraph::ComplexValue const*>);
 	}
+
+	void texpaitnerFilterGraphImageProcessorWrapperInputPorts()
+	{
+		Texpainter::FilterGraph::ImageProcessorWrapper obj{ImgProcStub{}};
+
+		auto ports = obj.inputPorts();
+		assert(std::ranges::equal(ports, ImgProcStub::inputPorts()));
+	}
+
+	void texpaitnerFilterGraphImageProcessorWrapperOutputPorts()
+	{
+		Texpainter::FilterGraph::ImageProcessorWrapper obj{ImgProcStub{}};
+
+		auto ports = obj.outputPorts();
+		assert(std::ranges::equal(ports, ImgProcStub::outputPorts()));
+	}
+
+	void texpaitnerFilterGraphImageProcessorWrapperParamNames()
+	{
+		Texpainter::FilterGraph::ImageProcessorWrapper obj{ImgProcStub{}};
+
+		auto params = obj.paramNames();
+		assert(std::equal(
+		    std::begin(params), std::end(params), std::begin(ImgProcStub::paramNames())));
+	}
+#if 0
+
+		std::span<char const* const> paramNames() const override { return m_proc.paramNames(); }
+
+		std::span<ParamValue const> paramValues() const override { return m_proc.paramValues(); }
+
+		ParamValue get(std::string_view param_name) const override
+		{
+			return m_proc.get(param_name);
+		}
+
+		AbstractImageProcessor& set(std::string_view param_name, ParamValue value) override
+		{
+			m_proc.set(param_name, value);
+			return *this;
+		}
+
+		std::unique_ptr<AbstractImageProcessor> clone() const override
+		{
+			return std::make_unique<ImageProcessorWrapper>(*this);
+		}
+
+		char const* name() const override { return Proc::name(); }
+#endif
 }
 
 int main()
 {
 	Testcases::texpaitnerFilterGraphImageProcessorWrapperCall();
+	Testcases::texpaitnerFilterGraphImageProcessorWrapperInputPorts();
+	Testcases::texpaitnerFilterGraphImageProcessorWrapperOutputPorts();
+	Testcases::texpaitnerFilterGraphImageProcessorWrapperParamNames();
+
+
 	return 0;
 }

@@ -29,6 +29,32 @@ namespace Texpainter::FilterGraph
 		double m_value;
 	};
 
+	class ParamName
+	{
+	public:
+		constexpr ParamName(char const* str): r_str{str} {}
+
+		constexpr char const* c_str() const { return r_str; }
+
+		constexpr auto operator<=>(ParamName other) const
+		{
+			auto res = strcmp(r_str, other.r_str);
+			if(res == 0) [[unlikely]]
+				{
+					return std::strong_ordering::equal;
+				}
+
+			if(res < 0) { return std::strong_ordering::less; }
+
+			return std::strong_ordering::greater;
+		}
+
+		constexpr bool operator==(ParamName const& other) const = default;
+
+	private:
+		char const* r_str;
+	};
+
 	enum class PortType : int
 	{
 		Input,
@@ -102,6 +128,14 @@ namespace Texpainter::FilterGraph
 		char const* name;
 	};
 
+	constexpr bool operator==(PortInfo a, PortInfo b)
+	{
+		if(a.type == b.type) { return strcmp(a.name, b.name) == 0; }
+		return false;
+	}
+
+	constexpr bool operator!=(PortInfo a, PortInfo b) { return !(a == b); }
+
 	using ImgProcArg = std::variant<Span2d<PixelStore::Pixel const>,
 	                                Span2d<double const>,
 	                                Span2d<std::complex<double> const>>;
@@ -125,7 +159,7 @@ namespace Texpainter::FilterGraph
 		{
 			T::paramNames()
 		}
-		->std::same_as<std::span<char const* const>>;
+		->std::ranges::random_access_range;
 
 		{
 			T::inputPorts()
