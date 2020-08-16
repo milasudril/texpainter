@@ -26,12 +26,8 @@ namespace
 			     {Texpainter::FilterGraph::PixelType::GrayscaleReal, "Output 2"},
 			     {Texpainter::FilterGraph::PixelType::RGBA, "Output 3"},
 			     {Texpainter::FilterGraph::PixelType::GrayscaleReal, "Output 4"}}};
-		};
 
-		struct ParamNames
-		{
-			static constexpr auto items =
-			    std::array<Texpainter::FilterGraph::ParamName, 3>{"Foo", "Bar", "Kaka"};
+			static constexpr auto ParamNames = std::array<Texpainter::FilterGraph::ParamName, 3>{"Foo", "Bar", "Kaka"};
 		};
 
 		static constexpr char const* name() { return "Stub"; }
@@ -74,6 +70,11 @@ namespace
 			{
 				return a < b;
 			}
+		};
+
+		struct ParamNames
+		{
+			static constexpr auto items = InterfaceDescriptor::ParamNames;
 		};
 
 		Texpainter::FixedFlatmap<ParamNames, Texpainter::FilterGraph::ParamValue, ParamNameCompare>
