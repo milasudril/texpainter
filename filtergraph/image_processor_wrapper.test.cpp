@@ -14,22 +14,25 @@ namespace
 {
 	struct ImgProcStub
 	{
-		static constexpr auto inputPorts()
+		struct InterfaceDescriptor
 		{
-			return std::array<Texpainter::FilterGraph::PortInfo, 3>{
-			    {{Texpainter::FilterGraph::PixelType::RGBA, "Input 1"},
-			     {Texpainter::FilterGraph::PixelType::GrayscaleReal, "Input 2"},
-			     {Texpainter::FilterGraph::PixelType::GrayscaleComplex, "Input 3"}}};
-		}
+			static constexpr auto inputPorts()
+			{
+				return std::array<Texpainter::FilterGraph::PortInfo, 3>{
+				    {{Texpainter::FilterGraph::PixelType::RGBA, "Input 1"},
+				     {Texpainter::FilterGraph::PixelType::GrayscaleReal, "Input 2"},
+				     {Texpainter::FilterGraph::PixelType::GrayscaleComplex, "Input 3"}}};
+			}
 
-		static constexpr auto outputPorts()
-		{
-			return std::array<Texpainter::FilterGraph::PortInfo, 4>{
-			    {{Texpainter::FilterGraph::PixelType::GrayscaleComplex, "Output 1"},
-			     {Texpainter::FilterGraph::PixelType::GrayscaleReal, "Output 2"},
-			     {Texpainter::FilterGraph::PixelType::RGBA, "Output 3"},
-			     {Texpainter::FilterGraph::PixelType::GrayscaleReal, "Output 4"}}};
-		}
+			static constexpr auto outputPorts()
+			{
+				return std::array<Texpainter::FilterGraph::PortInfo, 4>{
+				    {{Texpainter::FilterGraph::PixelType::GrayscaleComplex, "Output 1"},
+				     {Texpainter::FilterGraph::PixelType::GrayscaleReal, "Output 2"},
+				     {Texpainter::FilterGraph::PixelType::RGBA, "Output 3"},
+				     {Texpainter::FilterGraph::PixelType::GrayscaleReal, "Output 4"}}};
+			}
+		};
 
 		static constexpr char const* name() { return "Stub"; }
 		static constexpr auto paramNames() { return ParamNames::items; }
@@ -143,7 +146,7 @@ namespace Testcases
 		Texpainter::FilterGraph::ImageProcessorWrapper obj{ImgProcStub{}};
 
 		auto ports = obj.inputPorts();
-		assert(std::ranges::equal(ports, ImgProcStub::inputPorts()));
+		assert(std::ranges::equal(ports, ImgProcStub::InterfaceDescriptor::inputPorts()));
 	}
 
 	void texpaitnerFilterGraphImageProcessorWrapperOutputPorts()
@@ -151,7 +154,7 @@ namespace Testcases
 		Texpainter::FilterGraph::ImageProcessorWrapper obj{ImgProcStub{}};
 
 		auto ports = obj.outputPorts();
-		assert(std::ranges::equal(ports, ImgProcStub::outputPorts()));
+		assert(std::ranges::equal(ports, ImgProcStub::InterfaceDescriptor::outputPorts()));
 	}
 
 	void texpaitnerFilterGraphImageProcessorWrapperParamNames()

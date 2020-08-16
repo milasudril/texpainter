@@ -164,16 +164,6 @@ namespace Texpainter::FilterGraph
 		->std::ranges::random_access_range;
 
 		{
-			T::inputPorts()
-		}
-		->std::ranges::random_access_range;
-
-		{
-			T::outputPorts()
-		}
-		->std::ranges::random_access_range;
-
-		{
 			std::as_const(a).paramValues()
 		}
 		->std::same_as<std::span<ParamValue const>>;

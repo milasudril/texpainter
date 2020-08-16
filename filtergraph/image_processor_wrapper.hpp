@@ -29,9 +29,9 @@ namespace Texpainter::FilterGraph
 		template<ImageProcessor ImgProc>
 		auto alloc_output_buffers(Size2d size)
 		{
-			static_assert(std::size(ImgProc::outputPorts()) <= 4);
-			std::array<size_t, std::size(ImgProc::outputPorts())> sizes;
-			get_sizes<portTypes(ImgProc::outputPorts())>(sizes);
+			static_assert(std::size(ImgProc::InterfaceDescriptor::outputPorts()) <= 4);
+			std::array<size_t, std::size(ImgProc::InterfaceDescriptor::outputPorts())> sizes;
+			get_sizes<portTypes(ImgProc::InterfaceDescriptor::outputPorts())>(sizes);
 			std::array<Memblock, 4> ret;
 			std::ranges::transform(
 			    sizes, std::begin(ret), [size](auto val) { return Memblock{size.area() * val}; });
@@ -100,8 +100,8 @@ namespace Texpainter::FilterGraph
 
 	private:
 		Proc m_proc;
-		static constexpr auto s_input_ports  = Proc::inputPorts();
-		static constexpr auto s_output_ports = Proc::outputPorts();
+		static constexpr auto s_input_ports  = Proc::InterfaceDescriptor::inputPorts();
+		static constexpr auto s_output_ports = Proc::InterfaceDescriptor::outputPorts();
 		static constexpr auto s_param_names  = Proc::paramNames();
 	};
 }
