@@ -46,7 +46,7 @@ namespace Texpainter::FilterGraph
 	}
 
 	template<ImageProcessor Proc>
-	class ImageProcessorWrapper: public AbstractImageProcessor
+	class ImageProcessorWrapper final: public AbstractImageProcessor
 	{
 	public:
 		explicit ImageProcessorWrapper(Proc&& proc): m_proc{std::move(proc)} {}

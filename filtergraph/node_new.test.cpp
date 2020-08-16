@@ -5,6 +5,58 @@
 #include "./node_new.hpp"
 #include <cassert>
 
+namespace
+{
+	class ImageProcessorStub final: public Texpainter::FilterGraph::AbstractImageProcessor
+	{
+		std::array<Texpainter::Memblock, MaxNumOutputs> operator()(
+		    Texpainter::FilterGraph::NodeArgument const& arg) const override
+		{
+			return std::array<Texpainter::Memblock, MaxNumOutputs>{};
+		}
+
+		std::span<Texpainter::FilterGraph::PortInfo const> inputPorts() const override
+		{
+			return std::span<Texpainter::FilterGraph::PortInfo const>{};
+		}
+
+		std::span<Texpainter::FilterGraph::PortInfo const> outputPorts() const override
+		{
+			return std::span<Texpainter::FilterGraph::PortInfo const>{};
+		}
+
+		std::span<Texpainter::FilterGraph::ParamName const> paramNames() const override
+		{
+			return std::span<Texpainter::FilterGraph::ParamName const>{};
+		}
+
+		std::span<Texpainter::FilterGraph::ParamValue const> paramValues() const override
+		{
+			return std::span<Texpainter::FilterGraph::ParamValue const>{};
+		}
+
+		Texpainter::FilterGraph::ParamValue get(
+		    Texpainter::FilterGraph::ParamName param_name) const override
+		{
+			return Texpainter::FilterGraph::ParamValue{0};
+		}
+
+		Texpainter::FilterGraph::AbstractImageProcessor& set(
+		    Texpainter::FilterGraph::ParamName param_name,
+		    Texpainter::FilterGraph::ParamValue value) override
+		{
+			return *this;
+		}
+
+		std::unique_ptr<Texpainter::FilterGraph::AbstractImageProcessor> clone() const override
+		{
+			return std::make_unique<ImageProcessorStub>(*this);
+		}
+
+		char const* name() const override { return "ImageProcessorStub"; }
+	};
+}
+
 namespace Testcases
 {
 	void texpainterFilterGraphNodeDefaultState()
@@ -17,11 +69,19 @@ namespace Testcases
 		assert(!obj.connected(Texpainter::FilterGraph::InputPort{3}));
 		assert(!obj.dirty());
 	}
+
+	void texpainterFilterGraphNodeDisconnectedCopy()
+	{
+		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>()};
+		assert(obj.hasProcessor());
+		auto other = obj.disconnectedCopy();
+		assert(other.hasProcessor());
+		assert(&other.processor() != &obj.processor());
+	}
 }
 
 #if 0
 		explicit Node(std::unique_ptr<AbstractImageProcessor>&& proc);
-		Node(): m_dirty{0}, m_proc{nullptr} {}
 		auto disconnectedCopy() const { return Node{m_proc->clone()}; }
 		Node& replaceWith(std::unique_ptr<AbstractImageProcessor>&& proc);
 		AbstractImageProcessor const& processor() const;
@@ -45,5 +105,6 @@ namespace Testcases
 int main()
 {
 	Testcases::texpainterFilterGraphNodeDefaultState();
+	Testcases::texpainterFilterGraphNodeDisconnectedCopy();
 	return 0;
 }
