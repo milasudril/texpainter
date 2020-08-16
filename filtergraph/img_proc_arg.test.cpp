@@ -8,7 +8,7 @@
 
 namespace
 {
-	struct ImgProcStub
+	struct Ports
 	{
 		static constexpr auto inputPorts()
 		{
@@ -25,21 +25,10 @@ namespace
 			     {Texpainter::FilterGraph::PixelType::GrayscaleReal, "Output 2"},
 			     {Texpainter::FilterGraph::PixelType::RGBA, "Output 3"}}};
 		}
-
-		static constexpr char const* name() { return "Stub"; }
-		static constexpr auto paramNames() { return std::span<char const* const>{}; }
-		void set(std::string_view, Texpainter::FilterGraph::ParamValue) {}
-		auto get(std::string_view) const { return Texpainter::FilterGraph::ParamValue{0.0f}; }
-		auto paramValues() const { return std::span<Texpainter::FilterGraph::ParamValue const>{}; }
-
-		auto operator()(std::span<Texpainter::FilterGraph::ImgProcArg const>) const
-		{
-			return std::vector<Texpainter::FilterGraph::ImgProcRetval>{};
-		}
 	};
 
-	using InArgs  = Texpainter::FilterGraph::InArgTuple<portTypes(ImgProcStub::inputPorts())>;
-	using OutArgs = Texpainter::FilterGraph::OutArgTuple<portTypes(ImgProcStub::outputPorts())>;
+	using InArgs  = Texpainter::FilterGraph::InArgTuple<portTypes(Ports::inputPorts())>;
+	using OutArgs = Texpainter::FilterGraph::OutArgTuple<portTypes(Ports::outputPorts())>;
 }
 
 namespace Testcases
@@ -57,7 +46,7 @@ namespace Testcases
 		std::array<Texpainter::PixelStore::Pixel, size.area()> output3{};
 
 
-		Texpainter::FilterGraph::ImgProcArg2<ImgProcStub> const obj{
+		Texpainter::FilterGraph::ImgProcArg2<Ports> const obj{
 		    size,
 		    InArgs{std::begin(input3), std::begin(input2), std::begin(input1)},
 		    OutArgs{std::begin(output3), std::begin(output2), std::begin(output1)}};
