@@ -45,12 +45,12 @@ namespace
 			return std::vector<Texpainter::FilterGraph::ImgProcRetval>{};
 		}
 
-		void operator()(Texpainter::FilterGraph::ImgProcArg2<ImgProcStub> const& args) const
+		void operator()(Texpainter::FilterGraph::ImgProcArg2<InterfaceDescriptor> const& args) const
 		{
 			args_result = &args;
 		}
 
-		mutable Texpainter::FilterGraph::ImgProcArg2<ImgProcStub> const* args_result;
+		mutable Texpainter::FilterGraph::ImgProcArg2<InterfaceDescriptor> const* args_result;
 
 
 		struct ParamNameCompare

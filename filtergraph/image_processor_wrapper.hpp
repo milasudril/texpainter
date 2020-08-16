@@ -26,12 +26,12 @@ namespace Texpainter::FilterGraph
 			}
 		}
 
-		template<ImageProcessor ImgProc>
+		template<class InterfaceDescriptor>
 		auto alloc_output_buffers(Size2d size)
 		{
-			static_assert(std::size(ImgProc::InterfaceDescriptor::OutputPorts) <= 4);
-			std::array<size_t, std::size(ImgProc::InterfaceDescriptor::OutputPorts)> sizes;
-			get_sizes<portTypes(ImgProc::InterfaceDescriptor::OutputPorts)>(sizes);
+			static_assert(std::size(InterfaceDescriptor::OutputPorts) <= 4);
+			std::array<size_t, std::size(InterfaceDescriptor::OutputPorts)> sizes;
+			get_sizes<portTypes(InterfaceDescriptor::OutputPorts)>(sizes);
 			std::array<Memblock, 4> ret;
 			std::ranges::transform(
 			    sizes, std::begin(ret), [size](auto val) { return Memblock{size.area() * val}; });
@@ -53,10 +53,11 @@ namespace Texpainter::FilterGraph
 
 		std::array<Memblock, 4> operator()(NodeArgument const& arg) const override
 		{
-			auto ret = detail::alloc_output_buffers<Proc>(arg.size());
+			using InterfaceDescriptor = typename Proc::InterfaceDescriptor;
+			auto ret = detail::alloc_output_buffers<InterfaceDescriptor>(arg.size());
 
-			using InputArgs  = typename ImgProcArg2<Proc>::InputArgs;
-			using OutputArgs = typename ImgProcArg2<Proc>::OutputArgs;
+			using InputArgs  = typename ImgProcArg2<InterfaceDescriptor>::InputArgs;
+			using OutputArgs = typename ImgProcArg2<InterfaceDescriptor>::OutputArgs;
 
 			OutputArgs args_out{};
 			detail::apply(
@@ -65,7 +66,7 @@ namespace Texpainter::FilterGraph
 			    },
 			    args_out);
 
-			m_proc(ImgProcArg2<Proc>{arg.size(), arg.inputs<InputArgs>(), args_out});
+			m_proc(ImgProcArg2<InterfaceDescriptor>{arg.size(), arg.inputs<InputArgs>(), args_out});
 
 			return ret;
 		}
