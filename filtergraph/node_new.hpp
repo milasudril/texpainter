@@ -72,6 +72,10 @@ namespace Texpainter::FilterGraph
 
 		bool hasProcessor() const { return m_proc != nullptr; }
 
+		auto inputPorts() const { return m_proc->inputPorts(); }
+
+		auto outputPorts() const { return m_proc->outputPorts(); }
+
 
 		bool dirty() const
 		{
@@ -89,19 +93,18 @@ namespace Texpainter::FilterGraph
 			if(!dirty()) { return m_result_cache; }
 
 			std::array<void const*, NodeArgument::MaxNumInputs> args{};
-			std::ranges::transform(m_inputs, std::begin(args), [size](auto const& val) {
-				auto const& ret = val(size);
-				return ret;
-			});
+			std::transform(std::begin(m_inputs),
+			               std::begin(m_inputs) + inputPorts().size(),
+			               std::begin(args),
+			               [size](auto const& val) {
+				               auto const& ret = val(size);
+				               return ret;
+			               });
 			m_result_cache = (*m_proc)(NodeArgument{size, args});
 			m_dirty        = 0;
 			return m_result_cache;
 		}
 
-
-		auto inputPorts() const { return m_proc->inputPorts(); }
-
-		auto outputPorts() const { return m_proc->outputPorts(); }
 
 		Node& connect(InputPort input, std::reference_wrapper<Node const> other, OutputPort output)
 		{

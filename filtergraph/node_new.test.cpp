@@ -78,14 +78,28 @@ namespace Testcases
 		assert(other.hasProcessor());
 		assert(&other.processor() != &obj.processor());
 	}
+
+	void texpainterFilterGraphNodeReplaceWith()
+	{
+		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>()};
+		assert(obj.hasProcessor());
+		auto old = &obj.processor();
+		obj.replaceWith(std::make_unique<ImageProcessorStub>());
+		assert(obj.hasProcessor());
+		assert(old != &obj.processor());
+	}
+
+	void texpainterFilterGraphNodeDirty()
+	{
+		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>()};
+		assert(obj.hasProcessor());
+		assert(obj.dirty());
+		obj(Texpainter::Size2d{1, 1});
+		assert(!obj.dirty());
+	}
 }
 
 #if 0
-		explicit Node(std::unique_ptr<AbstractImageProcessor>&& proc);
-		auto disconnectedCopy() const { return Node{m_proc->clone()}; }
-		Node& replaceWith(std::unique_ptr<AbstractImageProcessor>&& proc);
-		AbstractImageProcessor const& processor() const;
-		bool hasProcessor() const;
 		bool dirty() const;
 		result_type const& operator()(Size2d size) const;
 		auto inputPorts() const;
@@ -106,5 +120,7 @@ int main()
 {
 	Testcases::texpainterFilterGraphNodeDefaultState();
 	Testcases::texpainterFilterGraphNodeDisconnectedCopy();
+	Testcases::texpainterFilterGraphNodeReplaceWith();
+	Testcases::texpainterFilterGraphNodeDirty();
 	return 0;
 }
