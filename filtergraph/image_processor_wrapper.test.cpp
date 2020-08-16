@@ -22,10 +22,11 @@ namespace
 
 		static constexpr auto outputPorts()
 		{
-			return std::array<Texpainter::FilterGraph::PortInfo, 3>{
+			return std::array<Texpainter::FilterGraph::PortInfo, 4>{
 			    {{Texpainter::FilterGraph::PixelType::GrayscaleComplex, "Output 1"},
 			     {Texpainter::FilterGraph::PixelType::GrayscaleReal, "Output 2"},
-			     {Texpainter::FilterGraph::PixelType::RGBA, "Output 3"}}};
+			     {Texpainter::FilterGraph::PixelType::RGBA, "Output 3"},
+			     {Texpainter::FilterGraph::PixelType::GrayscaleReal, "Output 4"}}};
 		}
 
 		static constexpr char const* name() { return "Stub"; }
@@ -63,7 +64,6 @@ namespace Testcases
 		std::array<Texpainter::FilterGraph::RealValue, 6> input2{};
 		std::array<Texpainter::FilterGraph::ComplexValue, 6> input3{};
 
-
 		Texpainter::FilterGraph::NodeArgument na{
 		    size, {{std::begin(input1), std::begin(input2), std::begin(input3)}}};
 
@@ -75,18 +75,23 @@ namespace Testcases
 		assert(ret[0].get() == args.output<0>());
 		assert(ret[1].get() == args.output<1>());
 		assert(ret[2].get() == args.output<2>());
+		assert(ret[3].get() == args.output<3>());
 		assert(Testutils::MallocHook::blockSize(args.output<0>())
 		       == size.area() * sizeof(Texpainter::FilterGraph::ComplexValue));
 		assert(Testutils::MallocHook::blockSize(args.output<1>())
 		       == size.area() * sizeof(Texpainter::FilterGraph::RealValue));
 		assert(Testutils::MallocHook::blockSize(args.output<2>())
 		       == size.area() * sizeof(Texpainter::FilterGraph::RgbaValue));
+		assert(Testutils::MallocHook::blockSize(args.output<3>())
+		       == size.area() * sizeof(Texpainter::FilterGraph::RealValue));
 		static_assert(
 		    std::is_same_v<decltype(args.output<0>()), Texpainter::FilterGraph::ComplexValue*>);
 		static_assert(
 		    std::is_same_v<decltype(args.output<1>()), Texpainter::FilterGraph::RealValue*>);
 		static_assert(
 		    std::is_same_v<decltype(args.output<2>()), Texpainter::FilterGraph::RgbaValue*>);
+		static_assert(
+		    std::is_same_v<decltype(args.output<3>()), Texpainter::FilterGraph::RealValue*>);
 
 		assert(std::begin(input1) == args.input<0>());
 		assert(std::begin(input2) == args.input<1>());
