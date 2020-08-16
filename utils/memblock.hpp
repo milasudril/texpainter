@@ -39,6 +39,8 @@ namespace Texpainter
 			return ret;
 		}
 
+		bool valid() const { return m_block != nullptr; }
+
 	private:
 		void* m_block;
 	};
