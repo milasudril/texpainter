@@ -17,7 +17,6 @@ namespace Texpainter::FilterGraph
 	class Node
 	{
 	public:
-		using argument_type = ImgProcArg;
 		using result_type   = std::array<Memblock, 4>;
 
 		class SourceNode
