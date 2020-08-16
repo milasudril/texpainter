@@ -17,7 +17,7 @@ namespace Texpainter::FilterGraph
 	class Node
 	{
 	public:
-		using result_type   = std::array<Memblock, 4>;
+		using result_type = std::array<Memblock, 4>;
 
 		class SourceNode
 		{
@@ -49,17 +49,20 @@ namespace Texpainter::FilterGraph
 			OutputPort m_index;
 		};
 
-		explicit Node(std::unique_ptr<AbstractImageProcessor>&& proc): m_proc{std::move(proc)} {}
+		explicit Node(std::unique_ptr<AbstractImageProcessor>&& proc)
+		    : m_dirty{1}
+		    , m_proc{std::move(proc)}
+		{
+		}
 
 		Node(Node&&) = delete;
 
-		Node(): m_proc{nullptr} {}
+		Node(): m_dirty{0}, m_proc{nullptr} {}
 
-		auto disconnectedCopy() const { return m_proc->clone(); }
+		auto disconnectedCopy() const { return Node{m_proc->clone()}; }
 
 		Node& replaceWith(std::unique_ptr<AbstractImageProcessor>&& proc)
 		{
-			//	m_inputs = std::vector<SourceNode>(proc.inputPorts().size());
 			clear_result_cache();
 			m_proc = std::move(proc);
 			return *this;
@@ -67,9 +70,9 @@ namespace Texpainter::FilterGraph
 
 		bool dirty() const
 		{
-			return m_result_cache.size() == 0
-			       || std::ranges::any_of(
-			           m_inputs, [](auto const& item) { return item.processor().dirty(); });
+			return m_dirty || std::ranges::any_of(m_inputs, [](auto const& item) {
+				       return item.processor().dirty();
+			       });
 		}
 
 
@@ -83,6 +86,7 @@ namespace Texpainter::FilterGraph
 				return ret;
 			});
 			m_result_cache = (*m_proc)(NodeArgument{size, args});
+			m_dirty        = 0;
 			return m_result_cache;
 		}
 
@@ -142,8 +146,10 @@ namespace Texpainter::FilterGraph
 		}
 
 	private:
-		mutable result_type m_result_cache;
+		mutable size_t m_dirty;
 		std::array<SourceNode, NodeArgument::MaxNumInputs> m_inputs;
+		std::unique_ptr<AbstractImageProcessor> m_proc;
+		mutable result_type m_result_cache;
 
 		struct InputPortCompare
 		{
@@ -157,9 +163,12 @@ namespace Texpainter::FilterGraph
 		//       as const from the consumer side.
 		mutable std::map<Node*, std::set<InputPort, InputPortCompare>> r_consumers;
 
-		std::unique_ptr<AbstractImageProcessor> m_proc;
 
-		void clear_result_cache() { m_result_cache = result_type{}; }
+		void clear_result_cache()
+		{
+			m_dirty        = 1;
+			m_result_cache = result_type{};
+		}
 	};
 }
 
