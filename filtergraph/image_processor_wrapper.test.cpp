@@ -30,13 +30,19 @@ namespace
 		};
 
 		static constexpr char const* name() { return "Stub"; }
-		void set(Texpainter::FilterGraph::ParamName, Texpainter::FilterGraph::ParamValue) {}
+
+		void set(Texpainter::FilterGraph::ParamName name, Texpainter::FilterGraph::ParamValue val)
+		{
+			param_name_asked_for = &name;
+			param_value_set = val;
+		}
+
 		auto get(Texpainter::FilterGraph::ParamName name) const
 		{
 			param_name_asked_for = &name;
 			return Texpainter::FilterGraph::ParamValue{0};
-
 		}
+
 		auto const& paramValues() const { return m_params; }
 
 		auto operator()(std::span<Texpainter::FilterGraph::ImgProcArg const>) const
@@ -55,8 +61,9 @@ namespace
 		    Texpainter::FilterGraph::ParamValue{3}};
 
 
-		mutable Texpainter::FilterGraph::ImgProcArg2<InterfaceDescriptor> const* args_result;
-		mutable Texpainter::FilterGraph::ParamName* param_name_asked_for;
+		mutable Texpainter::FilterGraph::ImgProcArg2<InterfaceDescriptor> const* args_result{nullptr};
+		mutable Texpainter::FilterGraph::ParamName* param_name_asked_for{nullptr};
+		mutable Texpainter::FilterGraph::ParamValue param_value_set{0};
 	};
 }
 
@@ -152,26 +159,21 @@ namespace Testcases
 		assert((asked_for == Texpainter::FilterGraph::ParamName{"Hej"}));
 	}
 
-#if 0
+	void texpainterFilterGraphImageProcessorWrapperSetParamValue()
+	{
+		Texpainter::FilterGraph::ImageProcessorWrapper obj{ImgProcStub{}};
+		obj.set(Texpainter::FilterGraph::ParamName{"Hej"}, Texpainter::FilterGraph::ParamValue{128});
+		auto asked_for = *obj.processor().param_name_asked_for;
+		auto value_set = obj.processor().param_value_set;
+		assert((asked_for == Texpainter::FilterGraph::ParamName{"Hej"}));
+		assert((value_set == Texpainter::FilterGraph::ParamValue{128}));
+	}
 
-		ParamValue get(std::string_view param_name) const override
-		{
-			return m_proc.get(param_name);
-		}
-
-		AbstractImageProcessor& set(std::string_view param_name, ParamValue value) override
-		{
-			m_proc.set(param_name, value);
-			return *this;
-		}
-
-		std::unique_ptr<AbstractImageProcessor> clone() const override
-		{
-			return std::make_unique<ImageProcessorWrapper>(*this);
-		}
-
-		char const* name() const override { return Proc::name(); }
-#endif
+	void texpainterFilterGraphImageProcessorWrapperName()
+	{
+		Texpainter::FilterGraph::ImageProcessorWrapper obj{ImgProcStub{}};
+		assert(strcmp(obj.name(), ImgProcStub::name()) == 0);
+	}
 }
 
 int main()
@@ -182,7 +184,8 @@ int main()
 	Testcases::texpaitnerFilterGraphImageProcessorWrapperParamNames();
 	Testcases::texpainterFilterGraphImageProcessorWrapperParamValues();
 	Testcases::texpainterFilterGraphImageProcessorWrapperGetParamValue();
-
+	Testcases::texpainterFilterGraphImageProcessorWrapperSetParamValue();
+	Testcases::texpainterFilterGraphImageProcessorWrapperName();
 
 	return 0;
 }
