@@ -59,7 +59,13 @@ namespace Testcases
 		Texpainter::FilterGraph::ImageProcessorWrapper obj{ImgProcStub{&args}};
 
 		Texpainter::Size2d size{3, 2};
-		Texpainter::FilterGraph::NodeArgument na{size, {{nullptr, nullptr, nullptr}}};
+
+		std::array<Texpainter::FilterGraph::RgbaValue, 6> input1{};
+		std::array<Texpainter::FilterGraph::RealValue, 6> input2{};
+		std::array<Texpainter::FilterGraph::ComplexValue, 6> input3{};
+
+
+		Texpainter::FilterGraph::NodeArgument na{size, {{std::begin(input1), std::begin(input2), std::begin(input3)}}};
 		auto ret = obj(na);
 		assert(args.size() == size);
 		assert(ret[0].get() == args.output<0>());
@@ -69,6 +75,9 @@ namespace Testcases
 		static_assert(std::is_same_v<decltype(args.output<1>()), Texpainter::FilterGraph::RealValue*>);
 		static_assert(std::is_same_v<decltype(args.output<2>()), Texpainter::FilterGraph::RgbaValue*>);
 
+		assert(std::begin(input1) == args.input<0>());
+		assert(std::begin(input2) == args.input<1>());
+		assert(std::begin(input3) == args.input<2>());
 		static_assert(std::is_same_v<decltype(args.input<0>()), Texpainter::FilterGraph::RgbaValue const*>);
 		static_assert(std::is_same_v<decltype(args.input<1>()), Texpainter::FilterGraph::RealValue const*>);
 		static_assert(std::is_same_v<decltype(args.input<2>()), Texpainter::FilterGraph::ComplexValue const*>);
