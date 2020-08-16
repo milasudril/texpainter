@@ -31,10 +31,10 @@ namespace Texpainter::FilterGraph
 			{
 			}
 
-			void const* operator()() const
+			void const* operator()(Size2d size) const
 			{
 				assert(valid());
-				auto const& ret = (*r_processor)();
+				auto const& ret = (*r_processor)(size);
 				assert(ret[m_index.value()].valid());
 				return ret[m_index.value()].get();
 			}
@@ -74,16 +74,16 @@ namespace Texpainter::FilterGraph
 		}
 
 
-		result_type const& operator()() const
+		result_type const& operator()(Size2d size) const
 		{
 			if(!dirty()) { return m_result_cache; }
 
 			std::array<void const*, NodeArgument::MaxNumInputs> args{};
-			std::ranges::transform(m_inputs, std::begin(args), [](auto const& val) {
-				auto const& ret = val();
+			std::ranges::transform(m_inputs, std::begin(args), [size](auto const& val) {
+				auto const& ret = val(size);
 				return ret;
 			});
-			m_result_cache = (*m_proc)(NodeArgument{Size2d{1, 1}, args});
+			m_result_cache = (*m_proc)(NodeArgument{size, args});
 			return m_result_cache;
 		}
 
