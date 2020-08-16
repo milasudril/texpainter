@@ -12,28 +12,22 @@ namespace
 	{
 		struct InterfaceDescriptor
 		{
-			static constexpr auto inputPorts()
-			{
-				return std::array<Texpainter::FilterGraph::PortInfo, 3>{
-				    {{Texpainter::FilterGraph::PixelType::RGBA, "Input 1"},
-				     {Texpainter::FilterGraph::PixelType::GrayscaleReal, "Input 2"},
-				     {Texpainter::FilterGraph::PixelType::GrayscaleComplex, "Input 3"}}};
-			}
+			static constexpr auto InputPorts = std::array<Texpainter::FilterGraph::PortInfo, 3>{
+			    {{Texpainter::FilterGraph::PixelType::RGBA, "Input 1"},
+			     {Texpainter::FilterGraph::PixelType::GrayscaleReal, "Input 2"},
+			     {Texpainter::FilterGraph::PixelType::GrayscaleComplex, "Input 3"}}};
 
-			static constexpr auto outputPorts()
-			{
-				return std::array<Texpainter::FilterGraph::PortInfo, 3>{
-				    {{Texpainter::FilterGraph::PixelType::GrayscaleComplex, "Output 1"},
-				     {Texpainter::FilterGraph::PixelType::GrayscaleReal, "Output 2"},
-				     {Texpainter::FilterGraph::PixelType::RGBA, "Output 3"}}};
-			}
+			static constexpr auto OutputPorts = std::array<Texpainter::FilterGraph::PortInfo, 3>{
+			    {{Texpainter::FilterGraph::PixelType::GrayscaleComplex, "Output 1"},
+			     {Texpainter::FilterGraph::PixelType::GrayscaleReal, "Output 2"},
+			     {Texpainter::FilterGraph::PixelType::RGBA, "Output 3"}}};
 		};
 	};
 
 	using InArgs =
-	    Texpainter::FilterGraph::InArgTuple<portTypes(Ports::InterfaceDescriptor::inputPorts())>;
+	    Texpainter::FilterGraph::InArgTuple<portTypes(Ports::InterfaceDescriptor::InputPorts)>;
 	using OutArgs =
-	    Texpainter::FilterGraph::OutArgTuple<portTypes(Ports::InterfaceDescriptor::outputPorts())>;
+	    Texpainter::FilterGraph::OutArgTuple<portTypes(Ports::InterfaceDescriptor::OutputPorts)>;
 }
 
 namespace Testcases
