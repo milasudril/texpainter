@@ -68,13 +68,21 @@ namespace Texpainter::FilterGraph
 			return *this;
 		}
 
+		AbstractImageProcessor const& processor() const { return *m_proc.get(); }
+
+		bool hasProcessor() const { return m_proc != nullptr; }
+
+
 		bool dirty() const
 		{
 			return m_dirty || std::ranges::any_of(m_inputs, [](auto const& item) {
+				       if(!item.valid()) [[unlikely]]
+					       {
+						       return false;
+					       }
 				       return item.processor().dirty();
 			       });
 		}
-
 
 		result_type const& operator()(Size2d size) const
 		{
@@ -89,6 +97,7 @@ namespace Texpainter::FilterGraph
 			m_dirty        = 0;
 			return m_result_cache;
 		}
+
 
 		auto inputPorts() const { return m_proc->inputPorts(); }
 
@@ -108,10 +117,17 @@ namespace Texpainter::FilterGraph
 
 		Node& disconnect(InputPort input)
 		{
+			assert(input.value() < NodeArgument::MaxNumInputs);
 			m_inputs[input.value()].processor().r_consumers.find(this)->second.erase(input);
 			m_inputs[input.value()] = SourceNode{};
 			clear_result_cache();
 			return *this;
+		}
+
+		bool connected(InputPort input) const
+		{
+			assert(input.value() < NodeArgument::MaxNumInputs);
+			return m_inputs[input.value()].valid();
 		}
 
 		std::span<SourceNode const> inputs() const { return m_inputs; }
@@ -137,7 +153,7 @@ namespace Texpainter::FilterGraph
 				std::ranges::for_each(item.second, [proc = item.first](auto port) {
 					// NOTE: Do not call disconnect here. This would screw up iterators.
 					//       Also, r_consumers will be destroyed anywas.
-					proc->m_inputs[port.value()] = SourceNode{};
+					if(proc != nullptr) { proc->m_inputs[port.value()] = SourceNode{}; }
 				});
 			});
 
@@ -145,7 +161,8 @@ namespace Texpainter::FilterGraph
 			//       be dead pointers left in the producer.
 			for(size_t k = 0; k < m_inputs.size(); ++k)
 			{
-				disconnect(InputPort{static_cast<uint32_t>(k)});
+				auto const port = InputPort{static_cast<uint32_t>(k)};
+				if(connected(port)) { disconnect(port); }
 			}
 		}
 
