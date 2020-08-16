@@ -4,6 +4,8 @@
 
 #include "./image_processor_wrapper.hpp"
 
+#include "testutils/mallochook.hpp"
+
 #include <cassert>
 
 namespace
@@ -27,10 +29,7 @@ namespace
 		}
 
 		static constexpr char const* name() { return "Stub"; }
-		static constexpr auto paramNames()
-		{
-			return std::span<char const* const>{};
-		}
+		static constexpr auto paramNames() { return std::span<char const* const>{}; }
 		void set(std::string_view, Texpainter::FilterGraph::ParamValue) {}
 		auto get(std::string_view) const { return Texpainter::FilterGraph::ParamValue{0.0f}; }
 		auto paramValues() const { return std::span<Texpainter::FilterGraph::ParamValue const>{}; }
@@ -65,22 +64,39 @@ namespace Testcases
 		std::array<Texpainter::FilterGraph::ComplexValue, 6> input3{};
 
 
-		Texpainter::FilterGraph::NodeArgument na{size, {{std::begin(input1), std::begin(input2), std::begin(input3)}}};
+		Texpainter::FilterGraph::NodeArgument na{
+		    size, {{std::begin(input1), std::begin(input2), std::begin(input3)}}};
+
+		Testutils::MallocHook::init();
 		auto ret = obj(na);
+		Testutils::MallocHook::disarm();
+
 		assert(args.size() == size);
 		assert(ret[0].get() == args.output<0>());
 		assert(ret[1].get() == args.output<1>());
 		assert(ret[2].get() == args.output<2>());
-		static_assert(std::is_same_v<decltype(args.output<0>()), Texpainter::FilterGraph::ComplexValue*>);
-		static_assert(std::is_same_v<decltype(args.output<1>()), Texpainter::FilterGraph::RealValue*>);
-		static_assert(std::is_same_v<decltype(args.output<2>()), Texpainter::FilterGraph::RgbaValue*>);
+		assert(Testutils::MallocHook::blockSize(args.output<0>())
+		       == size.area() * sizeof(Texpainter::FilterGraph::ComplexValue));
+		assert(Testutils::MallocHook::blockSize(args.output<1>())
+		       == size.area() * sizeof(Texpainter::FilterGraph::RealValue));
+		assert(Testutils::MallocHook::blockSize(args.output<2>())
+		       == size.area() * sizeof(Texpainter::FilterGraph::RgbaValue));
+		static_assert(
+		    std::is_same_v<decltype(args.output<0>()), Texpainter::FilterGraph::ComplexValue*>);
+		static_assert(
+		    std::is_same_v<decltype(args.output<1>()), Texpainter::FilterGraph::RealValue*>);
+		static_assert(
+		    std::is_same_v<decltype(args.output<2>()), Texpainter::FilterGraph::RgbaValue*>);
 
 		assert(std::begin(input1) == args.input<0>());
 		assert(std::begin(input2) == args.input<1>());
 		assert(std::begin(input3) == args.input<2>());
-		static_assert(std::is_same_v<decltype(args.input<0>()), Texpainter::FilterGraph::RgbaValue const*>);
-		static_assert(std::is_same_v<decltype(args.input<1>()), Texpainter::FilterGraph::RealValue const*>);
-		static_assert(std::is_same_v<decltype(args.input<2>()), Texpainter::FilterGraph::ComplexValue const*>);
+		static_assert(
+		    std::is_same_v<decltype(args.input<0>()), Texpainter::FilterGraph::RgbaValue const*>);
+		static_assert(
+		    std::is_same_v<decltype(args.input<1>()), Texpainter::FilterGraph::RealValue const*>);
+		static_assert(std::is_same_v<decltype(args.input<2>()),
+		                             Texpainter::FilterGraph::ComplexValue const*>);
 	}
 }
 
