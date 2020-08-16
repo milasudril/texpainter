@@ -164,6 +164,8 @@ namespace Texpainter::FilterGraph
 
 		// NOTE: Using mutable here is not a very good solution, but allows treating producer nodes
 		//       as const from the consumer side.
+		//
+		// TODO: Using std::set here is slightly overkill when there are only 4 ports
 		mutable std::map<Node*, std::set<InputPort, InputPortCompare>> r_consumers;
 
 
