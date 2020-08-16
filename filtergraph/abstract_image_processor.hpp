@@ -10,6 +10,8 @@
 
 #include "utils/memblock.hpp"
 
+#include <memory>
+
 namespace Texpainter::FilterGraph
 {
 	class AbstractImageProcessor

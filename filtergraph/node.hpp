@@ -15,6 +15,7 @@
 #include <variant>
 #include <map>
 #include <set>
+#include <memory>
 
 namespace Texpainter::FilterGraph
 {

@@ -6,12 +6,10 @@
 #include "./pixel.hpp"
 
 #include "utils/span_2d.hpp"
-#include "utils/call_free.hpp"
+#include "utils/memblock.hpp"
 #include "utils/trivial.hpp"
-#include "utils/malloc.hpp"
 
 #include <algorithm>
-#include <memory>
 #include <span>
 #include <cstring>
 
@@ -28,11 +26,7 @@ namespace Texpainter::PixelStore
 
 		explicit BasicImage(uint32_t width, uint32_t height): BasicImage{Size2d{width, height}} {}
 
-		explicit BasicImage(Size2d size)
-		    : m_size(size)
-		    , m_data{reinterpret_cast<PixelType*>(allocMem<PixelType>(area()))}
-		{
-		}
+		explicit BasicImage(Size2d size): m_size(size), m_data{area() * sizeof(PixelType)} {}
 
 		BasicImage(BasicImage const& src): BasicImage{src.size()}
 		{
@@ -61,9 +55,12 @@ namespace Texpainter::PixelStore
 			return *const_cast<PixelType*>(std::as_const(*this).getAddress(x, y));
 		}
 
-		Span2d<PixelType const> pixels() const { return {m_data.get(), size()}; }
+		Span2d<PixelType const> pixels() const
+		{
+			return {reinterpret_cast<PixelType const*>(m_data.get()), size()};
+		}
 
-		Span2d<PixelType> pixels() { return {m_data.get(), size()}; }
+		Span2d<PixelType> pixels() { return {reinterpret_cast<PixelType*>(m_data.get()), size()}; }
 
 		operator Span2d<PixelType>() { return pixels(); }
 
@@ -71,11 +68,11 @@ namespace Texpainter::PixelStore
 
 	private:
 		Size2d m_size;
-		std::unique_ptr<PixelType, CallFree> m_data;
+		Memblock m_data;
 
 		PixelType const* getAddress(uint32_t x, uint32_t y) const
 		{
-			auto ptr = m_data.get();
+			auto ptr = reinterpret_cast<PixelType const*>(m_data.get());
 			return ptr + y * width() + x;
 		}
 	};
