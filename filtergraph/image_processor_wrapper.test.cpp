@@ -3,8 +3,7 @@
 //@	}
 
 #include "./image_processor_wrapper.hpp"
-
-#include "utils/fixed_flatmap.hpp"
+#include "./param_map.hpp"
 
 #include "testutils/mallochook.hpp"
 
@@ -27,11 +26,11 @@ namespace
 			     {Texpainter::FilterGraph::PixelType::RGBA, "Output 3"},
 			     {Texpainter::FilterGraph::PixelType::GrayscaleReal, "Output 4"}}};
 
-			static constexpr auto ParamNames = std::array<Texpainter::FilterGraph::ParamName, 3>{"Foo", "Bar", "Kaka"};
+			static constexpr auto ParamNames =
+			    std::array<Texpainter::FilterGraph::ParamName, 3>{"Foo", "Bar", "Kaka"};
 		};
 
 		static constexpr char const* name() { return "Stub"; }
-		static constexpr auto paramNames() { return ParamNames::items; }
 		void set(std::string_view, Texpainter::FilterGraph::ParamValue) {}
 		auto get(std::string_view) const { return Texpainter::FilterGraph::ParamValue{0.0f}; }
 		auto paramValues() const { return std::span<Texpainter::FilterGraph::ParamValue const>{}; }
@@ -48,39 +47,9 @@ namespace
 
 		mutable Texpainter::FilterGraph::ImgProcArg2<InterfaceDescriptor> const* args_result;
 
-
-		struct ParamNameCompare
-		{
-			template<size_t n>
-			constexpr bool operator()(Texpainter::FilterGraph::ParamName a,
-			                          Texpainter::Str<n> const& b) const
-			{
-				return strcmp(a.c_str(), b.c_str()) < 0;
-			}
-
-			template<size_t n>
-			constexpr bool operator()(Texpainter::Str<n> const& a,
-			                          Texpainter::FilterGraph::ParamName b) const
-			{
-				return strcmp(a.c_str(), b.c_str()) < 0;
-			}
-
-			constexpr bool operator()(Texpainter::FilterGraph::ParamName a,
-			                          Texpainter::FilterGraph::ParamName b) const
-			{
-				return a < b;
-			}
-		};
-
-		struct ParamNames
-		{
-			static constexpr auto items = InterfaceDescriptor::ParamNames;
-		};
-
-		Texpainter::FixedFlatmap<ParamNames, Texpainter::FilterGraph::ParamValue, ParamNameCompare>
-		    m_params;
-
 		auto getFoo() const { return m_params.find<Texpainter::Str("Foo")>(); }
+
+		Texpainter::FilterGraph::ParamMap<InterfaceDescriptor> m_params;
 	};
 }
 
@@ -158,8 +127,9 @@ namespace Testcases
 		Texpainter::FilterGraph::ImageProcessorWrapper obj{ImgProcStub{}};
 
 		auto params = obj.paramNames();
-		assert(std::equal(
-		    std::begin(params), std::end(params), std::begin(ImgProcStub::paramNames())));
+		assert(std::equal(std::begin(params),
+		                  std::end(params),
+		                  std::begin(ImgProcStub::InterfaceDescriptor::ParamNames)));
 	}
 
 	void texpainterFilterGraphImageProcessorWrapperParamValues()

@@ -159,11 +159,6 @@ namespace Texpainter::FilterGraph
 		->std::same_as<char const*>;
 
 		{
-			T::paramNames()
-		}
-		->std::ranges::random_access_range;
-
-		{
 			std::as_const(a).paramValues()
 		}
 		->std::same_as<std::span<ParamValue const>>;

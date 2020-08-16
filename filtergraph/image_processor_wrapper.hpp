@@ -103,7 +103,7 @@ namespace Texpainter::FilterGraph
 		Proc m_proc;
 		static constexpr auto s_input_ports  = Proc::InterfaceDescriptor::InputPorts;
 		static constexpr auto s_output_ports = Proc::InterfaceDescriptor::OutputPorts;
-		static constexpr auto s_param_names  = Proc::paramNames();
+		static constexpr auto s_param_names  = Proc::InterfaceDescriptor::ParamNames;
 	};
 }
 
