@@ -162,12 +162,6 @@ namespace Texpainter::FilterGraph
 			std::as_const(a).paramValues()
 		}
 		->std::ranges::random_access_range;
-
-		{a.set(std::declval<std::string_view>(), std::declval<ParamValue>())};
-		{
-			std::as_const(a).get(std::declval<std::string_view>())
-		}
-		->std::same_as<ParamValue>;
 	};
 }
 

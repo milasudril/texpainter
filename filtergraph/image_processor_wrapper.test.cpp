@@ -30,8 +30,13 @@ namespace
 		};
 
 		static constexpr char const* name() { return "Stub"; }
-		void set(std::string_view, Texpainter::FilterGraph::ParamValue) {}
-		auto get(std::string_view) const { return Texpainter::FilterGraph::ParamValue{0.0f}; }
+		void set(Texpainter::FilterGraph::ParamName, Texpainter::FilterGraph::ParamValue) {}
+		auto get(Texpainter::FilterGraph::ParamName name) const
+		{
+			param_name_asked_for = &name;
+			return Texpainter::FilterGraph::ParamValue{0};
+
+		}
 		auto const& paramValues() const { return m_params; }
 
 		auto operator()(std::span<Texpainter::FilterGraph::ImgProcArg const>) const
@@ -44,11 +49,14 @@ namespace
 			args_result = &args;
 		}
 
-		mutable Texpainter::FilterGraph::ImgProcArg2<InterfaceDescriptor> const* args_result;
 		std::array<Texpainter::FilterGraph::ParamValue, 3> m_params{
 		    Texpainter::FilterGraph::ParamValue{1},
 		    Texpainter::FilterGraph::ParamValue{2},
 		    Texpainter::FilterGraph::ParamValue{3}};
+
+
+		mutable Texpainter::FilterGraph::ImgProcArg2<InterfaceDescriptor> const* args_result;
+		mutable Texpainter::FilterGraph::ParamName* param_name_asked_for;
 	};
 }
 
@@ -136,6 +144,14 @@ namespace Testcases
 		assert(std::ranges::equal(vals, obj.processor().m_params));
 	}
 
+	void texpainterFilterGraphImageProcessorWrapperGetParamValue()
+	{
+		Texpainter::FilterGraph::ImageProcessorWrapper obj{ImgProcStub{}};
+		(void)obj.get(Texpainter::FilterGraph::ParamName{"Hej"});
+		auto asked_for = *obj.processor().param_name_asked_for;
+		assert((asked_for == Texpainter::FilterGraph::ParamName{"Hej"}));
+	}
+
 #if 0
 
 		ParamValue get(std::string_view param_name) const override
@@ -165,6 +181,7 @@ int main()
 	Testcases::texpaitnerFilterGraphImageProcessorWrapperOutputPorts();
 	Testcases::texpaitnerFilterGraphImageProcessorWrapperParamNames();
 	Testcases::texpainterFilterGraphImageProcessorWrapperParamValues();
+	Testcases::texpainterFilterGraphImageProcessorWrapperGetParamValue();
 
 
 	return 0;

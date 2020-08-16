@@ -88,12 +88,12 @@ namespace Texpainter::FilterGraph
 
 		std::span<ParamValue const> paramValues() const override { return m_proc.paramValues(); }
 
-		ParamValue get(std::string_view param_name) const override
+		ParamValue get(ParamName param_name) const override
 		{
 			return m_proc.get(param_name);
 		}
 
-		AbstractImageProcessor& set(std::string_view param_name, ParamValue value) override
+		AbstractImageProcessor& set(ParamName param_name, ParamValue value) override
 		{
 			m_proc.set(param_name, value);
 			return *this;

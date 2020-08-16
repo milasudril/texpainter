@@ -22,8 +22,8 @@ namespace Texpainter::FilterGraph
 		virtual std::span<PortInfo const> outputPorts() const                                 = 0;
 		virtual std::span<ParamName const> paramNames() const                                 = 0;
 		virtual std::span<ParamValue const> paramValues() const                               = 0;
-		virtual ParamValue get(std::string_view param_name) const                             = 0;
-		virtual AbstractImageProcessor& set(std::string_view param_name, ParamValue value)    = 0;
+		virtual ParamValue get(ParamName param_name) const                             = 0;
+		virtual AbstractImageProcessor& set(ParamName param_name, ParamValue value)    = 0;
 		virtual std::unique_ptr<AbstractImageProcessor> clone() const                         = 0;
 		virtual char const* name() const                                                      = 0;
 		virtual ~AbstractImageProcessor() = default;
