@@ -19,6 +19,8 @@ namespace Texpainter::PixelStore
 	class BasicImage
 	{
 	public:
+		explicit BasicImage(Size2d size, Memblock&& data): m_size{size}, m_data(data.release()) {}
+
 		explicit BasicImage(Span2d<PixelType const> src): BasicImage{src.size()}
 		{
 			memcpy(m_data.get(), src.data(), area() * sizeof(PixelType));
