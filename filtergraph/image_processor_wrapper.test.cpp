@@ -3,7 +3,6 @@
 //@	}
 
 #include "./image_processor_wrapper.hpp"
-#include "./param_map.hpp"
 
 #include "testutils/mallochook.hpp"
 
@@ -33,7 +32,7 @@ namespace
 		static constexpr char const* name() { return "Stub"; }
 		void set(std::string_view, Texpainter::FilterGraph::ParamValue) {}
 		auto get(std::string_view) const { return Texpainter::FilterGraph::ParamValue{0.0f}; }
-		auto paramValues() const { return std::span<Texpainter::FilterGraph::ParamValue const>{}; }
+		auto const& paramValues() const { return m_params; }
 
 		auto operator()(std::span<Texpainter::FilterGraph::ImgProcArg const>) const
 		{
@@ -46,10 +45,10 @@ namespace
 		}
 
 		mutable Texpainter::FilterGraph::ImgProcArg2<InterfaceDescriptor> const* args_result;
-
-		auto getFoo() const { return m_params.find<Texpainter::Str("Foo")>(); }
-
-		Texpainter::FilterGraph::ParamMap<InterfaceDescriptor> m_params;
+		std::array<Texpainter::FilterGraph::ParamValue, 3> m_params{
+		    Texpainter::FilterGraph::ParamValue{1},
+		    Texpainter::FilterGraph::ParamValue{2},
+		    Texpainter::FilterGraph::ParamValue{3}};
 	};
 }
 
@@ -127,16 +126,16 @@ namespace Testcases
 		Texpainter::FilterGraph::ImageProcessorWrapper obj{ImgProcStub{}};
 
 		auto params = obj.paramNames();
-		assert(std::equal(std::begin(params),
-		                  std::end(params),
-		                  std::begin(ImgProcStub::InterfaceDescriptor::ParamNames)));
+		assert(std::ranges::equal(params, ImgProcStub::InterfaceDescriptor::ParamNames));
 	}
 
 	void texpainterFilterGraphImageProcessorWrapperParamValues()
 	{
 		Texpainter::FilterGraph::ImageProcessorWrapper obj{ImgProcStub{}};
 		auto vals = obj.paramValues();
+		assert(std::ranges::equal(vals, obj.processor().m_params));
 	}
+
 #if 0
 
 		ParamValue get(std::string_view param_name) const override
