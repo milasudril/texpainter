@@ -19,6 +19,8 @@ namespace Texpainter::FilterGraph
 	class ParamValue
 	{
 	public:
+		explicit constexpr ParamValue() = default;
+
 		explicit constexpr ParamValue(double val): m_value{val} {}
 
 		constexpr auto operator<=>(ParamValue const&) const = default;

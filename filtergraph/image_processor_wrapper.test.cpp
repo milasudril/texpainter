@@ -4,6 +4,8 @@
 
 #include "./image_processor_wrapper.hpp"
 
+#include "utils/fixed_flatmap.hpp"
+
 #include "testutils/mallochook.hpp"
 
 #include <cassert>
@@ -30,10 +32,7 @@ namespace
 		}
 
 		static constexpr char const* name() { return "Stub"; }
-		static constexpr auto paramNames()
-		{
-			return std::array<Texpainter::FilterGraph::ParamName, 3>{"Foo", "Bar", "Kaka"};
-		}
+		static constexpr auto paramNames() { return ParamNames::items; }
 		void set(std::string_view, Texpainter::FilterGraph::ParamValue) {}
 		auto get(std::string_view) const { return Texpainter::FilterGraph::ParamValue{0.0f}; }
 		auto paramValues() const { return std::span<Texpainter::FilterGraph::ParamValue const>{}; }
@@ -49,6 +48,40 @@ namespace
 		}
 
 		mutable Texpainter::FilterGraph::ImgProcArg2<ImgProcStub> const* args_result;
+
+		struct ParamNames
+		{
+			static constexpr auto items =
+			    std::array<Texpainter::FilterGraph::ParamName, 3>{"Foo", "Bar", "Kaka"};
+		};
+
+		struct ParamNameCompare
+		{
+			template<size_t n>
+			constexpr bool operator()(Texpainter::FilterGraph::ParamName a,
+			                          Texpainter::Str<n> const& b) const
+			{
+				return strcmp(a.c_str(), b.c_str()) < 0;
+			}
+
+			template<size_t n>
+			constexpr bool operator()(Texpainter::Str<n> const& a,
+			                          Texpainter::FilterGraph::ParamName b) const
+			{
+				return strcmp(a.c_str(), b.c_str()) < 0;
+			}
+
+			constexpr bool operator()(Texpainter::FilterGraph::ParamName a,
+			                          Texpainter::FilterGraph::ParamName b) const
+			{
+				return a < b;
+			}
+		};
+
+		Texpainter::FixedFlatmap<ParamNames, Texpainter::FilterGraph::ParamValue, ParamNameCompare>
+		    m_params;
+
+		auto getFoo() const { return m_params.find<Texpainter::Str("Foo")>(); }
 	};
 }
 
@@ -129,11 +162,13 @@ namespace Testcases
 		assert(std::equal(
 		    std::begin(params), std::end(params), std::begin(ImgProcStub::paramNames())));
 	}
+
+	void texpainterFilterGraphImageProcessorWrapperParamValues()
+	{
+		Texpainter::FilterGraph::ImageProcessorWrapper obj{ImgProcStub{}};
+		auto vals = obj.paramValues();
+	}
 #if 0
-
-		std::span<char const* const> paramNames() const override { return m_proc.paramNames(); }
-
-		std::span<ParamValue const> paramValues() const override { return m_proc.paramValues(); }
 
 		ParamValue get(std::string_view param_name) const override
 		{
@@ -161,6 +196,7 @@ int main()
 	Testcases::texpaitnerFilterGraphImageProcessorWrapperInputPorts();
 	Testcases::texpaitnerFilterGraphImageProcessorWrapperOutputPorts();
 	Testcases::texpaitnerFilterGraphImageProcessorWrapperParamNames();
+	Testcases::texpainterFilterGraphImageProcessorWrapperParamValues();
 
 
 	return 0;

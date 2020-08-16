@@ -37,9 +37,10 @@ namespace Texpainter
 
 		constexpr auto values() { return m_vals; }
 
-		static constexpr auto keyIndex(key_type const& key)
+		template<class KeyLike>
+		static constexpr auto keyIndex(KeyLike const& key)
 		{
-			auto i = std::ranges::lower_bound(s_keys, key, Compare{});
+			auto i = std::lower_bound(std::begin(s_keys), std::end(s_keys), key, Compare{});
 			if(i != std::end(s_keys) && !Compare{}(key, *i)) [[likely]]
 				{
 					return static_cast<size_t>(i - std::begin(s_keys));
@@ -90,7 +91,8 @@ namespace Texpainter
 
 		constexpr operator std::string_view() const { return value; }
 
-	private:
+		constexpr char const* c_str() const { return value; }
+
 		char value[N];
 	};
 }
