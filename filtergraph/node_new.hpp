@@ -96,6 +96,9 @@ namespace Texpainter::FilterGraph
 
 		Node& connect(InputPort input, std::reference_wrapper<Node const> other, OutputPort output)
 		{
+			assert(input.value() < inputPorts().size());
+			assert(output.value() < other.get().outputPorts().size());
+			assert(inputPorts()[input.value()].type == other.get().outputPorts()[output.value()].type);
 			other.get().r_consumers[this].insert(input);
 			m_inputs[input.value()] = SourceNode{&other.get(), output};
 			clear_result_cache();
