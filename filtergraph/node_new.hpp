@@ -93,15 +93,23 @@ namespace Texpainter::FilterGraph
 			if(!dirty()) { return m_result_cache; }
 
 			std::array<void const*, NodeArgument::MaxNumInputs> args{};
-			std::transform(std::begin(m_inputs),
-			               std::begin(m_inputs) + inputPorts().size(),
-			               std::begin(args),
-			               [size](auto const& val) {
-				               auto const& ret = val(size);
-				               return ret;
-			               });
-			m_result_cache = (*m_proc)(NodeArgument{size, args});
+			auto const n_ports   = inputPorts().size();
+			auto const input_end = std::begin(m_inputs) + n_ports;
+			auto const args_end  = std::begin(args) + n_ports;
+			std::transform(
+			    std::begin(m_inputs), input_end, std::begin(args), [size](auto const& val) {
+				    if(!val.valid()) [[unlikely]]
+					    {
+						    return static_cast<void const*>(nullptr);
+					    }
+				    return val(size);
+			    });
+			if(std::find(std::begin(args), args_end, nullptr) != args_end) [[unlikely]]
+				{
+					return m_result_cache;
+				}
 			m_dirty        = 0;
+			m_result_cache = (*m_proc)(NodeArgument{size, args});
 			return m_result_cache;
 		}
 
