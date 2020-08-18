@@ -195,7 +195,7 @@ namespace Texpainter::FilterGraph
 
 		bool dirty() const
 		{
-			return m_dirty || std::ranges::any_of(m_inputs, [](auto const& item) {
+			return m_dirty || std::ranges::any_of(inputs(), [](auto const& item) {
 				       return item.processor().dirty();
 			       });
 		}

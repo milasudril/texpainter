@@ -9,20 +9,34 @@ namespace
 {
 	class ImageProcessorStub final: public Texpainter::FilterGraph::AbstractImageProcessor
 	{
+	public:
+		static constexpr std::array<Texpainter::FilterGraph::PortInfo const, 2> s_input_ports{
+		    {{Texpainter::FilterGraph::PixelType::RGBA, "Input 1"},
+		     {Texpainter::FilterGraph::PixelType::GrayscaleReal, "Input 2"}}};
+
+		static constexpr std::array<Texpainter::FilterGraph::PortInfo const, 3> s_output_ports{
+		    {{Texpainter::FilterGraph::PixelType::RGBA, "Output 1"},
+		     {Texpainter::FilterGraph::PixelType::GrayscaleComplex, "Output 2"},
+		     {Texpainter::FilterGraph::PixelType::GrayscaleReal, "Output 3"}}};
+
+		bool no_inputs{false};
+
+	private:
 		std::array<Texpainter::Memblock, MaxNumOutputs> operator()(
 		    Texpainter::FilterGraph::NodeArgument const& arg) const override
 		{
-			return std::array<Texpainter::Memblock, MaxNumOutputs>{};
+			return std::array<Texpainter::Memblock, MaxNumOutputs>{
+			    Texpainter::Memblock{1}, Texpainter::Memblock{1}, Texpainter::Memblock{1}};
 		}
 
 		std::span<Texpainter::FilterGraph::PortInfo const> inputPorts() const override
 		{
-			return std::span<Texpainter::FilterGraph::PortInfo const>{};
+			return no_inputs ? std::span<Texpainter::FilterGraph::PortInfo const>{} : s_input_ports;
 		}
 
 		std::span<Texpainter::FilterGraph::PortInfo const> outputPorts() const override
 		{
-			return std::span<Texpainter::FilterGraph::PortInfo const>{};
+			return s_output_ports;
 		}
 
 		std::span<Texpainter::FilterGraph::ParamName const> paramNames() const override
@@ -89,10 +103,20 @@ namespace Testcases
 		assert(old != &obj.processor());
 	}
 
-	void texpainterFilterGraphNodeDirty()
+	void texpainterFilterGraphNodeCall()
 	{
 		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>()};
 		assert(obj.hasProcessor());
+
+		ImageProcessorStub input_stub;
+		input_stub.no_inputs = true;
+		Texpainter::FilterGraph::Node input{std::make_unique<ImageProcessorStub>(input_stub)};
+
+		obj.connect(
+		       Texpainter::FilterGraph::InputPort{0}, input, Texpainter::FilterGraph::OutputPort{0})
+		    .connect(Texpainter::FilterGraph::InputPort{1},
+		             input,
+		             Texpainter::FilterGraph::OutputPort{2});
 		obj(Texpainter::Size2d{1, 1});
 	}
 }
@@ -119,6 +143,6 @@ int main()
 	Testcases::texpainterFilterGraphNodeDefaultState();
 	Testcases::texpainterFilterGraphNodeDisconnectedCopy();
 	Testcases::texpainterFilterGraphNodeReplaceWith();
-	Testcases::texpainterFilterGraphNodeDirty();
+	Testcases::texpainterFilterGraphNodeCall();
 	return 0;
 }
