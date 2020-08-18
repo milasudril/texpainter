@@ -63,10 +63,11 @@ namespace Testcases
 	{
 		Texpainter::FilterGraph::Node obj;
 		assert(!obj.hasProcessor());
-		assert(!obj.connected(Texpainter::FilterGraph::InputPort{0}));
-		assert(!obj.connected(Texpainter::FilterGraph::InputPort{1}));
-		assert(!obj.connected(Texpainter::FilterGraph::InputPort{2}));
-		assert(!obj.connected(Texpainter::FilterGraph::InputPort{3}));
+		assert(!obj.isConnected(Texpainter::FilterGraph::InputPort{0}));
+		assert(!obj.isConnected(Texpainter::FilterGraph::InputPort{1}));
+		assert(!obj.isConnected(Texpainter::FilterGraph::InputPort{2}));
+		assert(!obj.isConnected(Texpainter::FilterGraph::InputPort{3}));
+		assert(!isConnected(obj));
 		assert(!obj.dirty());
 	}
 

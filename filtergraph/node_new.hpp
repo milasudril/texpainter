@@ -14,6 +14,10 @@
 
 namespace Texpainter::FilterGraph
 {
+	class Node;
+
+	inline bool isConnected(Node const& node);
+
 	class Node
 	{
 	public:
@@ -90,24 +94,18 @@ namespace Texpainter::FilterGraph
 
 		result_type const& operator()(Size2d size) const
 		{
+			assert(FilterGraph::isConnected(*this));
 			if(!dirty()) { return m_result_cache; }
 
 			std::array<void const*, NodeArgument::MaxNumInputs> args{};
 			auto const n_ports   = inputPorts().size();
 			auto const input_end = std::begin(m_inputs) + n_ports;
 			auto const args_end  = std::begin(args) + n_ports;
-			std::transform(
-			    std::begin(m_inputs), input_end, std::begin(args), [size](auto const& val) {
-				    if(!val.valid()) [[unlikely]]
-					    {
-						    return static_cast<void const*>(nullptr);
-					    }
-				    return val(size);
-			    });
-			if(std::find(std::begin(args), args_end, nullptr) != args_end) [[unlikely]]
-				{
-					return m_result_cache;
-				}
+			std::transform(std::begin(m_inputs),
+			               input_end,
+			               std::begin(args),
+			               [size](auto const& val) { return val(size); });
+
 			m_dirty        = 0;
 			m_result_cache = (*m_proc)(NodeArgument{size, args});
 			return m_result_cache;
@@ -135,13 +133,16 @@ namespace Texpainter::FilterGraph
 			return *this;
 		}
 
-		bool connected(InputPort input) const
+		bool isConnected(InputPort input) const
 		{
 			assert(input.value() < NodeArgument::MaxNumInputs);
 			return m_inputs[input.value()].valid();
 		}
 
-		std::span<SourceNode const> inputs() const { return m_inputs; }
+		std::span<SourceNode const> inputs() const
+		{
+			return {std::begin(m_inputs), std::begin(m_inputs) + inputPorts().size()};
+		}
 
 		auto paramNames() const { return m_proc->paramNames(); }
 
@@ -173,7 +174,7 @@ namespace Texpainter::FilterGraph
 			for(size_t k = 0; k < m_inputs.size(); ++k)
 			{
 				auto const port = InputPort{static_cast<uint32_t>(k)};
-				if(connected(port)) { disconnect(port); }
+				if(isConnected(port)) { disconnect(port); }
 			}
 		}
 
@@ -204,6 +205,12 @@ namespace Texpainter::FilterGraph
 			m_result_cache = result_type{};
 		}
 	};
+
+	inline bool isConnected(Node const& node)
+	{
+		return node.hasProcessor()
+		       && std::ranges::none_of(node.inputs(), [](auto node) { return !node.valid(); });
+	}
 }
 
 #endif
