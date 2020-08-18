@@ -68,7 +68,6 @@ namespace Testcases
 		assert(!obj.isConnected(Texpainter::FilterGraph::InputPort{2}));
 		assert(!obj.isConnected(Texpainter::FilterGraph::InputPort{3}));
 		assert(!isConnected(obj));
-		assert(!obj.dirty());
 	}
 
 	void texpainterFilterGraphNodeDisconnectedCopy()
@@ -94,9 +93,7 @@ namespace Testcases
 	{
 		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>()};
 		assert(obj.hasProcessor());
-		assert(obj.dirty());
 		obj(Texpainter::Size2d{1, 1});
-		assert(!obj.dirty());
 	}
 }
 

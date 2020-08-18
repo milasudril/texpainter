@@ -80,34 +80,22 @@ namespace Texpainter::FilterGraph
 
 		auto outputPorts() const { return m_proc->outputPorts(); }
 
-
-		bool dirty() const
-		{
-			return m_dirty || std::ranges::any_of(m_inputs, [](auto const& item) {
-				       if(!item.valid()) [[unlikely]]
-					       {
-						       return false;
-					       }
-				       return item.processor().dirty();
-			       });
-		}
-
 		result_type const& operator()(Size2d size) const
 		{
 			assert(FilterGraph::isConnected(*this));
+
 			if(!dirty()) { return m_result_cache; }
 
 			std::array<void const*, NodeArgument::MaxNumInputs> args{};
 			auto const n_ports   = inputPorts().size();
 			auto const input_end = std::begin(m_inputs) + n_ports;
-			auto const args_end  = std::begin(args) + n_ports;
 			std::transform(std::begin(m_inputs),
 			               input_end,
 			               std::begin(args),
 			               [size](auto const& val) { return val(size); });
 
-			m_dirty        = 0;
 			m_result_cache = (*m_proc)(NodeArgument{size, args});
+			m_dirty        = 0;
 			return m_result_cache;
 		}
 
@@ -203,6 +191,13 @@ namespace Texpainter::FilterGraph
 		{
 			m_dirty        = 1;
 			m_result_cache = result_type{};
+		}
+
+		bool dirty() const
+		{
+			return m_dirty || std::ranges::any_of(m_inputs, [](auto const& item) {
+				       return item.processor().dirty();
+			       });
 		}
 	};
 
