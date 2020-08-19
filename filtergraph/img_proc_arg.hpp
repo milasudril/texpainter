@@ -7,6 +7,7 @@
 
 #include "./argtuple.hpp"
 #include "./proctypes.hpp"
+#include "./img_proc_interface_descriptor.hpp"
 
 #include "utils/size_2d.hpp"
 
@@ -14,7 +15,7 @@
 
 namespace Texpainter::FilterGraph
 {
-	template<class Descriptor>
+	template<ImgProcInterfaceDescriptor Descriptor>
 	class ImgProcArg2
 	{
 	public:

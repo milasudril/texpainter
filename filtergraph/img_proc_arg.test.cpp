@@ -19,6 +19,9 @@ namespace
 		    {{Texpainter::FilterGraph::PixelType::GrayscaleComplex, "Output 1"},
 		     {Texpainter::FilterGraph::PixelType::GrayscaleReal, "Output 2"},
 		     {Texpainter::FilterGraph::PixelType::RGBA, "Output 3"}}};
+
+		static constexpr auto ParamNames =
+		    std::array<Texpainter::FilterGraph::ParamName, 1>{nullptr};
 	};
 
 	using InArgs  = Texpainter::FilterGraph::InArgTuple<portTypes(Ports::InputPorts)>;
