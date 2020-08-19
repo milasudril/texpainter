@@ -1,6 +1,5 @@
 //@	{
 //@	 "targets":[{"name":"node_new.hpp", "type":"include"}]
-//@	,"dependencies_extra":[{"ref":"node_new.o", "rel":"implementation"}]
 //@	}
 
 #ifndef TEXPAINTER_FILTERGRAPH_NODE_HPP
