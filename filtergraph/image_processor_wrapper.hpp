@@ -9,6 +9,7 @@
 #include "./proctypes.hpp"
 #include "./img_proc_arg.hpp"
 #include "./abstract_image_processor.hpp"
+#include "./image_processor.hpp"
 
 #include "utils/memblock.hpp"
 
@@ -45,7 +46,7 @@ namespace Texpainter::FilterGraph
 		}
 	}
 
-	template<ImageProcessor Proc>
+	template<ImageProcessor2 Proc>
 	class ImageProcessorWrapper final: public AbstractImageProcessor
 	{
 	public:
