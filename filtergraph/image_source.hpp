@@ -28,6 +28,24 @@ namespace Texpainter::FilterGraph
 		    PortInfo{detail::MapPixelType<PixelType>::value, "Pixels"}};
 
 	public:
+		struct InterfaceDescriptor
+		{
+			static constexpr std::array<PortInfo, 0> InputPorts{};
+			static constexpr std::array<PortInfo, 1> OutputPorts{
+			    {{detail::MapPixelType<PixelType>::value, "Pixels"}}};
+			static constexpr std::array<ParamName, 0> ParamNames{};
+		};
+
+		void operator()(auto const& args) const
+		{
+			std::ranges::copy(r_pixels, args.template output<0>());
+		}
+
+		ParamValue get(ParamName) const { return ParamValue{0.0}; }
+
+		void set(ParamName, ParamValue) {}
+
+
 		explicit ImageSource(Span2d<PixelType const> pixels): r_pixels{pixels} {}
 
 		static constexpr std::span<char const* const> paramNames()
@@ -55,6 +73,7 @@ namespace Texpainter::FilterGraph
 		{
 			return std::vector<ImgProcRetval>{PixelStore::BasicImage<PixelType>{r_pixels}};
 		}
+
 
 		static constexpr char const* name() { return "Layer input"; }
 
