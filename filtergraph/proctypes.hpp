@@ -123,6 +123,27 @@ namespace Texpainter::FilterGraph
 		using type = ComplexValue;
 	};
 
+	template<class T>
+	constexpr PixelType typeToPixelType() = delete;
+
+	template<>
+	constexpr PixelType typeToPixelType<RgbaValue>()
+	{
+		return PixelType::RGBA;
+	}
+
+	template<>
+	constexpr PixelType typeToPixelType<RealValue>()
+	{
+		return PixelType::GrayscaleReal;
+	}
+
+	template<>
+	constexpr PixelType typeToPixelType<ComplexValue>()
+	{
+		return PixelType::GrayscaleComplex;
+	}
+
 
 	struct PortInfo
 	{

@@ -32,7 +32,7 @@ namespace Texpainter::FilterGraph
 		{
 			static constexpr std::array<PortInfo, 0> InputPorts{};
 			static constexpr std::array<PortInfo, 1> OutputPorts{
-			    {{detail::MapPixelType<PixelType>::value, "Pixels"}}};
+			    {{typeToPixelType<PixelType>(), "Pixels"}}};
 			static constexpr std::array<ParamName, 0> ParamNames{};
 		};
 
