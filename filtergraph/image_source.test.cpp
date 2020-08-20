@@ -6,6 +6,8 @@
 
 #include "./image_processor.hpp"
 
+#include <cassert>
+
 namespace
 {
 	static_assert(Texpainter::FilterGraph::ImageProcessor2<
@@ -39,16 +41,27 @@ namespace Testcases
 		        .type
 		    == Texpainter::FilterGraph::PixelType::GrayscaleComplex);
 	}
+
+	void texpainterFilterGraphImageSourceCall()
+	{
+		std::array<Texpainter::FilterGraph::RealValue, 6> pixels{1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+		auto size =Texpainter::Size2d{3, 2};
+		Texpainter::FilterGraph::ImageSource<Texpainter::FilterGraph::RealValue> src{Texpainter::Span2d{pixels.data(), size}};
+		using InterfaceDescriptor = Texpainter::FilterGraph::ImageSource<Texpainter::FilterGraph::RealValue>::InterfaceDescriptor;
+		using ImgProcArg = Texpainter::FilterGraph::ImgProcArg2<InterfaceDescriptor>;
+		using InputArgs = ImgProcArg::InputArgs;
+		using OutputArgs = ImgProcArg::OutputArgs;
+
+		std::array<Texpainter::FilterGraph::RealValue, 6> pixels_out{};
+		OutputArgs args{};
+		args.template get<0>() = pixels_out.data();
+		src(ImgProcArg{size, InputArgs{}, args});
+		assert(std::ranges::equal(pixels, pixels_out));
+	}
 }
 
 #if 0
-		struct InterfaceDescriptor
-		{
-			static constexpr std::array<PortInfo, 0> InputPorts{};
-			static constexpr std::array<PortInfo, 1> OutputPorts{
-			    {{typeToPixelType<PixelType>(), "Pixels"}}};
-			static constexpr std::array<ParamName, 0> ParamNames{};
-		};
+
 
 		void operator()(ImgProcArg2<InterfaceDescriptor> const& args) const
 		{
@@ -96,5 +109,6 @@ namespace Testcases
 int main()
 {
 	Testcases::texpainterFilterGraphImageSourceInterfaceDescriptor();
+	Testcases::texpainterFilterGraphImageSourceCall();
 	return 0;
 }
