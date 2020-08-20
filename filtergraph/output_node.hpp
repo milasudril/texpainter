@@ -6,8 +6,10 @@
 #define TEXPAINTER_FILTERGRAPH_OUTPUTNODE_HPP
 
 #include "./proctypes.hpp"
+#include "./img_proc_arg.hpp"
 
 #include <vector>
+#include <cassert>
 
 namespace Texpainter::FilterGraph
 {
@@ -16,6 +18,24 @@ namespace Texpainter::FilterGraph
 		static constexpr PortInfo s_input_ports[] = {{PixelType::RGBA, "Pixels"}};
 
 	public:
+		struct InterfaceDescriptor
+		{
+			static constexpr std::array<PortInfo, 1> InputPorts{{PixelType::RGBA, "Pixels"}};
+			static constexpr std::array<PortInfo, 0> OutputPorts{};
+			static constexpr std::array<ParamName, 0> ParamNames{};
+		};
+
+		void operator()(ImgProcArg2<InterfaceDescriptor> const& args) const
+		{
+			assert(r_pixels.data() != nullptr);
+			std::copy_n(args.input<0>(), args.size().area(), r_pixels.data());
+		}
+
+		ParamValue get(ParamName) const{return ParamValue{0.0};}
+
+		void set(ParamName, ParamValue){}
+
+
 		static constexpr std::span<char const* const> paramNames()
 		{
 			return std::span<char const* const>{};
@@ -52,6 +72,9 @@ namespace Texpainter::FilterGraph
 		}
 
 		static constexpr char const* name() { return "Layer output"; }
+
+	private:
+		Span2d<RgbaValue> r_pixels;
 	};
 }
 
