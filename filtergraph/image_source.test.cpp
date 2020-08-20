@@ -76,5 +76,6 @@ int main()
 {
 	Testcases::texpainterFilterGraphImageSourceInterfaceDescriptor();
 	Testcases::texpainterFilterGraphImageSourceCall();
+	Testcases::texpainterFilterGraphImageSourceName();
 	return 0;
 }

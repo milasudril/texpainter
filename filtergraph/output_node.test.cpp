@@ -23,8 +23,8 @@ namespace Testcases
 		static_assert(Texpainter::FilterGraph::OutputNode::InterfaceDescriptor::InputPorts[0].type
 		              == Texpainter::FilterGraph::PixelType::RGBA);
 	}
-#if 0
 
+#if 0
 	void texpainterFilterGraphOutputNodeCall()
 	{
 		std::array<Texpainter::FilterGraph::RealValue, 6> pixels{1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
@@ -43,15 +43,13 @@ namespace Testcases
 		src(ImgProcArg{size, InputArgs{}, args});
 		assert(std::ranges::equal(pixels, pixels_out));
 	}
+#endif
 
 	void texpainterFilterGraphOutputNodeName()
 	{
-		static_assert(
-		    Texpainter::FilterGraph::OutputNode<Texpainter::FilterGraph::RealValue>::name()
-		    != nullptr);
-		static_assert(*Texpainter::FilterGraph::OutputNode<Texpainter::FilterGraph::RealValue>::name() != '\0');
+		static_assert(Texpainter::FilterGraph::OutputNode::name() != nullptr);
+		static_assert(*Texpainter::FilterGraph::OutputNode::name() != '\0');
 	}
-#endif
 }
 
 int main()
@@ -60,5 +58,6 @@ int main()
 #if 0
 	Testcases::texpainterFilterGraphOutputNodeCall();
 #endif
+	Testcases::texpainterFilterGraphOutputNodeName();
 	return 0;
 }
