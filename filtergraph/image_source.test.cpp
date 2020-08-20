@@ -66,6 +66,7 @@ namespace Testcases
 		static_assert(
 		    Texpainter::FilterGraph::ImageSource<Texpainter::FilterGraph::RealValue>::name()
 		    != nullptr);
+		static_assert(*Texpainter::FilterGraph::ImageSource<Texpainter::FilterGraph::RealValue>::name() != '\0');
 	}
 }
 
