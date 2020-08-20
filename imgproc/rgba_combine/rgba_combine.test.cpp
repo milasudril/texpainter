@@ -6,6 +6,8 @@
 
 #include "filtergraph/image_processor.hpp"
 
+#include <cassert>
+
 static_assert(Texpainter::FilterGraph::ImageProcessor2<RgbaCombine::ImageProcessor>);
 
 namespace Testcases
@@ -27,26 +29,47 @@ namespace Testcases
 		static_assert(RgbaCombine::ImageProcessor::InterfaceDescriptor::InputPorts[3].type
 		              == RgbaCombine::PixelType::GrayscaleReal);
 	}
-#if 0
 	void rgbaCombineImageProcessorCall()
 	{
-		std::array<Texpainter::FilterGraph::RealValue, 6> pixels{1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
-		auto size = Texpainter::Size2d{3, 2};
-		Texpainter::FilterGraph::ImageSource<Texpainter::FilterGraph::RealValue> src{
-		    Texpainter::Span2d{pixels.data(), size}};
-		using InterfaceDescriptor = Texpainter::FilterGraph::ImageSource<
-		    Texpainter::FilterGraph::RealValue>::InterfaceDescriptor;
-		using ImgProcArg = Texpainter::FilterGraph::ImgProcArg2<InterfaceDescriptor>;
-		using InputArgs  = ImgProcArg::InputArgs;
-		using OutputArgs = ImgProcArg::OutputArgs;
+		std::array<RgbaCombine::RealValue, 6> const red{1.0, 1.0, 0.0, 0.0, 0.0, 1.0};
+		std::array<RgbaCombine::RealValue, 6> const green{0.0, 1.0, 1.0, 1.0, 0.0, 0.0};
+		std::array<RgbaCombine::RealValue, 6> const blue{0.0, 0.0, 0.0, 1.0, 1.0, 1.0};
+		std::array<RgbaCombine::RealValue, 6> const alpha{1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
 
-		std::array<Texpainter::FilterGraph::RealValue, 6> pixels_out{};
-		OutputArgs args{};
-		args.template get<0>() = pixels_out.data();
-		src(ImgProcArg{size, InputArgs{}, args});
-		assert(std::ranges::equal(pixels, pixels_out));
+		std::array<RgbaCombine::RgbaValue, 6> const pixels_out_expected{
+		    RgbaCombine::RgbaValue{1.0f, 0.0f, 0.0f, 1.0f},
+		    RgbaCombine::RgbaValue{1.0f, 1.0f, 0.0f, 1.0f},
+		    RgbaCombine::RgbaValue{0.0f, 1.0f, 0.0f, 1.0f},
+		    RgbaCombine::RgbaValue{0.0f, 1.0f, 1.0f, 1.0f},
+		    RgbaCombine::RgbaValue{0.0f, 0.0f, 1.0, 1.0f},
+		    RgbaCombine::RgbaValue{1.0f, 0.0f, 1.0, 1.0f}};
+
+		using InterfaceDescriptor = RgbaCombine::ImageProcessor::InterfaceDescriptor;
+		using ImgProcArg          = RgbaCombine::ImgProcArg<InterfaceDescriptor>;
+		using InputArgs           = ImgProcArg::InputArgs;
+		using OutputArgs          = ImgProcArg::OutputArgs;
+
+		std::array<RgbaCombine::RgbaValue, 6> pixels_out{};
+		InputArgs in{};
+		in.get<0>() = red.data();
+		in.get<1>() = green.data();
+		in.get<2>() = blue.data();
+		in.get<3>() = alpha.data();
+
+		OutputArgs out{};
+		out.get<0>() = pixels_out.data();
+
+		RgbaCombine::ImageProcessor proc;
+		Texpainter::Size2d size{3, 2};
+		proc(ImgProcArg{size, in, out});
+
+		assert(std::ranges::equal(pixels_out_expected, pixels_out, [](auto a, auto b) {
+			auto diff = a - b;
+			return diff.red() == 0.0f && diff.green() == 0.0f && diff.blue() == 0.0f
+			       && diff.alpha() == 0.0f;
+		}));
 	}
-#endif
+
 	void rgbaCombineImageProcessorName()
 	{
 		static_assert(RgbaCombine::ImageProcessor::name() != nullptr);
@@ -57,7 +80,7 @@ namespace Testcases
 int main()
 {
 	Testcases::rgbaCombineImageProcessorInterfaceDescriptor();
-	//	Testcases::rgbaCombineImageProcessorCall();
+	Testcases::rgbaCombineImageProcessorCall();
 	Testcases::rgbaCombineImageProcessorName();
 	return 0;
 }
