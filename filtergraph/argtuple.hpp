@@ -90,12 +90,14 @@ namespace Texpainter::FilterGraph
 		template<size_t index>
 		constexpr auto& get()
 		{
+			static_assert(index < types.size());
 			return static_cast<detail::GenInArgTuple<types, index + 1>&>(m_data).value;
 		}
 
 		template<size_t index>
 		constexpr auto get() const
 		{
+			static_assert(index < types.size());
 			return static_cast<detail::GenInArgTuple<types, index + 1> const&>(m_data).value;
 		}
 
@@ -117,12 +119,14 @@ namespace Texpainter::FilterGraph
 		template<size_t index>
 		constexpr auto& get()
 		{
+			static_assert(index < types.size());
 			return static_cast<detail::GenOutArgTuple<types, index + 1>&>(m_data).value;
 		}
 
 		template<size_t index>
 		constexpr auto get() const
 		{
+			static_assert(index < types.size());
 			return static_cast<detail::GenOutArgTuple<types, index + 1> const&>(m_data).value;
 		}
 

@@ -6,6 +6,7 @@
 #define TEXPAINTER_FILTERGRAPH_IMAGESOURCE_HPP
 
 #include "./proctypes.hpp"
+#include "./img_proc_arg.hpp"
 
 namespace Texpainter::FilterGraph
 {
@@ -36,7 +37,7 @@ namespace Texpainter::FilterGraph
 			static constexpr std::array<ParamName, 0> ParamNames{};
 		};
 
-		void operator()(auto const& args) const
+		void operator()(ImgProcArg2<InterfaceDescriptor> const& args) const
 		{
 			std::ranges::copy(r_pixels, args.template output<0>());
 		}
