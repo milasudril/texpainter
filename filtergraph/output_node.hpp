@@ -31,9 +31,9 @@ namespace Texpainter::FilterGraph
 			std::copy_n(args.input<0>(), args.size().area(), r_pixels.data());
 		}
 
-		ParamValue get(ParamName) const{return ParamValue{0.0};}
+		ParamValue get(ParamName) const { return ParamValue{0.0}; }
 
-		void set(ParamName, ParamValue){}
+		void set(ParamName, ParamValue) {}
 
 
 		static constexpr std::span<char const* const> paramNames()
@@ -44,6 +44,8 @@ namespace Texpainter::FilterGraph
 		std::span<ParamValue const> paramValues() const { return std::span<ParamValue const>{}; }
 
 		void set(std::string_view, ParamValue) {}
+
+		void pixels(Span2d<RgbaValue> val) { r_pixels = val; }
 
 		ParamValue get(std::string_view) const { return ParamValue{0.0}; }
 
