@@ -24,26 +24,35 @@ namespace Testcases
 		              == Texpainter::FilterGraph::PixelType::RGBA);
 	}
 
-#if 0
 	void texpainterFilterGraphOutputNodeCall()
 	{
-		std::array<Texpainter::FilterGraph::RealValue, 6> pixels{1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
 		auto size = Texpainter::Size2d{3, 2};
-		Texpainter::FilterGraph::OutputNode<Texpainter::FilterGraph::RealValue> src{
-		    Texpainter::Span2d{pixels.data(), size}};
-		using InterfaceDescriptor = Texpainter::FilterGraph::OutputNode<
-		    Texpainter::FilterGraph::RealValue>::InterfaceDescriptor;
-		using ImgProcArg = Texpainter::FilterGraph::ImgProcArg2<InterfaceDescriptor>;
-		using InputArgs  = ImgProcArg::InputArgs;
-		using OutputArgs = ImgProcArg::OutputArgs;
+		Texpainter::FilterGraph::OutputNode sink;
+		using InterfaceDescriptor = Texpainter::FilterGraph::OutputNode::InterfaceDescriptor;
+		using ImgProcArg          = Texpainter::FilterGraph::ImgProcArg2<InterfaceDescriptor>;
+		using InputArgs           = ImgProcArg::InputArgs;
+		using OutputArgs          = ImgProcArg::OutputArgs;
 
-		std::array<Texpainter::FilterGraph::RealValue, 6> pixels_out{};
-		OutputArgs args{};
-		args.template get<0>() = pixels_out.data();
-		src(ImgProcArg{size, InputArgs{}, args});
-		assert(std::ranges::equal(pixels, pixels_out));
+		InputArgs args{};
+		std::array<Texpainter::FilterGraph::RgbaValue, 6> pixels{
+		    Texpainter::FilterGraph::RgbaValue{1.0f, 0.0f, 0.0f, 1.0f},
+		    Texpainter::FilterGraph::RgbaValue{1.0f, 1.0f, 0.0f, 1.0f},
+		    Texpainter::FilterGraph::RgbaValue{0.0f, 1.0f, 0.0f, 1.0f},
+		    Texpainter::FilterGraph::RgbaValue{0.0f, 1.0f, 1.0f, 1.0f},
+		    Texpainter::FilterGraph::RgbaValue{0.0f, 0.0f, 1.0, 1.0f},
+		    Texpainter::FilterGraph::RgbaValue{1.0f, 0.0f, 1.0, 1.0f}};
+		args.template get<0>() = pixels.data();
+
+		std::array<Texpainter::FilterGraph::RgbaValue, 6> pixels_out{};
+		sink.pixels(Texpainter::Span2d{pixels_out.data(), size});
+
+		sink(ImgProcArg{size, args, OutputArgs{}});
+		assert(std::ranges::equal(pixels, pixels_out, [](auto a, auto b) {
+			auto diff = a - b;
+			return diff.red() == 0.0f && diff.green() == 0.0f && diff.blue() == 0.0f
+			       && diff.alpha() == 0.0f;
+		}));
 	}
-#endif
 
 	void texpainterFilterGraphOutputNodeName()
 	{
@@ -55,9 +64,7 @@ namespace Testcases
 int main()
 {
 	Testcases::texpainterFilterGraphOutputNodeInterfaceDescriptor();
-#if 0
 	Testcases::texpainterFilterGraphOutputNodeCall();
-#endif
 	Testcases::texpainterFilterGraphOutputNodeName();
 	return 0;
 }
