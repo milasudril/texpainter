@@ -64,13 +64,6 @@ namespace Texpainter::FilterGraph
 
 		auto disconnectedCopy() const { return Node{m_proc->clone()}; }
 
-		Node& replaceWith(std::unique_ptr<AbstractImageProcessor>&& proc)
-		{
-			clear_result_cache();
-			m_proc = std::move(proc);
-			return *this;
-		}
-
 		AbstractImageProcessor const& processor() const { return *m_proc.get(); }
 
 		bool hasProcessor() const { return m_proc != nullptr; }

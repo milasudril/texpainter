@@ -108,16 +108,6 @@ namespace Testcases
 		assert(&other.processor() != &obj.processor());
 	}
 
-	void texpainterFilterGraphNodeReplaceWith()
-	{
-		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>()};
-		assert(obj.hasProcessor());
-		auto old = &obj.processor();
-		obj.replaceWith(std::make_unique<ImageProcessorStub>());
-		assert(obj.hasProcessor());
-		assert(old != &obj.processor());
-	}
-
 	void texpainterFilterGraphNodeCall()
 	{
 		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>()};
@@ -255,7 +245,6 @@ int main()
 {
 	Testcases::texpainterFilterGraphNodeDefaultState();
 	Testcases::texpainterFilterGraphNodeDisconnectedCopy();
-	Testcases::texpainterFilterGraphNodeReplaceWith();
 	Testcases::texpainterFilterGraphNodeCall();
 	Testcases::texpainterFilterGraphNodeInputPorts();
 	Testcases::texpainterFilterGraphNodeOutputPorts();
