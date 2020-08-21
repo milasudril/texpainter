@@ -34,7 +34,8 @@ namespace Texpainter::FilterGraph
 			auto output = std::make_unique<ImageProcessorWrapper<ImageSink>>(ImageSink{});
 			r_input     = &input->processor();
 			r_output    = &output->processor();
-			m_nodes.insert(std::make_pair(InputNodeId, std::move(input)));
+			r_input_node =
+			    &m_nodes.insert(std::make_pair(InputNodeId, std::move(input))).first->second;
 			r_output_node =
 			    &m_nodes.insert(std::make_pair(OutputNodeId, std::move(output))).first->second;
 			m_current_id = NodeId{2};
@@ -59,6 +60,7 @@ namespace Texpainter::FilterGraph
 			r_input->source(input);
 			PixelStore::Image ret{input.size()};
 			r_output->pixels(ret.pixels());
+			r_input_node->forceUpdate();
 			(*r_output_node)(input.size());
 			return ret;
 		}
@@ -123,6 +125,7 @@ namespace Texpainter::FilterGraph
 	private:
 		ImageSource<RgbaValue>* r_input;
 		ImageSink* r_output;
+		Node* r_input_node;
 		Node* r_output_node;
 		std::map<NodeId, Node> m_nodes;
 		NodeId m_current_id;

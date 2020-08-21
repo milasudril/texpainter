@@ -45,10 +45,11 @@ Texpainter::FilterGraph::Graph::Graph(Graph const& other)
     , m_current_id{other.m_current_id}
 {
 	copy_connections(other, *this);
+	r_input_node  = &m_nodes.find(InputNodeId)->second;
 	r_output_node = &m_nodes.find(OutputNodeId)->second;
+	r_input =
+	    &dynamic_cast<ImageProcessorWrapper<ImageSource<RgbaValue>>*>(&r_input_node->processor())
+	         ->processor();
 	r_output =
 	    &dynamic_cast<ImageProcessorWrapper<ImageSink>*>(&r_output_node->processor())->processor();
-	r_input = &dynamic_cast<ImageProcessorWrapper<ImageSource<RgbaValue>>*>(
-	               &m_nodes.find(InputNodeId)->second.processor())
-	               ->processor();
 }

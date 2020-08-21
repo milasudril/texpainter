@@ -74,6 +74,8 @@ namespace Texpainter::FilterGraph
 
 		auto outputPorts() const { return m_proc->outputPorts(); }
 
+		void forceUpdate() const { m_dirty = true; }
+
 		result_type const& operator()(Size2d size) const
 		{
 			assert(FilterGraph::isConnected(*this));
