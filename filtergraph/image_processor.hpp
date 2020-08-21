@@ -15,7 +15,7 @@
 namespace Texpainter::FilterGraph
 {
 	template<class T>
-	concept ImageProcessor2 = requires(T a)
+	concept ImageProcessor = requires(T a)
 	{
 		{std::as_const(a)(std::declval<ImgProcArg2<typename T::InterfaceDescriptor>>())};
 

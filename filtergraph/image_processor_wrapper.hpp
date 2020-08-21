@@ -46,7 +46,7 @@ namespace Texpainter::FilterGraph
 		}
 	}
 
-	template<ImageProcessor2 Proc>
+	template<ImageProcessor Proc>
 	class ImageProcessorWrapper final: public AbstractImageProcessor
 	{
 	public:

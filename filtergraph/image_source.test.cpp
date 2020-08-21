@@ -10,7 +10,7 @@
 
 namespace
 {
-	static_assert(Texpainter::FilterGraph::ImageProcessor2<
+	static_assert(Texpainter::FilterGraph::ImageProcessor<
 	              Texpainter::FilterGraph::ImageSource<Texpainter::FilterGraph::RgbaValue>>);
 }
 

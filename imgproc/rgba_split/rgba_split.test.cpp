@@ -8,7 +8,7 @@
 
 #include <cassert>
 
-static_assert(Texpainter::FilterGraph::ImageProcessor2<RgbaSplit::ImageProcessor>);
+static_assert(Texpainter::FilterGraph::ImageProcessor<RgbaSplit::ImageProcessor>);
 
 namespace Testcases
 {

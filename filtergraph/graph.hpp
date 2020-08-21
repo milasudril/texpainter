@@ -85,7 +85,7 @@ namespace Texpainter::FilterGraph
 			return std::make_pair(i.first->first, std::ref(i.first->second));
 		}
 
-		template<ImageProcessor2 ImgProc>
+		template<ImageProcessor ImgProc>
 		std::pair<NodeId, std::reference_wrapper<Node const>> insert(ImgProc&& proc)
 		{
 			return insert(

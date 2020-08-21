@@ -10,7 +10,7 @@
 
 namespace
 {
-	static_assert(Texpainter::FilterGraph::ImageProcessor2<Texpainter::FilterGraph::ImageSink>);
+	static_assert(Texpainter::FilterGraph::ImageProcessor<Texpainter::FilterGraph::ImageSink>);
 }
 namespace Testcases
 {
