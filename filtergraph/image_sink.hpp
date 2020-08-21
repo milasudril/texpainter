@@ -1,9 +1,9 @@
 //@	{
-//@	 "targets":[{"name":"output_node.hpp", "type":"include"}]
+//@	 "targets":[{"name":"image_sink.hpp", "type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_FILTERGRAPH_OUTPUTNODE_HPP
-#define TEXPAINTER_FILTERGRAPH_OUTPUTNODE_HPP
+#ifndef TEXPAINTER_FILTERGRAPH_IMAGESINK_HPP
+#define TEXPAINTER_FILTERGRAPH_IMAGESINK_HPP
 
 #include "./proctypes.hpp"
 #include "./img_proc_arg.hpp"
@@ -13,7 +13,7 @@
 
 namespace Texpainter::FilterGraph
 {
-	class OutputNode
+	class ImageSink
 	{
 		static constexpr PortInfo s_input_ports[] = {{PixelType::RGBA, "Pixels"}};
 

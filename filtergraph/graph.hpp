@@ -9,7 +9,7 @@
 #include "./node.hpp"
 #include "./node_id.hpp"
 #include "./image_source.hpp"
-#include "./output_node.hpp"
+#include "./image_sink.hpp"
 
 #include "utils/iter_pair.hpp"
 
@@ -29,7 +29,7 @@ namespace Texpainter::FilterGraph
 		Graph()
 		{
 			r_input  = &m_nodes[InputNodeId];  // Create an empty node as input node
-			r_output = &m_nodes.insert(std::make_pair(OutputNodeId, OutputNode{})).first->second;
+			r_output = &m_nodes.insert(std::make_pair(OutputNodeId, ImageSink{})).first->second;
 			m_current_id = NodeId{2};
 
 			insert(RgbaSplit::ImageProcessor{});
@@ -58,7 +58,7 @@ namespace Texpainter::FilterGraph
 					std::ranges::fill(ret.pixels(), PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
 				}
 
-			// NOTE: OutputNode always returns PixelStore::Image
+			// NOTE: ImageSink always returns PixelStore::Image
 			return *std::get_if<PixelStore::Image>(&ret[0]);
 		}
 

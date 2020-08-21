@@ -1,8 +1,8 @@
 //@	{
-//@	 "targets":[{"name":"output_node.test", "type":"application", "autorun":1}]
+//@	 "targets":[{"name":"image_sink.test", "type":"application", "autorun":1}]
 //@	}
 
-#include "./output_node.hpp"
+#include "./image_sink.hpp"
 
 #include "./image_processor.hpp"
 
@@ -10,25 +10,25 @@
 
 namespace
 {
-	static_assert(Texpainter::FilterGraph::ImageProcessor2<Texpainter::FilterGraph::OutputNode>);
+	static_assert(Texpainter::FilterGraph::ImageProcessor2<Texpainter::FilterGraph::ImageSink>);
 }
 namespace Testcases
 {
-	void texpainterFilterGraphOutputNodeInterfaceDescriptor()
+	void texpainterFilterGraphImageSinkInterfaceDescriptor()
 	{
-		static_assert(Texpainter::FilterGraph::OutputNode::InterfaceDescriptor::InputPorts.size()
+		static_assert(Texpainter::FilterGraph::ImageSink::InterfaceDescriptor::InputPorts.size()
 		              == 1);
-		static_assert(Texpainter::FilterGraph::OutputNode::InterfaceDescriptor::OutputPorts.size()
+		static_assert(Texpainter::FilterGraph::ImageSink::InterfaceDescriptor::OutputPorts.size()
 		              == 0);
-		static_assert(Texpainter::FilterGraph::OutputNode::InterfaceDescriptor::InputPorts[0].type
+		static_assert(Texpainter::FilterGraph::ImageSink::InterfaceDescriptor::InputPorts[0].type
 		              == Texpainter::FilterGraph::PixelType::RGBA);
 	}
 
-	void texpainterFilterGraphOutputNodeCall()
+	void texpainterFilterGraphImageSinkCall()
 	{
 		auto size = Texpainter::Size2d{3, 2};
-		Texpainter::FilterGraph::OutputNode sink;
-		using InterfaceDescriptor = Texpainter::FilterGraph::OutputNode::InterfaceDescriptor;
+		Texpainter::FilterGraph::ImageSink sink;
+		using InterfaceDescriptor = Texpainter::FilterGraph::ImageSink::InterfaceDescriptor;
 		using ImgProcArg          = Texpainter::FilterGraph::ImgProcArg2<InterfaceDescriptor>;
 		using InputArgs           = ImgProcArg::InputArgs;
 		using OutputArgs          = ImgProcArg::OutputArgs;
@@ -54,17 +54,17 @@ namespace Testcases
 		}));
 	}
 
-	void texpainterFilterGraphOutputNodeName()
+	void texpainterFilterGraphImageSinkName()
 	{
-		static_assert(Texpainter::FilterGraph::OutputNode::name() != nullptr);
-		static_assert(*Texpainter::FilterGraph::OutputNode::name() != '\0');
+		static_assert(Texpainter::FilterGraph::ImageSink::name() != nullptr);
+		static_assert(*Texpainter::FilterGraph::ImageSink::name() != '\0');
 	}
 }
 
 int main()
 {
-	Testcases::texpainterFilterGraphOutputNodeInterfaceDescriptor();
-	Testcases::texpainterFilterGraphOutputNodeCall();
-	Testcases::texpainterFilterGraphOutputNodeName();
+	Testcases::texpainterFilterGraphImageSinkInterfaceDescriptor();
+	Testcases::texpainterFilterGraphImageSinkCall();
+	Testcases::texpainterFilterGraphImageSinkName();
 	return 0;
 }
