@@ -16,13 +16,13 @@
 namespace Texpainter::FilterGraph
 {
 	template<ImgProcInterfaceDescriptor Descriptor>
-	class ImgProcArg2
+	class ImgProcArg
 	{
 	public:
 		using InputArgs  = InArgTuple<portTypes(Descriptor::InputPorts)>;
 		using OutputArgs = OutArgTuple<portTypes(Descriptor::OutputPorts)>;
 
-		explicit ImgProcArg2(Size2d size, InputArgs const& inputs, OutputArgs const& outputs)
+		explicit ImgProcArg(Size2d size, InputArgs const& inputs, OutputArgs const& outputs)
 		    : m_size{size}
 		    , m_inputs{inputs}
 		    , m_outputs{outputs}

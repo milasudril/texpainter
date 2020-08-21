@@ -43,7 +43,7 @@ namespace Testcases
 		std::array<Texpainter::PixelStore::Pixel, size.area()> output3{};
 
 
-		Texpainter::FilterGraph::ImgProcArg2<Ports> const obj{
+		Texpainter::FilterGraph::ImgProcArg<Ports> const obj{
 		    size,
 		    InArgs{std::begin(input3), std::begin(input2), std::begin(input1)},
 		    OutArgs{std::begin(output3), std::begin(output2), std::begin(output1)}};

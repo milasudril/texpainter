@@ -57,8 +57,8 @@ namespace Texpainter::FilterGraph
 			using InterfaceDescriptor = typename Proc::InterfaceDescriptor;
 			auto ret = detail::alloc_output_buffers<InterfaceDescriptor>(arg.size());
 
-			using InputArgs  = typename ImgProcArg2<InterfaceDescriptor>::InputArgs;
-			using OutputArgs = typename ImgProcArg2<InterfaceDescriptor>::OutputArgs;
+			using InputArgs  = typename ImgProcArg<InterfaceDescriptor>::InputArgs;
+			using OutputArgs = typename ImgProcArg<InterfaceDescriptor>::OutputArgs;
 
 			OutputArgs args_out{};
 			detail::apply(
@@ -67,7 +67,7 @@ namespace Texpainter::FilterGraph
 			    },
 			    args_out);
 
-			m_proc(ImgProcArg2<InterfaceDescriptor>{arg.size(), arg.inputs<InputArgs>(), args_out});
+			m_proc(ImgProcArg<InterfaceDescriptor>{arg.size(), arg.inputs<InputArgs>(), args_out});
 
 			return ret;
 		}

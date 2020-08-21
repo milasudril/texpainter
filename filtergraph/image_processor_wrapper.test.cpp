@@ -45,7 +45,7 @@ namespace
 
 		auto const& paramValues() const { return m_params; }
 
-		void operator()(Texpainter::FilterGraph::ImgProcArg2<InterfaceDescriptor> const& args) const
+		void operator()(Texpainter::FilterGraph::ImgProcArg<InterfaceDescriptor> const& args) const
 		{
 			args_result = &args;
 		}
@@ -56,7 +56,7 @@ namespace
 		    Texpainter::FilterGraph::ParamValue{3}};
 
 
-		mutable Texpainter::FilterGraph::ImgProcArg2<InterfaceDescriptor> const* args_result{
+		mutable Texpainter::FilterGraph::ImgProcArg<InterfaceDescriptor> const* args_result{
 		    nullptr};
 		mutable Texpainter::FilterGraph::ParamName* param_name_asked_for{nullptr};
 		mutable Texpainter::FilterGraph::ParamValue param_value_set{0};

@@ -29,7 +29,7 @@ namespace Testcases
 		auto size = Texpainter::Size2d{3, 2};
 		Texpainter::FilterGraph::ImageSink sink;
 		using InterfaceDescriptor = Texpainter::FilterGraph::ImageSink::InterfaceDescriptor;
-		using ImgProcArg          = Texpainter::FilterGraph::ImgProcArg2<InterfaceDescriptor>;
+		using ImgProcArg          = Texpainter::FilterGraph::ImgProcArg<InterfaceDescriptor>;
 		using InputArgs           = ImgProcArg::InputArgs;
 		using OutputArgs          = ImgProcArg::OutputArgs;
 

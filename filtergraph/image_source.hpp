@@ -34,7 +34,7 @@ namespace Texpainter::FilterGraph
 			static constexpr std::array<ParamName, 0> ParamNames{};
 		};
 
-		void operator()(ImgProcArg2<InterfaceDescriptor> const& args) const
+		void operator()(ImgProcArg<InterfaceDescriptor> const& args) const
 		{
 			std::ranges::copy(r_pixels, args.template output<0>());
 		}

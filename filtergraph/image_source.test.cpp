@@ -50,7 +50,7 @@ namespace Testcases
 		src.source(Texpainter::Span2d{pixels.data(), size});
 		using InterfaceDescriptor = Texpainter::FilterGraph::ImageSource<
 		    Texpainter::FilterGraph::RealValue>::InterfaceDescriptor;
-		using ImgProcArg = Texpainter::FilterGraph::ImgProcArg2<InterfaceDescriptor>;
+		using ImgProcArg = Texpainter::FilterGraph::ImgProcArg<InterfaceDescriptor>;
 		using InputArgs  = ImgProcArg::InputArgs;
 		using OutputArgs = ImgProcArg::OutputArgs;
 
