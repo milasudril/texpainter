@@ -19,6 +19,8 @@ namespace RgbaSplit
 	using ParamName  = Texpainter::FilterGraph::ParamName;
 	template<class T>
 	using ImgProcArg = Texpainter::FilterGraph::ImgProcArg2<T>;
+	using RgbaValue  = Texpainter::FilterGraph::RgbaValue;
+	using RealValue  = Texpainter::FilterGraph::RealValue;
 
 	class ImageProcessor
 	{

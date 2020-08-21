@@ -29,15 +29,14 @@ namespace Testcases
 		static_assert(RgbaSplit::ImageProcessor::InterfaceDescriptor::OutputPorts[3].type
 		              == RgbaSplit::PixelType::GrayscaleReal);
 	}
-#if 0
 	void rgbaSplitImageProcessorCall()
 	{
-		std::array<RgbaSplit::RealValue, 6> const red{1.0, 1.0, 0.0, 0.0, 0.0, 1.0};
-		std::array<RgbaSplit::RealValue, 6> const green{0.0, 1.0, 1.0, 1.0, 0.0, 0.0};
-		std::array<RgbaSplit::RealValue, 6> const blue{0.0, 0.0, 0.0, 1.0, 1.0, 1.0};
-		std::array<RgbaSplit::RealValue, 6> const alpha{1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+		std::array<RgbaSplit::RealValue, 6> const red_expected{1.0, 1.0, 0.0, 0.0, 0.0, 1.0};
+		std::array<RgbaSplit::RealValue, 6> const green_expected{0.0, 1.0, 1.0, 1.0, 0.0, 0.0};
+		std::array<RgbaSplit::RealValue, 6> const blue_expected{0.0, 0.0, 0.0, 1.0, 1.0, 1.0};
+		std::array<RgbaSplit::RealValue, 6> const alpha_expected{1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
 
-		std::array<RgbaSplit::RgbaValue, 6> const pixels_out_expected{
+		std::array<RgbaSplit::RgbaValue, 6> const pixels_in{
 		    RgbaSplit::RgbaValue{1.0f, 0.0f, 0.0f, 1.0f},
 		    RgbaSplit::RgbaValue{1.0f, 1.0f, 0.0f, 1.0f},
 		    RgbaSplit::RgbaValue{0.0f, 1.0f, 0.0f, 1.0f},
@@ -50,26 +49,30 @@ namespace Testcases
 		using InputArgs           = ImgProcArg::InputArgs;
 		using OutputArgs          = ImgProcArg::OutputArgs;
 
-		std::array<RgbaSplit::RgbaValue, 6> pixels_out{};
+		std::array<RgbaSplit::RealValue, 6> red{};
+		std::array<RgbaSplit::RealValue, 6> green{};
+		std::array<RgbaSplit::RealValue, 6> blue{};
+		std::array<RgbaSplit::RealValue, 6> alpha{};
+
 		InputArgs in{};
-		in.get<0>() = red.data();
-		in.get<1>() = green.data();
-		in.get<2>() = blue.data();
-		in.get<3>() = alpha.data();
+		in.get<0>() = pixels_in.data();
 
 		OutputArgs out{};
-		out.get<0>() = pixels_out.data();
+		out.get<0>() = red.data();
+		out.get<1>() = green.data();
+		out.get<2>() = blue.data();
+		out.get<3>() = alpha.data();
 
 		RgbaSplit::ImageProcessor proc;
 		Texpainter::Size2d size{3, 2};
 		proc(ImgProcArg{size, in, out});
 
-		assert(std::ranges::equal(pixels_out_expected, pixels_out, [](auto a, auto b) {
-			auto diff = a - b;
-			return diff.red() == 0.0f && diff.green() == 0.0f && diff.blue() == 0.0f
-			       && diff.alpha() == 0.0f;
-		}));
+		assert(red_expected == red);
+		assert(green_expected == green);
+		assert(blue_expected == blue);
+		assert(alpha_expected == alpha);
 	}
+#if 0
 
 	void rgbaSplitImageProcessorName()
 	{
