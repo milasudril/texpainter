@@ -158,32 +158,6 @@ namespace Texpainter::FilterGraph
 	}
 
 	constexpr bool operator!=(PortInfo a, PortInfo b) { return !(a == b); }
-
-	using ImgProcArg = std::variant<Span2d<PixelStore::Pixel const>,
-	                                Span2d<double const>,
-	                                Span2d<std::complex<double> const>>;
-
-	inline PixelType pixelType(ImgProcArg const& x) { return static_cast<PixelType>(x.index()); }
-
-	using ImgProcRetval = std::variant<PixelStore::BasicImage<PixelStore::Pixel>,
-	                                   PixelStore::BasicImage<double>,
-	                                   PixelStore::BasicImage<std::complex<double>>>;
-
-	inline PixelType pixelType(ImgProcRetval const& x) { return static_cast<PixelType>(x.index()); }
-
-	template<class T>
-	concept ImageProcessor = requires(T a)
-	{
-		{
-			T::name()
-		}
-		->std::same_as<char const*>;
-
-		{
-			std::as_const(a).paramValues()
-		}
-		->std::ranges::random_access_range;
-	};
 }
 
 #endif

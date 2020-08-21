@@ -46,8 +46,8 @@ namespace Testcases
 	{
 		std::array<Texpainter::FilterGraph::RealValue, 6> pixels{1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
 		auto size = Texpainter::Size2d{3, 2};
-		Texpainter::FilterGraph::ImageSource<Texpainter::FilterGraph::RealValue> src{
-		    Texpainter::Span2d{pixels.data(), size}};
+		Texpainter::FilterGraph::ImageSource<Texpainter::FilterGraph::RealValue> src;
+		src.source(Texpainter::Span2d{pixels.data(), size});
 		using InterfaceDescriptor = Texpainter::FilterGraph::ImageSource<
 		    Texpainter::FilterGraph::RealValue>::InterfaceDescriptor;
 		using ImgProcArg = Texpainter::FilterGraph::ImgProcArg2<InterfaceDescriptor>;

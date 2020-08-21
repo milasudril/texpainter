@@ -45,11 +45,6 @@ namespace
 
 		auto const& paramValues() const { return m_params; }
 
-		auto operator()(std::span<Texpainter::FilterGraph::ImgProcArg const>) const
-		{
-			return std::vector<Texpainter::FilterGraph::ImgProcRetval>{};
-		}
-
 		void operator()(Texpainter::FilterGraph::ImgProcArg2<InterfaceDescriptor> const& args) const
 		{
 			args_result = &args;

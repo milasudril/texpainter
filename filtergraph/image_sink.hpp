@@ -8,15 +8,12 @@
 #include "./proctypes.hpp"
 #include "./img_proc_arg.hpp"
 
-#include <vector>
 #include <cassert>
 
 namespace Texpainter::FilterGraph
 {
 	class ImageSink
 	{
-		static constexpr PortInfo s_input_ports[] = {{PixelType::RGBA, "Pixels"}};
-
 	public:
 		struct InterfaceDescriptor
 		{
@@ -35,45 +32,11 @@ namespace Texpainter::FilterGraph
 
 		void set(ParamName, ParamValue) {}
 
-
-		static constexpr std::span<char const* const> paramNames()
-		{
-			return std::span<char const* const>{};
-		}
-
 		std::span<ParamValue const> paramValues() const { return std::span<ParamValue const>{}; }
 
-		void set(std::string_view, ParamValue) {}
+		static constexpr char const* name() { return "Layer output"; }
 
 		void pixels(Span2d<RgbaValue> val) { r_pixels = val; }
-
-		ParamValue get(std::string_view) const { return ParamValue{0.0}; }
-
-		static constexpr std::span<PortInfo const> inputPorts()
-		{
-			return std::span<PortInfo const>{s_input_ports};
-		}
-
-		static constexpr std::span<PortInfo const> outputPorts()
-		{
-			return std::span<PortInfo const>{};
-		}
-
-		std::vector<ImgProcRetval> operator()(std::span<ImgProcArg const> args) const
-		{
-			if(args.size() != 1) [[unlikely]]
-				{
-					return std::vector<ImgProcRetval>{};
-				}
-
-			if(auto args_0 = std::get_if<Span2d<PixelStore::Pixel const>>(&args[0]);
-			   args_0 != nullptr)
-				[[likely]] { return std::vector<ImgProcRetval>{PixelStore::Image{*args_0}}; }
-
-			return std::vector<ImgProcRetval>{};
-		}
-
-		static constexpr char const* name() { return "Layer output"; }
 
 	private:
 		Span2d<RgbaValue> r_pixels;
