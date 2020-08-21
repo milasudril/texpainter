@@ -7,6 +7,7 @@
 #define TEXPAINTER_IMGPROC_RGBASPLIT_RGBASPLIT_HPP
 
 #include "filtergraph/proctypes.hpp"
+#include "filtergraph/img_proc_arg.hpp"
 
 namespace RgbaSplit
 {
@@ -15,6 +16,9 @@ namespace RgbaSplit
 	using ParamValue = Texpainter::FilterGraph::ParamValue;
 	using RetVal     = Texpainter::FilterGraph::ImgProcRetval;
 	using Arg        = Texpainter::FilterGraph::ImgProcArg;
+	using ParamName  = Texpainter::FilterGraph::ParamName;
+	template<class T>
+	using ImgProcArg = Texpainter::FilterGraph::ImgProcArg2<T>;
 
 	class ImageProcessor
 	{
@@ -26,6 +30,25 @@ namespace RgbaSplit
 		                                              PortInfo{PixelType::GrayscaleReal, "Alpha"}};
 
 	public:
+		struct InterfaceDescriptor
+		{
+			static constexpr std::array<PortInfo, 1> InputPorts{{PixelType::RGBA, "Pixels"}};
+
+			static constexpr std::array<PortInfo, 4> OutputPorts{
+			    {{PixelType::GrayscaleReal, "Red"},
+			     {PixelType::GrayscaleReal, "Green"},
+			     {PixelType::GrayscaleReal, "Blue"},
+			     {PixelType::GrayscaleReal, "Alpha"}}};
+
+			static constexpr std::array<ParamName, 0> ParamNames{};
+		};
+
+		void operator()(ImgProcArg<InterfaceDescriptor> const&) const;
+
+		ParamValue get(ParamName) const { return ParamValue{0.0}; }
+
+		void set(ParamName, ParamValue) {}
+
 		static constexpr std::span<char const* const> paramNames()
 		{
 			return std::span<char const* const>{};
