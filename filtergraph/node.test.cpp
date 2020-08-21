@@ -1,8 +1,8 @@
 //@	{
-//@	 "targets":[{"name":"node_new.test", "type":"application", "autorun":1}]
+//@	 "targets":[{"name":"node.test", "type":"application", "autorun":1}]
 //@	}
 
-#include "./node_new.hpp"
+#include "./node.hpp"
 #include <cassert>
 
 namespace

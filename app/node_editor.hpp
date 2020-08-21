@@ -5,7 +5,7 @@
 #ifndef TEXPAINTER_NODEEDITOR_HPP
 #define TEXPAINTER_NODEEDITOR_HPP
 
-#include "filtergraph/node_new.hpp"
+#include "filtergraph/node.hpp"
 #include "ui/label.hpp"
 #include "ui/box.hpp"
 #include "ui/slider.hpp"

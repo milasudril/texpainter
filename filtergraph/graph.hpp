@@ -6,7 +6,7 @@
 #ifndef TEXPAINTER_FILTERGRAPH_GRAPH_HPP
 #define TEXPAINTER_FILTERGRAPH_GRAPH_HPP
 
-#include "./node_new.hpp"
+#include "./node.hpp"
 #include "./node_id.hpp"
 #include "./image_source.hpp"
 #include "./image_sink.hpp"
