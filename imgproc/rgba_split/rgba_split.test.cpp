@@ -72,22 +72,18 @@ namespace Testcases
 		assert(blue_expected == blue);
 		assert(alpha_expected == alpha);
 	}
-#if 0
 
 	void rgbaSplitImageProcessorName()
 	{
 		static_assert(RgbaSplit::ImageProcessor::name() != nullptr);
 		static_assert(*RgbaSplit::ImageProcessor::name() != '\0');
 	}
-#endif
 }
 
 int main()
 {
 	Testcases::rgbaSplitImageProcessorInterfaceDescriptor();
-#if 0
 	Testcases::rgbaSplitImageProcessorCall();
 	Testcases::rgbaSplitImageProcessorName();
-#endif
 	return 0;
 }
