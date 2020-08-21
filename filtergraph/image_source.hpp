@@ -49,6 +49,8 @@ namespace Texpainter::FilterGraph
 
 		explicit ImageSource(Span2d<PixelType const> pixels): r_pixels{pixels} {}
 
+		ImageSource() = default;
+
 		static constexpr std::span<char const* const> paramNames()
 		{
 			return std::span<char const* const>{};
@@ -77,6 +79,12 @@ namespace Texpainter::FilterGraph
 
 
 		static constexpr char const* name() { return "Layer input"; }
+
+		ImageSource& source(Span2d<PixelType const> src)
+		{
+			r_pixels = src;
+			return *this;
+		}
 
 	private:
 		Span2d<PixelType const> r_pixels;

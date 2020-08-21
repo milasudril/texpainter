@@ -99,13 +99,12 @@ namespace Testcases
 		assert(!isConnected(obj));
 	}
 
-	void texpainterFilterGraphNodeDisconnectedCopy()
+	void texpainterFilterGraphNodeClonedProcessor()
 	{
 		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>()};
 		assert(obj.hasProcessor());
-		auto other = obj.disconnectedCopy();
-		assert(other.hasProcessor());
-		assert(&other.processor() != &obj.processor());
+		auto other = obj.clonedProcessor();
+		assert(other.get() != &obj.processor());
 	}
 
 	void texpainterFilterGraphNodeCall()
@@ -244,7 +243,7 @@ namespace Testcases
 int main()
 {
 	Testcases::texpainterFilterGraphNodeDefaultState();
-	Testcases::texpainterFilterGraphNodeDisconnectedCopy();
+	Testcases::texpainterFilterGraphNodeClonedProcessor();
 	Testcases::texpainterFilterGraphNodeCall();
 	Testcases::texpainterFilterGraphNodeInputPorts();
 	Testcases::texpainterFilterGraphNodeOutputPorts();

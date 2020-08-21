@@ -6,10 +6,11 @@
 #ifndef TEXPAINTER_FILTERGRAPH_GRAPH_HPP
 #define TEXPAINTER_FILTERGRAPH_GRAPH_HPP
 
-#include "./node.hpp"
+#include "./node_new.hpp"
 #include "./node_id.hpp"
 #include "./image_source.hpp"
 #include "./image_sink.hpp"
+#include "./image_processor_wrapper.hpp"
 
 #include "utils/iter_pair.hpp"
 
@@ -28,8 +29,14 @@ namespace Texpainter::FilterGraph
 
 		Graph()
 		{
-			r_input  = &m_nodes[InputNodeId];  // Create an empty node as input node
-			r_output = &m_nodes.insert(std::make_pair(OutputNodeId, ImageSink{})).first->second;
+			auto input = std::make_unique<ImageProcessorWrapper<ImageSource<RgbaValue>>>(
+			    ImageSource<RgbaValue>{});
+			auto output = std::make_unique<ImageProcessorWrapper<ImageSink>>(ImageSink{});
+			r_input     = &input->processor();
+			r_output    = &output->processor();
+			m_nodes.insert(std::make_pair(InputNodeId, std::move(input)));
+			r_output_node =
+			    &m_nodes.insert(std::make_pair(OutputNodeId, std::move(output))).first->second;
 			m_current_id = NodeId{2};
 
 			insert(RgbaSplit::ImageProcessor{});
@@ -47,21 +54,14 @@ namespace Texpainter::FilterGraph
 
 		Graph(Graph const& other);
 
-		template<class PixelType>
-		PixelStore::Image process(Span2d<PixelType const> source) const
+		PixelStore::Image process(Span2d<RgbaValue const> input) const
 		{
-			r_input->replaceWith(ImageSource{source});
-			auto ret = (*r_output)();
-			if(ret.size() != 1) [[unlikely]]  // Should only have one output
-				{
-					PixelStore::Image ret{source.size()};
-					std::ranges::fill(ret.pixels(), PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
-				}
-
-			// NOTE: ImageSink always returns PixelStore::Image
-			return *std::get_if<PixelStore::Image>(&ret[0]);
+			r_input->source(input);
+			PixelStore::Image ret{input.size()};
+			r_output->pixels(ret.pixels());
+			(*r_output_node)(input.size());
+			return ret;
 		}
-
 
 		Graph& connect(NodeId a, InputPort sink, NodeId b, OutputPort src)
 		{
@@ -75,23 +75,30 @@ namespace Texpainter::FilterGraph
 			return *this;
 		}
 
-
-		template<ImageProcessor T>
-		std::pair<NodeId, std::reference_wrapper<Node const>> insert(T&& obj)
+		std::pair<NodeId, std::reference_wrapper<Node const>> insert(
+		    std::unique_ptr<AbstractImageProcessor> proc)
 		{
-			auto i = m_nodes.insert(std::make_pair(m_current_id, std::forward<T>(obj)));
+			auto i = m_nodes.insert(std::make_pair(m_current_id, std::move(proc)));
 			++m_current_id;
 			return std::make_pair(i.first->first, std::ref(i.first->second));
 		}
+
+		template<ImageProcessor2 ImgProc>
+		std::pair<NodeId, std::reference_wrapper<Node const>> insert(ImgProc&& proc)
+		{
+			return insert(
+			    std::make_unique<ImageProcessorWrapper<ImgProc>>(std::forward<ImgProc>(proc)));
+		}
+#if 0
 
 		Graph& erase(NodeId id)
 		{
 			m_nodes.erase(id);
 			return *this;
 		}
-
+#endif
 		auto nodes() const { return IterPair{std::begin(m_nodes), std::end(m_nodes)}; }
-
+#if 0
 		auto get(NodeId id, std::string_view paramname) const
 		{
 			// Assume that id exists
@@ -111,10 +118,12 @@ namespace Texpainter::FilterGraph
 			auto ret = m_nodes.find(id);
 			return ret != std::end(m_nodes) ? &ret->second : nullptr;
 		}
+#endif
 
 	private:
-		Node* r_input;
-		Node* r_output;
+		ImageSource<RgbaValue>* r_input;
+		ImageSink* r_output;
+		Node* r_output_node;
 		std::map<NodeId, Node> m_nodes;
 		NodeId m_current_id;
 	};

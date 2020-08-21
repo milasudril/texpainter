@@ -106,6 +106,8 @@ namespace Texpainter::FilterGraph
 
 		Proc const& processor() const { return m_proc; }
 
+		Proc& processor() { return m_proc; }
+
 	private:
 		Proc m_proc;
 	};

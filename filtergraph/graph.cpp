@@ -19,7 +19,7 @@ namespace
 	{
 		std::map<Texpainter::FilterGraph::NodeId, Texpainter::FilterGraph::Node> ret;
 		std::ranges::for_each(g.nodes(), [&ret](auto const& item) {
-			ret.insert(std::make_pair(item.first, item.second.disconnectedCopy()));
+			ret.insert(std::make_pair(item.first, item.second.clonedProcessor()));
 		});
 		return ret;
 	}
@@ -45,6 +45,10 @@ Texpainter::FilterGraph::Graph::Graph(Graph const& other)
     , m_current_id{other.m_current_id}
 {
 	copy_connections(other, *this);
-	r_input  = &m_nodes.find(InputNodeId)->second;
-	r_output = &m_nodes.find(OutputNodeId)->second;
+	r_output_node = &m_nodes.find(OutputNodeId)->second;
+	r_output =
+	    &dynamic_cast<ImageProcessorWrapper<ImageSink>*>(&r_output_node->processor())->processor();
+	r_input = &dynamic_cast<ImageProcessorWrapper<ImageSource<RgbaValue>>*>(
+	               &m_nodes.find(InputNodeId)->second.processor())
+	               ->processor();
 }

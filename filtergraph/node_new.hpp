@@ -52,7 +52,7 @@ namespace Texpainter::FilterGraph
 			OutputPort m_index;
 		};
 
-		explicit Node(std::unique_ptr<AbstractImageProcessor>&& proc)
+		explicit Node(std::unique_ptr<AbstractImageProcessor> proc)
 		    : m_dirty{1}
 		    , m_proc{std::move(proc)}
 		{
@@ -62,9 +62,11 @@ namespace Texpainter::FilterGraph
 
 		Node(): m_dirty{0}, m_proc{nullptr} {}
 
-		auto disconnectedCopy() const { return Node{m_proc->clone()}; }
+		auto clonedProcessor() const { return m_proc->clone(); }
 
 		AbstractImageProcessor const& processor() const { return *m_proc.get(); }
+
+		AbstractImageProcessor& processor() { return *m_proc.get(); }
 
 		bool hasProcessor() const { return m_proc != nullptr; }
 
