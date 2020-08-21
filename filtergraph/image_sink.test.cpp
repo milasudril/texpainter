@@ -44,7 +44,7 @@ namespace Testcases
 		args.template get<0>() = pixels.data();
 
 		std::array<Texpainter::FilterGraph::RgbaValue, 6> pixels_out{};
-		sink.pixels(Texpainter::Span2d{pixels_out.data(), size});
+		sink.sink(Texpainter::Span2d{pixels_out.data(), size});
 
 		sink(ImgProcArg{size, args, OutputArgs{}});
 		assert(std::ranges::equal(pixels, pixels_out, [](auto a, auto b) {

@@ -59,7 +59,7 @@ namespace Texpainter::FilterGraph
 		{
 			r_input->source(input);
 			PixelStore::Image ret{input.size()};
-			r_output->pixels(ret.pixels());
+			r_output->sink(ret.pixels());
 			r_input_node->forceUpdate();
 			(*r_output_node)(input.size());
 			return ret;

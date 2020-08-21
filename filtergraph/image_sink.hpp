@@ -36,7 +36,7 @@ namespace Texpainter::FilterGraph
 
 		static constexpr char const* name() { return "Layer output"; }
 
-		void pixels(Span2d<RgbaValue> val) { r_pixels = val; }
+		void sink(Span2d<RgbaValue> val) { r_pixels = val; }
 
 	private:
 		Span2d<RgbaValue> r_pixels;
