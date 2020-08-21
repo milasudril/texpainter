@@ -9,26 +9,27 @@
 #include <cassert>
 
 static_assert(Texpainter::FilterGraph::ImageProcessor2<RgbaSplit::ImageProcessor>);
+
 namespace Testcases
 {
-#if 0
 	void rgbaSplitImageProcessorInterfaceDescriptor()
 	{
-		static_assert(RgbaSplit::ImageProcessor::InterfaceDescriptor::InputPorts.size() == 4);
-		static_assert(RgbaSplit::ImageProcessor::InterfaceDescriptor::OutputPorts.size() == 1);
-
-		static_assert(RgbaSplit::ImageProcessor::InterfaceDescriptor::OutputPorts[0].type
-		              == RgbaSplit::PixelType::RGBA);
+		static_assert(RgbaSplit::ImageProcessor::InterfaceDescriptor::InputPorts.size() == 1);
+		static_assert(RgbaSplit::ImageProcessor::InterfaceDescriptor::OutputPorts.size() == 4);
 
 		static_assert(RgbaSplit::ImageProcessor::InterfaceDescriptor::InputPorts[0].type
+		              == RgbaSplit::PixelType::RGBA);
+
+		static_assert(RgbaSplit::ImageProcessor::InterfaceDescriptor::OutputPorts[0].type
 		              == RgbaSplit::PixelType::GrayscaleReal);
-		static_assert(RgbaSplit::ImageProcessor::InterfaceDescriptor::InputPorts[1].type
+		static_assert(RgbaSplit::ImageProcessor::InterfaceDescriptor::OutputPorts[1].type
 		              == RgbaSplit::PixelType::GrayscaleReal);
-		static_assert(RgbaSplit::ImageProcessor::InterfaceDescriptor::InputPorts[2].type
+		static_assert(RgbaSplit::ImageProcessor::InterfaceDescriptor::OutputPorts[2].type
 		              == RgbaSplit::PixelType::GrayscaleReal);
-		static_assert(RgbaSplit::ImageProcessor::InterfaceDescriptor::InputPorts[3].type
+		static_assert(RgbaSplit::ImageProcessor::InterfaceDescriptor::OutputPorts[3].type
 		              == RgbaSplit::PixelType::GrayscaleReal);
 	}
+#if 0
 	void rgbaSplitImageProcessorCall()
 	{
 		std::array<RgbaSplit::RealValue, 6> const red{1.0, 1.0, 0.0, 0.0, 0.0, 1.0};
@@ -80,8 +81,8 @@ namespace Testcases
 
 int main()
 {
-#if 0
 	Testcases::rgbaSplitImageProcessorInterfaceDescriptor();
+#if 0
 	Testcases::rgbaSplitImageProcessorCall();
 	Testcases::rgbaSplitImageProcessorName();
 #endif
