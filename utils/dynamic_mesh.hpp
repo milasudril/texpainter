@@ -49,7 +49,7 @@ namespace Texpainter
 			if(auto i = m_seg_refs.find(v); i != std::end(m_seg_refs))
 			{
 				std::ranges::for_each(
-				    i.second, [&segs = m_segs](auto const& item) { segs.erase(item.get()); });
+				    i->second, [&segs = m_segs](auto const& item) { segs.erase(item.get()); });
 				m_seg_refs.erase(i);
 			}
 			return *this;

@@ -57,7 +57,8 @@ namespace Texpainter
 		enum class ControlId : int
 		{
 			NodeEditors,
-			CopyNode
+			CopyNode,
+			DeleteNode
 		};
 
 
@@ -65,6 +66,7 @@ namespace Texpainter
 		    : r_graph{graph}
 		    , m_canvas{owner}
 		    , m_node_copy{m_node_menu, "Copy"}
+		    , m_node_delete{m_node_menu, "Delete"}
 		{
 			m_linesegs = m_canvas.insert<Ui::LineSegmentRenderer>();
 			std::ranges::transform(r_graph.nodes(),
@@ -78,6 +80,7 @@ namespace Texpainter
 			                       });
 			m_canvas.eventHandler<ControlId::NodeEditors>(*this);
 			m_node_copy.eventHandler<ControlId::CopyNode>(*this);
+			m_node_delete.eventHandler<ControlId::DeleteNode>(*this);
 		}
 
 		template<ControlId>
@@ -106,6 +109,7 @@ namespace Texpainter
 		std::map<FilterGraph::NodeId, Canvas::WidgetHandle<NodeEditor>> m_node_editors;
 		Ui::Menu m_node_menu;
 		Ui::MenuItem m_node_copy;
+		Ui::MenuItem m_node_delete;
 
 
 		void init();
@@ -172,6 +176,8 @@ namespace Texpainter
 	    Ui::MenuItem&)
 	{
 		auto node = r_graph.insert(r_graph.node(m_sel_node)->clonedProcessor());
+
+		// TODO: Below is similar to create new node
 		m_node_editors.insert(
 		    std::make_pair(node.first,
 		                   m_canvas.insert<NodeEditor>(
@@ -181,6 +187,30 @@ namespace Texpainter
 		    &node.second.get(), std::vector<PortId>(node.second.get().inputPorts().size())));
 		m_output_port_map.insert(std::make_pair(
 		    &node.second.get(), std::vector<PortId>(node.second.get().outputPorts().size())));
+	}
+
+	template<>
+	inline void FilterGraphEditor::onActivated<FilterGraphEditor::ControlId::DeleteNode>(
+	    Ui::MenuItem&)
+	{
+		auto node = r_graph.node(m_sel_node);
+
+		std::ranges::for_each(m_output_port_map.find(node)->second,
+		                      [&connections = m_connections](auto item) {
+			                      if(item.valid()) { connections.remove(item); }
+		                      });
+		m_output_port_map.erase(node);
+
+		std::ranges::for_each(m_input_port_map.find(node)->second,
+		                      [&connections = m_connections](auto item) {
+			                      if(item.valid()) { connections.remove(item); }
+		                      });
+		m_input_port_map.erase(node);
+
+		m_node_editors.erase(m_sel_node);
+
+		r_graph.erase(m_sel_node);
+		m_linesegs->lineSegments(resolveLineSegs(m_connections));
 	}
 }
 
