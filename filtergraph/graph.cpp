@@ -92,9 +92,7 @@ Texpainter::FilterGraph::ValidationResult Texpainter::FilterGraph::validate(Grap
 				{
 					switch(visited[&item.processor()])
 					{
-						case State::Init:
-							nodes.push(&item.processor());
-							break;
+						case State::Init: nodes.push(&item.processor()); break;
 
 						case State::InProgress: return ValidationResult::CyclicConnections;
 

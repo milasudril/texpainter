@@ -146,6 +146,8 @@ namespace Texpainter::Ui
 			                                    std::forward<WidgetParams>(params)...);
 		}
 
+		void showWidgets() { WidgetCanvasDetail::show(); }
+
 		template<auto id, class EventHandler>
 		WidgetCanvas& eventHandler(EventHandler& eh)
 		{

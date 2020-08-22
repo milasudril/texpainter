@@ -15,6 +15,7 @@
 #include "ui/menu_item.hpp"
 #include "utils/dynamic_mesh.hpp"
 
+#include <limits>
 #include <cassert>
 
 namespace Texpainter
@@ -22,6 +23,35 @@ namespace Texpainter
 	class FilterGraphEditor
 	{
 		using Canvas = Ui::WidgetCanvas<FilterGraph::NodeId>;
+		class PortId
+		{
+		public:
+			constexpr PortId(): m_value{0} {}
+
+			constexpr explicit PortId(uint64_t id): m_value{id} { assert(valid()); }
+
+			constexpr bool valid() const { return m_value != 0; }
+
+			constexpr uint64_t value() const { return m_value; }
+
+			constexpr PortId operator++(int)
+			{
+				auto tmp = *this;
+				++m_value;
+				return tmp;
+			}
+
+			constexpr PortId& operator++()
+			{
+				++m_value;
+				return *this;
+			}
+
+			constexpr auto operator<=>(PortId const&) const = default;
+
+		private:
+			uint64_t m_value;
+		};
 
 	public:
 		enum class ControlId : int
@@ -33,7 +63,6 @@ namespace Texpainter
 
 		FilterGraphEditor(Ui::Container& owner, FilterGraph::Graph& graph)
 		    : r_graph{graph}
-		    , m_current_port_id{0}
 		    , m_canvas{owner}
 		    , m_node_copy{m_node_menu, "Copy"}
 		{
@@ -66,10 +95,10 @@ namespace Texpainter
 
 	private:
 		FilterGraph::Graph& r_graph;
-		uint64_t m_current_port_id;
-		DynamicMesh<uint64_t, Ui::ToplevelCoordinates> m_connections;
-		std::map<FilterGraph::Node const*, std::vector<uint64_t>> m_input_port_map;
-		std::map<FilterGraph::Node const*, std::vector<uint64_t>> m_output_port_map;
+		PortId m_current_port_id;
+		DynamicMesh<PortId, Ui::ToplevelCoordinates> m_connections;
+		std::map<FilterGraph::Node const*, std::vector<PortId>> m_input_port_map;
+		std::map<FilterGraph::Node const*, std::vector<PortId>> m_output_port_map;
 		FilterGraph::NodeId m_sel_node;
 
 		Canvas m_canvas;
@@ -92,8 +121,11 @@ namespace Texpainter
 	{
 		if(button == 3)
 		{
-			m_sel_node = node;
-			m_node_menu.show().popupAtCursor();
+			if(node != FilterGraph::Graph::InputNodeId && node != FilterGraph::Graph::OutputNodeId)
+			{
+				m_sel_node = node;
+				m_node_menu.show().popupAtCursor();
+			}
 		}
 	}
 
@@ -101,7 +133,7 @@ namespace Texpainter
 	inline void FilterGraphEditor::onMove<FilterGraphEditor::ControlId::NodeEditors>(
 	    Canvas& src, Ui::WidgetCoordinates loc, FilterGraph::NodeId id)
 	{
-		if(m_current_port_id == 0) [[unlikely]]
+		if(!m_current_port_id.valid()) [[unlikely]]
 			{
 				init();
 			}
@@ -116,7 +148,8 @@ namespace Texpainter
 		                      [&connections = m_connections,
 		                       &ids         = i->second,
 		                       k            = static_cast<size_t>(0)](auto const& item) mutable {
-			                      connections.moveTo(ids[k], item.inputField().location());
+			                      if(ids[k].valid())
+			                      { connections.moveTo(ids[k], item.inputField().location()); }
 			                      ++k;
 		                      });
 
@@ -126,9 +159,11 @@ namespace Texpainter
 		                      [&connections = m_connections,
 		                       &ids         = o->second,
 		                       k            = static_cast<size_t>(0)](auto const& item) mutable {
-			                      connections.moveTo(ids[k], item.inputField().location());
+			                      if(ids[k].valid())
+			                      { connections.moveTo(ids[k], item.inputField().location()); }
 			                      ++k;
 		                      });
+
 		m_linesegs->lineSegments(resolveLineSegs(m_connections));
 	}
 
@@ -136,7 +171,16 @@ namespace Texpainter
 	inline void FilterGraphEditor::onActivated<FilterGraphEditor::ControlId::CopyNode>(
 	    Ui::MenuItem&)
 	{
-		printf("Copy node %zu\n", m_sel_node.value());
+		auto node = r_graph.insert(r_graph.node(m_sel_node)->clonedProcessor());
+		m_node_editors.insert(
+		    std::make_pair(node.first,
+		                   m_canvas.insert<NodeEditor>(
+		                       node.first, Ui::WidgetCoordinates{50.0, 50.0}, node.second)));
+		m_canvas.showWidgets();
+		m_input_port_map.insert(std::make_pair(
+		    &node.second.get(), std::vector<PortId>(node.second.get().inputPorts().size())));
+		m_output_port_map.insert(std::make_pair(
+		    &node.second.get(), std::vector<PortId>(node.second.get().outputPorts().size())));
 	}
 }
 

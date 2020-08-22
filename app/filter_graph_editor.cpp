@@ -6,11 +6,11 @@
 
 namespace
 {
-	template<class PortCollection>
-	uint64_t add_ports_from(
+	template<class PortCollection, class PortId>
+	PortId add_ports_from(
 	    PortCollection const& ports,
-	    uint64_t port_id_start,
-	    Texpainter::DynamicMesh<uint64_t, Texpainter::Ui::ToplevelCoordinates>& connections)
+	    PortId port_id_start,
+	    Texpainter::DynamicMesh<PortId, Texpainter::Ui::ToplevelCoordinates>& connections)
 	{
 		std::ranges::for_each(ports, [&connections, &port_id = port_id_start](auto const& port) {
 			connections.insert(std::make_pair(port_id, port.inputField().location()));
@@ -20,13 +20,14 @@ namespace
 		return port_id_start;
 	}
 
+	template<class PortId>
 	void map_node_to_ports(
-	    uint64_t first_port,
-	    uint64_t after_last_port,
-	    std::map<Texpainter::FilterGraph::Node const*, std::vector<uint64_t>>& ports,
+	    PortId first_port,
+	    PortId after_last_port,
+	    std::map<Texpainter::FilterGraph::Node const*, std::vector<PortId>>& ports,
 	    std::reference_wrapper<Texpainter::FilterGraph::Node const> node)
 	{
-		std::vector<uint64_t> tmp;
+		std::vector<PortId> tmp;
 		while(first_port != after_last_port)
 		{
 			tmp.push_back(first_port);
@@ -39,6 +40,7 @@ namespace
 
 void Texpainter::FilterGraphEditor::init()
 {
+	m_current_port_id = PortId{1};
 	std::ranges::for_each(
 	    m_node_editors,
 	    [&port_id         = m_current_port_id,
