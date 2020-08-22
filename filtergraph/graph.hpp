@@ -55,24 +55,34 @@ namespace Texpainter::FilterGraph
 
 		Graph(Graph const& other);
 
-		PixelStore::Image process(Span2d<RgbaValue const> input) const
+		PixelStore::Image process(Span2d<RgbaValue const> input, bool force_update = true) const
 		{
+		//	assert(allInputsConnected());
 			r_input->source(input);
 			PixelStore::Image ret{input.size()};
 			r_output->sink(ret.pixels());
-			r_input_node->forceUpdate();
+			if( force_update )
+			{ r_input_node->forceUpdate(); }
 			(*r_output_node)(input.size());
 			return ret;
 		}
 
+		auto node(NodeId id) const
+		{
+			auto ret = m_nodes.find(id);
+			return ret != std::end(m_nodes) ? &ret->second : nullptr;
+		}
+
 		Graph& connect(NodeId a, InputPort sink, NodeId b, OutputPort src)
 		{
+			assert(node(a) != nullptr && node(b) != nullptr);
 			m_nodes[a].connect(sink, m_nodes[b], src);
 			return *this;
 		}
 
 		Graph& disconnect(NodeId a, InputPort sink)
 		{
+			assert(node(a) != nullptr);
 			m_nodes[a].disconnect(sink);
 			return *this;
 		}
@@ -94,6 +104,7 @@ namespace Texpainter::FilterGraph
 
 		Graph& erase(NodeId id)
 		{
+			assert(id != InputNodeId && id != OutputNodeId);
 			m_nodes.erase(id);
 			return *this;
 		}
@@ -102,23 +113,17 @@ namespace Texpainter::FilterGraph
 
 		auto get(NodeId id, ParamName paramname) const
 		{
-			// Assume that id exists
+			assert(node(id) != nullptr);
 			return m_nodes.find(id)->second.get(paramname);
 		}
 
 		void set(NodeId id, ParamName paramname, ParamValue val)
 		{
-			// Assume that id exists
+			assert(node(id) != nullptr);
 			m_nodes.find(id)->second.set(paramname, val);
 		}
 
 		auto currentId() const { return m_current_id; }
-
-		auto node(NodeId id) const
-		{
-			auto ret = m_nodes.find(id);
-			return ret != std::end(m_nodes) ? &ret->second : nullptr;
-		}
 
 	private:
 		ImageSource<RgbaValue>* r_input;
