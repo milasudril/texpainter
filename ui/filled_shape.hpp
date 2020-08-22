@@ -36,7 +36,13 @@ namespace Texpainter::Ui
 		FilledShape(FilledShape&& obj) noexcept: m_impl{obj.m_impl} { obj.m_impl = nullptr; }
 
 		template<auto id, class EventHandler>
-		FilledShape& eventHandler(EventHandler& eh);
+		FilledShape& eventHandler(EventHandler& eh)
+		{
+			return eventHandler(&eh, [](void* event_handler, FilledShape& self) {
+				auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				obj.template onClicked<id>(self);
+			});
+		}
 
 		ToplevelCoordinates location() const;
 
@@ -44,6 +50,8 @@ namespace Texpainter::Ui
 		class Impl;
 		Impl* m_impl;
 		explicit FilledShape(Impl& impl): m_impl(&impl) {}
+		using EventHandlerFunc = void (*)(void* event_handler, FilledShape& self);
+		FilledShape& eventHandler(void* event_handler, EventHandlerFunc f);
 	};
 }
 

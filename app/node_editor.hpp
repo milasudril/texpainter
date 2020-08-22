@@ -35,6 +35,12 @@ namespace Texpainter
 
 	class NodeEditor
 	{
+		enum class ControlId : int
+		{
+			Input,
+			Output
+		};
+
 	public:
 		NodeEditor(Ui::Container& owner, std::reference_wrapper<FilterGraph::Node const> node)
 		    : r_node{node}
@@ -88,6 +94,14 @@ namespace Texpainter
 				                       ret.label().oneline(true).alignment(1.0);
 				                       return ret;
 			                       });
+
+			std::ranges::for_each(m_input_labels, [this](auto& item) {
+				item.inputField().template eventHandler<ControlId::Input>(*this);
+			});
+
+			std::ranges::for_each(m_output_labels, [this](auto& item) {
+				item.inputField().template eventHandler<ControlId::Output>(*this);
+			});
 		}
 
 		auto const& inputs() const { return m_input_labels; }
@@ -96,6 +110,8 @@ namespace Texpainter
 
 		auto node() const { return r_node; }
 
+		template<ControlId>
+		void onClicked(Ui::FilledShape&);
 
 	private:
 		std::reference_wrapper<FilterGraph::Node const> r_node;
@@ -111,6 +127,18 @@ namespace Texpainter
 		std::vector<Ui::LabeledInput<Ui::Slider>> m_params_input;
 		std::vector<Ui::LabeledInput<Ui::FilledShape>> m_output_labels;
 	};
+
+	template<>
+	inline void NodeEditor::onClicked<NodeEditor::ControlId::Output>(Ui::FilledShape& src)
+	{
+		puts("Output");
+	}
+
+	template<>
+	inline void NodeEditor::onClicked<NodeEditor::ControlId::Input>(Ui::FilledShape& src)
+	{
+		puts("Input");
+	}
 }
 
 #endif

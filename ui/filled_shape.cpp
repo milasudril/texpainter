@@ -26,7 +26,16 @@ public:
 		       + 0.5 * (size + size * m_loc);
 	}
 
+	void eventHandler(void* event_handler, EventHandlerFunc f)
+	{
+		r_eh   = event_handler;
+		r_func = f;
+	}
+
 private:
+	void* r_eh;
+	EventHandlerFunc r_func;
+
 	PixelStore::Pixel m_color;
 	double m_radius;
 	vec2_t m_loc;
@@ -60,6 +69,30 @@ private:
 		auto const h = allocation->height;
 		gtk_widget_set_size_request(widget, h, -1);
 	}
+
+	static gboolean clicked_callack(GtkWidget*, GdkEvent* e, gpointer self)
+	{
+		auto& obj         = *reinterpret_cast<Impl*>(self);
+		auto event_button = reinterpret_cast<GdkEventButton const*>(e);
+		if(obj.r_eh != nullptr && event_button->button == 1)
+		{
+			obj.r_func(obj.r_eh, obj);
+			return FALSE;
+		}
+		return TRUE;
+	}
+
+	static gboolean on_mouse_down(GtkWidget* w, GdkEvent* e, gpointer self)
+	{
+		auto& obj = *reinterpret_cast<Impl*>(self);
+		auto event_button = reinterpret_cast<GdkEventButton const*>(e);
+		if(obj.r_eh != nullptr && event_button->button == 1)
+		{
+			return FALSE;
+		}
+		return TRUE;
+	}
+
 };
 
 Texpainter::Ui::FilledShape::FilledShape(Container& cnt,
@@ -84,6 +117,11 @@ Texpainter::Ui::FilledShape::Impl::Impl(Container& cnt,
 	auto widget = gtk_drawing_area_new();
 	g_signal_connect(G_OBJECT(widget), "draw", G_CALLBACK(draw_callback), this);
 	g_signal_connect(G_OBJECT(widget), "size-allocate", G_CALLBACK(size_callback), this);
+	g_signal_connect(G_OBJECT(widget), "button-release-event", G_CALLBACK(clicked_callack), this);
+	g_signal_connect(G_OBJECT(widget), "button-press-event", G_CALLBACK(on_mouse_down), this);
+	gtk_widget_add_events(widget,
+	                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK
+	                          | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_SCROLL_MASK);
 
 	m_handle = GTK_DRAWING_AREA(widget);
 
@@ -99,4 +137,11 @@ Texpainter::Ui::FilledShape::Impl::~Impl()
 Texpainter::Ui::ToplevelCoordinates Texpainter::Ui::FilledShape::location() const
 {
 	return m_impl->location();
+}
+
+Texpainter::Ui::FilledShape& Texpainter::Ui::FilledShape::eventHandler(void* event_handler,
+                                                                       EventHandlerFunc f)
+{
+	m_impl->eventHandler(event_handler, f);
+	return *this;
 }
