@@ -1,15 +1,15 @@
 //@	{"targets":[{"name":"menu_action.hpp","type":"include"}]}
 
-#ifndef TEXPAINTER_MENUACTION_HPP
-	#define TEXPAITNER_MENUACTION_HPP
+#ifndef TEXPAINTER_APP_MENUACTION_HPP
+#define TEXPAINTER_APP_MENUACTION_HPP
 
-	#include "./menu_app.hpp"
-	#include "./menu_file.hpp"
-	#include "./menu_layer.hpp"
-	#include "./menu_palette.hpp"
+#include "./menu_app.hpp"
+#include "./menu_file.hpp"
+#include "./menu_layer.hpp"
+#include "./menu_palette.hpp"
 
-	#include "ui/menu_item.hpp"
-	#include "ui/menu_builder.hpp"
+#include "ui/menu_item.hpp"
+#include "ui/menu_builder.hpp"
 
 namespace Texpainter
 {

@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"sorted_sequence.hpp", "type":"include"}]}
 
-#ifndef TEXPAINTER_DOUBLEKEYMAP_HPP
-#define TEXPAINTER_DOUBLEKEYMAP_HPP
+#ifndef TEXPAINTER_UTILS_SORTEDSEQUENCE_HPP
+#define TEXPAINTER_UTILS_SORTEDSEQUENCE_HPP
 
 #include "./iter_pair.hpp"
 #include "./pair_iterator.hpp"

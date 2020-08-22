@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"color_index.hpp", "type":"include"}]}
 
-#ifndef TEXPAINTER_COLORINDEX_HPP
-#define TEXPAINTER_COLORINDEX_HPP
+#ifndef TEXPAINTER_PIXELSTORE_COLORINDEX_HPP
+#define TEXPAINTER_PIXELSTORE_COLORINDEX_HPP
 
 #include <cstdint>
 #include <compare>

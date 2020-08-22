@@ -2,8 +2,8 @@
 //@	  "targets":[{"name":"crack_creator.hpp", "type":"include"}]
 //@	 }
 
-#ifndef TEXPAINTER_CRACKCREATOR_HPP
-#define TEXPAINTER_CRACKCREATOR_HPP
+#ifndef TEXPAINTER_APP_CRACKCREATOR_HPP
+#define TEXPAINTER_APP_CRACKCREATOR_HPP
 
 #include "generators/crack_generator.hpp"
 #include "ui/box.hpp"

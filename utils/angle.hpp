@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"angle.hpp", "type":"include"}]}
 
-#ifndef TEXPAINTER_ANGLE_HPP
-#define TEXPAINTER_ANGLE_HPP
+#ifndef TEXPAINTER_UTILS_ANGLE_HPP
+#define TEXPAINTER_UTILS_ANGLE_HPP
 
 #include "./vec_t.hpp"
 

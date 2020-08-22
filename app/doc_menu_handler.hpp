@@ -2,8 +2,8 @@
 //@	"targets":[{"name":"doc_menu_handler.hpp","type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_DOCMENUHANDLER_HPP
-#define TEXPAINTER_DOCMENUHANDLER_HPP
+#ifndef TEXPAINTER_APP_DOCMENUHANDLER_HPP
+#define TEXPAINTER_APP_DOCMENUHANDLER_HPP
 
 #include "./menu_file.hpp"
 #include "./size_input.hpp"

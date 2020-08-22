@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"size_input.hpp","type":"include"}]}
 
-#ifndef TEXPAINTER_SIZEINPUT_HPP
-#define TEXPAINTER_SIZEINPUT_HPP
+#ifndef TEXPAINTER_APP_SIZEINPUT_HPP
+#define TEXPAINTER_APP_SIZEINPUT_HPP
 
 #include "model/layer.hpp"
 #include "ui/box.hpp"

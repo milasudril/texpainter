@@ -3,8 +3,8 @@
 //@	,"dependencies_extra":[{"ref":"filled_shape.o","rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_FILLEDSHAPE_HPP
-#define TEXPAINTER_FILLEDSHAPE_HPP
+#ifndef TEXPAINTER_UI_FILLEDSHAPE_HPP
+#define TEXPAINTER_UI_FILLEDSHAPE_HPP
 
 #include "./container.hpp"
 #include "./box.hpp"

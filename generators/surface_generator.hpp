@@ -3,8 +3,8 @@
 //@	 ,"dependencies_extra":[{"ref":"surface_generator.o", "rel":"implementation"}]
 //@	 }
 
-#ifndef TEXPAINTER_SURFACEGENERATOR_HPP
-#define TEXPAINTER_SURFACEGENERATOR_HPP
+#ifndef TEXPAINTER_GENERATORS_SURFACEGENERATOR_HPP
+#define TEXPAINTER_GENERATORS_SURFACEGENERATOR_HPP
 
 #include "generators/fourier_transform.hpp"
 #include "generators/grayscale_noise.hpp"

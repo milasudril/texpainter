@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"iter_pair.hpp", "type":"include"}]}
 
-#ifndef TEXPAINTER_ITERPAIR_HPP
-#define TEXPAINTER_ITERPAIR_HPP
+#ifndef TEXPAINTER_UTILS_ITERPAIR_HPP
+#define TEXPAINTER_UTILS_ITERPAIR_HPP
 
 #include <ranges>
 

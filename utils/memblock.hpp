@@ -2,8 +2,8 @@
 //@	 "targets":[{"name":"memblock.hpp", "type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_MEMBLOCK_HPP
-#define TEXPAINTER_MEMBLOCK_HPP
+#ifndef TEXPAINTER_UTILS_MEMBLOCK_HPP
+#define TEXPAINTER_UTILS_MEMBLOCK_HPP
 
 #include <cstdlib>
 

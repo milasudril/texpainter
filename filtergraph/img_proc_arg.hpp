@@ -2,8 +2,8 @@
 //@	 "targets":[{"name":"img_proc_arg.hpp", "type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_FILTERGRAPH_IMG_PROC_ARG_HPP
-#define TEXPAINTER_FILTERGRAPH_IMG_PROC_ARG_HPP
+#ifndef TEXPAINTER_FILTERGRAPH_IMGPROCARG_HPP
+#define TEXPAINTER_FILTERGRAPH_IMGPROCARG_HPP
 
 #include "./argtuple.hpp"
 #include "./proctypes.hpp"

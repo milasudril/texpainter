@@ -3,8 +3,8 @@
 //@	,"dependencies_extra":[{"ref":"app_window.o","rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_APPWINDOW_HPP
-#define TEXPAINTER_APPWINDOW_HPP
+#ifndef TEXPAINTER_APP_APPWINDOW_HPP
+#define TEXPAINTER_APP_APPWINDOW_HPP
 
 #include "./menu_action.hpp"
 #include "./doc_menu_handler.hpp"

@@ -2,8 +2,8 @@
 //@	"targets":[{"name":"layer_menu_handler.hpp","type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_LAYERMENUHANDLER_HPP
-#define TEXPAINTER_LAYERMENUHANDLER_HPP
+#ifndef TEXPAINTER_APP_LAYERMENUHANDLER_HPP
+#define TEXPAINTER_APP_LAYERMENUHANDLER_HPP
 
 #include "./menu_layer.hpp"
 #include "./size_input.hpp"

@@ -2,8 +2,8 @@
 //@	"targets":[{"name":"unique_name.hpp","type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_UNIQUENAME_HPP
-#define TEXPAINTER_UNIQUENAME_HPP
+#ifndef TEXPAINTER_APP_UNIQUENAME_HPP
+#define TEXPAINTER_APP_UNIQUENAME_HPP
 
 #include <iterator>
 #include <concepts>

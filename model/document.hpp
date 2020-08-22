@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"document.hpp", "type":"include"}]}
 
-#ifndef TEXPAINTER_DOCUMENT_HPP
-#define TEXPAINTER_DOCUMENT_HPP
+#ifndef TEXPAINTER_MODEL_DOCUMENT_HPP
+#define TEXPAINTER_MODEL_DOCUMENT_HPP
 
 #include "./palette_index.hpp"
 #include "./layer.hpp"

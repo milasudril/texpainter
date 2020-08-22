@@ -3,8 +3,8 @@
 //@	,"dependencies_extra":[{"ref":"color_picker.o","rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_COLORPICKER_HPP
-#define TEXPAINTER_COLORPICKER_HPP
+#ifndef TEXPAINTER_UI_COLORPICKER_HPP
+#define TEXPAINTER_UI_COLORPICKER_HPP
 
 #include "./container.hpp"
 

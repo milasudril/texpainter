@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"palette.hpp", "type":"include"}]}
 
-#ifndef TEXPAINTER_PALETTE_HPP
-#define TEXPAINTER_PALETTE_HPP
+#ifndef TEXPAINTER_PIXELSTORE_PALETTE_HPP
+#define TEXPAINTER_PIXELSTORE_PALETTE_HPP
 
 #include "./pixel.hpp"
 #include "./color_index.hpp"

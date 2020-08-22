@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"span_2d.hpp", "type":"include"}]}
 
-#ifndef TEXPAINTER_SPAN_2D_HPP
-#define TEXPAINTER_SPAN_2D_HPP
+#ifndef TEXPAINTER_UTILS_SPAN2D_HPP
+#define TEXPAINTER_UTILS_SPAN2D_HPP
 
 #include "./size_2d.hpp"
 

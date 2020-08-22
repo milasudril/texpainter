@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"image.hpp", "type":"include"}]}
 
-#ifndef TEXPAINTER_IMAGE_HPP
-#define TEXPAINTER_IMAGE_HPP
+#ifndef TEXPAINTER_PIXELSTORE_IMAGE_HPP
+#define TEXPAINTER_PIXELSTORE_IMAGE_HPP
 
 #include "./pixel.hpp"
 

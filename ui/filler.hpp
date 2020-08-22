@@ -3,8 +3,8 @@
 //@	,"dependencies_extra":[{"ref":"filler.o","rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_UI__FILLER_HPP
-#define TEXPAINTER_UI__FILLER_HPP
+#ifndef TEXPAINTER_UI_FILLER_HPP
+#define TEXPAINTER_UI_FILLER_HPP
 
 #include "./container.hpp"
 

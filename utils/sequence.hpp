@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"sequence.hpp", "type":"include"}]}
 
-#ifndef TEXPAINTER_SEQUENCE_HPP
-#define TEXPAINTER_SEQUENCE_HPP
+#ifndef TEXPAINTER_UTILS_SEQUENCE_HPP
+#define TEXPAINTER_UTILS_SEQUENCE_HPP
 
 #include <vector>
 #include <cassert>

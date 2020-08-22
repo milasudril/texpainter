@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"deref_iterator.hpp", "type":"include"}]}
 
-#ifndef TEXPAINTER_DEREFITERATOR_HPP
-#define TEXPAINTER_DEREFITERATOR_HPP
+#ifndef TEXPAINTER_UTILS_DEREFITERATOR_HPP
+#define TEXPAINTER_UTILS_DEREFITERATOR_HPP
 
 #include <iterator>
 #include <type_traits>

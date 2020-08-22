@@ -3,8 +3,8 @@
 //@	,"dependencies_extra":[{"ref":"button.o","rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_BUTTON_HPP
-#define TEXPAINTER_BUTTON_HPP
+#ifndef TEXPAINTER_UI_BUTTON_HPP
+#define TEXPAINTER_UI_BUTTON_HPP
 
 #include "./container.hpp"
 

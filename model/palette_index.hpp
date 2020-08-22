@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"palette_index.hpp", "type":"include"}]}
 
-#ifndef TEXPAINTER_PALETTEINDEX_HPP
-#define TEXPAINTER_PALETTEINDEX_HPP
+#ifndef TEXPAINTER_MODEL_PALETTEINDEX_HPP
+#define TEXPAINTER_MODEL_PALETTEINDEX_HPP
 
 #include <cstdint>
 #include <compare>

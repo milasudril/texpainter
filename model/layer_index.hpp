@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"layer_index.hpp", "type":"include"}]}
 
-#ifndef TEXPAINTER_LAYERINDEX_HPP
-#define TEXPAINTER_LAYERINDEX_HPP
+#ifndef TEXPAINTER_MODEL_LAYERINDEX_HPP
+#define TEXPAINTER_MODEL_LAYERINDEX_HPP
 
 #include <cstdint>
 #include <compare>

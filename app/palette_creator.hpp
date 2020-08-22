@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"palette_creator.hpp","type":"include"}]}
 
-#ifndef TEXPAINTER_PALETTECREATOR_HPP
-#define TEXPAINTER_PALETTECREATOR_HPP
+#ifndef TEXPAINTER_APP_PALETTECREATOR_HPP
+#define TEXPAINTER_APP_PALETTECREATOR_HPP
 
 #include "./size_input.hpp"
 

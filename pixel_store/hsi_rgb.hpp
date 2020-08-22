@@ -2,8 +2,8 @@
 //@  "targets":[{"name":"hsi_rgb.hpp","type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_MODEL_HSIRGB_HPP
-#define TEXPAINTER_MODEL_HSIRGB_HPP
+#ifndef TEXPAINTER_PIXELSTORE_HSIRGB_HPP
+#define TEXPAINTER_PIXELSTORE_HSIRGB_HPP
 
 #include "./pixel.hpp"
 

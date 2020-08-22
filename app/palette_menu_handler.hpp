@@ -2,8 +2,8 @@
 //@	"targets":[{"name":"palette_menu_handler.hpp","type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_PALETTEMENUHANDLER_HPP
-#define TEXPAINTER_PALETTEMENUHANDLER_HPP
+#ifndef TEXPAINTER_APP_PALETTEMENUHANDLER_HPP
+#define TEXPAINTER_APP_PALETTEMENUHANDLER_HPP
 
 #include "./menu_palette.hpp"
 #include "./palette_creator.hpp"

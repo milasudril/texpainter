@@ -2,8 +2,8 @@
 //@	 "targets":[{"name":"snap.hpp", "type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_APP_SNAP_HPP
-#define TEXPAINTER_APP_SNAP_HPP
+#ifndef TEXPAINTER_UTILS_SNAP_HPP
+#define TEXPAINTER_UTILS_SNAP_HPP
 
 #include <algorithm>
 //#include <array>

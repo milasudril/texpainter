@@ -3,8 +3,8 @@
 //@	,"dependencies_extra":[{"ref":"separator.o","rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_SEPARATOR_HPP
-#define TEXPAINTER_SEPARATOR_HPP
+#ifndef TEXPAINTER_UI_SEPARATOR_HPP
+#define TEXPAINTER_UI_SEPARATOR_HPP
 
 #include "./container.hpp"
 #include "./box.hpp"

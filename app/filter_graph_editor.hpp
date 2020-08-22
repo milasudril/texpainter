@@ -3,8 +3,8 @@
 //@	,"dependencies_extra":[{"ref":"filter_graph_editor.o","rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_FILTERGRAPHEDITOR_HPP
-#define TEXPAINTER_FILTERGRAPHEDITOR_HPP
+#ifndef TEXPAINTER_APP_FILTERGRAPHEDITOR_HPP
+#define TEXPAINTER_APP_FILTERGRAPHEDITOR_HPP
 
 #include "./node_editor.hpp"
 

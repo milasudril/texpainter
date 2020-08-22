@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"trivial.hpp", "type":"include"}]}
 
-#ifndef TEXPAINTER_TRIVIAL_HPP
-#define TEXPAINTER_TRIVIAL_HPP
+#ifndef TEXPAINTER_UTILS_TRIVIAL_HPP
+#define TEXPAINTER_UTILS_TRIVIAL_HPP
 
 #include <type_traits>
 #include <complex>

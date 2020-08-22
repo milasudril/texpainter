@@ -2,8 +2,8 @@
 //@	"targets":[{"name":"fixed_flatmap.hpp","type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_FIXEDFLATMAP_HPP
-#define TEXPAINTER_FIXEDFLATMAP_HPP
+#ifndef TEXPAINTER_UTILS_FIXEDFLATMAP_HPP
+#define TEXPAINTER_UTILS_FIXEDFLATMAP_HPP
 
 #include <algorithm>
 #include <array>

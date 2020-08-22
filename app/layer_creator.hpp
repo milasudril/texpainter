@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"layer_creator.hpp","type":"include"}]}
 
-#ifndef TEXPAINTER_LAYERCREATOR_HPP
-#define TEXPAINTER_LAYERCREATOR_HPP
+#ifndef TEXPAINTER_APP_LAYERCREATOR_HPP
+#define TEXPAINTER_APP_LAYERCREATOR_HPP
 
 #include "./size_input.hpp"
 

@@ -3,8 +3,8 @@
 //@	 ,"dependencies_extra":[{"ref": "crack_generator.o", "rel":"implementation"}]
 //@	 }
 
-#ifndef TEXPAINTER_CRACKGENERATOR_HPP
-#define TEXPAINTER_CRACKGENERATOR_HPP
+#ifndef TEXPAINTER_GENERATORS_CRACKGENERATOR_HPP
+#define TEXPAINTER_GENERATORS_CRACKGENERATOR_HPP
 
 #include "pixel_store/image.hpp"
 

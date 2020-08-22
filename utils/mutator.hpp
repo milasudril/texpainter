@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"mutator.hpp", "type":"include"}]}
 
-#ifndef TEXPAINTER_MUTATOR_HPP
-#define TEXPAINTER_MUTATOR_HPP
+#ifndef TEXPAINTER_UTILS_MUTATOR_HPP
+#define TEXPAINTER_UTILS_MUTATOR_HPP
 
 namespace Texpainter
 {

@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"add_member_if.hpp","type":"include"}]}
 
-#ifndef TEXPAINTER_ADDMEMBERIF_HPP
-#define TEXPAINTER_ADDMEMBERIF_HPP
+#ifndef TEXPAINTER_UTILS_ADDMEMBERIF_HPP
+#define TEXPAINTER_UTILS_ADDMEMBERIF_HPP
 
 namespace Texpainter
 {

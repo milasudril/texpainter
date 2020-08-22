@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"pair_iterator.hpp", "type":"include"}]}
 
-#ifndef TEXPAINTER_PAIRITERATOR_HPP
-#define TEXPAINTER_PAIRITERATOR_HPP
+#ifndef TEXPAINTER_UTILS_PAIRITERATOR_HPP
+#define TEXPAINTER_UTILS_PAIRITERATOR_HPP
 
 #include <iterator>
 #include <type_traits>

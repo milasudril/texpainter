@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"datablock.hpp", "type":"include"}]}
 
-#ifndef TEXPAINTER_DATABLOCK_HPP
-#define TEXPAINTER_DATABLOCK_HPP
+#ifndef TEXPAINTER_UTILS_DATABLOCK_HPP
+#define TEXPAINTER_UTILS_DATABLOCK_HPP
 
 #include "./trivial.hpp"
 #include "./empty.hpp"

@@ -11,8 +11,8 @@
 #include "ui/box.hpp"
 #include "ui/button.hpp"
 
-#ifndef TEXPAINTER_SURFACECREATOR_HPP
-	#define TEXPAINTER_SURFACECREATOR_HPP
+#ifndef TEXPAINTER_APP_SURFACECREATOR_HPP
+	#define TEXPAINTER_APP_SURFACECREATOR_HPP
 
 namespace Texpainter
 {
