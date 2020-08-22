@@ -41,7 +41,8 @@ namespace Texpainter
 			BrushSelector,
 			BrushSize,
 			PaletteSelector,
-			Canvas
+			Canvas,
+			FxBlendEditor
 		};
 
 		explicit AppWindow(Ui::Container& container, PolymorphicRng rng);
@@ -139,6 +140,12 @@ namespace Texpainter
 		{
 		}
 
+		template<ControlId>
+		void dismiss(FxBlendEditorDlg&);
+
+		template<ControlId>
+		void confirmPositive(FxBlendEditorDlg&);
+
 		void onKeyDown(Ui::Scancode key);
 
 		void onKeyUp(Ui::Scancode key);
@@ -156,6 +163,7 @@ namespace Texpainter
 			{
 				m_fx_blend_editor_dlg = std::make_unique<FxBlendEditorDlg>(
 				    m_rows, "Effects and blend mode", layer->filterGraph());
+				m_fx_blend_editor_dlg->eventHandler<ControlId::FxBlendEditor>(*this);
 			}
 		}
 
@@ -340,6 +348,18 @@ namespace Texpainter
 			                   Ui::PaletteView::HighlightMode::Read);
 		}
 		m_rows.killFocus();
+	}
+
+	template<>
+	inline void AppWindow::dismiss<AppWindow::ControlId::FxBlendEditor>(FxBlendEditorDlg&)
+	{
+		m_fx_blend_editor_dlg.reset();
+	}
+
+	template<>
+	inline void AppWindow::confirmPositive<AppWindow::ControlId::FxBlendEditor>(FxBlendEditorDlg&)
+	{
+		m_fx_blend_editor_dlg.reset();
 	}
 }
 
