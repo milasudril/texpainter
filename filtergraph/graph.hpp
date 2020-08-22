@@ -57,12 +57,11 @@ namespace Texpainter::FilterGraph
 
 		PixelStore::Image process(Span2d<RgbaValue const> input, bool force_update = true) const
 		{
-		//	assert(allInputsConnected());
+			//	assert(allInputsConnected());
 			r_input->source(input);
 			PixelStore::Image ret{input.size()};
 			r_output->sink(ret.pixels());
-			if( force_update )
-			{ r_input_node->forceUpdate(); }
+			if(force_update) { r_input_node->forceUpdate(); }
 			(*r_output_node)(input.size());
 			return ret;
 		}
@@ -133,6 +132,16 @@ namespace Texpainter::FilterGraph
 		std::map<NodeId, Node> m_nodes;
 		NodeId m_current_id;
 	};
+
+	enum class ValidationResult : int
+	{
+		NoError,
+		CyclicConnections,
+		InputsNotConnected,
+		GraphTooDeep
+	};
+
+	ValidationResult validate(Graph const& g);
 }
 
 #endif

@@ -4,6 +4,9 @@
 
 #include "./graph.hpp"
 
+#include <stack>
+#include <map>
+
 namespace
 {
 	auto map_objects_to_node_id(Texpainter::FilterGraph::Graph const& g)
@@ -52,4 +55,57 @@ Texpainter::FilterGraph::Graph::Graph(Graph const& other)
 	         ->processor();
 	r_output =
 	    &dynamic_cast<ImageProcessorWrapper<ImageSink>*>(&r_output_node->processor())->processor();
+}
+
+Texpainter::FilterGraph::ValidationResult Texpainter::FilterGraph::validate(Graph const& g)
+{
+	enum class State : int
+	{
+		Init,
+		InProgress,
+		Done
+	};
+
+	std::stack<Node const*> nodes;
+	std::map<Node const*, State> visited;
+
+	std::ranges::for_each(g.nodes(), [&visited](auto const& item) {
+		visited.insert(std::make_pair(&item.second, State::Init));
+	});
+
+	nodes.push(g.node(Graph::OutputNodeId));
+	size_t peak_depth = 0;
+	while(!nodes.empty())
+	{
+		auto node  = nodes.top();
+		peak_depth = std::max(peak_depth, nodes.size());
+
+		if(peak_depth > 32) { return ValidationResult::GraphTooDeep; }
+
+		switch(visited[node])
+		{
+			case State::Init:
+				if(!isConnected(*node)) { return ValidationResult::InputsNotConnected; }
+
+				for(auto const& item: node->inputs())
+				{
+					switch(visited[&item.processor()])
+					{
+						case State::Init: nodes.push(&item.processor()); break;
+						case State::InProgress: return ValidationResult::CyclicConnections;
+						case State::Done: break;
+					}
+				};
+				break;
+
+			case State::InProgress:
+				visited[node] = State::Done;
+				nodes.pop();
+				break;
+
+			case State::Done: nodes.pop(); break;
+		}
+	}
+
+	return Texpainter::FilterGraph::ValidationResult::NoError;
 }
