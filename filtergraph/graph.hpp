@@ -91,23 +91,22 @@ namespace Texpainter::FilterGraph
 			return insert(
 			    std::make_unique<ImageProcessorWrapper<ImgProc>>(std::forward<ImgProc>(proc)));
 		}
-#if 0
 
 		Graph& erase(NodeId id)
 		{
 			m_nodes.erase(id);
 			return *this;
 		}
-#endif
+
 		auto nodes() const { return IterPair{std::begin(m_nodes), std::end(m_nodes)}; }
-#if 0
-		auto get(NodeId id, std::string_view paramname) const
+
+		auto get(NodeId id, ParamName paramname) const
 		{
 			// Assume that id exists
 			return m_nodes.find(id)->second.get(paramname);
 		}
 
-		void set(NodeId id, std::string_view paramname, ParamValue val)
+		void set(NodeId id, ParamName paramname, ParamValue val)
 		{
 			// Assume that id exists
 			m_nodes.find(id)->second.set(paramname, val);
@@ -120,7 +119,6 @@ namespace Texpainter::FilterGraph
 			auto ret = m_nodes.find(id);
 			return ret != std::end(m_nodes) ? &ret->second : nullptr;
 		}
-#endif
 
 	private:
 		ImageSource<RgbaValue>* r_input;
