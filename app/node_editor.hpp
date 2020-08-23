@@ -43,19 +43,18 @@ namespace Texpainter
 		template<>
 		constexpr unsigned short insertPosition<FilterGraph::OutputPort>()
 		{
-			return  Ui::Box::PositionBack;
+			return Ui::Box::PositionBack;
 		}
 
 		template<class PortType>
 		class Connector
 		{
 		public:
-			explicit Connector(Ui::Container& owner,
-			                        PortType port,
-			                        FilterGraph::PortInfo info)
+			explicit Connector(Ui::Container& owner, PortType port, FilterGraph::PortInfo info)
 			    : m_port{port}
 			    , m_root{owner, Ui::Box::Orientation::Horizontal}
-			    , m_connector{m_root.insertMode(Ui::Box::InsertMode{0, insertPosition<PortType>()}), portColor(info.type)}
+			    , m_connector{m_root.insertMode(Ui::Box::InsertMode{0, insertPosition<PortType>()}),
+			                  portColor(info.type)}
 			    , m_label{m_root, info.name}
 			{
 			}
@@ -67,6 +66,22 @@ namespace Texpainter
 			Ui::Box m_root;
 			Ui::FilledShape m_connector;
 			Ui::Label m_label;
+		};
+
+		template<class PortType>
+		class PortCreator
+		{
+		public:
+			explicit PortCreator(Ui::Container& owner): r_owner{owner}, m_k{0} {}
+
+			Connector<PortType> operator()(auto portinfo)
+			{
+				return Connector<PortType>{r_owner, PortType{m_k++}, portinfo};
+			}
+
+		private:
+			std::reference_wrapper<Ui::Container> r_owner;
+			uint32_t m_k;
 		};
 	}
 
@@ -94,14 +109,10 @@ namespace Texpainter
 		                Ui::Box::Orientation::Vertical}
 		{
 			m_name.oneline(true).alignment(0.5);
-			std::ranges::transform(
-			    r_node.get().inputPorts(),
-			    std::back_inserter(m_input_labels),
-			    [&owner = m_inputs, k = 0u](auto portinfo) mutable {
-				    auto ret = detail::Connector<FilterGraph::InputPort>{owner, FilterGraph::InputPort{k}, portinfo};
-				    ++k;
-				    return ret;
-			    });
+
+			std::ranges::transform(r_node.get().inputPorts(),
+			                       std::back_inserter(m_input_labels),
+			                       detail::PortCreator<FilterGraph::InputPort>{m_inputs});
 
 			std::ranges::transform(
 			    r_node.get().paramNames(),
@@ -111,14 +122,9 @@ namespace Texpainter
 				        params, Ui::Box::Orientation::Vertical, name.c_str(), false};
 			    });
 
-			std::ranges::transform(
-			    r_node.get().outputPorts(),
-			    std::back_inserter(m_output_labels),
-			    [&owner = m_outputs, k = 0u](auto portinfo) mutable {
-				    auto ret = detail::Connector<FilterGraph::OutputPort>{owner, FilterGraph::OutputPort{k}, portinfo};
-				    ++k;
-				    return ret;
-			    });
+			std::ranges::transform(r_node.get().outputPorts(),
+			                       std::back_inserter(m_output_labels),
+			                       detail::PortCreator<FilterGraph::OutputPort>{m_outputs});
 
 			//		std::ranges::for_each(m_input_labels, [this](auto& item) {
 			//			item.inputField().template eventHandler<ControlId::Input>(*this);
