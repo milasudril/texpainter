@@ -109,7 +109,7 @@ namespace Texpainter
 		using InputConnector  = detail::Connector<FilterGraph::InputPort, NodeEditor>;
 		using OutputConnector = detail::Connector<FilterGraph::OutputPort, NodeEditor>;
 
-		NodeEditor(Ui::Container& owner, std::reference_wrapper<FilterGraph::Node const> node)
+		NodeEditor(Ui::Container& owner, std::reference_wrapper<FilterGraph::Node> node)
 		    : r_node{node}
 		    , m_root{owner, Ui::Box::Orientation::Vertical}
 		    , m_name{m_root, node.get().name()}
@@ -145,7 +145,9 @@ namespace Texpainter
 
 		auto const& outputs() const { return m_outputs; }
 
-		auto const& node() const { return r_node.get(); }
+		//	auto const& node() const{ return r_node.get(); }
+
+		auto& node() const { return r_node.get(); }
 
 		NodeEditor& eventHandler(EventHandler& eh)
 		{
@@ -162,7 +164,7 @@ namespace Texpainter
 		}
 
 	private:
-		std::reference_wrapper<FilterGraph::Node const> r_node;
+		std::reference_wrapper<FilterGraph::Node> r_node;
 		EventHandler* r_eh;
 
 		Ui::Box m_root;

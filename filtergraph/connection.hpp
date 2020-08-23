@@ -15,9 +15,11 @@ namespace Texpainter::FilterGraph
 		using node_type = std::conditional_t<std::is_same_v<PortType, InputPort>, Node, Node const>;
 
 	public:
-		Endpoint(): r_node{nullptr} {}
+		Endpoint(): r_node{nullptr}, m_port{0} {}
 
-		Endpoint(std::reference_wrapepr<node_type> port, PortType port): r_node{node}, m_port{port}
+		Endpoint(std::reference_wrapper<node_type> node, PortType port)
+		    : r_node{&node.get()}
+		    , m_port{port}
 		{
 		}
 
@@ -28,17 +30,18 @@ namespace Texpainter::FilterGraph
 		bool valid() const { return r_node != nullptr; }
 
 	private:
-		node* r_node;
+		node_type* r_node;
 		PortType m_port;
 	};
 
 	class Connection
 	{
 	public:
-		explicit Connection(std::reference_wrapepr<Node> node, InputPort port): m_sink{node, port}
+		explicit Connection(std::reference_wrapper<Node> node, InputPort port): m_sink{node, port}
 		{
 		}
-		explicit Connection(std::reference_wrapepr<Node const> node, OutputPort port)
+
+		explicit Connection(std::reference_wrapper<Node const> node, OutputPort port)
 		    : m_source{node, port}
 		{
 		}
@@ -47,17 +50,17 @@ namespace Texpainter::FilterGraph
 
 		bool sourceValid() const { return m_source.valid(); }
 
-		auto sink() const { return sink; }
+		auto sink() const { return m_sink; }
 
-		auto source() const { return source; }
+		auto source() const { return m_source; }
 
-		Connection& sink(std::reference_wrapepr<Node> node, InputPort port)
+		Connection& sink(std::reference_wrapper<Node> node, InputPort port)
 		{
 			m_sink = {node, port};
 			return *this;
 		}
 
-		Connection& source(std::reference_wrapepr<Node const> node, OutputPort port)
+		Connection& source(std::reference_wrapper<Node const> node, OutputPort port)
 		{
 			m_source = {node, port};
 			return *this;
@@ -83,14 +86,14 @@ namespace Texpainter::FilterGraph
 				return Connection::ValidationResult::NotComplete;
 			}
 
-		if(&conn.sink().node() == &con.source().node())
+		if(&conn.sink().node() == &conn.source().node())
 		{ return Connection::ValidationResult::SelfConnection; }
 
-		if(conn.sink().node().inputPort()[conn.sink().port().value()].type
+		if(conn.sink().node().inputPorts()[conn.sink().port().value()].type
 		   != conn.source().node().outputPorts()[conn.source().port().value()].type)
-		{ return COnnection::ValidationResult::TypeMismatch; }
+		{ return Connection::ValidationResult::TypeMismatch; }
 
-		return ValidationResult::NoError;
+		return Connection::ValidationResult::NoError;
 	}
 }
 

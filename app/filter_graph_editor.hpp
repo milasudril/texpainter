@@ -9,6 +9,7 @@
 #include "./node_editor.hpp"
 
 #include "filtergraph/graph.hpp"
+#include "filtergraph/connection.hpp"
 #include "ui/widget_canvas.hpp"
 #include "ui/line_segment_renderer.hpp"
 #include "ui/menu.hpp"
@@ -74,7 +75,7 @@ namespace Texpainter
 			m_linesegs = m_canvas.insert<Ui::LineSegmentRenderer>();
 			std::ranges::transform(r_graph.nodes(),
 			                       std::inserter(m_node_editors, std::end(m_node_editors)),
-			                       [&canvas = m_canvas](auto const& node) {
+			                       [&canvas = m_canvas](auto& node) {
 				                       return std::make_pair(node.first,
 				                                             canvas.insert<NodeWidget>(
 				                                                 node.first,
@@ -104,12 +105,32 @@ namespace Texpainter
 
 		void onClicked(NodeWidget const& src, FilterGraph::InputPort port)
 		{
-			printf("> %s:%u\n", src.node().name(), port.value());
+			if(m_con_proc == nullptr)
+			{ m_con_proc = std::make_unique<FilterGraph::Connection>(src.node(), port); }
+			else if(m_con_proc->sink().valid())
+			{
+				m_con_proc = std::make_unique<FilterGraph::Connection>(src.node(), port);
+			}
+			else
+			{
+				m_con_proc->sink(src.node(), port);
+				m_con_proc.reset();
+			}
 		}
 
 		void onClicked(NodeWidget const& src, FilterGraph::OutputPort port)
 		{
-			printf("< %s:%u\n", src.node().name(), port.value());
+			if(m_con_proc == nullptr)
+			{ m_con_proc = std::make_unique<FilterGraph::Connection>(src.node(), port); }
+			else if(m_con_proc->source().valid())
+			{
+				m_con_proc = std::make_unique<FilterGraph::Connection>(src.node(), port);
+			}
+			else
+			{
+				m_con_proc->source(src.node(), port);
+				m_con_proc.reset();
+			}
 		}
 
 
@@ -128,6 +149,7 @@ namespace Texpainter
 		Ui::MenuItem m_node_copy;
 		Ui::MenuItem m_node_delete;
 
+		std::unique_ptr<FilterGraph::Connection> m_con_proc;
 
 		void init();
 	};

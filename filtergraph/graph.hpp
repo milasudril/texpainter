@@ -98,7 +98,7 @@ namespace Texpainter::FilterGraph
 			return *this;
 		}
 
-		std::pair<NodeId, std::reference_wrapper<Node const>> insert(
+		std::pair<NodeId, std::reference_wrapper<Node>> insert(
 		    std::unique_ptr<AbstractImageProcessor> proc)
 		{
 			auto i = m_nodes.insert(std::make_pair(m_current_id, std::move(proc)));
@@ -107,7 +107,7 @@ namespace Texpainter::FilterGraph
 		}
 
 		template<ImageProcessor ImgProc>
-		std::pair<NodeId, std::reference_wrapper<Node const>> insert(ImgProc&& proc)
+		std::pair<NodeId, std::reference_wrapper<Node>> insert(ImgProc&& proc)
 		{
 			return insert(
 			    std::make_unique<ImageProcessorWrapper<ImgProc>>(std::forward<ImgProc>(proc)));
@@ -121,6 +121,8 @@ namespace Texpainter::FilterGraph
 		}
 
 		auto nodes() const { return IterPair{std::begin(m_nodes), std::end(m_nodes)}; }
+
+		auto nodes() { return IterPair{std::begin(m_nodes), std::end(m_nodes)}; }
 
 		auto get(NodeId id, ParamName paramname) const
 		{
