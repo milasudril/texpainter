@@ -31,15 +31,31 @@ namespace Texpainter
 			__builtin_unreachable();
 		}
 
-		class InputConnector
+		template<class PortType>
+		constexpr unsigned short insertPosition() = delete;
+
+		template<>
+		constexpr unsigned short insertPosition<FilterGraph::InputPort>()
+		{
+			return 0;
+		}
+
+		template<>
+		constexpr unsigned short insertPosition<FilterGraph::OutputPort>()
+		{
+			return  Ui::Box::PositionBack;
+		}
+
+		template<class PortType>
+		class Connector
 		{
 		public:
-			explicit InputConnector(Ui::Container& owner,
-			                        FilterGraph::InputPort port,
+			explicit Connector(Ui::Container& owner,
+			                        PortType port,
 			                        FilterGraph::PortInfo info)
 			    : m_port{port}
 			    , m_root{owner, Ui::Box::Orientation::Horizontal}
-			    , m_connector{m_root, portColor(info.type)}
+			    , m_connector{m_root.insertMode(Ui::Box::InsertMode{0, insertPosition<PortType>()}), portColor(info.type)}
 			    , m_label{m_root, info.name}
 			{
 			}
@@ -47,29 +63,7 @@ namespace Texpainter
 			auto location() const { return m_connector.location(); }
 
 		private:
-			FilterGraph::InputPort m_port;
-			Ui::Box m_root;
-			Ui::FilledShape m_connector;
-			Ui::Label m_label;
-		};
-
-		class OutputConnector
-		{
-		public:
-			explicit OutputConnector(Ui::Container& owner,
-			                         FilterGraph::OutputPort port,
-			                         FilterGraph::PortInfo info)
-			    : m_port{port}
-			    , m_root{owner, Ui::Box::Orientation::Horizontal}
-			    , m_connector{m_root.insertMode(Ui::Box::InsertMode{0, Ui::Box::PositionBack}), portColor(info.type)}
-			    , m_label{m_root, info.name}
-			{
-			}
-
-			auto location() const { return m_connector.location(); }
-
-		private:
-			FilterGraph::OutputPort m_port;
+			PortType m_port;
 			Ui::Box m_root;
 			Ui::FilledShape m_connector;
 			Ui::Label m_label;
@@ -104,7 +98,7 @@ namespace Texpainter
 			    r_node.get().inputPorts(),
 			    std::back_inserter(m_input_labels),
 			    [&owner = m_inputs, k = 0u](auto portinfo) mutable {
-				    auto ret = detail::InputConnector{owner, FilterGraph::InputPort{k}, portinfo};
+				    auto ret = detail::Connector<FilterGraph::InputPort>{owner, FilterGraph::InputPort{k}, portinfo};
 				    ++k;
 				    return ret;
 			    });
@@ -121,7 +115,7 @@ namespace Texpainter
 			    r_node.get().outputPorts(),
 			    std::back_inserter(m_output_labels),
 			    [&owner = m_outputs, k = 0u](auto portinfo) mutable {
-				    auto ret = detail::OutputConnector{owner, FilterGraph::OutputPort{k}, portinfo};
+				    auto ret = detail::Connector<FilterGraph::OutputPort>{owner, FilterGraph::OutputPort{k}, portinfo};
 				    ++k;
 				    return ret;
 			    });
@@ -154,9 +148,9 @@ namespace Texpainter
 		Ui::Box m_params;
 		Ui::Box m_outputs;
 
-		std::vector<detail::InputConnector> m_input_labels;
+		std::vector<detail::Connector<FilterGraph::InputPort>> m_input_labels;
 		std::vector<Ui::LabeledInput<Ui::Slider>> m_params_input;
-		std::vector<detail::OutputConnector> m_output_labels;
+		std::vector<detail::Connector<FilterGraph::OutputPort>> m_output_labels;
 	};
 
 	template<>
