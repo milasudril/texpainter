@@ -53,10 +53,13 @@ namespace Texpainter
 			uint64_t m_value;
 		};
 
+
+		using NodeWidget = NodeEditor<FilterGraphEditor>;
+
 	public:
 		enum class ControlId : int
 		{
-			NodeEditors,
+			NodeWidgets,
 			CopyNode,
 			DeleteNode
 		};
@@ -73,12 +76,12 @@ namespace Texpainter
 			                       std::inserter(m_node_editors, std::end(m_node_editors)),
 			                       [&canvas = m_canvas](auto const& node) {
 				                       return std::make_pair(node.first,
-				                                             canvas.insert<NodeEditor>(
+				                                             canvas.insert<NodeWidget>(
 				                                                 node.first,
 				                                                 Ui::WidgetCoordinates{50.0, 50.0},
 				                                                 node.second));
 			                       });
-			m_canvas.eventHandler<ControlId::NodeEditors>(*this);
+			m_canvas.eventHandler<ControlId::NodeWidgets>(*this);
 			m_node_copy.eventHandler<ControlId::CopyNode>(*this);
 			m_node_delete.eventHandler<ControlId::DeleteNode>(*this);
 		}
@@ -106,7 +109,7 @@ namespace Texpainter
 
 		Canvas m_canvas;
 		std::unique_ptr<Ui::LineSegmentRenderer> m_linesegs;
-		std::map<FilterGraph::NodeId, Canvas::WidgetHandle<NodeEditor>> m_node_editors;
+		std::map<FilterGraph::NodeId, Canvas::WidgetHandle<NodeWidget>> m_node_editors;
 		Ui::Menu m_node_menu;
 		Ui::MenuItem m_node_copy;
 		Ui::MenuItem m_node_delete;
@@ -116,7 +119,7 @@ namespace Texpainter
 	};
 
 	template<>
-	inline void FilterGraphEditor::onMouseDown<FilterGraphEditor::ControlId::NodeEditors>(
+	inline void FilterGraphEditor::onMouseDown<FilterGraphEditor::ControlId::NodeWidgets>(
 	    Canvas& src,
 	    Ui::WidgetCoordinates,
 	    Ui::ScreenCoordinates,
@@ -134,7 +137,7 @@ namespace Texpainter
 	}
 
 	template<>
-	inline void FilterGraphEditor::onMove<FilterGraphEditor::ControlId::NodeEditors>(
+	inline void FilterGraphEditor::onMove<FilterGraphEditor::ControlId::NodeWidgets>(
 	    Canvas& src, Ui::WidgetCoordinates loc, FilterGraph::NodeId id)
 	{
 		if(!m_current_port_id.valid()) [[unlikely]]
@@ -180,7 +183,7 @@ namespace Texpainter
 		// TODO: Below is similar to create new node
 		m_node_editors.insert(
 		    std::make_pair(node.first,
-		                   m_canvas.insert<NodeEditor>(
+		                   m_canvas.insert<NodeWidget>(
 		                       node.first, Ui::WidgetCoordinates{50.0, 50.0}, node.second)));
 		m_canvas.showWidgets();
 		m_input_port_map.insert(std::make_pair(

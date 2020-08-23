@@ -102,7 +102,7 @@ namespace Texpainter
 		};
 	}
 
-
+	template<class EventHandler>
 	class NodeEditor
 	{
 	public:
@@ -114,61 +114,66 @@ namespace Texpainter
 		    , m_root{owner, Ui::Box::Orientation::Vertical}
 		    , m_name{m_root, node.get().name()}
 		    , m_content{m_root, Ui::Box::Orientation::Horizontal}
-		    , m_inputs{m_content.insertMode(Ui::Box::InsertMode{0, 0}),
-		               Ui::Box::Orientation::Vertical}
-		    , m_params{m_content.insertMode(
-		                   Ui::Box::InsertMode{0, Ui::Box::Expand | Ui::Box::Fill}),
-		               Ui::Box::Orientation::Vertical}
-		    , m_outputs{m_content.insertMode(Ui::Box::InsertMode{0, 0}),
-		                Ui::Box::Orientation::Vertical}
+		    , m_input_col{m_content.insertMode(Ui::Box::InsertMode{0, 0}),
+		                  Ui::Box::Orientation::Vertical}
+		    , m_params_col{m_content.insertMode(
+		                       Ui::Box::InsertMode{0, Ui::Box::Expand | Ui::Box::Fill}),
+		                   Ui::Box::Orientation::Vertical}
+		    , m_output_col{m_content.insertMode(Ui::Box::InsertMode{0, 0}),
+		                   Ui::Box::Orientation::Vertical}
 		{
 			m_name.oneline(true).alignment(0.5);
 
 			std::ranges::transform(r_node.get().inputPorts(),
-			                       std::back_inserter(m_input_labels),
-			                       detail::ConnectorFactory<InputConnector>{m_inputs});
+			                       std::back_inserter(m_inputs),
+			                       detail::ConnectorFactory<InputConnector>{m_input_col});
 
 			std::ranges::transform(
 			    r_node.get().paramNames(),
-			    std::back_inserter(m_params_input),
-			    [&params = m_params](auto name) {
+			    std::back_inserter(m_params),
+			    [&params = m_params_col](auto name) {
 				    return Ui::LabeledInput<Ui::Slider>{
 				        params, Ui::Box::Orientation::Vertical, name.c_str(), false};
 			    });
 
 			std::ranges::transform(r_node.get().outputPorts(),
-			                       std::back_inserter(m_output_labels),
-			                       detail::ConnectorFactory<OutputConnector>{m_outputs});
-
-			std::ranges::for_each(m_input_labels, [this](auto& item) { item.eventHandler(*this); });
-
-			std::ranges::for_each(m_output_labels,
-			                      [this](auto& item) { item.eventHandler(*this); });
+			                       std::back_inserter(m_outputs),
+			                       detail::ConnectorFactory<OutputConnector>{m_output_col});
 		}
 
-		auto const& inputs() const { return m_input_labels; }
+		auto const& inputs() const { return m_inputs; }
 
-		auto const& outputs() const { return m_output_labels; }
+		auto const& outputs() const { return m_outputs; }
 
 		auto node() const { return r_node; }
 
-		void onClicked(InputConnector const& src) { printf("Input  %u\n", src.port().value()); }
+		NodeEditor& eventHandler(EventHandler* eh)
+		{
+			std::ranges::for_each(m_inputs, [this](auto& item) { item.eventHandler(*this); });
+			std::ranges::for_each(m_outputs, [this](auto& item) { item.eventHandler(*this); });
+			r_eh = eh;
+		}
 
-		void onClicked(OutputConnector const& src) { printf("Output %u\n", src.port().value()); }
+		template<class Connector>
+		void onClicked(Connector const& src)
+		{
+			r_eh->onClicked(*this, src.port());
+		}
 
 	private:
 		std::reference_wrapper<FilterGraph::Node const> r_node;
+		EventHandler* r_eh;
 
 		Ui::Box m_root;
 		Ui::Label m_name;
 		Ui::Box m_content;
-		Ui::Box m_inputs;
-		Ui::Box m_params;
-		Ui::Box m_outputs;
+		Ui::Box m_input_col;
+		Ui::Box m_params_col;
+		Ui::Box m_output_col;
 
-		std::vector<InputConnector> m_input_labels;
-		std::vector<Ui::LabeledInput<Ui::Slider>> m_params_input;
-		std::vector<OutputConnector> m_output_labels;
+		std::vector<InputConnector> m_inputs;
+		std::vector<Ui::LabeledInput<Ui::Slider>> m_params;
+		std::vector<OutputConnector> m_outputs;
 	};
 }
 
