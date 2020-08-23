@@ -85,15 +85,15 @@ namespace Texpainter
 			Ui::Label m_label;
 		};
 
-		template<class PortType, class EventHandler>
-		class PortCreator
+		template<class Connector>
+		class ConnectorFactory
 		{
 		public:
-			explicit PortCreator(Ui::Container& owner): r_owner{owner}, m_k{0} {}
+			explicit ConnectorFactory(Ui::Container& owner): r_owner{owner}, m_k{0} {}
 
 			auto operator()(auto portinfo)
 			{
-				return Connector<PortType, EventHandler>{r_owner, PortType{m_k++}, portinfo};
+				return Connector{r_owner, typename Connector::type{m_k++}, portinfo};
 			}
 
 		private:
@@ -105,13 +105,10 @@ namespace Texpainter
 
 	class NodeEditor
 	{
-		enum class ControlId : int
-		{
-			Input,
-			Output
-		};
-
 	public:
+		using InputConnector  = detail::Connector<FilterGraph::InputPort, NodeEditor>;
+		using OutputConnector = detail::Connector<FilterGraph::OutputPort, NodeEditor>;
+
 		NodeEditor(Ui::Container& owner, std::reference_wrapper<FilterGraph::Node const> node)
 		    : r_node{node}
 		    , m_root{owner, Ui::Box::Orientation::Vertical}
@@ -127,10 +124,9 @@ namespace Texpainter
 		{
 			m_name.oneline(true).alignment(0.5);
 
-			std::ranges::transform(
-			    r_node.get().inputPorts(),
-			    std::back_inserter(m_input_labels),
-			    detail::PortCreator<FilterGraph::InputPort, NodeEditor>{m_inputs});
+			std::ranges::transform(r_node.get().inputPorts(),
+			                       std::back_inserter(m_input_labels),
+			                       detail::ConnectorFactory<InputConnector>{m_inputs});
 
 			std::ranges::transform(
 			    r_node.get().paramNames(),
@@ -140,10 +136,9 @@ namespace Texpainter
 				        params, Ui::Box::Orientation::Vertical, name.c_str(), false};
 			    });
 
-			std::ranges::transform(
-			    r_node.get().outputPorts(),
-			    std::back_inserter(m_output_labels),
-			    detail::PortCreator<FilterGraph::OutputPort, NodeEditor>{m_outputs});
+			std::ranges::transform(r_node.get().outputPorts(),
+			                       std::back_inserter(m_output_labels),
+			                       detail::ConnectorFactory<OutputConnector>{m_outputs});
 
 			std::ranges::for_each(m_input_labels, [this](auto& item) { item.eventHandler(*this); });
 
@@ -157,17 +152,9 @@ namespace Texpainter
 
 		auto node() const { return r_node; }
 
-		template<class Connector>
-		void onClicked(Connector const& src)
-		{
-			if constexpr(std::is_same_v<typename Connector::type, FilterGraph::InputPort>)
-			{ printf("Input  %u\n", src.port().value()); }
-			else
-			{
-				printf("Output %u\n", src.port().value());
-			}
-		}
+		void onClicked(InputConnector const& src) { printf("Input  %u\n", src.port().value()); }
 
+		void onClicked(OutputConnector const& src) { printf("Output %u\n", src.port().value()); }
 
 	private:
 		std::reference_wrapper<FilterGraph::Node const> r_node;
@@ -179,9 +166,9 @@ namespace Texpainter
 		Ui::Box m_params;
 		Ui::Box m_outputs;
 
-		std::vector<detail::Connector<FilterGraph::InputPort, NodeEditor>> m_input_labels;
+		std::vector<InputConnector> m_input_labels;
 		std::vector<Ui::LabeledInput<Ui::Slider>> m_params_input;
-		std::vector<detail::Connector<FilterGraph::OutputPort, NodeEditor>> m_output_labels;
+		std::vector<OutputConnector> m_output_labels;
 	};
 }
 
