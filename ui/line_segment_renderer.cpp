@@ -32,6 +32,7 @@ public:
 		std::vector<std::pair<ToplevelCoordinates, ToplevelCoordinates>> res;
 		std::ranges::copy(segs, std::back_inserter(res));
 		m_segs = std::move(res);
+		gtk_widget_queue_draw(GTK_WIDGET(m_handle));
 	}
 
 private:
