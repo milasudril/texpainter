@@ -75,11 +75,12 @@ namespace Texpainter::FilterGraph
 	inline auto validate(Connection const& conn, ValidationCallback&& cb)
 	{
 		if(!conn.sink().valid() || !conn.source().valid()) [[unlikely]]
-		{ return cb.notCompleted(conn); }
+			{
+				return cb.notCompleted(conn);
+			}
 
 
-		if(&conn.sink().node() == &conn.source().node())
-		{ return cb.selfConnection(conn); }
+		if(&conn.sink().node() == &conn.source().node()) { return cb.selfConnection(conn); }
 
 		if(conn.sink().node().inputPorts()[conn.sink().port().value()].type
 		   != conn.source().node().outputPorts()[conn.source().port().value()].type)

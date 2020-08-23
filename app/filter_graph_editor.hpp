@@ -133,26 +133,20 @@ namespace Texpainter
 			}
 		}
 
-		void notCompleted(FilterGraph::Connection const&)
-		{}
+		void notCompleted(FilterGraph::Connection const&) {}
 
-		void selfConnection(FilterGraph::Connection const&)
-		{}
+		void selfConnection(FilterGraph::Connection const&) {}
 
-		void typeMismatch(FilterGraph::Connection const&)
-		{}
+		void typeMismatch(FilterGraph::Connection const&) {}
 
 		void connectionOk(FilterGraph::Connection const& conn)
 		{
 			establish(conn);
 
-			m_connections.insert(std::make_pair(m_current_port_id, Ui::ToplevelCoordinates{0.0, 0.0}));
-			m_input_port_map.find(&conn.sink().node())->second[conn.sink().port().value()] = m_current_port_id;
-			++m_current_port_id;
-
-			m_connections.insert(std::make_pair(m_current_port_id, Ui::ToplevelCoordinates{0.0, 0.0}));
-			m_output_port_map.find(&conn.source().node())->second[conn.source().port().value()] = m_current_port_id;
-			++m_current_port_id;
+			m_connections.connect(
+			    m_input_port_map.find(&conn.sink().node())->second[conn.sink().port().value()],
+			    m_output_port_map.find(&conn.source().node())
+			        ->second[conn.source().port().value()]);
 
 			m_linesegs->lineSegments(resolveLineSegs(m_connections));
 		}
