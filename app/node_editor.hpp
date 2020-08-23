@@ -46,14 +46,16 @@ namespace Texpainter
 			return Ui::Box::PositionBack;
 		}
 
-		template<class PortType>
+		template<class PortType, class EventHandler>
 		class Connector
 		{
 		public:
-			explicit Connector(Ui::Container& owner, PortType port, FilterGraph::PortInfo info)
+			using type = PortType;
+
+			explicit Connector(Ui::Container& owner, type port, FilterGraph::PortInfo info)
 			    : m_port{port}
 			    , m_root{owner, Ui::Box::Orientation::Horizontal}
-			    , m_connector{m_root.insertMode(Ui::Box::InsertMode{0, insertPosition<PortType>()}),
+			    , m_connector{m_root.insertMode(Ui::Box::InsertMode{0, insertPosition<type>()}),
 			                  portColor(info.type)}
 			    , m_label{m_root, info.name}
 			{
@@ -61,22 +63,37 @@ namespace Texpainter
 
 			auto location() const { return m_connector.location(); }
 
+			auto port() const { return m_port; }
+
+			void eventHandler(EventHandler& eh)
+			{
+				r_eh = &eh;
+				m_connector.eventHandler<0>(*this);
+			}
+
+			template<int>
+			void onClicked(Ui::FilledShape&)
+			{
+				r_eh->onClicked(*this);
+			}
+
 		private:
-			PortType m_port;
+			EventHandler* r_eh;
+			type m_port;
 			Ui::Box m_root;
 			Ui::FilledShape m_connector;
 			Ui::Label m_label;
 		};
 
-		template<class PortType>
+		template<class PortType, class EventHandler>
 		class PortCreator
 		{
 		public:
 			explicit PortCreator(Ui::Container& owner): r_owner{owner}, m_k{0} {}
 
-			Connector<PortType> operator()(auto portinfo)
+			auto operator()(auto portinfo)
 			{
-				return Connector<PortType>{r_owner, PortType{m_k++}, portinfo};
+				return Connector<PortType, EventHandler>{r_owner, PortType{m_k++}, portinfo};
 			}
 
 		private:
@@ -110,9 +127,10 @@ namespace Texpainter
 		{
 			m_name.oneline(true).alignment(0.5);
 
-			std::ranges::transform(r_node.get().inputPorts(),
-			                       std::back_inserter(m_input_labels),
-			                       detail::PortCreator<FilterGraph::InputPort>{m_inputs});
+			std::ranges::transform(
+			    r_node.get().inputPorts(),
+			    std::back_inserter(m_input_labels),
+			    detail::PortCreator<FilterGraph::InputPort, NodeEditor>{m_inputs});
 
 			std::ranges::transform(
 			    r_node.get().paramNames(),
@@ -122,17 +140,15 @@ namespace Texpainter
 				        params, Ui::Box::Orientation::Vertical, name.c_str(), false};
 			    });
 
-			std::ranges::transform(r_node.get().outputPorts(),
-			                       std::back_inserter(m_output_labels),
-			                       detail::PortCreator<FilterGraph::OutputPort>{m_outputs});
+			std::ranges::transform(
+			    r_node.get().outputPorts(),
+			    std::back_inserter(m_output_labels),
+			    detail::PortCreator<FilterGraph::OutputPort, NodeEditor>{m_outputs});
 
-			//		std::ranges::for_each(m_input_labels, [this](auto& item) {
-			//			item.inputField().template eventHandler<ControlId::Input>(*this);
-			//		});
+			std::ranges::for_each(m_input_labels, [this](auto& item) { item.eventHandler(*this); });
 
-			//		std::ranges::for_each(m_output_labels, [this](auto& item) {
-			//			item.inputField().template eventHandler<ControlId::Output>(*this);
-			//		});
+			std::ranges::for_each(m_output_labels,
+			                      [this](auto& item) { item.eventHandler(*this); });
 		}
 
 		auto const& inputs() const { return m_input_labels; }
@@ -141,8 +157,17 @@ namespace Texpainter
 
 		auto node() const { return r_node; }
 
-		template<ControlId>
-		void onClicked(Ui::FilledShape&);
+		template<class Connector>
+		void onClicked(Connector const& src)
+		{
+			if constexpr(std::is_same_v<typename Connector::type, FilterGraph::InputPort>)
+			{ printf("Input  %u\n", src.port().value()); }
+			else
+			{
+				printf("Output %u\n", src.port().value());
+			}
+		}
+
 
 	private:
 		std::reference_wrapper<FilterGraph::Node const> r_node;
@@ -154,22 +179,10 @@ namespace Texpainter
 		Ui::Box m_params;
 		Ui::Box m_outputs;
 
-		std::vector<detail::Connector<FilterGraph::InputPort>> m_input_labels;
+		std::vector<detail::Connector<FilterGraph::InputPort, NodeEditor>> m_input_labels;
 		std::vector<Ui::LabeledInput<Ui::Slider>> m_params_input;
-		std::vector<detail::Connector<FilterGraph::OutputPort>> m_output_labels;
+		std::vector<detail::Connector<FilterGraph::OutputPort, NodeEditor>> m_output_labels;
 	};
-
-	template<>
-	inline void NodeEditor::onClicked<NodeEditor::ControlId::Output>(Ui::FilledShape& src)
-	{
-		puts("Output");
-	}
-
-	template<>
-	inline void NodeEditor::onClicked<NodeEditor::ControlId::Input>(Ui::FilledShape& src)
-	{
-		puts("Input");
-	}
 }
 
 #endif
