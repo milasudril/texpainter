@@ -114,7 +114,7 @@ namespace Texpainter
 			else
 			{
 				m_con_proc->sink(src.node(), port);
-				m_con_proc.reset();
+				completeConnection();
 			}
 		}
 
@@ -129,8 +129,32 @@ namespace Texpainter
 			else
 			{
 				m_con_proc->source(src.node(), port);
-				m_con_proc.reset();
+				completeConnection();
 			}
+		}
+
+		void notCompleted(FilterGraph::Connection const&)
+		{}
+
+		void selfConnection(FilterGraph::Connection const&)
+		{}
+
+		void typeMismatch(FilterGraph::Connection const&)
+		{}
+
+		void connectionOk(FilterGraph::Connection const& conn)
+		{
+			establish(conn);
+
+			m_connections.insert(std::make_pair(m_current_port_id, Ui::ToplevelCoordinates{0.0, 0.0}));
+			m_input_port_map.find(&conn.sink().node())->second[conn.sink().port().value()] = m_current_port_id;
+			++m_current_port_id;
+
+			m_connections.insert(std::make_pair(m_current_port_id, Ui::ToplevelCoordinates{0.0, 0.0}));
+			m_output_port_map.find(&conn.source().node())->second[conn.source().port().value()] = m_current_port_id;
+			++m_current_port_id;
+
+			m_linesegs->lineSegments(resolveLineSegs(m_connections));
 		}
 
 
@@ -152,6 +176,12 @@ namespace Texpainter
 		std::unique_ptr<FilterGraph::Connection> m_con_proc;
 
 		void init();
+
+		void completeConnection()
+		{
+			validate(*m_con_proc, *this);
+			m_con_proc.reset();
+		}
 	};
 
 	template<>

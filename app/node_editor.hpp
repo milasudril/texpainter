@@ -145,8 +145,6 @@ namespace Texpainter
 
 		auto const& outputs() const { return m_outputs; }
 
-		//	auto const& node() const{ return r_node.get(); }
-
 		auto& node() const { return r_node.get(); }
 
 		NodeEditor& eventHandler(EventHandler& eh)
