@@ -145,13 +145,14 @@ namespace Texpainter
 
 		auto const& outputs() const { return m_outputs; }
 
-		auto node() const { return r_node; }
+		auto const& node() const { return r_node.get(); }
 
-		NodeEditor& eventHandler(EventHandler* eh)
+		NodeEditor& eventHandler(EventHandler& eh)
 		{
 			std::ranges::for_each(m_inputs, [this](auto& item) { item.eventHandler(*this); });
 			std::ranges::for_each(m_outputs, [this](auto& item) { item.eventHandler(*this); });
-			r_eh = eh;
+			r_eh = &eh;
+			return *this;
 		}
 
 		template<class Connector>

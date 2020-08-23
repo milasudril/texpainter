@@ -81,7 +81,10 @@ namespace Texpainter
 				                                                 Ui::WidgetCoordinates{50.0, 50.0},
 				                                                 node.second));
 			                       });
+
 			m_canvas.eventHandler<ControlId::NodeWidgets>(*this);
+			std::ranges::for_each(m_node_editors,
+			                      [this](auto& item) { item.second->eventHandler(*this); });
 			m_node_copy.eventHandler<ControlId::CopyNode>(*this);
 			m_node_delete.eventHandler<ControlId::DeleteNode>(*this);
 		}
@@ -98,6 +101,17 @@ namespace Texpainter
 
 		template<ControlId>
 		void onActivated(Ui::MenuItem& src);
+
+		void onClicked(NodeWidget const& src, FilterGraph::InputPort port)
+		{
+			printf("> %s:%u\n", src.node().name(), port.value());
+		}
+
+		void onClicked(NodeWidget const& src, FilterGraph::OutputPort port)
+		{
+			printf("< %s:%u\n", src.node().name(), port.value());
+		}
+
 
 	private:
 		FilterGraph::Graph& r_graph;
@@ -149,7 +163,7 @@ namespace Texpainter
 
 		auto const& node_edit = *(node_edit_iter->second);
 
-		auto i = m_input_port_map.find(&node_edit.node().get());
+		auto i = m_input_port_map.find(&node_edit.node());
 		assert(i != std::end(m_input_port_map));
 		std::ranges::for_each(node_edit.inputs(),
 		                      [&connections = m_connections,
@@ -160,7 +174,7 @@ namespace Texpainter
 			                      ++k;
 		                      });
 
-		auto o = m_output_port_map.find(&node_edit.node().get());
+		auto o = m_output_port_map.find(&node_edit.node());
 		assert(o != std::end(m_output_port_map));
 		std::ranges::for_each(node_edit.outputs(),
 		                      [&connections = m_connections,
