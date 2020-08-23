@@ -63,10 +63,35 @@ namespace Texpainter::FilterGraph
 			return *this;
 		}
 
+		enum class ValidationResult : int
+		{
+			NoError,
+			NotComplete,
+			TypeMismatch,
+			SelfConnection
+		};
+
 	private:
 		Endpoint<InputPort> m_sink;
 		Endpoint<OutputPort> m_source;
 	};
+
+	inline Connection::ValidationResult validate(Connection const& conn)
+	{
+		if(!conn.sink().valid() || !conn.source().valid()) [[unlikely]]
+			{
+				return Connection::ValidationResult::NotComplete;
+			}
+
+		if(&conn.sink().node() == &con.source().node())
+		{ return Connection::ValidationResult::SelfConnection; }
+
+		if(conn.sink().node().inputPort()[conn.sink().port().value()].type
+		   != conn.source().node().outputPorts()[conn.source().port().value()].type)
+		{ return COnnection::ValidationResult::TypeMismatch; }
+
+		return ValidationResult::NoError;
+	}
 }
 
 #endif

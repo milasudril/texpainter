@@ -24,8 +24,8 @@ namespace Texpainter::FilterGraph
 	enum class ValidationResult : int
 	{
 		NoError,
-		CyclicConnections,
 		InputsNotConnected,
+		CyclicConnections,
 		GraphTooDeep
 	};
 
