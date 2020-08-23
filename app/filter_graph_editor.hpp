@@ -153,7 +153,7 @@ namespace Texpainter
 		                       &ids         = i->second,
 		                       k            = static_cast<size_t>(0)](auto const& item) mutable {
 			                      if(ids[k].valid())
-			                      { connections.moveTo(ids[k], item.inputField().location()); }
+			                      { connections.moveTo(ids[k], item.location()); }
 			                      ++k;
 		                      });
 
@@ -164,7 +164,7 @@ namespace Texpainter
 		                       &ids         = o->second,
 		                       k            = static_cast<size_t>(0)](auto const& item) mutable {
 			                      if(ids[k].valid())
-			                      { connections.moveTo(ids[k], item.inputField().location()); }
+			                      { connections.moveTo(ids[k], item.location()); }
 			                      ++k;
 		                      });
 

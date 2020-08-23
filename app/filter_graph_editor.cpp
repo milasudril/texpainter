@@ -13,7 +13,7 @@ namespace
 	    Texpainter::DynamicMesh<PortId, Texpainter::Ui::ToplevelCoordinates>& connections)
 	{
 		std::ranges::for_each(ports, [&connections, &port_id = port_id_start](auto const& port) {
-			connections.insert(std::make_pair(port_id, port.inputField().location()));
+			connections.insert(std::make_pair(port_id, port.location()));
 			++port_id;
 		});
 

@@ -84,15 +84,11 @@ private:
 
 	static gboolean on_mouse_down(GtkWidget* w, GdkEvent* e, gpointer self)
 	{
-		auto& obj = *reinterpret_cast<Impl*>(self);
+		auto& obj         = *reinterpret_cast<Impl*>(self);
 		auto event_button = reinterpret_cast<GdkEventButton const*>(e);
-		if(obj.r_eh != nullptr && event_button->button == 1)
-		{
-			return FALSE;
-		}
+		if(obj.r_eh != nullptr && event_button->button == 1) { return FALSE; }
 		return TRUE;
 	}
-
 };
 
 Texpainter::Ui::FilledShape::FilledShape(Container& cnt,

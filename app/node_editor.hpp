@@ -30,6 +30,53 @@ namespace Texpainter
 			}
 			__builtin_unreachable();
 		}
+
+		constexpr auto box_radius = 1.0 - 1.0 / std::numbers::phi;
+		constexpr auto box_offset = vec2_t{0.5, 0.0};
+
+		class InputConnector
+		{
+		public:
+			explicit InputConnector(Ui::Container& owner,
+			                        FilterGraph::InputPort port,
+			                        FilterGraph::PortInfo info)
+			    : m_port{port}
+			    , m_root{owner, Ui::Box::Orientation::Horizontal}
+			    , m_connector{m_root, portColor(info.type)}
+			    , m_label{m_root, info.name}
+			{
+			}
+
+			auto location() const { return m_connector.location(); }
+
+		private:
+			FilterGraph::InputPort m_port;
+			Ui::Box m_root;
+			Ui::FilledShape m_connector;
+			Ui::Label m_label;
+		};
+
+		class OutputConnector
+		{
+		public:
+			explicit OutputConnector(Ui::Container& owner,
+			                         FilterGraph::OutputPort port,
+			                         FilterGraph::PortInfo info)
+			    : m_port{port}
+			    , m_root{owner, Ui::Box::Orientation::Horizontal}
+			    , m_label{m_root, info.name}
+			    , m_connector{m_root, portColor(info.type)}
+			{
+			}
+
+			auto location() const { return m_connector.location(); }
+
+		private:
+			FilterGraph::OutputPort m_port;
+			Ui::Box m_root;
+			Ui::Label m_label;
+			Ui::FilledShape m_connector;
+		};
 	}
 
 
@@ -55,23 +102,15 @@ namespace Texpainter
 		    , m_outputs{m_content.insertMode(Ui::Box::InsertMode{0, 0}),
 		                Ui::Box::Orientation::Vertical}
 		{
-			constexpr auto box_radius = 1.0 - 1.0 / std::numbers::phi;
-			constexpr auto box_offset = vec2_t{0.5, 0.0};
-
 			m_name.oneline(true).alignment(0.5);
-			std::ranges::transform(r_node.get().inputPorts(),
-			                       std::back_inserter(m_input_labels),
-			                       [&inputs = m_inputs, box_radius, box_offset](auto portinfo) {
-				                       auto ret = Ui::ReversedLabeledInput<Ui::FilledShape>{
-				                           inputs,
-				                           Ui::Box::Orientation::Horizontal,
-				                           portinfo.name,
-				                           detail::portColor(portinfo.type),
-				                           box_radius,
-				                           -box_offset};
-				                       ret.label().oneline(true).alignment(0.0);
-				                       return ret;
-			                       });
+			std::ranges::transform(
+			    r_node.get().inputPorts(),
+			    std::back_inserter(m_input_labels),
+			    [&owner = m_inputs, k = 0u](auto portinfo) mutable {
+				    auto ret = detail::InputConnector{owner, FilterGraph::InputPort{k}, portinfo};
+				    ++k;
+				    return ret;
+			    });
 
 			std::ranges::transform(
 			    r_node.get().paramNames(),
@@ -81,27 +120,22 @@ namespace Texpainter
 				        params, Ui::Box::Orientation::Vertical, name.c_str(), false};
 			    });
 
-			std::ranges::transform(r_node.get().outputPorts(),
-			                       std::back_inserter(m_output_labels),
-			                       [&outputs = m_outputs, box_radius, box_offset](auto portinfo) {
-				                       auto ret = Ui::LabeledInput<Ui::FilledShape>{
-				                           outputs,
-				                           Ui::Box::Orientation::Horizontal,
-				                           portinfo.name,
-				                           detail::portColor(portinfo.type),
-				                           box_radius,
-				                           box_offset};
-				                       ret.label().oneline(true).alignment(1.0);
-				                       return ret;
-			                       });
+			std::ranges::transform(
+			    r_node.get().outputPorts(),
+			    std::back_inserter(m_output_labels),
+			    [&owner = m_outputs, k = 0u](auto portinfo) mutable {
+				    auto ret = detail::OutputConnector{owner, FilterGraph::OutputPort{k}, portinfo};
+				    ++k;
+				    return ret;
+			    });
 
-			std::ranges::for_each(m_input_labels, [this](auto& item) {
-				item.inputField().template eventHandler<ControlId::Input>(*this);
-			});
+			//		std::ranges::for_each(m_input_labels, [this](auto& item) {
+			//			item.inputField().template eventHandler<ControlId::Input>(*this);
+			//		});
 
-			std::ranges::for_each(m_output_labels, [this](auto& item) {
-				item.inputField().template eventHandler<ControlId::Output>(*this);
-			});
+			//		std::ranges::for_each(m_output_labels, [this](auto& item) {
+			//			item.inputField().template eventHandler<ControlId::Output>(*this);
+			//		});
 		}
 
 		auto const& inputs() const { return m_input_labels; }
@@ -123,9 +157,9 @@ namespace Texpainter
 		Ui::Box m_params;
 		Ui::Box m_outputs;
 
-		std::vector<Ui::ReversedLabeledInput<Ui::FilledShape>> m_input_labels;
+		std::vector<detail::InputConnector> m_input_labels;
 		std::vector<Ui::LabeledInput<Ui::Slider>> m_params_input;
-		std::vector<Ui::LabeledInput<Ui::FilledShape>> m_output_labels;
+		std::vector<detail::OutputConnector> m_output_labels;
 	};
 
 	template<>
