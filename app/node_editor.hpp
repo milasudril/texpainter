@@ -31,9 +31,6 @@ namespace Texpainter
 			__builtin_unreachable();
 		}
 
-		constexpr auto box_radius = 1.0 - 1.0 / std::numbers::phi;
-		constexpr auto box_offset = vec2_t{0.5, 0.0};
-
 		class InputConnector
 		{
 		public:
@@ -64,8 +61,8 @@ namespace Texpainter
 			                         FilterGraph::PortInfo info)
 			    : m_port{port}
 			    , m_root{owner, Ui::Box::Orientation::Horizontal}
+			    , m_connector{m_root.insertMode(Ui::Box::InsertMode{0, Ui::Box::PositionBack}), portColor(info.type)}
 			    , m_label{m_root, info.name}
-			    , m_connector{m_root, portColor(info.type)}
 			{
 			}
 
@@ -74,8 +71,8 @@ namespace Texpainter
 		private:
 			FilterGraph::OutputPort m_port;
 			Ui::Box m_root;
-			Ui::Label m_label;
 			Ui::FilledShape m_connector;
+			Ui::Label m_label;
 		};
 	}
 
