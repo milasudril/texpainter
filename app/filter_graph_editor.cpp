@@ -82,6 +82,30 @@ void Texpainter::FilterGraphEditor::init()
 	                      });
 }
 
+namespace
+{
+	template<class Mesh, class IdArrayIterator>
+	class ConnectorMove
+	{
+	public:
+		explicit ConnectionMove(Mesh& connectors, IdArrayIterator iter)
+		    : r_connectors{connectors}
+		    , m_iter{iter}
+		{
+		}
+
+		void operator()(auto const& item)
+		{
+			if(m_iter->valid()) { r_connectors.moveTo(*m_iter, item.location()); }
+			++m_iter;
+		}
+
+	private:
+		Mesh& r_connectors;
+		IdArrayIterator m_iter;
+	};
+}
+
 template<>
 void Texpainter::FilterGraphEditor::onMove<Texpainter::FilterGraphEditor::ControlId::NodeWidgets>(
     Canvas& src, Ui::WidgetCoordinates loc, FilterGraph::NodeId id)
@@ -95,25 +119,17 @@ void Texpainter::FilterGraphEditor::onMove<Texpainter::FilterGraphEditor::Contro
 
 	auto const& node_edit = *(node_edit_iter->second);
 
-	auto i = m_input_port_map.find(&node_edit.node());
-	assert(i != std::end(m_input_port_map));
-	std::ranges::for_each(node_edit.inputs(),
-	                      [&connections = m_connections,
-	                       &ids         = i->second,
-	                       k            = static_cast<size_t>(0)](auto const& item) mutable {
-		                      if(ids[k].valid()) { connections.moveTo(ids[k], item.location()); }
-		                      ++k;
-	                      });
+	{
+		auto i = m_input_port_map.find(&node_edit.node());
+		assert(i != std::end(m_input_port_map));
+		std::ranges::for_each(node_edit.inputs(), ConnectorMove{m_connections, i->second.begin()});
+	}
 
-	auto o = m_output_port_map.find(&node_edit.node());
-	assert(o != std::end(m_output_port_map));
-	std::ranges::for_each(node_edit.outputs(),
-	                      [&connections = m_connections,
-	                       &ids         = o->second,
-	                       k            = static_cast<size_t>(0)](auto const& item) mutable {
-		                      if(ids[k].valid()) { connections.moveTo(ids[k], item.location()); }
-		                      ++k;
-	                      });
+	{
+		auto o = m_output_port_map.find(&node_edit.node());
+		assert(o != std::end(m_output_port_map));
+		std::ranges::for_each(node_edit.outputs(), ConnectorMove{m_connections, o->second.begin()});
+	}
 
 	m_linesegs->lineSegments(resolveLineSegs(m_connections));
 }
