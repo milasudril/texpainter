@@ -185,6 +185,12 @@ private:
 		self->m_moving = nullptr;
 		return FALSE;
 	}
+
+	static void on_realized(GtkWidget*, gpointer user_data)
+	{
+		auto self = reinterpret_cast<Impl*>(user_data);
+		if(self->r_eh != nullptr) { self->m_vt.on_realized(self->r_eh, *self); }
+	}
 };
 
 Texpainter::Ui::WidgetCanvasDetail::WidgetDeleter::WidgetDeleter(
@@ -210,6 +216,7 @@ Texpainter::Ui::WidgetCanvasDetail::Impl::Impl(Container& cnt)
 	cnt.add(widget);
 	m_moving = nullptr;
 	r_eh     = nullptr;
+	g_signal_connect(widget, "map", G_CALLBACK(on_realized), this);
 }
 
 Texpainter::Ui::WidgetCanvasDetail::Impl::~Impl()

@@ -95,6 +95,7 @@ namespace Texpainter::Ui
 			void (*on_mouse_down)(
 			    void*, WidgetCanvasDetail&, WidgetCoordinates, ScreenCoordinates, int, ClientId);
 			void (*on_move)(void*, WidgetCanvasDetail&, WidgetCoordinates, ClientId);
+			void (*on_realized)(void*, WidgetCanvasDetail&);
 		};
 
 		void eventHandler(void*, EventHandlerVtable const& vt);
@@ -153,29 +154,33 @@ namespace Texpainter::Ui
 		{
 			WidgetCanvasDetail::eventHandler(
 			    &eh,
-			    EventHandlerVtable{[](void* event_handler,
-			                          WidgetCanvasDetail& self,
-			                          WidgetCoordinates loc_window,
-			                          ScreenCoordinates loc_screen,
-			                          int button,
-			                          ClientId widget) {
-				                       auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				                       obj.template onMouseDown<id>(
-				                           static_cast<WidgetCanvas&>(self),
-				                           loc_window,
-				                           loc_screen,
-				                           button,
-				                           ClientIdType{widget.value()});
-			                       },
-			                       {[](void* event_handler,
-			                           WidgetCanvasDetail& self,
-			                           WidgetCoordinates loc_window,
-			                           ClientId widget) {
-				                       auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				                       obj.template onMove<id>(static_cast<WidgetCanvas&>(self),
-				                                               loc_window,
-				                                               ClientIdType{widget.value()});
-			                       }}});
+			    EventHandlerVtable{
+			        [](void* event_handler,
+			           WidgetCanvasDetail& self,
+			           WidgetCoordinates loc_window,
+			           ScreenCoordinates loc_screen,
+			           int button,
+			           ClientId widget) {
+				        auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				        obj.template onMouseDown<id>(static_cast<WidgetCanvas&>(self),
+				                                     loc_window,
+				                                     loc_screen,
+				                                     button,
+				                                     ClientIdType{widget.value()});
+			        },
+			        [](void* event_handler,
+			           WidgetCanvasDetail& self,
+			           WidgetCoordinates loc_window,
+			           ClientId widget) {
+				        auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				        obj.template onMove<id>(static_cast<WidgetCanvas&>(self),
+				                                loc_window,
+				                                ClientIdType{widget.value()});
+			        },
+			        [](void* event_handler, WidgetCanvasDetail& self) {
+				        auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				        obj.template onRealized<id>(static_cast<WidgetCanvas&>(self));
+			        }});
 			return *this;
 		}
 	};

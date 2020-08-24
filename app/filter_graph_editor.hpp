@@ -85,7 +85,6 @@ namespace Texpainter
 			                      [this](auto& item) { item.second->eventHandler(*this); });
 			m_node_copy.eventHandler<ControlId::CopyNode>(*this);
 			m_node_delete.eventHandler<ControlId::DeleteNode>(*this);
-			init();
 		}
 
 		FilterGraphEditor& insert(std::unique_ptr<FilterGraph::AbstractImageProcessor> node);
@@ -96,6 +95,9 @@ namespace Texpainter
 		                 Ui::ScreenCoordinates,
 		                 int button,
 		                 FilterGraph::NodeId);
+
+		template<ControlId>
+		void onRealized(Canvas& src);
 
 		template<ControlId>
 		void onMove(Canvas& src, Ui::WidgetCoordinates, FilterGraph::NodeId);
@@ -232,6 +234,13 @@ namespace Texpainter
 
 		r_graph.erase(m_sel_node);
 		m_linesegs->lineSegments(resolveLineSegs(m_connectors));
+	}
+
+	template<>
+	inline void FilterGraphEditor::onRealized<FilterGraphEditor::ControlId::NodeWidgets>(Canvas&)
+	{
+		// TODO: This function should only collect port locations
+		init();
 	}
 }
 
