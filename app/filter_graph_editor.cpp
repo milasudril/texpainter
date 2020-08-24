@@ -81,3 +81,39 @@ void Texpainter::FilterGraphEditor::init()
 		                          });
 	                      });
 }
+
+template<>
+void Texpainter::FilterGraphEditor::onMove<Texpainter::FilterGraphEditor::ControlId::NodeWidgets>(
+    Canvas& src, Ui::WidgetCoordinates loc, FilterGraph::NodeId id)
+{
+	if(!m_current_port_id.valid()) [[unlikely]]
+		{
+			init();
+		}
+	auto node_edit_iter = m_node_editors.find(id);
+	assert(node_edit_iter != std::end(m_node_editors));
+
+	auto const& node_edit = *(node_edit_iter->second);
+
+	auto i = m_input_port_map.find(&node_edit.node());
+	assert(i != std::end(m_input_port_map));
+	std::ranges::for_each(node_edit.inputs(),
+	                      [&connections = m_connections,
+	                       &ids         = i->second,
+	                       k            = static_cast<size_t>(0)](auto const& item) mutable {
+		                      if(ids[k].valid()) { connections.moveTo(ids[k], item.location()); }
+		                      ++k;
+	                      });
+
+	auto o = m_output_port_map.find(&node_edit.node());
+	assert(o != std::end(m_output_port_map));
+	std::ranges::for_each(node_edit.outputs(),
+	                      [&connections = m_connections,
+	                       &ids         = o->second,
+	                       k            = static_cast<size_t>(0)](auto const& item) mutable {
+		                      if(ids[k].valid()) { connections.moveTo(ids[k], item.location()); }
+		                      ++k;
+	                      });
+
+	m_linesegs->lineSegments(resolveLineSegs(m_connections));
+}

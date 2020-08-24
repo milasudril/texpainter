@@ -106,7 +106,11 @@ namespace Texpainter
 		void onClicked(NodeWidget const& src, FilterGraph::InputPort port)
 		{
 			if(m_con_proc == nullptr)
-			{ m_con_proc = std::make_unique<FilterGraph::Connection>(src.node(), port); }
+			{
+				//TODO: Start track mouse pointer and draw line from current port to mouse
+				//      cursor
+				m_con_proc = std::make_unique<FilterGraph::Connection>(src.node(), port);
+			}
 			else if(m_con_proc->sink().valid())
 			{
 				m_con_proc = std::make_unique<FilterGraph::Connection>(src.node(), port);
@@ -121,7 +125,11 @@ namespace Texpainter
 		void onClicked(NodeWidget const& src, FilterGraph::OutputPort port)
 		{
 			if(m_con_proc == nullptr)
-			{ m_con_proc = std::make_unique<FilterGraph::Connection>(src.node(), port); }
+			{
+				//TODO: Start track mouse pointer and draw line from current port to mouse
+				//      cursor
+				m_con_proc = std::make_unique<FilterGraph::Connection>(src.node(), port);
+			}
 			else if(m_con_proc->source().valid())
 			{
 				m_con_proc = std::make_unique<FilterGraph::Connection>(src.node(), port);
@@ -143,6 +151,7 @@ namespace Texpainter
 		{
 			establish(conn);
 
+			// TODO: Remove any existing connection
 			m_connections.connect(
 			    m_input_port_map.find(&conn.sink().node())->second[conn.sink().port().value()],
 			    m_output_port_map.find(&conn.source().node())
@@ -197,50 +206,14 @@ namespace Texpainter
 	}
 
 	template<>
-	inline void FilterGraphEditor::onMove<FilterGraphEditor::ControlId::NodeWidgets>(
-	    Canvas& src, Ui::WidgetCoordinates loc, FilterGraph::NodeId id)
-	{
-		if(!m_current_port_id.valid()) [[unlikely]]
-			{
-				init();
-			}
-		auto node_edit_iter = m_node_editors.find(id);
-		assert(node_edit_iter != std::end(m_node_editors));
-
-		auto const& node_edit = *(node_edit_iter->second);
-
-		auto i = m_input_port_map.find(&node_edit.node());
-		assert(i != std::end(m_input_port_map));
-		std::ranges::for_each(node_edit.inputs(),
-		                      [&connections = m_connections,
-		                       &ids         = i->second,
-		                       k            = static_cast<size_t>(0)](auto const& item) mutable {
-			                      if(ids[k].valid())
-			                      { connections.moveTo(ids[k], item.location()); }
-			                      ++k;
-		                      });
-
-		auto o = m_output_port_map.find(&node_edit.node());
-		assert(o != std::end(m_output_port_map));
-		std::ranges::for_each(node_edit.outputs(),
-		                      [&connections = m_connections,
-		                       &ids         = o->second,
-		                       k            = static_cast<size_t>(0)](auto const& item) mutable {
-			                      if(ids[k].valid())
-			                      { connections.moveTo(ids[k], item.location()); }
-			                      ++k;
-		                      });
-
-		m_linesegs->lineSegments(resolveLineSegs(m_connections));
-	}
-
-	template<>
 	inline void FilterGraphEditor::onActivated<FilterGraphEditor::ControlId::CopyNode>(
 	    Ui::MenuItem&)
 	{
 		auto node = r_graph.insert(r_graph.node(m_sel_node)->clonedProcessor());
 
 		// TODO: Below is similar to create new node
+		// TODO: Populate m_connections with new ports
+		// TODO: Do not hard-code insert position?
 		m_node_editors.insert(
 		    std::make_pair(node.first,
 		                   m_canvas.insert<NodeWidget>(
