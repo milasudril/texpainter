@@ -20,11 +20,11 @@ Texpainter::FilterGraphEditor& Texpainter::FilterGraphEditor::insert(
 	auto gen_ports_ids = [](auto ports, auto& port_id) {
 		std::vector<PortId> ret;
 		ret.reserve(ports.size());
-		std::generate_n(std::back_inserter(ret), ports.size(), [&port_id](){ return port_id++;});
+		std::generate_n(std::back_inserter(ret), ports.size(), [&port_id]() { return port_id++; });
 		return ret;
 	};
 
-	auto input_port_ids = gen_ports_ids(node_item.second.get().inputPorts(), m_current_port_id);
+	auto input_port_ids  = gen_ports_ids(node_item.second.get().inputPorts(), m_current_port_id);
 	auto output_port_ids = gen_ports_ids(node_item.second.get().outputPorts(), m_current_port_id);
 
 	auto insert_connector = [&connectors = m_connectors](auto port_id) {
@@ -78,7 +78,6 @@ namespace
 
 void Texpainter::FilterGraphEditor::init()
 {
-	m_current_port_id = PortId{1};
 	std::ranges::for_each(
 	    m_node_editors,
 	    [&port_id         = m_current_port_id,
@@ -134,7 +133,7 @@ namespace
 
 		void operator()(auto const& item)
 		{
-			if(m_iter->valid()) { r_connectors.moveTo(*m_iter, item.location()); }
+			r_connectors.moveTo(*m_iter, item.location());
 			++m_iter;
 		}
 
@@ -148,10 +147,6 @@ template<>
 void Texpainter::FilterGraphEditor::onMove<Texpainter::FilterGraphEditor::ControlId::NodeWidgets>(
     Canvas& src, Ui::WidgetCoordinates loc, FilterGraph::NodeId id)
 {
-	if(!m_current_port_id.valid()) [[unlikely]]
-		{
-			init();
-		}
 	auto node_edit_iter = m_node_editors.find(id);
 	assert(node_edit_iter != std::end(m_node_editors));
 

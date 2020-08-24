@@ -27,11 +27,7 @@ namespace Texpainter
 		class PortId
 		{
 		public:
-			constexpr PortId(): m_value{0} {}
-
-			constexpr explicit PortId(uint64_t id): m_value{id} { assert(valid()); }
-
-			constexpr bool valid() const { return m_value != 0; }
+			constexpr explicit PortId(uint64_t id): m_value{id} {}
 
 			constexpr uint64_t value() const { return m_value; }
 
@@ -68,6 +64,7 @@ namespace Texpainter
 
 		FilterGraphEditor(Ui::Container& owner, FilterGraph::Graph& graph)
 		    : r_graph{graph}
+		    , m_current_port_id{0}
 		    , m_canvas{owner}
 		    , m_node_copy{m_node_menu, "Copy"}
 		    , m_node_delete{m_node_menu, "Delete"}
@@ -88,6 +85,7 @@ namespace Texpainter
 			                      [this](auto& item) { item.second->eventHandler(*this); });
 			m_node_copy.eventHandler<ControlId::CopyNode>(*this);
 			m_node_delete.eventHandler<ControlId::DeleteNode>(*this);
+			init();
 		}
 
 		FilterGraphEditor& insert(std::unique_ptr<FilterGraph::AbstractImageProcessor> node);
@@ -220,16 +218,14 @@ namespace Texpainter
 	{
 		auto node = r_graph.node(m_sel_node);
 
-		std::ranges::for_each(m_output_port_map.find(node)->second,
-		                      [&connections = m_connectors](auto item) {
-			                      if(item.valid()) { connections.remove(item); }
-		                      });
+		std::ranges::for_each(
+		    m_output_port_map.find(node)->second,
+		    [&connections = m_connectors](auto item) { connections.remove(item); });
 		m_output_port_map.erase(node);
 
-		std::ranges::for_each(m_input_port_map.find(node)->second,
-		                      [&connections = m_connectors](auto item) {
-			                      if(item.valid()) { connections.remove(item); }
-		                      });
+		std::ranges::for_each(
+		    m_input_port_map.find(node)->second,
+		    [&connections = m_connectors](auto item) { connections.remove(item); });
 		m_input_port_map.erase(node);
 
 		m_node_editors.erase(m_sel_node);
