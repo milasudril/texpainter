@@ -90,6 +90,8 @@ namespace Texpainter
 			m_node_delete.eventHandler<ControlId::DeleteNode>(*this);
 		}
 
+		FilterGraphEditor& insert(std::unique_ptr<FilterGraph::AbstractImageProcessor> node);
+
 		template<ControlId>
 		void onMouseDown(Canvas& src,
 		                 Ui::WidgetCoordinates,
@@ -209,20 +211,7 @@ namespace Texpainter
 	inline void FilterGraphEditor::onActivated<FilterGraphEditor::ControlId::CopyNode>(
 	    Ui::MenuItem&)
 	{
-		auto node = r_graph.insert(r_graph.node(m_sel_node)->clonedProcessor());
-
-		// TODO: Below is similar to create new node
-		// TODO: Populate m_connectors with new ports
-		// TODO: Do not hard-code insert position?
-		m_node_editors.insert(
-		    std::make_pair(node.first,
-		                   m_canvas.insert<NodeWidget>(
-		                       node.first, Ui::WidgetCoordinates{50.0, 50.0}, node.second)));
-		m_canvas.showWidgets();
-		m_input_port_map.insert(std::make_pair(
-		    &node.second.get(), std::vector<PortId>(node.second.get().inputPorts().size())));
-		m_output_port_map.insert(std::make_pair(
-		    &node.second.get(), std::vector<PortId>(node.second.get().outputPorts().size())));
+		insert(r_graph.node(m_sel_node)->clonedProcessor());
 	}
 
 	template<>

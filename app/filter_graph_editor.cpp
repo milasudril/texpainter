@@ -3,6 +3,44 @@
 //@	}
 
 #include "./filter_graph_editor.hpp"
+#include <algorithm>
+
+Texpainter::FilterGraphEditor& Texpainter::FilterGraphEditor::insert(
+    std::unique_ptr<FilterGraph::AbstractImageProcessor> node)
+{
+	auto node_item = r_graph.insert(std::move(node));
+
+	// TODO: Do not hard-code insert position?
+	auto ip = m_node_editors.insert(
+	    std::make_pair(node_item.first,
+	                   m_canvas.insert<NodeWidget>(
+	                       node_item.first, Ui::WidgetCoordinates{50.0, 50.0}, node_item.second)));
+	ip.first->second->eventHandler(*this);
+
+	auto gen_ports_ids = [](auto ports, auto& port_id) {
+		std::vector<PortId> ret;
+		ret.reserve(ports.size());
+		std::generate_n(std::back_inserter(ret), ports.size(), [&port_id](){ return port_id++;});
+		return ret;
+	};
+
+	auto input_port_ids = gen_ports_ids(node_item.second.get().inputPorts(), m_current_port_id);
+	auto output_port_ids = gen_ports_ids(node_item.second.get().outputPorts(), m_current_port_id);
+
+	auto insert_connector = [&connectors = m_connectors](auto port_id) {
+		connectors.insert(std::make_pair(port_id, Ui::ToplevelCoordinates{0.0, 0.0}));
+	};
+
+	std::ranges::for_each(input_port_ids, insert_connector);
+	std::ranges::for_each(output_port_ids, insert_connector);
+
+	m_input_port_map.insert(std::make_pair(&node_item.second.get(), std::move(input_port_ids)));
+	m_output_port_map.insert(std::make_pair(&node_item.second.get(), std::move(output_port_ids)));
+
+	m_canvas.showWidgets();
+
+	return *this;
+}
 
 namespace
 {

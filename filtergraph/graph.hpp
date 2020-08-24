@@ -39,6 +39,8 @@ namespace Texpainter::FilterGraph
 		static constexpr NodeId InputNodeId{0};
 		static constexpr NodeId OutputNodeId{1};
 
+		using NodeItem = std::pair<NodeId, std::reference_wrapper<Node>>;
+
 		Graph()
 		{
 			auto input = std::make_unique<ImageProcessorWrapper<ImageSource<RgbaValue>>>(
@@ -98,8 +100,7 @@ namespace Texpainter::FilterGraph
 			return *this;
 		}
 
-		std::pair<NodeId, std::reference_wrapper<Node>> insert(
-		    std::unique_ptr<AbstractImageProcessor> proc)
+		NodeItem insert(std::unique_ptr<AbstractImageProcessor> proc)
 		{
 			auto i = m_nodes.insert(std::make_pair(m_current_id, std::move(proc)));
 			++m_current_id;
@@ -107,7 +108,7 @@ namespace Texpainter::FilterGraph
 		}
 
 		template<ImageProcessor ImgProc>
-		std::pair<NodeId, std::reference_wrapper<Node>> insert(ImgProc&& proc)
+		NodeItem insert(ImgProc&& proc)
 		{
 			return insert(
 			    std::make_unique<ImageProcessorWrapper<ImgProc>>(std::forward<ImgProc>(proc)));
