@@ -152,19 +152,19 @@ namespace Texpainter
 			establish(conn);
 
 			// TODO: Remove any existing connection
-			m_connections.connect(
+			m_connectors.connect(
 			    m_input_port_map.find(&conn.sink().node())->second[conn.sink().port().value()],
 			    m_output_port_map.find(&conn.source().node())
 			        ->second[conn.source().port().value()]);
 
-			m_linesegs->lineSegments(resolveLineSegs(m_connections));
+			m_linesegs->lineSegments(resolveLineSegs(m_connectors));
 		}
 
 
 	private:
 		FilterGraph::Graph& r_graph;
 		PortId m_current_port_id;
-		DynamicMesh<PortId, Ui::ToplevelCoordinates> m_connections;
+		DynamicMesh<PortId, Ui::ToplevelCoordinates> m_connectors;
 		std::map<FilterGraph::Node const*, std::vector<PortId>> m_input_port_map;
 		std::map<FilterGraph::Node const*, std::vector<PortId>> m_output_port_map;
 		FilterGraph::NodeId m_sel_node;
@@ -212,7 +212,7 @@ namespace Texpainter
 		auto node = r_graph.insert(r_graph.node(m_sel_node)->clonedProcessor());
 
 		// TODO: Below is similar to create new node
-		// TODO: Populate m_connections with new ports
+		// TODO: Populate m_connectors with new ports
 		// TODO: Do not hard-code insert position?
 		m_node_editors.insert(
 		    std::make_pair(node.first,
@@ -232,13 +232,13 @@ namespace Texpainter
 		auto node = r_graph.node(m_sel_node);
 
 		std::ranges::for_each(m_output_port_map.find(node)->second,
-		                      [&connections = m_connections](auto item) {
+		                      [&connections = m_connectors](auto item) {
 			                      if(item.valid()) { connections.remove(item); }
 		                      });
 		m_output_port_map.erase(node);
 
 		std::ranges::for_each(m_input_port_map.find(node)->second,
-		                      [&connections = m_connections](auto item) {
+		                      [&connections = m_connectors](auto item) {
 			                      if(item.valid()) { connections.remove(item); }
 		                      });
 		m_input_port_map.erase(node);
@@ -246,7 +246,7 @@ namespace Texpainter
 		m_node_editors.erase(m_sel_node);
 
 		r_graph.erase(m_sel_node);
-		m_linesegs->lineSegments(resolveLineSegs(m_connections));
+		m_linesegs->lineSegments(resolveLineSegs(m_connectors));
 	}
 }
 

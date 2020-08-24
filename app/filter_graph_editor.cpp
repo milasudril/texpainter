@@ -44,7 +44,7 @@ void Texpainter::FilterGraphEditor::init()
 	std::ranges::for_each(
 	    m_node_editors,
 	    [&port_id         = m_current_port_id,
-	     &connections     = m_connections,
+	     &connections     = m_connectors,
 	     &input_port_map  = m_input_port_map,
 	     &output_port_map = m_output_port_map](auto const& item) {
 		    auto port_id_start = port_id;
@@ -60,7 +60,7 @@ void Texpainter::FilterGraphEditor::init()
 	    });
 
 	std::ranges::for_each(r_graph.nodes(),
-	                      [&connections     = m_connections,
+	                      [&connections     = m_connectors,
 	                       &input_port_map  = std::as_const(m_input_port_map),
 	                       &output_port_map = std::as_const(m_output_port_map)](auto const& item) {
 		                      auto i = input_port_map.find(&item.second);
@@ -88,7 +88,7 @@ namespace
 	class ConnectorMove
 	{
 	public:
-		explicit ConnectionMove(Mesh& connectors, IdArrayIterator iter)
+		explicit ConnectorMove(Mesh& connectors, IdArrayIterator iter)
 		    : r_connectors{connectors}
 		    , m_iter{iter}
 		{
@@ -122,14 +122,14 @@ void Texpainter::FilterGraphEditor::onMove<Texpainter::FilterGraphEditor::Contro
 	{
 		auto i = m_input_port_map.find(&node_edit.node());
 		assert(i != std::end(m_input_port_map));
-		std::ranges::for_each(node_edit.inputs(), ConnectorMove{m_connections, i->second.begin()});
+		std::ranges::for_each(node_edit.inputs(), ConnectorMove{m_connectors, i->second.begin()});
 	}
 
 	{
 		auto o = m_output_port_map.find(&node_edit.node());
 		assert(o != std::end(m_output_port_map));
-		std::ranges::for_each(node_edit.outputs(), ConnectorMove{m_connections, o->second.begin()});
+		std::ranges::for_each(node_edit.outputs(), ConnectorMove{m_connectors, o->second.begin()});
 	}
 
-	m_linesegs->lineSegments(resolveLineSegs(m_connections));
+	m_linesegs->lineSegments(resolveLineSegs(m_connectors));
 }
