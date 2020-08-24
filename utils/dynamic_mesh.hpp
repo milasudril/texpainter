@@ -15,6 +15,23 @@
 
 namespace Texpainter
 {
+	template<class VertexId>
+	class Edge
+	{
+	public:
+		constexpr explicit Edge(VertexId a, VertexId b): m_a{std::min(a, b)}, m_b{std::max(a, b)} {}
+
+		constexpr VertexId a() const { return m_a; }
+
+		constexpr VertexId b() const { return m_b; }
+
+		constexpr auto operator<=>(Edge const& other) const = default;
+
+	private:
+		VertexId m_a;
+		VertexId m_b;
+	};
+
 	template<class VertexId, class Point>
 	class DynamicMesh
 	{
