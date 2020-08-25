@@ -5,6 +5,29 @@
 #include "./filter_graph_editor.hpp"
 #include <algorithm>
 
+Texpainter::FilterGraphEditor::FilterGraphEditor(Ui::Container& owner, FilterGraph::Graph& graph)
+    : r_graph{graph}
+    , m_current_port_id{0}
+    , m_canvas{owner}
+    , m_node_copy{m_node_menu, "Copy"}
+    , m_node_delete{m_node_menu, "Delete"}
+{
+	m_linesegs = m_canvas.insert<Ui::LineSegmentRenderer>();
+	std::ranges::transform(r_graph.nodes(),
+	                       std::inserter(m_node_editors, std::end(m_node_editors)),
+	                       [&canvas = m_canvas](auto& node) {
+		                       return std::make_pair(
+		                           node.first,
+		                           canvas.insert<NodeWidget>(
+		                               node.first, Ui::WidgetCoordinates{50.0, 50.0}, node.second));
+	                       });
+
+	m_canvas.eventHandler<ControlId::NodeWidgets>(*this);
+	std::ranges::for_each(m_node_editors, [this](auto& item) { item.second->eventHandler(*this); });
+	m_node_copy.eventHandler<ControlId::CopyNode>(*this);
+	m_node_delete.eventHandler<ControlId::DeleteNode>(*this);
+}
+
 Texpainter::FilterGraphEditor& Texpainter::FilterGraphEditor::insert(
     std::unique_ptr<FilterGraph::AbstractImageProcessor> node)
 {
