@@ -5,6 +5,29 @@
 #include "./filter_graph_editor.hpp"
 #include <algorithm>
 
+namespace
+{
+	template<class Canvas>
+	class MakeNodeEditor
+	{
+		using NodeWidget = Texpainter::NodeEditor<Texpainter::FilterGraphEditor>;
+
+	public:
+		explicit MakeNodeEditor(Canvas& canvas): r_canvas{canvas} {}
+
+		auto operator()(auto& item) const
+		{
+			auto tmp = r_canvas.template insert<NodeWidget>(item.first, m_insert_loc, item.second);
+			return std::make_pair(item.first, std::move(tmp));
+		}
+
+	private:
+		// TODO: Do not hard-code insert position?
+		Texpainter::Ui::WidgetCoordinates m_insert_loc{50.0, 50.0};
+		Canvas& r_canvas;
+	};
+}
+
 Texpainter::FilterGraphEditor::FilterGraphEditor(Ui::Container& owner, FilterGraph::Graph& graph)
     : r_graph{graph}
     , m_current_port_id{0}
@@ -15,12 +38,7 @@ Texpainter::FilterGraphEditor::FilterGraphEditor(Ui::Container& owner, FilterGra
 	m_linesegs = m_canvas.insert<Ui::LineSegmentRenderer>();
 	std::ranges::transform(r_graph.nodes(),
 	                       std::inserter(m_node_editors, std::end(m_node_editors)),
-	                       [&canvas = m_canvas](auto& node) {
-		                       return std::make_pair(
-		                           node.first,
-		                           canvas.insert<NodeWidget>(
-		                               node.first, Ui::WidgetCoordinates{50.0, 50.0}, node.second));
-	                       });
+	                       MakeNodeEditor{m_canvas});
 
 	m_canvas.eventHandler<ControlId::NodeWidgets>(*this);
 	std::ranges::for_each(m_node_editors, [this](auto& item) { item.second->eventHandler(*this); });
@@ -33,11 +51,7 @@ Texpainter::FilterGraphEditor& Texpainter::FilterGraphEditor::insert(
 {
 	auto node_item = r_graph.insert(std::move(node));
 
-	// TODO: Do not hard-code insert position?
-	auto ip = m_node_editors.insert(
-	    std::make_pair(node_item.first,
-	                   m_canvas.insert<NodeWidget>(
-	                       node_item.first, Ui::WidgetCoordinates{50.0, 50.0}, node_item.second)));
+	auto ip = m_node_editors.insert(MakeNodeEditor{m_canvas}(node_item));
 	ip.first->second->eventHandler(*this);
 
 	auto gen_ports_ids = [](auto ports, auto& port_id) {
