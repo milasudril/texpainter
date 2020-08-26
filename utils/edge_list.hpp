@@ -58,8 +58,8 @@ namespace Texpainter
 			if(auto i = m_a_to_edges.find(a); i != std::end(m_a_to_edges))
 			{
 				std::ranges::for_each(i->second, [&edges = m_edges](auto e) { edges.erase(e); });
+				m_a_to_edges.erase(i);
 			}
-			m_a_to_edges.erase(i);
 			m_a_to_node.erase(a);
 		}
 
@@ -68,9 +68,9 @@ namespace Texpainter
 			if(auto i = m_b_to_edges.find(b); i != std::end(m_b_to_edges))
 			{
 				std::ranges::for_each(i->second, [&edges = m_edges](auto e) { edges.erase(e); });
+				m_b_to_edges.erase(i);
 			}
-			m_b_to_edges.erase(i);
-			m_b_to_edges.erase(a);
+			m_b_to_node.erase(b);
 		}
 
 		bool exists(EndpointA a) const { return m_a_to_node.contains(a); }
@@ -90,10 +90,10 @@ namespace Texpainter
 
 		void disconnect(EndpointA a, EndpointB b)
 		{
-			if(auto i = m_a_to_edges.find(a); i_a != std::end(m_a_to_edges))
+			if(auto i = m_a_to_edges.find(a); i != std::end(m_a_to_edges))
 			{ i->second.erase(Edge{a, b}); }
 
-			if(auto i = m_b_to_edges.find(b); i_a != std::end(m_b_to_edges))
+			if(auto i = m_b_to_edges.find(b); i != std::end(m_b_to_edges))
 			{ i->second.erase(Edge{a, b}); }
 
 			m_edges.erase(Edge{a, b});
@@ -108,7 +108,7 @@ namespace Texpainter
 		auto const& node(EndpointB b) const
 		{
 			assert(exists(b));
-			return m_b_to_node.find(b) > second;
+			return m_b_to_node.find(b)->second;
 		}
 
 		auto& node(EndpointA a)
@@ -120,7 +120,7 @@ namespace Texpainter
 		auto& node(EndpointB b)
 		{
 			assert(exists(b));
-			return m_b_to_node.find(b) > second;
+			return m_b_to_node.find(b)->second;
 		}
 
 		decltype(auto) edges() const { return IterPair{std::begin(m_edges), std::end(m_edges)}; }
@@ -129,13 +129,13 @@ namespace Texpainter
 	private:
 		std::map<EndpointA, NodeType> m_a_to_node;
 		std::map<EndpointB, NodeType> m_b_to_node;
-		std::map<EndpointA, std::set<Edge>> m_a_to_edges;
-		std::map<EndpointB, std::set<Edge>> m_b_to_edges;
-		std::set<Edge> m_edges;
+		std::map<EndpointA, std::set<Edge<EndpointA, EndpointB>>> m_a_to_edges;
+		std::map<EndpointB, std::set<Edge<EndpointA, EndpointB>>> m_b_to_edges;
+		std::set<Edge<EndpointA, EndpointB>> m_edges;
 	};
 
 	template<class EndpointA, class EndpointB, class NodeType>
-	auto resolveLineSegs(EdgeList<class EndpointA, class EndpointB, class NodeType> const& g)
+	auto resolveLineSegs(EdgeList<EndpointA, EndpointB, NodeType> const& g)
 	{
 		std::vector<std::pair<NodeType, NodeType>> ret;
 		std::ranges::transform(g.edges(), std::back_inserter(ret), [&g](auto edge) {
