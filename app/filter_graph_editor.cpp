@@ -3,6 +3,8 @@
 //@	}
 
 #include "./filter_graph_editor.hpp"
+#include "utils/integer_sequence_iterator.hpp"
+
 #include <algorithm>
 
 namespace
@@ -26,6 +28,14 @@ namespace
 		Texpainter::Ui::WidgetCoordinates m_insert_loc{50.0, 50.0};
 		Canvas& r_canvas;
 	};
+
+	std::vector<Texpainter::PortId> gen_ports_ids(Texpainter::PortId initial_value, size_t count)
+	{
+		std::vector<Texpainter::PortId> ret;
+		ret.reserve(count);
+		std::copy_n(Texpainter::IntegerSequenceIterator{initial_value}, count, std::back_inserter(ret));
+		return ret;
+	}
 }
 
 Texpainter::FilterGraphEditor::FilterGraphEditor(Ui::Container& owner, FilterGraph::Graph& graph)
@@ -54,15 +64,11 @@ Texpainter::FilterGraphEditor& Texpainter::FilterGraphEditor::insert(
 	auto ip = m_node_editors.insert(MakeNodeEditor{m_canvas}(node_item));
 	ip.first->second->eventHandler(*this);
 
-	auto gen_ports_ids = [](auto ports, auto& port_id) {
-		std::vector<PortId> ret;
-		ret.reserve(ports.size());
-		std::generate_n(std::back_inserter(ret), ports.size(), [&port_id]() { return port_id++; });
-		return ret;
-	};
+	auto input_port_ids  = gen_ports_ids(m_current_port_id, node_item.second.get().inputPorts().size());
+	m_current_port_id+=input_port_ids.size();
 
-	auto input_port_ids  = gen_ports_ids(node_item.second.get().inputPorts(), m_current_port_id);
-	auto output_port_ids = gen_ports_ids(node_item.second.get().outputPorts(), m_current_port_id);
+	auto output_port_ids = gen_ports_ids(m_current_port_id, node_item.second.get().outputPorts().size());
+	m_current_port_id+=output_port_ids.size();
 
 	auto insert_connector = [&connectors = m_connectors](auto port_id) {
 		connectors.insert(std::make_pair(port_id, Ui::ToplevelCoordinates{0.0, 0.0}));

@@ -53,15 +53,12 @@ namespace Texpainter
 		uint64_t m_value;
 	};
 
-	constexpr PortId operator+(PortId a, uint64_t offset)
-	{
-		return a+=offset;
-	}
+	constexpr PortId operator+(PortId a, uint64_t offset) { return a += offset; }
 
 
 	class FilterGraphEditor
 	{
-		using Canvas = Ui::WidgetCanvas<FilterGraph::NodeId>;
+		using Canvas     = Ui::WidgetCanvas<FilterGraph::NodeId>;
 		using NodeWidget = NodeEditor<FilterGraphEditor>;
 
 	public:
