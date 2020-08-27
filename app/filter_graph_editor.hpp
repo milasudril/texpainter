@@ -21,36 +21,47 @@
 
 namespace Texpainter
 {
+	class PortId
+	{
+	public:
+		constexpr explicit PortId(uint64_t id): m_value{id} {}
+
+		constexpr uint64_t value() const { return m_value; }
+
+		constexpr PortId operator++(int)
+		{
+			auto tmp = *this;
+			++m_value;
+			return tmp;
+		}
+
+		constexpr PortId& operator++()
+		{
+			++m_value;
+			return *this;
+		}
+
+		constexpr PortId& operator+=(uint64_t offset)
+		{
+			m_value += offset;
+			return *this;
+		}
+
+		constexpr auto operator<=>(PortId const&) const = default;
+
+	private:
+		uint64_t m_value;
+	};
+
+	constexpr PortId operator+(PortId a, uint64_t offset)
+	{
+		return a+=offset;
+	}
+
+
 	class FilterGraphEditor
 	{
 		using Canvas = Ui::WidgetCanvas<FilterGraph::NodeId>;
-		class PortId
-		{
-		public:
-			constexpr explicit PortId(uint64_t id): m_value{id} {}
-
-			constexpr uint64_t value() const { return m_value; }
-
-			constexpr PortId operator++(int)
-			{
-				auto tmp = *this;
-				++m_value;
-				return tmp;
-			}
-
-			constexpr PortId& operator++()
-			{
-				++m_value;
-				return *this;
-			}
-
-			constexpr auto operator<=>(PortId const&) const = default;
-
-		private:
-			uint64_t m_value;
-		};
-
-
 		using NodeWidget = NodeEditor<FilterGraphEditor>;
 
 	public:
