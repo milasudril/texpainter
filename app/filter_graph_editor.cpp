@@ -29,12 +29,38 @@ namespace
 		Canvas& r_canvas;
 	};
 
-	std::vector<Texpainter::PortId> gen_ports_ids(Texpainter::PortId initial_value, size_t count)
+	std::vector<Texpainter::PortId> gen_ports_ids(Texpainter::PortId initial_value, size_t n)
 	{
 		std::vector<Texpainter::PortId> ret;
-		ret.reserve(count);
-		std::copy_n(Texpainter::IntegerSequenceIterator{initial_value}, count, std::back_inserter(ret));
+		ret.reserve(n);
+		std::copy_n(Texpainter::IntegerSequenceIterator{initial_value}, n, std::back_inserter(ret));
 		return ret;
+	}
+
+	template<class PortCollection, class InputPortMap, class OutputPortMap>
+	Texpainter::PortId insert_ports(Texpainter::FilterGraph::Node& node,
+	                                Texpainter::PortId current_port_id,
+	                                PortCollection& connectors,
+	                                InputPortMap& input_ports,
+	                                OutputPortMap& output_ports)
+	{
+		auto input_port_ids = gen_ports_ids(current_port_id, node.inputPorts().size());
+		current_port_id += input_port_ids.size();
+
+		auto output_port_ids = gen_ports_ids(current_port_id, node.outputPorts().size());
+		current_port_id += output_port_ids.size();
+
+		auto insert_connector = [&connectors](auto port_id) {
+			connectors.insert(std::pair{port_id, Texpainter::Ui::ToplevelCoordinates{0.0, 0.0}});
+		};
+
+		std::ranges::for_each(input_port_ids, insert_connector);
+		std::ranges::for_each(output_port_ids, insert_connector);
+
+		input_ports.insert(std::make_pair(&node, std::move(input_port_ids)));
+		output_ports.insert(std::make_pair(&node, std::move(output_port_ids)));
+
+		return current_port_id;
 	}
 }
 
@@ -64,21 +90,11 @@ Texpainter::FilterGraphEditor& Texpainter::FilterGraphEditor::insert(
 	auto ip = m_node_editors.insert(MakeNodeEditor{m_canvas}(node_item));
 	ip.first->second->eventHandler(*this);
 
-	auto input_port_ids  = gen_ports_ids(m_current_port_id, node_item.second.get().inputPorts().size());
-	m_current_port_id+=input_port_ids.size();
-
-	auto output_port_ids = gen_ports_ids(m_current_port_id, node_item.second.get().outputPorts().size());
-	m_current_port_id+=output_port_ids.size();
-
-	auto insert_connector = [&connectors = m_connectors](auto port_id) {
-		connectors.insert(std::make_pair(port_id, Ui::ToplevelCoordinates{0.0, 0.0}));
-	};
-
-	std::ranges::for_each(input_port_ids, insert_connector);
-	std::ranges::for_each(output_port_ids, insert_connector);
-
-	m_input_port_map.insert(std::make_pair(&node_item.second.get(), std::move(input_port_ids)));
-	m_output_port_map.insert(std::make_pair(&node_item.second.get(), std::move(output_port_ids)));
+	m_current_port_id = insert_ports(node_item.second.get(),
+	                                 m_current_port_id,
+	                                 m_connectors,
+	                                 m_input_port_map,
+	                                 m_output_port_map);
 
 	m_canvas.showWidgets();
 
