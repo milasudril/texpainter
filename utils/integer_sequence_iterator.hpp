@@ -4,8 +4,6 @@
 #define TEXPAINTER_UTILS_PAIRITERATOR_HPP
 
 #include <iterator>
-#include <type_traits>
-#include <utility>
 
 namespace Texpainter
 {
