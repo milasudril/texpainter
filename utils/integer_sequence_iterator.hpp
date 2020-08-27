@@ -15,7 +15,7 @@ namespace Texpainter
 	public:
 		using difference_type   = intptr_t;
 		using value_type        = Integer;
-		using iterator_category = std::bidirectional_iterator_tag;
+		using iterator_category = std::input_iterator_tag;
 
 		IntegerSequenceIterator() = default;
 
@@ -34,23 +34,10 @@ namespace Texpainter
 			return *this;
 		}
 
-		IntegerSequenceIterator& operator--()
-		{
-			--m_i;
-			return *this;
-		}
-
 		IntegerSequenceIterator operator++(int)
 		{
 			auto tmp = *this;
 			++(*this);
-			return tmp;
-		}
-
-		IntegerSequenceIterator operator--(int)
-		{
-			auto tmp = *this;
-			--(*this);
 			return tmp;
 		}
 
