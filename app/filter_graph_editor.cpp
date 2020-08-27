@@ -20,7 +20,7 @@ namespace
 		auto operator()(auto& item) const
 		{
 			auto tmp = r_canvas.template insert<NodeWidget>(item.first, m_insert_loc, item.second);
-			return std::make_pair(item.first, std::move(tmp));
+			return std::pair{item.first, std::move(tmp)};
 		}
 
 	private:
@@ -57,8 +57,8 @@ namespace
 		std::ranges::for_each(input_port_ids, insert_connector);
 		std::ranges::for_each(output_port_ids, insert_connector);
 
-		input_ports.insert(std::make_pair(&node, std::move(input_port_ids)));
-		output_ports.insert(std::make_pair(&node, std::move(output_port_ids)));
+		input_ports.insert(std::pair{&node, std::move(input_port_ids)});
+		output_ports.insert(std::pair{&node, std::move(output_port_ids)});
 
 		return current_port_id;
 	}
