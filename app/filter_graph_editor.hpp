@@ -78,11 +78,18 @@ namespace Texpainter
 
 	struct PortMap
 	{
-		void addPorts(Texpainter::FilterGraph::Node& node);
-		void addConnections(Texpainter::FilterGraph::Node const& node);
+		void addPorts(FilterGraph::Node& node);
+		void addConnections(FilterGraph::Node const& node);
+
+		void addConnection(FilterGraph::Endpoint<FilterGraph::InputPort> const& in,
+		                   FilterGraph::Endpoint<FilterGraph::OutputPort> const& out)
+		{
+			m_connectors.connect(m_input_port_map.find(&in.node())->second[in.port().value()],
+			                     m_output_port_map.find(&out.node())->second[out.port().value()]);
+		}
 
 		template<class InputConnectorList, class OutputConnectorList>
-		void updateLocation(Texpainter::FilterGraph::Node const& node,
+		void updateLocation(FilterGraph::Node const& node,
 		                    InputConnectorList const& inputs,
 		                    OutputConnectorList const& outputs)
 		{
@@ -187,12 +194,8 @@ namespace Texpainter
 		void connectionOk(FilterGraph::Connection const& conn)
 		{
 			establish(conn);
-
-			// TODO: Remove any existing connection
-			m_ports.m_connectors.connect(m_ports.m_input_port_map.find(&conn.sink().node())
-			                                 ->second[conn.sink().port().value()],
-			                             m_ports.m_output_port_map.find(&conn.source().node())
-			                                 ->second[conn.source().port().value()]);
+			m_ports.addConnection(conn.sink(), conn.source());
+			// TODO: Remove any conflicting connections
 
 			m_linesegs->lineSegments(resolveLineSegs(m_ports.m_connectors));
 		}
