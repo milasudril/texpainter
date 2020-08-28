@@ -36,32 +36,25 @@ namespace
 		std::copy_n(Texpainter::IntegerSequenceIterator{initial_value}, n, std::back_inserter(ret));
 		return ret;
 	}
+}
 
-	template<class PortCollection, class InputPortMap, class OutputPortMap>
-	Texpainter::PortId insert_ports(Texpainter::FilterGraph::Node& node,
-	                                Texpainter::PortId current_port_id,
-	                                PortCollection& connectors,
-	                                InputPortMap& input_ports,
-	                                OutputPortMap& output_ports)
-	{
-		auto input_port_ids = gen_ports_ids(current_port_id, node.inputPorts().size());
-		current_port_id += input_port_ids.size();
+void Texpainter::PortMap::addPorts(Texpainter::FilterGraph::Node& node)
+{
+	auto input_port_ids = gen_ports_ids(m_current_port_id, node.inputPorts().size());
+	m_current_port_id += input_port_ids.size();
 
-		auto output_port_ids = gen_ports_ids(current_port_id, node.outputPorts().size());
-		current_port_id += output_port_ids.size();
+	auto output_port_ids = gen_ports_ids(m_current_port_id, node.outputPorts().size());
+	m_current_port_id += output_port_ids.size();
 
-		auto insert_connector = [&connectors](auto port_id) {
-			connectors.insert(std::pair{port_id, Texpainter::Ui::ToplevelCoordinates{0.0, 0.0}});
-		};
+	auto insert_connector = [&connectors = m_connectors](auto port_id) {
+		connectors.insert(std::pair{port_id, Texpainter::Ui::ToplevelCoordinates{0.0, 0.0}});
+	};
 
-		std::ranges::for_each(input_port_ids, insert_connector);
-		std::ranges::for_each(output_port_ids, insert_connector);
+	std::ranges::for_each(input_port_ids, insert_connector);
+	std::ranges::for_each(output_port_ids, insert_connector);
 
-		input_ports.insert(std::pair{&node, std::move(input_port_ids)});
-		output_ports.insert(std::pair{&node, std::move(output_port_ids)});
-
-		return current_port_id;
-	}
+	m_input_port_map.insert(std::pair{&node, std::move(input_port_ids)});
+	m_output_port_map.insert(std::pair{&node, std::move(output_port_ids)});
 }
 
 Texpainter::FilterGraphEditor::FilterGraphEditor(Ui::Container& owner, FilterGraph::Graph& graph)
@@ -91,11 +84,7 @@ Texpainter::FilterGraphEditor& Texpainter::FilterGraphEditor::insert(
 	auto ip = m_node_editors.insert(MakeNodeEditor{m_canvas}(node_item));
 	ip.first->second->eventHandler(*this);
 
-	m_ports.m_current_port_id = insert_ports(node_item.second.get(),
-	                                         m_ports.m_current_port_id,
-	                                         m_ports.m_connectors,
-	                                         m_ports.m_input_port_map,
-	                                         m_ports.m_output_port_map);
+	m_ports.addPorts(node_item.second.get());
 
 	m_canvas.showWidgets();
 

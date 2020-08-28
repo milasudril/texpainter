@@ -57,6 +57,8 @@ namespace Texpainter
 
 	struct PortMap
 	{
+		void addPorts(Texpainter::FilterGraph::Node& node);
+
 		PortId m_current_port_id{0};
 		DynamicMesh<PortId, Ui::ToplevelCoordinates> m_connectors;
 		std::map<FilterGraph::Node const*, std::vector<PortId>> m_input_port_map;
