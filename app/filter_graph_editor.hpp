@@ -55,11 +55,52 @@ namespace Texpainter
 
 	constexpr PortId operator+(PortId a, uint64_t offset) { return a += offset; }
 
+	template<class Mesh, class IdArrayIterator>
+	class ConnectorMove
+	{
+	public:
+		explicit ConnectorMove(Mesh& connectors, IdArrayIterator iter)
+		    : r_connectors{connectors}
+		    , m_iter{iter}
+		{
+		}
+
+		void operator()(auto const& item)
+		{
+			r_connectors.moveTo(*m_iter, item.location());
+			++m_iter;
+		}
+
+	private:
+		Mesh& r_connectors;
+		IdArrayIterator m_iter;
+	};
+
 	struct PortMap
 	{
 		void addPorts(Texpainter::FilterGraph::Node& node);
+		void addConnections(Texpainter::FilterGraph::Node const& node);
+
+		template<class InputConnectorList, class OutputConnectorList>
+		void updateLocation(Texpainter::FilterGraph::Node const& node,
+		                    InputConnectorList const& inputs,
+		                    OutputConnectorList const& outputs)
+		{
+			{
+				auto i = m_input_port_map.find(&node);
+				assert(i != std::end(m_input_port_map));
+				std::ranges::for_each(inputs, ConnectorMove{m_connectors, i->second.begin()});
+			}
+
+			{
+				auto o = m_output_port_map.find(&node);
+				assert(o != std::end(m_output_port_map));
+				std::ranges::for_each(outputs, ConnectorMove{m_connectors, o->second.begin()});
+			}
+		}
 
 		PortId m_current_port_id{0};
+
 		DynamicMesh<PortId, Ui::ToplevelCoordinates> m_connectors;
 		std::map<FilterGraph::Node const*, std::vector<PortId>> m_input_port_map;
 		std::map<FilterGraph::Node const*, std::vector<PortId>> m_output_port_map;
@@ -156,6 +197,7 @@ namespace Texpainter
 			m_linesegs->lineSegments(resolveLineSegs(m_ports.m_connectors));
 		}
 
+		void updateLocations();
 
 	private:
 		FilterGraph::Graph& r_graph;
@@ -173,7 +215,6 @@ namespace Texpainter
 
 		std::unique_ptr<FilterGraph::Connection> m_con_proc;
 
-		void init();
 
 		void completeConnection()
 		{
@@ -232,8 +273,7 @@ namespace Texpainter
 	template<>
 	inline void FilterGraphEditor::onRealized<FilterGraphEditor::ControlId::NodeWidgets>(Canvas&)
 	{
-		// TODO: This function should only collect port locations
-		init();
+		updateLocations();
 	}
 }
 
