@@ -66,7 +66,6 @@ namespace
 
 Texpainter::FilterGraphEditor::FilterGraphEditor(Ui::Container& owner, FilterGraph::Graph& graph)
     : r_graph{graph}
-    , m_current_port_id{0}
     , m_canvas{owner}
     , m_node_copy{m_node_menu, "Copy"}
     , m_node_delete{m_node_menu, "Delete"}
@@ -80,6 +79,8 @@ Texpainter::FilterGraphEditor::FilterGraphEditor(Ui::Container& owner, FilterGra
 	std::ranges::for_each(m_node_editors, [this](auto& item) { item.second->eventHandler(*this); });
 	m_node_copy.eventHandler<ControlId::CopyNode>(*this);
 	m_node_delete.eventHandler<ControlId::DeleteNode>(*this);
+
+	//	std::ranges::for_each(r_graph.nodes(), insert_ports);
 }
 
 Texpainter::FilterGraphEditor& Texpainter::FilterGraphEditor::insert(
@@ -90,11 +91,11 @@ Texpainter::FilterGraphEditor& Texpainter::FilterGraphEditor::insert(
 	auto ip = m_node_editors.insert(MakeNodeEditor{m_canvas}(node_item));
 	ip.first->second->eventHandler(*this);
 
-	m_current_port_id = insert_ports(node_item.second.get(),
-	                                 m_current_port_id,
-	                                 m_connectors,
-	                                 m_input_port_map,
-	                                 m_output_port_map);
+	m_ports.m_current_port_id = insert_ports(node_item.second.get(),
+	                                         m_ports.m_current_port_id,
+	                                         m_ports.m_connectors,
+	                                         m_ports.m_input_port_map,
+	                                         m_ports.m_output_port_map);
 
 	m_canvas.showWidgets();
 
@@ -139,10 +140,10 @@ void Texpainter::FilterGraphEditor::init()
 {
 	std::ranges::for_each(
 	    m_node_editors,
-	    [&port_id         = m_current_port_id,
-	     &connections     = m_connectors,
-	     &input_port_map  = m_input_port_map,
-	     &output_port_map = m_output_port_map](auto const& item) {
+	    [&port_id         = m_ports.m_current_port_id,
+	     &connections     = m_ports.m_connectors,
+	     &input_port_map  = m_ports.m_input_port_map,
+	     &output_port_map = m_ports.m_output_port_map](auto const& item) {
 		    auto port_id_start = port_id;
 		    auto input_ports_end =
 		        add_ports_from(item.second->inputs(), port_id_start, connections);
@@ -155,14 +156,14 @@ void Texpainter::FilterGraphEditor::init()
 		    port_id = output_ports_end;
 	    });
 
-	std::ranges::for_each(r_graph.nodes(),
-	                      [&connections     = m_connectors,
-	                       &input_port_map  = std::as_const(m_input_port_map),
-	                       &output_port_map = std::as_const(m_output_port_map)](auto const& item) {
-		                      auto i = input_port_map.find(&item.second);
-		                      assert(i != std::end(input_port_map));
-		                      std::ranges::for_each(
-		                          item.second.inputs(),
+	std::ranges::for_each(
+	    r_graph.nodes(),
+	    [&connections     = m_ports.m_connectors,
+	     &input_port_map  = std::as_const(m_ports.m_input_port_map),
+	     &output_port_map = std::as_const(m_ports.m_output_port_map)](auto const& item) {
+		    auto i = input_port_map.find(&item.second);
+		    assert(i != std::end(input_port_map));
+		    std::ranges::for_each(item.second.inputs(),
 		                          [&connections,
 		                           &output_port_map,
 		                           &inputs = i->second,
@@ -175,7 +176,7 @@ void Texpainter::FilterGraphEditor::init()
 			                          }
 			                          ++input;
 		                          });
-	                      });
+	    });
 }
 
 namespace
@@ -212,16 +213,18 @@ void Texpainter::FilterGraphEditor::onMove<Texpainter::FilterGraphEditor::Contro
 	auto const& node_edit = *(node_edit_iter->second);
 
 	{
-		auto i = m_input_port_map.find(&node_edit.node());
-		assert(i != std::end(m_input_port_map));
-		std::ranges::for_each(node_edit.inputs(), ConnectorMove{m_connectors, i->second.begin()});
+		auto i = m_ports.m_input_port_map.find(&node_edit.node());
+		assert(i != std::end(m_ports.m_input_port_map));
+		std::ranges::for_each(node_edit.inputs(),
+		                      ConnectorMove{m_ports.m_connectors, i->second.begin()});
 	}
 
 	{
-		auto o = m_output_port_map.find(&node_edit.node());
-		assert(o != std::end(m_output_port_map));
-		std::ranges::for_each(node_edit.outputs(), ConnectorMove{m_connectors, o->second.begin()});
+		auto o = m_ports.m_output_port_map.find(&node_edit.node());
+		assert(o != std::end(m_ports.m_output_port_map));
+		std::ranges::for_each(node_edit.outputs(),
+		                      ConnectorMove{m_ports.m_connectors, o->second.begin()});
 	}
 
-	m_linesegs->lineSegments(resolveLineSegs(m_connectors));
+	m_linesegs->lineSegments(resolveLineSegs(m_ports.m_connectors));
 }

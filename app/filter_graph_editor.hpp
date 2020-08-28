@@ -55,6 +55,14 @@ namespace Texpainter
 
 	constexpr PortId operator+(PortId a, uint64_t offset) { return a += offset; }
 
+	struct PortMap
+	{
+		PortId m_current_port_id{0};
+		DynamicMesh<PortId, Ui::ToplevelCoordinates> m_connectors;
+		std::map<FilterGraph::Node const*, std::vector<PortId>> m_input_port_map;
+		std::map<FilterGraph::Node const*, std::vector<PortId>> m_output_port_map;
+	};
+
 
 	class FilterGraphEditor
 	{
@@ -68,7 +76,6 @@ namespace Texpainter
 			CopyNode,
 			DeleteNode
 		};
-
 
 		FilterGraphEditor(Ui::Container& owner, FilterGraph::Graph& graph);
 
@@ -139,21 +146,20 @@ namespace Texpainter
 			establish(conn);
 
 			// TODO: Remove any existing connection
-			m_connectors.connect(
-			    m_input_port_map.find(&conn.sink().node())->second[conn.sink().port().value()],
-			    m_output_port_map.find(&conn.source().node())
-			        ->second[conn.source().port().value()]);
+			m_ports.m_connectors.connect(m_ports.m_input_port_map.find(&conn.sink().node())
+			                                 ->second[conn.sink().port().value()],
+			                             m_ports.m_output_port_map.find(&conn.source().node())
+			                                 ->second[conn.source().port().value()]);
 
-			m_linesegs->lineSegments(resolveLineSegs(m_connectors));
+			m_linesegs->lineSegments(resolveLineSegs(m_ports.m_connectors));
 		}
 
 
 	private:
 		FilterGraph::Graph& r_graph;
-		PortId m_current_port_id;
-		DynamicMesh<PortId, Ui::ToplevelCoordinates> m_connectors;
-		std::map<FilterGraph::Node const*, std::vector<PortId>> m_input_port_map;
-		std::map<FilterGraph::Node const*, std::vector<PortId>> m_output_port_map;
+
+		PortMap m_ports;
+
 		FilterGraph::NodeId m_sel_node;
 
 		Canvas m_canvas;
@@ -206,19 +212,19 @@ namespace Texpainter
 		auto node = r_graph.node(m_sel_node);
 
 		std::ranges::for_each(
-		    m_output_port_map.find(node)->second,
-		    [&connections = m_connectors](auto item) { connections.remove(item); });
-		m_output_port_map.erase(node);
+		    m_ports.m_output_port_map.find(node)->second,
+		    [&connections = m_ports.m_connectors](auto item) { connections.remove(item); });
+		m_ports.m_output_port_map.erase(node);
 
 		std::ranges::for_each(
-		    m_input_port_map.find(node)->second,
-		    [&connections = m_connectors](auto item) { connections.remove(item); });
-		m_input_port_map.erase(node);
+		    m_ports.m_input_port_map.find(node)->second,
+		    [&connections = m_ports.m_connectors](auto item) { connections.remove(item); });
+		m_ports.m_input_port_map.erase(node);
 
 		m_node_editors.erase(m_sel_node);
 
 		r_graph.erase(m_sel_node);
-		m_linesegs->lineSegments(resolveLineSegs(m_connectors));
+		m_linesegs->lineSegments(resolveLineSegs(m_ports.m_connectors));
 	}
 
 	template<>
