@@ -41,7 +41,7 @@ namespace Texpainter::FilterGraph
 
 		using NodeItem = std::pair<NodeId, std::reference_wrapper<Node>>;
 
-		Graph()
+		Graph(): m_valid_state{ValidationState::NotValidated}
 		{
 			auto input = std::make_unique<ImageProcessorWrapper<ImageSource<RgbaValue>>>(
 			    ImageSource<RgbaValue>{});
@@ -90,6 +90,7 @@ namespace Texpainter::FilterGraph
 		{
 			assert(node(a) != nullptr && node(b) != nullptr);
 			m_nodes[a].connect(sink, m_nodes[b], src);
+			m_valid_state = ValidationState::NotValidated;
 			return *this;
 		}
 
@@ -97,6 +98,7 @@ namespace Texpainter::FilterGraph
 		{
 			assert(node(a) != nullptr);
 			m_nodes[a].disconnect(sink);
+			m_valid_state = ValidationState::NotValidated;
 			return *this;
 		}
 
@@ -118,6 +120,7 @@ namespace Texpainter::FilterGraph
 		{
 			assert(id != InputNodeId && id != OutputNodeId);
 			m_nodes.erase(id);
+			m_valid_state = ValidationState::NotValidated;
 			return *this;
 		}
 
