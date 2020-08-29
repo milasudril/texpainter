@@ -120,6 +120,12 @@ namespace Texpainter
 			                     m_output_port_map.find(&out.node())->second[out.port().value()]);
 		}
 
+		void removeDummyConnection(FilterGraph::Endpoint<FilterGraph::OutputPort> const& out)
+		{
+			m_connectors.disconnect(
+			    InputPortId{0}, m_output_port_map.find(&out.node())->second[out.port().value()]);
+		}
+
 		void moveDummyConnectors(Texpainter::Ui::ToplevelCoordinates loc)
 		{
 			m_connectors.node(InputPortId{0})  = loc;
@@ -234,6 +240,7 @@ namespace Texpainter
 		void connectionOk(FilterGraph::Connection const& conn)
 		{
 			m_ports.removeConnections(conn.sink());
+			m_ports.removeDummyConnection(conn.source());
 			establish(conn);
 			m_ports.addConnection(conn.sink(), conn.source());
 			m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
