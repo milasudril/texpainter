@@ -9,6 +9,7 @@
 #include "./container.hpp"
 #include "./widget_coordinates.hpp"
 #include "./screen_coordinates.hpp"
+#include "./toplevel_coordinates.hpp"
 
 #include <utility>
 #include <memory>
@@ -92,6 +93,7 @@ namespace Texpainter::Ui
 
 		struct EventHandlerVtable
 		{
+			void (*on_move_canvas)(void*, WidgetCanvasDetail&, ToplevelCoordinates);
 			void (*on_mouse_down)(
 			    void*, WidgetCanvasDetail&, WidgetCoordinates, ScreenCoordinates, int, ClientId);
 			void (*on_move)(void*, WidgetCanvasDetail&, WidgetCoordinates, ClientId);
@@ -155,6 +157,10 @@ namespace Texpainter::Ui
 			WidgetCanvasDetail::eventHandler(
 			    &eh,
 			    EventHandlerVtable{
+			        [](void* event_handler, WidgetCanvasDetail& self, ToplevelCoordinates loc) {
+				        auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				        obj.template onMouseMove<id>(static_cast<WidgetCanvas&>(self), loc);
+			        },
 			        [](void* event_handler,
 			           WidgetCanvasDetail& self,
 			           WidgetCoordinates loc_window,

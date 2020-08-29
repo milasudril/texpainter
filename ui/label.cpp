@@ -12,11 +12,6 @@ namespace
 	size_t s_style_refcount      = 0;
 }
 
-//GtkWidget *somewidget;
-//gint wx, wy;
-//gtk_widget_translate_coordinates(somewidget, gtk_widget_get_toplevel(somewidget), 0, 0, &wx, &wy);
-
-
 class Texpainter::Ui::Label::Impl: private Label
 {
 public:

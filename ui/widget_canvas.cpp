@@ -2,6 +2,7 @@
 
 #include "./widget_canvas.hpp"
 #include "./screen_coordinates.hpp"
+#include "./toplevel_coordinates.hpp"
 
 #include <gtk/gtk.h>
 
@@ -191,6 +192,25 @@ private:
 		auto self = reinterpret_cast<Impl*>(user_data);
 		if(self->r_eh != nullptr) { self->m_vt.on_realized(self->r_eh, *self); }
 	}
+
+
+	static gboolean canvas_mouse_move(GtkWidget* widget, GdkEvent* event, gpointer user_data)
+	{
+		auto self = reinterpret_cast<Impl*>(user_data);
+		if(self->r_eh != nullptr)
+		{
+			auto event_move = reinterpret_cast<GdkEventMotion const*>(event);
+			int x{};
+			int y{};
+			gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &x, &y);
+			self->m_vt.on_move_canvas(self->r_eh,
+			                          *self,
+			                          ToplevelCoordinates{event_move->x, event_move->y}
+			                              + vec2_t{static_cast<double>(x), static_cast<double>(y)});
+			return TRUE;
+		}
+		return FALSE;
+	}
 };
 
 Texpainter::Ui::WidgetCanvasDetail::WidgetDeleter::WidgetDeleter(
@@ -213,6 +233,10 @@ Texpainter::Ui::WidgetCanvasDetail::Impl::Impl(Container& cnt)
 {
 	auto widget = gtk_overlay_new();
 	m_handle    = GTK_OVERLAY(widget);
+	gtk_widget_set_events(
+	    widget, GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
+	g_signal_connect(widget, "motion-notify-event", G_CALLBACK(canvas_mouse_move), this);
+
 	cnt.add(widget);
 	m_moving = nullptr;
 	r_eh     = nullptr;

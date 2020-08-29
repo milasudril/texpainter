@@ -120,6 +120,12 @@ namespace Texpainter
 			                     m_output_port_map.find(&out.node())->second[out.port().value()]);
 		}
 
+		void moveDummyConnectors(Texpainter::Ui::ToplevelCoordinates loc)
+		{
+			m_connectors.node(InputPortId{0})  = loc;
+			m_connectors.node(OutputPortId{0}) = loc;
+		}
+
 
 		void removePorts(FilterGraph::Node const& node);
 
@@ -210,6 +216,9 @@ namespace Texpainter
 		void onMove(Canvas& src, Ui::WidgetCoordinates, FilterGraph::NodeId);
 
 		template<ControlId>
+		void onMouseMove(Canvas& src, Ui::ToplevelCoordinates loc);
+
+		template<ControlId>
 		void onActivated(Ui::MenuItem& src);
 
 		void onClicked(NodeWidget const& src, FilterGraph::InputPort port);
@@ -272,6 +281,14 @@ namespace Texpainter
 				m_node_menu.show().popupAtCursor();
 			}
 		}
+	}
+
+	template<>
+	inline void FilterGraphEditor::onMouseMove<FilterGraphEditor::ControlId::NodeWidgets>(
+	    Canvas& src, Ui::ToplevelCoordinates loc)
+	{
+		m_ports.moveDummyConnectors(loc);
+		m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
 	}
 
 	template<>

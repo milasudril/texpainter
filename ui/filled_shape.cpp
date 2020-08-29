@@ -115,9 +115,7 @@ Texpainter::Ui::FilledShape::Impl::Impl(Container& cnt,
 	g_signal_connect(G_OBJECT(widget), "size-allocate", G_CALLBACK(size_callback), this);
 	g_signal_connect(G_OBJECT(widget), "button-release-event", G_CALLBACK(clicked_callack), this);
 	g_signal_connect(G_OBJECT(widget), "button-press-event", G_CALLBACK(on_mouse_down), this);
-	gtk_widget_add_events(widget,
-	                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK
-	                          | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_SCROLL_MASK);
+	gtk_widget_add_events(widget, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 
 	m_handle = GTK_DRAWING_AREA(widget);
 
