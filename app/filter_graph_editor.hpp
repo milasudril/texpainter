@@ -87,6 +87,17 @@ namespace Texpainter
 	class PortMap
 	{
 	public:
+		PortMap()
+		{
+			// Dummy connectors for use with mouse cursor tracking
+			m_connectors.insert(
+			    std::pair{m_port_id_in, Texpainter::Ui::ToplevelCoordinates{0.0, 0.0}});
+			++m_port_id_in;
+			m_connectors.insert(
+			    std::pair{m_port_id_out, Texpainter::Ui::ToplevelCoordinates{0.0, 0.0}});
+			++m_port_id_out;
+		}
+
 		void addPorts(FilterGraph::Node& node);
 		void addConnections(FilterGraph::Node const& node);
 
@@ -96,6 +107,19 @@ namespace Texpainter
 			m_connectors.connect(m_input_port_map.find(&in.node())->second[in.port().value()],
 			                     m_output_port_map.find(&out.node())->second[out.port().value()]);
 		}
+
+		void addDummyConnection(FilterGraph::Endpoint<FilterGraph::InputPort> const& in)
+		{
+			m_connectors.connect(m_input_port_map.find(&in.node())->second[in.port().value()],
+			                     OutputPortId{0});
+		}
+
+		void addDummyConnection(FilterGraph::Endpoint<FilterGraph::OutputPort> const& out)
+		{
+			m_connectors.connect(InputPortId{0},
+			                     m_output_port_map.find(&out.node())->second[out.port().value()]);
+		}
+
 
 		void removePorts(FilterGraph::Node const& node);
 

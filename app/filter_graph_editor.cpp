@@ -139,13 +139,15 @@ void Texpainter::FilterGraphEditor::onClicked(NodeWidget const& src, FilterGraph
 {
 	if(m_con_proc == nullptr)
 	{
-		//TODO: Start track mouse pointer and draw line from current port to mouse
-		//      cursor
 		m_con_proc = std::make_unique<FilterGraph::Connection>(src.node(), port);
+		m_ports.addDummyConnection(m_con_proc->sink());
+		m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
 	}
 	else if(m_con_proc->sink().valid())
 	{
 		m_con_proc = std::make_unique<FilterGraph::Connection>(src.node(), port);
+		m_ports.addDummyConnection(m_con_proc->sink());
+		m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
 	}
 	else
 	{
