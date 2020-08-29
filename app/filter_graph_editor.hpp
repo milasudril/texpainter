@@ -124,7 +124,7 @@ namespace Texpainter
 		void removeDummyConnection(FilterGraph::Endpoint<FilterGraph::InputPort> const& in)
 		{
 			m_connectors.disconnect(m_input_port_map.find(&in.node())->second[in.port().value()],
-			                     OutputPortId{0});
+			                        OutputPortId{0});
 		}
 
 		void removeDummyConnection(FilterGraph::Endpoint<FilterGraph::OutputPort> const& out)
@@ -232,6 +232,9 @@ namespace Texpainter
 		void onMouseMove(Canvas& src, Ui::ToplevelCoordinates loc);
 
 		template<ControlId>
+		void onMouseUp(Canvas& src, Ui::WidgetCoordinates, Ui::ScreenCoordinates, int button);
+
+		template<ControlId>
 		void onActivated(Ui::MenuItem& src);
 
 		void onClicked(NodeWidget const& src, FilterGraph::InputPort port);
@@ -327,6 +330,25 @@ namespace Texpainter
 	inline void FilterGraphEditor::onRealized<FilterGraphEditor::ControlId::NodeWidgets>(Canvas&)
 	{
 		updateLocations();
+	}
+
+	template<>
+	inline void FilterGraphEditor::onMouseUp<FilterGraphEditor::ControlId::NodeWidgets>(
+	    Canvas&, Ui::WidgetCoordinates, Ui::ScreenCoordinates, int button)
+	{
+		switch(button)
+		{
+			case 1:
+				if(m_con_proc != nullptr)
+				{
+					m_ports.removeDummyConnection(m_con_proc->sink());
+					m_ports.removeDummyConnection(m_con_proc - source());
+					m_con_proc.reset();
+					m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
+				}
+				break;
+			case 3: break;
+		}
 	}
 }
 

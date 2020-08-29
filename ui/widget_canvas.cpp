@@ -215,6 +215,20 @@ private:
 		}
 		return FALSE;
 	}
+	static gboolean canvas_mouse_up(GtkWidget* widget, GdkEvent* event, gpointer user_data)
+	{
+		auto self = reinterpret_cast<Impl*>(user_data);
+		if(self->r_eh != nullptr)
+		{
+			auto e = reinterpret_cast<GdkEventButton const*>(event);
+			self->m_vt.on_mouse_up_canvas(self->r_eh,
+			                              *self,
+			                              WidgetCoordinates{e->x, e->y},
+			                              ScreenCoordinates{e->x_root, e->y_root},
+			                              e->button);
+		}
+		return FALSE;
+	}
 };
 
 Texpainter::Ui::WidgetCanvasDetail::WidgetDeleter::WidgetDeleter(
@@ -240,6 +254,7 @@ Texpainter::Ui::WidgetCanvasDetail::Impl::Impl(Container& cnt)
 	gtk_widget_set_events(
 	    widget, GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 	g_signal_connect(widget, "motion-notify-event", G_CALLBACK(canvas_mouse_move), this);
+	g_signal_connect(widget, "button-release-event", G_CALLBACK(canvas_mouse_up), this);
 
 	cnt.add(widget);
 	m_moving = nullptr;
