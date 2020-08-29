@@ -252,6 +252,7 @@ namespace Texpainter
 			m_ports.removeConnections(conn.sink());
 			m_ports.removeDummyConnection(conn.source());
 			establish(conn);
+			r_graph.clearValidationState();
 			m_ports.addConnection(conn.sink(), conn.source());
 			m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
 		}
