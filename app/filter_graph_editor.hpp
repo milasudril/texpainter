@@ -108,6 +108,7 @@ namespace Texpainter
 			                     m_output_port_map.find(&out.node())->second[out.port().value()]);
 		}
 
+
 		void addDummyConnection(FilterGraph::Endpoint<FilterGraph::InputPort> const& in)
 		{
 			m_connectors.connect(m_input_port_map.find(&in.node())->second[in.port().value()],
@@ -118,6 +119,12 @@ namespace Texpainter
 		{
 			m_connectors.connect(InputPortId{0},
 			                     m_output_port_map.find(&out.node())->second[out.port().value()]);
+		}
+
+		void removeDummyConnection(FilterGraph::Endpoint<FilterGraph::InputPort> const& in)
+		{
+			m_connectors.disconnect(m_input_port_map.find(&in.node())->second[in.port().value()],
+			                     OutputPortId{0});
 		}
 
 		void removeDummyConnection(FilterGraph::Endpoint<FilterGraph::OutputPort> const& out)

@@ -145,9 +145,8 @@ void Texpainter::FilterGraphEditor::onClicked(NodeWidget const& src, FilterGraph
 	}
 	else if(m_con_proc->sink().valid())
 	{
-		m_con_proc = std::make_unique<FilterGraph::Connection>(src.node(), port);
-		m_ports.addDummyConnection(m_con_proc->sink());
-		m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
+		// Ignore new trigger
+		return;
 	}
 	else
 	{
@@ -166,9 +165,8 @@ void Texpainter::FilterGraphEditor::onClicked(NodeWidget const& src, FilterGraph
 	}
 	else if(m_con_proc->source().valid())
 	{
-		m_con_proc = std::make_unique<FilterGraph::Connection>(src.node(), port);
-		m_ports.addDummyConnection(m_con_proc->source());
-		m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
+		// Ignore new trigger
+		return;
 	}
 	else
 	{
