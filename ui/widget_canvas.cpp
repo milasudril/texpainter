@@ -193,20 +193,24 @@ private:
 		if(self->r_eh != nullptr) { self->m_vt.on_realized(self->r_eh, *self); }
 	}
 
-
 	static gboolean canvas_mouse_move(GtkWidget* widget, GdkEvent* event, gpointer user_data)
 	{
 		auto self = reinterpret_cast<Impl*>(user_data);
 		if(self->r_eh != nullptr)
 		{
 			auto event_move = reinterpret_cast<GdkEventMotion const*>(event);
-			int x{};
-			int y{};
-			gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &x, &y);
-			self->m_vt.on_move_canvas(self->r_eh,
-			                          *self,
-			                          ToplevelCoordinates{event_move->x, event_move->y}
-			                              + vec2_t{static_cast<double>(x), static_cast<double>(y)});
+
+			assert(GTK_OVERLAY(widget) == self->m_handle);
+
+			// Manually compute correct coordinates for the event
+			int screen_x{};
+			int screen_y{};
+			gdk_window_get_origin(gtk_widget_get_window(widget), &screen_x, &screen_y);
+			auto delta =
+			    ScreenCoordinates{event_move->x_root, event_move->y_root}
+			    - ScreenCoordinates{static_cast<double>(screen_x), static_cast<double>(screen_y)};
+
+			self->m_vt.on_move_canvas(self->r_eh, *self, ToplevelCoordinates{0.0, 0.0} + delta);
 			return TRUE;
 		}
 		return FALSE;
