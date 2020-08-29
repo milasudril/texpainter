@@ -7,28 +7,9 @@
 
 #include <algorithm>
 
+
 namespace
 {
-	template<class Canvas>
-	class MakeNodeEditor
-	{
-		using NodeWidget = Texpainter::NodeEditor<Texpainter::FilterGraphEditor>;
-
-	public:
-		explicit MakeNodeEditor(Canvas& canvas): r_canvas{canvas} {}
-
-		auto operator()(auto& item) const
-		{
-			auto tmp = r_canvas.template insert<NodeWidget>(item.first, m_insert_loc, item.second);
-			return std::pair{item.first, std::move(tmp)};
-		}
-
-	private:
-		// TODO: Do not hard-code insert position?
-		Texpainter::Ui::WidgetCoordinates m_insert_loc{50.0, 50.0};
-		Canvas& r_canvas;
-	};
-
 	template<class PortIdType>
 	std::vector<PortIdType> gen_ports_ids(PortIdType initial_value, size_t n)
 	{
@@ -83,6 +64,30 @@ void Texpainter::PortMap::addConnections(Texpainter::FilterGraph::Node const& no
 	    });
 }
 
+
+namespace
+{
+	template<class Canvas>
+	class MakeNodeEditor
+	{
+		using NodeWidget = Texpainter::NodeEditor<Texpainter::FilterGraphEditor>;
+
+	public:
+		explicit MakeNodeEditor(Canvas& canvas): r_canvas{canvas} {}
+
+		auto operator()(auto& item) const
+		{
+			auto tmp = r_canvas.template insert<NodeWidget>(item.first, m_insert_loc, item.second);
+			return std::pair{item.first, std::move(tmp)};
+		}
+
+	private:
+		// TODO: Do not hard-code insert position?
+		Texpainter::Ui::WidgetCoordinates m_insert_loc{50.0, 50.0};
+		Canvas& r_canvas;
+	};
+}
+
 Texpainter::FilterGraphEditor::FilterGraphEditor(Ui::Container& owner, FilterGraph::Graph& graph)
     : r_graph{graph}
     , m_canvas{owner}
@@ -128,6 +133,44 @@ void Texpainter::FilterGraphEditor::updateLocations()
 	});
 
 	m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
+}
+
+void Texpainter::FilterGraphEditor::onClicked(NodeWidget const& src, FilterGraph::InputPort port)
+{
+	if(m_con_proc == nullptr)
+	{
+		//TODO: Start track mouse pointer and draw line from current port to mouse
+		//      cursor
+		m_con_proc = std::make_unique<FilterGraph::Connection>(src.node(), port);
+	}
+	else if(m_con_proc->sink().valid())
+	{
+		m_con_proc = std::make_unique<FilterGraph::Connection>(src.node(), port);
+	}
+	else
+	{
+		m_con_proc->sink(src.node(), port);
+		completeConnection();
+	}
+}
+
+void Texpainter::FilterGraphEditor::onClicked(NodeWidget const& src, FilterGraph::OutputPort port)
+{
+	if(m_con_proc == nullptr)
+	{
+		//TODO: Start track mouse pointer and draw line from current port to mouse
+		//      cursor
+		m_con_proc = std::make_unique<FilterGraph::Connection>(src.node(), port);
+	}
+	else if(m_con_proc->source().valid())
+	{
+		m_con_proc = std::make_unique<FilterGraph::Connection>(src.node(), port);
+	}
+	else
+	{
+		m_con_proc->source(src.node(), port);
+		completeConnection();
+	}
 }
 
 template<>
