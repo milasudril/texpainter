@@ -58,13 +58,7 @@ private:
 			    cairo_line_to(cr, b[0], b[1]);
 			    cairo_stroke(cr);
 		    });
-#if 0
-		auto const w = static_cast<uint32_t>(gtk_widget_get_allocated_width(widget));
-		auto const h = static_cast<uint32_t>(gtk_widget_get_allocated_height(widget));
-		cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, .25);
-		cairo_rectangle(cr, 0, 0, w, h);
-		cairo_fill(cr);
-#endif
+
 		return FALSE;
 	}
 };
