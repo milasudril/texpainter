@@ -40,6 +40,7 @@ namespace Texpainter
 			auto i = m_a_to_node.find(val.first);
 			if(i != std::end(m_a_to_node)) { return std::make_pair(i, false); }
 
+			m_a_to_edges.insert(std::pair{val.first, std::set<Edge<EndpointA, EndpointB>>{}});
 			auto ret = m_a_to_node.insert(i, std::move(val));
 			return std::make_pair(ret, true);
 		}
@@ -49,6 +50,7 @@ namespace Texpainter
 			auto i = m_b_to_node.find(val.first);
 			if(i != std::end(m_b_to_node)) { return std::make_pair(i, false); }
 
+			m_b_to_edges.insert(std::pair{val.first, std::set<Edge<EndpointA, EndpointB>>{}});
 			auto ret = m_b_to_node.insert(i, std::move(val));
 			return std::make_pair(ret, true);
 		}
@@ -124,6 +126,18 @@ namespace Texpainter
 		}
 
 		decltype(auto) edges() const { return IterPair{std::begin(m_edges), std::end(m_edges)}; }
+
+		auto const& edges(EndpointA a) const
+		{
+			assert(exists(a));
+			return m_a_to_edges.find(a)->second;
+		}
+
+		auto const& edges(EndpointB b) const
+		{
+			assert(exists(b));
+			return m_b_to_edges.find(b)->second;
+		}
 
 
 	private:

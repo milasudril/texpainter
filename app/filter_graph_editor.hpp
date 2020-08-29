@@ -99,6 +99,22 @@ namespace Texpainter
 
 		void removePorts(FilterGraph::Node const& node);
 
+		void removeConnection(FilterGraph::Endpoint<FilterGraph::InputPort> const& in,
+		                      FilterGraph::Endpoint<FilterGraph::OutputPort> const& out)
+		{
+			m_connectors.disconnect(m_input_port_map.find(&in.node())->second[in.port().value()],
+			                        m_output_port_map.find(&out.node())->second[in.port().value()]);
+		}
+
+		void removeConnections(FilterGraph::Endpoint<FilterGraph::InputPort> const& in)
+		{
+			std::ranges::for_each(
+			    m_connectors.edges(inputPort(in)),
+			    [&conn = m_connectors](auto const& edge) { conn.disconnect(edge.a(), edge.b()); });
+		}
+
+		void removeConnection(InputPortId a, OutputPortId b) { m_connectors.disconnect(a, b); }
+
 		template<class InputConnectorList, class OutputConnectorList>
 		void updateLocation(FilterGraph::Node const& node,
 		                    InputConnectorList const& inputs,
@@ -118,6 +134,16 @@ namespace Texpainter
 		}
 
 		auto const& connectors() const { return m_connectors; }
+
+		auto const& outputPorts(FilterGraph::Node const& node) const
+		{
+			return m_output_port_map.find(&node)->second;
+		}
+
+		InputPortId inputPort(FilterGraph::Endpoint<FilterGraph::InputPort> const& sink) const
+		{
+			return m_input_port_map.find(&sink.node())->second[sink.port().value()];
+		}
 
 	private:
 		InputPortId m_port_id_in{0};
@@ -208,6 +234,7 @@ namespace Texpainter
 
 		void connectionOk(FilterGraph::Connection const& conn)
 		{
+			m_ports.removeConnections(conn.sink());
 			establish(conn);
 			m_ports.addConnection(conn.sink(), conn.source());
 			// TODO: Remove any conflicting connections
