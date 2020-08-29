@@ -88,6 +88,8 @@ namespace Texpainter
 			                     m_output_port_map.find(&out.node())->second[out.port().value()]);
 		}
 
+		void removePorts(FilterGraph::Node const& node);
+
 		template<class InputConnectorList, class OutputConnectorList>
 		void updateLocation(FilterGraph::Node const& node,
 		                    InputConnectorList const& inputs,
@@ -256,19 +258,8 @@ namespace Texpainter
 	    Ui::MenuItem&)
 	{
 		auto node = r_graph.node(m_sel_node);
-
-		std::ranges::for_each(
-		    m_ports.m_output_port_map.find(node)->second,
-		    [&connections = m_ports.m_connectors](auto item) { connections.remove(item); });
-		m_ports.m_output_port_map.erase(node);
-
-		std::ranges::for_each(
-		    m_ports.m_input_port_map.find(node)->second,
-		    [&connections = m_ports.m_connectors](auto item) { connections.remove(item); });
-		m_ports.m_input_port_map.erase(node);
-
+		m_ports.removePorts(*node);
 		m_node_editors.erase(m_sel_node);
-
 		r_graph.erase(m_sel_node);
 		m_linesegs->lineSegments(resolveLineSegs(m_ports.m_connectors));
 	}

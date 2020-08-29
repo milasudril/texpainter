@@ -57,6 +57,17 @@ void Texpainter::PortMap::addPorts(Texpainter::FilterGraph::Node& node)
 	m_output_port_map.insert(std::pair{&node, std::move(output_port_ids)});
 }
 
+void Texpainter::PortMap::removePorts(FilterGraph::Node const& node)
+{
+	std::ranges::for_each(m_output_port_map.find(&node)->second,
+	                      [&connections = m_connectors](auto item) { connections.remove(item); });
+	m_output_port_map.erase(&node);
+
+	std::ranges::for_each(m_input_port_map.find(&node)->second,
+	                      [&connections = m_connectors](auto item) { connections.remove(item); });
+	m_input_port_map.erase(&node);
+}
+
 void Texpainter::PortMap::addConnections(Texpainter::FilterGraph::Node const& node)
 {
 	std::ranges::for_each(
