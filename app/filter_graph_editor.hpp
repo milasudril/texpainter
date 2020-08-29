@@ -215,6 +215,17 @@ namespace Texpainter
 
 		FilterGraphEditor& insert(std::unique_ptr<FilterGraph::AbstractImageProcessor> node);
 
+		template<auto id, class EventHandler>
+		FilterGraphEditor& eventHandler(EventHandler& eh)
+		{
+			r_eh       = &eh;
+			r_callback = [](void* eh, FilterGraphEditor& src) {
+				auto self = reinterpret_cast<EventHandler*>(eh);
+				self->template graphUpdated<id>(src);
+			};
+			return *this;
+		}
+
 		template<ControlId>
 		void onMouseDown(Canvas& src,
 		                 Ui::WidgetCoordinates,
@@ -255,12 +266,15 @@ namespace Texpainter
 			r_graph.clearValidationState();
 			m_ports.addConnection(conn.sink(), conn.source());
 			m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
+			r_callback(r_eh, *this);
 		}
 
 		void updateLocations();
 
 	private:
 		FilterGraph::Graph& r_graph;
+		void* r_eh;
+		void (*r_callback)(void*, FilterGraphEditor&);
 
 		PortMap m_ports;
 
@@ -325,6 +339,7 @@ namespace Texpainter
 		m_node_editors.erase(m_sel_node);
 		r_graph.erase(m_sel_node);
 		m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
+		r_callback(r_eh, *this);
 	}
 
 	template<>

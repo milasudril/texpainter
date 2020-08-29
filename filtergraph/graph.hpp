@@ -153,10 +153,7 @@ namespace Texpainter::FilterGraph
 			return m_valid_state == ValidationState::ValidatedValid;
 		}
 
-		void clearValidationState()
-		{
-			m_valid_state = ValidationState::NotValidated;
-		}
+		void clearValidationState() { m_valid_state = ValidationState::NotValidated; }
 
 	private:
 		ImageSource<RgbaValue>* r_input;

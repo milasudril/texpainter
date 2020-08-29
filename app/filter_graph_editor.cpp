@@ -90,6 +90,7 @@ namespace
 
 Texpainter::FilterGraphEditor::FilterGraphEditor(Ui::Container& owner, FilterGraph::Graph& graph)
     : r_graph{graph}
+    , r_callback{[](void*, FilterGraphEditor&) {}}
     , m_canvas{owner}
     , m_node_copy{m_node_menu, "Copy"}
     , m_node_delete{m_node_menu, "Delete"}

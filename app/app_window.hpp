@@ -146,6 +146,9 @@ namespace Texpainter
 		template<ControlId>
 		void confirmPositive(FxBlendEditorDlg&);
 
+		template<ControlId>
+		void graphUpdated(FilterGraphEditor&);
+
 		void onKeyDown(Ui::Scancode key);
 
 		void onKeyUp(Ui::Scancode key);
@@ -164,6 +167,7 @@ namespace Texpainter
 				m_fx_blend_editor_dlg = std::make_unique<FxBlendEditorDlg>(
 				    m_rows, "Effects and blend mode", layer->filterGraph());
 				m_fx_blend_editor_dlg->eventHandler<ControlId::FxBlendEditor>(*this);
+				m_fx_blend_editor_dlg->widget().eventHandler<ControlId::FxBlendEditor>(*this);
 			}
 		}
 
@@ -360,6 +364,12 @@ namespace Texpainter
 	inline void AppWindow::confirmPositive<AppWindow::ControlId::FxBlendEditor>(FxBlendEditorDlg&)
 	{
 		m_fx_blend_editor_dlg.reset();
+	}
+
+	template<>
+	inline void AppWindow::graphUpdated<AppWindow::ControlId::FxBlendEditor>(FilterGraphEditor&)
+	{
+		doRender();
 	}
 }
 
