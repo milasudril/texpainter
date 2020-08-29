@@ -14,13 +14,14 @@
 #include "ui/line_segment_renderer.hpp"
 #include "ui/menu.hpp"
 #include "ui/menu_item.hpp"
-#include "utils/dynamic_mesh.hpp"
+#include "utils/edge_list.hpp"
 
 #include <limits>
 #include <cassert>
 
 namespace Texpainter
 {
+	template<auto Tag>
 	class PortId
 	{
 	public:
@@ -53,7 +54,14 @@ namespace Texpainter
 		uint64_t m_value;
 	};
 
-	constexpr PortId operator+(PortId a, uint64_t offset) { return a += offset; }
+	template<auto Tag>
+	constexpr PortId<Tag> operator+(PortId<Tag> a, uint64_t offset)
+	{
+		return a += offset;
+	}
+
+	using InputPortId  = PortId<FilterGraph::PortType::Input>;
+	using OutputPortId = PortId<FilterGraph::PortType::Output>;
 
 	template<class Mesh, class IdArrayIterator>
 	class ConnectorMove
@@ -67,7 +75,7 @@ namespace Texpainter
 
 		void operator()(auto const& item)
 		{
-			r_connectors.moveTo(*m_iter, item.location());
+			r_connectors.node(*m_iter) = item.location();
 			++m_iter;
 		}
 
@@ -112,11 +120,12 @@ namespace Texpainter
 		auto const& connectors() const { return m_connectors; }
 
 	private:
-		PortId m_current_port_id{0};
+		InputPortId m_port_id_in{0};
+		OutputPortId m_port_id_out{0};
 
-		DynamicMesh<PortId, Ui::ToplevelCoordinates> m_connectors;
-		std::map<FilterGraph::Node const*, std::vector<PortId>> m_input_port_map;
-		std::map<FilterGraph::Node const*, std::vector<PortId>> m_output_port_map;
+		EdgeList<InputPortId, OutputPortId, Ui::ToplevelCoordinates> m_connectors;
+		std::map<FilterGraph::Node const*, std::vector<InputPortId>> m_input_port_map;
+		std::map<FilterGraph::Node const*, std::vector<OutputPortId>> m_output_port_map;
 	};
 
 

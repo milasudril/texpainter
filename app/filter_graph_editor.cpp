@@ -29,9 +29,10 @@ namespace
 		Canvas& r_canvas;
 	};
 
-	std::vector<Texpainter::PortId> gen_ports_ids(Texpainter::PortId initial_value, size_t n)
+	template<class PortIdType>
+	std::vector<PortIdType> gen_ports_ids(PortIdType initial_value, size_t n)
 	{
-		std::vector<Texpainter::PortId> ret;
+		std::vector<PortIdType> ret;
 		ret.reserve(n);
 		std::copy_n(Texpainter::IntegerSequenceIterator{initial_value}, n, std::back_inserter(ret));
 		return ret;
@@ -40,11 +41,11 @@ namespace
 
 void Texpainter::PortMap::addPorts(Texpainter::FilterGraph::Node& node)
 {
-	auto input_port_ids = gen_ports_ids(m_current_port_id, node.inputPorts().size());
-	m_current_port_id += input_port_ids.size();
+	auto input_port_ids = gen_ports_ids(m_port_id_in, node.inputPorts().size());
+	m_port_id_in += input_port_ids.size();
 
-	auto output_port_ids = gen_ports_ids(m_current_port_id, node.outputPorts().size());
-	m_current_port_id += output_port_ids.size();
+	auto output_port_ids = gen_ports_ids(m_port_id_out, node.outputPorts().size());
+	m_port_id_out += output_port_ids.size();
 
 	auto insert_connector = [&connectors = m_connectors](auto port_id) {
 		connectors.insert(std::pair{port_id, Texpainter::Ui::ToplevelCoordinates{0.0, 0.0}});
