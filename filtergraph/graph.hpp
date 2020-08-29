@@ -71,7 +71,7 @@ namespace Texpainter::FilterGraph
 
 		PixelStore::Image process(Span2d<RgbaValue const> input, bool force_update = true) const
 		{
-			assert(validate(*this) == ValidationResult::NoError);
+			assert(valid());
 			r_input->source(input);
 			PixelStore::Image ret{input.size()};
 			r_output->sink(ret.pixels());
@@ -139,11 +139,29 @@ namespace Texpainter::FilterGraph
 
 		auto currentId() const { return m_current_id; }
 
+		bool valid() const
+		{
+			if(m_valid_state == ValidationState::NotValidated) [[unlikely]]
+				{
+					m_valid_state = validate(*this) == ValidationResult::NoError
+					                    ? ValidationState::ValidatedValid
+					                    : ValidationState::ValidatedNotValid;
+				}
+			return m_valid_state == ValidationState::ValidatedValid;
+		}
+
 	private:
 		ImageSource<RgbaValue>* r_input;
 		ImageSink* r_output;
 		Node* r_input_node;
 		Node* r_output_node;
+		enum class ValidationState : size_t
+		{
+			NotValidated,
+			ValidatedNotValid,
+			ValidatedValid
+		};
+		mutable ValidationState m_valid_state;
 		std::map<NodeId, Node> m_nodes;
 		NodeId m_current_id;
 	};
