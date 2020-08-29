@@ -7,15 +7,16 @@ Utility application that can be used to create repeatable textures
  * Wrap-around paint (done)
  * Export to exr
  * Different noise generation tools (Filtered noise, Cracks, and Voronoi)
+ * "Real time" image filters (in progress)
  * Import image
- * Layer stack (locrot transform + mirror symmetry)
+ * Layer stack (locrot transform + mirror symmetry) (done)
 
 ## How to compile
 
 ### On *ubuntu
 
  1. Install libfftw3-dev, and libgtk+-3.0-dev. If you do not have it, also install g++
-	version 10 or later, since the code uses some new features from C++20.
+    version 10 or later, since the code uses some new features from C++20.
  2. Install maike, currently avaiable in the ppa https://launchpad.net/~milasudril/+archive/ubuntu/maike
     That is,
 
