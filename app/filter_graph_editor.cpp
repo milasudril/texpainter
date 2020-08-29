@@ -126,7 +126,7 @@ void Texpainter::FilterGraphEditor::updateLocations()
 		ports.updateLocation(item.second->node(), item.second->inputs(), item.second->outputs());
 	});
 
-	m_linesegs->lineSegments(resolveLineSegs(m_ports.m_connectors));
+	m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
 }
 
 template<>
@@ -139,5 +139,5 @@ void Texpainter::FilterGraphEditor::onMove<Texpainter::FilterGraphEditor::Contro
 	auto const& editor = *(node_edit_iter->second);
 	m_ports.updateLocation(editor.node(), editor.inputs(), editor.outputs());
 
-	m_linesegs->lineSegments(resolveLineSegs(m_ports.m_connectors));
+	m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
 }

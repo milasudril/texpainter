@@ -76,8 +76,9 @@ namespace Texpainter
 		IdArrayIterator m_iter;
 	};
 
-	struct PortMap
+	class PortMap
 	{
+	public:
 		void addPorts(FilterGraph::Node& node);
 		void addConnections(FilterGraph::Node const& node);
 
@@ -108,6 +109,9 @@ namespace Texpainter
 			}
 		}
 
+		auto const& connectors() const { return m_connectors; }
+
+	private:
 		PortId m_current_port_id{0};
 
 		DynamicMesh<PortId, Ui::ToplevelCoordinates> m_connectors;
@@ -199,7 +203,7 @@ namespace Texpainter
 			m_ports.addConnection(conn.sink(), conn.source());
 			// TODO: Remove any conflicting connections
 
-			m_linesegs->lineSegments(resolveLineSegs(m_ports.m_connectors));
+			m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
 		}
 
 		void updateLocations();
@@ -261,7 +265,7 @@ namespace Texpainter
 		m_ports.removePorts(*node);
 		m_node_editors.erase(m_sel_node);
 		r_graph.erase(m_sel_node);
-		m_linesegs->lineSegments(resolveLineSegs(m_ports.m_connectors));
+		m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
 	}
 
 	template<>
