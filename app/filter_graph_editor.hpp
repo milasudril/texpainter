@@ -123,14 +123,14 @@ namespace Texpainter
 
 		void removeDummyConnection(FilterGraph::Endpoint<FilterGraph::InputPort> const& in)
 		{
-			m_connectors.disconnect(m_input_port_map.find(&in.node())->second[in.port().value()],
-			                        OutputPortId{0});
+			if(auto i = m_input_port_map.find(&in.node()); i != std::end(m_input_port_map))
+			{ m_connectors.disconnect(i->second[in.port().value()], OutputPortId{0}); }
 		}
 
 		void removeDummyConnection(FilterGraph::Endpoint<FilterGraph::OutputPort> const& out)
 		{
-			m_connectors.disconnect(
-			    InputPortId{0}, m_output_port_map.find(&out.node())->second[out.port().value()]);
+			if(auto i = m_output_port_map.find(&out.node()); i != std::end(m_output_port_map))
+			{ m_connectors.disconnect(InputPortId{0}, i->second[out.port().value()]); }
 		}
 
 		void moveDummyConnectors(Texpainter::Ui::ToplevelCoordinates loc)
@@ -342,7 +342,7 @@ namespace Texpainter
 				if(m_con_proc != nullptr)
 				{
 					m_ports.removeDummyConnection(m_con_proc->sink());
-					m_ports.removeDummyConnection(m_con_proc - source());
+					m_ports.removeDummyConnection(m_con_proc->source());
 					m_con_proc.reset();
 					m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
 				}

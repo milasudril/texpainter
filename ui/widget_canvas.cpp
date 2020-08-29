@@ -20,7 +20,13 @@ public:
 	{
 		switch(m_ins_mode)
 		{
-			case InsertMode::Fixed: gtk_overlay_add_overlay(m_handle, handle); break;
+			case InsertMode::Fixed:
+				gtk_widget_set_events(handle,
+				                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK
+				                          | GDK_BUTTON_RELEASE_MASK);
+				g_signal_connect(handle, "button-release-event", G_CALLBACK(canvas_mouse_up), this);
+				gtk_overlay_add_overlay(m_handle, handle);
+				break;
 			case InsertMode::Movable:
 				auto frame = GTK_FRAME(gtk_frame_new(nullptr));
 				gtk_frame_set_shadow_type(frame, GTK_SHADOW_OUT);
@@ -226,6 +232,7 @@ private:
 			                              WidgetCoordinates{e->x, e->y},
 			                              ScreenCoordinates{e->x_root, e->y_root},
 			                              e->button);
+			return TRUE;
 		}
 		return FALSE;
 	}
@@ -254,7 +261,6 @@ Texpainter::Ui::WidgetCanvasDetail::Impl::Impl(Container& cnt)
 	gtk_widget_set_events(
 	    widget, GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 	g_signal_connect(widget, "motion-notify-event", G_CALLBACK(canvas_mouse_move), this);
-	g_signal_connect(widget, "button-release-event", G_CALLBACK(canvas_mouse_up), this);
 
 	cnt.add(widget);
 	m_moving = nullptr;
