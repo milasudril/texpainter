@@ -123,3 +123,14 @@ std::unique_ptr<Texpainter::FilterGraph::AbstractImageProcessor> Texpainter::
 	auto i = name_to_processor.find(name);
 	return i != nullptr ? (*i)() : nullptr;
 }
+
+std::span<Texpainter::FilterGraph::ImageProcessorId const> Texpainter::ImageProcessorRegistry::
+    processorIds()
+{
+	return id_to_processor.keys();
+}
+
+std::span<char const* const> Texpainter::ImageProcessorRegistry::processorNames()
+{
+	return name_to_processor.keys();
+}
