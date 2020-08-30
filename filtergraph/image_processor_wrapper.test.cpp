@@ -31,6 +31,11 @@ namespace
 
 		static constexpr char const* name() { return "Stub"; }
 
+		static constexpr auto id()
+		{
+			return Texpainter::FilterGraph::ImageProcessorId{"61ffe9104bb6e21b4c95dd062afacdac"};
+		}
+
 		void set(Texpainter::FilterGraph::ParamName name, Texpainter::FilterGraph::ParamValue val)
 		{
 			param_name_asked_for = &name;

@@ -7,6 +7,7 @@
 
 #include "./proctypes.hpp"
 #include "./img_proc_arg.hpp"
+#include "./image_processor_id.hpp"
 
 #include <cassert>
 
@@ -35,6 +36,8 @@ namespace Texpainter::FilterGraph
 		std::span<ParamValue const> paramValues() const { return std::span<ParamValue const>{}; }
 
 		static constexpr char const* name() { return "Layer output"; }
+
+		static constexpr auto id() { return ImageProcessorId{"4332d23feb31f1daf36caf312aca0911"}; }
 
 		void sink(Span2d<RgbaValue> val) { r_pixels = val; }
 

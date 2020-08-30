@@ -8,6 +8,7 @@
 
 #include "filtergraph/proctypes.hpp"
 #include "filtergraph/img_proc_arg.hpp"
+#include "filtergraph/image_processor_id.hpp"
 
 namespace RgbaSplit
 {
@@ -15,10 +16,13 @@ namespace RgbaSplit
 	using PixelType  = Texpainter::FilterGraph::PixelType;
 	using ParamValue = Texpainter::FilterGraph::ParamValue;
 	using ParamName  = Texpainter::FilterGraph::ParamName;
+
 	template<class T>
 	using ImgProcArg = Texpainter::FilterGraph::ImgProcArg<T>;
-	using RgbaValue  = Texpainter::FilterGraph::RgbaValue;
-	using RealValue  = Texpainter::FilterGraph::RealValue;
+
+	using RgbaValue        = Texpainter::FilterGraph::RgbaValue;
+	using RealValue        = Texpainter::FilterGraph::RealValue;
+	using ImageProcessorId = Texpainter::FilterGraph::ImageProcessorId;
 
 	class ImageProcessor
 	{
@@ -45,6 +49,8 @@ namespace RgbaSplit
 		std::span<ParamValue const> paramValues() const { return std::span<ParamValue const>{}; }
 
 		static constexpr char const* name() { return "RGBA split"; }
+
+		static constexpr auto id() { return ImageProcessorId{"369c906fb7cfe8a1e10f5e8012ab5e60"}; }
 
 	private:
 	};

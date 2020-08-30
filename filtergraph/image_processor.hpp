@@ -6,6 +6,7 @@
 #define TEXPAINTER_FILTERGRAPH_IMAGEPROCESSOR_HPP
 
 #include "./img_proc_arg.hpp"
+#include "./image_processor_id.hpp"
 #include "./img_proc_interface_descriptor.hpp"
 
 #include "utils/memblock.hpp"
@@ -40,6 +41,11 @@ namespace Texpainter::FilterGraph
 			T::name()
 		}
 		->std::same_as<char const*>;
+
+		{
+			T::id()
+		}
+		->std::same_as<ImageProcessorId>;
 	}
 	&&std::copy_constructible<T>;
 }

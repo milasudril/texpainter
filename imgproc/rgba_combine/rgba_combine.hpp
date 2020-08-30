@@ -8,6 +8,7 @@
 
 #include "filtergraph/proctypes.hpp"
 #include "filtergraph/img_proc_arg.hpp"
+#include "filtergraph/image_processor_id.hpp"
 
 namespace RgbaCombine
 {
@@ -15,10 +16,13 @@ namespace RgbaCombine
 	using PixelType  = Texpainter::FilterGraph::PixelType;
 	using ParamValue = Texpainter::FilterGraph::ParamValue;
 	using ParamName  = Texpainter::FilterGraph::ParamName;
+
 	template<class T>
 	using ImgProcArg = Texpainter::FilterGraph::ImgProcArg<T>;
-	using RgbaValue  = Texpainter::FilterGraph::RgbaValue;
-	using RealValue  = Texpainter::FilterGraph::RealValue;
+
+	using RgbaValue        = Texpainter::FilterGraph::RgbaValue;
+	using RealValue        = Texpainter::FilterGraph::RealValue;
+	using ImageProcessorId = Texpainter::FilterGraph::ImageProcessorId;
 
 	class ImageProcessor
 	{
@@ -44,6 +48,8 @@ namespace RgbaCombine
 		std::span<ParamValue const> paramValues() const { return std::span<ParamValue const>{}; }
 
 		static constexpr char const* name() { return "RGBA combine"; }
+
+		static constexpr auto id() { return ImageProcessorId{"2f1a5a2f195dde21a8629191e66fdb2d"}; }
 
 	private:
 	};
