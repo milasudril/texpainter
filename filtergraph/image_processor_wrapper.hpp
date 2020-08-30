@@ -115,7 +115,7 @@ namespace Texpainter::FilterGraph
 	};
 
 	template<ImageProcessor Proc>
-	decltype(auto) createProcInstance()
+	std::unique_ptr<AbstractImageProcessor> createProcInstance()
 	{
 		return std::make_unique<ImageProcessorWrapper<Proc>>(Proc{});
 	}

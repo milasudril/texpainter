@@ -10,6 +10,7 @@
 
 #include "filtergraph/graph.hpp"
 #include "filtergraph/connection.hpp"
+#include "imgproc/image_processor_registry.hpp"
 #include "ui/widget_canvas.hpp"
 #include "ui/line_segment_renderer.hpp"
 #include "ui/menu.hpp"

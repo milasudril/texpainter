@@ -27,6 +27,8 @@ namespace Texpainter::FilterGraph
 	class ImageProcessorId
 	{
 	public:
+		ImageProcessorId() = default;
+
 		template<size_t N>
 		consteval explicit ImageProcessorId(char const (&id)[N])
 		{
