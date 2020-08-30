@@ -65,7 +65,7 @@ namespace Texpainter
 
 		constexpr auto find(key_type const& key) const
 		{
-			if(auto i = keyIndex(key); i != std::numeric_limits<size_t>()) [[likely]]
+			if(auto i = keyIndex(key); i != std::numeric_limits<size_t>::max()) [[likely]]
 				{
 					return std::begin(m_vals) + i;
 				}
