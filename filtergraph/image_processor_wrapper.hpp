@@ -104,6 +104,8 @@ namespace Texpainter::FilterGraph
 
 		char const* name() const override { return Proc::name(); }
 
+		ImageProcessorId id() const override { return Proc::id(); }
+
 		Proc const& processor() const { return m_proc; }
 
 		Proc& processor() { return m_proc; }

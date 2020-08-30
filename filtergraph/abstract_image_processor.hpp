@@ -7,6 +7,7 @@
 
 #include "./node_argument.hpp"
 #include "./proctypes.hpp"
+#include "./image_processor_id.hpp"
 
 #include "utils/memblock.hpp"
 
@@ -28,6 +29,7 @@ namespace Texpainter::FilterGraph
 		virtual AbstractImageProcessor& set(ParamName param_name, ParamValue value)           = 0;
 		virtual std::unique_ptr<AbstractImageProcessor> clone() const                         = 0;
 		virtual char const* name() const                                                      = 0;
+		virtual ImageProcessorId id() const                                                   = 0;
 		virtual ~AbstractImageProcessor() = default;
 	};
 }
