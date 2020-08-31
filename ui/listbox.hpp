@@ -33,7 +33,7 @@ namespace Texpainter::Ui
 
 		int selected() const noexcept;
 
-		Listbox& clear() noexcept;
+		Listbox& scrollIntoView(int row) noexcept;
 
 		template<auto id, class EventHandler>
 		Listbox& eventHandler(EventHandler& eh)

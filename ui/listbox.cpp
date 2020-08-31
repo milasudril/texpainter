@@ -51,6 +51,16 @@ public:
 		r_func = func;
 	}
 
+	void scrollIntoView(int index)
+	{
+		auto row = m_index_row[index];
+		int x{};
+		int y{};
+		gtk_widget_translate_coordinates(GTK_WIDGET(row), GTK_WIDGET(m_handle), 0, 0, &x, &y);
+		auto adjustment = gtk_list_box_get_adjustment(m_handle);
+		gtk_adjustment_set_value(adjustment, static_cast<double>(y) - 0.33*gtk_adjustment_get_page_size(adjustment));
+	}
+
 private:
 	void* r_eh;
 	EventHandlerFunc r_func;
@@ -109,4 +119,10 @@ Texpainter::Ui::Listbox::Impl::~Impl()
 	m_impl = nullptr;
 	r_eh   = nullptr;
 	gtk_widget_destroy(GTK_WIDGET(m_handle));
+}
+
+Texpainter::Ui::Listbox& Texpainter::Ui::Listbox::scrollIntoView(int row) noexcept
+{
+	m_impl->scrollIntoView(row);
+	return *this;
 }
