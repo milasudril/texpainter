@@ -64,7 +64,7 @@ private:
 		return FALSE;
 	}
 
-	static void size_callback(GtkWidget* widget, GdkRectangle* allocation, gpointer self)
+	static void size_callback(GtkWidget* widget, GdkRectangle* allocation, gpointer)
 	{
 		auto const h = allocation->height;
 		gtk_widget_set_size_request(widget, h, -1);
@@ -82,7 +82,7 @@ private:
 		return TRUE;
 	}
 
-	static gboolean on_mouse_down(GtkWidget* w, GdkEvent* e, gpointer self)
+	static gboolean on_mouse_down(GtkWidget*, GdkEvent* e, gpointer self)
 	{
 		auto& obj         = *reinterpret_cast<Impl*>(self);
 		auto event_button = reinterpret_cast<GdkEventButton const*>(e);

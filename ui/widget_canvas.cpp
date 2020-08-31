@@ -186,7 +186,7 @@ private:
 		return FALSE;
 	}
 
-	static gboolean button_release(GtkWidget* widget, GdkEvent* event, gpointer user_data)
+	static gboolean button_release(GtkWidget*, GdkEvent*, gpointer user_data)
 	{
 		auto self      = reinterpret_cast<Impl*>(user_data);
 		self->m_moving = nullptr;
@@ -221,7 +221,7 @@ private:
 		}
 		return FALSE;
 	}
-	static gboolean canvas_mouse_up(GtkWidget* widget, GdkEvent* event, gpointer user_data)
+	static gboolean canvas_mouse_up(GtkWidget*, GdkEvent* event, gpointer user_data)
 	{
 		auto self = reinterpret_cast<Impl*>(user_data);
 		if(self->r_eh != nullptr)
@@ -240,14 +240,14 @@ private:
 
 Texpainter::Ui::WidgetCanvasDetail::WidgetDeleter::WidgetDeleter(
     std::reference_wrapper<Impl> impl) noexcept
-    : r_impl{impl}
-    , m_id{r_impl.get().clientId()}
+    : r_impl{&impl.get()}
+    , m_id{r_impl->clientId()}
 {
 }
 
 void Texpainter::Ui::WidgetCanvasDetail::WidgetDeleter::do_cleanup() noexcept
 {
-	r_impl.get().removeParentsFor(m_id);
+	if(r_impl != nullptr) { r_impl->removeParentsFor(m_id); }
 }
 
 

@@ -196,7 +196,7 @@ private:
 		return FALSE;
 	}
 
-	static gboolean on_mouse_down(GtkWidget* w, GdkEvent* e, gpointer self)
+	static gboolean on_mouse_down(GtkWidget*, GdkEvent* e, gpointer self)
 	{
 		auto& obj = *reinterpret_cast<Impl*>(self);
 		if(obj.r_eh != nullptr)
@@ -250,7 +250,7 @@ private:
 		return TRUE;
 	}
 
-	static gboolean on_key_press(GtkWidget* widget, GdkEvent* event, gpointer self)
+	static gboolean on_key_press(GtkWidget*, GdkEvent* event, gpointer self)
 	{
 		auto obj      = reinterpret_cast<Impl*>(self);
 		auto& key     = event->key;
@@ -263,7 +263,7 @@ private:
 		return TRUE;
 	}
 
-	static gboolean on_key_release(GtkWidget* widget, GdkEvent* event, gpointer self)
+	static gboolean on_key_release(GtkWidget*, GdkEvent* event, gpointer self)
 	{
 		auto obj      = reinterpret_cast<Impl*>(self);
 		auto& key     = event->key;
@@ -311,7 +311,7 @@ Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::focus()
 	return *this;
 }
 
-Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::alwaysEmitMouseEvents(bool status)
+Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::alwaysEmitMouseEvents(bool)
 {
 	m_impl->alwaysEmitMouseEvents(true);
 	return *this;

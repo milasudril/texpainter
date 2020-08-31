@@ -144,7 +144,7 @@ Texpainter::Ui::Button::Impl::~Impl()
 	gtk_widget_destroy(GTK_WIDGET(m_handle));
 }
 
-void Texpainter::Ui::Button::Impl::clicked(GtkWidget* widget, gpointer data)
+void Texpainter::Ui::Button::Impl::clicked(GtkWidget*, gpointer data)
 {
 	auto self = reinterpret_cast<Impl*>(data);
 	if(self->r_eh != nullptr) { self->r_func(self->r_eh, *self); }

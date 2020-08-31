@@ -471,7 +471,7 @@ void Texpainter::AppWindow::onKeyUp(Ui::Scancode key)
 
 template<>
 void Texpainter::AppWindow::onMouseDown<Texpainter::AppWindow::ControlId::Canvas>(
-    Ui::ImageView& view, vec2_t loc_window, vec2_t loc_screen, int button)
+    Ui::ImageView& view, vec2_t loc_window, vec2_t, int button)
 {
 	m_mouse_state |= 1 << (button - 1);
 	auto loc = ::toLogicalCoordinates(view.imageSize(), loc_window);
@@ -489,9 +489,9 @@ void Texpainter::AppWindow::onMouseDown<Texpainter::AppWindow::ControlId::Canvas
 }
 
 template<>
-void Texpainter::AppWindow::onMouseUp<Texpainter::AppWindow::ControlId::Canvas>(Ui::ImageView& view,
-                                                                                vec2_t loc_window,
-                                                                                vec2_t loc_screen,
+void Texpainter::AppWindow::onMouseUp<Texpainter::AppWindow::ControlId::Canvas>(Ui::ImageView&,
+                                                                                vec2_t,
+                                                                                vec2_t,
                                                                                 int button)
 {
 	m_mouse_state &= ~(1 << (button - 1));
@@ -500,7 +500,7 @@ void Texpainter::AppWindow::onMouseUp<Texpainter::AppWindow::ControlId::Canvas>(
 
 template<>
 void Texpainter::AppWindow::onMouseMove<Texpainter::AppWindow::ControlId::Canvas>(
-    Ui::ImageView& view, vec2_t loc_window, vec2_t loc_screen)
+    Ui::ImageView& view, vec2_t loc_window, vec2_t)
 {
 	if(auto layer = currentLayer(*m_current_document); layer != nullptr)
 	{

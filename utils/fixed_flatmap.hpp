@@ -26,16 +26,16 @@ namespace Texpainter
 	class FixedFlatmap
 	{
 	public:
-		using key_type    = std::remove_reference_t<decltype(Keys::items[0])>;
+		using key_type    = std::decay_t<decltype(Keys::items[0])>;
 		using mapped_type = Value;
 
 		static constexpr auto size() { return std::size(Keys::items); }
 
-		static constexpr auto const keys() { return s_keys; }
+		static constexpr auto const& keys() { return s_keys; }
 
-		constexpr auto const values() const { return m_vals; }
+		constexpr auto const& values() const { return m_vals; }
 
-		constexpr auto values() { return m_vals; }
+		constexpr auto& values() { return m_vals; }
 
 		template<class KeyLike>
 		static constexpr auto keyIndex(KeyLike const& key)

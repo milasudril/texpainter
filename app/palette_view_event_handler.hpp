@@ -44,7 +44,7 @@ namespace Texpainter
 		}
 
 		template<auto>
-		void onMouseDown(Texpainter::Ui::PaletteView& view, PixelStore::ColorIndex, int)
+		void onMouseDown(Texpainter::Ui::PaletteView&, PixelStore::ColorIndex, int)
 		{
 		}
 

@@ -84,7 +84,7 @@ namespace Texpainter::Ui
 	std::array<Button, N> buttons_create(Container& cnt);
 
 	template<>
-	inline std::array<Button, 0> buttons_create<0>(Container& cnt)
+	inline std::array<Button, 0> buttons_create<0>(Container&)
 	{
 		return std::array<Button, 0>{};
 	}
@@ -226,7 +226,7 @@ namespace Texpainter::Ui
 		}
 
 		template<auto id>
-		void onClose(Window& win)
+		void onClose(Window&)
 		{
 			if(has_dismiss()) { m_vtable.dismiss(r_cb_obj, *this); }
 			else
@@ -236,7 +236,7 @@ namespace Texpainter::Ui
 		}
 
 		template<auto id>
-		void onKeyDown(Window& win, Scancode scancode)
+		void onKeyDown(Window&, Scancode scancode)
 		{
 			switch(scancode.value())
 			{
@@ -255,7 +255,7 @@ namespace Texpainter::Ui
 		}
 
 		template<auto id>
-		void onKeyUp(Window& win, Scancode)
+		void onKeyUp(Window&, Scancode)
 		{
 		}
 
@@ -382,7 +382,7 @@ namespace Texpainter::Ui
 		public:
 			Vtable() {}
 			template<class IdTag, class Callback>
-			explicit Vtable(IdTag tag, Callback& cb) noexcept
+			explicit Vtable(IdTag tag, Callback&) noexcept
 			{
 				Dismiss::value(call<tag.value, Dismiss, Callback, has_dismiss()>::callback);
 				ConfirmNeg::value(

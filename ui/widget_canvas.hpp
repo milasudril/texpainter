@@ -108,6 +108,8 @@ namespace Texpainter::Ui
 		class WidgetDeleter
 		{
 		public:
+			WidgetDeleter(): r_impl{nullptr} {}
+
 			explicit WidgetDeleter(std::reference_wrapper<Impl> impl) noexcept;
 
 			template<class WidgetType>
@@ -118,7 +120,7 @@ namespace Texpainter::Ui
 			}
 
 		private:
-			std::reference_wrapper<Impl> r_impl;
+			Impl* r_impl;
 			ClientId m_id;
 			void do_cleanup() noexcept;
 		};

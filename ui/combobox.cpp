@@ -52,7 +52,7 @@ private:
 	EventHandlerFunc r_func;
 	GtkComboBoxText* m_handle;
 
-	static void changed_callback(GtkComboBox* widget, void* listboxgtk)
+	static void changed_callback(GtkComboBox*, void* listboxgtk)
 	{
 		auto self = reinterpret_cast<Impl*>(listboxgtk);
 		if(self->r_eh != nullptr) { self->r_func(self->r_eh, *self); }

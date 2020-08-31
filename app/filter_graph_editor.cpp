@@ -178,10 +178,10 @@ void Texpainter::FilterGraphEditor::onClicked(NodeWidget const& src, FilterGraph
 
 template<>
 void Texpainter::FilterGraphEditor::onMove<Texpainter::FilterGraphEditor::ControlId::NodeWidgets>(
-    Canvas& src, Ui::WidgetCoordinates loc, FilterGraph::NodeId id)
+    Canvas&, Ui::WidgetCoordinates, FilterGraph::NodeId id)
 {
 	auto node_edit_iter = m_node_editors.find(id);
-	assert(node_edit_iter != std::end(m_node_editors));
+	if(node_edit_iter == std::end(m_node_editors)) { return; }
 
 	auto const& editor = *(node_edit_iter->second);
 	m_ports.updateLocation(editor.node(), editor.inputs(), editor.outputs());

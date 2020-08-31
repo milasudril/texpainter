@@ -35,7 +35,7 @@ namespace
 
 	private:
 		std::array<Texpainter::Memblock, MaxNumOutputs> operator()(
-		    Texpainter::FilterGraph::NodeArgument const& arg) const override
+		    Texpainter::FilterGraph::NodeArgument const&) const override
 		{
 			return std::array<Texpainter::Memblock, MaxNumOutputs>{
 			    Texpainter::Memblock{1}, Texpainter::Memblock{1}, Texpainter::Memblock{1}};
@@ -83,6 +83,11 @@ namespace
 		}
 
 		char const* name() const override { return "ImageProcessorStub"; }
+
+		Texpainter::FilterGraph::ImageProcessorId id() const override
+		{
+			return Texpainter::FilterGraph::ImageProcessorId{"32520701CBF9985E5E3866051A9FC52D"};
+		}
 	};
 }
 

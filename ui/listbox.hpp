@@ -33,6 +33,8 @@ namespace Texpainter::Ui
 
 		int selected() const noexcept;
 
+		char const* get(int index) const noexcept;
+
 		Listbox& scrollIntoView(int row) noexcept;
 
 		template<auto id, class EventHandler>
@@ -40,7 +42,7 @@ namespace Texpainter::Ui
 		{
 			return eventHandler(&eh, [](void* event_handler, Listbox& self, int index) {
 				auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				obj.template onActiveted<id>(self, index);
+				obj.template onActivated<id>(self, index);
 			});
 		}
 

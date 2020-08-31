@@ -131,12 +131,12 @@ namespace Texpainter
 		void onMouseMove(Ui::ImageView& view, vec2_t loc_window, vec2_t loc_screen);
 
 		template<ControlId>
-		void onKeyDown(Ui::ImageView& view, int scancode)
+		void onKeyDown(Ui::ImageView&, int)
 		{
 		}
 
 		template<ControlId>
-		void onKeyUp(Ui::ImageView& view, int scancode)
+		void onKeyUp(Ui::ImageView&, int)
 		{
 		}
 

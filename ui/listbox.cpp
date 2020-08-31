@@ -58,7 +58,13 @@ public:
 		int y{};
 		gtk_widget_translate_coordinates(GTK_WIDGET(row), GTK_WIDGET(m_handle), 0, 0, &x, &y);
 		auto adjustment = gtk_list_box_get_adjustment(m_handle);
-		gtk_adjustment_set_value(adjustment, static_cast<double>(y) - 0.33*gtk_adjustment_get_page_size(adjustment));
+		gtk_adjustment_set_value(
+		    adjustment, static_cast<double>(y) - 0.33 * gtk_adjustment_get_page_size(adjustment));
+	}
+
+	char const* get(int index) const
+	{
+		return gtk_label_get_text(GTK_LABEL(gtk_bin_get_child(GTK_BIN(m_index_row[index]))));
 	}
 
 private:
@@ -69,7 +75,7 @@ private:
 	std::vector<GtkListBoxRow*> m_index_row;
 	std::map<GtkListBoxRow*, int> m_row_index;
 
-	static void activated(GtkListBox* box, GtkListBoxRow* row, gpointer user_data)
+	static void activated(GtkListBox*, GtkListBoxRow* row, gpointer user_data)
 	{
 		auto self = reinterpret_cast<Impl*>(user_data);
 		if(self->r_eh != nullptr)
@@ -106,11 +112,12 @@ Texpainter::Ui::Listbox& Texpainter::Ui::Listbox::eventHandler(void* event_handl
 Texpainter::Ui::Listbox::Impl::Impl(Container& cnt): Listbox(*this), r_eh{nullptr}
 {
 	auto scrolled_window = GTK_SCROLLED_WINDOW(gtk_scrolled_window_new(nullptr, nullptr));
-	auto widget = gtk_list_box_new();
-	m_handle    = GTK_LIST_BOX(widget);
+	auto widget          = gtk_list_box_new();
+	m_handle             = GTK_LIST_BOX(widget);
 	gtk_list_box_set_activate_on_single_click(m_handle, FALSE);
 	g_signal_connect(m_handle, "row-activated", G_CALLBACK(activated), this);
 	gtk_container_add(GTK_CONTAINER(scrolled_window), GTK_WIDGET(m_handle));
+	gtk_widget_set_size_request(GTK_WIDGET(scrolled_window), 300, 200);
 	cnt.add(scrolled_window);
 }
 
@@ -126,3 +133,5 @@ Texpainter::Ui::Listbox& Texpainter::Ui::Listbox::scrollIntoView(int row) noexce
 	m_impl->scrollIntoView(row);
 	return *this;
 }
+
+char const* Texpainter::Ui::Listbox::get(int index) const noexcept { return m_impl->get(index); }

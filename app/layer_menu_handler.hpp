@@ -296,7 +296,7 @@ namespace Texpainter
 			m_rename_dlg.reset();
 		}
 
-		void dismiss(Tag<ControlId::Rename>, NameInputDlg& src) { m_rename_dlg.reset(); }
+		void dismiss(Tag<ControlId::Rename>, NameInputDlg&) { m_rename_dlg.reset(); }
 
 
 		void confirmPositive(Tag<ControlId::Delete>, ConfirmationDlg& src)

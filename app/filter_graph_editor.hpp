@@ -15,6 +15,7 @@
 #include "ui/line_segment_renderer.hpp"
 #include "ui/menu.hpp"
 #include "ui/menu_item.hpp"
+#include "ui/listbox.hpp"
 #include "utils/edge_list.hpp"
 
 #include <limits>
@@ -209,7 +210,8 @@ namespace Texpainter
 		{
 			NodeWidgets,
 			CopyNode,
-			DeleteNode
+			DeleteNode,
+			FilterMenu
 		};
 
 		FilterGraphEditor(Ui::Container& owner, FilterGraph::Graph& graph);
@@ -249,6 +251,9 @@ namespace Texpainter
 		template<ControlId>
 		void onActivated(Ui::MenuItem& src);
 
+		template<ControlId>
+		void onActivated(Ui::Listbox& src, int item);
+
 		void onClicked(NodeWidget const& src, FilterGraph::InputPort port);
 
 		void onClicked(NodeWidget const& src, FilterGraph::OutputPort port);
@@ -284,6 +289,7 @@ namespace Texpainter
 		Canvas m_canvas;
 		std::unique_ptr<Ui::LineSegmentRenderer> m_linesegs;
 		std::map<FilterGraph::NodeId, Canvas::WidgetHandle<NodeWidget>> m_node_editors;
+		Canvas::WidgetHandle<Ui::Listbox> m_filtermenu;
 		Ui::Menu m_node_menu;
 		Ui::MenuItem m_node_copy;
 		Ui::MenuItem m_node_delete;
@@ -300,11 +306,7 @@ namespace Texpainter
 
 	template<>
 	inline void FilterGraphEditor::onMouseDown<FilterGraphEditor::ControlId::NodeWidgets>(
-	    Canvas& src,
-	    Ui::WidgetCoordinates,
-	    Ui::ScreenCoordinates,
-	    int button,
-	    FilterGraph::NodeId node)
+	    Canvas&, Ui::WidgetCoordinates, Ui::ScreenCoordinates, int button, FilterGraph::NodeId node)
 	{
 		if(button == 3)
 		{
@@ -318,7 +320,7 @@ namespace Texpainter
 
 	template<>
 	inline void FilterGraphEditor::onMouseMove<FilterGraphEditor::ControlId::NodeWidgets>(
-	    Canvas& src, Ui::ToplevelCoordinates loc)
+	    Canvas&, Ui::ToplevelCoordinates loc)
 	{
 		m_ports.moveDummyConnectors(loc);
 		m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
@@ -351,7 +353,7 @@ namespace Texpainter
 
 	template<>
 	inline void FilterGraphEditor::onMouseUp<FilterGraphEditor::ControlId::NodeWidgets>(
-	    Canvas&, Ui::WidgetCoordinates, Ui::ScreenCoordinates, int button)
+	    Canvas&, Ui::WidgetCoordinates loc, Ui::ScreenCoordinates, int button)
 	{
 		switch(button)
 		{
@@ -363,9 +365,27 @@ namespace Texpainter
 					m_con_proc.reset();
 					m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
 				}
+				m_filtermenu.reset();
 				break;
-			case 3: break;
+			case 3:
+				m_filtermenu.reset();  // Reset first so the same id can be reused
+				m_filtermenu = m_canvas.insert<Ui::Listbox>(
+				    FilterGraph::NodeId{static_cast<uint64_t>(-1)}, loc);
+				std::ranges::for_each(ImageProcessorRegistry::processorNames(),
+				                      [&menu = *m_filtermenu](auto item) { menu.append(item); });
+				m_filtermenu->eventHandler<ControlId::FilterMenu>(*this);
+				m_canvas.showWidgets();
+				break;
 		}
+	}
+
+	template<>
+	inline void FilterGraphEditor::onActivated<FilterGraphEditor::ControlId::FilterMenu>(
+	    Ui::Listbox& box, int item)
+	{
+		auto name = box.get(item);
+		printf("%s\n", name);
+		insert(ImageProcessorRegistry::createImageProcessor(name));
 	}
 }
 

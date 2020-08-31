@@ -93,7 +93,7 @@ Texpainter::Ui::Slider::Impl::~Impl()
 	g_object_unref(m_handle);
 }
 
-gboolean Texpainter::Ui::Slider::Impl::changed_callback(GtkWidget* widget, gpointer data)
+gboolean Texpainter::Ui::Slider::Impl::changed_callback(GtkWidget*, gpointer data)
 {
 	auto state = reinterpret_cast<Impl*>(data);
 	if(state->r_eh != nullptr) { state->r_func(state->r_eh, *state); }

@@ -253,7 +253,7 @@ private:
 		    std::min(m_colors.size(), static_cast<uint32_t>(m_n_cols * row + col))};
 	}
 
-	static void size_callback(GtkWidget* widget, GdkRectangle* allocation, gpointer self)
+	static void size_callback(GtkWidget*, GdkRectangle*, gpointer self)
 	{
 		reinterpret_cast<Impl*>(self)->recalculateWidgetSize();
 		reinterpret_cast<Impl*>(self)->update();

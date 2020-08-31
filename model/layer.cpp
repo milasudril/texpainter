@@ -99,7 +99,7 @@ void Texpainter::Model::render(Layer const& layer, Span2d<PixelStore::Pixel> ret
 
 	auto const src = layer.filterGraph().valid()
 	                     ? layer.filterGraph().process(layer.content().pixels())
-	                     : layer.content().pixels();
+	                     : layer.content();
 	auto const origin_src =
 	    0.5 * vec2_t{static_cast<double>(src.width()), static_cast<double>(src.height())};
 	auto const loc_src_ret_coord =

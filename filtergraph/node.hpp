@@ -1,5 +1,5 @@
 //@	{
-//@	 "targets":[{"name":"node_new.hpp", "type":"include"}]
+//@	 "targets":[{"name":"node.hpp", "type":"include"}]
 //@	}
 
 #ifndef TEXPAINTER_FILTERGRAPH_NODE_HPP

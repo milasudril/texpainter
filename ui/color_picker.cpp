@@ -251,7 +251,7 @@ public:
 
 
 	template<ControlId>
-	void onMouseDown(Texpainter::Ui::PaletteView& view, PixelStore::ColorIndex, int)
+	void onMouseDown(Texpainter::Ui::PaletteView&, PixelStore::ColorIndex, int)
 	{
 	}
 
@@ -380,7 +380,7 @@ void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseUp<ControlId::Colors
 
 template<>
 void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onMouseMove<ControlId::Colors>(
-    ImageView& view, vec2_t loc_window, vec2_t)
+    ImageView&, vec2_t loc_window, vec2_t)
 {
 	if(m_btn_state == 2) { updateHueSaturation(loc_window); }
 }

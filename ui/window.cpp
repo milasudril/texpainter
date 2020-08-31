@@ -145,9 +145,7 @@ Texpainter::Ui::Window::Impl::~Impl()
 	if(m_icon != nullptr) { g_object_unref(m_icon); }
 }
 
-gboolean Texpainter::Ui::Window::Impl::delete_event(GtkWidget* widget,
-                                                    GdkEvent* event,
-                                                    void* user_data)
+gboolean Texpainter::Ui::Window::Impl::delete_event(GtkWidget*, GdkEvent*, void* user_data)
 {
 	auto self = reinterpret_cast<Impl*>(user_data);
 	if(self->r_eh != nullptr) { self->m_vt.on_close(self->r_eh, *self); }

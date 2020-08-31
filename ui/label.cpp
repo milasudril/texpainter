@@ -167,9 +167,7 @@ Texpainter::Ui::Label::Impl::~Impl()
 	g_object_unref(m_handle);
 }
 
-void Texpainter::Ui::Label::Impl::size_changed(GtkWidget* widget,
-                                               GdkRectangle* allocation,
-                                               void* obj)
+void Texpainter::Ui::Label::Impl::size_changed(GtkWidget* widget, GdkRectangle*, void* obj)
 {
 	auto self = reinterpret_cast<Impl*>(obj);
 	auto w    = gtk_widget_get_allocated_width(widget);
