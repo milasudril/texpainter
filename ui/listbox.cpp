@@ -95,11 +95,13 @@ Texpainter::Ui::Listbox& Texpainter::Ui::Listbox::eventHandler(void* event_handl
 
 Texpainter::Ui::Listbox::Impl::Impl(Container& cnt): Listbox(*this), r_eh{nullptr}
 {
+	auto scrolled_window = GTK_SCROLLED_WINDOW(gtk_scrolled_window_new(nullptr, nullptr));
 	auto widget = gtk_list_box_new();
 	m_handle    = GTK_LIST_BOX(widget);
 	gtk_list_box_set_activate_on_single_click(m_handle, FALSE);
 	g_signal_connect(m_handle, "row-activated", G_CALLBACK(activated), this);
-	cnt.add(widget);
+	gtk_container_add(GTK_CONTAINER(scrolled_window), GTK_WIDGET(m_handle));
+	cnt.add(scrolled_window);
 }
 
 Texpainter::Ui::Listbox::Impl::~Impl()
