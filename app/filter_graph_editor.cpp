@@ -73,7 +73,9 @@ namespace
 		using NodeWidget = Texpainter::NodeEditor<Texpainter::FilterGraphEditor>;
 
 	public:
-		explicit MakeNodeEditor(Canvas& canvas): r_canvas{canvas} {}
+		explicit MakeNodeEditor(Canvas& canvas, Texpainter::Ui::WidgetCoordinates loc=Texpainter::Ui::WidgetCoordinates{50.0, 50.0}):
+		m_insert_loc{loc}
+		,r_canvas{canvas} {}
 
 		auto operator()(auto& item) const
 		{
@@ -82,8 +84,7 @@ namespace
 		}
 
 	private:
-		// TODO: Do not hard-code insert position?
-		Texpainter::Ui::WidgetCoordinates m_insert_loc{50.0, 50.0};
+		Texpainter::Ui::WidgetCoordinates m_insert_loc;
 		Canvas& r_canvas;
 	};
 }
@@ -113,11 +114,12 @@ Texpainter::FilterGraphEditor::FilterGraphEditor(Ui::Container& owner, FilterGra
 }
 
 Texpainter::FilterGraphEditor& Texpainter::FilterGraphEditor::insert(
-    std::unique_ptr<FilterGraph::AbstractImageProcessor> node)
+    std::unique_ptr<FilterGraph::AbstractImageProcessor> node,
+	Ui::WidgetCoordinates insert_loc)
 {
 	auto node_item = r_graph.insert(std::move(node));
 
-	auto ip = m_node_editors.insert(MakeNodeEditor{m_canvas}(node_item));
+	auto ip = m_node_editors.insert(MakeNodeEditor{m_canvas, insert_loc}(node_item));
 	ip.first->second->eventHandler(*this);
 
 	m_ports.addPorts(node_item.second.get());

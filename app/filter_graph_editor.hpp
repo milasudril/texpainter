@@ -216,7 +216,8 @@ namespace Texpainter
 
 		FilterGraphEditor(Ui::Container& owner, FilterGraph::Graph& graph);
 
-		FilterGraphEditor& insert(std::unique_ptr<FilterGraph::AbstractImageProcessor> node);
+		FilterGraphEditor& insert(std::unique_ptr<FilterGraph::AbstractImageProcessor> node,
+								  Ui::WidgetCoordinates loc=Ui::WidgetCoordinates{50.0, 50.0});
 
 		template<auto id, class EventHandler>
 		FilterGraphEditor& eventHandler(EventHandler& eh)
