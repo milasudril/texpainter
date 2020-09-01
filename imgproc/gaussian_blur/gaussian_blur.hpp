@@ -29,8 +29,10 @@ namespace GaussianBlur
 	public:
 		struct InterfaceDescriptor
 		{
-			static constexpr std::array<PortInfo, 1> InputPorts{{PortInfo{PixelType::GrayscaleComplex, "Image spectrum"}}};
-			static constexpr std::array<PortInfo, 1> OutputPorts{{PortInfo{PixelType::GrayscaleComplex, "Image spectrum"}}};
+			static constexpr std::array<PortInfo, 1> InputPorts{
+			    {PortInfo{PixelType::GrayscaleComplex, "Image spectrum"}}};
+			static constexpr std::array<PortInfo, 1> OutputPorts{
+			    {PortInfo{PixelType::GrayscaleComplex, "Image spectrum"}}};
 
 			static constexpr std::array<ParamName, 1> ParamNames{"Radius"};
 		};

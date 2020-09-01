@@ -11,6 +11,7 @@
 #include "ui/slider.hpp"
 #include "ui/filled_shape.hpp"
 #include "ui/labeled_input.hpp"
+#include "ui/separator.hpp"
 
 namespace Texpainter
 {
@@ -116,9 +117,11 @@ namespace Texpainter
 		    , m_content{m_root, Ui::Box::Orientation::Horizontal}
 		    , m_input_col{m_content.insertMode(Ui::Box::InsertMode{0, 0}),
 		                  Ui::Box::Orientation::Vertical}
+		    , m_input_sep{m_content.insertMode(Ui::Box::InsertMode{2, 0})}
 		    , m_params_col{m_content.insertMode(
 		                       Ui::Box::InsertMode{0, Ui::Box::Expand | Ui::Box::Fill}),
 		                   Ui::Box::Orientation::Vertical}
+		    , m_output_sep{m_content.insertMode(Ui::Box::InsertMode{2, 0})}
 		    , m_output_col{m_content.insertMode(Ui::Box::InsertMode{0, 0}),
 		                   Ui::Box::Orientation::Vertical}
 		{
@@ -169,7 +172,9 @@ namespace Texpainter
 		Ui::Label m_name;
 		Ui::Box m_content;
 		Ui::Box m_input_col;
+		Ui::Separator m_input_sep;
 		Ui::Box m_params_col;
+		Ui::Separator m_output_sep;
 		Ui::Box m_output_col;
 
 		std::vector<InputConnector> m_inputs;
