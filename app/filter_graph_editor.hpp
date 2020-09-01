@@ -386,6 +386,7 @@ namespace Texpainter
 		auto name = box.get(item);
 		printf("%s\n", name);
 		insert(ImageProcessorRegistry::createImageProcessor(name));
+		m_filtermenu.reset();
 	}
 }
 
