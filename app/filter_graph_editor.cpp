@@ -73,9 +73,13 @@ namespace
 		using NodeWidget = Texpainter::NodeEditor<Texpainter::FilterGraphEditor>;
 
 	public:
-		explicit MakeNodeEditor(Canvas& canvas, Texpainter::Ui::WidgetCoordinates loc=Texpainter::Ui::WidgetCoordinates{50.0, 50.0}):
-		m_insert_loc{loc}
-		,r_canvas{canvas} {}
+		explicit MakeNodeEditor(
+		    Canvas& canvas,
+		    Texpainter::Ui::WidgetCoordinates loc = Texpainter::Ui::WidgetCoordinates{50.0, 50.0})
+		    : m_insert_loc{loc}
+		    , r_canvas{canvas}
+		{
+		}
 
 		auto operator()(auto& item) const
 		{
@@ -114,8 +118,7 @@ Texpainter::FilterGraphEditor::FilterGraphEditor(Ui::Container& owner, FilterGra
 }
 
 Texpainter::FilterGraphEditor& Texpainter::FilterGraphEditor::insert(
-    std::unique_ptr<FilterGraph::AbstractImageProcessor> node,
-	Ui::WidgetCoordinates insert_loc)
+    std::unique_ptr<FilterGraph::AbstractImageProcessor> node, Ui::WidgetCoordinates insert_loc)
 {
 	auto node_item = r_graph.insert(std::move(node));
 

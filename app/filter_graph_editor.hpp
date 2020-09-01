@@ -217,7 +217,7 @@ namespace Texpainter
 		FilterGraphEditor(Ui::Container& owner, FilterGraph::Graph& graph);
 
 		FilterGraphEditor& insert(std::unique_ptr<FilterGraph::AbstractImageProcessor> node,
-								  Ui::WidgetCoordinates loc=Ui::WidgetCoordinates{50.0, 50.0});
+		                          Ui::WidgetCoordinates loc = Ui::WidgetCoordinates{50.0, 50.0});
 
 		template<auto id, class EventHandler>
 		FilterGraphEditor& eventHandler(EventHandler& eh)
@@ -291,6 +291,7 @@ namespace Texpainter
 		std::unique_ptr<Ui::LineSegmentRenderer> m_linesegs;
 		std::map<FilterGraph::NodeId, Canvas::WidgetHandle<NodeWidget>> m_node_editors;
 		Canvas::WidgetHandle<Ui::Listbox> m_filtermenu;
+		Ui::WidgetCoordinates m_filtermenuloc;
 		Ui::Menu m_node_menu;
 		Ui::MenuItem m_node_copy;
 		Ui::MenuItem m_node_delete;
@@ -369,6 +370,7 @@ namespace Texpainter
 				m_filtermenu.reset();
 				break;
 			case 3:
+				m_filtermenuloc = loc;
 				m_filtermenu.reset();  // Reset first so the same id can be reused
 				m_filtermenu = m_canvas.insert<Ui::Listbox>(
 				    FilterGraph::NodeId{static_cast<uint64_t>(-1)}, loc);
@@ -385,8 +387,7 @@ namespace Texpainter
 	    Ui::Listbox& box, int item)
 	{
 		auto name = box.get(item);
-		printf("%s\n", name);
-		insert(ImageProcessorRegistry::createImageProcessor(name));
+		insert(ImageProcessorRegistry::createImageProcessor(name), m_filtermenuloc);
 		m_filtermenu.reset();
 	}
 }
