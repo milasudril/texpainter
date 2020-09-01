@@ -47,7 +47,7 @@ namespace GaussianBlur
 
 		static constexpr char const* name() { return "Gaussian blur"; }
 
-		static constexpr auto id() { return ImageProcessorId{"2f1a5a2f195dde21a8629191e66fdb2d"}; }
+		static constexpr auto id() { return ImageProcessorId{"1041A52FDD679E35C7916ED99067B5DB"}; }
 
 	private:
 	};
