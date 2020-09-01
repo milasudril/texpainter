@@ -34,7 +34,7 @@ namespace GaussianBlur
 			static constexpr std::array<PortInfo, 1> OutputPorts{
 			    {PortInfo{PixelType::GrayscaleComplex, "Image spectrum"}}};
 
-			static constexpr std::array<ParamName, 1> ParamNames{"Radius"};
+			static constexpr std::array<ParamName, 3> ParamNames{"ξ_0", "η_0", "θ"};
 		};
 
 		void operator()(ImgProcArg<InterfaceDescriptor> const& args) const;
