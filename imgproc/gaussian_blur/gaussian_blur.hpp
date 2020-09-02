@@ -9,20 +9,20 @@
 #include "filtergraph/proctypes.hpp"
 #include "filtergraph/img_proc_arg.hpp"
 #include "filtergraph/image_processor_id.hpp"
+#include "filtergraph/param_map.hpp"
+#include "pixel_store/image.hpp"
 
 namespace GaussianBlur
 {
-	using PortInfo   = Texpainter::FilterGraph::PortInfo;
-	using PixelType  = Texpainter::FilterGraph::PixelType;
-	using ParamValue = Texpainter::FilterGraph::ParamValue;
-	using ParamName  = Texpainter::FilterGraph::ParamName;
-
-	template<class T>
-	using ImgProcArg = Texpainter::FilterGraph::ImgProcArg<T>;
-
-	using ComplexValue     = Texpainter::FilterGraph::RgbaValue;
-	using RealValue        = Texpainter::FilterGraph::RealValue;
-	using ImageProcessorId = Texpainter::FilterGraph::ImageProcessorId;
+	using Texpainter::FilterGraph::ImageProcessorId;
+	using Texpainter::FilterGraph::ImgProcArg;
+	using Texpainter::FilterGraph::ParamMap;
+	using Texpainter::FilterGraph::ParamName;
+	using Texpainter::FilterGraph::ParamValue;
+	using Texpainter::FilterGraph::PixelType;
+	using Texpainter::FilterGraph::PortInfo;
+	using Texpainter::FilterGraph::RealValue;
+	using Texpainter::FilterGraph::RgbaValue;
 
 	class ImageProcessor
 	{
@@ -39,17 +39,28 @@ namespace GaussianBlur
 
 		void operator()(ImgProcArg<InterfaceDescriptor> const& args) const;
 
-		void set(ParamName, ParamValue) {}
+		void set(ParamName name, ParamValue value)
+		{
+			if(auto ptr = m_params.find(name); ptr != nullptr) [[likely]]
+				{
+					*ptr = value;
+				}
+		}
 
-		ParamValue get(ParamName) const { return ParamValue{0.0}; }
+		ParamValue get(ParamName name) const
+		{
+			auto ptr = m_params.find(name);
+			return ptr != nullptr ? *ptr : ParamValue{0.0};
+		}
 
-		std::span<ParamValue const> paramValues() const { return std::span<ParamValue const>{}; }
+		std::span<ParamValue const> paramValues() const { return m_params.values(); }
 
 		static constexpr char const* name() { return "Gaussian blur"; }
 
 		static constexpr auto id() { return ImageProcessorId{"1041A52FDD679E35C7916ED99067B5DB"}; }
 
 	private:
+		ParamMap<InterfaceDescriptor> m_params;
 	};
 }
 
