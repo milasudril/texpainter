@@ -14,27 +14,28 @@
 
 namespace DftForward
 {
-	using Texpainter::FilterGraph::PortInfo;
-	using Texpainter::FilterGraph::PixelType;
-	using Texpainter::FilterGraph::ParamValue;
-	using Texpainter::FilterGraph::ParamName;
-	using Texpainter::FilterGraph::ImgProcArg;
 	using Texpainter::FilterGraph::ComplexValue;
-	using Texpainter::FilterGraph::RealValue;
 	using Texpainter::FilterGraph::ImageProcessorId;
+	using Texpainter::FilterGraph::ImgProcArg;
+	using Texpainter::FilterGraph::ParamName;
+	using Texpainter::FilterGraph::ParamValue;
+	using Texpainter::FilterGraph::PixelType;
+	using Texpainter::FilterGraph::PortInfo;
+	using Texpainter::FilterGraph::RealValue;
 
 	namespace Dft = Texpainter::Dft;
 
 	class ImageProcessor
 	{
 	public:
-		ImageProcessor():r_dft_engine{&Dft::engineInstance()}{};
+		ImageProcessor(): r_dft_engine{&Dft::engineInstance()} {};
 
 		struct InterfaceDescriptor
 		{
 			static constexpr std::array<PortInfo, 1> InputPorts{
 			    {PortInfo{PixelType::GrayscaleReal, "Pixels"}}};
-			static constexpr std::array<PortInfo, 1> OutputPorts{{PixelType::GrayscaleComplex, "Image spectrum"}};
+			static constexpr std::array<PortInfo, 1> OutputPorts{
+			    {PixelType::GrayscaleComplex, "Image spectrum"}};
 
 			static constexpr std::array<ParamName, 0> ParamNames{};
 		};

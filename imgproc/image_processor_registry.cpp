@@ -7,6 +7,7 @@
 #include "./rgba_combine/rgba_combine.hpp"
 #include "./rgba_split/rgba_split.hpp"
 #include "./gaussian_blur/gaussian_blur.hpp"
+#include "./dft_forward/dft_forward.hpp"
 
 #include "filtergraph/image_processor_wrapper.hpp"
 #include "utils/fixed_flatmap.hpp"
@@ -32,7 +33,8 @@ namespace
 
 	constexpr ImageProcessorInfo s_processors[] = {get_info<::RgbaCombine::ImageProcessor>(),
 	                                               get_info<::RgbaSplit::ImageProcessor>(),
-	                                               get_info<::GaussianBlur::ImageProcessor>()};
+	                                               get_info<::GaussianBlur::ImageProcessor>(),
+	                                               get_info<::DftForward::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
