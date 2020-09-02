@@ -12,6 +12,8 @@
 #include "filtergraph/param_map.hpp"
 #include "pixel_store/image.hpp"
 
+#include <optional>
+
 namespace GaussianBlur
 {
 	using Texpainter::FilterGraph::ImageProcessorId;
@@ -23,6 +25,8 @@ namespace GaussianBlur
 	using Texpainter::FilterGraph::PortInfo;
 	using Texpainter::FilterGraph::RealValue;
 	using Texpainter::FilterGraph::RgbaValue;
+	using Texpainter::PixelStore::BasicImage;
+	using Texpainter::Size2d;
 
 	class ImageProcessor
 	{
@@ -44,6 +48,7 @@ namespace GaussianBlur
 			if(auto ptr = m_params.find(name); ptr != nullptr) [[likely]]
 				{
 					*ptr = value;
+					m_kernel = {};
 				}
 		}
 
@@ -60,6 +65,7 @@ namespace GaussianBlur
 		static constexpr auto id() { return ImageProcessorId{"1041A52FDD679E35C7916ED99067B5DB"}; }
 
 	private:
+		mutable std::optional<BasicImage<RealValue>> m_kernel;
 		ParamMap<InterfaceDescriptor> m_params;
 	};
 }
