@@ -16,6 +16,7 @@
 
 namespace GaussianBlur
 {
+	using Texpainter::Size2d;
 	using Texpainter::FilterGraph::ImageProcessorId;
 	using Texpainter::FilterGraph::ImgProcArg;
 	using Texpainter::FilterGraph::ParamMap;
@@ -24,9 +25,7 @@ namespace GaussianBlur
 	using Texpainter::FilterGraph::PixelType;
 	using Texpainter::FilterGraph::PortInfo;
 	using Texpainter::FilterGraph::RealValue;
-	using Texpainter::FilterGraph::RgbaValue;
 	using Texpainter::PixelStore::BasicImage;
-	using Texpainter::Size2d;
 
 	class ImageProcessor
 	{
@@ -47,7 +46,7 @@ namespace GaussianBlur
 		{
 			if(auto ptr = m_params.find(name); ptr != nullptr) [[likely]]
 				{
-					*ptr = value;
+					*ptr     = value;
 					m_kernel = {};
 				}
 		}
