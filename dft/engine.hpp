@@ -1,5 +1,6 @@
 //@	{
 //@	  "targets":[{"name":"engine.hpp", "type":"include"}]
+//@	 ,"dependencies_extra":[{"ref":"engine.o","rel":"implementation"}]
 //@	}
 
 #ifndef TEXPAINTER_DFT_ENGINE_HPP
@@ -53,6 +54,8 @@ namespace Texpainter::Dft
 
 		mutable std::array<PlanData, 16> m_plans;
 	};
+
+	Engine const& engineInstance();
 }
 
 #endif
