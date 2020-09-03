@@ -22,13 +22,14 @@ namespace DftForward
 	using Texpainter::FilterGraph::PixelType;
 	using Texpainter::FilterGraph::PortInfo;
 	using Texpainter::FilterGraph::RealValue;
+	using Texpainter::FilterGraph::ComplexValue;
 
 	namespace Dft = Texpainter::Dft;
 
 	class ImageProcessor
 	{
 	public:
-		ImageProcessor(): r_dft_engine{&Dft::engineInstance()} {};
+		ImageProcessor(): r_engine{&Dft::engineInstance()} {};
 
 		struct InterfaceDescriptor
 		{
@@ -53,7 +54,7 @@ namespace DftForward
 		static constexpr auto id() { return ImageProcessorId{"3B0189D5F690713FF7D02B05E74571D1"}; }
 
 	private:
-		Dft::Engine const* r_dft_engine;
+		Dft::Engine const* r_engine;
 	};
 }
 
