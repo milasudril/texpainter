@@ -115,6 +115,11 @@ namespace Texpainter
 				return FilterGraph::ParamValue{m_slider.inputField().value().value()};
 			}
 
+			void value(FilterGraph::ParamValue val)
+			{
+				m_slider.inputField().value(Ui::SliderValue{val.value()});
+			}
+
 
 		private:
 			EventHandler* r_eh;
@@ -177,6 +182,10 @@ namespace Texpainter
 			std::ranges::transform(r_node.get().outputPorts(),
 			                       std::back_inserter(m_outputs),
 			                       detail::ConnectorFactory<OutputConnector>{m_output_col});
+
+			std::ranges::for_each(m_params, [&node = r_node.get()](auto& param) {
+				param.value(node.get(param.name()));
+			});
 		}
 
 		auto const& inputs() const { return m_inputs; }
