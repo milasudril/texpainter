@@ -86,6 +86,42 @@ namespace Texpainter
 			Ui::Label m_label;
 		};
 
+		template<class EventHandler>
+		class ParamInput
+		{
+		public:
+			explicit ParamInput(Ui::Container& owner, FilterGraph::ParamName name)
+			    : m_name{name}
+			    , m_slider{owner, Ui::Box::Orientation::Vertical, name.c_str(), false}
+			{
+			}
+
+			void eventHandler(EventHandler& eh)
+			{
+				r_eh = &eh;
+				m_slider.inputField().eventHandler<0>(*this);
+			}
+
+			template<int>
+			void onChanged(Ui::Slider&)
+			{
+				r_eh->onChanged(*this);
+			}
+
+			auto name() const { return m_name; }
+
+			auto value() const
+			{
+				return FilterGraph::ParamValue{m_slider.inputField().value().value()};
+			}
+
+
+		private:
+			EventHandler* r_eh;
+			FilterGraph::ParamName m_name;
+			Ui::LabeledInput<Ui::Slider> m_slider;
+		};
+
 		template<class Connector>
 		class ConnectorFactory
 		{
@@ -109,6 +145,7 @@ namespace Texpainter
 	public:
 		using InputConnector  = detail::Connector<FilterGraph::InputPort, NodeEditor>;
 		using OutputConnector = detail::Connector<FilterGraph::OutputPort, NodeEditor>;
+		using ParamInput      = detail::ParamInput<NodeEditor>;
 
 		NodeEditor(Ui::Container& owner, std::reference_wrapper<FilterGraph::Node> node)
 		    : r_node{node}
@@ -131,13 +168,11 @@ namespace Texpainter
 			                       std::back_inserter(m_inputs),
 			                       detail::ConnectorFactory<InputConnector>{m_input_col});
 
-			std::ranges::transform(
-			    r_node.get().paramNames(),
-			    std::back_inserter(m_params),
-			    [&params = m_params_col](auto name) {
-				    return Ui::LabeledInput<Ui::Slider>{
-				        params, Ui::Box::Orientation::Vertical, name.c_str(), false};
-			    });
+			std::ranges::transform(r_node.get().paramNames(),
+			                       std::back_inserter(m_params),
+			                       [&params = m_params_col](auto name) {
+				                       return ParamInput{params, name};
+			                       });
 
 			std::ranges::transform(r_node.get().outputPorts(),
 			                       std::back_inserter(m_outputs),
@@ -154,6 +189,7 @@ namespace Texpainter
 		{
 			std::ranges::for_each(m_inputs, [this](auto& item) { item.eventHandler(*this); });
 			std::ranges::for_each(m_outputs, [this](auto& item) { item.eventHandler(*this); });
+			std::ranges::for_each(m_params, [this](auto& item) { item.eventHandler(*this); });
 			r_eh = &eh;
 			return *this;
 		}
@@ -162,6 +198,11 @@ namespace Texpainter
 		void onClicked(Connector const& src)
 		{
 			r_eh->onClicked(*this, src.port());
+		}
+
+		void onChanged(ParamInput const& input)
+		{
+			r_eh->onChanged(*this, input.name(), input.value());
 		}
 
 	private:
@@ -178,7 +219,7 @@ namespace Texpainter
 		Ui::Box m_output_col;
 
 		std::vector<InputConnector> m_inputs;
-		std::vector<Ui::LabeledInput<Ui::Slider>> m_params;
+		std::vector<ParamInput> m_params;
 		std::vector<OutputConnector> m_outputs;
 	};
 }

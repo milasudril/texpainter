@@ -259,6 +259,14 @@ namespace Texpainter
 
 		void onClicked(NodeWidget const& src, FilterGraph::OutputPort port);
 
+		void onChanged(NodeWidget const& src,
+		               FilterGraph::ParamName name,
+		               FilterGraph::ParamValue value)
+		{
+			src.node().set(name, value);
+			r_callback(r_eh, *this);
+		}
+
 		void notCompleted(FilterGraph::Connection const&) {}
 
 		void selfConnection(FilterGraph::Connection const&) {}
