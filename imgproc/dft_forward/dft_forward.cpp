@@ -8,7 +8,7 @@ using TempBuffer = Texpainter::PixelStore::BasicImage<DftForward::ComplexValue>;
 
 void DftForward::ImageProcessor::operator()(ImgProcArg<InterfaceDescriptor> const& args) const
 {
-	auto sign_row = 1;
+	auto sign_row   = 1;
 	auto const size = args.size();
 	TempBuffer input_buffer{size};
 	for(uint32_t row = 0; row < size.height(); ++row)
