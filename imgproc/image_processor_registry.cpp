@@ -9,6 +9,7 @@
 #include "./gaussian_mask/gaussian_mask.hpp"
 #include "./dft_forward/dft_forward.hpp"
 #include "./dft_backward/dft_backward.hpp"
+#include "./complex_real_multiply/complex_real_multiply.hpp"
 
 #include "filtergraph/image_processor_wrapper.hpp"
 #include "utils/fixed_flatmap.hpp"
@@ -36,7 +37,9 @@ namespace
 	                                               get_info<::RgbaSplit::ImageProcessor>(),
 	                                               get_info<::GaussianMask::ImageProcessor>(),
 	                                               get_info<::DftForward::ImageProcessor>(),
-	                                               get_info<::DftBackward::ImageProcessor>()};
+	                                               get_info<::DftBackward::ImageProcessor>(),
+		get_info<::ComplexRealMultiply::ImageProcessor>()
+	};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
