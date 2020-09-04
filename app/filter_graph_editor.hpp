@@ -153,9 +153,7 @@ namespace Texpainter
 
 		void removeConnections(FilterGraph::Endpoint<FilterGraph::InputPort> const& in)
 		{
-			std::ranges::for_each(
-			    m_connectors.edges(inputPort(in)),
-			    [&conn = m_connectors](auto const& edge) { conn.disconnect(edge.a(), edge.b()); });
+			m_connectors.disconnect(inputPort(in));
 		}
 
 		void removeConnection(InputPortId a, OutputPortId b) { m_connectors.disconnect(a, b); }

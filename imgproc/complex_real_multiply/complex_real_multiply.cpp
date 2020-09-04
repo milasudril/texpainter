@@ -12,7 +12,7 @@ void ComplexRealMultiply::ImageProcessor::operator()(
 	{
 		for(uint32_t col = 0; col < size.width(); ++col)
 		{
-			args.output<0>(col, row) = args.input<0>(col, row)* args.input<1>(col, row);
+			args.output<0>(col, row) = args.input<0>(col, row) * args.input<1>(col, row);
 		}
 	}
 }

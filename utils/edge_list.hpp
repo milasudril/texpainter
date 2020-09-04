@@ -101,6 +101,16 @@ namespace Texpainter
 			m_edges.erase(Edge{a, b});
 		}
 
+		void disconnect(EndpointA a)
+		{
+			if(auto i = m_a_to_edges.find(a); i != std::end(m_a_to_edges))
+			{
+				std::ranges::for_each(i->second,
+				                      [&edges = m_edges](auto const& e) { edges.erase(e); });
+				i->second.clear();
+			}
+		}
+
 		auto const& node(EndpointA a) const
 		{
 			assert(exists(a));

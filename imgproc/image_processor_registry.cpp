@@ -33,13 +33,13 @@ namespace
 		    Proc::name(), Proc::id(), Texpainter::FilterGraph::createImageProcessor<Proc>};
 	}
 
-	constexpr ImageProcessorInfo s_processors[] = {get_info<::RgbaCombine::ImageProcessor>(),
-	                                               get_info<::RgbaSplit::ImageProcessor>(),
-	                                               get_info<::GaussianMask::ImageProcessor>(),
-	                                               get_info<::DftForward::ImageProcessor>(),
-	                                               get_info<::DftBackward::ImageProcessor>(),
-		get_info<::ComplexRealMultiply::ImageProcessor>()
-	};
+	constexpr ImageProcessorInfo s_processors[] = {
+	    get_info<::RgbaCombine::ImageProcessor>(),
+	    get_info<::RgbaSplit::ImageProcessor>(),
+	    get_info<::GaussianMask::ImageProcessor>(),
+	    get_info<::DftForward::ImageProcessor>(),
+	    get_info<::DftBackward::ImageProcessor>(),
+	    get_info<::ComplexRealMultiply::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
