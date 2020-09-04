@@ -1,10 +1,10 @@
 //@	{
-//@	 "targets":[{"name":"gaussian_blur.hpp", "type":"include"}]
-//@	,"dependencies_extra":[{"ref":"gaussian_blur.o","rel":"implementation"}]
+//@	 "targets":[{"name":"gaussian_mask.hpp", "type":"include"}]
+//@	,"dependencies_extra":[{"ref":"gaussian_mask.o","rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_IMGPROC_GAUSSIANBLUR_GAUSSIANBLUR_HPP
-#define TEXPAINTER_IMGPROC_GAUSSIANBLUR_GAUSSIANBLUR_HPP
+#ifndef TEXPAINTER_IMGPROC_GAUSSIANMASK_GAUSSIANMASK_HPP
+#define TEXPAINTER_IMGPROC_GAUSSIANMASK_GAUSSIANMASK_HPP
 
 #include "filtergraph/proctypes.hpp"
 #include "filtergraph/img_proc_arg.hpp"
@@ -12,9 +12,7 @@
 #include "filtergraph/param_map.hpp"
 #include "pixel_store/image.hpp"
 
-#include <optional>
-
-namespace GaussianBlur
+namespace GaussianMask
 {
 	using Texpainter::Size2d;
 	using Texpainter::FilterGraph::ImageProcessorId;
@@ -32,10 +30,9 @@ namespace GaussianBlur
 	public:
 		struct InterfaceDescriptor
 		{
-			static constexpr std::array<PortInfo, 1> InputPorts{
-			    {PortInfo{PixelType::GrayscaleComplex, "Image spectrum"}}};
+			static constexpr std::array<PortInfo, 0> InputPorts{};
 			static constexpr std::array<PortInfo, 1> OutputPorts{
-			    {PortInfo{PixelType::GrayscaleComplex, "Image spectrum"}}};
+			    {PortInfo{PixelType::GrayscaleReal, "Output"}}};
 
 			static constexpr std::array<ParamName, 3> ParamNames{"ξ_0", "η_0", "θ"};
 		};
@@ -46,8 +43,7 @@ namespace GaussianBlur
 		{
 			if(auto ptr = m_params.find(name); ptr != nullptr) [[likely]]
 				{
-					*ptr     = value;
-					m_kernel = {};
+					*ptr = value;
 				}
 		}
 
@@ -59,12 +55,11 @@ namespace GaussianBlur
 
 		std::span<ParamValue const> paramValues() const { return m_params.values(); }
 
-		static constexpr char const* name() { return "Gaussian blur"; }
+		static constexpr char const* name() { return "Gaussian mask"; }
 
 		static constexpr auto id() { return ImageProcessorId{"1041A52FDD679E35C7916ED99067B5DB"}; }
 
 	private:
-		mutable std::optional<BasicImage<RealValue>> m_kernel;
 		ParamMap<InterfaceDescriptor> m_params;
 	};
 }
