@@ -29,7 +29,10 @@ void GaussianMask::ImageProcessor::operator()(ImgProcArg<InterfaceDescriptor> co
 
 	auto const ξ_0 = frequency(*m_params.find<Str{"ξ_0"}>());
 	auto const η_0 = frequency(*m_params.find<Str{"η_0"}>());
-	//	auto const θ   = Angle{0.5 * m_params.find<Str{"θ"}>()->value(), Angle::Turns{}};
+	auto const θ   = Angle{0.5 * m_params.find<Str{"θ"}>()->value(), Angle::Turns{}};
+
+	auto const rot_vec_ξ = vec2_t{cos(θ), -sin(θ)};
+	auto const rot_vec_η = vec2_t{sin(θ), cos(θ)};
 
 	auto const O =
 	    0.5 * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
@@ -40,8 +43,8 @@ void GaussianMask::ImageProcessor::operator()(ImgProcArg<InterfaceDescriptor> co
 	{
 		for(uint32_t col = 0; col < size.width(); ++col)
 		{
-			auto P                   = vec2_t{static_cast<double>(col), static_cast<double>(row)};
-			auto f                   = SpatialFrequency{P - O} / f_0;
+			auto P = vec2_t{static_cast<double>(col), static_cast<double>(row)};
+			auto f = transform(SpatialFrequency{P - O}, rot_vec_ξ, rot_vec_η) / f_0;
 			args.output<0>(col, row) = std::exp2(-0.5 * Texpainter::dot(f, f));
 		}
 	}
