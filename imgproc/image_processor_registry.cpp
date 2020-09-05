@@ -6,7 +6,7 @@
 
 #include "./rgba_combine/rgba_combine.hpp"
 #include "./rgba_split/rgba_split.hpp"
-#include "./gaussian_mask/gaussian_mask.hpp"
+#include "./gaussian_mask_2d/gaussian_mask_2d.hpp"
 #include "./dft_forward/dft_forward.hpp"
 #include "./dft_backward/dft_backward.hpp"
 #include "./complex_real_multiply/complex_real_multiply.hpp"
@@ -37,7 +37,7 @@ namespace
 	constexpr ImageProcessorInfo s_processors[] = {
 	    get_info<::RgbaCombine::ImageProcessor>(),
 	    get_info<::RgbaSplit::ImageProcessor>(),
-	    get_info<::GaussianMask::ImageProcessor>(),
+	    get_info<::GaussianMask2d::ImageProcessor>(),
 	    get_info<::DftForward::ImageProcessor>(),
 	    get_info<::DftBackward::ImageProcessor>(),
 	    get_info<::ComplexRealMultiply::ImageProcessor>(),

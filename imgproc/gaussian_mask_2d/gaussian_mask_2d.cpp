@@ -1,8 +1,8 @@
 //@	{
-//@	 "targets":[{"name":"gaussian_mask.o", "type":"object"}]
+//@	 "targets":[{"name":"gaussian_mask_2d.o", "type":"object"}]
 //@	}
 
-#include "./gaussian_mask.hpp"
+#include "./gaussian_mask_2d.hpp"
 
 #include "utils/angle.hpp"
 
@@ -14,13 +14,13 @@ using Texpainter::vec2_t;
 
 namespace
 {
-	auto sizeFromParam(GaussianMask::ParamValue val)
+	auto sizeFromParam(GaussianMask2d::ParamValue val)
 	{
 		return 0.5 * std::exp2(std::lerp(-16.0, 0.0, val.value()));
 	}
 }
 
-void GaussianMask::ImageProcessor::operator()(ImgProcArg<InterfaceDescriptor> const& args) const
+void GaussianMask2d::ImageProcessor::operator()(ImgProcArg<InterfaceDescriptor> const& args) const
 {
 	auto const size = args.size();
 

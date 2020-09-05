@@ -1,6 +1,6 @@
 //@	{
-//@	 "targets":[{"name":"gaussian_mask.hpp", "type":"include"}]
-//@	,"dependencies_extra":[{"ref":"gaussian_mask.o","rel":"implementation"}]
+//@	 "targets":[{"name":"gaussian_mask_2d.hpp", "type":"include"}]
+//@	,"dependencies_extra":[{"ref":"gaussian_mask_2d.o","rel":"implementation"}]
 //@	}
 
 #ifndef TEXPAINTER_IMGPROC_GAUSSIANMASK_GAUSSIANMASK_HPP
@@ -12,7 +12,7 @@
 #include "filtergraph/param_map.hpp"
 #include "pixel_store/image.hpp"
 
-namespace GaussianMask
+namespace GaussianMask2d
 {
 	using Texpainter::Size2d;
 	using Texpainter::FilterGraph::ImageProcessorId;
@@ -56,7 +56,7 @@ namespace GaussianMask
 
 		std::span<ParamValue const> paramValues() const { return m_params.values(); }
 
-		static constexpr char const* name() { return "Gaussian mask"; }
+		static constexpr char const* name() { return "Gaussian mask 2d"; }
 
 		static constexpr auto id() { return ImageProcessorId{"27a6e3a3254aa2a0a8744366c82a363f"}; }
 
