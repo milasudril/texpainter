@@ -34,7 +34,7 @@ namespace GaussianMask
 			static constexpr std::array<PortInfo, 1> OutputPorts{
 			    {PortInfo{PixelType::GrayscaleReal, "Output"}}};
 
-			static constexpr std::array<ParamName, 3> ParamNames{"ξ_0", "η_0", "θ"};
+			static constexpr std::array<ParamName, 3> ParamNames{"Semi-axis 1", "Semi-axis 2", "Orientation"};
 		};
 
 		void operator()(ImgProcArg<InterfaceDescriptor> const& args) const;
@@ -57,7 +57,7 @@ namespace GaussianMask
 
 		static constexpr char const* name() { return "Gaussian mask"; }
 
-		static constexpr auto id() { return ImageProcessorId{"1041A52FDD679E35C7916ED99067B5DB"}; }
+		static constexpr auto id() { return ImageProcessorId{"27a6e3a3254aa2a0a8744366c82a363f"}; }
 
 	private:
 		ParamMap<InterfaceDescriptor> m_params;
