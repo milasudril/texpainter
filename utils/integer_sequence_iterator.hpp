@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"integer_sequence_iterator.hpp", "type":"include"}]}
 
-#ifndef TEXPAINTER_UTILS_PAIRITERATOR_HPP
-#define TEXPAINTER_UTILS_PAIRITERATOR_HPP
+#ifndef TEXPAINTER_UTILS_INTEGERSEQUENCEITERATOR_HPP
+#define TEXPAINTER_UTILS_INTEGERSEQUENCEITERATOR_HPP
 
 #include <iterator>
 

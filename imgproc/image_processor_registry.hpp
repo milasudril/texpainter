@@ -3,8 +3,8 @@
 //@	,"dependencies_extra":[{"ref":"image_processor_registry.o","rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_FILTERGRAPH_IMAGEPROCESSORREGISTRY_HPP
-#define TEXPAINTER_FILTERGRAPH_IMAGEPROCESSORREGISTRY_HPP
+#ifndef TEXPAINTER_IMGPROC_IMAGEPROCESSORREGISTRY_HPP
+#define TEXPAINTER_IMGPROC_IMAGEPROCESSORREGISTRY_HPP
 
 #include "filtergraph/abstract_image_processor.hpp"
 

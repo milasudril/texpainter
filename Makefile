@@ -4,7 +4,7 @@ all:
 
 .PHONY: format
 format:
-	devtools/include_guard_fix.py
+	find -name '*.hpp' | xargs devtools/include_guard_fix.py
 	find -name '*.hpp' -or -name '*.cpp' | xargs clang-format -i
 	find -name '*.json' -exec bash -c 'jq --tab --sort-keys . "{}" > .fmt && mv .fmt "{}"' \;
 
