@@ -1,6 +1,5 @@
 //@	{
 //@	 "targets":[{"name":"complex_real_multiply.hpp", "type":"include"}]
-//@	,"dependencies_extra":[{"ref":"complex_real_multiply.o","rel":"implementation"}]
 //@	}
 
 #ifndef TEXPAINTER_IMGPROC_COMPLEXREALMULTIPLY_COMPLEXREALMULTIPLY_HPP
@@ -9,6 +8,8 @@
 #include "filtergraph/proctypes.hpp"
 #include "filtergraph/img_proc_arg.hpp"
 #include "filtergraph/image_processor_id.hpp"
+
+#include <algorithm>
 
 namespace ComplexRealMultiply
 {
@@ -35,7 +36,15 @@ namespace ComplexRealMultiply
 			static constexpr std::array<ParamName, 0> ParamNames{};
 		};
 
-		void operator()(ImgProcArg<InterfaceDescriptor> const& args) const;
+		void operator()(ImgProcArg<InterfaceDescriptor> const& args) const
+		{
+			auto const size = args.size().area();
+			std::transform(args.input<0>(),
+			               args.input<0>() + size,
+			               args.input<1>(),
+			               args.output<0>(),
+			               std::multiplies{});
+		}
 
 		void set(ParamName, ParamValue) {}
 
