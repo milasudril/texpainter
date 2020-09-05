@@ -45,8 +45,7 @@ namespace
 	    get_info<::ComplexRealMultiply::ImageProcessor>(),
 	    get_info<::ButterworthMask2d::ImageProcessor>(),
 	    get_info<::ButterworthMask1d::ImageProcessor>(),
-		get_info<::NormalizeGrayscale::ImageProcessor>()
-	};
+	    get_info<::NormalizeGrayscale::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;

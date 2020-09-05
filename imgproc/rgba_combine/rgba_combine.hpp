@@ -12,17 +12,14 @@
 
 namespace RgbaCombine
 {
-	using PortInfo   = Texpainter::FilterGraph::PortInfo;
-	using PixelType  = Texpainter::FilterGraph::PixelType;
-	using ParamValue = Texpainter::FilterGraph::ParamValue;
-	using ParamName  = Texpainter::FilterGraph::ParamName;
-
-	template<class T>
-	using ImgProcArg = Texpainter::FilterGraph::ImgProcArg<T>;
-
-	using RgbaValue        = Texpainter::FilterGraph::RgbaValue;
-	using RealValue        = Texpainter::FilterGraph::RealValue;
-	using ImageProcessorId = Texpainter::FilterGraph::ImageProcessorId;
+	using Texpainter::FilterGraph::ImageProcessorId;
+	using Texpainter::FilterGraph::ImgProcArg;
+	using Texpainter::FilterGraph::ParamName;
+	using Texpainter::FilterGraph::ParamValue;
+	using Texpainter::FilterGraph::PixelType;
+	using Texpainter::FilterGraph::PortInfo;
+	using Texpainter::FilterGraph::RealValue;
+	using Texpainter::FilterGraph::RgbaValue;
 
 	class ImageProcessor
 	{

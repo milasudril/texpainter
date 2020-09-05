@@ -23,7 +23,6 @@ namespace GaussianMask2d
 	using Texpainter::FilterGraph::PixelType;
 	using Texpainter::FilterGraph::PortInfo;
 	using Texpainter::FilterGraph::RealValue;
-	using Texpainter::PixelStore::BasicImage;
 
 	class ImageProcessor
 	{
