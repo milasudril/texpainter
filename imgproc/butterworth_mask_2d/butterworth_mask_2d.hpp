@@ -10,7 +10,6 @@
 #include "filtergraph/img_proc_arg.hpp"
 #include "filtergraph/image_processor_id.hpp"
 #include "filtergraph/param_map.hpp"
-#include "pixel_store/image.hpp"
 
 namespace ButterworthMask2d
 {
@@ -23,7 +22,6 @@ namespace ButterworthMask2d
 	using Texpainter::FilterGraph::PixelType;
 	using Texpainter::FilterGraph::PortInfo;
 	using Texpainter::FilterGraph::RealValue;
-	using Texpainter::PixelStore::BasicImage;
 
 	class ImageProcessor
 	{

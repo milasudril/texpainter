@@ -10,7 +10,6 @@
 #include "filtergraph/img_proc_arg.hpp"
 #include "filtergraph/image_processor_id.hpp"
 #include "filtergraph/param_map.hpp"
-#include "pixel_store/image.hpp"
 
 namespace ButterworthMask1d
 {
