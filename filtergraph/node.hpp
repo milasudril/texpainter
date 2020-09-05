@@ -19,16 +19,14 @@ namespace Texpainter::FilterGraph
 
 	class Node
 	{
-	public:
-		using result_type = std::array<Memblock, 4>;
-
 		class SourceNode
 		{
 		public:
 			SourceNode(): r_processor{nullptr}, m_index{OutputPort{0}} {}
 
 			explicit SourceNode(Node const* node, OutputPort index)
-			    : r_processor{node}
+			    : m_last_usecount{0}
+			    , r_processor{node}
 			    , m_index{index}
 			{
 			}
@@ -38,6 +36,7 @@ namespace Texpainter::FilterGraph
 				assert(valid());
 				auto const& ret = (*r_processor)(size);
 				assert(ret[m_index.value()].valid());
+				m_last_usecount = r_processor->m_usecount;
 				return ret[m_index.value()].get();
 			}
 
@@ -47,13 +46,21 @@ namespace Texpainter::FilterGraph
 
 			bool valid() const { return r_processor != nullptr; }
 
+			bool hasOldResult() const { return m_last_usecount < r_processor->m_usecount; }
+
 		private:
+			mutable size_t m_last_usecount;
 			Node const* r_processor;
 			OutputPort m_index;
 		};
 
+	public:
+		using result_type = std::array<Memblock, 4>;
+
+
 		explicit Node(std::unique_ptr<AbstractImageProcessor> proc)
 		    : m_dirty{1}
+		    , m_usecount{static_cast<size_t>(-1)}
 		    , m_proc{std::move(proc)}
 		{
 		}
@@ -91,7 +98,8 @@ namespace Texpainter::FilterGraph
 			               [size](auto const& val) { return val(size); });
 
 			m_result_cache = (*m_proc)(NodeArgument{size, args});
-			m_dirty        = 0;
+			++m_usecount;
+			m_dirty = 0;
 			return m_result_cache;
 		}
 
@@ -141,7 +149,7 @@ namespace Texpainter::FilterGraph
 
 		ParamValue get(ParamName param_name) const { return m_proc->get(param_name); }
 
-		auto name() const { return m_proc->name(); }
+		char const* name() const { return m_proc->name(); }
 
 		~Node()
 		{
@@ -164,6 +172,7 @@ namespace Texpainter::FilterGraph
 
 	private:
 		mutable size_t m_dirty;
+		mutable size_t m_usecount;
 		std::array<SourceNode, NodeArgument::MaxNumInputs> m_inputs;
 		std::unique_ptr<AbstractImageProcessor> m_proc;
 		mutable result_type m_result_cache;
@@ -192,7 +201,7 @@ namespace Texpainter::FilterGraph
 		bool dirty() const
 		{
 			return m_dirty || std::ranges::any_of(inputs(), [](auto const& item) {
-				       return item.processor().dirty();
+				       return item.processor().dirty() || item.hasOldResult();
 			       });
 		}
 	};
