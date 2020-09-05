@@ -1,10 +1,10 @@
 //@	{
-//@	 "targets":[{"name":"gaussian_mask_2d.hpp", "type":"include"}]
-//@	,"dependencies_extra":[{"ref":"gaussian_mask_2d.o","rel":"implementation"}]
+//@	 "targets":[{"name":"butterworth_mask_1d.hpp", "type":"include"}]
+//@	,"dependencies_extra":[{"ref":"butterworth_mask_1d.o","rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_IMGPROC_GAUSSIANMASK2D_GAUSSIANMASK2D_HPP
-#define TEXPAINTER_IMGPROC_GAUSSIANMASK2D_GAUSSIANMASK2D_HPP
+#ifndef TEXPAINTER_IMGPROC_BUTTERWORTHMASK1D_BUTTERWORTHMASK1D_HPP
+#define TEXPAINTER_IMGPROC_BUTTERWORTHMASK1D_BUTTERWORTHMASK1D_HPP
 
 #include "filtergraph/proctypes.hpp"
 #include "filtergraph/img_proc_arg.hpp"
@@ -12,7 +12,7 @@
 #include "filtergraph/param_map.hpp"
 #include "pixel_store/image.hpp"
 
-namespace GaussianMask2d
+namespace ButterworthMask1d
 {
 	using Texpainter::Size2d;
 	using Texpainter::FilterGraph::ImageProcessorId;
@@ -34,8 +34,7 @@ namespace GaussianMask2d
 			static constexpr std::array<PortInfo, 1> OutputPorts{
 			    {PortInfo{PixelType::GrayscaleReal, "Output"}}};
 
-			static constexpr std::array<ParamName, 3> ParamNames{
-			    "Semi-axis 1", "Semi-axis 2", "Orientation"};
+			static constexpr std::array<ParamName, 3> ParamNames{"Radius", "Order", "Orientation"};
 		};
 
 		void operator()(ImgProcArg<InterfaceDescriptor> const& args) const;
@@ -56,9 +55,9 @@ namespace GaussianMask2d
 
 		std::span<ParamValue const> paramValues() const { return m_params.values(); }
 
-		static constexpr char const* name() { return "Gaussian mask 2d"; }
+		static constexpr char const* name() { return "Butterworth mask 1d"; }
 
-		static constexpr auto id() { return ImageProcessorId{"27a6e3a3254aa2a0a8744366c82a363f"}; }
+		static constexpr auto id() { return ImageProcessorId{"744774f5bdf17e218773b07d5f9ef5b7"}; }
 
 	private:
 		ParamMap<InterfaceDescriptor> m_params;

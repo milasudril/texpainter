@@ -32,7 +32,7 @@ void ButterworthMask2d::ImageProcessor::operator()(
 
 	auto const r_x = sizeFromParam(*m_params.find<Str{"Semi-axis 1"}>());
 	auto const r_y = sizeFromParam(*m_params.find<Str{"Semi-axis 2"}>());
-	auto const n = orderFromParam(*m_params.find<Str{"Order"}>());
+	auto const n   = orderFromParam(*m_params.find<Str{"Order"}>());
 	auto const θ   = Angle{0.5 * m_params.find<Str{"Orientation"}>()->value(), Angle::Turns{}};
 
 	auto const rot_vec_x = vec2_t{cos(θ), -sin(θ)};
@@ -48,7 +48,7 @@ void ButterworthMask2d::ImageProcessor::operator()(
 		{
 			auto P                   = vec2_t{static_cast<double>(col), static_cast<double>(row)};
 			auto r                   = Texpainter::transform(P - O, rot_vec_x, rot_vec_y) / r_0;
-			args.output<0>(col, row) = 1.0/sqrt(1 + std::pow(Texpainter::dot(r, r), n));
+			args.output<0>(col, row) = 1.0 / sqrt(1 + std::pow(Texpainter::dot(r, r), n));
 		}
 	}
 }

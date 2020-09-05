@@ -11,6 +11,7 @@
 #include "./dft_backward/dft_backward.hpp"
 #include "./complex_real_multiply/complex_real_multiply.hpp"
 #include "./butterworth_mask_2d/butterworth_mask_2d.hpp"
+#include "./butterworth_mask_1d/butterworth_mask_1d.hpp"
 
 #include "filtergraph/image_processor_wrapper.hpp"
 #include "utils/fixed_flatmap.hpp"
@@ -41,8 +42,8 @@ namespace
 	    get_info<::DftForward::ImageProcessor>(),
 	    get_info<::DftBackward::ImageProcessor>(),
 	    get_info<::ComplexRealMultiply::ImageProcessor>(),
-		get_info<::ButterworthMask2d::ImageProcessor>()
-	};
+	    get_info<::ButterworthMask2d::ImageProcessor>(),
+	    get_info<::ButterworthMask1d::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
