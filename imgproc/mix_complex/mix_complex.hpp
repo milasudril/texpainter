@@ -1,20 +1,20 @@
 //@	{
-//@	 "targets":[{"name":"mix_grayscale.hpp", "type":"include"}]
+//@	 "targets":[{"name":"mix_complex.hpp", "type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_IMGPROC_MIXGRAYSCALE_MIXGRAYSCALE_HPP
-#define TEXPAINTER_IMGPROC_MIXGRAYSCALE_MIXGRAYSCALE_HPP
+#ifndef TEXPAINTER_IMGPROC_MIXCOMPLEX_MIXCOMPLEX_HPP
+#define TEXPAINTER_IMGPROC_MIXCOMPLEX_MIXCOMPLEX_HPP
 
 #include "filtergraph/proctypes.hpp"
 #include "filtergraph/img_proc_arg.hpp"
 #include "filtergraph/image_processor_id.hpp"
 
 #include <algorithm>
-#include <cmath>
 
-namespace MixGrayscale
+namespace MixComplex
 {
 	using Texpainter::Str;
+	using Texpainter::FilterGraph::ComplexValue;
 	using Texpainter::FilterGraph::ImageProcessorId;
 	using Texpainter::FilterGraph::ImgProcArg;
 	using Texpainter::FilterGraph::ParamMap;
@@ -22,7 +22,6 @@ namespace MixGrayscale
 	using Texpainter::FilterGraph::ParamValue;
 	using Texpainter::FilterGraph::PixelType;
 	using Texpainter::FilterGraph::PortInfo;
-	using Texpainter::FilterGraph::RealValue;
 
 	class ImageProcessor
 	{
@@ -30,10 +29,10 @@ namespace MixGrayscale
 		struct InterfaceDescriptor
 		{
 			static constexpr std::array<PortInfo, 2> InputPorts{
-			    {PortInfo{PixelType::GrayscaleReal, "Input A"},
-			     PortInfo{PixelType::GrayscaleReal, "Input B"}}};
+			    {PortInfo{PixelType::GrayscaleComplex, "Input A"},
+			     PortInfo{PixelType::GrayscaleComplex, "Input B"}}};
 			static constexpr std::array<PortInfo, 1> OutputPorts{
-			    {PixelType::GrayscaleReal, "Output"}};
+			    {PixelType::GrayscaleComplex, "Output"}};
 
 			static constexpr std::array<ParamName, 1> ParamNames{"Blend factor"};
 		};
@@ -46,7 +45,7 @@ namespace MixGrayscale
 			               args.input<1>(),
 			               args.output<0>(),
 			               [t = *m_params.find<Str{"Blend factor"}>()](auto a, auto b) {
-				               return std::lerp(a, b, t.value());
+				               return a + t.value() * (b - a);
 			               });
 		}
 
@@ -66,9 +65,9 @@ namespace MixGrayscale
 
 		std::span<ParamValue const> paramValues() const { return m_params.values(); }
 
-		static constexpr char const* name() { return "Mix grayscale"; }
+		static constexpr char const* name() { return "Mix spectra"; }
 
-		static constexpr auto id() { return ImageProcessorId{"27180c19b176cfa0e91c899b2a54c165"}; }
+		static constexpr auto id() { return ImageProcessorId{"1845d33d870ee84be36344fdb450e09f"}; }
 
 	private:
 		ParamMap<InterfaceDescriptor> m_params;
