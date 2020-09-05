@@ -28,8 +28,8 @@ namespace ComplexRealMultiply
 		struct InterfaceDescriptor
 		{
 			static constexpr std::array<PortInfo, 2> InputPorts{
-			    {PortInfo{PixelType::GrayscaleComplex, "Input"},
-			     PortInfo{PixelType::GrayscaleReal, "Input"}}};
+			    {PortInfo{PixelType::GrayscaleComplex, "Input A"},
+			     PortInfo{PixelType::GrayscaleReal, "Input B"}}};
 			static constexpr std::array<PortInfo, 1> OutputPorts{
 			    {PixelType::GrayscaleComplex, "Output"}};
 

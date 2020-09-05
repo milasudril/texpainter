@@ -14,6 +14,7 @@
 #include "./butterworth_mask_1d/butterworth_mask_1d.hpp"
 #include "./normalize_grayscale/normalize_grayscale.hpp"
 #include "./grayscale_noise/grayscale_noise.hpp"
+#include "./mix_grayscale/mix_grayscale.hpp"
 
 #include "filtergraph/image_processor_wrapper.hpp"
 #include "utils/fixed_flatmap.hpp"
@@ -47,7 +48,8 @@ namespace
 	    get_info<::ButterworthMask2d::ImageProcessor>(),
 	    get_info<::ButterworthMask1d::ImageProcessor>(),
 	    get_info<::NormalizeGrayscale::ImageProcessor>(),
-	    get_info<::GrayscaleNoise::ImageProcessor>()};
+	    get_info<::GrayscaleNoise::ImageProcessor>(),
+	    get_info<::MixGrayscale::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
