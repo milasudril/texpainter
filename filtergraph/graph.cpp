@@ -86,11 +86,7 @@ Texpainter::FilterGraph::ValidationResult Texpainter::FilterGraph::validate(Grap
 		{
 			case State::Init:
 				visited[node] = State::InProgress;
-				if(!isConnected(*node))
-				{
-					printf("%s %p is not connected\n", node->name(), node);
-					return ValidationResult::InputsNotConnected;
-				}
+				if(!isConnected(*node)) { return ValidationResult::InputsNotConnected; }
 
 				for(auto const& item: node->inputs())
 				{
