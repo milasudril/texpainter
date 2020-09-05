@@ -10,13 +10,17 @@
 
 namespace Texpainter::DefaultRng
 {
+	namespace detail
+	{
+		void engine(PolymorphicRng rng);
+	}
+
 	template<class Rng>
 	void engine(Rng& rng)
 	{
-		engine(PolymorphicRng{rng});
+		detail::engine(PolymorphicRng{rng});
 	}
 
-	void engine(PolymorphicRng rng);
 
 	PolymorphicRng engine();
 }

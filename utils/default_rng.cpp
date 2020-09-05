@@ -23,6 +23,6 @@ namespace
 	constinit Texpainter::PolymorphicRng s_default_rng{s_dummy_rng};
 }
 
-void Texpainter::DefaultRng::engine(PolymorphicRng rng) { s_default_rng = rng; }
+void Texpainter::DefaultRng::detail::engine(PolymorphicRng rng) { s_default_rng = rng; }
 
 Texpainter::PolymorphicRng Texpainter::DefaultRng::engine() { return s_default_rng; }
