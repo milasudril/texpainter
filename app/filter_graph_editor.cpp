@@ -93,15 +93,16 @@ namespace
 	};
 }
 
-Texpainter::FilterGraphEditor::FilterGraphEditor(Ui::Container& owner, FilterGraph::Graph& graph)
-    : r_graph{graph}
+Texpainter::FilterGraphEditor::FilterGraphEditor(Ui::Container& owner,
+                                                 FilterGraph::Graph const& graph)
+    : m_graph{graph}
     , r_callback{[](void*, FilterGraphEditor&) {}}
     , m_canvas{owner}
     , m_node_copy{m_node_menu, "Copy"}
     , m_node_delete{m_node_menu, "Delete"}
 {
 	m_linesegs = m_canvas.insert<Ui::LineSegmentRenderer>();
-	std::ranges::transform(r_graph.nodes(),
+	std::ranges::transform(m_graph.nodes(),
 	                       std::inserter(m_node_editors, std::end(m_node_editors)),
 	                       MakeNodeEditor{m_canvas});
 
@@ -111,8 +112,8 @@ Texpainter::FilterGraphEditor::FilterGraphEditor(Ui::Container& owner, FilterGra
 	m_node_delete.eventHandler<ControlId::DeleteNode>(*this);
 
 	std::ranges::for_each(
-	    r_graph.nodes(), [&ports = m_ports](auto& node_item) { ports.addPorts(node_item.second); });
-	std::ranges::for_each(r_graph.nodes(), [&ports = m_ports](auto const& node_item) {
+	    m_graph.nodes(), [&ports = m_ports](auto& node_item) { ports.addPorts(node_item.second); });
+	std::ranges::for_each(m_graph.nodes(), [&ports = m_ports](auto const& node_item) {
 		ports.addConnections(node_item.second);
 	});
 }
@@ -120,7 +121,7 @@ Texpainter::FilterGraphEditor::FilterGraphEditor(Ui::Container& owner, FilterGra
 Texpainter::FilterGraphEditor& Texpainter::FilterGraphEditor::insert(
     std::unique_ptr<FilterGraph::AbstractImageProcessor> node, Ui::WidgetCoordinates insert_loc)
 {
-	auto node_item = r_graph.insert(std::move(node));
+	auto node_item = m_graph.insert(std::move(node));
 
 	auto ip = m_node_editors.insert(MakeNodeEditor{m_canvas, insert_loc}(node_item));
 	ip.first->second->eventHandler(*this);

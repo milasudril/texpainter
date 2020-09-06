@@ -119,18 +119,11 @@ namespace Texpainter::Model
 
 		FilterGraph::Graph const& filterGraph() const { return *m_graph; }
 
-		// HACK: Because other alternatives are awkward:
-		//
-		//       1. Using a temp copy of the graph would allow change revert but then it is more
-		//          work to preview on canvas
-		//
-		//       2. A Mutator does not work well together with changes to be commited after the
-		//          mutator returns
-		//
-		//       Should probably try to implement (1) later. This requires that it is possible to
-		//       override the filter graph when rendering the layer.
-		//
-		FilterGraph::Graph& filterGraph() { return *m_graph; }
+		Layer& filterGraph(FilterGraph::Graph const& graph)
+		{
+			m_graph = std::make_unique<FilterGraph::Graph>(graph);
+			return *this;
+		}
 
 	private:
 		bool m_visible;

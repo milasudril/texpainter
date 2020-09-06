@@ -212,7 +212,7 @@ namespace Texpainter
 			FilterMenu
 		};
 
-		FilterGraphEditor(Ui::Container& owner, FilterGraph::Graph& graph);
+		FilterGraphEditor(Ui::Container& owner, FilterGraph::Graph const& graph);
 
 		FilterGraphEditor& insert(std::unique_ptr<FilterGraph::AbstractImageProcessor> node,
 		                          Ui::WidgetCoordinates loc = Ui::WidgetCoordinates{50.0, 50.0});
@@ -276,7 +276,7 @@ namespace Texpainter
 			m_ports.removeConnections(conn.sink());
 			m_ports.removeDummyConnection(conn.source());
 			establish(conn);
-			r_graph.clearValidationState();
+			m_graph.clearValidationState();
 			m_ports.addConnection(conn.sink(), conn.source());
 			m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
 			r_callback(r_eh, *this);
@@ -284,8 +284,10 @@ namespace Texpainter
 
 		void updateLocations();
 
+		FilterGraph::Graph const& graph() const { return m_graph; }
+
 	private:
-		FilterGraph::Graph& r_graph;
+		FilterGraph::Graph m_graph;
 		void* r_eh;
 		void (*r_callback)(void*, FilterGraphEditor&);
 
@@ -338,17 +340,17 @@ namespace Texpainter
 	inline void FilterGraphEditor::onActivated<FilterGraphEditor::ControlId::CopyNode>(
 	    Ui::MenuItem&)
 	{
-		insert(r_graph.node(m_sel_node)->clonedProcessor());
+		insert(m_graph.node(m_sel_node)->clonedProcessor());
 	}
 
 	template<>
 	inline void FilterGraphEditor::onActivated<FilterGraphEditor::ControlId::DeleteNode>(
 	    Ui::MenuItem&)
 	{
-		auto node = r_graph.node(m_sel_node);
+		auto node = m_graph.node(m_sel_node);
 		m_ports.removePorts(*node);
 		m_node_editors.erase(m_sel_node);
-		r_graph.erase(m_sel_node);
+		m_graph.erase(m_sel_node);
 		m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
 		r_callback(r_eh, *this);
 	}
