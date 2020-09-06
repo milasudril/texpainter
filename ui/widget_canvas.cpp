@@ -260,6 +260,7 @@ Texpainter::Ui::WidgetCanvasDetail::Impl::Impl(Container& cnt)
 	m_handle    = GTK_OVERLAY(widget);
 	gtk_widget_set_events(
 	    widget, GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
+	gtk_widget_set_size_request(widget, 500, 300);
 	g_signal_connect(widget, "motion-notify-event", G_CALLBACK(canvas_mouse_move), this);
 
 	cnt.add(widget);
