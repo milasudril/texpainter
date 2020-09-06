@@ -284,7 +284,7 @@ namespace Texpainter
 
 		void updateLocations();
 
-		FilterGraph::Graph const& graph() const { return m_graph; }
+		FilterGraph::Graph const& filterGraph() const { return m_graph; }
 
 	private:
 		FilterGraph::Graph m_graph;

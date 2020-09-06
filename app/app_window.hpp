@@ -155,14 +155,7 @@ namespace Texpainter
 
 		void showFxBlendEditor()
 		{
-			Model::Layer* layer{};
-			m_current_document->layersModify(
-			    [&current_layer = m_current_document->currentLayer(), &layer](auto& layers) {
-				    layer = layers[current_layer];
-				    return false;
-			    });
-
-			if(layer != nullptr)
+			if(auto layer = currentLayer(*m_current_document); layer != nullptr)
 			{
 				m_fx_blend_editor_dlg = std::make_unique<FxBlendEditorDlg>(
 				    m_rows, "Effects and blend mode", layer->filterGraph());
@@ -287,7 +280,12 @@ namespace Texpainter
 		void updatePaletteSelector();
 		void updateLayerInfo();
 		void update();
-		void doRender();
+		void doRender(FilterGraph::Graph const& filter);
+		void doRender()
+		{
+			if(auto current_layer = currentLayer(*m_current_document); current_layer != nullptr)
+			{ doRender(current_layer->filterGraph()); }
+		}
 
 		void paint(vec2_t loc);
 
@@ -357,19 +355,26 @@ namespace Texpainter
 	template<>
 	inline void AppWindow::dismiss<AppWindow::ControlId::FxBlendEditor>(FxBlendEditorDlg&)
 	{
-		m_fx_blend_editor_dlg.reset();
-	}
-
-	template<>
-	inline void AppWindow::confirmPositive<AppWindow::ControlId::FxBlendEditor>(FxBlendEditorDlg&)
-	{
-		m_fx_blend_editor_dlg.reset();
-	}
-
-	template<>
-	inline void AppWindow::graphUpdated<AppWindow::ControlId::FxBlendEditor>(FilterGraphEditor&)
-	{
 		doRender();
+		m_fx_blend_editor_dlg.reset();
+	}
+
+	template<>
+	inline void AppWindow::confirmPositive<AppWindow::ControlId::FxBlendEditor>(
+	    FxBlendEditorDlg& dlg)
+	{
+		m_current_document->layersModify([&current_layer = m_current_document->currentLayer(),
+		                                  &filter = dlg.widget().filterGraph()](auto& layers) {
+			layers[current_layer]->filterGraph(filter);
+			return true;
+		});
+		m_fx_blend_editor_dlg.reset();
+	}
+
+	template<>
+	inline void AppWindow::graphUpdated<AppWindow::ControlId::FxBlendEditor>(FilterGraphEditor& src)
+	{
+		doRender(src.filterGraph());
 	}
 }
 
