@@ -139,6 +139,7 @@ namespace Texpainter::Model
 		vec2_t m_scale;
 		std::shared_ptr<PixelStore::Image> m_content;
 		std::unique_ptr<FilterGraph::Graph> m_graph;
+		std::map<FilterGraph::NodeId, vec2_t> m_node_locations;
 
 		explicit Layer(bool vis,
 		               vec2_t loc,
@@ -166,7 +167,14 @@ namespace Texpainter::Model
 		return axisAlignedBoundingBox(scaled_size, layer.rotation());
 	}
 
-	void render(Layer const& layer, Span2d<PixelStore::Pixel> ret);
+	void render(Layer const& layer,
+	            Span2d<PixelStore::Pixel> ret,
+	            FilterGraph::Graph const* filter);
+
+	inline void render(Layer const& layer, Span2d<PixelStore::Pixel> ret)
+	{
+		return render(layer, ret, &layer.filterGraph());
+	}
 
 	void outline(Layer const& layer, Span2d<PixelStore::Pixel> ret);
 }

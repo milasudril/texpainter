@@ -90,16 +90,17 @@ void Texpainter::Model::outline(Layer const& layer, Span2d<PixelStore::Pixel> ca
 	draw_marker(origin + transform(box_layer * vec2_t{1.0, -1.0}, rot_x, rot_y), canvas);
 }
 
-void Texpainter::Model::render(Layer const& layer, Span2d<PixelStore::Pixel> ret)
+void Texpainter::Model::render(Layer const& layer,
+                               Span2d<PixelStore::Pixel> ret,
+                               FilterGraph::Graph const* filter)
 {
 	auto const ϴ            = layer.rotation();
 	auto const rot_x        = vec2_t{cos(ϴ), sin(ϴ)};
 	auto const rot_y        = vec2_t{-sin(ϴ), cos(ϴ)};
 	auto const scale_factor = 1.0 / layer.scaleFactor();
 
-	auto const src = layer.filterGraph().valid()
-	                     ? layer.filterGraph().process(layer.content().pixels())
-	                     : layer.content();
+	auto const src =
+	    filter != nullptr ? filter->process(layer.content().pixels()) : layer.content();
 	auto const origin_src =
 	    0.5 * vec2_t{static_cast<double>(src.width()), static_cast<double>(src.height())};
 	auto const loc_src_ret_coord =
