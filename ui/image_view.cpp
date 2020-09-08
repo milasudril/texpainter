@@ -160,7 +160,6 @@ private:
 			{
 				constexpr auto last_lut_entry = static_cast<int>(gamma_22.size() - 1);
 				auto val                      = read_ptr->value();
-				val *= vec4_t{val[3], val[3], val[3], 1.0f};
 
 				auto pixel_out = static_cast<float>(last_lut_entry) * val;
 

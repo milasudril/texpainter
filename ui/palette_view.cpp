@@ -110,7 +110,6 @@ public:
 		     item_height = dim.height() / m_n_rows - 4,
 		     cols        = m_n_cols,
 		     k           = 0](auto color) mutable {
-			    color *= PixelStore::Pixel{color.alpha(), color.alpha(), color.alpha(), 1.0f};
 			    auto const color_conv =
 			        PixelStore::BasicPixel<PixelStore::ColorProfiles::Gamma22>{color};
 			    cairo_set_source_rgba(cr,
