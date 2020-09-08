@@ -7,7 +7,7 @@
 #define TEXPAINTER_MODEL_LAYER_HPP
 
 #include "./brush.hpp"
-#include "./blend_modes.hpp"
+#include "./blend_function.hpp"
 
 #include "pixel_store/image.hpp"
 #include "utils/angle.hpp"
