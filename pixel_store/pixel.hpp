@@ -222,6 +222,13 @@ namespace Texpainter::PixelStore
 	}
 
 	template<class ColorProfile>
+	constexpr auto absDiff(BasicPixel<ColorProfile> a, BasicPixel<ColorProfile> b)
+	{
+		auto tmp = a - b;
+		return BasicPixel<ColorProfile>{abs(tmp.value())};
+	}
+
+	template<class ColorProfile>
 	constexpr auto intensity(BasicPixel<ColorProfile> a)
 	{
 		return a.red() + a.green() + a.blue();

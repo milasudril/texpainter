@@ -44,6 +44,8 @@ namespace Texpainter
 		return mask_double * vec2_t{1.0, 1.0} + (1.0 + mask_double) * vec2_t{1.0, 1.0};
 	}
 
+	constexpr vec4_t abs(vec4_t a) { return a < vec4_t{0.0f, 0.0f, 0.0f, 0.0f} ? -a : a; }
+
 	inline std::string toString(vec2_t v)
 	{
 		auto ret = std::string{"("};

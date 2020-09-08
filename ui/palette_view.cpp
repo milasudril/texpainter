@@ -103,28 +103,28 @@ public:
 		cairo_fill(cr);
 
 		cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
-		std::ranges::for_each(
-		    m_colors,
-		    [cr,
-		     item_width  = dim.width() / m_n_cols - 4,
-		     item_height = dim.height() / m_n_rows - 4,
-		     cols        = m_n_cols,
-		     k           = 0](auto color) mutable {
-			    auto const color_conv =
-			        PixelStore::BasicPixel<PixelStore::ColorProfiles::Gamma22>{color};
-			    cairo_set_source_rgba(cr,
-			                          color_conv.red(),
-			                          color_conv.green(),
-			                          color_conv.blue(),
-			                          color_conv.alpha());
-			    cairo_rectangle(cr,
-			                    (k % cols) * (item_width + 4) + 2,
-			                    (k / cols) * (item_height + 4) + 2,
-			                    item_width,
-			                    item_height);
-			    cairo_fill(cr);
-			    ++k;
-		    });
+		std::ranges::for_each(m_colors,
+		                      [cr,
+		                       item_width  = dim.width() / m_n_cols - 4,
+		                       item_height = dim.height() / m_n_rows - 4,
+		                       cols        = m_n_cols,
+		                       k           = 0](auto color) mutable {
+			                      auto const color_conv =
+			                          PixelStore::BasicPixel<PixelStore::ColorProfiles::Gamma22>{
+			                              color};
+			                      cairo_set_source_rgba(cr,
+			                                            color_conv.red(),
+			                                            color_conv.green(),
+			                                            color_conv.blue(),
+			                                            color_conv.alpha());
+			                      cairo_rectangle(cr,
+			                                      (k % cols) * (item_width + 4) + 2,
+			                                      (k / cols) * (item_height + 4) + 2,
+			                                      item_width,
+			                                      item_height);
+			                      cairo_fill(cr);
+			                      ++k;
+		                      });
 
 		cairo_set_line_width(cr, 2);
 		std::ranges::for_each(m_highlight_mode,
