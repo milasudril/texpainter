@@ -12,7 +12,11 @@ namespace Texpainter::Model
 	class BlendFunctionInfo
 	{
 	public:
-		explicit BlendFunctionInfo(float strength, BlendMode mode): m_strength{strength}, m_mode{mode} {}
+		explicit BlendFunctionInfo(float strength, BlendMode mode)
+		    : m_strength{strength}
+		    , m_mode{mode}
+		{
+		}
 
 		BlendFunctionInfo& mode(BlendMode mode)
 		{
@@ -37,7 +41,8 @@ namespace Texpainter::Model
 
 	namespace detail
 	{
-		using BlendFunctionFunc = PixelStore::Pixel (*)(PixelStore::Pixel dest, PixelStore::Pixel source);
+		using BlendFunctionFunc = PixelStore::Pixel (*)(PixelStore::Pixel dest,
+		                                                PixelStore::Pixel source);
 		constexpr auto gen_blendfunc_vtable()
 		{
 			std::array<BlendFunctionFunc, static_cast<size_t>(end(Empty<BlendMode>{}))> ret{};
@@ -52,14 +57,17 @@ namespace Texpainter::Model
 	class BlendFunction
 	{
 	public:
-		explicit BlendFunction(BlendMode mode): r_func{detail::blendfunc_vtable[static_cast<int>(mode)]}
+		explicit BlendFunction(BlendMode mode)
+		    : r_func{detail::blendfunc_vtable[static_cast<int>(mode)]}
 		{
 		}
 
-		decltype(auto) operator()(PixelStore::Pixel dest, PixelStore::Pixel source, float strength) const
+		decltype(auto) operator()(PixelStore::Pixel dest,
+		                          PixelStore::Pixel source,
+		                          float strength) const
 		{
 			auto ret = r_func(dest, source);
-			return strength*ret + (1.0f - strength)*ret;
+			return strength * ret + (1.0f - strength) * ret;
 		}
 
 	private:
