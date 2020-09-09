@@ -219,7 +219,7 @@ namespace Texpainter
 			});
 		}
 
-		void onActivated(Tag<LayerAction::EffectsAndBlendMode>, Ui::MenuItem&)
+		void onActivated(Tag<LayerAction::CompositingOptions>, Ui::MenuItem&)
 		{
 			r_doc_owner.showFxBlendEditor();
 		}

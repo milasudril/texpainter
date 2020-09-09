@@ -158,7 +158,7 @@ namespace Texpainter
 			if(auto layer = currentLayer(*m_current_document); layer != nullptr)
 			{
 				m_fx_blend_editor_dlg = std::make_unique<FxBlendEditorDlg>(
-				    m_rows, "Effects and blend mode", layer->filterGraph());
+				    m_rows, "Compositing options", layer->filterGraph());
 				m_fx_blend_editor_dlg->eventHandler<ControlId::FxBlendEditor>(*this);
 				m_fx_blend_editor_dlg->widget().eventHandler<ControlId::FxBlendEditor>(*this);
 			}

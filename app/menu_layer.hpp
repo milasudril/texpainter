@@ -58,7 +58,7 @@ namespace Texpainter
 		MoveUp,
 		MoveDown,
 		MoveToBottom,
-		EffectsAndBlendMode,
+		CompositingOptions,
 		Isolate,
 		Hide
 	};
@@ -198,10 +198,10 @@ namespace Texpainter
 
 
 	template<>
-	struct LayerActionTraits<LayerAction::EffectsAndBlendMode>
+	struct LayerActionTraits<LayerAction::CompositingOptions>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName() { return "Effects and blend mode"; }
+		static constexpr char const* displayName() { return "Compositing options"; }
 	};
 
 	template<>
