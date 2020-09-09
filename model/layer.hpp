@@ -27,7 +27,6 @@ namespace Texpainter::Model
 		    , m_rot{0}
 		    , m_scale{1.0, 1.0}
 		    , m_content{std::make_shared<PixelStore::Image>(std::move(img))}
-		    , m_graph{std::make_unique<FilterGraph::Graph>()}
 		{
 		}
 
@@ -38,7 +37,6 @@ namespace Texpainter::Model
 		    , m_rot{0}
 		    , m_scale{1.0, 1.0}
 		    , m_content{std::make_shared<PixelStore::Image>(size)}
-		    , m_graph{std::make_unique<FilterGraph::Graph>()}
 		{
 			fill(initial_color);
 		}
@@ -55,7 +53,7 @@ namespace Texpainter::Model
 
 		Layer linkedLayer() const
 		{
-			return Layer{m_visible, m_loc, m_rot, m_scale, m_content, *m_graph};
+			return Layer{m_visible, m_loc, m_rot, m_scale, m_content, m_compose_opts};
 		}
 
 		Layer copiedLayer() const
@@ -65,7 +63,7 @@ namespace Texpainter::Model
 			             m_rot,
 			             m_scale,
 			             std::make_shared<PixelStore::Image>(*m_content),
-			             *m_graph};
+			             m_compose_opts};
 		}
 
 		Layer& convertToCopy()
@@ -118,11 +116,11 @@ namespace Texpainter::Model
 
 		auto size() const { return m_content->size(); }
 
-		FilterGraph::Graph const& filterGraph() const { return *m_graph; }
+		FilterGraph::Graph const& filterGraph() const { return m_compose_opts.filterGraph(); }
 
 		Layer& filterGraph(FilterGraph::Graph const& graph)
 		{
-			m_graph = std::make_unique<FilterGraph::Graph>(graph);
+			m_compose_opts.filterGraph(graph);
 			return *this;
 		}
 
@@ -132,7 +130,7 @@ namespace Texpainter::Model
 		Angle m_rot;
 		vec2_t m_scale;
 		std::shared_ptr<PixelStore::Image> m_content;
-		std::unique_ptr<FilterGraph::Graph> m_graph;
+		CompositingOptions m_compose_opts;
 		std::map<FilterGraph::NodeId, vec2_t> m_node_locations;
 
 		explicit Layer(bool vis,
@@ -140,13 +138,13 @@ namespace Texpainter::Model
 		               Angle rot,
 		               vec2_t scale,
 		               std::shared_ptr<PixelStore::Image> const& content,
-		               FilterGraph::Graph const& graph)
+		               CompositingOptions const& compose_opts)
 		    : m_visible{vis}
 		    , m_loc{loc}
 		    , m_rot{rot}
 		    , m_scale{scale}
 		    , m_content{content}
-		    , m_graph{std::make_unique<FilterGraph::Graph>(graph)}
+		    , m_compose_opts{compose_opts}
 		{
 		}
 	};
