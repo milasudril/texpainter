@@ -27,6 +27,22 @@ namespace Texpainter::Model
 		{
 		}
 
+		CompositingOptions(CompositingOptions const& other)
+		    : CompositingOptions{other.filterGraph(), other.blendFunction(), other.strength()}
+		{
+		}
+
+		CompositingOptions(CompositingOptions&& other) = default;
+
+		CompositingOptions& operator=(CompositingOptions&& other) = default;
+
+		CompositingOptions& operator=(CompositingOptions const& other)
+		{
+			auto temp = other;
+			*this     = std::move(other);
+			return *this;
+		}
+
 		FilterGraph::Graph const& filterGraph() const { return *m_filtergraph; }
 
 		CompositingOptions& filterGraph(FilterGraph::Graph const& filtergraph)
