@@ -12,6 +12,8 @@ namespace Texpainter::Model
 	class BlendFunctionInfo
 	{
 	public:
+		BlendFunctionInfo(): BlendFunctionInfo(1.0f, BlendMode::SourceOver) {}
+
 		explicit BlendFunctionInfo(float strength, BlendMode mode)
 		    : m_strength{strength}
 		    , m_mode{mode}
@@ -57,6 +59,8 @@ namespace Texpainter::Model
 	class BlendFunction
 	{
 	public:
+		BlendFunction(): BlendFunction(BlendMode::SourceOver) {}
+
 		explicit BlendFunction(BlendMode mode)
 		    : r_func{detail::blendfunc_vtable[static_cast<int>(mode)]}
 		{
