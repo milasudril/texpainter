@@ -7,7 +7,6 @@
 
 #include <algorithm>
 
-
 namespace
 {
 	template<class PortIdType>
@@ -75,28 +74,29 @@ namespace
 	public:
 		explicit MakeNodeEditor(
 		    Canvas& canvas,
-		    std::map<Texpainter::FilterGraph::NodeId, Texpainter::vec2_t> const& node_locs,
-		    Texpainter::Ui::WidgetCoordinates loc = Texpainter::Ui::WidgetCoordinates{50.0, 50.0})
-		    : m_insert_loc{loc}
-		    , r_node_locs{node_locs}
+		    std::map<Texpainter::FilterGraph::NodeId, Texpainter::vec2_t> const& node_locs)
+		    : r_node_locs{node_locs}
 		    , r_canvas{canvas}
+		    , k{0}
 		{
 		}
 
-		auto operator()(auto& item) const
+		auto operator()(auto& item)
 		{
 			auto const i   = r_node_locs.find(item.first);
 			auto const loc = i != std::end(r_node_locs)
-			                     ? Texpainter::Ui::WidgetCoordinates{i->second}
-			                     : m_insert_loc;
-			auto tmp = r_canvas.template insert<NodeWidget>(item.first, loc, item.second);
+			                     ? Texpainter::vec2_t{i->second}
+			                     : Texpainter::vec2_t{20.0 + 200.0 * k, 20.0};
+			auto tmp = r_canvas.template insert<NodeWidget>(
+			    item.first, Texpainter::Ui::WidgetCoordinates{loc}, item.second);
+			++k;
 			return std::pair{item.first, std::move(tmp)};
 		}
 
 	private:
-		Texpainter::Ui::WidgetCoordinates m_insert_loc;
 		std::map<Texpainter::FilterGraph::NodeId, Texpainter::vec2_t> const& r_node_locs;
 		Canvas& r_canvas;
+		size_t k;
 	};
 }
 
