@@ -130,6 +130,11 @@ namespace Texpainter::Model
 			return *this;
 		}
 
+		std::map<FilterGraph::NodeId, vec2_t> const& nodeLocations() const
+		{
+			return m_node_locations;
+		}
+
 	private:
 		bool m_visible;
 		vec2_t m_loc;

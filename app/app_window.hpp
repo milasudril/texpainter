@@ -158,7 +158,7 @@ namespace Texpainter
 			if(auto layer = currentLayer(*m_current_document); layer != nullptr)
 			{
 				m_fx_blend_editor_dlg = std::make_unique<FxBlendEditorDlg>(
-				    m_rows, "Compositing options", layer->filterGraph());
+				    m_rows, "Compositing options", layer->filterGraph(), layer->nodeLocations());
 				m_fx_blend_editor_dlg->eventHandler<ControlId::FxBlendEditor>(*this);
 				m_fx_blend_editor_dlg->widget().eventHandler<ControlId::FxBlendEditor>(*this);
 			}
@@ -364,7 +364,7 @@ namespace Texpainter
 	    FxBlendEditorDlg& dlg)
 	{
 		m_current_document->layersModify([&current_layer = m_current_document->currentLayer(),
-		                                  &editor = dlg.widget()](auto& layers) {
+		                                  &editor        = dlg.widget()](auto& layers) {
 			layers[current_layer]->filterGraph(editor.filterGraph());
 			layers[current_layer]->nodeLocations(editor.nodeLocations());
 			return true;

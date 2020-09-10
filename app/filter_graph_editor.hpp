@@ -212,7 +212,9 @@ namespace Texpainter
 			FilterMenu
 		};
 
-		FilterGraphEditor(Ui::Container& owner, FilterGraph::Graph const& graph);
+		FilterGraphEditor(Ui::Container& owner,
+		                  FilterGraph::Graph const& graph,
+		                  std::map<FilterGraph::NodeId, vec2_t> const& node_locations);
 
 		FilterGraphEditor& insert(std::unique_ptr<FilterGraph::AbstractImageProcessor> node,
 		                          Ui::WidgetCoordinates loc = Ui::WidgetCoordinates{50.0, 50.0});

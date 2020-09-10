@@ -75,26 +75,35 @@ namespace
 	public:
 		explicit MakeNodeEditor(
 		    Canvas& canvas,
+		    std::map<Texpainter::FilterGraph::NodeId, Texpainter::vec2_t> const& node_locs,
 		    Texpainter::Ui::WidgetCoordinates loc = Texpainter::Ui::WidgetCoordinates{50.0, 50.0})
 		    : m_insert_loc{loc}
+		    , r_node_locs{node_locs}
 		    , r_canvas{canvas}
 		{
 		}
 
 		auto operator()(auto& item) const
 		{
-			auto tmp = r_canvas.template insert<NodeWidget>(item.first, m_insert_loc, item.second);
+			auto const i   = r_node_locs.find(item.first);
+			auto const loc = i != std::end(r_node_locs)
+			                     ? Texpainter::Ui::WidgetCoordinates{i->second}
+			                     : m_insert_loc;
+			auto tmp = r_canvas.template insert<NodeWidget>(item.first, loc, item.second);
 			return std::pair{item.first, std::move(tmp)};
 		}
 
 	private:
 		Texpainter::Ui::WidgetCoordinates m_insert_loc;
+		std::map<Texpainter::FilterGraph::NodeId, Texpainter::vec2_t> const& r_node_locs;
 		Canvas& r_canvas;
 	};
 }
 
-Texpainter::FilterGraphEditor::FilterGraphEditor(Ui::Container& owner,
-                                                 FilterGraph::Graph const& graph)
+Texpainter::FilterGraphEditor::FilterGraphEditor(
+    Ui::Container& owner,
+    FilterGraph::Graph const& graph,
+    std::map<FilterGraph::NodeId, vec2_t> const& node_locations)
     : m_graph{graph}
     , r_callback{[](void*, FilterGraphEditor&) {}}
     , m_canvas{owner}
@@ -104,7 +113,7 @@ Texpainter::FilterGraphEditor::FilterGraphEditor(Ui::Container& owner,
 	m_linesegs = m_canvas.insert<Ui::LineSegmentRenderer>();
 	std::ranges::transform(m_graph.nodes(),
 	                       std::inserter(m_node_editors, std::end(m_node_editors)),
-	                       MakeNodeEditor{m_canvas});
+	                       MakeNodeEditor{m_canvas, node_locations});
 
 	m_canvas.eventHandler<ControlId::NodeWidgets>(*this);
 	std::ranges::for_each(m_node_editors, [this](auto& item) { item.second->eventHandler(*this); });
@@ -134,12 +143,13 @@ std::map<Texpainter::FilterGraph::NodeId, Texpainter::vec2_t> Texpainter::Filter
 Texpainter::FilterGraphEditor& Texpainter::FilterGraphEditor::insert(
     std::unique_ptr<FilterGraph::AbstractImageProcessor> node, Ui::WidgetCoordinates insert_loc)
 {
-	auto node_item = m_graph.insert(std::move(node));
+	auto item = m_graph.insert(std::move(node));
 
-	auto ip = m_node_editors.insert(MakeNodeEditor{m_canvas, insert_loc}(node_item));
+	auto ip = m_node_editors.insert(std::pair{
+	    item.first, m_canvas.template insert<NodeWidget>(item.first, insert_loc, item.second)});
 	ip.first->second->eventHandler(*this);
 
-	m_ports.addPorts(node_item.second.get());
+	m_ports.addPorts(item.second.get());
 
 	m_canvas.showWidgets();
 
