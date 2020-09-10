@@ -118,6 +118,19 @@ Texpainter::FilterGraphEditor::FilterGraphEditor(Ui::Container& owner,
 	});
 }
 
+std::map<Texpainter::FilterGraph::NodeId, Texpainter::vec2_t> Texpainter::FilterGraphEditor::
+    nodeLocations() const
+{
+	std::map<FilterGraph::NodeId, vec2_t> ret;
+
+	std::ranges::transform(
+	    m_graph.nodes(), std::inserter(ret, std::end(ret)), [&canvas = m_canvas](auto const& item) {
+		    return std::pair{item.first, canvas.widgetLocation(item.first).value()};
+	    });
+
+	return ret;
+}
+
 Texpainter::FilterGraphEditor& Texpainter::FilterGraphEditor::insert(
     std::unique_ptr<FilterGraph::AbstractImageProcessor> node, Ui::WidgetCoordinates insert_loc)
 {

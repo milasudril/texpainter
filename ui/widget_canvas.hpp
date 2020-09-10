@@ -62,6 +62,8 @@ namespace Texpainter::Ui
 
 		Container& asContainer() { return *this; }
 
+		WidgetCoordinates widgetLocation(ClientId) const;
+
 	protected:
 		class Impl;
 		explicit WidgetCanvasDetail(WidgetCanvasDetail::Impl& impl): m_impl(&impl) {}
@@ -154,6 +156,11 @@ namespace Texpainter::Ui
 		}
 
 		void showWidgets() { WidgetCanvasDetail::show(); }
+
+		auto widgetLocation(ClientIdType id) const
+		{
+			return WidgetCanvasDetail::widgetLocation(ClientId{id});
+		}
 
 		template<auto id, class EventHandler>
 		WidgetCanvas& eventHandler(EventHandler& eh)

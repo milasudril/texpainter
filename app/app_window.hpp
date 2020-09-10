@@ -364,8 +364,9 @@ namespace Texpainter
 	    FxBlendEditorDlg& dlg)
 	{
 		m_current_document->layersModify([&current_layer = m_current_document->currentLayer(),
-		                                  &filter = dlg.widget().filterGraph()](auto& layers) {
-			layers[current_layer]->filterGraph(filter);
+		                                  &editor = dlg.widget()](auto& layers) {
+			layers[current_layer]->filterGraph(editor.filterGraph());
+			layers[current_layer]->nodeLocations(editor.nodeLocations());
 			return true;
 		});
 		m_fx_blend_editor_dlg.reset();

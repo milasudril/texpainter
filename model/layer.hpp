@@ -124,6 +124,12 @@ namespace Texpainter::Model
 			return *this;
 		}
 
+		Layer& nodeLocations(std::map<FilterGraph::NodeId, vec2_t>&& loc)
+		{
+			m_node_locations = std::move(loc);
+			return *this;
+		}
+
 	private:
 		bool m_visible;
 		vec2_t m_loc;

@@ -286,6 +286,8 @@ namespace Texpainter
 
 		FilterGraph::Graph const& filterGraph() const { return m_graph; }
 
+		std::map<FilterGraph::NodeId, vec2_t> nodeLocations() const;
+
 	private:
 		FilterGraph::Graph m_graph;
 		void* r_eh;

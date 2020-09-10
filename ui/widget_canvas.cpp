@@ -90,6 +90,22 @@ public:
 
 	void insertMode(InsertMode mode) { m_ins_mode = mode; }
 
+	WidgetCoordinates widgetLocation(ClientId client) const
+	{
+		auto i = m_floats.find(client);
+		assert(i != std::end(m_floats));
+
+		int x{};
+		int y{};
+		auto children = gtk_container_get_children(GTK_CONTAINER(i->second));
+		auto frame    = GTK_WIDGET(children->data);
+		g_list_free(children);
+
+		gtk_widget_translate_coordinates(frame, GTK_WIDGET(m_handle), 0, 0, &x, &y);
+
+		return WidgetCoordinates{static_cast<double>(x), static_cast<double>(y)};
+	}
+
 
 private:
 	GtkOverlay* m_handle;
@@ -323,4 +339,10 @@ Texpainter::Ui::WidgetCanvasDetail& Texpainter::Ui::WidgetCanvasDetail::insertMo
 {
 	m_impl->insertMode(mode);
 	return *this;
+}
+
+Texpainter::Ui::WidgetCoordinates Texpainter::Ui::WidgetCanvasDetail::widgetLocation(
+    ClientId id) const
+{
+	return m_impl->widgetLocation(id);
 }
