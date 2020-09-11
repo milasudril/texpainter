@@ -212,6 +212,10 @@ namespace Texpainter
 			FilterMenu
 		};
 
+		FilterGraphEditor(FilterGraphEditor&&) = delete;
+
+		FilterGraphEditor& operator=(FilterGraphEditor&&) = delete;
+
 		FilterGraphEditor(Ui::Container& owner,
 		                  FilterGraph::Graph const& graph,
 		                  std::map<FilterGraph::NodeId, vec2_t> const& node_locations);

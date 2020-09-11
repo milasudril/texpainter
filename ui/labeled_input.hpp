@@ -21,8 +21,9 @@ namespace Texpainter::Ui
 		                      Args&&... args) requires(!Reversed)
 		    : m_box{container, orientation}
 		    , m_widgets{LabelType{m_box, label},
-		                Widget{m_box.insertMode(Box::InsertMode{0, Box::Expand | Box::Fill}),
-		                       std::forward<Args>(args)...}}
+		                std::make_unique<Widget>(
+		                    m_box.insertMode(Box::InsertMode{0, Box::Expand | Box::Fill}),
+		                    std::forward<Args>(args)...)}
 		{
 		}
 
@@ -33,7 +34,7 @@ namespace Texpainter::Ui
 		                      Args&&... args) requires(Reversed)
 		    : m_box{container, orientation}
 		    , m_widgets{
-		          Widget{m_box, std::forward<Args>(args)...},
+		          std::make_unique<Widget>(m_box, std::forward<Args>(args)...),
 		          LabelType{m_box.insertMode(Box::InsertMode{0, Box::Expand | Box::Fill}), label}}
 		{
 		}
@@ -53,17 +54,21 @@ namespace Texpainter::Ui
 
 		Widget const& inputField() const
 		{
-			if constexpr(Reversed) { return m_widgets.first; }
+			if constexpr(Reversed) { return *m_widgets.first; }
 			else
 			{
-				return m_widgets.second;
+				return *m_widgets.second;
 			}
 		}
 
 
 	private:
 		Box m_box;
-		std::conditional_t<Reversed, std::pair<Widget, LabelType>, std::pair<LabelType, Widget>>
+
+		using WidgetPtr = std::unique_ptr<Widget>;
+		std::conditional_t<Reversed,
+		                   std::pair<WidgetPtr, LabelType>,
+		                   std::pair<LabelType, WidgetPtr>>
 		    m_widgets;
 	};
 

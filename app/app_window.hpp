@@ -12,6 +12,7 @@
 #include "./palette_menu_handler.hpp"
 #include "./palette_view_event_handler.hpp"
 #include "./filter_graph_editor.hpp"
+#include "./compositing_options_editor.hpp"
 
 #include "model/document.hpp"
 #include "utils/snap.hpp"
@@ -32,7 +33,7 @@ namespace Texpainter
 {
 	class AppWindow
 	{
-		using FxBlendEditorDlg = Ui::Dialog<FilterGraphEditor>;
+		using CompositingOptionsDlg = Ui::Dialog<CompositingOptionsEditor>;
 
 	public:
 		enum class ControlId : int
@@ -42,7 +43,7 @@ namespace Texpainter
 			BrushSize,
 			PaletteSelector,
 			Canvas,
-			FxBlendEditor
+			CompositingOptions
 		};
 
 		explicit AppWindow(Ui::Container& container, PolymorphicRng rng);
@@ -141,10 +142,10 @@ namespace Texpainter
 		}
 
 		template<ControlId>
-		void dismiss(FxBlendEditorDlg&);
+		void dismiss(CompositingOptionsDlg&);
 
 		template<ControlId>
-		void confirmPositive(FxBlendEditorDlg&);
+		void confirmPositive(CompositingOptionsDlg&);
 
 		template<ControlId>
 		void graphUpdated(FilterGraphEditor&);
@@ -157,10 +158,13 @@ namespace Texpainter
 		{
 			if(auto layer = currentLayer(*m_current_document); layer != nullptr)
 			{
-				m_fx_blend_editor_dlg = std::make_unique<FxBlendEditorDlg>(
-				    m_rows, "Compositing options", layer->filterGraph(), layer->nodeLocations());
-				m_fx_blend_editor_dlg->eventHandler<ControlId::FxBlendEditor>(*this);
-				m_fx_blend_editor_dlg->widget().eventHandler<ControlId::FxBlendEditor>(*this);
+				m_fx_blend_editor_dlg =
+				    std::make_unique<CompositingOptionsDlg>(m_rows,
+				                                            "Compositing options",
+				                                            layer->compositingOptions(),
+				                                            layer->nodeLocations());
+				m_fx_blend_editor_dlg->eventHandler<ControlId::CompositingOptions>(*this);
+				m_fx_blend_editor_dlg->widget().eventHandler<ControlId::CompositingOptions>(*this);
 			}
 		}
 
@@ -272,7 +276,7 @@ namespace Texpainter
 		Ui::Label m_paint_info;
 		Ui::ImageView m_img_view;
 
-		std::unique_ptr<FxBlendEditorDlg> m_fx_blend_editor_dlg;
+		std::unique_ptr<CompositingOptionsDlg> m_fx_blend_editor_dlg;
 
 
 		void updateLayerSelector();
@@ -353,19 +357,19 @@ namespace Texpainter
 	}
 
 	template<>
-	inline void AppWindow::dismiss<AppWindow::ControlId::FxBlendEditor>(FxBlendEditorDlg&)
+	inline void AppWindow::dismiss<AppWindow::ControlId::CompositingOptions>(CompositingOptionsDlg&)
 	{
 		doRender();
 		m_fx_blend_editor_dlg.reset();
 	}
 
 	template<>
-	inline void AppWindow::confirmPositive<AppWindow::ControlId::FxBlendEditor>(
-	    FxBlendEditorDlg& dlg)
+	inline void AppWindow::confirmPositive<AppWindow::ControlId::CompositingOptions>(
+	    CompositingOptionsDlg& dlg)
 	{
 		m_current_document->layersModify([&current_layer = m_current_document->currentLayer(),
 		                                  &editor        = dlg.widget()](auto& layers) {
-			layers[current_layer]->filterGraph(editor.filterGraph());
+			layers[current_layer]->compositingOptions(editor.compositingOptions());
 			layers[current_layer]->nodeLocations(editor.nodeLocations());
 			return true;
 		});
@@ -373,7 +377,8 @@ namespace Texpainter
 	}
 
 	template<>
-	inline void AppWindow::graphUpdated<AppWindow::ControlId::FxBlendEditor>(FilterGraphEditor& src)
+	inline void AppWindow::graphUpdated<AppWindow::ControlId::CompositingOptions>(
+	    FilterGraphEditor& src)
 	{
 		doRender(src.filterGraph());
 	}

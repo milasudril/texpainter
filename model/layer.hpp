@@ -135,6 +135,14 @@ namespace Texpainter::Model
 			return m_node_locations;
 		}
 
+		Layer& compositingOptions(CompositingOptions&& opts)
+		{
+			m_compose_opts = std::move(opts);
+			return *this;
+		}
+
+		CompositingOptions const& compositingOptions() const { return m_compose_opts; }
+
 	private:
 		bool m_visible;
 		vec2_t m_loc;
