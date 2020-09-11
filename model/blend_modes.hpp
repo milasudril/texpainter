@@ -24,10 +24,10 @@ namespace Texpainter::Model
 		return BlendMode{static_cast<uint32_t>(BlendMode::AbsDifference) + 1};
 	}
 	template<BlendMode>
-	struct BlendFunctionTraits;
+	struct BlendModeTraits;
 
 	template<>
-	struct BlendFunctionTraits<BlendMode::SourceOver>
+	struct BlendModeTraits<BlendMode::SourceOver>
 	{
 		static constexpr PixelStore::Pixel blend(PixelStore::Pixel dest, PixelStore::Pixel source)
 		{
@@ -38,7 +38,7 @@ namespace Texpainter::Model
 	};
 
 	template<>
-	struct BlendFunctionTraits<BlendMode::Multiply>
+	struct BlendModeTraits<BlendMode::Multiply>
 	{
 		static constexpr PixelStore::Pixel blend(PixelStore::Pixel dest, PixelStore::Pixel source)
 		{
@@ -49,7 +49,7 @@ namespace Texpainter::Model
 	};
 
 	template<>
-	struct BlendFunctionTraits<BlendMode::AbsDifference>
+	struct BlendModeTraits<BlendMode::AbsDifference>
 	{
 		static constexpr PixelStore::Pixel blend(PixelStore::Pixel dest, PixelStore::Pixel source)
 		{

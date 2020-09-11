@@ -49,7 +49,7 @@ namespace Texpainter::Model
 		{
 			std::array<BlendFunctionFunc, static_cast<size_t>(end(Empty<BlendMode>{}))> ret{};
 			forEachEnumItem<BlendMode>([&ret](auto item) {
-				ret[static_cast<int>(item.value)] = BlendFunctionTraits<item.value>::blend;
+				ret[static_cast<int>(item.value)] = BlendModeTraits<item.value>::blend;
 			});
 			return ret;
 		}
