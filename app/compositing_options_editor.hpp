@@ -44,9 +44,11 @@ namespace Texpainter
 
 		Model::CompositingOptions compositingOptions() const
 		{
-			return Model::CompositingOptions{m_filter_graph.inputField().filterGraph(),
-			                                 Model::BlendFunction{Model::BlendMode::SourceOver},
-			                                 1.0f};
+			return Model::CompositingOptions{
+			    m_filter_graph.inputField().filterGraph(),
+			    Model::BlendFunction{
+			        static_cast<Model::BlendMode>(m_blend_func.inputField().selected())},
+			    static_cast<float>(m_layer_opacity.inputField().value().value())};
 		}
 
 		decltype(auto) nodeLocations() const { return m_filter_graph.inputField().nodeLocations(); }
