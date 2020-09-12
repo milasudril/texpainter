@@ -30,7 +30,7 @@ namespace Texpainter
 		               Ui::Box::Orientation::Horizontal}
 		    , m_blend_func{m_footer, Ui::Box::Orientation::Horizontal, "Blend mode: "}
 		    , m_layer_opacity{
-		          m_footer.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand}),
+		          m_footer.insertMode(Ui::Box::InsertMode{8, Ui::Box::Fill | Ui::Box::Expand}),
 		          Ui::Box::Orientation::Horizontal,
 		          "Layer opacity: ",
 		          false}
