@@ -63,6 +63,7 @@ namespace Texpainter::Model
 
 		explicit BlendFunction(BlendMode mode)
 		    : r_func{detail::blendfunc_vtable[static_cast<int>(mode)]}
+		    , m_id{mode}
 		{
 		}
 
@@ -74,8 +75,11 @@ namespace Texpainter::Model
 			return strength * ret + (1.0f - strength) * ret;
 		}
 
+		BlendMode id() const { return m_id; }
+
 	private:
 		detail::BlendFunctionFunc r_func;
+		BlendMode m_id;
 	};
 }
 #endif

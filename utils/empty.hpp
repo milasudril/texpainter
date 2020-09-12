@@ -103,9 +103,9 @@ namespace Texpainter
 			constexpr static void process(Function&& f)
 			{
 				constexpr auto current_id = previous(enum_item);
-				f(Tag<current_id>{});
 				if constexpr(static_cast<int>(current_id) != 0)
 				{ VisitEnumItem<current_id>::process(f); }
+				f(Tag<current_id>{});
 			}
 		};
 	}

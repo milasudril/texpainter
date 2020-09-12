@@ -23,6 +23,8 @@ namespace Texpainter::Model
 	{
 		return BlendMode{static_cast<uint32_t>(BlendMode::AbsDifference) + 1};
 	}
+
+
 	template<BlendMode>
 	struct BlendModeTraits;
 

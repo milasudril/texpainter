@@ -38,6 +38,7 @@ namespace Texpainter
 			forEachEnumItem<Model::BlendMode>([&blend_func = m_blend_func.inputField()](auto tag) {
 				blend_func.append(Model::BlendModeTraits<tag.value>::displayName());
 			});
+			m_blend_func.inputField().selected(static_cast<int>(comp_opts.blendFunction().id()));
 			m_layer_opacity.inputField().value(Ui::SliderValue{comp_opts.strength()});
 		}
 
