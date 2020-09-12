@@ -282,9 +282,13 @@ Texpainter::Ui::WidgetCanvasDetail::Impl::Impl(Container& cnt)
 	    frame, GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 	gtk_container_add(GTK_CONTAINER(m_handle), frame);
 	gtk_widget_set_size_request(widget, 500, 300);
-	g_signal_connect(frame, "motion-notify-event", G_CALLBACK(canvas_mouse_move), this);
 	g_signal_connect(frame, "button-release-event", G_CALLBACK(canvas_mouse_up), this);
 	g_signal_connect(frame, "button-press-event", G_CALLBACK(canvas_mouse_down), this);
+
+	gtk_widget_set_events(widget, GDK_POINTER_MOTION_MASK);
+	g_signal_connect(widget, "motion-notify-event", G_CALLBACK(canvas_mouse_move), this);
+
+
 	cnt.add(widget);
 	m_moving = nullptr;
 	r_eh     = nullptr;
