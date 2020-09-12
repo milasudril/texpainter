@@ -192,7 +192,7 @@ namespace Texpainter::Model
 		render(layer,
 		       ret,
 		       compose_opts.blendFunction(),
-		       compose_opts.strength(),
+		       compose_opts.opacity(),
 		       filter_graph.valid() ? &filter_graph : nullptr);
 	}
 

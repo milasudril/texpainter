@@ -14,21 +14,21 @@ namespace Texpainter::Model
 	public:
 		CompositingOptions()
 		    : m_filtergraph{std::make_unique<FilterGraph::Graph>()}
-		    , m_strength{1.0f}
+		    , m_opacity{1.0f}
 		{
 		}
 
 		explicit CompositingOptions(FilterGraph::Graph const& filtergraph,
 		                            BlendFunction blend_func,
-		                            float strength)
+		                            float opacity)
 		    : m_filtergraph{std::make_unique<FilterGraph::Graph>(filtergraph)}
 		    , m_blend_func{blend_func}
-		    , m_strength{strength}
+		    , m_opacity{opacity}
 		{
 		}
 
 		CompositingOptions(CompositingOptions const& other)
-		    : CompositingOptions{other.filterGraph(), other.blendFunction(), other.strength()}
+		    : CompositingOptions{other.filterGraph(), other.blendFunction(), other.opacity()}
 		{
 		}
 
@@ -59,18 +59,18 @@ namespace Texpainter::Model
 			return *this;
 		}
 
-		float strength() const { return m_strength; }
+		float opacity() const { return m_opacity; }
 
-		CompositingOptions& strength(float strength)
+		CompositingOptions& opacity(float val)
 		{
-			m_strength = strength;
+			m_opacity = val;
 			return *this;
 		}
 
 	private:
 		std::unique_ptr<FilterGraph::Graph> m_filtergraph;
 		BlendFunction m_blend_func;
-		float m_strength;
+		float m_opacity;
 	};
 
 
@@ -78,7 +78,7 @@ namespace Texpainter::Model
 	                               PixelStore::Pixel dest,
 	                               PixelStore::Pixel src)
 	{
-		return composit_options.blendFunction()(dest, src, composit_options.strength());
+		return composit_options.blendFunction()(dest, src, composit_options.opacity());
 	}
 }
 

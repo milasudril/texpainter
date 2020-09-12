@@ -46,7 +46,7 @@ namespace Texpainter
 				blend_func.append(Model::BlendModeTraits<tag.value>::displayName());
 			});
 			m_blend_func.inputField().selected(static_cast<int>(comp_opts.blendFunction().id()));
-			m_layer_opacity.inputField().value(Ui::SliderValue{comp_opts.strength()});
+			m_layer_opacity.inputField().value(Ui::SliderValue{comp_opts.opacity()});
 		}
 
 		Model::CompositingOptions compositingOptions() const
