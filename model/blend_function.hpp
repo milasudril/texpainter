@@ -72,7 +72,7 @@ namespace Texpainter::Model
 		                          float strength) const
 		{
 			auto ret = r_func(dest, source);
-			return strength * ret + (1.0f - strength) * ret;
+			return strength * ret + (1.0f - strength) * dest;
 		}
 
 		BlendMode id() const { return m_id; }

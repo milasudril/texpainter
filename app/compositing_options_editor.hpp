@@ -14,6 +14,13 @@ namespace Texpainter
 {
 	class CompositingOptionsEditor
 	{
+		enum class ControlId : int
+		{
+			FilterGraph,
+			BlendFunction,
+			LayerOpacity
+		};
+
 	public:
 		explicit CompositingOptionsEditor(Ui::Container& container,
 		                                  Model::CompositingOptions const& comp_opts,
@@ -56,11 +63,37 @@ namespace Texpainter
 		template<auto id, class EventHandler>
 		CompositingOptionsEditor& eventHandler(EventHandler& eh)
 		{
-			m_filter_graph.inputField().template eventHandler<id>(eh);
+			r_eh       = &eh;
+			r_callback = [](void* eh, CompositingOptionsEditor& self) {
+				reinterpret_cast<EventHandler*>(eh)->template onChanged<id>(self);
+			};
+			m_filter_graph.inputField().template eventHandler<ControlId::FilterGraph>(*this);
+			m_blend_func.inputField().template eventHandler<ControlId::BlendFunction>(*this);
+			m_layer_opacity.inputField().template eventHandler<ControlId::LayerOpacity>(*this);
 			return *this;
 		}
 
+		template<ControlId>
+		void graphUpdated(FilterGraphEditor const&)
+		{
+			r_callback(r_eh, *this);
+		}
+
+		template<ControlId>
+		void onChanged(Ui::Combobox const&)
+		{
+			r_callback(r_eh, *this);
+		}
+
+		template<ControlId>
+		void onChanged(Ui::Slider const&)
+		{
+			r_callback(r_eh, *this);
+		}
+
 	private:
+		void* r_eh;
+		void (*r_callback)(void* eh, CompositingOptionsEditor& self);
 		Ui::Box m_root;
 		Ui::LabeledInput<FilterGraphEditor> m_filter_graph;
 		Ui::Box m_footer;

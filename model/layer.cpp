@@ -92,6 +92,8 @@ void Texpainter::Model::outline(Layer const& layer, Span2d<PixelStore::Pixel> ca
 
 void Texpainter::Model::render(Layer const& layer,
                                Span2d<PixelStore::Pixel> ret,
+                               BlendFunction blend,
+                               float opacity,
                                FilterGraph::Graph const* filter)
 {
 	auto const ϴ            = layer.rotation();
@@ -126,7 +128,7 @@ void Texpainter::Model::render(Layer const& layer,
 				    src(static_cast<uint32_t>(src_pos[0]), static_cast<uint32_t>(src_pos[1]));
 				auto& ret_pixel =
 				    ret((col + ret.width()) % ret.width(), (row + ret.height()) % ret.height());
-				ret_pixel = src_pixel.alpha() * src_pixel + (1.0f - src_pixel.alpha()) * ret_pixel;
+				ret_pixel = blend(ret_pixel, src_pixel, opacity);
 			}
 		}
 	}

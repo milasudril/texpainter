@@ -148,7 +148,7 @@ namespace Texpainter
 		void confirmPositive(CompositingOptionsDlg&);
 
 		template<ControlId>
-		void graphUpdated(FilterGraphEditor&);
+		void onChanged(CompositingOptionsEditor&);
 
 		void onKeyDown(Ui::Scancode key);
 
@@ -284,11 +284,11 @@ namespace Texpainter
 		void updatePaletteSelector();
 		void updateLayerInfo();
 		void update();
-		void doRender(FilterGraph::Graph const& filter);
+		void doRender(Model::CompositingOptions const& compose_opts);
 		void doRender()
 		{
 			if(auto current_layer = currentLayer(*m_current_document); current_layer != nullptr)
-			{ doRender(current_layer->filterGraph()); }
+			{ doRender(current_layer->compositingOptions()); }
 		}
 
 		void paint(vec2_t loc);
@@ -377,10 +377,10 @@ namespace Texpainter
 	}
 
 	template<>
-	inline void AppWindow::graphUpdated<AppWindow::ControlId::CompositingOptions>(
-	    FilterGraphEditor& src)
+	inline void AppWindow::onChanged<AppWindow::ControlId::CompositingOptions>(
+	    CompositingOptionsEditor& src)
 	{
-		doRender(src.filterGraph());
+		doRender(src.compositingOptions());
 	}
 }
 

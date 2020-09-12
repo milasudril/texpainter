@@ -133,23 +133,24 @@ void Texpainter::AppWindow::update()
 	doRender();
 }
 
-void Texpainter::AppWindow::doRender(FilterGraph::Graph const& filter)
+void Texpainter::AppWindow::doRender(Model::CompositingOptions const& compose_opts)
 {
 	PixelStore::Image canvas{m_current_document->canvasSize()};
 	std::ranges::fill(canvas.pixels(), PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
-	std::ranges::for_each(
-	    m_current_document->layersByIndex(),
-	    [&canvas, &filter, current_layer = currentLayer(*m_current_document)](auto const& layer) {
-		    if(layer.visible())
-		    {
-			    if(&layer == current_layer)
-			    { render(layer, canvas, filter.valid() ? &filter : nullptr); }
-			    else
-			    {
-				    render(layer, canvas);
-			    }
-		    }
-	    });
+	std::ranges::for_each(m_current_document->layersByIndex(),
+	                      [&canvas,
+	                       &compose_opts,
+	                       current_layer = currentLayer(*m_current_document)](auto const& layer) {
+		                      if(layer.visible())
+		                      {
+			                      if(&layer == current_layer)
+			                      { render(layer, canvas, compose_opts); }
+			                      else
+			                      {
+				                      render(layer, canvas);
+			                      }
+		                      }
+	                      });
 
 	if(auto current_layer = currentLayer(*m_current_document); current_layer != nullptr) [[likely]]
 		{

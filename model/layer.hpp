@@ -180,11 +180,25 @@ namespace Texpainter::Model
 
 	void render(Layer const& layer,
 	            Span2d<PixelStore::Pixel> ret,
+	            BlendFunction blend,
+	            float opacity,
 	            FilterGraph::Graph const* filter);
+
+	inline void render(Layer const& layer,
+	                   Span2d<PixelStore::Pixel> ret,
+	                   CompositingOptions const& compose_opts)
+	{
+		auto const& filter_graph = compose_opts.filterGraph();
+		render(layer,
+		       ret,
+		       compose_opts.blendFunction(),
+		       compose_opts.strength(),
+		       filter_graph.valid() ? &filter_graph : nullptr);
+	}
 
 	inline void render(Layer const& layer, Span2d<PixelStore::Pixel> ret)
 	{
-		return render(layer, ret, &layer.filterGraph());
+		render(layer, ret, layer.compositingOptions());
 	}
 
 	void outline(Layer const& layer, Span2d<PixelStore::Pixel> ret);
