@@ -226,15 +226,13 @@ private:
 		{
 			auto event_move = reinterpret_cast<GdkEventMotion const*>(event);
 
-			// Manually compute correct coordinates for the event
-			int screen_x{};
-			int screen_y{};
-			gdk_window_get_origin(gtk_widget_get_window(widget), &screen_x, &screen_y);
-			auto delta =
-			    ScreenCoordinates{event_move->x_root, event_move->y_root}
-			    - ScreenCoordinates{static_cast<double>(screen_x), static_cast<double>(screen_y)};
-
-			self->m_vt.on_move_canvas(self->r_eh, *self, ToplevelCoordinates{0.0, 0.0} + delta);
+			int loc_x{};
+			int loc_y{};
+			gtk_widget_translate_coordinates(
+			    widget, gtk_widget_get_toplevel(widget), 0, 0, &loc_x, &loc_y);
+			auto offset = vec2_t{static_cast<double>(loc_x), static_cast<double>(loc_y)};
+			self->m_vt.on_move_canvas(
+			    self->r_eh, *self, ToplevelCoordinates{event_move->x, event_move->y} + offset);
 			return FALSE;
 		}
 		return FALSE;
