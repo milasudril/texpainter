@@ -21,13 +21,14 @@ public:
 		switch(m_ins_mode)
 		{
 			case InsertMode::Fixed:
-				gtk_widget_set_events(handle,
-				                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK
-				                          | GDK_BUTTON_RELEASE_MASK);
-				g_signal_connect(handle, "button-release-event", G_CALLBACK(canvas_mouse_up), this);
+			{
 				gtk_overlay_add_overlay(m_handle, handle);
+				gtk_overlay_set_overlay_pass_through(m_handle, handle, TRUE);
 				break;
+			}
+
 			case InsertMode::Movable:
+			{
 				auto frame = GTK_FRAME(gtk_frame_new(nullptr));
 				gtk_frame_set_shadow_type(frame, GTK_SHADOW_OUT);
 				gtk_widget_set_events(GTK_WIDGET(frame),
@@ -57,7 +58,9 @@ public:
 
 				gtk_overlay_add_overlay(m_handle, GTK_WIDGET(fixed_layout));
 				gtk_overlay_set_overlay_pass_through(m_handle, GTK_WIDGET(fixed_layout), TRUE);
+
 				break;
+			}
 		}
 	}
 
@@ -109,6 +112,7 @@ public:
 
 private:
 	GtkOverlay* m_handle;
+	GtkWidget* m_bottom;
 	WidgetCoordinates m_insert_loc;
 	InsertMode m_ins_mode;
 
@@ -222,8 +226,6 @@ private:
 		{
 			auto event_move = reinterpret_cast<GdkEventMotion const*>(event);
 
-			assert(GTK_OVERLAY(widget) == self->m_handle);
-
 			// Manually compute correct coordinates for the event
 			int screen_x{};
 			int screen_y{};
@@ -233,10 +235,13 @@ private:
 			    - ScreenCoordinates{static_cast<double>(screen_x), static_cast<double>(screen_y)};
 
 			self->m_vt.on_move_canvas(self->r_eh, *self, ToplevelCoordinates{0.0, 0.0} + delta);
-			return TRUE;
+			return FALSE;
 		}
 		return FALSE;
 	}
+
+	static gboolean canvas_mouse_down(GtkWidget*, GdkEvent*, gpointer) { return FALSE; }
+
 	static gboolean canvas_mouse_up(GtkWidget*, GdkEvent* event, gpointer user_data)
 	{
 		auto self = reinterpret_cast<Impl*>(user_data);
@@ -248,7 +253,7 @@ private:
 			                              WidgetCoordinates{e->x, e->y},
 			                              ScreenCoordinates{e->x_root, e->y_root},
 			                              e->button);
-			return TRUE;
+			return FALSE;
 		}
 		return FALSE;
 	}
@@ -274,11 +279,14 @@ Texpainter::Ui::WidgetCanvasDetail::Impl::Impl(Container& cnt)
 {
 	auto widget = gtk_overlay_new();
 	m_handle    = GTK_OVERLAY(widget);
+	auto frame  = gtk_drawing_area_new();
 	gtk_widget_set_events(
-	    widget, GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
+	    frame, GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
+	gtk_container_add(GTK_CONTAINER(m_handle), frame);
 	gtk_widget_set_size_request(widget, 500, 300);
-	g_signal_connect(widget, "motion-notify-event", G_CALLBACK(canvas_mouse_move), this);
-
+	g_signal_connect(frame, "motion-notify-event", G_CALLBACK(canvas_mouse_move), this);
+	g_signal_connect(frame, "button-release-event", G_CALLBACK(canvas_mouse_up), this);
+	g_signal_connect(frame, "button-press-event", G_CALLBACK(canvas_mouse_down), this);
 	cnt.add(widget);
 	m_moving = nullptr;
 	r_eh     = nullptr;

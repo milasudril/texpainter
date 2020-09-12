@@ -12,9 +12,7 @@ namespace Texpainter::Model
 	class CompositingOptions
 	{
 	public:
-		CompositingOptions()
-		    : m_filtergraph{std::make_unique<FilterGraph::Graph>()}
-		    , m_opacity{1.0f}
+		CompositingOptions(): m_filtergraph{std::make_unique<FilterGraph::Graph>()}, m_opacity{1.0f}
 		{
 		}
 

@@ -306,7 +306,7 @@ namespace Texpainter
 		Canvas m_canvas;
 		std::unique_ptr<Ui::LineSegmentRenderer> m_linesegs;
 		std::map<FilterGraph::NodeId, Canvas::WidgetHandle<NodeWidget>> m_node_editors;
-		Canvas::WidgetHandle<Ui::Listbox> m_filtermenu;
+		std::unique_ptr<Ui::Listbox> m_filtermenu;
 		Ui::WidgetCoordinates m_filtermenuloc;
 		Ui::Menu m_node_menu;
 		Ui::MenuItem m_node_copy;
@@ -388,8 +388,7 @@ namespace Texpainter
 			case 3:
 				m_filtermenuloc = loc;
 				m_filtermenu.reset();  // Reset first so the same id can be reused
-				m_filtermenu = m_canvas.insert<Ui::Listbox>(
-				    FilterGraph::NodeId{static_cast<uint64_t>(-1)}, loc);
+				m_filtermenu = m_canvas.insert<Ui::Listbox>();
 				std::ranges::for_each(ImageProcessorRegistry::processorNames(),
 				                      [&menu = *m_filtermenu](auto item) { menu.append(item); });
 				m_filtermenu->eventHandler<ControlId::FilterMenu>(*this);

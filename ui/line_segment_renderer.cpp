@@ -17,6 +17,7 @@ public:
 	{
 		auto widget = gtk_drawing_area_new();
 		g_signal_connect(G_OBJECT(widget), "draw", G_CALLBACK(draw_callback), this);
+		g_signal_connect(G_OBJECT(widget), "realize", G_CALLBACK(realized), this);
 		cnt.add(widget);
 		m_handle = GTK_DRAWING_AREA(widget);
 	}
@@ -60,6 +61,12 @@ private:
 		    });
 
 		return FALSE;
+	}
+
+	static void realized(GtkWidget* widget, gpointer*)
+	{
+		auto window = gtk_widget_get_window(widget);
+		gdk_window_set_pass_through(window, TRUE);
 	}
 };
 

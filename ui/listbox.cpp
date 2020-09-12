@@ -70,6 +70,7 @@ public:
 private:
 	void* r_eh;
 	EventHandlerFunc r_func;
+	GtkScrolledWindow* m_root;
 	GtkListBox* m_handle;
 
 	std::vector<GtkListBoxRow*> m_index_row;
@@ -111,21 +112,21 @@ Texpainter::Ui::Listbox& Texpainter::Ui::Listbox::eventHandler(void* event_handl
 
 Texpainter::Ui::Listbox::Impl::Impl(Container& cnt): Listbox(*this), r_eh{nullptr}
 {
-	//	auto scrolled_window = GTK_SCROLLED_WINDOW(gtk_scrolled_window_new(nullptr, nullptr));
-	auto widget = gtk_list_box_new();
-	m_handle    = GTK_LIST_BOX(widget);
+	auto scrolled_window = GTK_SCROLLED_WINDOW(gtk_scrolled_window_new(nullptr, nullptr));
+	auto widget          = gtk_list_box_new();
+	m_handle             = GTK_LIST_BOX(widget);
 	gtk_list_box_set_activate_on_single_click(m_handle, FALSE);
 	g_signal_connect(m_handle, "row-activated", G_CALLBACK(activated), this);
-	//	gtk_container_add(GTK_CONTAINER(scrolled_window), GTK_WIDGET(m_handle));
-	//	gtk_widget_set_size_request(GTK_WIDGET(scrolled_window), 300, 200);
-	cnt.add(widget);
+	gtk_container_add(GTK_CONTAINER(scrolled_window), GTK_WIDGET(m_handle));
+	m_root = scrolled_window;
+	cnt.add(scrolled_window);
 }
 
 Texpainter::Ui::Listbox::Impl::~Impl()
 {
 	m_impl = nullptr;
 	r_eh   = nullptr;
-	gtk_widget_destroy(GTK_WIDGET(m_handle));
+	gtk_widget_destroy(GTK_WIDGET(m_root));
 }
 
 Texpainter::Ui::Listbox& Texpainter::Ui::Listbox::scrollIntoView(int row) noexcept
