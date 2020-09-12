@@ -111,6 +111,7 @@ public:
 
 
 private:
+	GtkScrolledWindow* m_root;
 	GtkOverlay* m_handle;
 	GtkWidget* m_bottom;
 	WidgetCoordinates m_insert_loc;
@@ -142,6 +143,13 @@ private:
 			    self->m_loc_init
 			    + (ScreenCoordinates{event_move->x_root, event_move->y_root} - self->m_click_loc);
 			loc_new = max(loc_new, WidgetCoordinates{0.0, 0.0});
+
+			auto const w_widget = gtk_widget_get_allocated_width(self->m_moving);
+			auto const h_widget = gtk_widget_get_allocated_height(self->m_moving);
+
+			gtk_widget_set_size_request(
+			    GTK_WIDGET(self->m_handle), w_widget + loc_new.x(), h_widget + loc_new.y());
+
 			gtk_fixed_move(fixed_layout, self->m_moving, loc_new.x(), loc_new.y());
 			if(self->r_eh != nullptr)
 			{
@@ -275,21 +283,22 @@ Texpainter::Ui::WidgetCanvasDetail::Impl::Impl(Container& cnt)
     , m_insert_loc{0.0, 0.0}
     , m_ins_mode{InsertMode::Fixed}
 {
+	m_root      = GTK_SCROLLED_WINDOW(gtk_scrolled_window_new(nullptr, nullptr));
 	auto widget = gtk_overlay_new();
-	m_handle    = GTK_OVERLAY(widget);
-	auto frame  = gtk_drawing_area_new();
+	gtk_container_add(GTK_CONTAINER(m_root), widget);
+	m_handle   = GTK_OVERLAY(widget);
+	auto frame = gtk_drawing_area_new();
 	gtk_widget_set_events(
 	    frame, GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 	gtk_container_add(GTK_CONTAINER(m_handle), frame);
-	gtk_widget_set_size_request(widget, 500, 300);
+	gtk_widget_set_size_request(GTK_WIDGET(m_root), 500, 300);
 	g_signal_connect(frame, "button-release-event", G_CALLBACK(canvas_mouse_up), this);
 	g_signal_connect(frame, "button-press-event", G_CALLBACK(canvas_mouse_down), this);
 
 	gtk_widget_set_events(widget, GDK_POINTER_MOTION_MASK);
 	g_signal_connect(widget, "motion-notify-event", G_CALLBACK(canvas_mouse_move), this);
 
-
-	cnt.add(widget);
+	cnt.add(m_root);
 	m_moving = nullptr;
 	r_eh     = nullptr;
 	g_signal_connect(widget, "map", G_CALLBACK(on_realized), this);
@@ -299,7 +308,7 @@ Texpainter::Ui::WidgetCanvasDetail::Impl::~Impl()
 {
 	r_eh   = nullptr;
 	m_impl = nullptr;
-	gtk_widget_destroy(GTK_WIDGET(m_handle));
+	gtk_widget_destroy(GTK_WIDGET(m_root));
 }
 
 Texpainter::Ui::WidgetCanvasDetail::WidgetCanvasDetail(Container& cnt) { m_impl = new Impl(cnt); }
