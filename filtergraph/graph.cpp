@@ -35,8 +35,12 @@ namespace
 			    std::ranges::for_each(
 			        item.second.inputs(),
 			        [&g2, &ptr_to_id, id_a = item.first, k = 0u](auto const& conn) mutable {
-				        auto id_b = ptr_to_id.find(&conn.processor())->second;
-				        g2.connect(id_a, Texpainter::FilterGraph::InputPort{k}, id_b, conn.port());
+				        if(conn.valid())
+				        {
+					        auto id_b = ptr_to_id.find(&conn.processor())->second;
+					        g2.connect(
+					            id_a, Texpainter::FilterGraph::InputPort{k}, id_b, conn.port());
+				        }
 				        ++k;
 			        });
 		    });
