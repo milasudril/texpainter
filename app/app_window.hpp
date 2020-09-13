@@ -62,15 +62,6 @@ namespace Texpainter
 			return *this;
 		}
 
-		template<Mutator<Model::Document> Func>
-		bool documentModify(Func&& f)
-		{
-			auto res = f(*m_current_document);
-			if(res) { update(); }
-			m_rows.killFocus();
-			return res;
-		}
-
 		Model::Document const& document() const { return *m_current_document; }
 
 		bool hasDocument() const { return m_current_document != nullptr; }
