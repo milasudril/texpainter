@@ -4,6 +4,7 @@
 #define TEXPAINTER_APP_MENULAYER_HPP
 
 #include "ui/menu_item.hpp"
+#include "ui/checkable_menu_item.hpp"
 #include "ui/menu_builder.hpp"
 
 namespace Texpainter
@@ -207,14 +208,14 @@ namespace Texpainter
 	template<>
 	struct LayerActionTraits<LayerAction::Isolate>
 	{
-		using type = Ui::MenuItem;
+		using type = Ui::CheckableMenuItem;
 		static constexpr char const* displayName() { return "Isolate"; }
 	};
 
 	template<>
 	struct LayerActionTraits<LayerAction::Hide>
 	{
-		using type = Ui::MenuItem;
+		using type = Ui::CheckableMenuItem;
 		static constexpr char const* displayName() { return "Hide"; }
 	};
 }

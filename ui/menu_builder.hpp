@@ -39,7 +39,11 @@ namespace Texpainter::Ui
 		SubmenuBuilder& eventHandler(EventHandler& eh)
 		{
 			forEachEnumItem<EnumType>([this, &eh](auto tag) {
-				if constexpr(std::is_same_v<Ui::MenuItem, typename EnumTypeTraits<tag.value>::type>)
+				if constexpr(
+				    std::is_same_v<
+				        Ui::MenuItem,
+				        typename EnumTypeTraits<tag.value>::
+				            type> || std::is_same_v<Ui::CheckableMenuItem, typename EnumTypeTraits<tag.value>::type>)
 				{ get<tag.value>(m_items).template eventHandler<tag.value>(eh); }
 				else
 				{
@@ -71,7 +75,11 @@ namespace Texpainter::Ui
 		MenuBuilder& eventHandler(EventHandler& eh)
 		{
 			forEachEnumItem<EnumType>([this, &eh](auto tag) {
-				if constexpr(std::is_same_v<Ui::MenuItem, typename EnumTypeTraits<tag.value>::type>)
+				if constexpr(
+				    std::is_same_v<
+				        Ui::MenuItem,
+				        typename EnumTypeTraits<tag.value>::
+				            type> || std::is_same_v<Ui::CheckableMenuItem, typename EnumTypeTraits<tag.value>::type>)
 				{ get<tag.value>(m_items).template eventHandler<tag.value>(eh); }
 				else
 				{

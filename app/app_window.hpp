@@ -93,6 +93,16 @@ namespace Texpainter
 			if(hasDocument()) { m_layer_menu_handler.onActivated<action>(item); }
 		}
 
+		template<LayerAction action>
+		void onActivated(Ui::CheckableMenuItem& item)
+		{
+			if(hasDocument()) { m_layer_menu_handler.onActivated<action>(item); }
+			else
+			{
+				item.toggle();
+			}
+		}
+
 		template<LayerActionNew action>
 		void onActivated(Ui::MenuItem& item)
 		{

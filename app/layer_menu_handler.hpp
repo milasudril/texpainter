@@ -64,8 +64,8 @@ namespace Texpainter
 		{
 		}
 
-		template<LayerAction action>
-		void onActivated(Ui::MenuItem& item)
+		template<LayerAction action, class MenuItemType>
+		void onActivated(MenuItemType& item)
 		{
 			onActivated(Tag<action>{}, item);
 		}
@@ -222,6 +222,33 @@ namespace Texpainter
 		void onActivated(Tag<LayerAction::CompositingOptions>, Ui::MenuItem&)
 		{
 			r_doc_owner.showFxBlendEditor();
+		}
+
+		void onActivated(Tag<LayerAction::Isolate>, Ui::CheckableMenuItem& item)
+		{
+			r_doc_owner.documentModify([&item](auto& doc) {
+				if(auto layer = currentLayer(doc); layer != nullptr) { return true; }
+				else
+				{
+					item.toggle();
+					return false;
+				}
+			});
+		}
+
+		void onActivated(Tag<LayerAction::Hide>, Ui::CheckableMenuItem& item)
+		{
+			r_doc_owner.documentModify([&item](auto& doc) {
+				return doc.layersModify([&current_layer = doc.currentLayer(), &item](auto& layers) {
+					if(auto layer = layers[current_layer]; layer != nullptr)
+					{
+						layer->visible(!item.status());
+						return true;
+					}
+					item.toggle();
+					return false;
+				});
+			});
 		}
 
 		template<ControlId id, class Src>
