@@ -259,7 +259,7 @@ namespace Texpainter
 
 		DocMenuHandler<AppWindow> m_doc_menu_handler;
 		LayerMenuHandler<AppWindow> m_layer_menu_handler;
-		PaletteMenuHandler<AppWindow> m_palette_menu_handler;
+		PaletteMenuHandler m_palette_menu_handler;
 		PaletteViewEventHandler<AppWindow> m_pal_view_eh;
 
 		Ui::Box m_rows;

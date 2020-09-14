@@ -18,11 +18,35 @@
 
 namespace Texpainter
 {
-	template<class DocOwner>
 	class PaletteMenuHandler
 	{
-		using PaletteCreateDlg   = Ui::Dialog<Ui::LabeledInput<Ui::TextEntry>>;
-		using PaletteGenerateDlg = Ui::Dialog<PaletteCreator>;
+		template<class DialogType>
+		class InputDialog
+		{
+		public:
+			template<class... Args>
+			explicit InputDialog(Model::Document& doc, Args&&... args)
+			    : r_document{&doc}
+			    , m_dlg{std::forward<Args>(args)...} {};
+
+			template<auto id, class EventHandler>
+			InputDialog& eventHandler(EventHandler& eh)
+			{
+				m_dlg.template eventHandler<id>(eh);
+				return *this;
+			}
+
+			auto& widget() { return m_dlg.widget(); }
+
+			Model::Document& document() { return *r_document; }
+
+		private:
+			Model::Document* r_document;
+			DialogType m_dlg;
+		};
+
+		using PaletteCreateDlg   = InputDialog<Ui::Dialog<Ui::LabeledInput<Ui::TextEntry>>>;
+		using PaletteGenerateDlg = InputDialog<Ui::Dialog<PaletteCreator>>;
 
 	public:
 		enum class ControlId : int
@@ -31,19 +55,16 @@ namespace Texpainter
 			NewGenerated
 		};
 
-		explicit PaletteMenuHandler(Ui::Container& dialog_owner,
-		                            DocOwner& doc_owner,
-		                            PolymorphicRng rng)
+		explicit PaletteMenuHandler(Ui::Container& dialog_owner, PolymorphicRng rng)
 		    : r_dlg_owner{dialog_owner}
-		    , r_doc_owner{doc_owner}
 		    , m_rng{rng}
 		{
 		}
 
 		template<PaletteActionNew action>
-		void onActivated(Ui::MenuItem& item)
+		void onActivated(Ui::MenuItem& item, Model::Document& doc)
 		{
-			onActivated(Tag<action>{}, item);
+			onActivated(Tag<action>{}, item, doc);
 		}
 
 		template<ControlId id, class Src>
@@ -58,35 +79,21 @@ namespace Texpainter
 			confirmPositive(Tag<id>{}, src);
 		}
 
-		void onActivated(Tag<PaletteActionNew::Empty>, Ui::MenuItem&)
+		void onActivated(Tag<PaletteActionNew::Empty>, Ui::MenuItem&, Model::Document& doc)
 		{
-			if(r_doc_owner.hasDocument())
-			{
-				m_new_empty_dlg =
-				    std::make_unique<PaletteCreateDlg>(r_dlg_owner,
-				                                       "Create new palette",
-				                                       Ui::Box::Orientation::Horizontal,
-				                                       "Palette name: ");
-				m_new_empty_dlg->eventHandler<ControlId::NewEmpty>(*this);
-			}
-			else
-			{
-				// TODO: Create new document and retrigger this action
-			}
+			m_new_empty_dlg = std::make_unique<PaletteCreateDlg>(doc,
+			                                                     r_dlg_owner,
+			                                                     "Create new palette",
+			                                                     Ui::Box::Orientation::Horizontal,
+			                                                     "Palette name: ");
+			m_new_empty_dlg->eventHandler<ControlId::NewEmpty>(*this);
 		}
 
-		void onActivated(Tag<PaletteActionNew::Generate>, Ui::MenuItem&)
+		void onActivated(Tag<PaletteActionNew::Generate>, Ui::MenuItem&, Model::Document& doc)
 		{
-			if(r_doc_owner.hasDocument())
-			{
-				m_new_generated_dlg =
-				    std::make_unique<PaletteGenerateDlg>(r_dlg_owner, "Generate palette");
-				m_new_generated_dlg->eventHandler<ControlId::NewGenerated>(*this);
-			}
-			else
-			{
-				// TODO: Create new document and retrigger this action
-			}
+			m_new_generated_dlg =
+			    std::make_unique<PaletteGenerateDlg>(doc, r_dlg_owner, "Generate palette");
+			m_new_generated_dlg->eventHandler<ControlId::NewGenerated>(*this);
 		}
 
 		template<PaletteActionNew action>
@@ -99,7 +106,7 @@ namespace Texpainter
 		void confirmPositive(Tag<ControlId::NewEmpty>, PaletteCreateDlg& src)
 		{
 			auto palette_name = src.widget().inputField().content();
-			insertNewPalette(std::move(palette_name), PixelStore::Palette{23});
+			insertNewPalette(std::move(palette_name), PixelStore::Palette{23}, src.document());
 			m_new_empty_dlg.reset();
 		}
 
@@ -123,7 +130,7 @@ namespace Texpainter
 			pal[PixelStore::ColorIndex{21}] =
 			    toRgb(PixelStore::Hsi{0.0f, 0.0f, 1.0f / (128.0f * 3.0), 1.0f});
 			pal[PixelStore::ColorIndex{22}] = PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f};
-			insertNewPalette(std::move(palette_info.name), std::move(pal));
+			insertNewPalette(std::move(palette_info.name), std::move(pal), src.document());
 			m_new_generated_dlg.reset();
 		}
 
@@ -134,24 +141,22 @@ namespace Texpainter
 
 	private:
 		Ui::Container& r_dlg_owner;
-		DocOwner& r_doc_owner;
 		PolymorphicRng m_rng;
 
 		std::unique_ptr<PaletteCreateDlg> m_new_empty_dlg;
 		std::unique_ptr<PaletteGenerateDlg> m_new_generated_dlg;
 
 
-		void insertNewPalette(std::string&& palette_name, PixelStore::Palette&& palette)
+		void insertNewPalette(std::string&& palette_name,
+		                      PixelStore::Palette&& palette,
+		                      Model::Document& doc)
 		{
-			r_doc_owner.documentModify([&palette_name, &palette](auto& doc) noexcept {
-				(void)doc.palettesModify([palette_name, &palette](auto& palettes) mutable noexcept {
-					// FIXME: Unique name generator...
-					palettes.insert(std::make_pair(std::move(palette_name), std::move(palette)));
-					return true;
-				});
-				doc.currentPalette(std::move(palette_name));
+			doc.palettesModify([palette_name, &palette](auto& palettes) mutable noexcept {
+				// FIXME: Unique name generator...
+				palettes.insert(std::make_pair(std::move(palette_name), std::move(palette)));
 				return true;
 			});
+			doc.currentPalette(std::move(palette_name));
 		}
 	};
 }
