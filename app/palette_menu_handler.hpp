@@ -103,17 +103,23 @@ namespace Texpainter
 		}
 
 
-		void confirmPositive(Tag<ControlId::NewEmpty>, PaletteCreateDlg& src)
+		template<class Dialog>
+		void confirmPositive(Tag<ControlId::NewEmpty>, Dialog& src)
 		{
 			auto palette_name = src.widget().inputField().content();
 			insertNewPalette(std::move(palette_name), PixelStore::Palette{23}, src.document());
 			m_new_empty_dlg.reset();
 		}
 
-		void dismiss(Tag<ControlId::NewEmpty>, PaletteCreateDlg&) { m_new_empty_dlg.reset(); }
+		template<class Dialog>
+		void dismiss(Tag<ControlId::NewEmpty>, Dialog&)
+		{
+			m_new_empty_dlg.reset();
+		}
 
 
-		void confirmPositive(Tag<ControlId::NewGenerated>, PaletteGenerateDlg& src)
+		template<class Dialog>
+		void confirmPositive(Tag<ControlId::NewGenerated>, Dialog& src)
 		{
 			auto palette_info = src.widget().value();
 			PixelStore::Palette pal{23};
@@ -134,7 +140,8 @@ namespace Texpainter
 			m_new_generated_dlg.reset();
 		}
 
-		void dismiss(Tag<ControlId::NewGenerated>, PaletteGenerateDlg&)
+		template<class Dialog>
+		void dismiss(Tag<ControlId::NewGenerated>, Dialog&)
 		{
 			m_new_generated_dlg.reset();
 		}

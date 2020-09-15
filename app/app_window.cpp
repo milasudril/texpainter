@@ -14,7 +14,7 @@ Texpainter::AppWindow::AppWindow(Ui::Container& container, PolymorphicRng rng)
     , m_doc_menu_handler{container, *this}
     , m_layer_menu_handler{container, *this, m_rng}
     , m_palette_menu_handler{container, m_rng}
-    , m_pal_view_eh{container, *this, m_rng}
+    , m_pal_view_eh{container, m_rng}
 
     // Widgets
     , m_rows{container, Ui::Box::Orientation::Vertical}

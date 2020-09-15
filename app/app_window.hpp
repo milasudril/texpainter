@@ -42,6 +42,7 @@ namespace Texpainter
 			BrushSelector,
 			BrushSize,
 			PaletteSelector,
+			PaletteView,
 			Canvas,
 			CompositingOptions
 		};
@@ -51,7 +52,7 @@ namespace Texpainter
 		AppWindow& document(Model::Document&& doc)
 		{
 			m_current_document = std::make_unique<Model::Document>(std::move(doc));
-			m_pal_view.eventHandler<0>(m_pal_view_eh);
+			m_pal_view.eventHandler<ControlId::PaletteView>(*this);
 			m_layer_selector.inputField().eventHandler<ControlId::LayerSelector>(*this);
 			m_brush_selector.inputField().eventHandler<ControlId::BrushSelector>(*this);
 			m_brush_size.eventHandler<ControlId::BrushSize>(*this);
@@ -139,6 +140,17 @@ namespace Texpainter
 
 		template<ControlId>
 		void onKeyUp(Ui::ImageView&, int)
+		{
+		}
+
+		template<ControlId>
+		void onMouseDown(Ui::PaletteView&, PixelStore::ColorIndex, int button);
+
+		template<ControlId>
+		void onMouseUp(Ui::PaletteView&, PixelStore::ColorIndex, int button);
+
+		template<ControlId>
+		void onMouseMove(Ui::PaletteView&, PixelStore::ColorIndex)
 		{
 		}
 
@@ -260,7 +272,7 @@ namespace Texpainter
 		DocMenuHandler<AppWindow> m_doc_menu_handler;
 		LayerMenuHandler<AppWindow> m_layer_menu_handler;
 		PaletteMenuHandler m_palette_menu_handler;
-		PaletteViewEventHandler<AppWindow> m_pal_view_eh;
+		PaletteViewEventHandler m_pal_view_eh;
 
 		Ui::Box m_rows;
 		Ui::MenuBuilder<MainMenuItem, MainMenuItemTraits> m_menu;
