@@ -20,33 +20,8 @@ namespace Texpainter
 {
 	class PaletteMenuHandler
 	{
-		template<class DialogType>
-		class InputDialog
-		{
-		public:
-			template<class... Args>
-			explicit InputDialog(Model::Document& doc, Args&&... args)
-			    : r_document{&doc}
-			    , m_dlg{std::forward<Args>(args)...} {};
-
-			template<auto id, class EventHandler>
-			InputDialog& eventHandler(EventHandler& eh)
-			{
-				m_dlg.template eventHandler<id>(eh);
-				return *this;
-			}
-
-			auto& widget() { return m_dlg.widget(); }
-
-			Model::Document& document() { return *r_document; }
-
-		private:
-			Model::Document* r_document;
-			DialogType m_dlg;
-		};
-
-		using PaletteCreateDlg   = InputDialog<Ui::Dialog<Ui::LabeledInput<Ui::TextEntry>>>;
-		using PaletteGenerateDlg = InputDialog<Ui::Dialog<PaletteCreator>>;
+		using PaletteCreateDlg   = Ui::Dialog<Ui::LabeledInput<Ui::TextEntry>>;
+		using PaletteGenerateDlg = Ui::Dialog<PaletteCreator>;
 
 	public:
 		enum class ControlId : int
@@ -56,8 +31,9 @@ namespace Texpainter
 		};
 
 		explicit PaletteMenuHandler(Ui::Container& dialog_owner, PolymorphicRng rng)
-		    : r_dlg_owner{dialog_owner}
+		    : r_document{nullptr}
 		    , m_rng{rng}
+		    , r_dlg_owner{dialog_owner}
 		{
 		}
 
@@ -81,8 +57,8 @@ namespace Texpainter
 
 		void onActivated(Tag<PaletteActionNew::Empty>, Ui::MenuItem&, Model::Document& doc)
 		{
-			m_new_empty_dlg = std::make_unique<PaletteCreateDlg>(doc,
-			                                                     r_dlg_owner,
+			r_document      = &doc;
+			m_new_empty_dlg = std::make_unique<PaletteCreateDlg>(r_dlg_owner,
 			                                                     "Create new palette",
 			                                                     Ui::Box::Orientation::Horizontal,
 			                                                     "Palette name: ");
@@ -91,8 +67,9 @@ namespace Texpainter
 
 		void onActivated(Tag<PaletteActionNew::Generate>, Ui::MenuItem&, Model::Document& doc)
 		{
+			r_document = &doc;
 			m_new_generated_dlg =
-			    std::make_unique<PaletteGenerateDlg>(doc, r_dlg_owner, "Generate palette");
+			    std::make_unique<PaletteGenerateDlg>(r_dlg_owner, "Generate palette");
 			m_new_generated_dlg->eventHandler<ControlId::NewGenerated>(*this);
 		}
 
@@ -102,24 +79,16 @@ namespace Texpainter
 			printf("Todo: %d\n", static_cast<int>(action));
 		}
 
-
-		template<class Dialog>
-		void confirmPositive(Tag<ControlId::NewEmpty>, Dialog& src)
+		void confirmPositive(Tag<ControlId::NewEmpty>, PaletteCreateDlg& src)
 		{
 			auto palette_name = src.widget().inputField().content();
-			insertNewPalette(std::move(palette_name), PixelStore::Palette{23}, src.document());
+			insertNewPalette(std::move(palette_name), PixelStore::Palette{23}, *r_document);
 			m_new_empty_dlg.reset();
 		}
 
-		template<class Dialog>
-		void dismiss(Tag<ControlId::NewEmpty>, Dialog&)
-		{
-			m_new_empty_dlg.reset();
-		}
+		void dismiss(Tag<ControlId::NewEmpty>, PaletteCreateDlg&) { m_new_empty_dlg.reset(); }
 
-
-		template<class Dialog>
-		void confirmPositive(Tag<ControlId::NewGenerated>, Dialog& src)
+		void confirmPositive(Tag<ControlId::NewGenerated>, PaletteGenerateDlg& src)
 		{
 			auto palette_info = src.widget().value();
 			PixelStore::Palette pal{23};
@@ -136,19 +105,19 @@ namespace Texpainter
 			pal[PixelStore::ColorIndex{21}] =
 			    toRgb(PixelStore::Hsi{0.0f, 0.0f, 1.0f / (128.0f * 3.0), 1.0f});
 			pal[PixelStore::ColorIndex{22}] = PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f};
-			insertNewPalette(std::move(palette_info.name), std::move(pal), src.document());
+			insertNewPalette(std::move(palette_info.name), std::move(pal), *r_document);
 			m_new_generated_dlg.reset();
 		}
 
-		template<class Dialog>
-		void dismiss(Tag<ControlId::NewGenerated>, Dialog&)
+		void dismiss(Tag<ControlId::NewGenerated>, PaletteGenerateDlg&)
 		{
 			m_new_generated_dlg.reset();
 		}
 
 	private:
-		Ui::Container& r_dlg_owner;
+		Model::Document* r_document;
 		PolymorphicRng m_rng;
+		Ui::Container& r_dlg_owner;
 
 		std::unique_ptr<PaletteCreateDlg> m_new_empty_dlg;
 		std::unique_ptr<PaletteGenerateDlg> m_new_generated_dlg;
