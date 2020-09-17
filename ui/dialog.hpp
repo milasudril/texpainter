@@ -8,6 +8,7 @@
 #include "./box.hpp"
 #include "./filler.hpp"
 #include "utils/add_member_if.hpp"
+#include "utils/constructible_from.hpp"
 
 #include <array>
 #include <cassert>
@@ -146,7 +147,8 @@ namespace Texpainter::Ui
 		Dialog(Dialog&&)            = delete;
 
 		template<class... WidgetParams>
-		Dialog(Container& owner, const char* title, WidgetParams&&... params)
+		Dialog(Container& owner, char const* title, WidgetParams&&... params) requires
+		ConstructibleFrom<Widget, Container, WidgetParams...>
 		    : m_window(title, &owner)
 		    , m_content(m_window, Box::Orientation::Vertical)
 		    , m_widget(m_content.insertMode({2, Box::Fill | Box::Expand}),

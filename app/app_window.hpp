@@ -270,7 +270,7 @@ namespace Texpainter
 		} m_rot_state;
 
 		DocMenuHandler<AppWindow> m_doc_menu_handler;
-		LayerMenuHandler<AppWindow> m_layer_menu_handler;
+		LayerMenuHandler m_layer_menu_handler;
 		PaletteMenuHandler m_palette_menu_handler;
 		PaletteViewEventHandler m_pal_view_eh;
 

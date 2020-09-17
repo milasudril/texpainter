@@ -13,6 +13,7 @@
 #include "ui/dialog.hpp"
 #include "ui/labeled_input.hpp"
 #include "ui/text_entry.hpp"
+#include "utils/inherit_from.hpp"
 
 #include <random>
 
@@ -20,7 +21,10 @@ namespace Texpainter
 {
 	class PaletteMenuHandler
 	{
-		using PaletteCreateDlg   = Ui::Dialog<Ui::LabeledInput<Ui::TextEntry>>;
+		using PaletteCreateDlg   = Ui::Dialog<
+			InheritFrom<
+				std::reference_wrapper<Model::Document>, Ui::LabeledInput<Ui::TextEntry>
+				>>;
 		using PaletteGenerateDlg = Ui::Dialog<PaletteCreator>;
 
 	public:
@@ -61,7 +65,9 @@ namespace Texpainter
 			m_new_empty_dlg = std::make_unique<PaletteCreateDlg>(r_dlg_owner,
 			                                                     "Create new palette",
 			                                                     Ui::Box::Orientation::Horizontal,
-			                                                     "Palette name: ");
+			                                                     "Palette name: ",
+														         std::ref(doc)
+																);
 			m_new_empty_dlg->eventHandler<ControlId::NewEmpty>(*this);
 		}
 

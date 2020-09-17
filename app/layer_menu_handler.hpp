@@ -209,7 +209,7 @@ namespace Texpainter
 
 		void onActivated(Tag<LayerAction::CompositingOptions>, Ui::MenuItem&)
 		{
-			r_doc_owner.showFxBlendEditor();
+//			r_doc_owner.showFxBlendEditor();
 		}
 
 		bool onActivated(Tag<LayerAction::Isolate>,
@@ -256,26 +256,27 @@ namespace Texpainter
 		}
 
 
-		void confirmPositive(Tag<ControlId::Copy>, NameInputDlg& src)
+		void confirmPositive(Tag<ControlId::Copy>, NameInputDlg&)
 		{
-			insertNewLayer(src.widget().inputField().content(), src.widget().layer->copiedLayer());
+//			insertNewLayer(src.widget().inputField().content(), src.widget().layer->copiedLayer());
 			m_copy_dlg.reset();
 		}
 
 		void dismiss(Tag<ControlId::Link>, NameInputDlg&) { m_link_dlg.reset(); }
 
 
-		void confirmPositive(Tag<ControlId::Link>, NameInputDlg& src)
+		void confirmPositive(Tag<ControlId::Link>, NameInputDlg&)
 		{
-			insertNewLayer(src.widget().inputField().content(), src.widget().layer->linkedLayer());
+//			insertNewLayer(src.widget().inputField().content(), src.widget().layer->linkedLayer());
 			m_link_dlg.reset();
 		}
 
 		void dismiss(Tag<ControlId::Copy>, NameInputDlg&) { m_copy_dlg.reset(); }
 
 
-		void confirmPositive(Tag<ControlId::LinkToCopy>, ConfirmationDlg& src)
+		void confirmPositive(Tag<ControlId::LinkToCopy>, ConfirmationDlg&)
 		{
+#if 0
 			r_doc_owner.documentModify([current_layer = src.widget().layer_name](auto& doc) {
 				(void)doc.layersModify([current_layer](auto& layers) {
 					layers[*current_layer]->convertToCopy();
@@ -285,6 +286,7 @@ namespace Texpainter
 				// Return false here because there are no changes to the ui
 				return false;
 			});
+#endif
 
 			m_link_to_copy_dlg.reset();
 		}
@@ -295,8 +297,9 @@ namespace Texpainter
 		}
 
 
-		void confirmPositive(Tag<ControlId::Rename>, NameInputDlg& src)
+		void confirmPositive(Tag<ControlId::Rename>, NameInputDlg&)
 		{
+#if 0
 			r_doc_owner.documentModify([current_layer = src.widget().layer_name,
 			                            new_name = src.widget().inputField().content()](auto& doc) {
 				(void)doc.layersModify([current_layer, new_name, &doc](auto& layers) {
@@ -306,14 +309,16 @@ namespace Texpainter
 				});
 				return true;
 			});
+#endif
 			m_rename_dlg.reset();
 		}
 
 		void dismiss(Tag<ControlId::Rename>, NameInputDlg&) { m_rename_dlg.reset(); }
 
 
-		void confirmPositive(Tag<ControlId::Delete>, ConfirmationDlg& src)
+		void confirmPositive(Tag<ControlId::Delete>, ConfirmationDlg&)
 		{
+#if 0
 			r_doc_owner.documentModify([current_layer = src.widget().layer_name](auto& doc) {
 				(void)doc.layersModify([current_layer, &doc](auto& layers) {
 					auto i = layers.index(*current_layer);
@@ -333,24 +338,25 @@ namespace Texpainter
 				});
 				return true;
 			});
+#endif
 			m_delete_dlg.reset();
 		}
 
 		void confirmNegative(Tag<ControlId::Delete>, ConfirmationDlg&) { m_delete_dlg.reset(); }
 
 
-		void onActivated(Tag<LayerActionNew::FromCurrentColor>, Ui::MenuItem&)
+		void onActivated(Tag<LayerActionNew::FromCurrentColor>, Ui::MenuItem&, Model::Document& doc)
 		{
-			auto const size_max     = r_doc_owner.document().canvasSize();
+			auto const size_max     = doc.canvasSize();
 			auto const size_default = Size2d{size_max.width() / 2, size_max.height() / 2};
 			m_new_from_color_dlg    = std::make_unique<LayerCreatorDlg>(
                 r_dlg_owner, "Create new layer from current color", size_default, size_max);
 			m_new_from_color_dlg->eventHandler<ControlId::NewFromCurrentColor>(*this);
 		}
 
-		void onActivated(Tag<LayerActionNew::FromNoise>, Ui::MenuItem&)
+		void onActivated(Tag<LayerActionNew::FromNoise>, Ui::MenuItem&, Model::Document& doc)
 		{
-			auto const size_max     = r_doc_owner.document().canvasSize();
+			auto const size_max     = doc.canvasSize();
 			auto const size_default = Size2d{size_max.width() / 2, size_max.height() / 2};
 			m_new_from_noise        = std::make_unique<LayerCreatorDlg>(
                 r_dlg_owner, "Create new layer from noise", size_default, size_max);
@@ -358,23 +364,21 @@ namespace Texpainter
 		}
 
 
-		void onActivated(Tag<LayerActionClearTransformation::Location>, Ui::MenuItem&)
+		bool onActivated(Tag<LayerActionClearTransformation::Location>, Ui::MenuItem&, Model::Document& doc)
 		{
-			r_doc_owner.documentModify([](auto& doc) {
-				return doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
-					if(auto layer = layers[current_layer]; layer != nullptr)
-					{
-						layer->location(vec2_t{0.0, 0.0});
-						return true;
-					}
-					return false;
-				});
+			return doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+				if(auto layer = layers[current_layer]; layer != nullptr)
+				{
+					layer->location(vec2_t{0.0, 0.0});
+					return true;
+				}
+				return false;
 			});
+
 		}
 
-		void onActivated(Tag<LayerActionClearTransformation::Rotation>, Ui::MenuItem&)
+		bool onActivated(Tag<LayerActionClearTransformation::Rotation>, Ui::MenuItem&, Model::Document& doc)
 		{
-			r_doc_owner.documentModify([](auto& doc) {
 				return doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
 					if(auto layer = layers[current_layer]; layer != nullptr)
 					{
@@ -383,12 +387,10 @@ namespace Texpainter
 					}
 					return false;
 				});
-			});
 		}
 
-		void onActivated(Tag<LayerActionClearTransformation::Scale>, Ui::MenuItem&)
+		bool onActivated(Tag<LayerActionClearTransformation::Scale>, Ui::MenuItem&, Model::Document& doc)
 		{
-			r_doc_owner.documentModify([](auto& doc) {
 				return doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
 					if(auto layer = layers[current_layer]; layer != nullptr)
 					{
@@ -397,12 +399,10 @@ namespace Texpainter
 					}
 					return false;
 				});
-			});
 		}
 
-		void onActivated(Tag<LayerActionClearTransformation::All>, Ui::MenuItem&)
+		bool onActivated(Tag<LayerActionClearTransformation::All>, Ui::MenuItem&, Model::Document& doc)
 		{
-			r_doc_owner.documentModify([](auto& doc) {
 				return doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
 					if(auto layer = layers[current_layer]; layer != nullptr)
 					{
@@ -413,12 +413,12 @@ namespace Texpainter
 					}
 					return false;
 				});
-			});
 		}
 
 
-		void confirmPositive(Tag<ControlId::NewFromCurrentColor>, LayerCreatorDlg& src)
+		void confirmPositive(Tag<ControlId::NewFromCurrentColor>, LayerCreatorDlg&)
 		{
+#if 0
 			auto layer_info = src.widget().value();
 			if(!isSupported<PixelStore::Pixel>(layer_info.size)) [[unlikely]]
 				{
@@ -428,9 +428,9 @@ namespace Texpainter
 					//  "this size exeeds the largest supported integer value."};
 					return;
 				}
-
 			insertNewLayer(std::move(layer_info.name),
-			               Model::Layer{layer_info.size, currentColor(r_doc_owner.document())});
+			               Model::Layer{layer_info.size, currentColor(doc)});
+#endif
 			m_new_from_color_dlg.reset();
 		}
 
@@ -439,8 +439,9 @@ namespace Texpainter
 			m_new_from_color_dlg.reset();
 		}
 
-		void confirmPositive(Tag<ControlId::NewFromNoise>, LayerCreatorDlg& src)
+		void confirmPositive(Tag<ControlId::NewFromNoise>, LayerCreatorDlg&)
 		{
+#if 0
 			auto layer_info = src.widget().value();
 			if(!isSupported<PixelStore::Pixel>(layer_info.size)) [[unlikely]]
 				{
@@ -458,6 +459,7 @@ namespace Texpainter
 			});
 
 			insertNewLayer(std::move(layer_info.name), Model::Layer{std::move(noise)});
+#endif
 			m_new_from_noise.reset();
 		}
 
@@ -475,7 +477,7 @@ namespace Texpainter
 
 		std::unique_ptr<LayerCreatorDlg> m_new_from_color_dlg;
 		std::unique_ptr<LayerCreatorDlg> m_new_from_noise;
-
+#if 0
 		void insertNewLayer(std::string&& layer_name, Model::Layer&& layer)
 		{
 			r_doc_owner.documentModify([&layer_name, &layer](auto& doc) noexcept {
@@ -488,6 +490,7 @@ namespace Texpainter
 				return true;
 			});
 		}
+#endif
 	};
 }
 
