@@ -23,7 +23,8 @@ namespace Texpainter
 	{
 		using PaletteCreateDlg = Ui::Dialog<
 		    InheritFrom<std::reference_wrapper<Model::Document>, Ui::LabeledInput<Ui::TextEntry>>>;
-		using PaletteGenerateDlg = Ui::Dialog<PaletteCreator>;
+		using PaletteGenerateDlg =
+		    Ui::Dialog<InheritFrom<std::reference_wrapper<Model::Document>, PaletteCreator>>;
 
 	public:
 		enum class ControlId : int
@@ -33,8 +34,7 @@ namespace Texpainter
 		};
 
 		explicit PaletteMenuHandler(Ui::Container& dialog_owner, PolymorphicRng rng)
-		    : r_document{nullptr}
-		    , m_rng{rng}
+		    : m_rng{rng}
 		    , r_dlg_owner{dialog_owner}
 		{
 		}
@@ -59,7 +59,6 @@ namespace Texpainter
 
 		void onActivated(Tag<PaletteActionNew::Empty>, Ui::MenuItem&, Model::Document& doc)
 		{
-			r_document      = &doc;
 			m_new_empty_dlg = std::make_unique<PaletteCreateDlg>(std::ref(doc),
 			                                                     r_dlg_owner,
 			                                                     "Create new palette",
@@ -70,9 +69,8 @@ namespace Texpainter
 
 		void onActivated(Tag<PaletteActionNew::Generate>, Ui::MenuItem&, Model::Document& doc)
 		{
-			r_document = &doc;
-			m_new_generated_dlg =
-			    std::make_unique<PaletteGenerateDlg>(r_dlg_owner, "Generate palette");
+			m_new_generated_dlg = std::make_unique<PaletteGenerateDlg>(
+			    std::ref(doc), r_dlg_owner, "Generate palette");
 			m_new_generated_dlg->eventHandler<ControlId::NewGenerated>(*this);
 		}
 
@@ -108,7 +106,7 @@ namespace Texpainter
 			pal[PixelStore::ColorIndex{21}] =
 			    toRgb(PixelStore::Hsi{0.0f, 0.0f, 1.0f / (128.0f * 3.0), 1.0f});
 			pal[PixelStore::ColorIndex{22}] = PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f};
-			insertNewPalette(std::move(palette_info.name), std::move(pal), *r_document);
+			insertNewPalette(std::move(palette_info.name), std::move(pal), src.widget().get());
 			m_new_generated_dlg.reset();
 		}
 
@@ -118,7 +116,6 @@ namespace Texpainter
 		}
 
 	private:
-		Model::Document* r_document;
 		PolymorphicRng m_rng;
 		Ui::Container& r_dlg_owner;
 
