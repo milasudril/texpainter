@@ -82,13 +82,15 @@ namespace Texpainter
 		template<LayerAction action>
 		void onActivated(Ui::MenuItem& item)
 		{
-			if(hasDocument()) { m_layer_menu_handler.onActivated<action>(item); }
+			if(hasDocument())
+			{ m_layer_menu_handler.onActivated<action>(item, *m_current_document); }
 		}
 
 		template<LayerAction action>
 		void onActivated(Ui::CheckableMenuItem& item)
 		{
-			if(hasDocument()) { m_layer_menu_handler.onActivated<action>(item); }
+			if(hasDocument())
+			{ m_layer_menu_handler.onActivated<action>(item, *m_current_document); }
 			else
 			{
 				item.toggle();
@@ -115,7 +117,8 @@ namespace Texpainter
 		template<PaletteActionNew action>
 		void onActivated(Ui::MenuItem& item)
 		{
-			m_palette_menu_handler.onActivated<action>(item);
+			if(hasDocument())
+			{ m_palette_menu_handler.onActivated<action>(item, *m_current_document); }
 		}
 
 		template<ControlId>

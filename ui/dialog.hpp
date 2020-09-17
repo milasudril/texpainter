@@ -147,50 +147,48 @@ namespace Texpainter::Ui
 		Dialog(Dialog&&)            = delete;
 
 		template<class... WidgetParams>
-		Dialog(Container& owner, char const* title, WidgetParams&&... params) requires
-		ConstructibleFrom<Widget, Container, WidgetParams...>
-		    : m_window(title, &owner)
-		    , m_content(m_window, Box::Orientation::Vertical)
-		    , m_widget(m_content.insertMode({2, Box::Fill | Box::Expand}),
-		               std::forward<WidgetParams>(params)...)
-		    , m_buttons_outer(m_content.insertMode(Box::InsertMode{0, 0}),
-		                      Box::Orientation::Horizontal)
-		    , m_filler_l(m_buttons_outer.insertMode({0, Box::Fill | Box::Expand}))
-		    , m_buttons_box(m_buttons_outer.insertMode({0, 0}), Box::Orientation::Horizontal)
-		    , m_buttons(buttons_create<button_count()>(m_buttons_box.homogenous(true).insertMode(
-		          Box::InsertMode{2, Box::Fill | Box::Expand})))
-		    , m_filler_r(m_buttons_outer.insertMode({0, Box::Fill | Box::Expand}))
+		Dialog(Container& owner,
+		       char const* title,
+		       WidgetParams&&... params) requires ConstructibleFrom<Widget,
+		                                                            Container&,
+		                                                            WidgetParams...>
+		    : m_window(title, &owner),
+		      m_content(m_window, Box::Orientation::Vertical),
+		      m_widget(m_content.insertMode({2, Box::Fill | Box::Expand}),
+		               std::forward<WidgetParams>(params)...),
+		      m_buttons_outer(m_content.insertMode(Box::InsertMode{0, 0}),
+		                      Box::Orientation::Horizontal),
+		      m_filler_l(m_buttons_outer.insertMode({0, Box::Fill | Box::Expand})),
+		      m_buttons_box(m_buttons_outer.insertMode({0, 0}), Box::Orientation::Horizontal),
+		      m_buttons(buttons_create<button_count()>(m_buttons_box.homogenous(true).insertMode(
+		          Box::InsertMode{2, Box::Fill | Box::Expand}))),
+		      m_filler_r(m_buttons_outer.insertMode({0, Box::Fill | Box::Expand}))
 		{
-			if(has_dismiss())
-			{
-				assert(ButtonIndex::dismiss() != -1);
-				m_buttons[ButtonIndex::dismiss()].label(DialogTraits::dismiss());
-			}
-			if(has_confirm_neg())
-			{
-				assert(ButtonIndex::confirmNegative() != -1);
-				m_buttons[ButtonIndex::confirmNegative()].label(DialogTraits::confirmNegative());
-			}
-			if(has_confirm_pos())
-			{
-				assert(ButtonIndex::confirmPositive() != -1);
-				m_buttons[ButtonIndex::confirmPositive()].label(DialogTraits::confirmPositive());
-			}
-			if(has_user_1())
-			{
-				assert(ButtonIndex::user1() != -1);
-				m_buttons[ButtonIndex::user1()].label(DialogTraits::user1());
-			}
-			if(has_user_2())
-			{
-				assert(ButtonIndex::user2() != -1);
-				m_buttons[ButtonIndex::user2()].label(DialogTraits::user2());
-			}
+			initButtons();
+		}
 
-			if constexpr(Focus != InitialFocus::NoChange) { focus_select(); }
-
-
-			m_window.modal(true).show().resize(Size2d{1, 1});
+		template<class WidgetData, class... WidgetParams>
+		Dialog(WidgetData&& data,
+		       Container& owner,
+		       char const* title,
+		       WidgetParams&&... params) requires ConstructibleFrom<Widget,
+		                                                            WidgetData,
+		                                                            Container&,
+		                                                            WidgetParams...>
+		    : m_window(title, &owner),
+		      m_content(m_window, Box::Orientation::Vertical),
+		      m_widget(std::forward<WidgetData>(data),
+		               m_content.insertMode({2, Box::Fill | Box::Expand}),
+		               std::forward<WidgetParams>(params)...),
+		      m_buttons_outer(m_content.insertMode(Box::InsertMode{0, 0}),
+		                      Box::Orientation::Horizontal),
+		      m_filler_l(m_buttons_outer.insertMode({0, Box::Fill | Box::Expand})),
+		      m_buttons_box(m_buttons_outer.insertMode({0, 0}), Box::Orientation::Horizontal),
+		      m_buttons(buttons_create<button_count()>(m_buttons_box.homogenous(true).insertMode(
+		          Box::InsertMode{2, Box::Fill | Box::Expand}))),
+		      m_filler_r(m_buttons_outer.insertMode({0, Box::Fill | Box::Expand}))
+		{
+			initButtons();
 		}
 
 		template<auto id, class EventHandler>
@@ -264,6 +262,39 @@ namespace Texpainter::Ui
 		void show() { m_window.show(); }
 
 	private:
+		void initButtons()
+		{
+			if(has_dismiss())
+			{
+				assert(ButtonIndex::dismiss() != -1);
+				m_buttons[ButtonIndex::dismiss()].label(DialogTraits::dismiss());
+			}
+			if(has_confirm_neg())
+			{
+				assert(ButtonIndex::confirmNegative() != -1);
+				m_buttons[ButtonIndex::confirmNegative()].label(DialogTraits::confirmNegative());
+			}
+			if(has_confirm_pos())
+			{
+				assert(ButtonIndex::confirmPositive() != -1);
+				m_buttons[ButtonIndex::confirmPositive()].label(DialogTraits::confirmPositive());
+			}
+			if(has_user_1())
+			{
+				assert(ButtonIndex::user1() != -1);
+				m_buttons[ButtonIndex::user1()].label(DialogTraits::user1());
+			}
+			if(has_user_2())
+			{
+				assert(ButtonIndex::user2() != -1);
+				m_buttons[ButtonIndex::user2()].label(DialogTraits::user2());
+			}
+
+			if constexpr(Focus != InitialFocus::NoChange) { focus_select(); }
+
+			m_window.modal(true).show().resize(Size2d{1, 1});
+		}
+
 		static constexpr bool has_dismiss() noexcept { return DialogTraits::dismiss() != nullptr; }
 
 		static constexpr bool has_confirm_neg() noexcept

@@ -7,7 +7,7 @@
 
 namespace Texpainter
 {
-	template<class T, class ... Args>
+	template<class T, class... Args>
 	concept ConstructibleFrom = requires
 	{
 		T(std::forward<Args>(std::declval<Args>())...);

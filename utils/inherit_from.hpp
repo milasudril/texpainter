@@ -5,18 +5,17 @@
 #ifndef TEXPAINTER_UTILS_INHERITFROM_HPP
 #define TEXPAINTER_UTILS_INHERITFROM_HPP
 
-#include <utility>
-
 namespace Texpainter
 {
-	template<class First, class Second>
-	struct InheritFrom:public First, Second
+	template<class FirstBase, class SecondBase>
+	struct InheritFrom: FirstBase, SecondBase
 	{
-		template<class ... SecondClassArgs, class FirstClassArg>
-		explicit InheritFrom(SecondClassArgs&& ... second, FirstClassArg&& first):
-			 First{std::forward<First>(first)}
-			,Second{std::forward<SecondClassArgs>(second)...}
-		{}
+		template<class FirstBaseArgs, class... SecondBaseArgs>
+		explicit InheritFrom(FirstBaseArgs&& first_args, SecondBaseArgs&&... second_args)
+		    : FirstBase{std::forward<FirstBaseArgs>(first_args)}
+		    , SecondBase{std::forward<SecondBaseArgs>(second_args)...}
+		{
+		}
 	};
 }
 

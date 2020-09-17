@@ -21,10 +21,8 @@ namespace Texpainter
 {
 	class PaletteMenuHandler
 	{
-		using PaletteCreateDlg   = Ui::Dialog<
-			InheritFrom<
-				std::reference_wrapper<Model::Document>, Ui::LabeledInput<Ui::TextEntry>
-				>>;
+		using PaletteCreateDlg = Ui::Dialog<
+		    InheritFrom<std::reference_wrapper<Model::Document>, Ui::LabeledInput<Ui::TextEntry>>>;
 		using PaletteGenerateDlg = Ui::Dialog<PaletteCreator>;
 
 	public:
@@ -62,12 +60,11 @@ namespace Texpainter
 		void onActivated(Tag<PaletteActionNew::Empty>, Ui::MenuItem&, Model::Document& doc)
 		{
 			r_document      = &doc;
-			m_new_empty_dlg = std::make_unique<PaletteCreateDlg>(r_dlg_owner,
+			m_new_empty_dlg = std::make_unique<PaletteCreateDlg>(std::ref(doc),
+			                                                     r_dlg_owner,
 			                                                     "Create new palette",
 			                                                     Ui::Box::Orientation::Horizontal,
-			                                                     "Palette name: ",
-														         std::ref(doc)
-																);
+			                                                     "Palette name: ");
 			m_new_empty_dlg->eventHandler<ControlId::NewEmpty>(*this);
 		}
 
@@ -88,7 +85,7 @@ namespace Texpainter
 		void confirmPositive(Tag<ControlId::NewEmpty>, PaletteCreateDlg& src)
 		{
 			auto palette_name = src.widget().inputField().content();
-			insertNewPalette(std::move(palette_name), PixelStore::Palette{23}, *r_document);
+			insertNewPalette(std::move(palette_name), PixelStore::Palette{23}, src.widget().get());
 			m_new_empty_dlg.reset();
 		}
 
