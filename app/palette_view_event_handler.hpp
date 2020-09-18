@@ -19,23 +19,35 @@ namespace Texpainter
 {
 	class PaletteViewEventHandler
 	{
-		struct WrappedColorPicker
+		class ColorPickerData
 		{
-			template<class... Args>
-			WrappedColorPicker(Args&&... args): first{std::forward<Args>(args)...}
-			                                  , second{nullptr}
+		public:
+			explicit ColorPickerData(Ui::PaletteView& pal_view,
+			                         PixelStore::ColorIndex current_index,
+			                         Model::Document& doc)
+			    : r_palette_view{pal_view}
+			    , m_current_index{current_index}
+			    , r_document{doc}
 			{
 			}
-			Texpainter::Ui::ColorPicker first;
-			Ui::PaletteView* second;
+
+			Model::Document& document() { return r_document.get(); }
+
+			PixelStore::ColorIndex currentIndex() const { return m_current_index; }
+
+			Ui::PaletteView& paletteView() { return r_palette_view.get(); }
+
+		private:
+			std::reference_wrapper<Ui::PaletteView> r_palette_view;
+			PixelStore::ColorIndex m_current_index;
+			std::reference_wrapper<Model::Document> r_document;
 		};
 
-		using ColorPicker = Texpainter::Ui::Dialog<WrappedColorPicker>;
+		using ColorPicker = Texpainter::Ui::Dialog<InheritFrom<ColorPickerData, Ui::ColorPicker>>;
 
 	public:
 		explicit PaletteViewEventHandler(Ui::Container& dialog_owner, PolymorphicRng rng)
-		    : r_document{nullptr}
-		    , m_rng{rng}
+		    : m_rng{rng}
 		    , r_dlg_owner{dialog_owner}
 		{
 		}
@@ -64,21 +76,19 @@ namespace Texpainter
 						break;
 
 					case 3:
-						r_document       = &doc;
-						m_modified_index = index;
 						pal_view
 						    .highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Write)
 						    .update();
 						m_color_picker =
-						    std::make_unique<ColorPicker>(r_dlg_owner,
+						    std::make_unique<ColorPicker>(ColorPickerData{pal_view, index, doc},
+						                                  r_dlg_owner,
 						                                  (std::string{"Select color number "}
 						                                   + std::to_string(index.value() + 1))
 						                                      .c_str(),
 						                                  m_rng,
 						                                  "Recently used: ",
 						                                  m_color_history);
-						m_color_picker->widget().second = &pal_view;
-						m_color_picker->template eventHandler<0>(*this).widget().first.value(
+						m_color_picker->template eventHandler<0>(*this).widget().value(
 						    pal_view.color(index));
 						break;
 				}
@@ -93,19 +103,21 @@ namespace Texpainter
 		template<auto>
 		void confirmPositive(ColorPicker& src)
 		{
-			auto const color_new = src.widget().first.value();
-			r_document->palettesModify(
+			auto const color_new = src.widget().value();
+			src.widget().document().palettesModify(
 			    [color_new    = color_new,
-			     sel_index    = m_modified_index,
-			     &current_pal = r_document->currentPalette()](auto& palettes) {
+			     sel_index    = src.widget().currentIndex(),
+			     &current_pal = src.widget().document().currentPalette()](auto& palettes) {
 				    (*palettes[current_pal])[sel_index] = color_new;
 				    return true;
 			    });
 
 			src.widget()
-			    .second->color(m_modified_index, color_new)
-			    .highlightMode(m_modified_index, Texpainter::Ui::PaletteView::HighlightMode::None)
-			    .highlightMode(r_document->currentColor(),
+			    .paletteView()
+			    .color(src.widget().currentIndex(), color_new)
+			    .highlightMode(src.widget().currentIndex(),
+			                   Texpainter::Ui::PaletteView::HighlightMode::None)
+			    .highlightMode(src.widget().document().currentColor(),
 			                   Texpainter::Ui::PaletteView::HighlightMode::Read)
 			    .update();
 
@@ -120,9 +132,10 @@ namespace Texpainter
 		void dismiss(ColorPicker& src)
 		{
 			src.widget()
-			    .second
-			    ->highlightMode(m_modified_index, Texpainter::Ui::PaletteView::HighlightMode::None)
-			    .highlightMode(r_document->currentColor(),
+			    .paletteView()
+			    .highlightMode(src.widget().currentIndex(),
+			                   Texpainter::Ui::PaletteView::HighlightMode::None)
+			    .highlightMode(src.widget().document().currentColor(),
 			                   Texpainter::Ui::PaletteView::HighlightMode::Read)
 			    .update();
 
@@ -130,9 +143,7 @@ namespace Texpainter
 		}
 
 	private:
-		Model::Document* r_document;
 		PolymorphicRng m_rng;
-		PixelStore::ColorIndex m_modified_index;
 		std::array<PixelStore::Pixel, 8> m_color_history;
 
 		Ui::Container& r_dlg_owner;
