@@ -67,26 +67,26 @@ namespace Texpainter
 		}
 
 		template<LayerActionNew action>
-		void onActivated(Ui::MenuItem& item)
+		void onActivated(Ui::MenuItem& item, Model::Document& doc)
 		{
-			onActivated(Tag<action>{}, item);
+			onActivated(Tag<action>{}, item, doc);
 		}
 
 		template<LayerActionClearTransformation action>
-		void onActivated(Ui::MenuItem& item)
+		void onActivated(Ui::MenuItem& item, Model::Document& doc)
 		{
-			onActivated(Tag<action>{}, item);
+			onActivated(Tag<action>{}, item, doc);
 		}
 
 
 		template<LayerAction action>
-		void onActivated(Tag<action>, Ui::MenuItem&)
+		void onActivated(Tag<action>, Ui::MenuItem&, Model::Document&)
 		{
 			printf("Todo: %d\n", static_cast<int>(action));
 		}
 
 		template<LayerActionNew action>
-		void onActivated(Tag<action>, Ui::MenuItem&)
+		void onActivated(Tag<action>, Ui::MenuItem&, Model::Document&)
 		{
 			printf("Todo: %d\n", static_cast<int>(action));
 		}
