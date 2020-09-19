@@ -13,8 +13,8 @@
 #include "./palette_view_event_handler.hpp"
 #include "./filter_graph_editor.hpp"
 #include "./compositing_options_editor.hpp"
+#include "./document_manager.hpp"
 
-#include "model/document.hpp"
 #include "utils/snap.hpp"
 #include "ui/box.hpp"
 #include "ui/image_view.hpp"
@@ -49,23 +49,7 @@ namespace Texpainter
 
 		explicit AppWindow(Ui::Container& container, PolymorphicRng rng);
 
-		AppWindow& document(Model::Document&& doc)
-		{
-			m_current_document = std::make_unique<Model::Document>(std::move(doc));
-			m_pal_view.eventHandler<ControlId::PaletteView>(*this);
-			m_layer_selector.inputField().eventHandler<ControlId::LayerSelector>(*this);
-			m_brush_selector.inputField().eventHandler<ControlId::BrushSelector>(*this);
-			m_brush_size.eventHandler<ControlId::BrushSize>(*this);
-			m_palette_selector.inputField().eventHandler<ControlId::PaletteSelector>(*this);
-			m_img_view.eventHandler<ControlId::Canvas>(*this);
-			update();
-			m_rows.killFocus();
-			return *this;
-		}
-
-		Model::Document const& document() const { return *m_current_document; }
-
-		bool hasDocument() const { return m_current_document != nullptr; }
+		bool hasDocument() const { return m_documents.currentDocument() != nullptr; }
 
 
 		template<AppAction>
@@ -83,14 +67,14 @@ namespace Texpainter
 		void onActivated(Ui::MenuItem& item)
 		{
 			if(hasDocument())
-			{ m_layer_menu_handler.onActivated<action>(item, *m_current_document); }
+			{ m_layer_menu_handler.onActivated<action>(item, *m_documents.currentDocument()); }
 		}
 
 		template<LayerAction action>
 		void onActivated(Ui::CheckableMenuItem& item)
 		{
 			if(hasDocument())
-			{ m_layer_menu_handler.onActivated<action>(item, *m_current_document); }
+			{ m_layer_menu_handler.onActivated<action>(item, *m_documents.currentDocument()); }
 			else
 			{
 				item.toggle();
@@ -118,7 +102,7 @@ namespace Texpainter
 		void onActivated(Ui::MenuItem& item)
 		{
 			if(hasDocument())
-			{ m_palette_menu_handler.onActivated<action>(item, *m_current_document); }
+			{ m_palette_menu_handler.onActivated<action>(item, *m_documents.currentDocument()); }
 		}
 
 		template<ControlId>
@@ -172,7 +156,7 @@ namespace Texpainter
 
 		void showFxBlendEditor()
 		{
-			if(auto layer = currentLayer(*m_current_document); layer != nullptr)
+			if(auto layer = currentLayer(*m_documents.currentDocument()); layer != nullptr)
 			{
 				m_fx_blend_editor_dlg =
 				    std::make_unique<CompositingOptionsDlg>(m_rows,
@@ -186,7 +170,7 @@ namespace Texpainter
 
 
 	private:
-		std::unique_ptr<Model::Document> m_current_document;
+		DocumentManager m_documents;
 
 		PolymorphicRng m_rng;
 		uint32_t m_mouse_state;
@@ -303,7 +287,8 @@ namespace Texpainter
 		void doRender(Model::CompositingOptions const& compose_opts);
 		void doRender()
 		{
-			if(auto current_layer = currentLayer(*m_current_document); current_layer != nullptr)
+			if(auto current_layer = currentLayer(*m_documents.currentDocument());
+			   current_layer != nullptr)
 			{ doRender(current_layer->compositingOptions()); }
 		}
 
@@ -324,11 +309,12 @@ namespace Texpainter
 	template<>
 	inline void AppWindow::onChanged<AppWindow::ControlId::LayerSelector>(Ui::Combobox& src)
 	{
-		auto const index   = Model::LayerIndex{static_cast<uint32_t>(src.selected())};
-		auto const& layers = m_current_document->layers();
+		auto const index       = Model::LayerIndex{static_cast<uint32_t>(src.selected())};
+		auto& current_document = *m_documents.currentDocument();
+		auto const& layers     = current_document.layers();
 		if(auto layer_name = layers.key(index); layer_name != nullptr)
 		{
-			m_current_document->currentLayer(std::string{*layer_name});
+			current_document.currentLayer(std::string{*layer_name});
 			updateLayerInfo();
 			doRender();
 		}
@@ -339,20 +325,22 @@ namespace Texpainter
 	template<>
 	inline void AppWindow::onChanged<AppWindow::ControlId::BrushSelector>(Ui::Combobox& src)
 	{
-		auto brush      = m_current_document->currentBrush();
-		auto brush_type = static_cast<Model::BrushType>(
-		    static_cast<int>(end(Empty<Model::BrushType>{})) - 1 - src.selected());
+		auto& current_document = *m_documents.currentDocument();
+		auto brush             = current_document.currentBrush();
+		auto brush_type        = static_cast<Model::BrushType>(
+            static_cast<int>(end(Empty<Model::BrushType>{})) - 1 - src.selected());
 		brush.type(brush_type);
-		m_current_document->currentBrush(brush);
+		current_document.currentBrush(brush);
 		m_rows.killFocus();
 	}
 
 	template<>
 	inline void AppWindow::onChanged<AppWindow::ControlId::BrushSize>(Ui::Slider& src)
 	{
-		auto brush = m_current_document->currentBrush();
+		auto& current_document = *m_documents.currentDocument();
+		auto brush             = current_document.currentBrush();
 		brush.radius(static_cast<float>(logValue(src.value())));
-		m_current_document->currentBrush(brush);
+		current_document.currentBrush(brush);
 		m_rows.killFocus();
 	}
 
@@ -360,13 +348,14 @@ namespace Texpainter
 	template<>
 	inline void AppWindow::onChanged<AppWindow::ControlId::PaletteSelector>(Ui::Combobox& src)
 	{
-		auto const index     = Model::PaletteIndex{static_cast<uint32_t>(src.selected())};
-		auto const& palettes = m_current_document->palettes();
+		auto const index       = Model::PaletteIndex{static_cast<uint32_t>(src.selected())};
+		auto& current_document = *m_documents.currentDocument();
+		auto const& palettes   = current_document.palettes();
 		if(auto pal_name = palettes.key(index); pal_name != nullptr)
 		{
-			m_current_document->currentPalette(std::string{*pal_name});
+			current_document.currentPalette(std::string{*pal_name});
 			m_pal_view.palette(*palettes[index])
-			    .highlightMode(m_current_document->currentColor(),
+			    .highlightMode(current_document.currentColor(),
 			                   Ui::PaletteView::HighlightMode::Read);
 		}
 		m_rows.killFocus();
@@ -383,8 +372,9 @@ namespace Texpainter
 	inline void AppWindow::confirmPositive<AppWindow::ControlId::CompositingOptions>(
 	    CompositingOptionsDlg& dlg)
 	{
-		m_current_document->layersModify([&current_layer = m_current_document->currentLayer(),
-		                                  &editor        = dlg.widget()](auto& layers) {
+		auto& current_document = *m_documents.currentDocument();
+		current_document.layersModify([&current_layer = current_document.currentLayer(),
+		                               &editor        = dlg.widget()](auto& layers) {
 			layers[current_layer]->compositingOptions(editor.compositingOptions());
 			layers[current_layer]->nodeLocations(editor.nodeLocations());
 			return true;

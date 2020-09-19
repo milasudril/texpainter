@@ -50,21 +50,23 @@ Texpainter::AppWindow::AppWindow(Ui::Container& container, PolymorphicRng rng)
 
 void Texpainter::AppWindow::updateLayerSelector()
 {
-	auto& layer_selector = m_layer_selector.inputField();
+	auto& layer_selector         = m_layer_selector.inputField();
+	auto const& current_document = *m_documents.currentDocument();
 
 	layer_selector.clear();
 	std::ranges::for_each(
-	    m_current_document->layers().keysByIndex(),
+	    current_document.layers().keysByIndex(),
 	    [&layer_selector](auto const& name) { layer_selector.append(name.c_str()); });
 
-	auto const& current_layer    = m_current_document->currentLayer();
-	auto const current_layer_idx = m_current_document->layers().index(current_layer);
+	auto const& current_layer    = current_document.currentLayer();
+	auto const current_layer_idx = current_document.layers().index(current_layer);
 	layer_selector.selected(static_cast<int>(current_layer_idx));
 }
 
 void Texpainter::AppWindow::updateBrushSelector()
 {
-	auto brush = m_current_document->currentBrush();
+	auto const& current_document = *m_documents.currentDocument();
+	auto brush                   = current_document.currentBrush();
 	auto brush_index =
 	    static_cast<int>(end(Empty<Model::BrushType>{})) - 1 - static_cast<int>(brush.type());
 	m_brush_selector.inputField().selected(brush_index);
@@ -73,20 +75,21 @@ void Texpainter::AppWindow::updateBrushSelector()
 
 void Texpainter::AppWindow::updatePaletteSelector()
 {
-	auto& pal_selector = m_palette_selector.inputField();
+	auto& pal_selector           = m_palette_selector.inputField();
+	auto const& current_document = *m_documents.currentDocument();
 
 	pal_selector.clear();
-	std::ranges::for_each(m_current_document->palettes().keys(),
+	std::ranges::for_each(current_document.palettes().keys(),
 	                      [&pal_selector](auto const& name) { pal_selector.append(name.c_str()); });
 
-	auto const& current_pal_name = m_current_document->currentPalette();
-	auto const current_layer_idx = m_current_document->palettes().location(current_pal_name);
+	auto const& current_pal_name = current_document.currentPalette();
+	auto const current_layer_idx = current_document.palettes().location(current_pal_name);
 	pal_selector.selected(static_cast<int>(current_layer_idx));
 
-	if(auto pal = currentPalette(*m_current_document); pal != nullptr)
+	if(auto pal = currentPalette(current_document); pal != nullptr)
 	{
 		m_pal_view.palette(*pal)
-		    .highlightMode(m_current_document->currentColor(), Ui::PaletteView::HighlightMode::Read)
+		    .highlightMode(current_document.currentColor(), Ui::PaletteView::HighlightMode::Read)
 		    .update();
 	}
 	else
@@ -98,13 +101,14 @@ void Texpainter::AppWindow::updatePaletteSelector()
 
 void Texpainter::AppWindow::updateLayerInfo()
 {
-	if(auto current_layer = currentLayer(*m_current_document); current_layer != nullptr) [[likely]]
+	auto const& current_document = *m_documents.currentDocument();
+	if(auto current_layer = currentLayer(current_document); current_layer != nullptr) [[likely]]
 		{
 			std::string layer_info;
 			auto const& layer = *current_layer;
 			std::string msg{"Layer "};
-			msg += std::to_string(
-			    m_current_document->layers().location(m_current_document->currentLayer()));
+			msg +=
+			    std::to_string(current_document.layers().location(current_document.currentLayer()));
 			msg += ". Size: ";
 			msg += std::to_string(layer.size().width());
 			msg += "×";
@@ -135,12 +139,12 @@ void Texpainter::AppWindow::update()
 
 void Texpainter::AppWindow::doRender(Model::CompositingOptions const& compose_opts)
 {
-	PixelStore::Image canvas{m_current_document->canvasSize()};
+	auto const& current_document = *m_documents.currentDocument();
+	PixelStore::Image canvas{current_document.canvasSize()};
 	std::ranges::fill(canvas.pixels(), PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
-	std::ranges::for_each(m_current_document->layersByIndex(),
-	                      [&canvas,
-	                       &compose_opts,
-	                       current_layer = currentLayer(*m_current_document)](auto const& layer) {
+	std::ranges::for_each(current_document.layersByIndex(),
+	                      [&canvas, &compose_opts, current_layer = currentLayer(current_document)](
+	                          auto const& layer) {
 		                      if(layer.visible())
 		                      {
 			                      if(&layer == current_layer)
@@ -152,7 +156,7 @@ void Texpainter::AppWindow::doRender(Model::CompositingOptions const& compose_op
 		                      }
 	                      });
 
-	if(auto current_layer = currentLayer(*m_current_document); current_layer != nullptr) [[likely]]
+	if(auto current_layer = currentLayer(current_document); current_layer != nullptr) [[likely]]
 		{
 			outline(*current_layer, canvas);
 		}
@@ -161,12 +165,13 @@ void Texpainter::AppWindow::doRender(Model::CompositingOptions const& compose_op
 
 void Texpainter::AppWindow::paint(vec2_t loc)
 {
-	m_current_document->layersModify(
+	auto& current_document = *m_documents.currentDocument();
+	current_document.layersModify(
 	    [loc,
-	     radius         = m_current_document->currentBrush().radius(),
-	     brush          = Model::BrushFunction{m_current_document->currentBrush().type()},
-	     color          = currentColor(*m_current_document),
-	     &current_layer = m_current_document->currentLayer()](auto& layers) {
+	     radius         = current_document.currentBrush().radius(),
+	     brush          = Model::BrushFunction{current_document.currentBrush().type()},
+	     color          = currentColor(current_document),
+	     &current_layer = current_document.currentLayer()](auto& layers) {
 		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
 			    {
 				    auto const scale = static_cast<float>(std::sqrt(layer->size().area()));
@@ -185,7 +190,8 @@ void Texpainter::AppWindow::grabInit(vec2_t mouse_loc, Model::Layer const& curre
 
 void Texpainter::AppWindow::grab(vec2_t loc_current)
 {
-	auto layer = currentLayer(*m_current_document);
+	auto& current_document = *m_documents.currentDocument();
+	auto layer             = currentLayer(current_document);
 	if(layer == nullptr) [[unlikely]]
 		{
 			return;
@@ -198,8 +204,8 @@ void Texpainter::AppWindow::grab(vec2_t loc_current)
 	info += toString(Δ𝒙);
 	m_paint_info.content(info.c_str());
 
-	m_current_document->layersModify(
-	    [loc = 𝒙, &current_layer = m_current_document->currentLayer()](auto& layers) {
+	current_document.layersModify(
+	    [loc = 𝒙, &current_layer = current_document.currentLayer()](auto& layers) {
 		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
 			    {
 				    layer->location(loc);
@@ -292,7 +298,8 @@ namespace
 
 void Texpainter::AppWindow::scale(vec2_t loc_current)
 {
-	auto layer = currentLayer(*m_current_document);
+	auto& current_document = *m_documents.currentDocument();
+	auto layer             = currentLayer(current_document);
 	if(layer == nullptr) [[unlikely]]
 		{
 			return;
@@ -322,8 +329,8 @@ void Texpainter::AppWindow::scale(vec2_t loc_current)
 	info += toString(Ϙ𝐬);
 	m_paint_info.content(info.c_str());
 
-	m_current_document->layersModify(
-	    [factor = 𝐬, &current_layer = m_current_document->currentLayer()](auto& layers) {
+	current_document.layersModify(
+	    [factor = 𝐬, &current_layer = current_document.currentLayer()](auto& layers) {
 		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
 			    {
 				    layer->scaleFactor(factor);
@@ -380,7 +387,8 @@ namespace
 
 void Texpainter::AppWindow::rotate(vec2_t loc_current)
 {
-	auto layer = currentLayer(*m_current_document);
+	auto& current_document = *m_documents.currentDocument();
+	auto layer             = currentLayer(current_document);
 	if(layer == nullptr) [[unlikely]]
 		{
 			return;
@@ -396,8 +404,8 @@ void Texpainter::AppWindow::rotate(vec2_t loc_current)
 	info += std::to_string(ΔΘ.turns());
 	m_paint_info.content(info.c_str());
 
-	m_current_document->layersModify(
-	    [rot = Θ, &current_layer = m_current_document->currentLayer()](auto& layers) {
+	current_document.layersModify(
+	    [rot = Θ, &current_layer = current_document.currentLayer()](auto& layers) {
 		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
 			    {
 				    layer->rotation(rot);
@@ -513,7 +521,8 @@ template<>
 void Texpainter::AppWindow::onMouseMove<Texpainter::AppWindow::ControlId::Canvas>(
     Ui::ImageView& view, vec2_t loc_window, vec2_t)
 {
-	if(auto layer = currentLayer(*m_current_document); layer != nullptr)
+	auto& current_document = *m_documents.currentDocument();
+	if(auto layer = currentLayer(current_document); layer != nullptr)
 	{
 		auto loc = ::toLogicalCoordinates(view.imageSize(), loc_window);
 		if(m_mouse_state & MouseButtonLeft)

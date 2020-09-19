@@ -12,17 +12,18 @@ namespace Texpainter
 	class DocumentManager
 	{
 	public:
-		Document* createDocument(Size2d canvas_size)
+		Model::Document* createDocument(Size2d canvas_size)
 		{
 			m_current_document = std::make_unique<Model::Document>(canvas_size);
+			return currentDocument();
 		}
 
 		//NOTE: This is const, because it does not change the statue of manager
-		Document* currentDocument() const { return m_current_document.get(); }
+		Model::Document* currentDocument() const { return m_current_document.get(); }
 
 	private:
 		std::unique_ptr<Model::Document> m_current_document;
-	}
+	};
 }
 
 #endif
