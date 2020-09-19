@@ -7,16 +7,19 @@
 
 #include "./menu_file.hpp"
 #include "./size_input.hpp"
+#include "./document_manager.hpp"
 
-#include "model/document.hpp"
 #include "ui/dialog.hpp"
+#include "utils/inherit_from.hpp"
 
 namespace Texpainter
 {
-	template<class DocOwner>
 	class DocMenuHandler
 	{
-		using CanvasSizeDialog = Ui::Dialog<SizeInput>;
+		using CanvasSizeDialog =
+		    Ui::Dialog<InheritFrom<std::reference_wrapper<Model::Document>, SizeInput>>;
+		using NewDocDialog =
+		    Ui::Dialog<InheritFrom<std::reference_wrapper<DocumentManager>, SizeInput>>;
 
 	public:
 		enum class ControlId : int
@@ -25,17 +28,16 @@ namespace Texpainter
 			SetCanvasSize
 		};
 
-		explicit DocMenuHandler(Ui::Container& dialog_owner, DocOwner& doc_owner)
+		explicit DocMenuHandler(Ui::Container& dialog_owner)
 		    : m_default_size{512, 512}
 		    , r_dlg_owner{dialog_owner}
-		    , r_doc_owner{doc_owner}
 		{
 		}
 
 		template<FileAction action>
-		void onActivated(Ui::MenuItem& item)
+		void onActivated(Ui::MenuItem& item, DocumentManager& docs)
 		{
-			onActivated(Tag<action>{}, item);
+			onActivated(Tag<action>{}, item, docs);
 		}
 
 		template<ControlId id, class Src>
@@ -51,53 +53,55 @@ namespace Texpainter
 		}
 
 
-		void onActivated(Tag<FileAction::New>, Ui::MenuItem&)
+		void onActivated(Tag<FileAction::New>, Ui::MenuItem&, DocumentManager& docs)
 		{
 			// if(documentHasBeenSaved)
 			{
-				m_new_dlg = std::make_unique<CanvasSizeDialog>(
-				    r_dlg_owner, "New document", m_default_size, Size2d{16384, 16384});
+				m_new_dlg = std::make_unique<NewDocDialog>(
+				    docs, r_dlg_owner, "New document", m_default_size, Size2d{16384, 16384});
 				m_new_dlg->eventHandler<ControlId::NewDocument>(*this);
 			}
 		}
 
-		void onActivated(Tag<FileAction::SetCanvasSize>, Ui::MenuItem& item)
+		void onActivated(Tag<FileAction::SetCanvasSize>, Ui::MenuItem& item, DocumentManager& docs)
 		{
-			if(r_doc_owner.hasDocument())
+			if(auto current_document = docs.currentDocument(); current_document != nullptr)
 			{
-				m_canvas_dlg = std::make_unique<CanvasSizeDialog>(
-				    r_dlg_owner, "Set canvas size", m_default_size, Size2d{16384, 16384});
+				m_canvas_dlg = std::make_unique<CanvasSizeDialog>(*current_document,
+				                                                  r_dlg_owner,
+				                                                  "Set canvas size",
+				                                                  m_default_size,
+				                                                  Size2d{16384, 16384});
 				m_canvas_dlg->eventHandler<ControlId::SetCanvasSize>(*this);
 			}
 			else
 			{
-				onActivated(Tag<FileAction::New>{}, item);
+				onActivated(Tag<FileAction::New>{}, item, docs);
 			}
 		}
 
 		template<FileAction action>
-		void onActivated(Tag<action>, Ui::MenuItem&)
+		void onActivated(Tag<action>, Ui::MenuItem&, DocumentManager&)
 		{
 			printf("Todo %d\n", static_cast<int>(action));
 		}
 
-		void confirmPositive(Tag<ControlId::NewDocument>, CanvasSizeDialog& src)
+		void confirmPositive(Tag<ControlId::NewDocument>, NewDocDialog& src)
 		{
-			m_default_size = src.widget().value();
+			auto size      = src.widget().value();
+			m_default_size = size;
+			src.widget().get().createDocument(size);
 			m_new_dlg.reset();
-			r_doc_owner.document(Model::Document{m_default_size});
 		}
 
-		void dismiss(Tag<ControlId::NewDocument>, CanvasSizeDialog&) { m_new_dlg.reset(); }
+		void dismiss(Tag<ControlId::NewDocument>, NewDocDialog&) { m_new_dlg.reset(); }
 
 		void confirmPositive(Tag<ControlId::SetCanvasSize>, CanvasSizeDialog& src)
 		{
-			m_default_size = src.widget().value();
+			auto size      = src.widget().value();
+			m_default_size = size;
+			src.widget().get().canvasSize(size);
 			m_canvas_dlg.reset();
-			r_doc_owner.documentModify([size = m_default_size](Model::Document& doc) noexcept {
-				doc.canvasSize(size);
-				return true;
-			});
 		}
 
 		void dismiss(Tag<ControlId::SetCanvasSize>, CanvasSizeDialog&) { m_canvas_dlg.reset(); }
@@ -106,9 +110,8 @@ namespace Texpainter
 		Size2d m_default_size;
 
 		Ui::Container& r_dlg_owner;
-		DocOwner& r_doc_owner;
 
-		std::unique_ptr<CanvasSizeDialog> m_new_dlg;
+		std::unique_ptr<NewDocDialog> m_new_dlg;
 		std::unique_ptr<CanvasSizeDialog> m_canvas_dlg;
 	};
 }

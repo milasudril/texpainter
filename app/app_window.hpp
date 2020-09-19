@@ -60,7 +60,7 @@ namespace Texpainter
 		template<FileAction action>
 		void onActivated(Ui::MenuItem& item)
 		{
-			m_doc_menu_handler.onActivated<action>(item);
+			m_doc_menu_handler.onActivated<action>(item, m_documents);
 		}
 
 		template<LayerAction action>
@@ -256,7 +256,7 @@ namespace Texpainter
 			Angle m_mouse_rot;
 		} m_rot_state;
 
-		DocMenuHandler<AppWindow> m_doc_menu_handler;
+		DocMenuHandler m_doc_menu_handler;
 		LayerMenuHandler m_layer_menu_handler;
 		PaletteMenuHandler m_palette_menu_handler;
 		PaletteViewEventHandler m_pal_view_eh;

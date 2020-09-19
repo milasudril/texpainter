@@ -11,7 +11,7 @@ Texpainter::AppWindow::AppWindow(Ui::Container& container, PolymorphicRng rng)
     , m_trans_mode{TransformationMode::Relative}
 
     // Event handlers
-    , m_doc_menu_handler{container, *this}
+    , m_doc_menu_handler{container}
     , m_layer_menu_handler{container, m_rng}
     , m_palette_menu_handler{container, m_rng}
     , m_pal_view_eh{container, m_rng}
