@@ -149,7 +149,9 @@ namespace Texpainter
 		}
 
 		template<ControlId>
-		void onMouseDown(Ui::PaletteView&, PixelStore::ColorIndex, int button);
+		void onMouseDown(Ui::PaletteView&, PixelStore::ColorIndex, int)
+		{
+		}
 
 		template<ControlId>
 		void onMouseUp(Ui::PaletteView&, PixelStore::ColorIndex, int button);
@@ -190,6 +192,18 @@ namespace Texpainter
 		void operator()(T)
 		{
 			update();
+		}
+
+		void operator()(Tag<FileAction::New>)
+		{
+			m_pal_view.eventHandler<ControlId::PaletteView>(*this);
+			m_layer_selector.inputField().eventHandler<ControlId::LayerSelector>(*this);
+			m_brush_selector.inputField().eventHandler<ControlId::BrushSelector>(*this);
+			m_brush_size.eventHandler<ControlId::BrushSize>(*this);
+			m_palette_selector.inputField().eventHandler<ControlId::PaletteSelector>(*this);
+			m_img_view.eventHandler<ControlId::Canvas>(*this);
+			update();
+			m_rows.killFocus();
 		}
 
 	private:
@@ -410,6 +424,16 @@ namespace Texpainter
 	    CompositingOptionsEditor& src)
 	{
 		doRender(src.compositingOptions());
+	}
+
+
+	template<>
+	inline void AppWindow::onMouseUp<AppWindow::ControlId::PaletteView>(
+	    Ui::PaletteView& src, PixelStore::ColorIndex index, int button)
+	{
+		auto& current_document = *m_documents.currentDocument();
+		m_pal_view_eh.template onMouseUp<AppWindow::ControlId::PaletteView>(
+		    src, index, button, current_document);
 	}
 }
 

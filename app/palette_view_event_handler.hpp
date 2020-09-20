@@ -53,11 +53,6 @@ namespace Texpainter
 		}
 
 		template<auto>
-		void onMouseDown(Texpainter::Ui::PaletteView&, PixelStore::ColorIndex, int)
-		{
-		}
-
-		template<auto>
 		void onMouseUp(Texpainter::Ui::PaletteView& pal_view,
 		               PixelStore::ColorIndex index,
 		               int button,
@@ -93,11 +88,6 @@ namespace Texpainter
 						break;
 				}
 			}
-		}
-
-		template<auto>
-		void onMouseMove(Texpainter::Ui::PaletteView&, PixelStore::ColorIndex)
-		{
 		}
 
 		template<auto>
