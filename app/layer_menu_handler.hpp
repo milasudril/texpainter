@@ -8,6 +8,7 @@
 #include "./menu_layer.hpp"
 #include "./size_input.hpp"
 #include "./layer_creator.hpp"
+#include "./compositing_options_editor.hpp"
 
 #include "utils/polymorphic_rng.hpp"
 #include "utils/function_ref.hpp"
@@ -57,6 +58,10 @@ namespace Texpainter
 		using LayerCreatorDlg = Ui::Dialog<
 		    InheritFrom<std::pair<std::reference_wrapper<Model::Document>, SimpleCallback>,
 		                LayerCreator>>;
+		using CompositingOptionsDlg = Ui::Dialog<
+		    InheritFrom<std::pair<std::reference_wrapper<Model::Document>, SimpleCallback>,
+		                CompositingOptionsEditor>>;
+
 
 	public:
 		enum class ControlId : int
@@ -67,7 +72,8 @@ namespace Texpainter
 			Link,
 			LinkToCopy,
 			Rename,
-			Delete
+			Delete,
+			CompositingOptions
 		};
 
 		explicit LayerMenuHandler(Ui::Container& dialog_owner, PolymorphicRng rng)
@@ -258,10 +264,20 @@ namespace Texpainter
 
 		void onActivated(Tag<LayerAction::CompositingOptions>,
 		                 Ui::MenuItem&,
-		                 Model::Document&,
-		                 SimpleCallback)
+		                 Model::Document& doc,
+		                 SimpleCallback on_completed)
 		{
-			// r_doc_owner.showFxBlendEditor();
+			if(auto layer = currentLayer(doc); layer != nullptr)
+			{
+				m_compositing_opts =
+				    std::make_unique<CompositingOptionsDlg>(std::pair{std::ref(doc), on_completed},
+				                                            r_dlg_owner,
+				                                            "Compositing options",
+				                                            layer->compositingOptions(),
+				                                            layer->nodeLocations());
+				m_compositing_opts->eventHandler<ControlId::CompositingOptions>(*this);
+				//	m_fx_blend_editor_dlg->widget().eventHandler<ControlId::CompositingOptions>(*this);
+			}
 		}
 
 		void onActivated(Tag<LayerAction::Isolate>,
@@ -547,6 +563,28 @@ namespace Texpainter
 
 		void dismiss(Tag<ControlId::NewFromNoise>, LayerCreatorDlg&) { m_new_from_noise.reset(); }
 
+		void confirmPositive(Tag<ControlId::CompositingOptions>, CompositingOptionsDlg& src)
+		{
+			auto& doc = src.widget().first.get();
+			doc.layersModify([&current_layer = doc.currentLayer(),
+			                  result = src.widget().compositingOptions()](auto& layers) mutable {
+				if(auto layer = layers[current_layer]; layer != nullptr)
+				{
+					layer->compositingOptions(std::move(result));
+					return true;
+				}
+				return false;
+			});
+
+			src.widget().second();
+			m_compositing_opts.reset();
+		}
+
+		void dismiss(Tag<ControlId::CompositingOptions>, CompositingOptionsDlg&)
+		{
+			m_compositing_opts.reset();
+		}
+
 	private:
 		Ui::Container& r_dlg_owner;
 		PolymorphicRng m_rng;
@@ -559,6 +597,8 @@ namespace Texpainter
 
 		std::unique_ptr<LayerCreatorDlg> m_new_from_color_dlg;
 		std::unique_ptr<LayerCreatorDlg> m_new_from_noise;
+
+		std::unique_ptr<CompositingOptionsDlg> m_compositing_opts;
 
 		void insertNewLayer(std::string&& layer_name, Model::Layer&& layer, Model::Document& doc)
 		{
