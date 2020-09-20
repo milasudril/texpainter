@@ -28,20 +28,24 @@ namespace Texpainter
 		public:
 			explicit LayerActionParams(std::reference_wrapper<Model::Layer const> layer,
 			                           std::reference_wrapper<std::string const> layer_name,
+			                           Model::Document& doc,
 			                           SimpleCallback on_completed)
 			    : m_layer{layer}
 			    , m_layer_name{layer_name}
+			    , m_doc{doc}
 			    , m_on_completed{on_completed}
 			{
 			}
 
 			Model::Layer const& layer() const { return m_layer; }
 			std::string const& layerName() const { return m_layer_name; }
+			Model::Document& document() { return m_doc; }
 			void finalize() { m_on_completed(); }
 
 		private:
 			std::reference_wrapper<Model::Layer const> m_layer;
 			std::reference_wrapper<std::string const> m_layer_name;
+			std::reference_wrapper<Model::Document> m_doc;
 			SimpleCallback m_on_completed;
 		};
 
@@ -50,7 +54,9 @@ namespace Texpainter
 		    Texpainter::Ui::Dialog<InheritFrom<LayerActionParams, Ui::LabeledInput<Ui::TextEntry>>>;
 		using ConfirmationDlg =
 		    Ui::Dialog<InheritFrom<LayerActionParams, Ui::Label>, Ui::DialogYesNo>;
-		using LayerCreatorDlg = Ui::Dialog<InheritFrom<SimpleCallback, LayerCreator>>;
+		using LayerCreatorDlg = Ui::Dialog<
+		    InheritFrom<std::pair<std::reference_wrapper<Model::Document>, SimpleCallback>,
+		                LayerCreator>>;
 
 	public:
 		enum class ControlId : int
@@ -110,7 +116,7 @@ namespace Texpainter
 			if(auto layer = currentLayer(doc); layer != nullptr)
 			{
 				m_copy_dlg = std::make_unique<NameInputDlg>(
-				    LayerActionParams{*layer, doc.currentLayer(), on_completed},
+				    LayerActionParams{*layer, doc.currentLayer(), doc, on_completed},
 				    r_dlg_owner,
 				    "Copy current layer",
 				    Ui::Box::Orientation::Horizontal,
@@ -127,7 +133,7 @@ namespace Texpainter
 			if(auto layer = currentLayer(doc); layer != nullptr)
 			{
 				m_link_dlg = std::make_unique<NameInputDlg>(
-				    LayerActionParams{*layer, doc.currentLayer(), on_completed},
+				    LayerActionParams{*layer, doc.currentLayer(), doc, on_completed},
 				    r_dlg_owner,
 				    "Create link to current layer",
 				    Ui::Box::Orientation::Horizontal,
@@ -144,7 +150,7 @@ namespace Texpainter
 			if(auto layer = currentLayer(doc); layer != nullptr)
 			{
 				m_link_to_copy_dlg = std::make_unique<ConfirmationDlg>(
-				    LayerActionParams{*layer, doc.currentLayer(), on_completed},
+				    LayerActionParams{*layer, doc.currentLayer(), doc, on_completed},
 				    r_dlg_owner,
 				    "Convert linked layer",
 				    "Are you shure you want to convert current layer to a static copy?");
@@ -160,7 +166,7 @@ namespace Texpainter
 			if(auto layer = currentLayer(doc); layer != nullptr)
 			{
 				m_rename_dlg = std::make_unique<NameInputDlg>(
-				    LayerActionParams{*layer, doc.currentLayer(), on_completed},
+				    LayerActionParams{*layer, doc.currentLayer(), doc, on_completed},
 				    r_dlg_owner,
 				    "Rename current layer",
 				    Ui::Box::Orientation::Horizontal,
@@ -177,7 +183,7 @@ namespace Texpainter
 			if(auto layer = currentLayer(doc); layer != nullptr)
 			{
 				m_delete_dlg = std::make_unique<ConfirmationDlg>(
-				    LayerActionParams{*layer, doc.currentLayer(), on_completed},
+				    LayerActionParams{*layer, doc.currentLayer(), doc, on_completed},
 				    r_dlg_owner,
 				    "Delete layer",
 				    "Are you shure you want to delete current layer?");
@@ -305,38 +311,38 @@ namespace Texpainter
 		}
 
 
-		void confirmPositive(Tag<ControlId::Copy>, NameInputDlg&)
+		void confirmPositive(Tag<ControlId::Copy>, NameInputDlg& src)
 		{
-			//			insertNewLayer(src.widget().inputField().content(), src.widget().layer->copiedLayer());
+			insertNewLayer(src.widget().inputField().content(),
+			               src.widget().layer().copiedLayer(),
+			               src.widget().document());
+			src.widget().finalize();
 			m_copy_dlg.reset();
 		}
 
 		void dismiss(Tag<ControlId::Link>, NameInputDlg&) { m_link_dlg.reset(); }
 
 
-		void confirmPositive(Tag<ControlId::Link>, NameInputDlg&)
+		void confirmPositive(Tag<ControlId::Link>, NameInputDlg& src)
 		{
-			//			insertNewLayer(src.widget().inputField().content(), src.widget().layer->linkedLayer());
+			insertNewLayer(src.widget().inputField().content(),
+			               src.widget().layer().linkedLayer(),
+			               src.widget().document());
+			src.widget().finalize();
 			m_link_dlg.reset();
 		}
 
 		void dismiss(Tag<ControlId::Copy>, NameInputDlg&) { m_copy_dlg.reset(); }
 
 
-		void confirmPositive(Tag<ControlId::LinkToCopy>, ConfirmationDlg&)
+		void confirmPositive(Tag<ControlId::LinkToCopy>, ConfirmationDlg& src)
 		{
-#if 0
-			r_doc_owner.documentModify([current_layer = src.widget().layer_name](auto& doc) {
-				(void)doc.layersModify([current_layer](auto& layers) {
-					layers[*current_layer]->convertToCopy();
-					return true;
-				});
-
-				// Return false here because there are no changes to the ui
-				return false;
+			src.widget().document().layersModify([&layer = src.widget().layerName()](auto& layers) {
+				layers[layer]->convertToCopy();
+				return true;
 			});
-#endif
 
+			src.widget().finalize();
 			m_link_to_copy_dlg.reset();
 		}
 
@@ -346,48 +352,41 @@ namespace Texpainter
 		}
 
 
-		void confirmPositive(Tag<ControlId::Rename>, NameInputDlg&)
+		void confirmPositive(Tag<ControlId::Rename>, NameInputDlg& src)
 		{
-#if 0
-			r_doc_owner.documentModify([current_layer = src.widget().layer_name,
-			                            new_name = src.widget().inputField().content()](auto& doc) {
-				(void)doc.layersModify([current_layer, new_name, &doc](auto& layers) {
-					layers.rename(*current_layer, new_name);
-					doc.currentLayer(new_name);
-					return true;
-				});
+			src.widget().document().layersModify([&layer   = src.widget().layerName(),
+			                                      new_name = src.widget().inputField().content(),
+			                                      &doc = src.widget().document()](auto& layers) {
+				layers.rename(layer, new_name);
+				doc.currentLayer(new_name);
 				return true;
 			});
-#endif
+
+			src.widget().finalize();
 			m_rename_dlg.reset();
 		}
 
 		void dismiss(Tag<ControlId::Rename>, NameInputDlg&) { m_rename_dlg.reset(); }
 
 
-		void confirmPositive(Tag<ControlId::Delete>, ConfirmationDlg&)
+		void confirmPositive(Tag<ControlId::Delete>, ConfirmationDlg& src)
 		{
-#if 0
-			r_doc_owner.documentModify([current_layer = src.widget().layer_name](auto& doc) {
-				(void)doc.layersModify([current_layer, &doc](auto& layers) {
-					auto i = layers.index(*current_layer);
-					if(i != Model::LayerIndex{0}) [[likely]]
-						{
-							--i;
-						}
-					else if(i.value() + 1 != layers.size().value())
-					{
-						++i;
-					}
-					auto current_layer_copy = *layers.key(i);
-					layers.erase(*current_layer);
-					if(layers.size() != Model::LayerIndex{0})
-					{ doc.currentLayer(std::move(current_layer_copy)); }
-					return true;
-				});
-				return true;
-			});
-#endif
+			src.widget().document().layersModify(
+			    [&layer = src.widget().layerName(), &doc = src.widget().document()](auto& layers) {
+				    auto i = layers.index(layer);
+				    if(i != Model::LayerIndex{0}) { --i; }
+				    else if(i.value() + 1 != layers.size().value())
+				    {
+					    ++i;
+				    }
+				    auto current_layer_copy = *layers.key(i);
+				    layers.erase(layer);
+				    if(layers.size() != Model::LayerIndex{0})
+				    { doc.currentLayer(std::move(current_layer_copy)); }
+				    return true;
+			    });
+
+			src.widget().finalize();
 			m_delete_dlg.reset();
 		}
 
@@ -402,7 +401,7 @@ namespace Texpainter
 			auto const size_max     = doc.canvasSize();
 			auto const size_default = Size2d{size_max.width() / 2, size_max.height() / 2};
 			m_new_from_color_dlg =
-			    std::make_unique<LayerCreatorDlg>(on_completed,
+			    std::make_unique<LayerCreatorDlg>(std::pair{std::ref(doc), on_completed},
 			                                      r_dlg_owner,
 			                                      "Create new layer from current color",
 			                                      size_default,
@@ -417,8 +416,12 @@ namespace Texpainter
 		{
 			auto const size_max     = doc.canvasSize();
 			auto const size_default = Size2d{size_max.width() / 2, size_max.height() / 2};
-			m_new_from_noise        = std::make_unique<LayerCreatorDlg>(
-                on_completed, r_dlg_owner, "Create new layer from noise", size_default, size_max);
+			m_new_from_noise =
+			    std::make_unique<LayerCreatorDlg>(std::pair{std::ref(doc), on_completed},
+			                                      r_dlg_owner,
+			                                      "Create new layer from noise",
+			                                      size_default,
+			                                      size_max);
 			m_new_from_noise->eventHandler<ControlId::NewFromNoise>(*this);
 		}
 
@@ -494,21 +497,21 @@ namespace Texpainter
 		}
 
 
-		void confirmPositive(Tag<ControlId::NewFromCurrentColor>, LayerCreatorDlg&)
+		void confirmPositive(Tag<ControlId::NewFromCurrentColor>, LayerCreatorDlg& src)
 		{
-#if 0
 			auto layer_info = src.widget().value();
-			if(!isSupported<PixelStore::Pixel>(layer_info.size)) [[unlikely]]
-				{
-					// FIXME:
-					//   "A layer of this size cannot be created. The number of bytes required to create a layer
-					//   of "
-					//  "this size exeeds the largest supported integer value."};
-					return;
-				}
+			if(!isSupported<PixelStore::Pixel>(layer_info.size))
+			{
+				// FIXME:
+				//   "A layer of this size cannot be created. The number of bytes required to create a layer
+				//   of "
+				//  "this size exeeds the largest supported integer value."};
+				return;
+			}
 			insertNewLayer(std::move(layer_info.name),
-			               Model::Layer{layer_info.size, currentColor(doc)});
-#endif
+			               Model::Layer{layer_info.size, currentColor(src.widget().first.get())},
+			               src.widget().first.get());
+			src.widget().second();
 			m_new_from_color_dlg.reset();
 		}
 
@@ -517,18 +520,17 @@ namespace Texpainter
 			m_new_from_color_dlg.reset();
 		}
 
-		void confirmPositive(Tag<ControlId::NewFromNoise>, LayerCreatorDlg&)
+		void confirmPositive(Tag<ControlId::NewFromNoise>, LayerCreatorDlg& src)
 		{
-#if 0
 			auto layer_info = src.widget().value();
-			if(!isSupported<PixelStore::Pixel>(layer_info.size)) [[unlikely]]
-				{
-					// FIXME:
-					//   "A layer of this size cannot be created. The number of bytes required to create a layer
-					//   of "
-					//  "this size exeeds the largest supported integer value."};
-					return;
-				}
+			if(!isSupported<PixelStore::Pixel>(layer_info.size))
+			{
+				// FIXME:
+				//   "A layer of this size cannot be created. The number of bytes required to create a layer
+				//   of "
+				//  "this size exeeds the largest supported integer value."};
+				return;
+			}
 
 			PixelStore::Image noise{layer_info.size};
 			std::ranges::generate(noise.pixels(), [rng = m_rng]() mutable {
@@ -536,8 +538,10 @@ namespace Texpainter
 				return PixelStore::Pixel{U(rng), U(rng), U(rng), U(rng)};
 			});
 
-			insertNewLayer(std::move(layer_info.name), Model::Layer{std::move(noise)});
-#endif
+			insertNewLayer(std::move(layer_info.name),
+			               Model::Layer{std::move(noise)},
+			               src.widget().first.get());
+			src.widget().second();
 			m_new_from_noise.reset();
 		}
 
@@ -555,20 +559,16 @@ namespace Texpainter
 
 		std::unique_ptr<LayerCreatorDlg> m_new_from_color_dlg;
 		std::unique_ptr<LayerCreatorDlg> m_new_from_noise;
-#if 0
-		void insertNewLayer(std::string&& layer_name, Model::Layer&& layer)
+
+		void insertNewLayer(std::string&& layer_name, Model::Layer&& layer, Model::Document& doc)
 		{
-			r_doc_owner.documentModify([&layer_name, &layer](auto& doc) noexcept {
-				(void)doc.layersModify([layer_name, &layer](auto& layers) mutable noexcept {
-					// FIXME: Unique name generator...
-					layers.insert(std::make_pair(std::move(layer_name), std::move(layer)));
-					return true;
-				});
-				doc.currentLayer(std::move(layer_name));
+			doc.layersModify([layer_name, &layer](auto& layers) mutable noexcept {
+				// FIXME: Unique name generator...
+				layers.insert(std::make_pair(std::move(layer_name), std::move(layer)));
 				return true;
 			});
+			doc.currentLayer(std::move(layer_name));
 		}
-#endif
 	};
 }
 
