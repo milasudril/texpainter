@@ -10,6 +10,7 @@
 #include "./document_manager.hpp"
 
 #include "ui/dialog.hpp"
+#include "utils/function_ref.hpp"
 #include "utils/inherit_from.hpp"
 
 namespace Texpainter
@@ -17,9 +18,9 @@ namespace Texpainter
 	class DocMenuHandler
 	{
 		using CanvasSizeDialog =
-		    Ui::Dialog<InheritFrom<std::reference_wrapper<Model::Document>, SizeInput>>;
+		    Ui::Dialog<InheritFrom<std::pair<std::reference_wrapper<Model::Document>, SimpleCallback>, SizeInput>>;
 		using NewDocDialog =
-		    Ui::Dialog<InheritFrom<std::reference_wrapper<DocumentManager>, SizeInput>>;
+		    Ui::Dialog<InheritFrom<std::pair<std::reference_wrapper<DocumentManager>, SimpleCallback>, SizeInput>>;
 
 	public:
 		enum class ControlId : int
@@ -35,9 +36,9 @@ namespace Texpainter
 		}
 
 		template<FileAction action>
-		void onActivated(Ui::MenuItem& item, DocumentManager& docs)
+		void onActivated(Ui::MenuItem& item, DocumentManager& docs, SimpleCallback on_completed)
 		{
-			onActivated(Tag<action>{}, item, docs);
+			onActivated(Tag<action>{}, item, docs, on_completed);
 		}
 
 		template<ControlId id, class Src>
@@ -53,21 +54,21 @@ namespace Texpainter
 		}
 
 
-		void onActivated(Tag<FileAction::New>, Ui::MenuItem&, DocumentManager& docs)
+		void onActivated(Tag<FileAction::New>, Ui::MenuItem&, DocumentManager& docs, SimpleCallback on_completed)
 		{
 			// if(documentHasBeenSaved)
 			{
 				m_new_dlg = std::make_unique<NewDocDialog>(
-				    docs, r_dlg_owner, "New document", m_default_size, Size2d{16384, 16384});
+					std::pair{std::ref(docs), on_completed}, r_dlg_owner, "New document", m_default_size, Size2d{16384, 16384});
 				m_new_dlg->eventHandler<ControlId::NewDocument>(*this);
 			}
 		}
 
-		void onActivated(Tag<FileAction::SetCanvasSize>, Ui::MenuItem& item, DocumentManager& docs)
+		void onActivated(Tag<FileAction::SetCanvasSize>, Ui::MenuItem& item, DocumentManager& docs, SimpleCallback on_completed)
 		{
 			if(auto current_document = docs.currentDocument(); current_document != nullptr)
 			{
-				m_canvas_dlg = std::make_unique<CanvasSizeDialog>(*current_document,
+				m_canvas_dlg = std::make_unique<CanvasSizeDialog>(std::pair{std::ref(*current_document), on_completed},
 				                                                  r_dlg_owner,
 				                                                  "Set canvas size",
 				                                                  m_default_size,
@@ -76,12 +77,12 @@ namespace Texpainter
 			}
 			else
 			{
-				onActivated(Tag<FileAction::New>{}, item, docs);
+				onActivated(Tag<FileAction::New>{}, item, docs, on_completed);
 			}
 		}
 
 		template<FileAction action>
-		void onActivated(Tag<action>, Ui::MenuItem&, DocumentManager&)
+		void onActivated(Tag<action>, Ui::MenuItem&, DocumentManager&, SimpleCallback)
 		{
 			printf("Todo %d\n", static_cast<int>(action));
 		}
@@ -90,7 +91,8 @@ namespace Texpainter
 		{
 			auto size      = src.widget().value();
 			m_default_size = size;
-			src.widget().get().createDocument(size);
+			src.widget().first.get().createDocument(size);
+			src.widget().second();
 			m_new_dlg.reset();
 		}
 
@@ -100,7 +102,8 @@ namespace Texpainter
 		{
 			auto size      = src.widget().value();
 			m_default_size = size;
-			src.widget().get().canvasSize(size);
+			src.widget().first.get().canvasSize(size);
+			src.widget().second();
 			m_canvas_dlg.reset();
 		}
 

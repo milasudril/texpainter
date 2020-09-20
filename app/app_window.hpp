@@ -60,7 +60,7 @@ namespace Texpainter
 		template<FileAction action>
 		void onActivated(Ui::MenuItem& item)
 		{
-			m_doc_menu_handler.onActivated<action>(item, m_documents);
+			m_doc_menu_handler.onActivated<action>(item, m_documents, SimpleCallback{*this, Tag<action>{}});
 		}
 
 		template<LayerAction action>
@@ -168,6 +168,11 @@ namespace Texpainter
 			}
 		}
 
+		template<class T>
+		void operator()(T)
+		{
+			update();
+		}
 
 	private:
 		DocumentManager m_documents;

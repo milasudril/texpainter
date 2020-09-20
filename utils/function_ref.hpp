@@ -7,8 +7,6 @@
 
 #include <utility>
 #include <type_traits>
-#include <cstdio>
-
 namespace Texpainter
 {
 	template<class>
@@ -23,8 +21,18 @@ namespace Texpainter
 		constexpr explicit FunctionRef(Function& f)
 		    : r_handle{&f}
 		    , r_func{[](void* handle, Args... args) {
-			    auto& self = *reinterpret_cast<Function*>(handle);
+			    auto& self = *static_cast<Function*>(handle);
 			    return self(std::forward<Args>(args)...);
+		    }}
+		{
+		}
+
+		template<class Function, class Tag>
+		constexpr explicit FunctionRef(Function& f, Tag)
+		    : r_handle{&f}
+		    , r_func{[](void* handle, Args... args) {
+			    auto& self = *static_cast<Function*>(handle);
+			    return self(Tag{}, std::forward<Args>(args)...);
 		    }}
 		{
 		}
@@ -43,6 +51,8 @@ namespace Texpainter
 		void* r_handle;
 		R (*r_func)(void*, Args...);
 	};
+
+	using SimpleCallback = FunctionRef<void()>;
 }
 
 #endif
