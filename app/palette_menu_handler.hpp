@@ -8,12 +8,13 @@
 #include "./menu_palette.hpp"
 #include "./palette_creator.hpp"
 
-#include "utils/polymorphic_rng.hpp"
 #include "model/document.hpp"
 #include "ui/dialog.hpp"
 #include "ui/labeled_input.hpp"
 #include "ui/text_entry.hpp"
+#include "utils/polymorphic_rng.hpp"
 #include "utils/inherit_from.hpp"
+#include "utils/function_ref.hpp"
 
 #include <random>
 
@@ -40,9 +41,9 @@ namespace Texpainter
 		}
 
 		template<PaletteActionNew action>
-		void onActivated(Ui::MenuItem& item, Model::Document& doc)
+		void onActivated(Ui::MenuItem& item, Model::Document& doc, SimpleCallback on_compleeted)
 		{
-			onActivated(Tag<action>{}, item, doc);
+			onActivated(Tag<action>{}, item, doc, on_compleeted);
 		}
 
 		template<ControlId id, class Src>
@@ -57,7 +58,10 @@ namespace Texpainter
 			confirmPositive(Tag<id>{}, src);
 		}
 
-		void onActivated(Tag<PaletteActionNew::Empty>, Ui::MenuItem&, Model::Document& doc)
+		void onActivated(Tag<PaletteActionNew::Empty>,
+		                 Ui::MenuItem&,
+		                 Model::Document& doc,
+		                 SimpleCallback)
 		{
 			m_new_empty_dlg = std::make_unique<PaletteCreateDlg>(std::ref(doc),
 			                                                     r_dlg_owner,
@@ -67,7 +71,10 @@ namespace Texpainter
 			m_new_empty_dlg->eventHandler<ControlId::NewEmpty>(*this);
 		}
 
-		void onActivated(Tag<PaletteActionNew::Generate>, Ui::MenuItem&, Model::Document& doc)
+		void onActivated(Tag<PaletteActionNew::Generate>,
+		                 Ui::MenuItem&,
+		                 Model::Document& doc,
+		                 SimpleCallback)
 		{
 			m_new_generated_dlg = std::make_unique<PaletteGenerateDlg>(
 			    std::ref(doc), r_dlg_owner, "Generate palette");
@@ -75,7 +82,7 @@ namespace Texpainter
 		}
 
 		template<PaletteActionNew action>
-		void onActivated(Tag<action>, Ui::MenuItem& item)
+		void onActivated(Tag<action>, Ui::MenuItem&, Model::Document&, SimpleCallback)
 		{
 			printf("Todo: %d\n", static_cast<int>(action));
 		}

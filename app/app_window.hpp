@@ -60,21 +60,28 @@ namespace Texpainter
 		template<FileAction action>
 		void onActivated(Ui::MenuItem& item)
 		{
-			m_doc_menu_handler.onActivated<action>(item, m_documents, SimpleCallback{*this, Tag<action>{}});
+			m_doc_menu_handler.onActivated<action>(
+			    item, m_documents, SimpleCallback{*this, Tag<action>{}});
 		}
 
 		template<LayerAction action>
 		void onActivated(Ui::MenuItem& item)
 		{
 			if(hasDocument())
-			{ m_layer_menu_handler.onActivated<action>(item, *m_documents.currentDocument()); }
+			{
+				m_layer_menu_handler.onActivated<action>(
+				    item, *m_documents.currentDocument(), SimpleCallback{*this, Tag<action>{}});
+			}
 		}
 
 		template<LayerAction action>
 		void onActivated(Ui::CheckableMenuItem& item)
 		{
 			if(hasDocument())
-			{ m_layer_menu_handler.onActivated<action>(item, *m_documents.currentDocument()); }
+			{
+				m_layer_menu_handler.onActivated<action>(
+				    item, *m_documents.currentDocument(), SimpleCallback{*this, Tag<action>{}});
+			}
 			else
 			{
 				item.toggle();
@@ -84,13 +91,21 @@ namespace Texpainter
 		template<LayerActionNew action>
 		void onActivated(Ui::MenuItem& item)
 		{
-			if(hasDocument()) { m_layer_menu_handler.onActivated<action>(item, *m_documents.currentDocument()); }
+			if(hasDocument())
+			{
+				m_layer_menu_handler.onActivated<action>(
+				    item, *m_documents.currentDocument(), SimpleCallback{*this, Tag<action>{}});
+			}
 		}
 
 		template<LayerActionClearTransformation action>
 		void onActivated(Ui::MenuItem& item)
 		{
-			if(hasDocument()) { m_layer_menu_handler.onActivated<action>(item, *m_documents.currentDocument()); }
+			if(hasDocument())
+			{
+				m_layer_menu_handler.onActivated<action>(
+				    item, *m_documents.currentDocument(), SimpleCallback{*this, Tag<action>{}});
+			}
 		}
 
 		template<PaletteAction>
@@ -102,7 +117,10 @@ namespace Texpainter
 		void onActivated(Ui::MenuItem& item)
 		{
 			if(hasDocument())
-			{ m_palette_menu_handler.onActivated<action>(item, *m_documents.currentDocument()); }
+			{
+				m_palette_menu_handler.onActivated<action>(
+				    item, *m_documents.currentDocument(), SimpleCallback{*this, Tag<action>{}});
+			}
 		}
 
 		template<ControlId>

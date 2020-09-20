@@ -10,37 +10,47 @@
 #include "./layer_creator.hpp"
 
 #include "utils/polymorphic_rng.hpp"
+#include "utils/function_ref.hpp"
 #include "model/document.hpp"
 #include "ui/dialog.hpp"
 #include "ui/text_entry.hpp"
 #include "ui/labeled_input.hpp"
 
 #include <random>
+#include <functional>
 
 namespace Texpainter
 {
 	class LayerMenuHandler
 	{
-		template<class Widget>
-		struct WidgetWithLayerRef: public Widget
+		class LayerActionParams
 		{
-			template<class... Args>
-			WidgetWithLayerRef(Args&&... args)
-			    : Widget{std::forward<Args>(args)...}
-			    , layer{nullptr}
-			    , layer_name{nullptr}
+		public:
+			explicit LayerActionParams(std::reference_wrapper<Model::Layer const> layer,
+			                           std::reference_wrapper<std::string const> layer_name,
+			                           SimpleCallback on_completed)
+			    : m_layer{layer}
+			    , m_layer_name{layer_name}
+			    , m_on_completed{on_completed}
 			{
 			}
 
-			Model::Layer const* layer;
-			std::string const* layer_name;
+			Model::Layer const& layer() const { return m_layer; }
+			std::string const& layerName() const { return m_layer_name; }
+			void finalize() { m_on_completed(); }
+
+		private:
+			std::reference_wrapper<Model::Layer const> m_layer;
+			std::reference_wrapper<std::string const> m_layer_name;
+			SimpleCallback m_on_completed;
 		};
 
 
 		using NameInputDlg =
-		    Texpainter::Ui::Dialog<WidgetWithLayerRef<Ui::LabeledInput<Ui::TextEntry>>>;
-		using ConfirmationDlg = Ui::Dialog<WidgetWithLayerRef<Ui::Label>, Ui::DialogYesNo>;
-		using LayerCreatorDlg = Ui::Dialog<LayerCreator>;
+		    Texpainter::Ui::Dialog<InheritFrom<LayerActionParams, Ui::LabeledInput<Ui::TextEntry>>>;
+		using ConfirmationDlg =
+		    Ui::Dialog<InheritFrom<LayerActionParams, Ui::Label>, Ui::DialogYesNo>;
+		using LayerCreatorDlg = Ui::Dialog<InheritFrom<SimpleCallback, LayerCreator>>;
 
 	public:
 		enum class ControlId : int
@@ -61,106 +71,126 @@ namespace Texpainter
 		}
 
 		template<LayerAction action, class MenuItemType>
-		void onActivated(MenuItemType& item, Model::Document& doc)
+		void onActivated(MenuItemType& item, Model::Document& doc, SimpleCallback on_completed)
 		{
-			onActivated(Tag<action>{}, item, doc);
+			onActivated(Tag<action>{}, item, doc, on_completed);
 		}
 
 		template<LayerActionNew action>
-		void onActivated(Ui::MenuItem& item, Model::Document& doc)
+		void onActivated(Ui::MenuItem& item, Model::Document& doc, SimpleCallback on_completed)
 		{
-			onActivated(Tag<action>{}, item, doc);
+			onActivated(Tag<action>{}, item, doc, on_completed);
 		}
 
 		template<LayerActionClearTransformation action>
-		void onActivated(Ui::MenuItem& item, Model::Document& doc)
+		void onActivated(Ui::MenuItem& item, Model::Document& doc, SimpleCallback on_completed)
 		{
-			onActivated(Tag<action>{}, item, doc);
+			onActivated(Tag<action>{}, item, doc, on_completed);
 		}
 
 
 		template<LayerAction action>
-		void onActivated(Tag<action>, Ui::MenuItem&, Model::Document&)
+		void onActivated(Tag<action>, Ui::MenuItem&, Model::Document&, SimpleCallback on_completed)
 		{
 			printf("Todo: %d\n", static_cast<int>(action));
 		}
 
 		template<LayerActionNew action>
-		void onActivated(Tag<action>, Ui::MenuItem&, Model::Document&)
+		void onActivated(Tag<action>, Ui::MenuItem&, Model::Document&, SimpleCallback)
 		{
 			printf("Todo: %d\n", static_cast<int>(action));
 		}
 
 
-		void onActivated(Tag<LayerAction::Copy>, Ui::MenuItem&, Model::Document& doc)
+		void onActivated(Tag<LayerAction::Copy>,
+		                 Ui::MenuItem&,
+		                 Model::Document& doc,
+		                 SimpleCallback on_completed)
 		{
 			if(auto layer = currentLayer(doc); layer != nullptr)
 			{
 				m_copy_dlg = std::make_unique<NameInputDlg>(
-				    r_dlg_owner, "Copy current layer", Ui::Box::Orientation::Horizontal, "Name: ");
-				m_copy_dlg->widget().layer      = layer;
-				m_copy_dlg->widget().layer_name = &doc.currentLayer();
+				    LayerActionParams{*layer, doc.currentLayer(), on_completed},
+				    r_dlg_owner,
+				    "Copy current layer",
+				    Ui::Box::Orientation::Horizontal,
+				    "Name: ");
 				m_copy_dlg->template eventHandler<ControlId::Copy>(*this);
 			}
 		}
 
-		void onActivated(Tag<LayerAction::Link>, Ui::MenuItem&, Model::Document& doc)
+		void onActivated(Tag<LayerAction::Link>,
+		                 Ui::MenuItem&,
+		                 Model::Document& doc,
+		                 SimpleCallback on_completed)
 		{
 			if(auto layer = currentLayer(doc); layer != nullptr)
 			{
-				m_link_dlg                      = std::make_unique<NameInputDlg>(r_dlg_owner,
-                                                            "Create link to current layer",
-                                                            Ui::Box::Orientation::Horizontal,
-                                                            "Name: ");
-				m_link_dlg->widget().layer      = layer;
-				m_link_dlg->widget().layer_name = &doc.currentLayer();
+				m_link_dlg = std::make_unique<NameInputDlg>(
+				    LayerActionParams{*layer, doc.currentLayer(), on_completed},
+				    r_dlg_owner,
+				    "Create link to current layer",
+				    Ui::Box::Orientation::Horizontal,
+				    "Name: ");
 				m_link_dlg->template eventHandler<ControlId::Link>(*this);
 			}
 		}
 
-		void onActivated(Tag<LayerAction::LinkToCopy>, Ui::MenuItem&, Model::Document& doc)
+		void onActivated(Tag<LayerAction::LinkToCopy>,
+		                 Ui::MenuItem&,
+		                 Model::Document& doc,
+		                 SimpleCallback on_completed)
 		{
 			if(auto layer = currentLayer(doc); layer != nullptr)
 			{
 				m_link_to_copy_dlg = std::make_unique<ConfirmationDlg>(
+				    LayerActionParams{*layer, doc.currentLayer(), on_completed},
 				    r_dlg_owner,
 				    "Convert linked layer",
 				    "Are you shure you want to convert current layer to a static copy?");
-				m_link_to_copy_dlg->widget().layer      = layer;
-				m_link_to_copy_dlg->widget().layer_name = &doc.currentLayer();
 				m_link_to_copy_dlg->template eventHandler<ControlId::LinkToCopy>(*this);
 			}
 		}
 
-		void onActivated(Tag<LayerAction::Rename>, Ui::MenuItem&, Model::Document& doc)
+		void onActivated(Tag<LayerAction::Rename>,
+		                 Ui::MenuItem&,
+		                 Model::Document& doc,
+		                 SimpleCallback on_completed)
 		{
 			if(auto layer = currentLayer(doc); layer != nullptr)
 			{
-				m_rename_dlg                      = std::make_unique<NameInputDlg>(r_dlg_owner,
-                                                              "Rename current layer",
-                                                              Ui::Box::Orientation::Horizontal,
-                                                              "Name: ");
-				m_rename_dlg->widget().layer      = layer;
-				m_rename_dlg->widget().layer_name = &doc.currentLayer();
+				m_rename_dlg = std::make_unique<NameInputDlg>(
+				    LayerActionParams{*layer, doc.currentLayer(), on_completed},
+				    r_dlg_owner,
+				    "Rename current layer",
+				    Ui::Box::Orientation::Horizontal,
+				    "Name: ");
 				m_rename_dlg->template eventHandler<ControlId::Rename>(*this);
 			}
 		}
 
-		void onActivated(Tag<LayerAction::Delete>, Ui::MenuItem&, Model::Document& doc)
+		void onActivated(Tag<LayerAction::Delete>,
+		                 Ui::MenuItem&,
+		                 Model::Document& doc,
+		                 SimpleCallback on_completed)
 		{
 			if(auto layer = currentLayer(doc); layer != nullptr)
 			{
 				m_delete_dlg = std::make_unique<ConfirmationDlg>(
-				    r_dlg_owner, "Delete layer", "Are you shure you want to delete current layer?");
-				m_delete_dlg->widget().layer      = layer;
-				m_delete_dlg->widget().layer_name = &doc.currentLayer();
+				    LayerActionParams{*layer, doc.currentLayer(), on_completed},
+				    r_dlg_owner,
+				    "Delete layer",
+				    "Are you shure you want to delete current layer?");
 				m_delete_dlg->template eventHandler<ControlId::Delete>(*this);
 			}
 		}
 
-		bool onActivated(Tag<LayerAction::MoveToTop>, Ui::MenuItem&, Model::Document& doc)
+		void onActivated(Tag<LayerAction::MoveToTop>,
+		                 Ui::MenuItem&,
+		                 Model::Document& doc,
+		                 SimpleCallback on_completed)
 		{
-			return doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
 				if(auto i = layers.index(current_layer); i.valid())
 				{
 					layers.moveBack(i);
@@ -168,11 +198,15 @@ namespace Texpainter
 				}
 				return false;
 			});
+			on_completed();
 		}
 
-		bool onActivated(Tag<LayerAction::MoveUp>, Ui::MenuItem&, Model::Document& doc)
+		void onActivated(Tag<LayerAction::MoveUp>,
+		                 Ui::MenuItem&,
+		                 Model::Document& doc,
+		                 SimpleCallback on_completed)
 		{
-			return doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
 				if(auto i = layers.index(current_layer); i.valid())
 				{
 					layers.moveBackward(i);
@@ -180,11 +214,15 @@ namespace Texpainter
 				}
 				return false;
 			});
+			on_completed();
 		}
 
-		bool onActivated(Tag<LayerAction::MoveDown>, Ui::MenuItem&, Model::Document& doc)
+		void onActivated(Tag<LayerAction::MoveDown>,
+		                 Ui::MenuItem&,
+		                 Model::Document& doc,
+		                 SimpleCallback on_completed)
 		{
-			return doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
 				if(auto i = layers.index(current_layer); i.valid())
 				{
 					layers.moveForward(i);
@@ -192,12 +230,16 @@ namespace Texpainter
 				}
 				return false;
 			});
+			on_completed();
 		}
 
 
-		bool onActivated(Tag<LayerAction::MoveToBottom>, Ui::MenuItem&, Model::Document& doc)
+		void onActivated(Tag<LayerAction::MoveToBottom>,
+		                 Ui::MenuItem&,
+		                 Model::Document& doc,
+		                 SimpleCallback on_completed)
 		{
-			return doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
 				if(auto i = layers.index(current_layer); i.valid())
 				{
 					layers.moveFront(i);
@@ -205,28 +247,34 @@ namespace Texpainter
 				}
 				return false;
 			});
+			on_completed();
 		}
 
-		void onActivated(Tag<LayerAction::CompositingOptions>, Ui::MenuItem&, Model::Document&)
+		void onActivated(Tag<LayerAction::CompositingOptions>,
+		                 Ui::MenuItem&,
+		                 Model::Document&,
+		                 SimpleCallback)
 		{
-			//			r_doc_owner.showFxBlendEditor();
+			// r_doc_owner.showFxBlendEditor();
 		}
 
-		bool onActivated(Tag<LayerAction::Isolate>,
+		void onActivated(Tag<LayerAction::Isolate>,
 		                 Ui::CheckableMenuItem& item,
-		                 Model::Document& doc)
+		                 Model::Document&,
+		                 SimpleCallback on_completed)
 		{
-			if(auto layer = currentLayer(doc); layer != nullptr) { return true; }
-			else
-			{
-				item.toggle();
-				return false;
-			}
+			///	if(auto layer = currentLayer(doc); layer != nullptr) { return; }
+
+			item.toggle();
+			on_completed();
 		}
 
-		bool onActivated(Tag<LayerAction::Hide>, Ui::CheckableMenuItem& item, Model::Document& doc)
+		void onActivated(Tag<LayerAction::Hide>,
+		                 Ui::CheckableMenuItem& item,
+		                 Model::Document& doc,
+		                 SimpleCallback on_completed)
 		{
-			return doc.layersModify([&current_layer = doc.currentLayer(), &item](auto& layers) {
+			doc.layersModify([&current_layer = doc.currentLayer(), &item](auto& layers) {
 				if(auto layer = layers[current_layer]; layer != nullptr)
 				{
 					layer->visible(!item.status());
@@ -235,6 +283,7 @@ namespace Texpainter
 				item.toggle();
 				return false;
 			});
+			on_completed();
 		}
 
 		template<ControlId id, class Src>
@@ -345,30 +394,41 @@ namespace Texpainter
 		void confirmNegative(Tag<ControlId::Delete>, ConfirmationDlg&) { m_delete_dlg.reset(); }
 
 
-		void onActivated(Tag<LayerActionNew::FromCurrentColor>, Ui::MenuItem&, Model::Document& doc)
+		void onActivated(Tag<LayerActionNew::FromCurrentColor>,
+		                 Ui::MenuItem&,
+		                 Model::Document& doc,
+		                 SimpleCallback on_completed)
 		{
 			auto const size_max     = doc.canvasSize();
 			auto const size_default = Size2d{size_max.width() / 2, size_max.height() / 2};
-			m_new_from_color_dlg    = std::make_unique<LayerCreatorDlg>(
-                r_dlg_owner, "Create new layer from current color", size_default, size_max);
+			m_new_from_color_dlg =
+			    std::make_unique<LayerCreatorDlg>(on_completed,
+			                                      r_dlg_owner,
+			                                      "Create new layer from current color",
+			                                      size_default,
+			                                      size_max);
 			m_new_from_color_dlg->eventHandler<ControlId::NewFromCurrentColor>(*this);
 		}
 
-		void onActivated(Tag<LayerActionNew::FromNoise>, Ui::MenuItem&, Model::Document& doc)
+		void onActivated(Tag<LayerActionNew::FromNoise>,
+		                 Ui::MenuItem&,
+		                 Model::Document& doc,
+		                 SimpleCallback on_completed)
 		{
 			auto const size_max     = doc.canvasSize();
 			auto const size_default = Size2d{size_max.width() / 2, size_max.height() / 2};
 			m_new_from_noise        = std::make_unique<LayerCreatorDlg>(
-                r_dlg_owner, "Create new layer from noise", size_default, size_max);
+                on_completed, r_dlg_owner, "Create new layer from noise", size_default, size_max);
 			m_new_from_noise->eventHandler<ControlId::NewFromNoise>(*this);
 		}
 
 
-		bool onActivated(Tag<LayerActionClearTransformation::Location>,
+		void onActivated(Tag<LayerActionClearTransformation::Location>,
 		                 Ui::MenuItem&,
-		                 Model::Document& doc)
+		                 Model::Document& doc,
+		                 SimpleCallback on_completed)
 		{
-			return doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
 				if(auto layer = layers[current_layer]; layer != nullptr)
 				{
 					layer->location(vec2_t{0.0, 0.0});
@@ -376,13 +436,16 @@ namespace Texpainter
 				}
 				return false;
 			});
+
+			on_completed();
 		}
 
-		bool onActivated(Tag<LayerActionClearTransformation::Rotation>,
+		void onActivated(Tag<LayerActionClearTransformation::Rotation>,
 		                 Ui::MenuItem&,
-		                 Model::Document& doc)
+		                 Model::Document& doc,
+		                 SimpleCallback on_completed)
 		{
-			return doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
 				if(auto layer = layers[current_layer]; layer != nullptr)
 				{
 					layer->rotation(Angle{0.0, Angle::Turns{}});
@@ -390,13 +453,16 @@ namespace Texpainter
 				}
 				return false;
 			});
+
+			on_completed();
 		}
 
-		bool onActivated(Tag<LayerActionClearTransformation::Scale>,
+		void onActivated(Tag<LayerActionClearTransformation::Scale>,
 		                 Ui::MenuItem&,
-		                 Model::Document& doc)
+		                 Model::Document& doc,
+		                 SimpleCallback on_completed)
 		{
-			return doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
 				if(auto layer = layers[current_layer]; layer != nullptr)
 				{
 					layer->scaleFactor(vec2_t{1.0, 1.0});
@@ -404,13 +470,16 @@ namespace Texpainter
 				}
 				return false;
 			});
+
+			on_completed();
 		}
 
-		bool onActivated(Tag<LayerActionClearTransformation::All>,
+		void onActivated(Tag<LayerActionClearTransformation::All>,
 		                 Ui::MenuItem&,
-		                 Model::Document& doc)
+		                 Model::Document& doc,
+		                 SimpleCallback on_completed)
 		{
-			return doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
 				if(auto layer = layers[current_layer]; layer != nullptr)
 				{
 					layer->scaleFactor(vec2_t{1.0, 1.0})
@@ -420,6 +489,8 @@ namespace Texpainter
 				}
 				return false;
 			});
+
+			on_completed();
 		}
 
 

@@ -17,10 +17,12 @@ namespace Texpainter
 {
 	class DocMenuHandler
 	{
-		using CanvasSizeDialog =
-		    Ui::Dialog<InheritFrom<std::pair<std::reference_wrapper<Model::Document>, SimpleCallback>, SizeInput>>;
-		using NewDocDialog =
-		    Ui::Dialog<InheritFrom<std::pair<std::reference_wrapper<DocumentManager>, SimpleCallback>, SizeInput>>;
+		using CanvasSizeDialog = Ui::Dialog<
+		    InheritFrom<std::pair<std::reference_wrapper<Model::Document>, SimpleCallback>,
+		                SizeInput>>;
+		using NewDocDialog = Ui::Dialog<
+		    InheritFrom<std::pair<std::reference_wrapper<DocumentManager>, SimpleCallback>,
+		                SizeInput>>;
 
 	public:
 		enum class ControlId : int
@@ -54,25 +56,35 @@ namespace Texpainter
 		}
 
 
-		void onActivated(Tag<FileAction::New>, Ui::MenuItem&, DocumentManager& docs, SimpleCallback on_completed)
+		void onActivated(Tag<FileAction::New>,
+		                 Ui::MenuItem&,
+		                 DocumentManager& docs,
+		                 SimpleCallback on_completed)
 		{
 			// if(documentHasBeenSaved)
 			{
-				m_new_dlg = std::make_unique<NewDocDialog>(
-					std::pair{std::ref(docs), on_completed}, r_dlg_owner, "New document", m_default_size, Size2d{16384, 16384});
+				m_new_dlg = std::make_unique<NewDocDialog>(std::pair{std::ref(docs), on_completed},
+				                                           r_dlg_owner,
+				                                           "New document",
+				                                           m_default_size,
+				                                           Size2d{16384, 16384});
 				m_new_dlg->eventHandler<ControlId::NewDocument>(*this);
 			}
 		}
 
-		void onActivated(Tag<FileAction::SetCanvasSize>, Ui::MenuItem& item, DocumentManager& docs, SimpleCallback on_completed)
+		void onActivated(Tag<FileAction::SetCanvasSize>,
+		                 Ui::MenuItem& item,
+		                 DocumentManager& docs,
+		                 SimpleCallback on_completed)
 		{
 			if(auto current_document = docs.currentDocument(); current_document != nullptr)
 			{
-				m_canvas_dlg = std::make_unique<CanvasSizeDialog>(std::pair{std::ref(*current_document), on_completed},
-				                                                  r_dlg_owner,
-				                                                  "Set canvas size",
-				                                                  m_default_size,
-				                                                  Size2d{16384, 16384});
+				m_canvas_dlg = std::make_unique<CanvasSizeDialog>(
+				    std::pair{std::ref(*current_document), on_completed},
+				    r_dlg_owner,
+				    "Set canvas size",
+				    m_default_size,
+				    Size2d{16384, 16384});
 				m_canvas_dlg->eventHandler<ControlId::SetCanvasSize>(*this);
 			}
 			else
