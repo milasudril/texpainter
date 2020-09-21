@@ -9,9 +9,9 @@
 #include "./size_input.hpp"
 #include "./layer_creator.hpp"
 #include "./compositing_options_editor.hpp"
+#include "./menu_action_callback.hpp"
 
 #include "utils/polymorphic_rng.hpp"
-#include "utils/function_ref.hpp"
 #include "model/document.hpp"
 #include "ui/dialog.hpp"
 #include "ui/text_entry.hpp"
@@ -82,42 +82,9 @@ namespace Texpainter
 		{
 		}
 
-		template<LayerAction action, class MenuItemType>
-		void onActivated(MenuItemType& item, Model::Document& doc, SimpleCallback on_completed)
-		{
-			onActivated(Tag<action>{}, item, doc, on_completed);
-		}
-
-		template<LayerActionNew action>
-		void onActivated(Ui::MenuItem& item, Model::Document& doc, SimpleCallback on_completed)
-		{
-			onActivated(Tag<action>{}, item, doc, on_completed);
-		}
-
-		template<LayerActionClearTransformation action>
-		void onActivated(Ui::MenuItem& item, Model::Document& doc, SimpleCallback on_completed)
-		{
-			onActivated(Tag<action>{}, item, doc, on_completed);
-		}
-
-
-		template<LayerAction action>
-		void onActivated(Tag<action>, Ui::MenuItem&, Model::Document&, SimpleCallback on_completed)
-		{
-			printf("Todo: %d\n", static_cast<int>(action));
-		}
-
-		template<LayerActionNew action>
-		void onActivated(Tag<action>, Ui::MenuItem&, Model::Document&, SimpleCallback)
-		{
-			printf("Todo: %d\n", static_cast<int>(action));
-		}
-
-
-		void onActivated(Tag<LayerAction::Copy>,
-		                 Ui::MenuItem&,
+		void onActivated(Ui::MenuItem&,
 		                 Model::Document& doc,
-		                 SimpleCallback on_completed)
+		                 MenuActionCallback<LayerAction::Copy> on_completed)
 		{
 			if(auto layer = currentLayer(doc); layer != nullptr)
 			{
@@ -131,10 +98,9 @@ namespace Texpainter
 			}
 		}
 
-		void onActivated(Tag<LayerAction::Link>,
-		                 Ui::MenuItem&,
+		void onActivated(Ui::MenuItem&,
 		                 Model::Document& doc,
-		                 SimpleCallback on_completed)
+		                 MenuActionCallback<LayerAction::Link> on_completed)
 		{
 			if(auto layer = currentLayer(doc); layer != nullptr)
 			{
@@ -148,10 +114,9 @@ namespace Texpainter
 			}
 		}
 
-		void onActivated(Tag<LayerAction::LinkToCopy>,
-		                 Ui::MenuItem&,
+		void onActivated(Ui::MenuItem&,
 		                 Model::Document& doc,
-		                 SimpleCallback on_completed)
+		                 MenuActionCallback<LayerAction::LinkToCopy> on_completed)
 		{
 			if(auto layer = currentLayer(doc); layer != nullptr)
 			{
@@ -164,10 +129,9 @@ namespace Texpainter
 			}
 		}
 
-		void onActivated(Tag<LayerAction::Rename>,
-		                 Ui::MenuItem&,
+		void onActivated(Ui::MenuItem&,
 		                 Model::Document& doc,
-		                 SimpleCallback on_completed)
+		                 MenuActionCallback<LayerAction::Rename> on_completed)
 		{
 			if(auto layer = currentLayer(doc); layer != nullptr)
 			{
@@ -181,10 +145,9 @@ namespace Texpainter
 			}
 		}
 
-		void onActivated(Tag<LayerAction::Delete>,
-		                 Ui::MenuItem&,
+		void onActivated(Ui::MenuItem&,
 		                 Model::Document& doc,
-		                 SimpleCallback on_completed)
+		                 MenuActionCallback<LayerAction::Delete> on_completed)
 		{
 			if(auto layer = currentLayer(doc); layer != nullptr)
 			{
@@ -197,10 +160,9 @@ namespace Texpainter
 			}
 		}
 
-		void onActivated(Tag<LayerAction::MoveToTop>,
-		                 Ui::MenuItem&,
+		void onActivated(Ui::MenuItem&,
 		                 Model::Document& doc,
-		                 SimpleCallback on_completed)
+		                 MenuActionCallback<LayerAction::MoveToTop> on_completed)
 		{
 			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
 				if(auto i = layers.index(current_layer); i.valid())
@@ -213,10 +175,9 @@ namespace Texpainter
 			on_completed();
 		}
 
-		void onActivated(Tag<LayerAction::MoveUp>,
-		                 Ui::MenuItem&,
+		void onActivated(Ui::MenuItem&,
 		                 Model::Document& doc,
-		                 SimpleCallback on_completed)
+		                 MenuActionCallback<LayerAction::MoveUp> on_completed)
 		{
 			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
 				if(auto i = layers.index(current_layer); i.valid())
@@ -229,10 +190,9 @@ namespace Texpainter
 			on_completed();
 		}
 
-		void onActivated(Tag<LayerAction::MoveDown>,
-		                 Ui::MenuItem&,
+		void onActivated(Ui::MenuItem&,
 		                 Model::Document& doc,
-		                 SimpleCallback on_completed)
+		                 MenuActionCallback<LayerAction::MoveDown> on_completed)
 		{
 			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
 				if(auto i = layers.index(current_layer); i.valid())
@@ -246,10 +206,9 @@ namespace Texpainter
 		}
 
 
-		void onActivated(Tag<LayerAction::MoveToBottom>,
-		                 Ui::MenuItem&,
+		void onActivated(Ui::MenuItem&,
 		                 Model::Document& doc,
-		                 SimpleCallback on_completed)
+		                 MenuActionCallback<LayerAction::MoveToBottom> on_completed)
 		{
 			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
 				if(auto i = layers.index(current_layer); i.valid())
@@ -262,10 +221,9 @@ namespace Texpainter
 			on_completed();
 		}
 
-		void onActivated(Tag<LayerAction::CompositingOptions>,
-		                 Ui::MenuItem&,
+		void onActivated(Ui::MenuItem&,
 		                 Model::Document& doc,
-		                 SimpleCallback on_completed)
+		                 MenuActionCallback<LayerAction::CompositingOptions> on_completed)
 		{
 			if(auto layer = currentLayer(doc); layer != nullptr)
 			{
@@ -280,10 +238,9 @@ namespace Texpainter
 			}
 		}
 
-		void onActivated(Tag<LayerAction::Isolate>,
-		                 Ui::CheckableMenuItem& item,
+		void onActivated(Ui::CheckableMenuItem& item,
 		                 Model::Document&,
-		                 SimpleCallback on_completed)
+		                 MenuActionCallback<LayerAction::Isolate> on_completed)
 		{
 			///	if(auto layer = currentLayer(doc); layer != nullptr) { return; }
 
@@ -291,10 +248,9 @@ namespace Texpainter
 			on_completed();
 		}
 
-		void onActivated(Tag<LayerAction::Hide>,
-		                 Ui::CheckableMenuItem& item,
+		void onActivated(Ui::CheckableMenuItem& item,
 		                 Model::Document& doc,
-		                 SimpleCallback on_completed)
+		                 MenuActionCallback<LayerAction::Hide> on_completed)
 		{
 			doc.layersModify([&current_layer = doc.currentLayer(), &item](auto& layers) {
 				if(auto layer = layers[current_layer]; layer != nullptr)
@@ -408,11 +364,14 @@ namespace Texpainter
 
 		void confirmNegative(Tag<ControlId::Delete>, ConfirmationDlg&) { m_delete_dlg.reset(); }
 
+		template<auto action>
+		void onActivated(Ui::MenuItem&, Model::Document&, MenuActionCallback<action>)
+		{
+		}
 
-		void onActivated(Tag<LayerActionNew::FromCurrentColor>,
-		                 Ui::MenuItem&,
+		void onActivated(Ui::MenuItem&,
 		                 Model::Document& doc,
-		                 SimpleCallback on_completed)
+		                 MenuActionCallback<LayerActionNew::FromCurrentColor> on_completed)
 		{
 			auto const size_max     = doc.canvasSize();
 			auto const size_default = Size2d{size_max.width() / 2, size_max.height() / 2};
@@ -425,10 +384,9 @@ namespace Texpainter
 			m_new_from_color_dlg->eventHandler<ControlId::NewFromCurrentColor>(*this);
 		}
 
-		void onActivated(Tag<LayerActionNew::FromNoise>,
-		                 Ui::MenuItem&,
+		void onActivated(Ui::MenuItem&,
 		                 Model::Document& doc,
-		                 SimpleCallback on_completed)
+		                 MenuActionCallback<LayerActionNew::FromNoise> on_completed)
 		{
 			auto const size_max     = doc.canvasSize();
 			auto const size_default = Size2d{size_max.width() / 2, size_max.height() / 2};
@@ -442,10 +400,9 @@ namespace Texpainter
 		}
 
 
-		void onActivated(Tag<LayerActionClearTransformation::Location>,
-		                 Ui::MenuItem&,
+		void onActivated(Ui::MenuItem&,
 		                 Model::Document& doc,
-		                 SimpleCallback on_completed)
+		                 MenuActionCallback<LayerActionClearTransformation::Location> on_completed)
 		{
 			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
 				if(auto layer = layers[current_layer]; layer != nullptr)
@@ -459,10 +416,9 @@ namespace Texpainter
 			on_completed();
 		}
 
-		void onActivated(Tag<LayerActionClearTransformation::Rotation>,
-		                 Ui::MenuItem&,
+		void onActivated(Ui::MenuItem&,
 		                 Model::Document& doc,
-		                 SimpleCallback on_completed)
+		                 MenuActionCallback<LayerActionClearTransformation::Rotation> on_completed)
 		{
 			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
 				if(auto layer = layers[current_layer]; layer != nullptr)
@@ -476,10 +432,9 @@ namespace Texpainter
 			on_completed();
 		}
 
-		void onActivated(Tag<LayerActionClearTransformation::Scale>,
-		                 Ui::MenuItem&,
+		void onActivated(Ui::MenuItem&,
 		                 Model::Document& doc,
-		                 SimpleCallback on_completed)
+		                 MenuActionCallback<LayerActionClearTransformation::Scale> on_completed)
 		{
 			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
 				if(auto layer = layers[current_layer]; layer != nullptr)
@@ -493,10 +448,9 @@ namespace Texpainter
 			on_completed();
 		}
 
-		void onActivated(Tag<LayerActionClearTransformation::All>,
-		                 Ui::MenuItem&,
+		void onActivated(Ui::MenuItem&,
 		                 Model::Document& doc,
-		                 SimpleCallback on_completed)
+		                 MenuActionCallback<LayerActionClearTransformation::All> on_completed)
 		{
 			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
 				if(auto layer = layers[current_layer]; layer != nullptr)
