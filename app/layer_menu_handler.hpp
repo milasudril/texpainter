@@ -22,6 +22,28 @@
 
 namespace Texpainter
 {
+	template<>
+	class MenuActionCallback<LayerAction::CompositingOptions>
+	{
+	public:
+		template<class T>
+		explicit MenuActionCallback(T& handler) requires(
+		    !std::same_as<std::decay_t<T>, MenuActionCallback>)
+		    : r_handler{&handler}
+		    , on_completed{[](void* handle) {
+			    auto& self = *static_cast<T*>(handle);
+			    return self(Tag<LayerAction::CompositingOptions>{});
+		    }}
+		{
+		}
+
+		void onCompleted() const { on_completed(r_handler); }
+
+	private:
+		void* r_handler;
+		void (*on_completed)(void*);
+	};
+
 	class LayerMenuHandler
 	{
 		class LayerActionParams
@@ -58,9 +80,10 @@ namespace Texpainter
 		using LayerCreatorDlg = Ui::Dialog<
 		    InheritFrom<std::pair<std::reference_wrapper<Model::Document>, SimpleCallback>,
 		                LayerCreator>>;
-		using CompositingOptionsDlg = Ui::Dialog<
-		    InheritFrom<std::pair<std::reference_wrapper<Model::Document>, SimpleCallback>,
-		                CompositingOptionsEditor>>;
+		using CompositingOptionsDlg =
+		    Ui::Dialog<InheritFrom<std::pair<std::reference_wrapper<Model::Document>,
+		                                     MenuActionCallback<LayerAction::CompositingOptions>>,
+		                           CompositingOptionsEditor>>;
 
 
 	public:
@@ -530,7 +553,7 @@ namespace Texpainter
 				return false;
 			});
 
-			src.widget().second();
+			src.widget().second.onCompleted();
 			m_compositing_opts.reset();
 		}
 
