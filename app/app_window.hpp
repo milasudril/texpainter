@@ -12,7 +12,6 @@
 #include "./palette_menu_handler.hpp"
 #include "./palette_view_event_handler.hpp"
 #include "./filter_graph_editor.hpp"
-#include "./compositing_options_editor.hpp"
 #include "./document_manager.hpp"
 
 #include "utils/snap.hpp"
@@ -33,8 +32,6 @@ namespace Texpainter
 {
 	class AppWindow
 	{
-		using CompositingOptionsDlg = Ui::Dialog<CompositingOptionsEditor>;
-
 	public:
 		enum class ControlId : int
 		{
@@ -43,8 +40,7 @@ namespace Texpainter
 			BrushSize,
 			PaletteSelector,
 			PaletteView,
-			Canvas,
-			CompositingOptions
+			Canvas
 		};
 
 		explicit AppWindow(Ui::Container& container, PolymorphicRng rng);
@@ -161,32 +157,12 @@ namespace Texpainter
 		{
 		}
 
-		template<ControlId>
-		void dismiss(CompositingOptionsDlg&);
-
-		template<ControlId>
-		void confirmPositive(CompositingOptionsDlg&);
-
-		template<ControlId>
-		void onChanged(CompositingOptionsEditor&);
+		template<LayerAction>
+		void onUpdated(CompositingOptionsEditor const&);
 
 		void onKeyDown(Ui::Scancode key);
 
 		void onKeyUp(Ui::Scancode key);
-
-		void showFxBlendEditor()
-		{
-			if(auto layer = currentLayer(*m_documents.currentDocument()); layer != nullptr)
-			{
-				m_fx_blend_editor_dlg =
-				    std::make_unique<CompositingOptionsDlg>(m_rows,
-				                                            "Compositing options",
-				                                            layer->compositingOptions(),
-				                                            layer->nodeLocations());
-				m_fx_blend_editor_dlg->eventHandler<ControlId::CompositingOptions>(*this);
-				m_fx_blend_editor_dlg->widget().eventHandler<ControlId::CompositingOptions>(*this);
-			}
-		}
 
 		template<class T>
 		void operator()(T)
@@ -313,9 +289,6 @@ namespace Texpainter
 		Ui::Label m_paint_info;
 		Ui::ImageView m_img_view;
 
-		std::unique_ptr<CompositingOptionsDlg> m_fx_blend_editor_dlg;
-
-
 		void updateLayerSelector();
 		void updateBrushSelector();
 		void updatePaletteSelector();
@@ -399,29 +372,8 @@ namespace Texpainter
 	}
 
 	template<>
-	inline void AppWindow::dismiss<AppWindow::ControlId::CompositingOptions>(CompositingOptionsDlg&)
-	{
-		doRender();
-		m_fx_blend_editor_dlg.reset();
-	}
-
-	template<>
-	inline void AppWindow::confirmPositive<AppWindow::ControlId::CompositingOptions>(
-	    CompositingOptionsDlg& dlg)
-	{
-		auto& current_document = *m_documents.currentDocument();
-		current_document.layersModify([&current_layer = current_document.currentLayer(),
-		                               &editor        = dlg.widget()](auto& layers) {
-			layers[current_layer]->compositingOptions(editor.compositingOptions());
-			layers[current_layer]->nodeLocations(editor.nodeLocations());
-			return true;
-		});
-		m_fx_blend_editor_dlg.reset();
-	}
-
-	template<>
-	inline void AppWindow::onChanged<AppWindow::ControlId::CompositingOptions>(
-	    CompositingOptionsEditor& src)
+	inline void AppWindow::onUpdated<LayerAction::CompositingOptions>(
+	    CompositingOptionsEditor const& src)
 	{
 		doRender(src.compositingOptions());
 	}

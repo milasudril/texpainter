@@ -32,16 +32,28 @@ namespace Texpainter
 		    : r_handler{&handler}
 		    , on_completed{[](void* handle) {
 			    auto& self = *static_cast<T*>(handle);
-			    return self(Tag<LayerAction::CompositingOptions>{});
+			    self(Tag<LayerAction::CompositingOptions>{});
+		    }}
+		    , on_changed{[](void* handle, CompositingOptionsEditor const& editor) {
+			    auto& self = *static_cast<T*>(handle);
+			    self.template onUpdated<LayerAction::CompositingOptions>(editor);
 		    }}
 		{
 		}
 
 		void onCompleted() const { on_completed(r_handler); }
 
+		template<auto>
+		void onChanged(CompositingOptionsEditor const& editor) const
+		{
+			on_changed(r_handler, editor);
+		}
+
+
 	private:
 		void* r_handler;
 		void (*on_completed)(void*);
+		void (*on_changed)(void*, CompositingOptionsEditor const& editor);
 	};
 
 	class LayerMenuHandler
@@ -256,7 +268,9 @@ namespace Texpainter
 				                                            "Compositing options",
 				                                            layer->compositingOptions(),
 				                                            layer->nodeLocations());
-				m_compositing_opts->eventHandler<ControlId::CompositingOptions>(*this);
+				m_compositing_opts->eventHandler<ControlId::CompositingOptions>(*this)
+				    .widget()
+				    .template eventHandler<0>(m_compositing_opts->widget().second);
 				//	m_fx_blend_editor_dlg->widget().eventHandler<ControlId::CompositingOptions>(*this);
 			}
 		}
