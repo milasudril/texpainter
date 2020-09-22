@@ -7,6 +7,7 @@
 
 #include "./menu_palette.hpp"
 #include "./palette_creator.hpp"
+#include "./menu_action_callback.hpp"
 
 #include "model/document.hpp"
 #include "ui/dialog.hpp"
@@ -14,7 +15,6 @@
 #include "ui/text_entry.hpp"
 #include "utils/polymorphic_rng.hpp"
 #include "utils/inherit_from.hpp"
-#include "utils/function_ref.hpp"
 
 #include <random>
 
@@ -42,12 +42,6 @@ namespace Texpainter
 		{
 		}
 
-		template<PaletteActionNew action>
-		void onActivated(Ui::MenuItem& item, Model::Document& doc, SimpleCallback on_completed)
-		{
-			onActivated(Tag<action>{}, item, doc, on_completed);
-		}
-
 		template<ControlId id, class Src>
 		void dismiss(Src& src)
 		{
@@ -60,10 +54,9 @@ namespace Texpainter
 			confirmPositive(Tag<id>{}, src);
 		}
 
-		void onActivated(Tag<PaletteActionNew::Empty>,
-		                 Ui::MenuItem&,
+		void onActivated(Ui::MenuItem&,
 		                 Model::Document& doc,
-		                 SimpleCallback on_completed)
+		                 MenuActionCallback<PaletteActionNew::Empty> on_completed)
 		{
 			m_new_empty_dlg =
 			    std::make_unique<PaletteCreateDlg>(std::pair{std::ref(doc), on_completed},
@@ -74,20 +67,13 @@ namespace Texpainter
 			m_new_empty_dlg->eventHandler<ControlId::NewEmpty>(*this);
 		}
 
-		void onActivated(Tag<PaletteActionNew::Generate>,
-		                 Ui::MenuItem&,
+		void onActivated(Ui::MenuItem&,
 		                 Model::Document& doc,
-		                 SimpleCallback on_completed)
+		                 MenuActionCallback<PaletteActionNew::Generate> on_completed)
 		{
 			m_new_generated_dlg = std::make_unique<PaletteGenerateDlg>(
 			    std::pair{std::ref(doc), on_completed}, r_dlg_owner, "Generate palette");
 			m_new_generated_dlg->eventHandler<ControlId::NewGenerated>(*this);
-		}
-
-		template<PaletteActionNew action>
-		void onActivated(Tag<action>, Ui::MenuItem&, Model::Document&, SimpleCallback)
-		{
-			printf("Todo: %d\n", static_cast<int>(action));
 		}
 
 		void confirmPositive(Tag<ControlId::NewEmpty>, PaletteCreateDlg& src)

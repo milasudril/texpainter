@@ -113,8 +113,8 @@ namespace Texpainter
 		{
 			if(hasDocument())
 			{
-				m_palette_menu_handler.onActivated<action>(
-				    item, *m_documents.currentDocument(), SimpleCallback{*this, Tag<action>{}});
+				m_palette_menu_handler.onActivated(
+				    item, *m_documents.currentDocument(), MenuActionCallback<action>{*this});
 			}
 		}
 
