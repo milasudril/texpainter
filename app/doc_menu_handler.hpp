@@ -8,9 +8,9 @@
 #include "./menu_file.hpp"
 #include "./size_input.hpp"
 #include "./document_manager.hpp"
+#include "./menu_action_callback.hpp"
 
 #include "ui/dialog.hpp"
-#include "utils/function_ref.hpp"
 #include "utils/inherit_from.hpp"
 
 namespace Texpainter
@@ -37,10 +37,9 @@ namespace Texpainter
 		{
 		}
 
-		template<FileAction action>
-		void onActivated(Ui::MenuItem& item, DocumentManager& docs, SimpleCallback on_completed)
+		template<auto id>
+		void onActivated(Ui::MenuItem&, DocumentManager&, MenuActionCallback<id>)
 		{
-			onActivated(Tag<action>{}, item, docs, on_completed);
 		}
 
 		template<ControlId id, class Src>
@@ -56,10 +55,9 @@ namespace Texpainter
 		}
 
 
-		void onActivated(Tag<FileAction::New>,
-		                 Ui::MenuItem&,
+		void onActivated(Ui::MenuItem&,
 		                 DocumentManager& docs,
-		                 SimpleCallback on_completed)
+		                 MenuActionCallback<FileAction::New> on_completed)
 		{
 			// if(documentHasBeenSaved)
 			{
@@ -72,10 +70,9 @@ namespace Texpainter
 			}
 		}
 
-		void onActivated(Tag<FileAction::SetCanvasSize>,
-		                 Ui::MenuItem& item,
+		void onActivated(Ui::MenuItem&,
 		                 DocumentManager& docs,
-		                 SimpleCallback on_completed)
+		                 MenuActionCallback<FileAction::SetCanvasSize> on_completed)
 		{
 			if(auto current_document = docs.currentDocument(); current_document != nullptr)
 			{
@@ -87,16 +84,6 @@ namespace Texpainter
 				    Size2d{16384, 16384});
 				m_canvas_dlg->eventHandler<ControlId::SetCanvasSize>(*this);
 			}
-			else
-			{
-				onActivated(Tag<FileAction::New>{}, item, docs, on_completed);
-			}
-		}
-
-		template<FileAction action>
-		void onActivated(Tag<action>, Ui::MenuItem&, DocumentManager&, SimpleCallback)
-		{
-			printf("Todo %d\n", static_cast<int>(action));
 		}
 
 		void confirmPositive(Tag<ControlId::NewDocument>, NewDocDialog& src)

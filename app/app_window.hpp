@@ -56,8 +56,7 @@ namespace Texpainter
 		template<FileAction action>
 		void onActivated(Ui::MenuItem& item)
 		{
-			m_doc_menu_handler.onActivated<action>(
-			    item, m_documents, SimpleCallback{*this, Tag<action>{}});
+			m_doc_menu_handler.onActivated(item, m_documents, MenuActionCallback<action>{*this});
 		}
 
 		template<LayerAction action>
