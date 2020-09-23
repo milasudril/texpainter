@@ -276,12 +276,18 @@ namespace Texpainter
 		}
 
 		void onActivated(Ui::CheckableMenuItem& item,
-		                 Model::Document&,
+		                 Model::Document& doc,
 		                 MenuActionCallback<LayerAction::Isolate> on_completed)
 		{
-			///	if(auto layer = currentLayer(doc); layer != nullptr) { return; }
-
-			item.toggle();
+			doc.layersModify([&current_layer = doc.currentLayer(), &item](auto& layers) {
+				if(auto layer = layers[current_layer]; layer != nullptr)
+				{
+					layer->isolated(item.status());
+					return true;
+				}
+				item.toggle();
+				return false;
+			});
 			on_completed();
 		}
 

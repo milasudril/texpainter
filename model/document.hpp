@@ -47,16 +47,6 @@ namespace Texpainter::Model
 
 		auto layersByIndex() const { return m_layers.valuesByIndex(); }
 
-		auto visibleLayersByIndex() const
-		{
-			std::vector<std::reference_wrapper<Layer const>> ret;
-			ret.reserve(m_layers.size().value());
-			std::ranges::copy_if(layersByIndex(), std::back_inserter(ret), [](auto const& layer) {
-				return layer.visible();
-			});
-			return ret;
-		}
-
 		Document& layers(LayerStack&& layers_new)
 		{
 			m_layers = std::move(layers_new);
@@ -71,6 +61,20 @@ namespace Texpainter::Model
 			return m_dirty;
 		}
 
+		auto visibleLayersByIndex() const
+		{
+			std::vector<std::reference_wrapper<Layer const>> ret;
+			ret.reserve(m_layers.size().value());
+			std::ranges::copy_if(layersByIndex(), std::back_inserter(ret), [](auto const& layer) {
+				return layer.visible() && layer.isolated();
+			});
+			if(ret.size() != 0) { return ret; }
+
+			std::ranges::copy_if(layersByIndex(), std::back_inserter(ret), [](auto const& layer) {
+				return layer.visible();
+			});
+			return ret;
+		}
 
 		std::string const& currentLayer() const { return m_current_layer; }
 

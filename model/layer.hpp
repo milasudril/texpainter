@@ -22,7 +22,7 @@ namespace Texpainter::Model
 	{
 	public:
 		explicit Layer(PixelStore::Image&& img)
-		    : m_visible{true}
+		    : m_visibility_flags{Visible}
 		    , m_loc{0.0, 0.0}
 		    , m_rot{0}
 		    , m_scale{1.0, 1.0}
@@ -32,7 +32,7 @@ namespace Texpainter::Model
 
 		explicit Layer(Size2d size,
 		               PixelStore::Pixel initial_color = PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f})
-		    : m_visible{true}
+		    : m_visibility_flags{Visible}
 		    , m_loc{0.0, 0.0}
 		    , m_rot{0}
 		    , m_scale{1.0, 1.0}
@@ -53,12 +53,12 @@ namespace Texpainter::Model
 
 		Layer linkedLayer() const
 		{
-			return Layer{m_visible, m_loc, m_rot, m_scale, m_content, m_compose_opts};
+			return Layer{m_visibility_flags, m_loc, m_rot, m_scale, m_content, m_compose_opts};
 		}
 
 		Layer copiedLayer() const
 		{
-			return Layer{m_visible,
+			return Layer{m_visibility_flags,
 			             m_loc,
 			             m_rot,
 			             m_scale,
@@ -106,11 +106,21 @@ namespace Texpainter::Model
 			return *this;
 		}
 
-		bool visible() const { return m_visible; }
+		bool visible() const { return m_visibility_flags & Visible; }
 
 		Layer& visible(bool val)
 		{
-			m_visible = val;
+			m_visibility_flags =
+			    val ? m_visibility_flags | Visible : m_visibility_flags & (~Visible);
+			return *this;
+		}
+
+		bool isolated() const { return m_visibility_flags & Isolated; }
+
+		Layer& isolated(bool val)
+		{
+			m_visibility_flags =
+			    val ? m_visibility_flags | Isolated : m_visibility_flags & (~Isolated);
 			return *this;
 		}
 
@@ -144,7 +154,10 @@ namespace Texpainter::Model
 		CompositingOptions const& compositingOptions() const { return m_compose_opts; }
 
 	private:
-		bool m_visible;
+		static constexpr size_t Visible  = 0x1;
+		static constexpr size_t Isolated = 0x2;
+
+		size_t m_visibility_flags;
 		vec2_t m_loc;
 		Angle m_rot;
 		vec2_t m_scale;
@@ -152,13 +165,13 @@ namespace Texpainter::Model
 		CompositingOptions m_compose_opts;
 		std::map<FilterGraph::NodeId, vec2_t> m_node_locations;
 
-		explicit Layer(bool vis,
+		explicit Layer(size_t vis,
 		               vec2_t loc,
 		               Angle rot,
 		               vec2_t scale,
 		               std::shared_ptr<PixelStore::Image> const& content,
 		               CompositingOptions const& compose_opts)
-		    : m_visible{vis}
+		    : m_visibility_flags{vis}
 		    , m_loc{loc}
 		    , m_rot{rot}
 		    , m_scale{scale}
