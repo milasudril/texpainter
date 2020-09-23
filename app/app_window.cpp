@@ -146,7 +146,7 @@ void Texpainter::AppWindow::doRender(Model::CompositingOptions const& compose_op
 	auto const& current_document = *m_documents.currentDocument();
 	PixelStore::Image canvas{current_document.canvasSize()};
 	std::ranges::fill(canvas.pixels(), PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
-	std::ranges::for_each(current_document.visibleLayersByIndex(),
+	std::ranges::for_each(visibleLayersByIndex(current_document),
 	                      [&canvas, &compose_opts, current_layer = currentLayer(current_document)](
 	                          auto const& layer) {
 		                      if(&layer.get() == current_layer)

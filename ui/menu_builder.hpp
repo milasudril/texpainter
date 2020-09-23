@@ -53,7 +53,7 @@ namespace Texpainter::Ui
 			return *this;
 		}
 
-		auto& items() {return m_items;}
+		auto& items() { return m_items; }
 
 	private:
 		Submenu m_root;

@@ -61,21 +61,6 @@ namespace Texpainter::Model
 			return m_dirty;
 		}
 
-		auto visibleLayersByIndex() const
-		{
-			std::vector<std::reference_wrapper<Layer const>> ret;
-			ret.reserve(m_layers.size().value());
-			std::ranges::copy_if(layersByIndex(), std::back_inserter(ret), [](auto const& layer) {
-				return layer.visible() && layer.isolated();
-			});
-			if(ret.size() != 0) { return ret; }
-
-			std::ranges::copy_if(layersByIndex(), std::back_inserter(ret), [](auto const& layer) {
-				return layer.visible();
-			});
-			return ret;
-		}
-
 		std::string const& currentLayer() const { return m_current_layer; }
 
 		Document& currentLayer(std::string&& current_layer)
@@ -172,6 +157,26 @@ namespace Texpainter::Model
 		auto const& layers = doc.layers();
 		return layers[doc.currentLayer()];
 	}
+
+
+	inline auto visibleLayersByIndex(Document const& doc)
+	{
+		auto layers = doc.layersByIndex();
+		std::vector<std::reference_wrapper<Layer const>> ret;
+		ret.reserve(doc.layers().size().value());
+		if(std::ranges::any_of(layers, [](auto const& layer) { return layer.isolated(); }))
+		{
+			std::ranges::copy_if(layers, std::back_inserter(ret), [](auto const& layer) {
+				return layer.visible() && layer.isolated();
+			});
+			return ret;
+		}
+
+		std::ranges::copy_if(
+		    layers, std::back_inserter(ret), [](auto const& layer) { return layer.visible(); });
+		return ret;
+	}
+
 
 }
 
