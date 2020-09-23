@@ -120,6 +120,10 @@ void Texpainter::AppWindow::updateLayerInfo()
 			msg += " Rotation: ";
 			msg += std::to_string(layer.rotation().turns());
 			m_layer_info.content(msg.c_str());
+
+			auto& layer_menu = get<MainMenuItem::Layer>(m_menu.items()).items();
+			get<LayerAction::Isolate>(layer_menu).status(current_layer->isolated());
+			get<LayerAction::Hide>(layer_menu).status(!current_layer->visible());
 		}
 	else
 	{

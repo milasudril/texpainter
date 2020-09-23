@@ -53,6 +53,8 @@ namespace Texpainter::Ui
 			return *this;
 		}
 
+		auto& items() {return m_items;}
+
 	private:
 		Submenu m_root;
 		TupleFromEnum<EnumType, EnumTypeTraits> m_items;
@@ -88,6 +90,8 @@ namespace Texpainter::Ui
 			});
 			return *this;
 		}
+
+		auto& items() { return m_items; }
 
 	private:
 		MenuBar m_root;
