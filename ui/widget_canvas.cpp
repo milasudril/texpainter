@@ -4,11 +4,13 @@
 #include "./screen_coordinates.hpp"
 #include "./toplevel_coordinates.hpp"
 
+#include "utils/size_2d.hpp"
+
 #include <gtk/gtk.h>
 
 #include <map>
 #include <cassert>
-
+#include <algorithm>
 
 class Texpainter::Ui::WidgetCanvasDetail::Impl: private WidgetCanvasDetail
 {
@@ -98,15 +100,7 @@ public:
 		auto i = m_floats.find(client);
 		assert(i != std::end(m_floats));
 
-		int x{};
-		int y{};
-		auto children = gtk_container_get_children(GTK_CONTAINER(i->second));
-		auto frame    = GTK_WIDGET(children->data);
-		g_list_free(children);
-
-		gtk_widget_translate_coordinates(frame, GTK_WIDGET(m_handle), 0, 0, &x, &y);
-
-		return WidgetCoordinates{static_cast<double>(x), static_cast<double>(y)};
+		return widgetLocationAndSize(i->second).first;
 	}
 
 
@@ -132,6 +126,42 @@ private:
 	std::map<ClientId, GtkFixed*, ClientIdCompare> m_floats;
 	std::map<GtkFixed*, ClientId> m_clients;
 
+	std::pair<WidgetCoordinates, vec2_t> widgetLocationAndSize(GtkFixed* container) const
+	{
+		int x{};
+		int y{};
+		auto children = gtk_container_get_children(GTK_CONTAINER(container));
+		auto frame    = GTK_WIDGET(children->data);
+		g_list_free(children);
+		auto const w = gtk_widget_get_allocated_width(frame);
+		auto const h = gtk_widget_get_allocated_height(frame);
+
+		gtk_widget_translate_coordinates(frame, GTK_WIDGET(m_handle), 0, 0, &x, &y);
+
+		return std::pair{WidgetCoordinates{static_cast<double>(x), static_cast<double>(y)},
+		                 vec2_t{static_cast<double>(w), static_cast<double>(h)}};
+	}
+
+	Size2d calculateCanvasSize() const
+	{
+		auto i      = std::ranges::max_element(m_clients, [this](auto const& a, auto const& b) {
+            auto box_a    = widgetLocationAndSize(a.first);
+            auto box_b    = widgetLocationAndSize(b.first);
+            auto corner_a = box_a.first + box_a.second;
+            auto corner_b = box_b.first + box_b.second;
+            return (corner_a.x() < corner_b.x()) ? true : (corner_a.y() < corner_b.y());
+        });
+		auto ret    = widgetLocationAndSize(i->first);
+		auto corner = ret.first + ret.second;
+		return Size2d{static_cast<uint32_t>(corner.x()), static_cast<uint32_t>(corner.y())};
+	}
+
+	void updateCanvasSize()
+	{
+		auto size = calculateCanvasSize();
+		gtk_widget_set_size_request(GTK_WIDGET(m_handle), size.width(), size.height());
+	}
+
 	static gboolean mouse_move(GtkWidget* widget, GdkEvent* event, gpointer user_data)
 	{
 		auto self = reinterpret_cast<Impl*>(user_data);
@@ -143,19 +173,13 @@ private:
 			    self->m_loc_init
 			    + (ScreenCoordinates{event_move->x_root, event_move->y_root} - self->m_click_loc);
 			loc_new = max(loc_new, WidgetCoordinates{0.0, 0.0});
-
-			auto const w_widget = gtk_widget_get_allocated_width(self->m_moving);
-			auto const h_widget = gtk_widget_get_allocated_height(self->m_moving);
-
-			gtk_widget_set_size_request(
-			    GTK_WIDGET(self->m_handle), w_widget + loc_new.x(), h_widget + loc_new.y());
-
 			gtk_fixed_move(fixed_layout, self->m_moving, loc_new.x(), loc_new.y());
 			if(self->r_eh != nullptr)
 			{
 				if(auto i = self->m_clients.find(fixed_layout); i != std::end(self->m_clients))
 				{ self->m_vt.on_move(self->r_eh, *self, loc_new, i->second); }
 			}
+			self->updateCanvasSize();
 			return TRUE;
 		}
 		return FALSE;
