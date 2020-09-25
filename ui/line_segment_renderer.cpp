@@ -13,7 +13,7 @@
 class Texpainter::Ui::LineSegmentRenderer::Impl: public LineSegmentRenderer
 {
 public:
-	explicit Impl(Container& cnt): LineSegmentRenderer{*this}
+	explicit Impl(Container& cnt): LineSegmentRenderer{*this}, m_offset{0.0, 0.0}
 	{
 		auto widget = gtk_drawing_area_new();
 		g_signal_connect(G_OBJECT(widget), "draw", G_CALLBACK(draw_callback), this);
@@ -36,7 +36,13 @@ public:
 		gtk_widget_queue_draw(GTK_WIDGET(m_handle));
 	}
 
+	void renderOffset(vec2_t x)
+	{
+		m_offset = x;
+	}
+
 private:
+	vec2_t m_offset;
 	std::vector<std::pair<ToplevelCoordinates, ToplevelCoordinates>> m_segs;
 
 	GtkDrawingArea* m_handle;
@@ -51,7 +57,8 @@ private:
 		auto self = reinterpret_cast<Impl*>(obj);
 		std::ranges::for_each(
 		    self->m_segs,
-		    [cr, O = ToplevelCoordinates{static_cast<double>(x), static_cast<double>(y)}](
+		    [cr,
+			O = ToplevelCoordinates{static_cast<double>(x), static_cast<double>(y)} + self->m_offset](
 		        auto const& vals) {
 			    auto a = vals.first - O;
 			    auto b = vals.second - O;
@@ -78,5 +85,11 @@ Texpainter::Ui::LineSegmentRenderer& Texpainter::Ui::LineSegmentRenderer::lineSe
     std::span<std::pair<ToplevelCoordinates, ToplevelCoordinates> const> segs)
 {
 	m_impl->lineSegments(segs);
+	return *this;
+}
+
+Texpainter::Ui::LineSegmentRenderer& Texpainter::Ui::LineSegmentRenderer::renderOffset(vec2_t x)
+{
+	m_impl->renderOffset(x);
 	return *this;
 }

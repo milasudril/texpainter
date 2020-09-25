@@ -28,6 +28,8 @@ namespace Texpainter::Ui
 		LineSegmentRenderer& lineSegments(
 		    std::span<std::pair<ToplevelCoordinates, ToplevelCoordinates> const>);
 
+		LineSegmentRenderer& renderOffset(vec2_t x);
+
 	protected:
 		class Impl;
 		Impl* m_impl;

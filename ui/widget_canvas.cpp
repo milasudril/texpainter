@@ -103,6 +103,14 @@ public:
 		return widgetLocationAndSize(i->second).first;
 	}
 
+	vec2_t viewportOffset() const
+	{
+		auto x_adj = gtk_adjustment_get_value(gtk_scrolled_window_get_hadjustment(m_root));
+		auto y_adj = gtk_adjustment_get_value(gtk_scrolled_window_get_vadjustment(m_root));
+
+		return vec2_t{x_adj, y_adj};
+	}
+
 
 private:
 	GtkScrolledWindow* m_root;
@@ -257,11 +265,11 @@ private:
 		if(self->r_eh != nullptr)
 		{
 			auto event_move = reinterpret_cast<GdkEventMotion const*>(event);
-
 			int loc_x{};
 			int loc_y{};
 			gtk_widget_translate_coordinates(
 			    widget, gtk_widget_get_toplevel(widget), 0, 0, &loc_x, &loc_y);
+
 			auto offset = vec2_t{static_cast<double>(loc_x), static_cast<double>(loc_y)};
 			self->m_vt.on_move_canvas(
 			    self->r_eh, *self, ToplevelCoordinates{event_move->x, event_move->y} + offset);
@@ -388,4 +396,9 @@ Texpainter::Ui::WidgetCoordinates Texpainter::Ui::WidgetCanvasDetail::widgetLoca
     ClientId id) const
 {
 	return m_impl->widgetLocation(id);
+}
+
+Texpainter::vec2_t Texpainter::Ui::WidgetCanvasDetail::viewportOffset() const
+{
+	return m_impl->viewportOffset();
 }

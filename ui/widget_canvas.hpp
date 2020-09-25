@@ -64,6 +64,8 @@ namespace Texpainter::Ui
 
 		WidgetCoordinates widgetLocation(ClientId) const;
 
+		vec2_t viewportOffset() const;
+
 	protected:
 		class Impl;
 		explicit WidgetCanvasDetail(WidgetCanvasDetail::Impl& impl): m_impl(&impl) {}
@@ -133,6 +135,7 @@ namespace Texpainter::Ui
 	{
 	public:
 		using WidgetCanvasDetail::WidgetCanvasDetail;
+		using WidgetCanvasDetail::viewportOffset;
 
 		template<class WidgetType>
 		using WidgetHandle = WidgetCanvasDetail::WidgetHandle<WidgetType>;
