@@ -36,10 +36,7 @@ public:
 		gtk_widget_queue_draw(GTK_WIDGET(m_handle));
 	}
 
-	void renderOffset(vec2_t x)
-	{
-		m_offset = x;
-	}
+	void renderOffset(vec2_t x) { m_offset = x; }
 
 private:
 	vec2_t m_offset;
@@ -58,8 +55,8 @@ private:
 		std::ranges::for_each(
 		    self->m_segs,
 		    [cr,
-			O = ToplevelCoordinates{static_cast<double>(x), static_cast<double>(y)} + self->m_offset](
-		        auto const& vals) {
+		     O = ToplevelCoordinates{static_cast<double>(x), static_cast<double>(y)}
+		         + self->m_offset](auto const& vals) {
 			    auto a = vals.first - O;
 			    auto b = vals.second - O;
 			    cairo_move_to(cr, a[0], a[1]);

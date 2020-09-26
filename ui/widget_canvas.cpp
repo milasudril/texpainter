@@ -111,7 +111,6 @@ public:
 		return vec2_t{x_adj, y_adj};
 	}
 
-
 private:
 	GtkScrolledWindow* m_root;
 	GtkOverlay* m_handle;
@@ -150,7 +149,7 @@ private:
 		                 vec2_t{static_cast<double>(w), static_cast<double>(h)}};
 	}
 
-	Size2d calculateCanvasSize() const
+	std::pair<GtkFixed*, Size2d> calculateCanvasSize() const
 	{
 		auto i      = std::ranges::max_element(m_clients, [this](auto const& a, auto const& b) {
             auto box_a    = widgetLocationAndSize(a.first);
@@ -161,13 +160,30 @@ private:
         });
 		auto ret    = widgetLocationAndSize(i->first);
 		auto corner = ret.first + ret.second;
-		return Size2d{static_cast<uint32_t>(corner.x()), static_cast<uint32_t>(corner.y())};
+		return std::pair{
+		    i->first, Size2d{static_cast<uint32_t>(corner.x()), static_cast<uint32_t>(corner.y())}};
 	}
 
 	void updateCanvasSize()
 	{
-		auto size = calculateCanvasSize();
-		gtk_widget_set_size_request(GTK_WIDGET(m_handle), size.width(), size.height());
+		auto res = calculateCanvasSize();
+		gtk_widget_set_size_request(GTK_WIDGET(m_handle), res.second.width(), res.second.height());
+
+		auto x_adj = gtk_scrolled_window_get_hadjustment(m_root);
+		auto y_adj = gtk_scrolled_window_get_vadjustment(m_root);
+
+		gtk_adjustment_set_upper(x_adj, res.second.width() + 16);   // Compensate for scrollbars
+		gtk_adjustment_set_upper(y_adj, res.second.height() + 16);  // Compensate for scrollbars
+	}
+
+	void scrollIntoView(GtkFixed* container)
+	{
+		auto size_loc = widgetLocationAndSize(container);
+		auto x_adj    = gtk_scrolled_window_get_hadjustment(m_root);
+		auto y_adj    = gtk_scrolled_window_get_vadjustment(m_root);
+
+		gtk_adjustment_set_value(x_adj, size_loc.first.x());
+		gtk_adjustment_set_value(y_adj, size_loc.first.y());
 	}
 
 	static gboolean mouse_move(GtkWidget* widget, GdkEvent* event, gpointer user_data)
@@ -187,7 +203,6 @@ private:
 				if(auto i = self->m_clients.find(fixed_layout); i != std::end(self->m_clients))
 				{ self->m_vt.on_move(self->r_eh, *self, loc_new, i->second); }
 			}
-			self->updateCanvasSize();
 			return TRUE;
 		}
 		return FALSE;
@@ -222,6 +237,13 @@ private:
 				self->m_click_loc = ScreenCoordinates{static_cast<double>(e->x_root),
 				                                      static_cast<double>(e->y_root)};
 			}
+#if 0
+			printf("Init: click_loc: %.7f %.7f\n"
+			       "       loc_init: %.7f %.7f\n",
+					self->m_click_loc.x(), self->m_click_loc.y(),
+					self->m_loc_init.x(), self->m_loc_init.y()
+  				);
+#endif
 			return TRUE;
 		}
 		return FALSE;
@@ -248,7 +270,9 @@ private:
 
 	static gboolean button_release(GtkWidget*, GdkEvent*, gpointer user_data)
 	{
-		auto self      = reinterpret_cast<Impl*>(user_data);
+		auto self = reinterpret_cast<Impl*>(user_data);
+		self->updateCanvasSize();
+		self->scrollIntoView(GTK_FIXED(gtk_widget_get_parent(self->m_moving)));
 		self->m_moving = nullptr;
 		return FALSE;
 	}

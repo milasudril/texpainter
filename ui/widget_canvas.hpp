@@ -134,8 +134,8 @@ namespace Texpainter::Ui
 	class WidgetCanvas: private WidgetCanvasDetail
 	{
 	public:
-		using WidgetCanvasDetail::WidgetCanvasDetail;
 		using WidgetCanvasDetail::viewportOffset;
+		using WidgetCanvasDetail::WidgetCanvasDetail;
 
 		template<class WidgetType>
 		using WidgetHandle = WidgetCanvasDetail::WidgetHandle<WidgetType>;
