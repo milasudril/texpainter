@@ -237,13 +237,6 @@ private:
 				self->m_click_loc = ScreenCoordinates{static_cast<double>(e->x_root),
 				                                      static_cast<double>(e->y_root)};
 			}
-#if 0
-			printf("Init: click_loc: %.7f %.7f\n"
-			       "       loc_init: %.7f %.7f\n",
-					self->m_click_loc.x(), self->m_click_loc.y(),
-					self->m_loc_init.x(), self->m_loc_init.y()
-  				);
-#endif
 			return TRUE;
 		}
 		return FALSE;
@@ -319,6 +312,12 @@ private:
 		}
 		return FALSE;
 	}
+
+	static void canvas_viewport_moved(GtkAdjustment*, gpointer user_data)
+	{
+		auto self = reinterpret_cast<Impl*>(user_data);
+		if(self->r_eh != nullptr) { self->m_vt.on_viewport_moved(self->r_eh, *self); }
+	}
 };
 
 Texpainter::Ui::WidgetCanvasDetail::WidgetDeleter::WidgetDeleter(
@@ -350,6 +349,15 @@ Texpainter::Ui::WidgetCanvasDetail::Impl::Impl(Container& cnt)
 	gtk_widget_set_size_request(GTK_WIDGET(m_root), 500, 300);
 	g_signal_connect(frame, "button-release-event", G_CALLBACK(canvas_mouse_up), this);
 	g_signal_connect(frame, "button-press-event", G_CALLBACK(canvas_mouse_down), this);
+
+	g_signal_connect(gtk_scrolled_window_get_hadjustment(m_root),
+	                 "value-changed",
+	                 G_CALLBACK(canvas_viewport_moved),
+	                 this);
+	g_signal_connect(gtk_scrolled_window_get_vadjustment(m_root),
+	                 "value-changed",
+	                 G_CALLBACK(canvas_viewport_moved),
+	                 this);
 
 	gtk_widget_set_events(widget, GDK_POINTER_MOTION_MASK);
 	g_signal_connect(widget, "motion-notify-event", G_CALLBACK(canvas_mouse_move), this);

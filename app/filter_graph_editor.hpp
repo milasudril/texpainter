@@ -259,6 +259,9 @@ namespace Texpainter
 		template<ControlId>
 		void onActivated(Ui::Listbox& src, int item);
 
+		template<ControlId>
+		void onViewportMoved(Canvas& src);
+
 		void onClicked(NodeWidget const& src, FilterGraph::InputPort port);
 
 		void onClicked(NodeWidget const& src, FilterGraph::OutputPort port);
@@ -404,6 +407,15 @@ namespace Texpainter
 		auto name = box.get(item);
 		insert(ImageProcessorRegistry::createImageProcessor(name), m_filtermenuloc);
 		m_filtermenu.reset();
+	}
+
+	template<>
+	inline void FilterGraphEditor::onViewportMoved<FilterGraphEditor::ControlId::NodeWidgets>(
+	    Canvas& src)
+	{
+		auto offset = src.viewportOffset();
+		printf("%.7f %.7f\n", offset[0], offset[1]);
+		m_linesegs->renderOffset(offset);
 	}
 }
 

@@ -36,7 +36,11 @@ public:
 		gtk_widget_queue_draw(GTK_WIDGET(m_handle));
 	}
 
-	void renderOffset(vec2_t x) { m_offset = x; }
+	void renderOffset(vec2_t x)
+	{
+		m_offset = x;
+		gtk_widget_queue_draw(GTK_WIDGET(m_handle));
+	}
 
 private:
 	vec2_t m_offset;
