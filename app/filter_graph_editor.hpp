@@ -419,7 +419,6 @@ namespace Texpainter
 	    Canvas& src)
 	{
 		auto offset = src.viewportOffset();
-		printf("%.7f %.7f\n", offset[0], offset[1]);
 		m_linesegs->renderOffset(offset);
 	}
 }

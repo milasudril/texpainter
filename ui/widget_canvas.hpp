@@ -66,6 +66,8 @@ namespace Texpainter::Ui
 
 		vec2_t viewportOffset() const;
 
+		void updateCanvasSize();
+
 	protected:
 		class Impl;
 		explicit WidgetCanvasDetail(WidgetCanvasDetail::Impl& impl): m_impl(&impl) {}
@@ -135,6 +137,7 @@ namespace Texpainter::Ui
 	class WidgetCanvas: private WidgetCanvasDetail
 	{
 	public:
+		using WidgetCanvasDetail::updateCanvasSize;
 		using WidgetCanvasDetail::viewportOffset;
 		using WidgetCanvasDetail::WidgetCanvasDetail;
 

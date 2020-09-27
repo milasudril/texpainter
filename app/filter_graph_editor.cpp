@@ -131,7 +131,6 @@ std::map<Texpainter::FilterGraph::NodeId, Texpainter::vec2_t> Texpainter::Filter
     nodeLocations() const
 {
 	std::map<FilterGraph::NodeId, vec2_t> ret;
-
 	std::ranges::transform(
 	    m_graph.nodes(), std::inserter(ret, std::end(ret)), [&canvas = m_canvas](auto const& item) {
 		    return std::pair{item.first, canvas.widgetLocation(item.first).value()};
@@ -161,7 +160,7 @@ void Texpainter::FilterGraphEditor::updateLocations()
 	std::ranges::for_each(m_node_editors, [&ports = m_ports](auto const& item) {
 		ports.updateLocation(item.second->node(), item.second->inputs(), item.second->outputs());
 	});
-
+	m_canvas.updateCanvasSize();
 	m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
 }
 

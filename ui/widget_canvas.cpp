@@ -111,6 +111,18 @@ public:
 		return vec2_t{x_adj, y_adj};
 	}
 
+	void updateCanvasSize()
+	{
+		auto res = calculateCanvasSize();
+		gtk_widget_set_size_request(GTK_WIDGET(m_handle), res.second.width(), res.second.height());
+
+		auto x_adj = gtk_scrolled_window_get_hadjustment(m_root);
+		auto y_adj = gtk_scrolled_window_get_vadjustment(m_root);
+
+		gtk_adjustment_set_upper(x_adj, res.second.width() + 16);   // Compensate for scrollbars
+		gtk_adjustment_set_upper(y_adj, res.second.height() + 16);  // Compensate for scrollbars
+	}
+
 private:
 	GtkScrolledWindow* m_root;
 	GtkOverlay* m_handle;
@@ -162,18 +174,6 @@ private:
 		auto corner = ret.first + ret.second;
 		return std::pair{
 		    i->first, Size2d{static_cast<uint32_t>(corner.x()), static_cast<uint32_t>(corner.y())}};
-	}
-
-	void updateCanvasSize()
-	{
-		auto res = calculateCanvasSize();
-		gtk_widget_set_size_request(GTK_WIDGET(m_handle), res.second.width(), res.second.height());
-
-		auto x_adj = gtk_scrolled_window_get_hadjustment(m_root);
-		auto y_adj = gtk_scrolled_window_get_vadjustment(m_root);
-
-		gtk_adjustment_set_upper(x_adj, res.second.width() + 16);   // Compensate for scrollbars
-		gtk_adjustment_set_upper(y_adj, res.second.height() + 16);  // Compensate for scrollbars
 	}
 
 	void scrollIntoView(GtkFixed* container)
@@ -434,3 +434,5 @@ Texpainter::vec2_t Texpainter::Ui::WidgetCanvasDetail::viewportOffset() const
 {
 	return m_impl->viewportOffset();
 }
+
+void Texpainter::Ui::WidgetCanvasDetail::updateCanvasSize() { m_impl->updateCanvasSize(); }

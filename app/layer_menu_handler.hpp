@@ -564,10 +564,12 @@ namespace Texpainter
 		{
 			auto& doc = src.widget().first.get();
 			doc.layersModify([&current_layer = doc.currentLayer(),
-			                  result = src.widget().compositingOptions()](auto& layers) mutable {
+			                  result         = src.widget().compositingOptions(),
+			                  node_locations = src.widget().nodeLocations()](auto& layers) mutable {
 				if(auto layer = layers[current_layer]; layer != nullptr)
 				{
-					layer->compositingOptions(std::move(result));
+					layer->nodeLocations(std::move(node_locations))
+					    .compositingOptions(std::move(result));
 					return true;
 				}
 				return false;
