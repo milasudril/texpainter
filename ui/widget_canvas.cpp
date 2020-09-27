@@ -168,7 +168,12 @@ private:
             auto box_b    = widgetLocationAndSize(b.first);
             auto corner_a = box_a.first + box_a.second;
             auto corner_b = box_b.first + box_b.second;
-            return (corner_a.x() < corner_b.x()) ? true : (corner_a.y() < corner_b.y());
+
+            if(corner_a.x() < corner_b.x()) { return true; }
+
+            if(corner_a.x() == corner_b.x()) { return corner_b.y() < corner_b.y(); }
+
+            return false;
         });
 		auto ret    = widgetLocationAndSize(i->first);
 		auto corner = ret.first + ret.second;
