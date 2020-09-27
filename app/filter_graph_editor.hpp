@@ -279,11 +279,23 @@ namespace Texpainter
 			r_callback(r_eh, *this);
 		}
 
-		void notCompleted(FilterGraph::Connection const&) {}
+		void notCompleted(FilterGraph::Connection const& conn)
+		{
+			m_ports.removeDummyConnection(conn.source());
+			m_ports.removeDummyConnection(conn.sink());
+		}
 
-		void selfConnection(FilterGraph::Connection const&) {}
+		void selfConnection(FilterGraph::Connection const& conn)
+		{
+			m_ports.removeDummyConnection(conn.source());
+			m_ports.removeDummyConnection(conn.sink());
+		}
 
-		void typeMismatch(FilterGraph::Connection const&) {}
+		void typeMismatch(FilterGraph::Connection const& conn)
+		{
+			m_ports.removeDummyConnection(conn.source());
+			m_ports.removeDummyConnection(conn.sink());
+		}
 
 		void connectionOk(FilterGraph::Connection const& conn)
 		{
