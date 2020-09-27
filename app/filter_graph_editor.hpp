@@ -69,21 +69,23 @@ namespace Texpainter
 	class ConnectorMove
 	{
 	public:
-		explicit ConnectorMove(Mesh& connectors, IdArrayIterator iter)
+		explicit ConnectorMove(Mesh& connectors, IdArrayIterator iter, vec2_t offset)
 		    : r_connectors{connectors}
 		    , m_iter{iter}
+		    , m_offset{offset}
 		{
 		}
 
 		void operator()(auto const& item)
 		{
-			r_connectors.node(*m_iter) = item.location();
+			r_connectors.node(*m_iter) = item.location() + m_offset;
 			++m_iter;
 		}
 
 	private:
 		Mesh& r_connectors;
 		IdArrayIterator m_iter;
+		vec2_t m_offset;
 	};
 
 	class PortMap
@@ -161,18 +163,21 @@ namespace Texpainter
 		template<class InputConnectorList, class OutputConnectorList>
 		void updateLocation(FilterGraph::Node const& node,
 		                    InputConnectorList const& inputs,
-		                    OutputConnectorList const& outputs)
+		                    OutputConnectorList const& outputs,
+		                    vec2_t offset = vec2_t{0, 0})
 		{
 			{
 				auto i = m_input_port_map.find(&node);
 				assert(i != std::end(m_input_port_map));
-				std::ranges::for_each(inputs, ConnectorMove{m_connectors, i->second.begin()});
+				std::ranges::for_each(inputs,
+				                      ConnectorMove{m_connectors, i->second.begin(), offset});
 			}
 
 			{
 				auto o = m_output_port_map.find(&node);
 				assert(o != std::end(m_output_port_map));
-				std::ranges::for_each(outputs, ConnectorMove{m_connectors, o->second.begin()});
+				std::ranges::for_each(outputs,
+				                      ConnectorMove{m_connectors, o->second.begin(), offset});
 			}
 		}
 

@@ -207,13 +207,13 @@ void Texpainter::FilterGraphEditor::onClicked(NodeWidget const& src, FilterGraph
 
 template<>
 void Texpainter::FilterGraphEditor::onMove<Texpainter::FilterGraphEditor::ControlId::NodeWidgets>(
-    Canvas&, Ui::WidgetCoordinates, FilterGraph::NodeId id)
+    Canvas& src, Ui::WidgetCoordinates, FilterGraph::NodeId id)
 {
 	auto node_edit_iter = m_node_editors.find(id);
 	if(node_edit_iter == std::end(m_node_editors)) { return; }
 
 	auto const& editor = *(node_edit_iter->second);
-	m_ports.updateLocation(editor.node(), editor.inputs(), editor.outputs());
+	m_ports.updateLocation(editor.node(), editor.inputs(), editor.outputs(), src.viewportOffset());
 
 	m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
 }
