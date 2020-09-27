@@ -358,9 +358,9 @@ namespace Texpainter
 
 	template<>
 	inline void FilterGraphEditor::onMouseMove<FilterGraphEditor::ControlId::NodeWidgets>(
-	    Canvas&, Ui::ToplevelCoordinates loc)
+	    Canvas& src, Ui::ToplevelCoordinates loc)
 	{
-		m_ports.moveDummyConnectors(loc);
+		m_ports.moveDummyConnectors(loc + src.viewportOffset());
 		m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
 	}
 
