@@ -9,9 +9,8 @@
 #include <vector>
 #include <algorithm>
 
-struct MyContainer
+struct MyContainer: GtkContainer
 {
-	GtkContainer base;
 	std::map<GtkWidget*, Texpainter::Ui::WidgetCoordinates> m_children;
 };
 
@@ -21,9 +20,8 @@ void addWidget(MyContainer& obj, GtkWidget* widget, Texpainter::Ui::WidgetCoordi
 	gtk_widget_set_parent(widget, GTK_WIDGET(&obj));
 }
 
-struct MyContainerClass
+struct MyContainerClass: GtkContainerClass
 {
-	GtkContainerClass base_class;
 };
 
 #define volatile  // glib use volatile in a non-conformant manner
@@ -79,26 +77,23 @@ void my_container_class_init(MyContainerClass* klass)
 
 	widget_class->draw = [](GtkWidget* widget, cairo_t* cr) -> gboolean {
 		auto self = G_TYPE_CHECK_INSTANCE_CAST(widget, my_container_get_type(), MyContainer);
-		std::ranges::for_each(self->m_children,
-		                      [container = GTK_CONTAINER(self), cr](auto const& item) {
-			                      gtk_container_propagate_draw(container, item.first, cr);
-		                      });
+		std::ranges::for_each(self->m_children, [self, cr](auto const& item) {
+			gtk_container_propagate_draw(self, item.first, cr);
+		});
 		return FALSE;
 	};
 
-	auto container_class = GTK_CONTAINER_CLASS(klass);
+	klass->child_type = [](GtkContainer*) { return GTK_TYPE_WIDGET; };
 
-	container_class->child_type = [](GtkContainer*) { return GTK_TYPE_WIDGET; };
+	klass->add = [](GtkContainer*, GtkWidget*) { abort(); };
 
-	container_class->add = [](GtkContainer*, GtkWidget*) { abort(); };
-
-	container_class->remove = [](GtkContainer* obj, GtkWidget* widget) {
+	klass->remove = [](GtkContainer* obj, GtkWidget* widget) {
 		auto self = G_TYPE_CHECK_INSTANCE_CAST(obj, my_container_get_type(), MyContainer);
 		gtk_widget_unparent(widget);
 		self->m_children.erase(widget);
 	};
 
-	container_class->forall = [](GtkContainer* obj, gboolean, GtkCallback callback, gpointer data) {
+	klass->forall = [](GtkContainer* obj, gboolean, GtkCallback callback, gpointer data) {
 		auto self = G_TYPE_CHECK_INSTANCE_CAST(obj, my_container_get_type(), MyContainer);
 
 		// Copy widget container in case callback calls remove
