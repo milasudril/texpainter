@@ -31,20 +31,6 @@ public:
 
 			case InsertMode::Movable:
 			{
-				auto frame = GTK_FRAME(gtk_frame_new(nullptr));
-				gtk_frame_set_shadow_type(frame, GTK_SHADOW_OUT);
-				gtk_widget_set_events(GTK_WIDGET(frame),
-				                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK
-				                          | GDK_BUTTON_RELEASE_MASK);
-				g_signal_connect(
-				    GTK_WIDGET(frame), "button-press-event", G_CALLBACK(button_press), this);
-				g_signal_connect(
-				    GTK_WIDGET(frame), "button-release-event", G_CALLBACK(button_release), this);
-				gtk_widget_set_margin_start(handle, 4);
-				gtk_widget_set_margin_end(handle, 4);
-				gtk_widget_set_margin_top(handle, 4);
-				gtk_widget_set_margin_bottom(handle, 4);
-				gtk_container_add(GTK_CONTAINER(frame), handle);
 
 				auto fixed_layout = GTK_FIXED(gtk_fixed_new());
 				gtk_widget_set_events(GTK_WIDGET(fixed_layout),
@@ -54,13 +40,28 @@ public:
 				g_signal_connect(
 				    fixed_layout, "button-press-event", G_CALLBACK(button_press_fixed), this);
 
-				gtk_fixed_put(fixed_layout, GTK_WIDGET(frame), m_insert_loc.x(), m_insert_loc.y());
 				m_floats[m_client_id]   = fixed_layout;
 				m_clients[fixed_layout] = m_client_id;
-
 				gtk_overlay_add_overlay(m_handle, GTK_WIDGET(fixed_layout));
 				gtk_overlay_set_overlay_pass_through(m_handle, GTK_WIDGET(fixed_layout), TRUE);
+				gtk_overlay_reorder_overlay(m_handle, GTK_WIDGET(fixed_layout), -1);
 
+				auto frame = GTK_FRAME(gtk_frame_new(nullptr));
+				gtk_widget_set_events(GTK_WIDGET(frame),
+				                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK
+				                          | GDK_BUTTON_RELEASE_MASK);
+				g_signal_connect(
+				    GTK_WIDGET(frame), "button-press-event", G_CALLBACK(button_press), this);
+				g_signal_connect(
+				    GTK_WIDGET(frame), "button-release-event", G_CALLBACK(button_release), this);
+				gtk_frame_set_shadow_type(frame, GTK_SHADOW_OUT);
+				gtk_widget_set_margin_start(handle, 4);
+				gtk_widget_set_margin_end(handle, 4);
+				gtk_widget_set_margin_top(handle, 4);
+				gtk_widget_set_margin_bottom(handle, 4);
+				gtk_fixed_put(fixed_layout, GTK_WIDGET(frame), m_insert_loc.x(), m_insert_loc.y());
+
+				gtk_container_add(GTK_CONTAINER(frame), handle);
 				break;
 			}
 		}
@@ -113,14 +114,18 @@ public:
 
 	void updateCanvasSize()
 	{
-		auto res = calculateCanvasSize();
-		gtk_widget_set_size_request(GTK_WIDGET(m_handle), res.second.width(), res.second.height());
+		if(m_clients.size() != 0)
+		{
+			auto res = calculateCanvasSize();
+			gtk_widget_set_size_request(
+			    GTK_WIDGET(m_handle), res.second.width(), res.second.height());
 
-		auto x_adj = gtk_scrolled_window_get_hadjustment(m_root);
-		auto y_adj = gtk_scrolled_window_get_vadjustment(m_root);
+			auto x_adj = gtk_scrolled_window_get_hadjustment(m_root);
+			auto y_adj = gtk_scrolled_window_get_vadjustment(m_root);
 
-		gtk_adjustment_set_upper(x_adj, res.second.width() + 16);   // Compensate for scrollbars
-		gtk_adjustment_set_upper(y_adj, res.second.height() + 16);  // Compensate for scrollbars
+			gtk_adjustment_set_upper(x_adj, res.second.width() + 16);   // Compensate for scrollbars
+			gtk_adjustment_set_upper(y_adj, res.second.height() + 16);  // Compensate for scrollbars
+		}
 	}
 
 private:
@@ -269,9 +274,12 @@ private:
 	static gboolean button_release(GtkWidget*, GdkEvent*, gpointer user_data)
 	{
 		auto self = reinterpret_cast<Impl*>(user_data);
-		self->updateCanvasSize();
-		self->scrollIntoView(GTK_FIXED(gtk_widget_get_parent(self->m_moving)));
-		self->m_moving = nullptr;
+		if(self->m_moving != nullptr)
+		{
+			self->updateCanvasSize();
+			self->scrollIntoView(GTK_FIXED(gtk_widget_get_parent(self->m_moving)));
+			self->m_moving = nullptr;
+		}
 		return FALSE;
 	}
 
