@@ -34,7 +34,6 @@ static void widget_canvas_internal_class_init(WidgetCanvasInternalClass* klass)
 
 	widget_class->size_allocate = [](GtkWidget* widget, GtkAllocation* alloc) {
 		gtk_widget_set_allocation(widget, alloc);
-		printf("%d %d %d %d\n", alloc->width, alloc->height, alloc->x, alloc->y);
 		if(gtk_widget_get_has_window(widget))
 		{
 			if(gtk_widget_get_realized(widget))
@@ -45,25 +44,26 @@ static void widget_canvas_internal_class_init(WidgetCanvasInternalClass* klass)
 		}
 
 		auto self = Texpainter::Ui::asWidgetCanvasInternal(widget);
-		std::ranges::for_each(self->children(), [w = alloc->width, h = alloc->height](auto const& item) {
-			GtkRequisition req;
-			gtk_widget_get_preferred_size(item.first, &req, nullptr);
+		std::ranges::for_each(self->children(),
+		                      [w = alloc->width, h = alloc->height](auto const& item) {
+			                      GtkRequisition req;
+			                      gtk_widget_get_preferred_size(item.first, &req, nullptr);
 
-			GtkAllocation alloc{};
-			if(item.second.fullsize)
-			{
-				alloc.width  = w;
-				alloc.height = h;
-			}
-			else
-			{
-				alloc.width  = req.width;
-				alloc.height = req.height;
-				alloc.x      = item.second.loc.x();
-				alloc.y      = item.second.loc.y();
-			}
-			gtk_widget_size_allocate(item.first, &alloc);
-		});
+			                      GtkAllocation alloc{};
+			                      if(item.second.fullsize)
+			                      {
+				                      alloc.width  = w;
+				                      alloc.height = h;
+			                      }
+			                      else
+			                      {
+				                      alloc.width  = req.width;
+				                      alloc.height = req.height;
+				                      alloc.x      = item.second.loc.x();
+				                      alloc.y      = item.second.loc.y();
+			                      }
+			                      gtk_widget_size_allocate(item.first, &alloc);
+		                      });
 	};
 
 	widget_class->draw = [](GtkWidget* widget, cairo_t* cr) -> gboolean {

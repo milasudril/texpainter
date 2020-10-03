@@ -187,7 +187,6 @@ private:
 		auto self = reinterpret_cast<Impl*>(user_data);
 		if(self->m_moving != nullptr)
 		{
-			printf("Widgets mouse-move\n");
 			auto fixed_layout = asWidgetCanvasInternal(widget);
 			auto event_move   = reinterpret_cast<GdkEventMotion const*>(event);
 			auto loc_new =
@@ -235,13 +234,6 @@ private:
 		return FALSE;
 	}
 
-	static gboolean widgets_button_press(GtkWidget*, GdkEvent*, gpointer user_data)
-	{
-		auto self = reinterpret_cast<Impl*>(user_data);
-		if(self->r_eh != nullptr) { puts("Hej sadfh"); }
-		return FALSE;
-	}
-
 	static gboolean button_release(GtkWidget*, GdkEvent*, gpointer user_data)
 	{
 		auto self = reinterpret_cast<Impl*>(user_data);
@@ -279,23 +271,17 @@ private:
 		return FALSE;
 	}
 
-	static gboolean canvas_mouse_down(GtkWidget*, GdkEvent*, gpointer)
-	{
-		puts("canvas_mouse_down");
-		return FALSE;
-	}
-
-	static gboolean canvas_mouse_up(GtkWidget*, GdkEvent* event, gpointer user_data)
+	static gboolean canvas_mouse_down(GtkWidget*, GdkEvent* event, gpointer user_data)
 	{
 		auto self = reinterpret_cast<Impl*>(user_data);
 		if(self->r_eh != nullptr)
 		{
 			auto e = reinterpret_cast<GdkEventButton const*>(event);
-			self->m_vt.on_mouse_up_canvas(self->r_eh,
-			                              *self,
-			                              WidgetCoordinates{e->x, e->y},
-			                              ScreenCoordinates{e->x_root, e->y_root},
-			                              e->button);
+			self->m_vt.on_mouse_down_canvas(self->r_eh,
+			                                *self,
+			                                WidgetCoordinates{e->x, e->y},
+			                                ScreenCoordinates{e->x_root, e->y_root},
+			                                e->button);
 			return FALSE;
 		}
 		return FALSE;
@@ -340,14 +326,11 @@ Texpainter::Ui::WidgetCanvasDetail::Impl::Impl(Container& cnt)
 	                          | GDK_BUTTON_RELEASE_MASK);
 	g_signal_connect(
 	    GTK_WIDGET(m_widgets), "motion-notify-event", G_CALLBACK(widgets_mouse_move), this);
-	g_signal_connect(
-	    GTK_WIDGET(m_widgets), "button-press-event", G_CALLBACK(widgets_button_press), this);
 
-	gtk_container_add(GTK_CONTAINER(m_handle), frame);
+	m_widgets->insertFullsize(frame);
 	gtk_overlay_add_overlay(m_handle, GTK_WIDGET(m_widgets));
 
 	gtk_widget_set_size_request(GTK_WIDGET(m_root), 500, 300);
-	g_signal_connect(frame, "button-release-event", G_CALLBACK(canvas_mouse_up), this);
 	g_signal_connect(frame, "button-press-event", G_CALLBACK(canvas_mouse_down), this);
 
 	g_signal_connect(gtk_scrolled_window_get_hadjustment(m_root),

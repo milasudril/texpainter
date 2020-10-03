@@ -103,7 +103,7 @@ namespace Texpainter::Ui
 			void (*on_move)(void*, WidgetCanvasDetail&, WidgetCoordinates, ClientId);
 			void (*on_mouse_down)(
 			    void*, WidgetCanvasDetail&, WidgetCoordinates, ScreenCoordinates, int, ClientId);
-			void (*on_mouse_up_canvas)(
+			void (*on_mouse_down_canvas)(
 			    void*, WidgetCanvasDetail&, WidgetCoordinates, ScreenCoordinates, int);
 			void (*on_viewport_moved)(void*, WidgetCanvasDetail&);
 			void (*on_realized)(void*, WidgetCanvasDetail&);
@@ -207,7 +207,7 @@ namespace Texpainter::Ui
 			           ScreenCoordinates loc_screen,
 			           int button) {
 				        auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				        obj.template onMouseUp<id>(
+				        obj.template onMouseDown<id>(
 				            static_cast<WidgetCanvas&>(self), loc_window, loc_screen, button);
 			        },
 			        [](void* event_handler, WidgetCanvasDetail& self) {

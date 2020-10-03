@@ -256,7 +256,7 @@ namespace Texpainter
 		void onMouseMove(Canvas& src, Ui::ToplevelCoordinates loc);
 
 		template<ControlId>
-		void onMouseUp(Canvas& src, Ui::WidgetCoordinates, Ui::ScreenCoordinates, int button);
+		void onMouseDown(Canvas& src, Ui::WidgetCoordinates, Ui::ScreenCoordinates, int button);
 
 		template<ControlId>
 		void onActivated(Ui::MenuItem& src);
@@ -326,7 +326,6 @@ namespace Texpainter
 		Canvas m_canvas;
 		std::unique_ptr<Ui::LineSegmentRenderer> m_linesegs;
 		std::map<FilterGraph::NodeId, Canvas::WidgetHandle<NodeWidget>> m_node_editors;
-		//std::unique_ptr<Ui::Listbox> m_filtermenu;
 		Canvas::WidgetHandle<Ui::Listbox> m_filtermenu;
 		Ui::WidgetCoordinates m_filtermenuloc;
 		Ui::Menu m_node_menu;
@@ -391,7 +390,7 @@ namespace Texpainter
 	}
 
 	template<>
-	inline void FilterGraphEditor::onMouseUp<FilterGraphEditor::ControlId::NodeWidgets>(
+	inline void FilterGraphEditor::onMouseDown<FilterGraphEditor::ControlId::NodeWidgets>(
 	    Canvas&, Ui::WidgetCoordinates loc, Ui::ScreenCoordinates, int button)
 	{
 		switch(button)
