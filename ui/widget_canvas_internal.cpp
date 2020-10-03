@@ -44,7 +44,7 @@ static void widget_canvas_internal_class_init(WidgetCanvasInternalClass* klass)
 		}
 
 		auto self = Texpainter::Ui::asWidgetCanvas(widget);
-		std::ranges::for_each(self->m_widgets, [](auto const& item) {
+		std::ranges::for_each(self->children(), [](auto const& item) {
 			GtkRequisition req;
 			gtk_widget_get_preferred_size(item.first, &req, nullptr);
 
@@ -59,8 +59,8 @@ static void widget_canvas_internal_class_init(WidgetCanvasInternalClass* klass)
 
 	widget_class->draw = [](GtkWidget* widget, cairo_t* cr) -> gboolean {
 		auto self = Texpainter::Ui::asWidgetCanvas(widget);
-		std::ranges::for_each(self->m_widgets, [self, cr](auto const& item) {
-			gtk_container_propagate_draw(self, item.first, cr);
+		std::ranges::for_each(self->widgets(), [self, cr](auto item) {
+			gtk_container_propagate_draw(self, item, cr);
 		});
 		return FALSE;
 	};
@@ -72,19 +72,17 @@ static void widget_canvas_internal_class_init(WidgetCanvasInternalClass* klass)
 	klass->remove = [](GtkContainer* obj, GtkWidget* widget) {
 		auto self = Texpainter::Ui::asWidgetCanvas(obj);
 		gtk_widget_unparent(widget);
-		self->m_widgets.erase(widget);
+		self->remove(widget);
 	};
 
 	klass->forall = [](GtkContainer* obj, gboolean, GtkCallback callback, gpointer data) {
 		auto self = Texpainter::Ui::asWidgetCanvas(obj);
 
 		// Copy widget container in case callback calls remove
-		std::vector<GtkWidget*> tmp;
-		tmp.reserve(self->m_widgets.size());
-		std::ranges::transform(
-		    self->m_widgets, std::back_inserter(tmp), [](auto const& item) { return item.first; });
+		auto widgets = self->widgets();
+		std::vector<GtkWidget*> tmp{std::begin(widgets), std::end(widgets)};
 		std::ranges::for_each(
-		    tmp, [callback, user_data = data](auto const& item) { callback(item, user_data); });
+		    tmp, [callback, user_data = data](auto item) { callback(item, user_data); });
 	};
 
 	auto g_object_class      = G_OBJECT_CLASS(klass);

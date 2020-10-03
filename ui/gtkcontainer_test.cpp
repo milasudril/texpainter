@@ -31,8 +31,7 @@ G_DEFINE_TYPE(MyContainer, my_container, GTK_TYPE_CONTAINER);
 MyContainer* my_container_new()
 {
 	auto obj = g_object_new(my_container_get_type(), nullptr);
-	auto ret = G_TYPE_CHECK_INSTANCE_CAST(obj, my_container_get_type(), MyContainer);
-	return new(ret) MyContainer;
+	return new(obj) MyContainer;
 }
 
 void my_container_init(MyContainer* self) { gtk_widget_set_has_window(GTK_WIDGET(self), FALSE); }

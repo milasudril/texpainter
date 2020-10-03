@@ -5,6 +5,9 @@
 
 #include "./widget_coordinates.hpp"
 
+#include "utils/pair_iterator.hpp"
+#include "utils/iter_pair.hpp"
+
 #include <gtk/gtk.h>
 
 #include <map>
@@ -15,9 +18,27 @@ namespace Texpainter::Ui
 {
 	class WidgetCanvasInternal: public GtkContainer
 	{
+		using ChildrenMap = std::map<GtkWidget*, WidgetCoordinates>;
+
 	public:
-		//	private:
-		std::map<GtkWidget*, WidgetCoordinates> m_widgets;
+		auto widgets()
+		{
+			return IterPair{PairFirstIterator{std::begin(m_children)},
+			                PairFirstIterator{std::end(m_children)}};
+		}
+
+		auto locations() const
+		{
+			return IterPair{PairSecondIterator{std::begin(m_children)},
+			                PairSecondIterator{std::end(m_children)}};
+		}
+
+		auto children() { return IterPair{std::begin(m_children), std::end(m_children)}; }
+
+		void remove(GtkWidget* widget) { m_children.erase(widget); }
+
+	private:
+		ChildrenMap m_children;
 	};
 
 	WidgetCanvasInternal* widget_canvas_internal_new();
