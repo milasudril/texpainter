@@ -14,6 +14,9 @@
 #include <gtk/gtk.h>
 
 #include <map>
+#include <vector>
+#include <algorithm>
+
 #include <cassert>
 
 GType widget_canvas_internal_get_type(void) G_GNUC_CONST;
@@ -33,8 +36,7 @@ namespace Texpainter::Ui
 
 		auto widgets()
 		{
-			return IterPair{PairFirstIterator{std::begin(m_children)},
-			                PairFirstIterator{std::end(m_children)}};
+			return IterPair{std::begin(m_widgets), std::end(m_widgets)};
 		}
 
 		auto locations() const
@@ -45,10 +47,20 @@ namespace Texpainter::Ui
 
 		auto children() { return IterPair{std::begin(m_children), std::end(m_children)}; }
 
-		void remove(GtkWidget* widget) { m_children.erase(widget); }
+		void remove(GtkWidget* widget)
+		{
+			auto i = std::ranges::find(m_widgets, widget);
+			if(i == std::end(m_widgets))
+			{
+				return;
+			}
+			m_widgets.erase(i);
+			m_children.erase(widget);
+		}
 
 		void insert(GtkWidget* widget, WidgetCoordinates loc)
 		{
+			m_widgets.push_back(widget);
 			m_children.insert(ChildrenMap::value_type{widget, loc});
 			gtk_widget_set_parent(widget, GTK_WIDGET(this));
 		}
@@ -68,8 +80,16 @@ namespace Texpainter::Ui
 			return i->second;
 		}
 
+		void toFront(GtkWidget* widget)
+		{
+			auto i = std::ranges::find(m_widgets, widget);
+			assert(i != std::end(m_widgets));
+			std::swap(*i, m_widgets.back());
+		}
+
 	private:
 		WidgetCanvasInternal() {}
+		std::vector<GtkWidget*> m_widgets;
 		ChildrenMap m_children;
 	};
 
