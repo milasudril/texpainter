@@ -64,6 +64,8 @@ namespace Texpainter::Ui
 
 		ImageView& image(PixelStore::Image const& img);
 
+		ImageView& clear();
+
 		ImageView& minSize(Size2d size);
 
 		Size2d imageSize() const noexcept;

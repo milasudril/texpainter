@@ -177,6 +177,7 @@ namespace Texpainter
 			m_brush_size.eventHandler<ControlId::BrushSize>(*this);
 			m_palette_selector.inputField().eventHandler<ControlId::PaletteSelector>(*this);
 			m_img_view.eventHandler<ControlId::Canvas>(*this);
+			m_paint_info.content("");
 			update();
 			m_rows.killFocus();
 		}
@@ -299,6 +300,10 @@ namespace Texpainter
 			if(auto current_layer = currentLayer(*m_documents.currentDocument());
 			   current_layer != nullptr)
 			{ doRender(current_layer->compositingOptions()); }
+			else
+			{
+				m_img_view.clear();
+			}
 		}
 
 		void paint(vec2_t loc);

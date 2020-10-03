@@ -118,6 +118,16 @@ public:
 		update(img);
 	}
 
+	void clear()
+	{
+		if(m_img_surface != nullptr)
+		{
+			cairo_surface_destroy(m_img_surface);
+			m_img_surface  = nullptr;
+			m_size_current = Size2d{0, 0};
+		}
+	}
+
 	void eventHandler(void* event_handler, EventHandlerVtable const& vtable)
 	{
 		r_eh = event_handler;
@@ -313,5 +323,11 @@ Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::focus()
 Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::alwaysEmitMouseEvents(bool)
 {
 	m_impl->alwaysEmitMouseEvents(true);
+	return *this;
+}
+
+Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::clear()
+{
+	m_impl->clear();
 	return *this;
 }
