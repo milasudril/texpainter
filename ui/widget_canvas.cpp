@@ -206,23 +206,18 @@ private:
 
 	static gboolean button_press(GtkWidget* widget, GdkEvent* event, gpointer user_data)
 	{
-		auto e = reinterpret_cast<GdkEventButton const*>(event);
+		auto e    = reinterpret_cast<GdkEventButton const*>(event);
+		auto self = reinterpret_cast<Impl*>(user_data);
 		if(e->button == 1)
 		{
-			auto self = reinterpret_cast<Impl*>(user_data);
 			self->m_widgets->toFront(widget);
 			self->m_moving   = GTK_FRAME(widget);
 			self->m_loc_init = self->m_widgets->location(widget);
 			self->m_click_loc =
 			    ScreenCoordinates{static_cast<double>(e->x_root), static_cast<double>(e->y_root)};
-			return TRUE;
+			return FALSE;
 		}
-		return FALSE;
-	}
 
-	static gboolean button_press_fixed(GtkWidget* widget, GdkEvent* event, gpointer user_data)
-	{
-		auto self = reinterpret_cast<Impl*>(user_data);
 		if(self->r_eh != nullptr)
 		{
 			if(auto i = self->m_clients.find(GTK_FRAME(widget)); i != std::end(self->m_clients))
@@ -236,6 +231,13 @@ private:
 				                         i->second);
 			}
 		}
+		return FALSE;
+	}
+
+	static gboolean button_press_fixed(GtkWidget*, GdkEvent*, gpointer user_data)
+	{
+		auto self = reinterpret_cast<Impl*>(user_data);
+		if(self->r_eh != nullptr) {}
 		return FALSE;
 	}
 
@@ -333,8 +335,8 @@ Texpainter::Ui::WidgetCanvasDetail::Impl::Impl(Container& cnt)
 	                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK
 	                          | GDK_BUTTON_RELEASE_MASK);
 	g_signal_connect(GTK_WIDGET(m_widgets), "motion-notify-event", G_CALLBACK(mouse_move), this);
-	g_signal_connect(
-	    GTK_WIDGET(m_widgets), "button-press-event", G_CALLBACK(button_press_fixed), this);
+//	g_signal_connect(
+//	    GTK_WIDGET(m_widgets), "button-press-event", G_CALLBACK(button_press_fixed), this);
 	gtk_overlay_add_overlay(m_handle, GTK_WIDGET(m_widgets));
 
 	gtk_widget_set_size_request(GTK_WIDGET(m_root), 500, 300);
