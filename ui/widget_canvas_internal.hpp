@@ -34,10 +34,7 @@ namespace Texpainter::Ui
 			return new(gobj) Texpainter::Ui::WidgetCanvasInternal;
 		}
 
-		auto widgets()
-		{
-			return IterPair{std::begin(m_widgets), std::end(m_widgets)};
-		}
+		auto widgets() { return IterPair{std::begin(m_widgets), std::end(m_widgets)}; }
 
 		auto locations() const
 		{
@@ -50,10 +47,7 @@ namespace Texpainter::Ui
 		void remove(GtkWidget* widget)
 		{
 			auto i = std::ranges::find(m_widgets, widget);
-			if(i == std::end(m_widgets))
-			{
-				return;
-			}
+			if(i == std::end(m_widgets)) { return; }
 			m_widgets.erase(i);
 			m_children.erase(widget);
 		}
@@ -85,6 +79,7 @@ namespace Texpainter::Ui
 			auto i = std::ranges::find(m_widgets, widget);
 			assert(i != std::end(m_widgets));
 			std::swap(*i, m_widgets.back());
+			gtk_widget_queue_draw(GTK_WIDGET(this));
 		}
 
 	private:

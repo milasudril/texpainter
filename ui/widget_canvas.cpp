@@ -32,24 +32,16 @@ public:
 
 			case InsertMode::Movable:
 			{
-				auto fixed_layout = WidgetCanvasInternal::create();
-				gtk_widget_set_events(GTK_WIDGET(fixed_layout),
-				                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK
-				                          | GDK_BUTTON_RELEASE_MASK);
-				g_signal_connect(fixed_layout, "motion-notify-event", G_CALLBACK(mouse_move), this);
-				g_signal_connect(
-				    fixed_layout, "button-press-event", G_CALLBACK(button_press_fixed), this);
-
-				m_floats[m_client_id]   = fixed_layout;
-				m_clients[fixed_layout] = m_client_id;
-				gtk_overlay_add_overlay(m_handle, GTK_WIDGET(fixed_layout));
-				gtk_overlay_set_overlay_pass_through(m_handle, GTK_WIDGET(fixed_layout), TRUE);
-				gtk_overlay_reorder_overlay(m_handle, GTK_WIDGET(fixed_layout), -1);
-
 				auto frame = GTK_FRAME(gtk_frame_new(nullptr));
 				gtk_widget_set_events(GTK_WIDGET(frame),
 				                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK
 				                          | GDK_BUTTON_RELEASE_MASK);
+				g_signal_connect(
+				    GTK_WIDGET(frame), "button-press-event", G_CALLBACK(button_press_fixed), this);
+				m_floats[m_client_id] = frame;
+				m_clients[frame]      = m_client_id;
+
+
 				g_signal_connect(
 				    GTK_WIDGET(frame), "button-press-event", G_CALLBACK(button_press), this);
 				g_signal_connect(
@@ -59,9 +51,8 @@ public:
 				gtk_widget_set_margin_end(handle, 4);
 				gtk_widget_set_margin_top(handle, 4);
 				gtk_widget_set_margin_bottom(handle, 4);
-				fixed_layout->insert(GTK_WIDGET(frame), m_insert_loc);
-
 				gtk_container_add(GTK_CONTAINER(frame), handle);
+				m_widgets->insert(GTK_WIDGET(frame), m_insert_loc);
 				break;
 			}
 		}
@@ -131,11 +122,12 @@ public:
 private:
 	GtkScrolledWindow* m_root;
 	GtkOverlay* m_handle;
+	WidgetCanvasInternal* m_widgets;
 	GtkWidget* m_bottom;
 	WidgetCoordinates m_insert_loc;
 	InsertMode m_ins_mode;
 
-	GtkWidget* m_moving;
+	GtkFrame* m_moving;
 	WidgetCoordinates m_loc_init;
 	ScreenCoordinates m_click_loc;
 	ClientId m_client_id;
@@ -147,27 +139,23 @@ private:
 		bool operator()(ClientId a, ClientId b) const { return a.value() < b.value(); }
 	};
 
-	std::map<ClientId, WidgetCanvasInternal*, ClientIdCompare> m_floats;
-	std::map<WidgetCanvasInternal*, ClientId> m_clients;
+	std::map<ClientId, GtkFrame*, ClientIdCompare> m_floats;
+	std::map<GtkFrame*, ClientId> m_clients;
 
-	std::pair<WidgetCoordinates, vec2_t> widgetLocationAndSize(
-	    WidgetCanvasInternal* container) const
+	std::pair<WidgetCoordinates, vec2_t> widgetLocationAndSize(GtkFrame* frame) const
 	{
 		int x{};
 		int y{};
-		auto children = gtk_container_get_children(GTK_CONTAINER(container));
-		auto frame    = GTK_WIDGET(children->data);
-		g_list_free(children);
-		auto const w = gtk_widget_get_allocated_width(frame);
-		auto const h = gtk_widget_get_allocated_height(frame);
+		auto const w = gtk_widget_get_allocated_width(GTK_WIDGET(frame));
+		auto const h = gtk_widget_get_allocated_height(GTK_WIDGET(frame));
 
-		gtk_widget_translate_coordinates(frame, GTK_WIDGET(m_handle), 0, 0, &x, &y);
+		gtk_widget_translate_coordinates(GTK_WIDGET(frame), GTK_WIDGET(m_handle), 0, 0, &x, &y);
 
 		return std::pair{WidgetCoordinates{static_cast<double>(x), static_cast<double>(y)},
 		                 vec2_t{static_cast<double>(w), static_cast<double>(h)}};
 	}
 
-	std::pair<WidgetCanvasInternal*, Size2d> calculateCanvasSize() const
+	std::pair<GtkFrame*, Size2d> calculateCanvasSize() const
 	{
 		auto i      = std::ranges::max_element(m_clients, [this](auto const& a, auto const& b) {
             auto box_a    = widgetLocationAndSize(a.first);
@@ -187,7 +175,7 @@ private:
 		    i->first, Size2d{static_cast<uint32_t>(corner.x()), static_cast<uint32_t>(corner.y())}};
 	}
 
-	void scrollIntoView(WidgetCanvasInternal* container)
+	void scrollIntoView(GtkFrame* container)
 	{
 		auto size_loc = widgetLocationAndSize(container);
 		auto x_adj    = gtk_scrolled_window_get_hadjustment(m_root);
@@ -208,10 +196,10 @@ private:
 			    self->m_loc_init
 			    + (ScreenCoordinates{event_move->x_root, event_move->y_root} - self->m_click_loc);
 			loc_new = max(loc_new, WidgetCoordinates{0.0, 0.0});
-			fixed_layout->move(self->m_moving, loc_new);
+			fixed_layout->move(GTK_WIDGET(self->m_moving), loc_new);
 			if(self->r_eh != nullptr)
 			{
-				if(auto i = self->m_clients.find(fixed_layout); i != std::end(self->m_clients))
+				if(auto i = self->m_clients.find(self->m_moving); i != std::end(self->m_clients))
 				{ self->m_vt.on_move(self->r_eh, *self, loc_new, i->second); }
 			}
 			return TRUE;
@@ -224,12 +212,10 @@ private:
 		auto e = reinterpret_cast<GdkEventButton const*>(event);
 		if(e->button == 1)
 		{
-			auto self         = reinterpret_cast<Impl*>(user_data);
-			auto fixed_layout = asWidgetCanvasInternal(
-			    gtk_widget_get_ancestor(widget, widget_canvas_internal_get_type()));
-			gtk_overlay_reorder_overlay(self->m_handle, GTK_WIDGET(fixed_layout), -1);
-			self->m_moving   = widget;
-			self->m_loc_init = fixed_layout->location(widget);
+			auto self = reinterpret_cast<Impl*>(user_data);
+			self->m_widgets->toFront(widget);
+			self->m_moving   = GTK_FRAME(widget);
+			self->m_loc_init = self->m_widgets->location(widget);
 			self->m_click_loc =
 			    ScreenCoordinates{static_cast<double>(e->x_root), static_cast<double>(e->y_root)};
 			return TRUE;
@@ -242,8 +228,7 @@ private:
 		auto self = reinterpret_cast<Impl*>(user_data);
 		if(self->r_eh != nullptr)
 		{
-			if(auto i = self->m_clients.find(asWidgetCanvasInternal(widget));
-			   i != std::end(self->m_clients))
+			if(auto i = self->m_clients.find(GTK_FRAME(widget)); i != std::end(self->m_clients))
 			{
 				auto e = reinterpret_cast<GdkEventButton const*>(event);
 				self->m_vt.on_mouse_down(self->r_eh,
@@ -263,7 +248,7 @@ private:
 		if(self->m_moving != nullptr)
 		{
 			self->updateCanvasSize();
-			self->scrollIntoView(asWidgetCanvasInternal(gtk_widget_get_parent(self->m_moving)));
+			self->scrollIntoView(self->m_moving);
 			self->m_moving = nullptr;
 		}
 		return FALSE;
@@ -345,6 +330,11 @@ Texpainter::Ui::WidgetCanvasDetail::Impl::Impl(Container& cnt)
 	gtk_widget_set_events(
 	    frame, GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 	gtk_container_add(GTK_CONTAINER(m_handle), frame);
+
+	m_widgets = WidgetCanvasInternal::create();
+	g_signal_connect(GTK_WIDGET(m_widgets), "motion-notify-event", G_CALLBACK(mouse_move), this);
+	gtk_overlay_add_overlay(m_handle, GTK_WIDGET(m_widgets));
+
 	gtk_widget_set_size_request(GTK_WIDGET(m_root), 500, 300);
 	g_signal_connect(frame, "button-release-event", G_CALLBACK(canvas_mouse_up), this);
 	g_signal_connect(frame, "button-press-event", G_CALLBACK(canvas_mouse_down), this);
