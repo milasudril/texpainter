@@ -70,6 +70,7 @@ public:
 		m_clients.erase(i->second);
 		gtk_widget_destroy(GTK_WIDGET(i->second));
 		m_floats.erase(i);
+		updateCanvasSize();
 	}
 
 	void clientId(ClientId id) { m_client_id = id; }
