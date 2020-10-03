@@ -45,15 +45,23 @@ static void widget_canvas_internal_class_init(WidgetCanvasInternalClass* klass)
 		}
 
 		auto self = Texpainter::Ui::asWidgetCanvasInternal(widget);
-		std::ranges::for_each(self->children(), [](auto const& item) {
+		std::ranges::for_each(self->children(), [w = alloc->width, h = alloc->height](auto const& item) {
 			GtkRequisition req;
 			gtk_widget_get_preferred_size(item.first, &req, nullptr);
 
 			GtkAllocation alloc{};
-			alloc.width  = req.width;
-			alloc.height = req.height;
-			alloc.x      = item.second.x();
-			alloc.y      = item.second.y();
+			if(item.second.fullsize)
+			{
+				alloc.width  = w;
+				alloc.height = h;
+			}
+			else
+			{
+				alloc.width  = req.width;
+				alloc.height = req.height;
+				alloc.x      = item.second.loc.x();
+				alloc.y      = item.second.loc.y();
+			}
 			gtk_widget_size_allocate(item.first, &alloc);
 		});
 	};

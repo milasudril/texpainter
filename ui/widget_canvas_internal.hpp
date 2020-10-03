@@ -25,7 +25,13 @@ namespace Texpainter::Ui
 {
 	class WidgetCanvasInternal: public GtkContainer
 	{
-		using ChildrenMap = std::map<GtkWidget*, WidgetCoordinates>;
+		struct ChildInfo
+		{
+			WidgetCoordinates loc;
+			bool fullsize;
+		};
+
+		using ChildrenMap = std::map<GtkWidget*, ChildInfo>;
 
 	public:
 		static WidgetCanvasInternal* create()
@@ -35,12 +41,6 @@ namespace Texpainter::Ui
 		}
 
 		auto widgets() { return IterPair{std::begin(m_widgets), std::end(m_widgets)}; }
-
-		auto locations() const
-		{
-			return IterPair{PairSecondIterator{std::begin(m_children)},
-			                PairSecondIterator{std::end(m_children)}};
-		}
 
 		auto children() { return IterPair{std::begin(m_children), std::end(m_children)}; }
 
@@ -55,7 +55,14 @@ namespace Texpainter::Ui
 		void insert(GtkWidget* widget, WidgetCoordinates loc)
 		{
 			m_widgets.push_back(widget);
-			m_children.insert(ChildrenMap::value_type{widget, loc});
+			m_children.insert(ChildrenMap::value_type{widget, {loc, false}});
+			gtk_widget_set_parent(widget, GTK_WIDGET(this));
+		}
+
+		void insertFullsize(GtkWidget* widget)
+		{
+			m_widgets.push_back(widget);
+			m_children.insert(ChildrenMap::value_type{widget, {WidgetCoordinates{0, 0}, true}});
 			gtk_widget_set_parent(widget, GTK_WIDGET(this));
 		}
 
@@ -63,7 +70,7 @@ namespace Texpainter::Ui
 		{
 			auto i = m_children.find(widget);
 			assert(i != std::end(m_children));
-			i->second = loc;
+			i->second = {loc, false};
 			gtk_widget_queue_resize(GTK_WIDGET(this));
 		}
 
@@ -71,7 +78,7 @@ namespace Texpainter::Ui
 		{
 			auto i = m_children.find(widget);
 			assert(i != std::end(m_children));
-			return i->second;
+			return i->second.loc;
 		}
 
 		void toFront(GtkWidget* widget)
