@@ -37,21 +37,18 @@ public:
 				                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK
 				                          | GDK_BUTTON_RELEASE_MASK);
 				g_signal_connect(
-				    GTK_WIDGET(frame), "button-press-event", G_CALLBACK(button_press_fixed), this);
-				m_floats[m_client_id] = frame;
-				m_clients[frame]      = m_client_id;
-
-
-				g_signal_connect(
 				    GTK_WIDGET(frame), "button-press-event", G_CALLBACK(button_press), this);
 				g_signal_connect(
 				    GTK_WIDGET(frame), "button-release-event", G_CALLBACK(button_release), this);
+
 				gtk_frame_set_shadow_type(frame, GTK_SHADOW_OUT);
 				gtk_widget_set_margin_start(handle, 4);
 				gtk_widget_set_margin_end(handle, 4);
 				gtk_widget_set_margin_top(handle, 4);
 				gtk_widget_set_margin_bottom(handle, 4);
 				gtk_container_add(GTK_CONTAINER(frame), handle);
+				m_floats[m_client_id] = frame;
+				m_clients[frame]      = m_client_id;
 				m_widgets->insert(GTK_WIDGET(frame), m_insert_loc);
 				break;
 			}
@@ -332,7 +329,12 @@ Texpainter::Ui::WidgetCanvasDetail::Impl::Impl(Container& cnt)
 	gtk_container_add(GTK_CONTAINER(m_handle), frame);
 
 	m_widgets = WidgetCanvasInternal::create();
+	gtk_widget_set_events(GTK_WIDGET(m_widgets),
+	                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK
+	                          | GDK_BUTTON_RELEASE_MASK);
 	g_signal_connect(GTK_WIDGET(m_widgets), "motion-notify-event", G_CALLBACK(mouse_move), this);
+	g_signal_connect(
+	    GTK_WIDGET(m_widgets), "button-press-event", G_CALLBACK(button_press_fixed), this);
 	gtk_overlay_add_overlay(m_handle, GTK_WIDGET(m_widgets));
 
 	gtk_widget_set_size_request(GTK_WIDGET(m_root), 500, 300);
