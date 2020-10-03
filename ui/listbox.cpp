@@ -118,7 +118,7 @@ Texpainter::Ui::Listbox::Impl::Impl(Container& cnt): Listbox(*this), r_eh{nullpt
 	gtk_list_box_set_activate_on_single_click(m_handle, FALSE);
 	g_signal_connect(m_handle, "row-activated", G_CALLBACK(activated), this);
 	gtk_container_add(GTK_CONTAINER(scrolled_window), GTK_WIDGET(m_handle));
-	gtk_widget_set_size_request(GTK_WIDGET(scrolled_window), 128, 128);
+	gtk_widget_set_size_request(GTK_WIDGET(scrolled_window), 160, 160);
 	m_root = scrolled_window;
 	cnt.add(scrolled_window);
 }
