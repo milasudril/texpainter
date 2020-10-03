@@ -1,6 +1,7 @@
 //@	{"targets":[{"name":"widget_canvas.o","type":"object","pkgconfig_libs":["gtk+-3.0"]}]}
 
 #include "./widget_canvas.hpp"
+#include "./widget_canvas_internal.hpp"
 #include "./screen_coordinates.hpp"
 #include "./toplevel_coordinates.hpp"
 
@@ -31,8 +32,7 @@ public:
 
 			case InsertMode::Movable:
 			{
-
-				auto fixed_layout = GTK_FIXED(gtk_fixed_new());
+				auto fixed_layout = WidgetCanvasInternal::create();
 				gtk_widget_set_events(GTK_WIDGET(fixed_layout),
 				                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK
 				                          | GDK_BUTTON_RELEASE_MASK);
@@ -59,7 +59,7 @@ public:
 				gtk_widget_set_margin_end(handle, 4);
 				gtk_widget_set_margin_top(handle, 4);
 				gtk_widget_set_margin_bottom(handle, 4);
-				gtk_fixed_put(fixed_layout, GTK_WIDGET(frame), m_insert_loc.x(), m_insert_loc.y());
+				fixed_layout->insert(GTK_WIDGET(frame), m_insert_loc);
 
 				gtk_container_add(GTK_CONTAINER(frame), handle);
 				break;
@@ -147,10 +147,11 @@ private:
 		bool operator()(ClientId a, ClientId b) const { return a.value() < b.value(); }
 	};
 
-	std::map<ClientId, GtkFixed*, ClientIdCompare> m_floats;
-	std::map<GtkFixed*, ClientId> m_clients;
+	std::map<ClientId, WidgetCanvasInternal*, ClientIdCompare> m_floats;
+	std::map<WidgetCanvasInternal*, ClientId> m_clients;
 
-	std::pair<WidgetCoordinates, vec2_t> widgetLocationAndSize(GtkFixed* container) const
+	std::pair<WidgetCoordinates, vec2_t> widgetLocationAndSize(
+	    WidgetCanvasInternal* container) const
 	{
 		int x{};
 		int y{};
@@ -166,7 +167,7 @@ private:
 		                 vec2_t{static_cast<double>(w), static_cast<double>(h)}};
 	}
 
-	std::pair<GtkFixed*, Size2d> calculateCanvasSize() const
+	std::pair<WidgetCanvasInternal*, Size2d> calculateCanvasSize() const
 	{
 		auto i      = std::ranges::max_element(m_clients, [this](auto const& a, auto const& b) {
             auto box_a    = widgetLocationAndSize(a.first);
@@ -186,7 +187,7 @@ private:
 		    i->first, Size2d{static_cast<uint32_t>(corner.x()), static_cast<uint32_t>(corner.y())}};
 	}
 
-	void scrollIntoView(GtkFixed* container)
+	void scrollIntoView(WidgetCanvasInternal* container)
 	{
 		auto size_loc = widgetLocationAndSize(container);
 		auto x_adj    = gtk_scrolled_window_get_hadjustment(m_root);
@@ -201,13 +202,13 @@ private:
 		auto self = reinterpret_cast<Impl*>(user_data);
 		if(self->m_moving != nullptr)
 		{
-			auto fixed_layout = GTK_FIXED(widget);
+			auto fixed_layout = asWidgetCanvasInternal(widget);
 			auto event_move   = reinterpret_cast<GdkEventMotion const*>(event);
 			auto loc_new =
 			    self->m_loc_init
 			    + (ScreenCoordinates{event_move->x_root, event_move->y_root} - self->m_click_loc);
 			loc_new = max(loc_new, WidgetCoordinates{0.0, 0.0});
-			gtk_fixed_move(fixed_layout, self->m_moving, loc_new.x(), loc_new.y());
+			fixed_layout->move(self->m_moving, loc_new);
 			if(self->r_eh != nullptr)
 			{
 				if(auto i = self->m_clients.find(fixed_layout); i != std::end(self->m_clients))
@@ -224,29 +225,13 @@ private:
 		if(e->button == 1)
 		{
 			auto self         = reinterpret_cast<Impl*>(user_data);
-			auto fixed_layout = gtk_widget_get_ancestor(widget, GTK_TYPE_FIXED);
-			gtk_overlay_reorder_overlay(self->m_handle, fixed_layout, -1);
-			self->m_moving = widget;
-
-			{
-				GValue val_x{};
-				g_value_init(&val_x, G_TYPE_INT);
-				gtk_container_child_get_property(
-				    GTK_CONTAINER(fixed_layout), self->m_moving, "x", &val_x);
-
-				GValue val_y{};
-				g_value_init(&val_y, G_TYPE_INT);
-				gtk_container_child_get_property(
-				    GTK_CONTAINER(fixed_layout), self->m_moving, "y", &val_y);
-
-				self->m_loc_init = WidgetCoordinates{static_cast<double>(g_value_get_int(&val_x)),
-				                                     static_cast<double>(g_value_get_int(&val_y))};
-			}
-
-			{
-				self->m_click_loc = ScreenCoordinates{static_cast<double>(e->x_root),
-				                                      static_cast<double>(e->y_root)};
-			}
+			auto fixed_layout = asWidgetCanvasInternal(
+			    gtk_widget_get_ancestor(widget, widget_canvas_internal_get_type()));
+			gtk_overlay_reorder_overlay(self->m_handle, GTK_WIDGET(fixed_layout), -1);
+			self->m_moving   = widget;
+			self->m_loc_init = fixed_layout->location(widget);
+			self->m_click_loc =
+			    ScreenCoordinates{static_cast<double>(e->x_root), static_cast<double>(e->y_root)};
 			return TRUE;
 		}
 		return FALSE;
@@ -257,7 +242,8 @@ private:
 		auto self = reinterpret_cast<Impl*>(user_data);
 		if(self->r_eh != nullptr)
 		{
-			if(auto i = self->m_clients.find(GTK_FIXED(widget)); i != std::end(self->m_clients))
+			if(auto i = self->m_clients.find(asWidgetCanvasInternal(widget));
+			   i != std::end(self->m_clients))
 			{
 				auto e = reinterpret_cast<GdkEventButton const*>(event);
 				self->m_vt.on_mouse_down(self->r_eh,
@@ -277,7 +263,7 @@ private:
 		if(self->m_moving != nullptr)
 		{
 			self->updateCanvasSize();
-			self->scrollIntoView(GTK_FIXED(gtk_widget_get_parent(self->m_moving)));
+			self->scrollIntoView(asWidgetCanvasInternal(gtk_widget_get_parent(self->m_moving)));
 			self->m_moving = nullptr;
 		}
 		return FALSE;
