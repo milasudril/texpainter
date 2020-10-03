@@ -34,6 +34,7 @@ static void widget_canvas_internal_class_init(WidgetCanvasInternalClass* klass)
 
 	widget_class->size_allocate = [](GtkWidget* widget, GtkAllocation* alloc) {
 		gtk_widget_set_allocation(widget, alloc);
+		printf("%d %d %d %d\n", alloc->width, alloc->height, alloc->x, alloc->y);
 		if(gtk_widget_get_has_window(widget))
 		{
 			if(gtk_widget_get_realized(widget))

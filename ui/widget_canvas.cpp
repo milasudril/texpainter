@@ -182,11 +182,12 @@ private:
 		gtk_adjustment_set_value(y_adj, size_loc.first.y());
 	}
 
-	static gboolean mouse_move(GtkWidget* widget, GdkEvent* event, gpointer user_data)
+	static gboolean widgets_mouse_move(GtkWidget* widget, GdkEvent* event, gpointer user_data)
 	{
 		auto self = reinterpret_cast<Impl*>(user_data);
 		if(self->m_moving != nullptr)
 		{
+			printf("Widgets mouse-move\n");
 			auto fixed_layout = asWidgetCanvasInternal(widget);
 			auto event_move   = reinterpret_cast<GdkEventMotion const*>(event);
 			auto loc_new =
@@ -199,7 +200,7 @@ private:
 				if(auto i = self->m_clients.find(self->m_moving); i != std::end(self->m_clients))
 				{ self->m_vt.on_move(self->r_eh, *self, loc_new, i->second); }
 			}
-			return TRUE;
+			return FALSE;
 		}
 		return FALSE;
 	}
@@ -234,10 +235,10 @@ private:
 		return FALSE;
 	}
 
-	static gboolean button_press_fixed(GtkWidget*, GdkEvent*, gpointer user_data)
+	static gboolean widgets_button_press(GtkWidget*, GdkEvent*, gpointer user_data)
 	{
 		auto self = reinterpret_cast<Impl*>(user_data);
-		if(self->r_eh != nullptr) {}
+		if(self->r_eh != nullptr) { puts("Hej sadfh"); }
 		return FALSE;
 	}
 
@@ -278,7 +279,11 @@ private:
 		return FALSE;
 	}
 
-	static gboolean canvas_mouse_down(GtkWidget*, GdkEvent*, gpointer) { return FALSE; }
+	static gboolean canvas_mouse_down(GtkWidget*, GdkEvent*, gpointer)
+	{
+		puts("canvas_mouse_down");
+		return FALSE;
+	}
 
 	static gboolean canvas_mouse_up(GtkWidget*, GdkEvent* event, gpointer user_data)
 	{
@@ -328,15 +333,17 @@ Texpainter::Ui::WidgetCanvasDetail::Impl::Impl(Container& cnt)
 	auto frame = gtk_drawing_area_new();
 	gtk_widget_set_events(
 	    frame, GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
-	gtk_container_add(GTK_CONTAINER(m_handle), frame);
 
 	m_widgets = WidgetCanvasInternal::create();
 	gtk_widget_set_events(GTK_WIDGET(m_widgets),
 	                      GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK
 	                          | GDK_BUTTON_RELEASE_MASK);
-	g_signal_connect(GTK_WIDGET(m_widgets), "motion-notify-event", G_CALLBACK(mouse_move), this);
-//	g_signal_connect(
-//	    GTK_WIDGET(m_widgets), "button-press-event", G_CALLBACK(button_press_fixed), this);
+	g_signal_connect(
+	    GTK_WIDGET(m_widgets), "motion-notify-event", G_CALLBACK(widgets_mouse_move), this);
+	g_signal_connect(
+	    GTK_WIDGET(m_widgets), "button-press-event", G_CALLBACK(widgets_button_press), this);
+
+	gtk_container_add(GTK_CONTAINER(m_handle), frame);
 	gtk_overlay_add_overlay(m_handle, GTK_WIDGET(m_widgets));
 
 	gtk_widget_set_size_request(GTK_WIDGET(m_root), 500, 300);
