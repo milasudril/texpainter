@@ -37,6 +37,11 @@ namespace Texpainter::Ui
 
 		void remove(GtkWidget* widget) { m_children.erase(widget); }
 
+		void insert(GtkWidget* widget, WidgetCoordinates loc)
+		{
+			m_children.insert(ChildrenMap::value_type{widget, loc});
+		}
+
 	private:
 		ChildrenMap m_children;
 	};
