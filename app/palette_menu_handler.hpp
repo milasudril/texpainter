@@ -13,6 +13,7 @@
 #include "ui/dialog.hpp"
 #include "ui/labeled_input.hpp"
 #include "ui/text_entry.hpp"
+#include "ui/error_message_dialog.hpp"
 #include "utils/polymorphic_rng.hpp"
 #include "utils/inherit_from.hpp"
 
@@ -115,13 +116,19 @@ namespace Texpainter
 			m_new_generated_dlg.reset();
 		}
 
+		template<auto id, class... T>
+		void handleException(char const* msg, T&...)
+		{
+			m_err_display.show(r_dlg_owner, "Texpainter", msg);
+		}
+
 	private:
 		PolymorphicRng m_rng;
 		Ui::Container& r_dlg_owner;
 
 		std::unique_ptr<PaletteCreateDlg> m_new_empty_dlg;
 		std::unique_ptr<PaletteGenerateDlg> m_new_generated_dlg;
-
+		Ui::ErrorMessageDialog m_err_display;
 
 		void insertNewPalette(std::string&& palette_name,
 		                      PixelStore::Palette&& palette,

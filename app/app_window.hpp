@@ -25,6 +25,7 @@
 #include "ui/separator.hpp"
 #include "ui/slider.hpp"
 #include "ui/keyboard_state.hpp"
+#include "ui/error_message_dialog.hpp"
 
 #include <numbers>
 

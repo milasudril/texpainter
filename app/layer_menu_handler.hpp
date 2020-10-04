@@ -16,6 +16,7 @@
 #include "ui/dialog.hpp"
 #include "ui/text_entry.hpp"
 #include "ui/labeled_input.hpp"
+#include "ui/error_message_dialog.hpp"
 
 #include <random>
 #include <functional>
@@ -584,6 +585,12 @@ namespace Texpainter
 			m_compositing_opts.reset();
 		}
 
+		template<auto id, class... T>
+		void handleException(char const* msg, T&...)
+		{
+			m_err_display.show(r_dlg_owner, "Texpainter", msg);
+		}
+
 	private:
 		Ui::Container& r_dlg_owner;
 		PolymorphicRng m_rng;
@@ -598,6 +605,8 @@ namespace Texpainter
 		std::unique_ptr<LayerCreatorDlg> m_new_from_noise;
 
 		std::unique_ptr<CompositingOptionsDlg> m_compositing_opts;
+
+		Ui::ErrorMessageDialog m_err_display;
 
 		void insertNewLayer(std::string&& layer_name, Model::Layer&& layer, Model::Document& doc)
 		{

@@ -11,6 +11,7 @@
 #include "./menu_action_callback.hpp"
 
 #include "ui/dialog.hpp"
+#include "ui/error_message_dialog.hpp"
 #include "utils/inherit_from.hpp"
 
 namespace Texpainter
@@ -108,6 +109,12 @@ namespace Texpainter
 
 		void dismiss(Tag<ControlId::SetCanvasSize>, CanvasSizeDialog&) { m_canvas_dlg.reset(); }
 
+		template<auto id, class... T>
+		void handleException(char const* msg, T&...)
+		{
+			m_err_display.show(r_dlg_owner, "Texpainter", msg);
+		}
+
 	private:
 		Size2d m_default_size;
 
@@ -115,6 +122,7 @@ namespace Texpainter
 
 		std::unique_ptr<NewDocDialog> m_new_dlg;
 		std::unique_ptr<CanvasSizeDialog> m_canvas_dlg;
+		Ui::ErrorMessageDialog m_err_display;
 	};
 }
 

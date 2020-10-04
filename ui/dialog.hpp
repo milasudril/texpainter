@@ -7,6 +7,7 @@
 #include "./button.hpp"
 #include "./box.hpp"
 #include "./filler.hpp"
+
 #include "utils/add_member_if.hpp"
 #include "utils/constructible_from.hpp"
 
@@ -147,11 +148,11 @@ namespace Texpainter::Ui
 		Dialog(Dialog&&)            = delete;
 
 		template<class... WidgetParams>
-		Dialog(Container& owner,
-		       char const* title,
-		       WidgetParams&&... params) requires ConstructibleFrom<Widget,
-		                                                            Container&,
-		                                                            WidgetParams...>
+		explicit Dialog(Container& owner,
+		                char const* title,
+		                WidgetParams&&... params) requires ConstructibleFrom<Widget,
+		                                                                     Container&,
+		                                                                     WidgetParams...>
 		    : m_window(title, &owner),
 		      m_content(m_window, Box::Orientation::Vertical),
 		      m_widget(m_content.insertMode({2, Box::Fill | Box::Expand}),
@@ -168,13 +169,13 @@ namespace Texpainter::Ui
 		}
 
 		template<class WidgetData, class... WidgetParams>
-		Dialog(WidgetData&& data,
-		       Container& owner,
-		       char const* title,
-		       WidgetParams&&... params) requires ConstructibleFrom<Widget,
-		                                                            WidgetData,
-		                                                            Container&,
-		                                                            WidgetParams...>
+		explicit Dialog(WidgetData&& data,
+		                Container& owner,
+		                char const* title,
+		                WidgetParams&&... params) requires ConstructibleFrom<Widget,
+		                                                                     WidgetData,
+		                                                                     Container&,
+		                                                                     WidgetParams...>
 		    : m_window(title, &owner),
 		      m_content(m_window, Box::Orientation::Vertical),
 		      m_widget(std::forward<WidgetData>(data),
@@ -264,7 +265,7 @@ namespace Texpainter::Ui
 		template<auto, class... T>
 		void handleException(char const* msg, T&...)
 		{
-			fprintf(stderr, "%s\n", msg);
+			m_vtable.handle_exception(r_cb_obj, msg, *this);
 		}
 
 	private:
@@ -430,6 +431,10 @@ namespace Texpainter::Ui
 				    call<tag.value, ConfirmPos, Callback, has_confirm_pos()>::callback);
 				User1::value(call<tag.value, User1, Callback, has_user_1()>::callback);
 				User2::value(call<tag.value, User2, Callback, has_user_2()>::callback);
+				do_handle_exception = [](void* cb_obj, char const* msg, Dialog& self) {
+					reinterpret_cast<Callback*>(cb_obj)->template handleException<IdTag::value>(
+					    msg, self);
+				};
 			}
 
 			void dismiss(void* cb_obj, Dialog& dlg) { Dismiss::value()(cb_obj, dlg); }
@@ -441,6 +446,11 @@ namespace Texpainter::Ui
 			void user_1(void* cb_obj, Dialog& dlg) { User1::value()(cb_obj, dlg); }
 
 			void user_2(void* cb_obj, Dialog& dlg) { User2::value()(cb_obj, dlg); }
+
+			void handle_exception(void* cb_obj, char const* msg, Dialog& dlg)
+			{
+				do_handle_exception(cb_obj, msg, dlg);
+			}
 
 		private:
 			template<auto id, class Action, class Callback, bool enable>
@@ -493,6 +503,8 @@ namespace Texpainter::Ui
 					reinterpret_cast<Callback*>(cb_obj)->template user2<id>(self);
 				}
 			};
+
+			void (*do_handle_exception)(void* cb_obj, char const* msg, Dialog& self);
 		};
 
 		void focus_select()

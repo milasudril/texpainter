@@ -132,6 +132,13 @@ namespace Texpainter
 			m_color_picker.reset();
 		}
 
+		template<auto id>
+		void handleException(char const* msg, ColorPicker&)
+		{
+			fprintf(stderr, "Error occured in ColorPicker: %s\n", msg);
+			std::terminate();
+		}
+
 	private:
 		PolymorphicRng m_rng;
 		std::array<PixelStore::Pixel, 8> m_color_history;
