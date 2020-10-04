@@ -617,9 +617,7 @@ namespace Texpainter
 		void insertNewLayer(std::string&& layer_name, Model::Layer&& layer, Model::Document& doc)
 		{
 			doc.layersModify([layer_name, &layer](auto& layers) {
-				auto ip = layers.insert(std::make_pair(std::string{layer_name}, std::move(layer)));
-				if(!ip.second)
-				{ throw std::string{"A layer called “"} + layer_name + "” already exists."; }
+				insertOrThrow(layers, layer_name, std::move(layer));
 				return true;
 			});
 			doc.currentLayer(std::move(layer_name));

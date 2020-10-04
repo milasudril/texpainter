@@ -6,6 +6,7 @@
 #include "./iter_pair.hpp"
 #include "./pair_iterator.hpp"
 #include "./deref_iterator.hpp"
+#include "./to_string.hpp"
 
 #include <map>
 #include <memory>
@@ -177,6 +178,14 @@ namespace Texpainter
 		std::vector<Value*> m_seq;
 		std::vector<Key const*> m_key_seq;
 	};
+
+	template<class Key, class Value, class IndexType = size_t>
+	void insertOrThrow(SortedSequence<Key, Value, IndexType>& seq, Key const& key, Value&& value)
+	{
+		auto ip = seq.insert(std::pair{key, std::move(value)});
+		if(!ip.second)
+		{ throw std::string{"An item with name "} + toString(key) + " already exists."; }
+	}
 }
 
 #endif

@@ -140,9 +140,8 @@ namespace Texpainter
 		                      PixelStore::Palette&& palette,
 		                      Model::Document& doc)
 		{
-			doc.palettesModify([palette_name, &palette](auto& palettes) mutable noexcept {
-				// FIXME: Unique name generator...
-				palettes.insert(std::make_pair(std::move(palette_name), std::move(palette)));
+			doc.palettesModify([palette_name, &palette](auto& palettes) {
+				insertOrThrow(palettes, palette_name, std::move(palette));
 				return true;
 			});
 			doc.currentPalette(std::move(palette_name));
