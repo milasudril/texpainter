@@ -30,6 +30,8 @@ struct MainwinEventHandler
 		r_app.onKeyUp(key);
 	}
 
+	void handleException(char const* msg) { r_app.handleException(msg); }
+
 	T& r_app;
 };
 

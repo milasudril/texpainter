@@ -7,6 +7,7 @@
 #define TEXPAINTER_UI_CHECKABLEMENUITEM_HPP
 
 #include "./container.hpp"
+#include "./dispatch_event.hpp"
 
 #include <utility>
 
@@ -34,7 +35,14 @@ namespace Texpainter::Ui
 		{
 			return eventHandler(&eh, [](void* eh, CheckableMenuItem& self) {
 				auto& obj = *reinterpret_cast<EventHandler*>(eh);
-				obj.template onActivated<id>(self);
+				dispatchEvent(
+				    [](EventHandler& eh, CheckableMenuItem& self, auto&&... args) {
+					    self.toggle();
+					    eh.template onActivated<id>(self, std::forward<decltype(args)>(args)...);
+					    self.toggle();
+				    },
+				    obj,
+				    self);
 			});
 		}
 

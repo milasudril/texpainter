@@ -7,6 +7,8 @@
 #define TEXPAINTER_UI_IMAGEVIEW_HPP
 
 #include "./container.hpp"
+#include "./dispatch_event.hpp"
+
 #include "pixel_store/image.hpp"
 
 #include <utility>
@@ -46,19 +48,19 @@ namespace Texpainter::Ui
 			        vec2_t loc_screen,
 			        int button) {
 				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				     obj.template onMouseUp<id>(self, loc_window, loc_screen, button);
+				     dispatchEvent(
+				         [](EventHandler& eh, auto&&... args) {
+					         eh.template onMouseUp<id>(std::forward<decltype(args)>(args)...);
+				         },
+				         obj,
+				         self,
+				         loc_window,
+				         loc_screen,
+				         button);
 			     },
 			     [](void* event_handler, ImageView& self, vec2_t loc_window, vec2_t loc_screen) {
 				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
 				     obj.template onMouseMove<id>(self, loc_window, loc_screen);
-			     },
-			     [](void* event_handler, ImageView& self, int scancode) {
-				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				     obj.template onKeyDown<id>(self, scancode);
-			     },
-			     [](void* event_handler, ImageView& self, int scancode) {
-				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				     obj.template onKeyUp<id>(self, scancode);
 			     }});
 		}
 
@@ -94,8 +96,6 @@ namespace Texpainter::Ui
 			                        ImageView& self,
 			                        vec2_t loc_window,
 			                        vec2_t loc_screen);
-			void (*on_key_down)(void* event_handler, ImageView& self, int scancode);
-			void (*on_key_up)(void* event_handler, ImageView& self, int scancode);
 		};
 		ImageView& eventHandler(void* event_handler, EventHandlerVtable const& vtable);
 	};

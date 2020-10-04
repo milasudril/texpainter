@@ -261,6 +261,8 @@ namespace Texpainter::Ui
 
 		void show() { m_window.show(); }
 
+		void handleException(char const* msg) { puts(msg); }
+
 	private:
 		void initButtons()
 		{

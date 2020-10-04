@@ -134,16 +134,6 @@ namespace Texpainter
 		void onMouseMove(Ui::ImageView& view, vec2_t loc_window, vec2_t loc_screen);
 
 		template<ControlId>
-		void onKeyDown(Ui::ImageView&, int)
-		{
-		}
-
-		template<ControlId>
-		void onKeyUp(Ui::ImageView&, int)
-		{
-		}
-
-		template<ControlId>
 		void onMouseDown(Ui::PaletteView&, PixelStore::ColorIndex, int)
 		{
 		}
@@ -181,6 +171,8 @@ namespace Texpainter
 			update();
 			m_rows.killFocus();
 		}
+
+		void handleException(char const* msg) { fprintf(stderr, "%s\n", msg); }
 
 	private:
 		DocumentManager m_documents;

@@ -54,6 +54,8 @@ namespace Texpainter
 		template<ControlId>
 		void onChanged(Ui::TextEntry& entry);
 
+		void handleException(char const* msg) { fprintf(stderr, "%s\n", msg); }
+
 	private:
 		Ui::Box m_root;
 		Ui::LabeledInput<Ui::TextEntry> m_width;

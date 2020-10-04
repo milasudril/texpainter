@@ -314,6 +314,12 @@ namespace Texpainter
 
 		std::map<FilterGraph::NodeId, vec2_t> nodeLocations() const;
 
+		void handleException(char const* msg)
+		{
+			// TODO: redirect to r_eh
+			fprintf(stderr, "%s\n", msg);
+		}
+
 	private:
 		FilterGraph::Graph m_graph;
 		void* r_eh;

@@ -9,6 +9,7 @@
 #include "./container.hpp"
 #include "./box.hpp"
 #include "./toplevel_coordinates.hpp"
+#include "./dispatch_event.hpp"
 
 #include "pixel_store/pixel.hpp"
 
@@ -40,7 +41,12 @@ namespace Texpainter::Ui
 		{
 			return eventHandler(&eh, [](void* event_handler, FilledShape& self) {
 				auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				obj.template onClicked<id>(self);
+				dispatchEvent(
+				    [](EventHandler& eh, auto&&... args) {
+					    eh.template onClicked<id>(std::forward<decltype(args)>(args)...);
+				    },
+				    obj,
+				    self);
 			});
 		}
 

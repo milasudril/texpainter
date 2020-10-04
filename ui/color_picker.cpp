@@ -266,6 +266,12 @@ public:
 	template<ControlId>
 	void onChanged(Texpainter::Ui::TextEntry&);
 
+	[[noreturn]] void handleException(char const* msg)
+	{
+		fprintf(stderr, "Fatal error: %s\n", msg);
+		std::terminate();
+	}
+
 private:
 	PixelStore::Hsi m_hsi;
 	PixelStore::Image m_colors_cache;

@@ -7,8 +7,10 @@
 #define TEXPAINTER_UI_BUTTON_HPP
 
 #include "./container.hpp"
+#include "./dispatch_event.hpp"
 
 #include <utility>
+#include <exception>
 
 namespace Texpainter::Ui
 {
@@ -31,7 +33,14 @@ namespace Texpainter::Ui
 		{
 			return eventHandler(&eh, [](void* event_handler, Button& self) {
 				auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				obj.template onClicked<id>(self);
+				dispatchEvent(
+				    [](EventHandler& eh, Button& btn, auto&&... args) {
+					    btn.toggle();
+					    eh.template onClicked<id>(btn, std::forward<decltype(args)>(args)...);
+					    btn.toggle();
+				    },
+				    obj,
+				    self);
 			});
 		}
 
@@ -40,6 +49,8 @@ namespace Texpainter::Ui
 		Button& label(const char* text);
 
 		Button& state(bool s) noexcept;
+
+		Button& toggle() { return state(!state()); }
 
 		bool state() const noexcept;
 

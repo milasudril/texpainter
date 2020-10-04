@@ -91,6 +91,12 @@ namespace Texpainter
 			r_callback(r_eh, *this);
 		}
 
+		void handleException(char const* msg)
+		{
+			// TODO: r_eh...
+			fprintf(stderr, "%s\n", msg);
+		}
+
 	private:
 		void* r_eh;
 		void (*r_callback)(void* eh, CompositingOptionsEditor& self);

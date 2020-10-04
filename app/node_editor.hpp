@@ -78,6 +78,8 @@ namespace Texpainter
 				r_eh->onClicked(*this);
 			}
 
+			void handleException(char const* msg) { r_eh->handleException(msg); }
+
 		private:
 			EventHandler* r_eh;
 			type m_port;
@@ -213,6 +215,8 @@ namespace Texpainter
 		{
 			r_eh->onChanged(*this, input.name(), input.value());
 		}
+
+		void handleException(char const* msg) { r_eh->handleException(msg); }
 
 	private:
 		std::reference_wrapper<FilterGraph::Node> r_node;

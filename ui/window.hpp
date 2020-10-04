@@ -8,6 +8,7 @@
 
 #include "./container.hpp"
 #include "./scancode.hpp"
+#include "./dispatch_event.hpp"
 
 #include "utils/size_2d.hpp"
 
@@ -42,19 +43,37 @@ namespace Texpainter::Ui
 		template<auto id, class EventHandler>
 		Window& eventHandler(EventHandler& eh)
 		{
-			return eventHandler(&eh,
-			                    {[](void* event_handler, Window& self) {
-				                     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				                     obj.template onClose<id>(self);
-			                     },
-			                     [](void* event_handler, Window& self, Scancode key) {
-				                     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				                     obj.template onKeyDown<id>(self, key);
-			                     },
-			                     [](void* event_handler, Window& self, Scancode key) {
-				                     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				                     obj.template onKeyUp<id>(self, key);
-			                     }});
+			return eventHandler(
+			    &eh,
+			    {[](void* event_handler, Window& self) {
+				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				     dispatchEvent(
+				         [](EventHandler& eh, auto&&... args) {
+					         eh.template onClose<id>(std::forward<decltype(args)>(args)...);
+				         },
+				         obj,
+				         self);
+			     },
+			     [](void* event_handler, Window& self, Scancode key) {
+				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				     dispatchEvent(
+				         [](EventHandler& eh, auto&&... args) {
+					         eh.template onKeyDown<id>(std::forward<decltype(args)>(args)...);
+				         },
+				         obj,
+				         self,
+				         key);
+			     },
+			     [](void* event_handler, Window& self, Scancode key) {
+				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				     dispatchEvent(
+				         [](EventHandler& eh, auto&&... args) {
+					         eh.template onKeyUp<id>(std::forward<decltype(args)>(args)...);
+				         },
+				         obj,
+				         self,
+				         key);
+			     }});
 		}
 
 		Window& modal(bool state);

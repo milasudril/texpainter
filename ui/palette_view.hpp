@@ -7,6 +7,7 @@
 #define TEXPAINTER_UI_PALETTEVIEW_HPP
 
 #include "./container.hpp"
+#include "./dispatch_event.hpp"
 
 #include "pixel_store/palette.hpp"
 #include "utils/size_2d.hpp"
@@ -39,14 +40,28 @@ namespace Texpainter::Ui
 			        PixelStore::ColorIndex index,
 			        int button) {
 				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				     obj.template onMouseDown<id>(self, index, button);
+				     dispatchEvent(
+				         [](EventHandler& eh, auto&&... args) {
+					         eh.template onMouseDown<id>(std::forward<decltype(args)>(args)...);
+				         },
+				         obj,
+				         self,
+				         index,
+				         button);
 			     },
 			     [](void* event_handler,
 			        PaletteView& self,
 			        PixelStore::ColorIndex index,
 			        int button) {
 				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				     obj.template onMouseUp<id>(self, index, button);
+				     dispatchEvent(
+				         [](EventHandler& eh, auto&&... args) {
+					         eh.template onMouseUp<id>(std::forward<decltype(args)>(args)...);
+				         },
+				         obj,
+				         self,
+				         index,
+				         button);
 			     },
 			     [](void* event_handler, PaletteView& self, PixelStore::ColorIndex index) {
 				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);

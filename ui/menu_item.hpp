@@ -7,6 +7,7 @@
 #define TEXPAINTER_UI_MENUITEM_HPP
 
 #include "./container.hpp"
+#include "./dispatch_event.hpp"
 
 #include <utility>
 
@@ -31,7 +32,12 @@ namespace Texpainter::Ui
 		{
 			return eventHandler(&eh, [](void* eh, MenuItem& self) {
 				auto& obj = *reinterpret_cast<EventHandler*>(eh);
-				obj.template onActivated<id>(self);
+				dispatchEvent(
+				    [](EventHandler& eh, auto&&... args) {
+					    eh.template onActivated<id>(std::forward<decltype(args)>(args)...);
+				    },
+				    obj,
+				    self);
 			});
 		}
 

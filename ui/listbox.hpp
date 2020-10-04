@@ -7,6 +7,7 @@
 #define TEXPAINTER_UI_LISTBOX_HPP
 
 #include "./container.hpp"
+#include "./dispatch_event.hpp"
 
 #include <utility>
 
@@ -42,7 +43,13 @@ namespace Texpainter::Ui
 		{
 			return eventHandler(&eh, [](void* event_handler, Listbox& self, int index) {
 				auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				obj.template onActivated<id>(self, index);
+				dispatchEvent(
+				    [](EventHandler& eh, auto&&... args) {
+					    eh.template onActivated<id>(std::forward<decltype(args)>(args)...);
+				    },
+				    obj,
+				    self,
+				    index);
 			});
 		}
 

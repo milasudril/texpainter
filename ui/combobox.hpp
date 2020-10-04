@@ -7,6 +7,7 @@
 #define TEXPAINTER_UI_COMBOBOX_HPP
 
 #include "./container.hpp"
+#include "./dispatch_event.hpp"
 
 #include <utility>
 
@@ -47,7 +48,12 @@ namespace Texpainter::Ui
 		{
 			return eventHandler(&eh, [](void* event_handler, Combobox& self) {
 				auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				obj.template onChanged<id>(self);
+				dispatchEvent(
+				    [](EventHandler& eh, auto&&... args) {
+					    eh.template onChanged<id>(std::forward<decltype(args)>(args)...);
+				    },
+				    obj,
+				    self);
 			});
 		}
 
