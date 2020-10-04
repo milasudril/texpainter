@@ -63,7 +63,7 @@ namespace Texpainter
 		{
 		public:
 			explicit LayerActionParams(std::reference_wrapper<Model::Layer const> layer,
-			                           std::reference_wrapper<std::string const> layer_name,
+			                           std::reference_wrapper<Model::ItemName const> layer_name,
 			                           Model::Document& doc,
 			                           SimpleCallback on_completed)
 			    : m_layer{layer}
@@ -74,13 +74,13 @@ namespace Texpainter
 			}
 
 			Model::Layer const& layer() const { return m_layer; }
-			std::string const& layerName() const { return m_layer_name; }
+			Model::ItemName const& layerName() const { return m_layer_name; }
 			Model::Document& document() { return m_doc; }
 			void finalize() { m_on_completed(); }
 
 		private:
 			std::reference_wrapper<Model::Layer const> m_layer;
-			std::reference_wrapper<std::string const> m_layer_name;
+			std::reference_wrapper<Model::ItemName const> m_layer_name;
 			std::reference_wrapper<Model::Document> m_doc;
 			SimpleCallback m_on_completed;
 		};
@@ -329,7 +329,7 @@ namespace Texpainter
 
 		void confirmPositive(Tag<ControlId::Copy>, NameInputDlg& src)
 		{
-			insertNewLayer(src.widget().inputField().content(),
+			insertNewLayer(Model::ItemName{src.widget().inputField().content()},
 			               src.widget().layer().copiedLayer(),
 			               src.widget().document());
 			src.widget().finalize();
@@ -341,7 +341,7 @@ namespace Texpainter
 
 		void confirmPositive(Tag<ControlId::Link>, NameInputDlg& src)
 		{
-			insertNewLayer(src.widget().inputField().content(),
+			insertNewLayer(Model::ItemName{src.widget().inputField().content()},
 			               src.widget().layer().linkedLayer(),
 			               src.widget().document());
 			src.widget().finalize();
@@ -370,13 +370,14 @@ namespace Texpainter
 
 		void confirmPositive(Tag<ControlId::Rename>, NameInputDlg& src)
 		{
-			src.widget().document().layersModify([&layer   = src.widget().layerName(),
-			                                      new_name = src.widget().inputField().content(),
-			                                      &doc = src.widget().document()](auto& layers) {
-				layers.rename(layer, new_name);
-				doc.currentLayer(new_name);
-				return true;
-			});
+			src.widget().document().layersModify(
+			    [&layer   = src.widget().layerName(),
+			     new_name = Model::ItemName{src.widget().inputField().content()},
+			     &doc     = src.widget().document()](auto& layers) {
+				    layers.rename(layer, Model::ItemName{new_name});
+				    doc.currentLayer(Model::ItemName{new_name});
+				    return true;
+			    });
 
 			src.widget().finalize();
 			m_rename_dlg.reset();
@@ -614,7 +615,9 @@ namespace Texpainter
 
 		Ui::ErrorMessageDialog m_err_display;
 
-		void insertNewLayer(std::string&& layer_name, Model::Layer&& layer, Model::Document& doc)
+		void insertNewLayer(Model::ItemName&& layer_name,
+		                    Model::Layer&& layer,
+		                    Model::Document& doc)
 		{
 			doc.layersModify([layer_name, &layer](auto& layers) {
 				insertOrThrow(layers, layer_name, std::move(layer));

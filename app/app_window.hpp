@@ -326,7 +326,7 @@ namespace Texpainter
 		auto const& layers     = current_document.layers();
 		if(auto layer_name = layers.key(index); layer_name != nullptr)
 		{
-			current_document.currentLayer(std::string{*layer_name});
+			current_document.currentLayer(Model::ItemName{*layer_name});
 			updateLayerInfo();
 			doRender();
 		}
@@ -365,7 +365,7 @@ namespace Texpainter
 		auto const& palettes   = current_document.palettes();
 		if(auto pal_name = palettes.key(index); pal_name != nullptr)
 		{
-			current_document.currentPalette(std::string{*pal_name});
+			current_document.currentPalette(Model::ItemName{*pal_name});
 			m_pal_view.palette(*palettes[index])
 			    .highlightMode(current_document.currentColor(),
 			                   Ui::PaletteView::HighlightMode::Read);

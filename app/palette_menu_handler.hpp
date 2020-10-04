@@ -79,7 +79,7 @@ namespace Texpainter
 
 		void confirmPositive(Tag<ControlId::NewEmpty>, PaletteCreateDlg& src)
 		{
-			auto palette_name = src.widget().inputField().content();
+			auto palette_name = Model::ItemName{src.widget().inputField().content()};
 			insertNewPalette(
 			    std::move(palette_name), PixelStore::Palette{23}, src.widget().first.get());
 			src.widget().second();
@@ -136,7 +136,7 @@ namespace Texpainter
 		std::unique_ptr<PaletteGenerateDlg> m_new_generated_dlg;
 		Ui::ErrorMessageDialog m_err_display;
 
-		void insertNewPalette(std::string&& palette_name,
+		void insertNewPalette(Model::ItemName&& palette_name,
 		                      PixelStore::Palette&& palette,
 		                      Model::Document& doc)
 		{

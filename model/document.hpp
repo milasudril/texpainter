@@ -7,6 +7,7 @@
 #include "./layer.hpp"
 #include "./layer_index.hpp"
 #include "./brush.hpp"
+#include "./item_name.hpp"
 
 #include "pixel_store/palette.hpp"
 #include "pixel_store/color_index.hpp"
@@ -21,8 +22,8 @@ namespace Texpainter::Model
 	class Document
 	{
 	public:
-		using LayerStack        = SortedSequence<std::string, Layer, LayerIndex>;
-		using PaletteCollection = SortedSequence<std::string, PixelStore::Palette, PaletteIndex>;
+		using LayerStack        = SortedSequence<ItemName, Layer, LayerIndex>;
+		using PaletteCollection = SortedSequence<ItemName, PixelStore::Palette, PaletteIndex>;
 
 		explicit Document(Size2d canvas_size)
 		    : m_canvas_size{canvas_size}
@@ -61,9 +62,9 @@ namespace Texpainter::Model
 			return m_dirty;
 		}
 
-		std::string const& currentLayer() const { return m_current_layer; }
+		auto const& currentLayer() const { return m_current_layer; }
 
-		Document& currentLayer(std::string&& current_layer)
+		Document& currentLayer(ItemName&& current_layer)
 		{
 			assert(m_layers[current_layer] != nullptr);
 			m_current_layer = std::move(current_layer);
@@ -89,9 +90,9 @@ namespace Texpainter::Model
 		}
 
 
-		std::string const& currentPalette() const { return m_current_palette; }
+		auto const& currentPalette() const { return m_current_palette; }
 
-		Document& currentPalette(std::string&& current_palette)
+		Document& currentPalette(ItemName&& current_palette)
 		{
 			m_current_palette = std::move(current_palette);
 			m_current_color   = PixelStore::ColorIndex{0};
@@ -124,8 +125,8 @@ namespace Texpainter::Model
 		PaletteCollection m_palettes;
 		PixelStore::ColorIndex m_current_color;
 
-		std::string m_current_layer;
-		std::string m_current_palette;
+		ItemName m_current_layer;
+		ItemName m_current_palette;
 		BrushInfo m_current_brush;
 
 		bool m_dirty;

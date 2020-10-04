@@ -6,6 +6,7 @@
 #include "./size_input.hpp"
 
 #include "model/layer.hpp"
+#include "model/item_name.hpp"
 #include "ui/box.hpp"
 #include "ui/labeled_input.hpp"
 #include "ui/text_entry.hpp"
@@ -31,11 +32,14 @@ namespace Texpainter
 
 		struct LayerInfo
 		{
-			std::string name;
+			Model::ItemName name;
 			Size2d size;
 		};
 
-		auto value() const { return LayerInfo{m_name.inputField().content(), m_size.value()}; }
+		auto value() const
+		{
+			return LayerInfo{Model::ItemName{m_name.inputField().content()}, m_size.value()};
+		}
 
 	private:
 		Ui::Box m_root;

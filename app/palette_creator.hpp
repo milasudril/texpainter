@@ -55,7 +55,7 @@ namespace Texpainter
 
 		struct PaletteInfo
 		{
-			std::string name;
+			Model::ItemName name;
 			std::array<PixelStore::Pixel, 4> colors;
 		};
 
@@ -89,7 +89,7 @@ namespace Texpainter
 
 		PaletteInfo value() const
 		{
-			return PaletteInfo{m_name.inputField().content(), generateColors()};
+			return PaletteInfo{Model::ItemName{m_name.inputField().content()}, generateColors()};
 		}
 
 	private:
