@@ -54,7 +54,11 @@ namespace Texpainter
 		template<ControlId>
 		void onChanged(Ui::TextEntry& entry);
 
-		void handleException(char const* msg) { fprintf(stderr, "%s\n", msg); }
+		template<ControlId, class... T>
+		void handleException(char const* msg, T&...)
+		{
+			fprintf(stderr, "%s\n", msg);
+		}
 
 	private:
 		Ui::Box m_root;

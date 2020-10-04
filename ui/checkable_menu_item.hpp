@@ -35,11 +35,9 @@ namespace Texpainter::Ui
 		{
 			return eventHandler(&eh, [](void* eh, CheckableMenuItem& self) {
 				auto& obj = *reinterpret_cast<EventHandler*>(eh);
-				dispatchEvent(
-				    [](EventHandler& eh, CheckableMenuItem& self, auto&&... args) {
-					    self.toggle();
-					    eh.template onActivated<id>(self, std::forward<decltype(args)>(args)...);
-					    self.toggle();
+				dispatchEvent<id>(
+				    [](EventHandler& eh, auto&&... args) {
+					    eh.template onActivated<id>(std::forward<decltype(args)>(args)...);
 				    },
 				    obj,
 				    self);

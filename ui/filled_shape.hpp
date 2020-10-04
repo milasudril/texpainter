@@ -41,7 +41,7 @@ namespace Texpainter::Ui
 		{
 			return eventHandler(&eh, [](void* event_handler, FilledShape& self) {
 				auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				dispatchEvent(
+				dispatchEvent<id>(
 				    [](EventHandler& eh, auto&&... args) {
 					    eh.template onClicked<id>(std::forward<decltype(args)>(args)...);
 				    },

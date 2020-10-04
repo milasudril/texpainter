@@ -32,7 +32,7 @@ namespace Texpainter::Ui
 		{
 			return eventHandler(&eh, [](void* event_handler, TextEntry& self) {
 				auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				dispatchEvent(
+				dispatchEvent<id>(
 				    [](EventHandler& eh, auto&&... args) {
 					    eh.template onChanged<id>(std::forward<decltype(args)>(args)...);
 				    },

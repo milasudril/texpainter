@@ -261,7 +261,11 @@ namespace Texpainter::Ui
 
 		void show() { m_window.show(); }
 
-		void handleException(char const* msg) { puts(msg); }
+		template<auto, class... T>
+		void handleException(char const* msg, T&...)
+		{
+			fprintf(stderr, "%s\n", msg);
+		}
 
 	private:
 		void initButtons()

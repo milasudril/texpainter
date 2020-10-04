@@ -172,7 +172,11 @@ namespace Texpainter
 			m_rows.killFocus();
 		}
 
-		void handleException(char const* msg) { fprintf(stderr, "%s\n", msg); }
+		template<auto, class... T>
+		void handleException(char const* msg, T&...)
+		{
+			fprintf(stderr, "%s\n", msg);
+		}
 
 	private:
 		DocumentManager m_documents;

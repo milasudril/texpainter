@@ -266,7 +266,8 @@ public:
 	template<ControlId>
 	void onChanged(Texpainter::Ui::TextEntry&);
 
-	[[noreturn]] void handleException(char const* msg)
+	template<ControlId, class... T>
+	[[noreturn]] void handleException(char const* msg, T&...)
 	{
 		fprintf(stderr, "Fatal error: %s\n", msg);
 		std::terminate();

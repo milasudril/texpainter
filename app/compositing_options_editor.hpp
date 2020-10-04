@@ -91,9 +91,9 @@ namespace Texpainter
 			r_callback(r_eh, *this);
 		}
 
-		void handleException(char const* msg)
+		template<ControlId, class... T>
+		void handleException(char const* msg, T&...)
 		{
-			// TODO: r_eh...
 			fprintf(stderr, "%s\n", msg);
 		}
 

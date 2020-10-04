@@ -48,7 +48,7 @@ namespace Texpainter::Ui
 			        vec2_t loc_screen,
 			        int button) {
 				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				     dispatchEvent(
+				     dispatchEvent<id>(
 				         [](EventHandler& eh, auto&&... args) {
 					         eh.template onMouseUp<id>(std::forward<decltype(args)>(args)...);
 				         },

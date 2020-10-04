@@ -43,7 +43,7 @@ namespace Texpainter::Ui
 		{
 			return eventHandler(&eh, [](void* event_handler, Listbox& self, int index) {
 				auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				dispatchEvent(
+				dispatchEvent<id>(
 				    [](EventHandler& eh, auto&&... args) {
 					    eh.template onActivated<id>(std::forward<decltype(args)>(args)...);
 				    },

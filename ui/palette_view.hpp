@@ -40,21 +40,14 @@ namespace Texpainter::Ui
 			        PixelStore::ColorIndex index,
 			        int button) {
 				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				     dispatchEvent(
-				         [](EventHandler& eh, auto&&... args) {
-					         eh.template onMouseDown<id>(std::forward<decltype(args)>(args)...);
-				         },
-				         obj,
-				         self,
-				         index,
-				         button);
+				     obj.template onMouseDown<id>(self, index, button);
 			     },
 			     [](void* event_handler,
 			        PaletteView& self,
 			        PixelStore::ColorIndex index,
 			        int button) {
 				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				     dispatchEvent(
+				     dispatchEvent<id>(
 				         [](EventHandler& eh, auto&&... args) {
 					         eh.template onMouseUp<id>(std::forward<decltype(args)>(args)...);
 				         },

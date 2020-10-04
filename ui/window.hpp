@@ -47,7 +47,7 @@ namespace Texpainter::Ui
 			    &eh,
 			    {[](void* event_handler, Window& self) {
 				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				     dispatchEvent(
+				     dispatchEvent<id>(
 				         [](EventHandler& eh, auto&&... args) {
 					         eh.template onClose<id>(std::forward<decltype(args)>(args)...);
 				         },
@@ -56,7 +56,7 @@ namespace Texpainter::Ui
 			     },
 			     [](void* event_handler, Window& self, Scancode key) {
 				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				     dispatchEvent(
+				     dispatchEvent<id>(
 				         [](EventHandler& eh, auto&&... args) {
 					         eh.template onKeyDown<id>(std::forward<decltype(args)>(args)...);
 				         },
@@ -66,7 +66,7 @@ namespace Texpainter::Ui
 			     },
 			     [](void* event_handler, Window& self, Scancode key) {
 				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				     dispatchEvent(
+				     dispatchEvent<id>(
 				         [](EventHandler& eh, auto&&... args) {
 					         eh.template onKeyUp<id>(std::forward<decltype(args)>(args)...);
 				         },

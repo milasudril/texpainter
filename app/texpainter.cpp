@@ -30,7 +30,11 @@ struct MainwinEventHandler
 		r_app.onKeyUp(key);
 	}
 
-	void handleException(char const* msg) { r_app.handleException(msg); }
+	template<auto id, class... Args>
+	void handleException(char const* msg, Args&... args)
+	{
+		r_app.template handleException<id>(msg, args...);
+	}
 
 	T& r_app;
 };

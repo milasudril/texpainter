@@ -11,24 +11,24 @@
 
 namespace Texpainter::Ui
 {
-	template<class Callback, class EventHandler, class... Args>
-	void dispatchEvent(Callback&& cb, EventHandler& eh, Args&&... args)
+	template<auto id, class Callback, class Source, class EventHandler, class... Args>
+	void dispatchEvent(Callback&& cb, EventHandler& eh, Source& src, Args&&... args)
 	{
 		try
 		{
-			std::invoke(cb, eh, std::forward<Args>(args)...);
+			std::invoke(cb, eh, src, std::forward<Args>(args)...);
 		}
 		catch(std::exception const& exception)
 		{
-			eh.handleException(exception.what());
+			eh.template handleException<id>(exception.what(), src);
 		}
-		catch(std::string const& str)
+		catch(std::string const& msg)
 		{
-			eh.handleException(str.c_str());
+			eh.template handleException<id>(msg.c_str(), src);
 		}
 		catch(char const* msg)
 		{
-			eh.handleException(msg);
+			eh.template handleException<id>(msg, src);
 		}
 		catch(...)
 		{

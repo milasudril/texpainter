@@ -33,11 +33,9 @@ namespace Texpainter::Ui
 		{
 			return eventHandler(&eh, [](void* event_handler, Button& self) {
 				auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				dispatchEvent(
-				    [](EventHandler& eh, Button& btn, auto&&... args) {
-					    btn.toggle();
-					    eh.template onClicked<id>(btn, std::forward<decltype(args)>(args)...);
-					    btn.toggle();
+				dispatchEvent<id>(
+				    [](EventHandler& eh, auto&&... args) {
+					    eh.template onClicked<id>(std::forward<decltype(args)>(args)...);
 				    },
 				    obj,
 				    self);

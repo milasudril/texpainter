@@ -78,7 +78,11 @@ namespace Texpainter
 				r_eh->onClicked(*this);
 			}
 
-			void handleException(char const* msg) { r_eh->handleException(msg); }
+			template<int>
+			void handleException(char const* msg, Ui::FilledShape&)
+			{
+				r_eh->handleException(msg, *this);
+			}
 
 		private:
 			EventHandler* r_eh;
@@ -216,7 +220,11 @@ namespace Texpainter
 			r_eh->onChanged(*this, input.name(), input.value());
 		}
 
-		void handleException(char const* msg) { r_eh->handleException(msg); }
+		template<class Connector>
+		void handleException(char const* msg, Connector& src)
+		{
+			r_eh->handleException(msg, *this, src.port());
+		}
 
 	private:
 		std::reference_wrapper<FilterGraph::Node> r_node;
