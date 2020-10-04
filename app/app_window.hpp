@@ -176,7 +176,7 @@ namespace Texpainter
 		template<auto, class... T>
 		void handleException(char const* msg, T&...)
 		{
-			fprintf(stderr, "%s\n", msg);
+			m_err_disp.show(m_rows, "Texpainter", msg);
 		}
 
 	private:
@@ -285,6 +285,7 @@ namespace Texpainter
 		Ui::Label m_layer_info;
 		Ui::Label m_paint_info;
 		Ui::ImageView m_img_view;
+		Ui::ErrorMessageDialog m_err_disp;
 
 		void updateLayerSelector();
 		void updateBrushSelector();

@@ -94,7 +94,8 @@ namespace Texpainter
 		template<ControlId, class... T>
 		void handleException(char const* msg, T&...)
 		{
-			fprintf(stderr, "%s\n", msg);
+			fprintf(stderr, "An error occured while updating the view: %s\n", msg);
+			std::terminate();
 		}
 
 	private:

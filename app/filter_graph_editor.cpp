@@ -109,6 +109,7 @@ Texpainter::FilterGraphEditor::FilterGraphEditor(
     , m_canvas{owner}
     , m_node_copy{m_node_menu, "Copy"}
     , m_node_delete{m_node_menu, "Delete"}
+    , r_owner{owner}
 {
 	m_linesegs = m_canvas.insert<Ui::LineSegmentRenderer>();
 	std::ranges::transform(m_graph.nodes(),

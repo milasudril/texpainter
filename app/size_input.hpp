@@ -7,6 +7,7 @@
 #include "ui/box.hpp"
 #include "ui/labeled_input.hpp"
 #include "ui/text_entry.hpp"
+#include "ui/error_message_dialog.hpp"
 #include "utils/numconv.hpp"
 
 #include <stdexcept>
@@ -57,7 +58,7 @@ namespace Texpainter
 		template<ControlId, class... T>
 		void handleException(char const* msg, T&...)
 		{
-			fprintf(stderr, "%s\n", msg);
+			m_err_disp.show(m_root, "Texpainter", msg);
 		}
 
 	private:
@@ -68,6 +69,8 @@ namespace Texpainter
 		std::string m_width_str;
 		std::string m_height_str;
 		Size2d m_max_size;
+
+		Ui::ErrorMessageDialog m_err_disp;
 	};
 
 	template<>

@@ -269,7 +269,7 @@ public:
 	template<ControlId, class... T>
 	[[noreturn]] void handleException(char const* msg, T&...)
 	{
-		fprintf(stderr, "Fatal error: %s\n", msg);
+		fprintf(stderr, "An error occured while selecting a color: %s\n", msg);
 		std::terminate();
 	}
 

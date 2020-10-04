@@ -28,7 +28,7 @@ namespace Texpainter::Ui
 		template<int>
 		void handleException(char const* message, MsgBox&)
 		{
-			fprintf(stderr, "Error occured during processing an error: %s\n", message);
+			fprintf(stderr, "An error occured during processing of an error: %s\n", message);
 			std::terminate();
 		}
 

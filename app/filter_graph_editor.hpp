@@ -16,6 +16,7 @@
 #include "ui/menu.hpp"
 #include "ui/menu_item.hpp"
 #include "ui/listbox.hpp"
+#include "ui/error_message_dialog.hpp"
 #include "utils/edge_list.hpp"
 
 #include <limits>
@@ -273,12 +274,14 @@ namespace Texpainter
 
 		void handleException(char const* msg, NodeWidget const&, FilterGraph::InputPort)
 		{
-			fprintf(stderr, "%s\n", msg);
+			// TODO: Use NodeWidget and InputPort to format a better message
+			m_err_disp.show(r_owner.get(), "Texpainter", msg);
 		}
 
 		void handleException(char const* msg, NodeWidget const&, FilterGraph::OutputPort)
 		{
-			fprintf(stderr, "%s\n", msg);
+			// TODO: Use NodeWidget and OutputPort to format a better message
+			m_err_disp.show(r_owner.get(), "Texpainter", msg);
 		}
 
 		void onChanged(NodeWidget const& src,
@@ -324,11 +327,10 @@ namespace Texpainter
 
 		std::map<FilterGraph::NodeId, vec2_t> nodeLocations() const;
 
-		template<auto id, class T>
-		void handleException(char const* msg, T&)
+		template<auto id, class Src>
+		void handleException(char const* msg, Src&)
 		{
-			// TODO: redirect to r_eh
-			fprintf(stderr, "%s\n", msg);
+			m_err_disp.show(r_owner.get(), "Texpainter", msg);
 		}
 
 
@@ -351,6 +353,8 @@ namespace Texpainter
 		Ui::MenuItem m_node_delete;
 
 		std::unique_ptr<FilterGraph::Connection> m_con_proc;
+		Ui::ErrorMessageDialog m_err_disp;
+		std::reference_wrapper<Ui::Container> r_owner;
 
 
 		void completeConnection()
