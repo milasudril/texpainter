@@ -54,7 +54,6 @@ public:
 
 	void resize(Size2d size) { gtk_window_resize(m_handle, size.width(), size.height()); }
 
-
 private:
 	static gboolean delete_event(GtkWidget* widget, GdkEvent* event, void* user_data);
 	static gboolean key_press(GtkWidget* widget, GdkEvent* event, void* user_data);

@@ -192,6 +192,8 @@ namespace Texpainter::Ui
 			initButtons();
 		}
 
+		Window& owner() { return m_window; }
+
 		template<auto id, class EventHandler>
 		Dialog& eventHandler(EventHandler& cb_obj)
 		{

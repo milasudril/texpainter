@@ -585,10 +585,16 @@ namespace Texpainter
 			m_compositing_opts.reset();
 		}
 
-		template<auto id, class... T>
-		void handleException(char const* msg, T&...)
+		template<auto id, class DialogType>
+		void handleException(char const* msg, DialogType& src) requires requires
 		{
-			m_err_display.show(r_dlg_owner, "Texpainter", msg);
+			{
+				src.owner()
+			}
+			->std::same_as<Ui::Window&>;
+		}
+		{
+			m_err_display.show(src.owner(), "Texpainter", msg);
 		}
 
 	private:
