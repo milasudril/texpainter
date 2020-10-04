@@ -9,6 +9,8 @@
 #include <string>
 #include <exception>
 
+#include <unistd.h>
+
 namespace Texpainter::Ui
 {
 	template<auto id, class Callback, class Source, class EventHandler, class... Args>
@@ -17,6 +19,12 @@ namespace Texpainter::Ui
 		try
 		{
 			std::invoke(cb, eh, src, std::forward<Args>(args)...);
+		}
+		catch(std::bad_alloc const& exception)
+		{
+			constexpr std::string_view sv{"Out of memory\n"};
+			::write(STDERR_FILENO, std::data(sv), std::size(sv));
+			std::terminate();
 		}
 		catch(std::exception const& exception)
 		{
