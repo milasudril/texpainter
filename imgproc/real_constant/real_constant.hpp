@@ -1,9 +1,9 @@
 //@	{
-//@	 "targets":[{"name":"grayscale_constant.hpp", "type":"include"}]
+//@	 "targets":[{"name":"real_constant.hpp", "type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_IMGPROC_GRAYSCALECONSTANT_HPP
-#define TEXPAINTER_IMGPROC_GRAYSCALECONSTANT_HPP
+#ifndef TEXPAINTER_IMGPROC_REALCONSTANT_HPP
+#define TEXPAINTER_IMGPROC_REALCONSTANT_HPP
 
 #include "filtergraph/proctypes.hpp"
 #include "filtergraph/img_proc_arg.hpp"
@@ -12,7 +12,7 @@
 #include <algorithm>
 #include <cmath>
 
-namespace GrayscaleConstant
+namespace RealConstant
 {
 	using Texpainter::Str;
 	using Texpainter::FilterGraph::ImageProcessorId;
@@ -60,7 +60,7 @@ namespace GrayscaleConstant
 
 		std::span<ParamValue const> paramValues() const { return m_params.values(); }
 
-		static constexpr char const* name() { return "Grayscale constant"; }
+		static constexpr char const* name() { return "Real constant"; }
 
 		static constexpr auto id() { return ImageProcessorId{"85034d41dbd2669203e0b5046faa7174"}; }
 
