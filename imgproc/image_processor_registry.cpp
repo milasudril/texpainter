@@ -16,6 +16,7 @@
 #include "./grayscale_noise/grayscale_noise.hpp"
 #include "./mix_grayscale/mix_grayscale.hpp"
 #include "./mix_complex/mix_complex.hpp"
+#include "./grayscale_constant/grayscale_constant.hpp"
 
 #include "filtergraph/image_processor_wrapper.hpp"
 #include "utils/fixed_flatmap.hpp"
@@ -51,7 +52,8 @@ namespace
 	    get_info<::NormalizeGrayscale::ImageProcessor>(),
 	    get_info<::GrayscaleNoise::ImageProcessor>(),
 	    get_info<::MixGrayscale::ImageProcessor>(),
-	    get_info<::MixComplex::ImageProcessor>()};
+	    get_info<::MixComplex::ImageProcessor>(),
+	    get_info<::GrayscaleConstant::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
