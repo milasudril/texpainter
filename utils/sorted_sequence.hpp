@@ -186,6 +186,17 @@ namespace Texpainter
 		if(!ip.second)
 		{ throw std::string{"An item with name "} + toString(key) + " already exists."; }
 	}
+
+
+	template<class Key, class Value, class IndexType = size_t>
+	void renameOrThrow(SortedSequence<Key, Value, IndexType>& seq,
+	                   Key const& old_name,
+	                   Key const& new_name)
+	{
+		auto tmp = new_name;
+		if(!seq.rename(old_name, std::move(tmp)))
+		{ throw std::string{"An item with name "} + toString(new_name) + " already exists."; }
+	}
 }
 
 #endif

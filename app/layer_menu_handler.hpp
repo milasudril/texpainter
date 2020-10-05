@@ -374,7 +374,7 @@ namespace Texpainter
 			    [&layer   = src.widget().layerName(),
 			     new_name = Model::ItemName{src.widget().inputField().content()},
 			     &doc     = src.widget().document()](auto& layers) {
-				    layers.rename(layer, Model::ItemName{new_name});
+				    renameOrThrow(layers, layer, Model::ItemName{new_name});
 				    doc.currentLayer(Model::ItemName{new_name});
 				    return true;
 			    });
