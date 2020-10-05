@@ -2,8 +2,8 @@
 //@	 "targets":[{"name":"real_constant.hpp", "type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_IMGPROC_REALCONSTANT_HPP
-#define TEXPAINTER_IMGPROC_REALCONSTANT_HPP
+#ifndef TEXPAINTER_IMGPROC_REALCONSTANT_REALCONSTANT_HPP
+#define TEXPAINTER_IMGPROC_REALCONSTANT_REALCONSTANT_HPP
 
 #include "filtergraph/proctypes.hpp"
 #include "filtergraph/img_proc_arg.hpp"
