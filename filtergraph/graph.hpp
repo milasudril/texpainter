@@ -56,6 +56,17 @@ namespace Texpainter::FilterGraph
 
 		Graph(Graph const& other);
 
+		Graph(Graph&& other) = default;
+
+		Graph& operator=(Graph&& other) = default;
+
+		Graph& operator=(Graph const& other)
+		{
+			Graph tmp{other};
+			*this = std::move(tmp);
+			return *this;
+		}
+
 		PixelStore::Image process(Span2d<RgbaValue const> input, bool force_update = true) const
 		{
 			assert(valid());
