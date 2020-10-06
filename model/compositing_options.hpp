@@ -12,40 +12,31 @@ namespace Texpainter::Model
 	class CompositingOptions
 	{
 	public:
-		CompositingOptions(): m_filtergraph{std::make_unique<FilterGraph::Graph>()}, m_opacity{1.0f}
-		{
-		}
+		CompositingOptions(): m_opacity{1.0f} {}
 
-		explicit CompositingOptions(FilterGraph::Graph const& filtergraph,
+		explicit CompositingOptions(FilterGraph::Graph&& filtergraph,
 		                            BlendFunction blend_func,
 		                            float opacity)
-		    : m_filtergraph{std::make_unique<FilterGraph::Graph>(filtergraph)}
+		    : m_filtergraph{std::move(filtergraph)}
 		    , m_blend_func{blend_func}
 		    , m_opacity{opacity}
 		{
 		}
 
-		CompositingOptions(CompositingOptions const& other)
-		    : CompositingOptions{other.filterGraph(), other.blendFunction(), other.opacity()}
-		{
-		}
+
+		CompositingOptions(CompositingOptions const&) = default;
 
 		CompositingOptions(CompositingOptions&& other) = default;
 
 		CompositingOptions& operator=(CompositingOptions&& other) = default;
 
-		CompositingOptions& operator=(CompositingOptions const& other)
-		{
-			auto temp = other;
-			*this     = std::move(other);
-			return *this;
-		}
+		CompositingOptions& operator=(CompositingOptions const& other) = default;
 
-		FilterGraph::Graph const& filterGraph() const { return *m_filtergraph; }
+		FilterGraph::Graph const& filterGraph() const { return m_filtergraph; }
 
-		CompositingOptions& filterGraph(FilterGraph::Graph const& filtergraph)
+		CompositingOptions& filterGraph(FilterGraph::Graph&& filtergraph)
 		{
-			m_filtergraph = std::make_unique<FilterGraph::Graph>(filtergraph);
+			m_filtergraph = std::move(filtergraph);
 			return *this;
 		}
 
@@ -66,7 +57,7 @@ namespace Texpainter::Model
 		}
 
 	private:
-		std::unique_ptr<FilterGraph::Graph> m_filtergraph;
+		FilterGraph::Graph m_filtergraph;
 		BlendFunction m_blend_func;
 		float m_opacity;
 	};

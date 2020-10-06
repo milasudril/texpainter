@@ -128,9 +128,9 @@ namespace Texpainter::Model
 
 		FilterGraph::Graph const& filterGraph() const { return m_compose_opts.filterGraph(); }
 
-		Layer& filterGraph(FilterGraph::Graph const& graph)
+		Layer& filterGraph(FilterGraph::Graph&& graph)
 		{
-			m_compose_opts.filterGraph(graph);
+			m_compose_opts.filterGraph(std::move(graph));
 			return *this;
 		}
 
