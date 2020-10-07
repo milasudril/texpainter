@@ -18,7 +18,6 @@ namespace Texpainter::Model
 		                            BlendFunction blend_func,
 		                            float opacity)
 		    : m_filtergraph{std::move(filtergraph)}
-		    , r_filtergraph{nullptr}
 		    , m_blend_func{blend_func}
 		    , m_opacity{opacity}
 		{
@@ -33,15 +32,11 @@ namespace Texpainter::Model
 
 		CompositingOptions& operator=(CompositingOptions const& other) = default;
 
-		FilterGraph::Graph const& filterGraph() const
-		{
-			return r_filtergraph == nullptr ? m_filtergraph : *r_filtergraph;
-		}
+		FilterGraph::Graph const& filterGraph() const { return m_filtergraph; }
 
 		CompositingOptions& filterGraph(FilterGraph::Graph&& filtergraph)
 		{
 			m_filtergraph = std::move(filtergraph);
-			r_filtergraph = nullptr;
 			return *this;
 		}
 
@@ -63,7 +58,6 @@ namespace Texpainter::Model
 
 	private:
 		FilterGraph::Graph m_filtergraph;
-		FilterGraph::Graph const* r_filtergraph;
 		BlendFunction m_blend_func;
 		float m_opacity;
 	};
