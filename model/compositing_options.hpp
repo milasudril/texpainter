@@ -35,7 +35,7 @@ namespace Texpainter::Model
 
 		FilterGraph::Graph const& filterGraph() const
 		{
-			return r_filtergraph == nullptr? m_filtergraph : *r_filtergraph;
+			return r_filtergraph == nullptr ? m_filtergraph : *r_filtergraph;
 		}
 
 		CompositingOptions& filterGraph(FilterGraph::Graph&& filtergraph)
