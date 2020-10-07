@@ -23,13 +23,6 @@ namespace Texpainter
 
 		T const& get() const { return isOwner() ? m_data : *r_data; }
 
-		void toOwner()
-		{
-			assert(!isOwner());
-			m_data = *r_data;
-			r_data = nullptr;
-		}
-
 	private:
 		T const* r_data;
 		T m_data;

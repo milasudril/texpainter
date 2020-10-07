@@ -52,7 +52,15 @@ namespace Texpainter
 		Model::CompositingOptions compositingOptions() const
 		{
 			return Model::CompositingOptions{
-			    FilterGraph::Graph{m_filter_graph.inputField().filterGraph()},
+			    std::ref(m_filter_graph.inputField().filterGraph()),
+			    Model::BlendFunction{
+			        static_cast<Model::BlendMode>(m_blend_func.inputField().selected())},
+			    static_cast<float>(m_layer_opacity.inputField().value().value())};
+		}
+
+		Model::CompositingOptions compositingOptionsWithGraph() const
+		{
+			return Model::CompositingOptions{FilterGraph::Graph{m_filter_graph.inputField().filterGraph()},
 			    Model::BlendFunction{
 			        static_cast<Model::BlendMode>(m_blend_func.inputField().selected())},
 			    static_cast<float>(m_layer_opacity.inputField().value().value())};

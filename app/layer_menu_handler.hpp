@@ -566,7 +566,7 @@ namespace Texpainter
 		{
 			auto& doc = src.widget().first.get();
 			doc.layersModify([&current_layer = doc.currentLayer(),
-			                  result         = src.widget().compositingOptions(),
+			                  result         = src.widget().compositingOptionsWithGraph(),
 			                  node_locations = src.widget().nodeLocations()](auto& layers) mutable {
 				if(auto layer = layers[current_layer]; layer != nullptr)
 				{

@@ -19,23 +19,10 @@ namespace Testcases
 		val = 6;
 		assert(i_am_not_an_owner.get() == 6);
 	}
-
-	void texpainterMaybeOwnerToOwner()
-	{
-		int val = 5;
-		Texpainter::MaybeOwner<int> obj{val};
-		assert(!obj.isOwner());
-		obj.toOwner();
-		assert(obj.isOwner());
-
-		val = 6;
-		assert(obj.get() == 5);
-	}
 }
 
 int main()
 {
 	Testcases::texpainterMaybeOwnerInit();
-	Testcases::texpainterMaybeOwnerToOwner();
 	return 0;
 }

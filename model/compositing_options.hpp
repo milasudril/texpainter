@@ -25,6 +25,15 @@ namespace Texpainter::Model
 		{
 		}
 
+		explicit CompositingOptions(std::reference_wrapper<FilterGraph::Graph const> filtergraph,
+		                            BlendFunction blend_func,
+		                            float opacity)
+		    : m_filtergraph{filtergraph}
+		    , m_blend_func{blend_func}
+		    , m_opacity{opacity}
+		{
+		}
+
 
 		CompositingOptions(CompositingOptions const&) = default;
 
