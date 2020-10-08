@@ -71,9 +71,15 @@ namespace Texpainter::FilterGraph
 		{
 			assert(valid());
 			r_input->source(input);
+			if(force_update) { r_input_node->forceUpdate(); }
+
 			PixelStore::Image ret{input.size()};
 			r_output->sink(ret.pixels());
-			if(force_update) { r_input_node->forceUpdate(); }
+			// NOTE: Since OutputNode does not use the internal image cache (it has no outputs)
+			//       and it may happen that it is not connected to the input node, we must always
+			//       recompute the output node. Otherwise, the contents of ret will be undefined,
+			//       in case we already have computed the output result.
+			r_output_node->forceUpdate();
 			(*r_output_node)(input.size());
 			return ret;
 		}
