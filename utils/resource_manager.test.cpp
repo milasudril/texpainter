@@ -9,42 +9,47 @@ namespace Testcases
 	void texpainterResourceManagerCreateAndGetResource()
 	{
 		Texpainter::ResourceManager<int> resources;
-		auto result = resources.create(1234);
-		assert(result->second.get() == 1234);
-		assert(result->second.inUse());
+		auto& result = resources.create(1234);
+		assert(result.second.get() == 1234);
+		assert(result.second.inUse());
 
-		assert(resources.hasResource(result->first));
-		auto item = resources.get(result->first);
-		assert(item.get() == result->second.get());
+		assert(resources.hasResource(result.first));
+		auto& item = resources.get(result.first);
+		assert(item.get() == result.second.get());
 		assert(item.inUse());
 
 		assert(resources.objectCount() == 1);
 
-		auto items = resources.objects();
+		auto& items = resources.objects();
 		assert(items.size() == 1);
 		auto first = std::begin(items);
-		assert(first->first == result->first);
-		assert(first->second.get() == result->second.get());
-		assert(first->second.inUse() == result->second.inUse());
+		assert(first->first == result.first);
+		assert(first->second.get() == result.second.get());
+		assert(first->second.inUse() == result.second.inUse());
 	}
 
 
 	void texpainterResourceManagerRemoveResource()
 	{
 		Texpainter::ResourceManager<int> resources;
-		auto result = resources.create(1234);
-		assert(resources.hasResource(result->first));
+		auto& result = resources.create(1234);
+		assert(resources.hasResource(result.first));
 
-		auto result_2 = resources.incUsecount(result->first);
-		assert(result_2->first == result->first);
-		assert(result_2->second.get() == result->second.get());
+		auto& result_2 = resources.incUsecount(result.first);
+		assert(result_2.first == result.first);
+		assert(result_2.second.get() == result.second.get());
 
-		assert(result_2 == result);
+		assert(&result_2 == &result);
+		result_2.second.get() = 456;
+		assert(result_2.second.get() == result.second.get());
+		assert(result_2.first == result.first);
 
-		result_2->second.get() = 456;
-		assert(result_2->second.get() == result->second.get());
+		resources.decUsecount(result.first);
+		assert(resources.hasResource(result.first));
+		resources.decUsecount(result.first);
+		assert(!resources.hasResource(result.first));
+		assert(resources.objectCount() == 0);
 	}
-
 }
 
 int main()
