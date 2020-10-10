@@ -55,7 +55,7 @@ namespace Texpainter
 			return std::pair{id, std::ref(i->second.first)};
 		}
 
-		void decUsecound(key_type id)
+		void decUsecount(key_type id)
 		{
 			auto i = m_objects.find(id);
 			assert(i != std::end(m_objects));
@@ -85,6 +85,14 @@ namespace Texpainter
 			                           std::pair{ResourceType{std::forward<Args>(args)...}, 1});
 			++m_current_id;
 			return std::pair{ip->first.first, std::ref(ip->first.second.first)};
+		}
+
+		void purge()
+		{
+			auto pred = [](auto const& item){return item.second.second == 0;};
+			auto i = std::ranges::find_if(m_objects, pred);
+			while(i != std::end(m_objects))
+			{ i = std::find_if(m_objects.erase(i), std::end(m_objects), pred);}
 		}
 
 	private:
