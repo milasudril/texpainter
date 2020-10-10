@@ -8,8 +8,8 @@
 
 #include "./brush.hpp"
 #include "./compositing_options.hpp"
+#include "./resource_pool.hpp"
 
-#include "pixel_store/image.hpp"
 #include "utils/angle.hpp"
 #include "utils/rect.hpp"
 #include "filtergraph/graph.hpp"
@@ -21,22 +21,25 @@ namespace Texpainter::Model
 	class Layer
 	{
 	public:
-		explicit Layer(PixelStore::Image&& img)
+		explicit Layer(ResourcePool& resources, PixelStore::Image&& img)
 		    : m_visibility_flags{Visible}
 		    , m_loc{0.0, 0.0}
 		    , m_rot{0}
 		    , m_scale{1.0, 1.0}
 		    , m_content{std::make_shared<PixelStore::Image>(std::move(img))}
+		    , m_resources{resources}
 		{
 		}
 
-		explicit Layer(Size2d size,
+		explicit Layer(ResourcePool& resources,
+		               Size2d size,
 		               PixelStore::Pixel initial_color = PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f})
 		    : m_visibility_flags{Visible}
 		    , m_loc{0.0, 0.0}
 		    , m_rot{0}
 		    , m_scale{1.0, 1.0}
 		    , m_content{std::make_shared<PixelStore::Image>(size)}
+		    , m_resources{resources}
 		{
 			fill(initial_color);
 		}
@@ -53,12 +56,14 @@ namespace Texpainter::Model
 
 		Layer linkedLayer() const
 		{
-			return Layer{m_visibility_flags, m_loc, m_rot, m_scale, m_content, m_compose_opts};
+			return Layer{
+			    m_resources, m_visibility_flags, m_loc, m_rot, m_scale, m_content, m_compose_opts};
 		}
 
 		Layer copiedLayer() const
 		{
-			return Layer{m_visibility_flags,
+			return Layer{m_resources,
+			             m_visibility_flags,
 			             m_loc,
 			             m_rot,
 			             m_scale,
@@ -164,8 +169,10 @@ namespace Texpainter::Model
 		std::shared_ptr<PixelStore::Image> m_content;
 		CompositingOptions m_compose_opts;
 		std::map<FilterGraph::NodeId, vec2_t> m_node_locations;
+		std::reference_wrapper<ResourcePool> m_resources;
 
-		explicit Layer(size_t vis,
+		explicit Layer(ResourcePool& resources,
+		               size_t vis,
 		               vec2_t loc,
 		               Angle rot,
 		               vec2_t scale,
@@ -177,6 +184,7 @@ namespace Texpainter::Model
 		    , m_scale{scale}
 		    , m_content{content}
 		    , m_compose_opts{compose_opts}
+		    , m_resources{resources}
 		{
 		}
 	};

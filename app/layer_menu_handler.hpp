@@ -328,9 +328,14 @@ namespace Texpainter
 
 		void confirmPositive(Tag<ControlId::Copy>, NameInputDlg& src)
 		{
-			insertNewLayer(Model::ItemName{src.widget().inputField().content()},
-			               src.widget().layer().copiedLayer(),
-			               src.widget().document());
+			auto& doc = src.widget().document();
+			doc.layersModify(
+			    [&doc,
+			     name  = Model::ItemName{src.widget().inputField().content()},
+			     layer = src.widget().layer().copiedLayer()](auto& layers, auto&) mutable {
+				    insertNewLayer(layers, std::move(name), std::move(layer), doc);
+				    return true;
+			    });
 			src.widget().finalize();
 			m_copy_dlg.reset();
 		}
@@ -340,9 +345,16 @@ namespace Texpainter
 
 		void confirmPositive(Tag<ControlId::Link>, NameInputDlg& src)
 		{
-			insertNewLayer(Model::ItemName{src.widget().inputField().content()},
-			               src.widget().layer().linkedLayer(),
-			               src.widget().document());
+			auto& doc = src.widget().document();
+			doc.layersModify(
+			    [&doc,
+			     name  = Model::ItemName{src.widget().inputField().content()},
+			     layer = src.widget().layer().linkedLayer()](auto& layers, auto&) mutable {
+				    insertNewLayer(layers, std::move(name), std::move(layer), doc);
+				    return true;
+			    });
+			src.widget().finalize();
+			m_copy_dlg.reset();
 			src.widget().finalize();
 			m_link_dlg.reset();
 		}
@@ -524,9 +536,16 @@ namespace Texpainter
 				//  "this size exeeds the largest supported integer value."};
 				return;
 			}
-			insertNewLayer(std::move(layer_info.name),
-			               Model::Layer{layer_info.size, currentColor(src.widget().first.get())},
-			               src.widget().first.get());
+
+			auto& doc = src.widget().first.get();
+			doc.layersModify([&doc, &layer_info](auto& layers, auto& resources) {
+				insertNewLayer(layers,
+				               std::move(layer_info.name),
+				               Model::Layer{resources, layer_info.size, currentColor(doc)},
+				               doc);
+				return true;
+			});
+
 			src.widget().second();
 			m_new_from_color_dlg.reset();
 		}
@@ -554,9 +573,14 @@ namespace Texpainter
 				return PixelStore::Pixel{U(rng), U(rng), U(rng), U(rng)};
 			});
 
-			insertNewLayer(std::move(layer_info.name),
-			               Model::Layer{std::move(noise)},
-			               src.widget().first.get());
+			auto& doc = src.widget().first.get();
+			doc.layersModify([&doc, &layer_info, &noise](auto& layers, auto& resources) {
+				insertNewLayer(layers,
+				               std::move(layer_info.name),
+				               Model::Layer{resources, std::move(noise)},
+				               doc);
+				return true;
+			});
 			src.widget().second();
 			m_new_from_noise.reset();
 		}
@@ -617,14 +641,12 @@ namespace Texpainter
 
 		Ui::ErrorMessageDialog m_err_display;
 
-		void insertNewLayer(Model::ItemName&& layer_name,
-		                    Model::Layer&& layer,
-		                    Model::Document& doc)
+		static void insertNewLayer(Model::Document::LayerStack& layers,
+		                           Model::ItemName&& layer_name,
+		                           Model::Layer&& layer,
+		                           Model::Document& doc)
 		{
-			doc.layersModify([layer_name, &layer](auto& layers, auto&) {
-				insertOrThrow(layers, layer_name, std::move(layer));
-				return true;
-			});
+			insertOrThrow(layers, layer_name, std::move(layer));
 			doc.currentLayer(std::move(layer_name));
 		}
 	};
