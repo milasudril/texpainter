@@ -6,35 +6,36 @@
 #include <map>
 #include <cstddef>
 #include <cstdint>
+#include <algorithm>
 
 #include <cassert>
 
 namespace Texpainter
 {
-	template<class ResourceType>
-	class ResourceId
+	template<class T>
+	class TaggedId
 	{
 	public:
-		constexpr explicit ResourceId(uint64_t val): m_value{val} {}
+		constexpr explicit TaggedId(uint64_t val): m_value{val} {}
 
-		constexpr ResourceId(): m_value{0} {}
+		constexpr TaggedId(): m_value{0} {}
 
 		constexpr uint64_t value() const { return m_value; }
 
-		constexpr ResourceId& operator++()
+		constexpr TaggedId& operator++()
 		{
 			++m_value;
 			return *this;
 		}
 
-		constexpr ResourceId operator++(int)
+		constexpr TaggedId operator++(int)
 		{
 			auto current = *this;
 			++(*this);
 			return current;
 		}
 
-		constexpr auto operator<=>(ResourceId const& other) const = default;
+		constexpr auto operator<=>(TaggedId const& other) const = default;
 
 	private:
 		uint64_t m_value;
@@ -44,34 +45,44 @@ namespace Texpainter
 	class ResourceManager
 	{
 	public:
-		using mapped_type = ResourceType;
-		using key_type    = ResourceId<ResourceType>;
+		using ResourceId = TaggedId<ResourceType>;
 
-		[[nodiscard("Possible leak")]] auto incUsecout(key_type id)
+		class Resource
+		{
+		public:
+			explicit Resource(ResourceType&& res): m_resource{std::move(res)}, m_use_count{0}{}
+
+			bool inUse() const { return m_use_count != 0; }
+
+			ResourceType& get() { return m_resource; }
+
+			ResourceType const& get() const { return m_resource; }
+
+		private:
+			friend class ResourceManager;
+
+			ResourceType m_resource;
+			size_t m_use_count;
+		};
+
+		[[nodiscard("Possible leak")]] std::pair<ResourceId const, Resource>* incUsecount(ResourceId id)
 		{
 			auto i = m_objects.find(id);
 			assert(i != std::end(m_objects));
-			++(i->second.second);
-			return std::pair{id, std::ref(i->second.first)};
+			++(i->second.m_use_count);
+			return &(*i);
 		}
 
-		void decUsecount(key_type id)
+		void decUsecount(ResourceId id)
 		{
 			auto i = m_objects.find(id);
 			assert(i != std::end(m_objects));
 			assert(i->second.second != 0);
-			--(i->second.second);
+			--(i->second.m_use_count);
 			if(i->second.second == 0) { m_objects.erase(i); }
 		}
 
-		size_t usecount(key_type id) const
-		{
-			auto i = m_objects.find(id);
-			assert(i != std::end(m_objects));
-			return i->second.second;
-		}
-
-		mapped_type& get(key_type id)
+		Resource& get(ResourceId id)
 		{
 			auto i = m_objects.find(id);
 			assert(i != std::end(m_objects));
@@ -79,25 +90,38 @@ namespace Texpainter
 		}
 
 		template<class... Args>
-		[[nodiscard("Possible leak")]] auto create(Args&&... args)
+		[[nodiscard("Possible leak")]] std::pair<ResourceId const, Resource>* create(Args&&... args)
 		{
-			auto ip = m_objects.insert(m_current_id,
-			                           std::pair{ResourceType{std::forward<Args>(args)...}, 1});
+			auto ip = m_objects.insert(std::pair{m_current_id,
+			                           Resource{ResourceType{std::forward<Args>(args)...}}});
+			++(ip.first->second.m_use_count);
 			++m_current_id;
-			return std::pair{ip->first.first, std::ref(ip->first.second.first)};
+			return &(*ip.first);
 		}
 
 		void purge()
 		{
-			auto pred = [](auto const& item){return item.second.second == 0;};
+			auto pred = [](auto const& item){return !item.second.inUse();};
 			auto i = std::ranges::find_if(m_objects, pred);
 			while(i != std::end(m_objects))
 			{ i = std::find_if(m_objects.erase(i), std::end(m_objects), pred);}
 		}
 
+		auto objectCount() const
+		{ return m_objects.size(); }
+
+		auto const& objects() const
+		{ return m_objects; }
+
+		auto& objects()
+		{ return m_objects; }
+
+		bool hasResource(ResourceId id) const
+		{ return m_objects.contains(id); }
+
 	private:
-		std::map<key_type, std::pair<ResourceType, size_t>> m_objects;
-		key_type m_current_id;
+		std::map<ResourceId, Resource> m_objects;
+		ResourceId m_current_id;
 	};
 }
 

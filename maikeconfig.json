@@ -44,9 +44,7 @@
 					"Wno-parentheses",
 					"Werror",
 					"Wextra",
-					"mavx2",
-					"pg",
-					"O3"
+					"mavx2"
 				],
 				"cflags_format": "-^",
 				"dllcompile": {
