@@ -8,6 +8,7 @@
 #include "./layer_index.hpp"
 #include "./brush.hpp"
 #include "./item_name.hpp"
+#include "./resource_pool.hpp"
 
 #include "pixel_store/palette.hpp"
 #include "pixel_store/color_index.hpp"
