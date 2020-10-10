@@ -50,10 +50,25 @@ namespace Testcases
 		assert(!resources.hasResource(result.first));
 		assert(resources.objectCount() == 0);
 	}
+
+	void texpainterResourceManagerResourceHandle()
+	{
+		Texpainter::ResourceManager<int> resources;
+		auto& result = resources.create(1234);
+		assert(resources.hasResource(result.first));
+
+		{
+			auto handle = Texpainter::ResourceManager<int>::ResourceHandle{result.first, resources};
+			assert(resources.hasResource(result.first));
+		}
+
+		assert(!resources.hasResource(result.first));
+	}
 }
 
 int main()
 {
 	Testcases::texpainterResourceManagerCreateAndGetResource();
 	Testcases::texpainterResourceManagerRemoveResource();
+	Testcases::texpainterResourceManagerResourceHandle();
 }

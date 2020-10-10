@@ -49,6 +49,52 @@ namespace Texpainter
 	public:
 		using ResourceId = TaggedId<ResourceType>;
 
+		class ResourceHandle
+		{
+		public:
+			ResourceHandle(): r_manager{nullptr} {}
+
+			explicit ResourceHandle(ResourceId id, ResourceManager& manager)
+			    : m_id{id}
+			    , r_manager{&manager}
+			{
+			}
+
+			ResourceHandle(ResourceHandle&& other) noexcept
+			    : m_id{other.m_id}
+			    , r_manager{other.r_manager}
+			{
+				other.r_manager = nullptr;
+			}
+
+			ResourceHandle& operator=(ResourceHandle&& other) noexcept
+			{
+				m_id            = other.m_id;
+				r_manager       = other.r_manager;
+				other.r_manager = nullptr;
+				return *this;
+			}
+
+			~ResourceHandle()
+			{
+				if(r_manager != nullptr) { r_manager->decUsecount(m_id); }
+			}
+
+			bool valid() const { return r_manager != nullptr; }
+
+			std::pair<ResourceId, std::reference_wrapper<ResourceManager>> release()
+			{
+				assert(valid());
+				auto ret  = std::pair{m_id, std::ref(*r_manager)};
+				r_manager = nullptr;
+				return ret;
+			}
+
+		private:
+			ResourceId m_id;
+			ResourceManager* r_manager;
+		};
+
 		class Resource
 		{
 		public:
