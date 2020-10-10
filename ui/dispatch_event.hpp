@@ -11,6 +11,9 @@
 
 #include <unistd.h>
 
+template<class T>
+void unusedResult(T&&){}
+
 namespace Texpainter::Ui
 {
 	template<auto id, class Callback, class Source, class EventHandler, class... Args>
@@ -23,7 +26,7 @@ namespace Texpainter::Ui
 		catch(std::bad_alloc const& exception)
 		{
 			constexpr std::string_view sv{"Out of memory\n"};
-			::write(STDERR_FILENO, std::data(sv), std::size(sv));
+			unusedResult(::write(STDERR_FILENO, std::data(sv), std::size(sv)));
 			std::terminate();
 		}
 		catch(std::exception const& exception)
