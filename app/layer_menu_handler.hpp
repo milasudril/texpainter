@@ -200,7 +200,7 @@ namespace Texpainter
 		                 Model::Document& doc,
 		                 MenuActionCallback<LayerAction::MoveToTop> on_completed)
 		{
-			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers, auto&) {
 				if(auto i = layers.index(current_layer); i.valid())
 				{
 					layers.moveBack(i);
@@ -215,7 +215,7 @@ namespace Texpainter
 		                 Model::Document& doc,
 		                 MenuActionCallback<LayerAction::MoveUp> on_completed)
 		{
-			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers, auto&) {
 				if(auto i = layers.index(current_layer); i.valid())
 				{
 					layers.moveBackward(i);
@@ -230,7 +230,7 @@ namespace Texpainter
 		                 Model::Document& doc,
 		                 MenuActionCallback<LayerAction::MoveDown> on_completed)
 		{
-			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers, auto&) {
 				if(auto i = layers.index(current_layer); i.valid())
 				{
 					layers.moveForward(i);
@@ -246,7 +246,7 @@ namespace Texpainter
 		                 Model::Document& doc,
 		                 MenuActionCallback<LayerAction::MoveToBottom> on_completed)
 		{
-			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers, auto&) {
 				if(auto i = layers.index(current_layer); i.valid())
 				{
 					layers.moveFront(i);
@@ -272,7 +272,6 @@ namespace Texpainter
 				m_compositing_opts->eventHandler<ControlId::CompositingOptions>(*this)
 				    .widget()
 				    .template eventHandler<0>(m_compositing_opts->widget().second);
-				//	m_fx_blend_editor_dlg->widget().eventHandler<ControlId::CompositingOptions>(*this);
 			}
 		}
 
@@ -280,7 +279,7 @@ namespace Texpainter
 		                 Model::Document& doc,
 		                 MenuActionCallback<LayerAction::Isolate> on_completed)
 		{
-			doc.layersModify([&current_layer = doc.currentLayer(), &item](auto& layers) {
+			doc.layersModify([&current_layer = doc.currentLayer(), &item](auto& layers, auto&) {
 				if(auto layer = layers[current_layer]; layer != nullptr)
 				{
 					layer->isolated(item.status());
@@ -296,7 +295,7 @@ namespace Texpainter
 		                 Model::Document& doc,
 		                 MenuActionCallback<LayerAction::Hide> on_completed)
 		{
-			doc.layersModify([&current_layer = doc.currentLayer(), &item](auto& layers) {
+			doc.layersModify([&current_layer = doc.currentLayer(), &item](auto& layers, auto&) {
 				if(auto layer = layers[current_layer]; layer != nullptr)
 				{
 					layer->visible(!item.status());
@@ -353,10 +352,11 @@ namespace Texpainter
 
 		void confirmPositive(Tag<ControlId::LinkToCopy>, ConfirmationDlg& src)
 		{
-			src.widget().document().layersModify([&layer = src.widget().layerName()](auto& layers) {
-				layers[layer]->convertToCopy();
-				return true;
-			});
+			src.widget().document().layersModify(
+			    [&layer = src.widget().layerName()](auto& layers, auto&) {
+				    layers[layer]->convertToCopy();
+				    return true;
+			    });
 
 			src.widget().finalize();
 			m_link_to_copy_dlg.reset();
@@ -373,7 +373,7 @@ namespace Texpainter
 			src.widget().document().layersModify(
 			    [&layer   = src.widget().layerName(),
 			     new_name = Model::ItemName{src.widget().inputField().content()},
-			     &doc     = src.widget().document()](auto& layers) {
+			     &doc     = src.widget().document()](auto& layers, auto&) {
 				    renameOrThrow(layers, layer, Model::ItemName{new_name});
 				    doc.currentLayer(Model::ItemName{new_name});
 				    return true;
@@ -389,7 +389,8 @@ namespace Texpainter
 		void confirmPositive(Tag<ControlId::Delete>, ConfirmationDlg& src)
 		{
 			src.widget().document().layersModify(
-			    [&layer = src.widget().layerName(), &doc = src.widget().document()](auto& layers) {
+			    [&layer = src.widget().layerName(), &doc = src.widget().document()](auto& layers,
+			                                                                        auto&) {
 				    auto i = layers.index(layer);
 				    if(i != Model::LayerIndex{0}) { --i; }
 				    else if(i.value() + 1 != layers.size().value())
@@ -449,7 +450,7 @@ namespace Texpainter
 		                 Model::Document& doc,
 		                 MenuActionCallback<LayerActionClearTransformation::Location> on_completed)
 		{
-			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers, auto&) {
 				if(auto layer = layers[current_layer]; layer != nullptr)
 				{
 					layer->location(vec2_t{0.0, 0.0});
@@ -465,7 +466,7 @@ namespace Texpainter
 		                 Model::Document& doc,
 		                 MenuActionCallback<LayerActionClearTransformation::Rotation> on_completed)
 		{
-			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers, auto&) {
 				if(auto layer = layers[current_layer]; layer != nullptr)
 				{
 					layer->rotation(Angle{0.0, Angle::Turns{}});
@@ -481,7 +482,7 @@ namespace Texpainter
 		                 Model::Document& doc,
 		                 MenuActionCallback<LayerActionClearTransformation::Scale> on_completed)
 		{
-			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers, auto&) {
 				if(auto layer = layers[current_layer]; layer != nullptr)
 				{
 					layer->scaleFactor(vec2_t{1.0, 1.0});
@@ -497,7 +498,7 @@ namespace Texpainter
 		                 Model::Document& doc,
 		                 MenuActionCallback<LayerActionClearTransformation::All> on_completed)
 		{
-			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
+			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers, auto&) {
 				if(auto layer = layers[current_layer]; layer != nullptr)
 				{
 					layer->scaleFactor(vec2_t{1.0, 1.0})
@@ -565,17 +566,18 @@ namespace Texpainter
 		void confirmPositive(Tag<ControlId::CompositingOptions>, CompositingOptionsDlg& src)
 		{
 			auto& doc = src.widget().first.get();
-			doc.layersModify([&current_layer = doc.currentLayer(),
-			                  result         = src.widget().compositingOptionsWithGraph(),
-			                  node_locations = src.widget().nodeLocations()](auto& layers) mutable {
-				if(auto layer = layers[current_layer]; layer != nullptr)
-				{
-					layer->nodeLocations(std::move(node_locations))
-					    .compositingOptions(std::move(result));
-					return true;
-				}
-				return false;
-			});
+			doc.layersModify(
+			    [&current_layer = doc.currentLayer(),
+			     result         = src.widget().compositingOptionsWithGraph(),
+			     node_locations = src.widget().nodeLocations()](auto& layers, auto&) mutable {
+				    if(auto layer = layers[current_layer]; layer != nullptr)
+				    {
+					    layer->nodeLocations(std::move(node_locations))
+					        .compositingOptions(std::move(result));
+					    return true;
+				    }
+				    return false;
+			    });
 
 			src.widget().second.onCompleted();
 			m_compositing_opts.reset();
@@ -619,7 +621,7 @@ namespace Texpainter
 		                    Model::Layer&& layer,
 		                    Model::Document& doc)
 		{
-			doc.layersModify([layer_name, &layer](auto& layers) {
+			doc.layersModify([layer_name, &layer](auto& layers, auto&) {
 				insertOrThrow(layers, layer_name, std::move(layer));
 				return true;
 			});

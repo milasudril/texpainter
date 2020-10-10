@@ -172,7 +172,7 @@ void Texpainter::AppWindow::paint(vec2_t loc)
 	     radius         = current_document.currentBrush().radius(),
 	     brush          = Model::BrushFunction{current_document.currentBrush().type()},
 	     color          = currentColor(current_document),
-	     &current_layer = current_document.currentLayer()](auto& layers) {
+	     &current_layer = current_document.currentLayer()](auto& layers, auto&) {
 		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
 			    {
 				    auto const scale = static_cast<float>(std::sqrt(layer->size().area()));
@@ -206,7 +206,7 @@ void Texpainter::AppWindow::grab(vec2_t loc_current)
 	m_paint_info.content(info.c_str());
 
 	current_document.layersModify(
-	    [loc = 𝒙, &current_layer = current_document.currentLayer()](auto& layers) {
+	    [loc = 𝒙, &current_layer = current_document.currentLayer()](auto& layers, auto&) {
 		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
 			    {
 				    layer->location(loc);
@@ -331,7 +331,7 @@ void Texpainter::AppWindow::scale(vec2_t loc_current)
 	m_paint_info.content(info.c_str());
 
 	current_document.layersModify(
-	    [factor = 𝐬, &current_layer = current_document.currentLayer()](auto& layers) {
+	    [factor = 𝐬, &current_layer = current_document.currentLayer()](auto& layers, auto&) {
 		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
 			    {
 				    layer->scaleFactor(factor);
@@ -406,7 +406,7 @@ void Texpainter::AppWindow::rotate(vec2_t loc_current)
 	m_paint_info.content(info.c_str());
 
 	current_document.layersModify(
-	    [rot = Θ, &current_layer = current_document.currentLayer()](auto& layers) {
+	    [rot = Θ, &current_layer = current_document.currentLayer()](auto& layers, auto&) {
 		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
 			    {
 				    layer->rotation(rot);
