@@ -130,6 +130,8 @@ namespace Texpainter::Model
 		ItemName m_current_palette;
 		BrushInfo m_current_brush;
 
+		ResourcePool m_resources;
+
 		bool m_dirty;
 	};
 
