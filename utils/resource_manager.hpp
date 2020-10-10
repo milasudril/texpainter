@@ -69,11 +69,9 @@ namespace Texpainter
 			size_t m_use_count;
 		};
 
-		template<class... Args>
-		[[nodiscard("Possible leak")]] auto& create(Args&&... args)
+		[[nodiscard("Possible leak")]] auto& create(ResourceType&& resource)
 		{
-			auto ip = m_objects.insert(
-			    std::pair{m_current_id, Resource{ResourceType{std::forward<Args>(args)...}}});
+			auto ip = m_objects.insert(std::pair{m_current_id, Resource{std::move(resource)}});
 			++(ip.first->second.m_use_count);
 			++m_current_id;
 			return *ip.first;
