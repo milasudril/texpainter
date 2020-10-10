@@ -7,9 +7,14 @@
 
 namespace Texpainter::Model
 {
-	class ResourcePool
+	class ResourcePool:private ResourceManager<PixelStore::Image>
 	{
 	public:
+		using ResourceManager<PixelStore::Image>::create;
+		using ResourceManager<PixelStore::Image>::incUsecount;
+		using ResourceManager<PixelStore::Image>::decUsecount;
+		using ResourceManager<PixelStore::Image>::get;
+
 	private:
 	};
 }
