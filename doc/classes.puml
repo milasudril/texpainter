@@ -3,72 +3,69 @@
 title Relationships - Class Diagram
 
 class Document {
-    + canvasSize: Size2d
-    + layers: Layer
-    + currentLayer: ItemName
-    + currentBrush: BrushInfo
-    + images: Image
-    + palettes: Palette
-    + dirty: bool
+	+ canvasSize: Size2d
+	+ layers: Layer
+	+ currentLayer: ItemName
+	+ currentBrush: BrushInfo
+	+ images: Image
+	+ palettes: Palette
+	+ dirty: bool
 }
 
 class Layer {
-    + hidden: bool
-    + isolated: bool
-    + location: vec2_t
-    + rotation: Angle
-    + scale: vec2_t
-    + compositingOptions: CompositingOptions
-    + content: Image
-    + palette: Palette
-    - resourceManager: ResourceManager
+	+ hidden: bool
+	+ isolated: bool
+	+ location: vec2_t
+	+ rotation: Angle
+	+ scale: vec2_t
+	+ compositingOptions: CompositingOptions
+	+ content: Image
+	+ palette: Palette
+	- resources: ResourcePool
 }
 
 Document "1" *-up- "Many" Layer
 
 class CompositingOptions {
-    + filterGraph: FilterGraph::Graph
-    + blendFunction: BlendFunction
-    + opacity: float <<[0, 1]>>
+	+ filterGraph: FilterGraph::Graph
+	+ blendFunction: BlendFunction
+	+ opacity: float <<[0, 1]>>
 }
 
 Layer "1" *-up- "1" CompositingOptions
 
 class Image {
-    + size: Size2d
-    + pixels: Span2d<PixelType>
+	+ size: Size2d
+	+ pixels: Span2d<PixelType>
 }
 
 Layer "Many" o-up- "1" Image
 
 class Palette {
-    +colors: Pixel
+	+colors: Pixel
 }
 
 Layer "Many" o-up- "1" Palette
 
 class Pixel {
-    +red: float <<[0, 1]>>
-    +green: float <<[0, 1]>>
-    +blue: float <<[0, 1]>>
-    +alpha: float <<[0, 1]>>
+	+red: float <<[0, 1]>>
+	+green: float <<[0, 1]>>
+	+blue: float <<[0, 1]>>
+	+alpha: float <<[0, 1]>>
+}
+
+class ResourcePool {
+	+ palettes: Palette
+	+ images: Image
 }
 
 Palette "1" *-up- "16" Pixel
 Image "1" *-up- "Many" Pixel
 
-Document "1" *-up- "Many" Palette
-Document "1" *-up- "Many" Image
+ResourcePool "1" *-up- "Many" Palette
+ResourcePool "1" *-up- "Many" Image
 
-interface ResourceManager {
-    +createImage(Size2d): Image
-    +createPalette(): Palette
-    +releasePalette(): void
-    +releaseImage(): void
-}
-
-ResourceManager <|.. Document
-
-Layer "1" o-up- "1" ResourceManager
+Layer "1" o-up- "1" ResourcePool
+Document "1" *-up- "1" ResourcePool
 
 @enduml
