@@ -64,6 +64,7 @@ Texpainter::Model::Layer& Texpainter::Model::Layer::paint(vec2_t origin,
 			if(brush(radius, d)) { pixels((col + w) % w, (row + h) % h) = color; }
 		}
 	}
+	m_content_up_to_date = false;
 	return *this;
 }
 
@@ -101,8 +102,7 @@ void Texpainter::Model::render(Layer const& layer,
 	auto const rot_y        = vec2_t{-sin(ϴ), cos(ϴ)};
 	auto const scale_factor = 1.0 / layer.scaleFactor();
 
-	auto const src =
-	    filter != nullptr ? filter->process(layer.content().pixels()) : layer.content();
+	auto const& src = layer.filteredContent(filter);
 	auto const origin_src =
 	    0.5 * vec2_t{static_cast<double>(src.width()), static_cast<double>(src.height())};
 	auto const loc_src_ret_coord =

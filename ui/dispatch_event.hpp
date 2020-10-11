@@ -12,7 +12,9 @@
 #include <unistd.h>
 
 template<class T>
-void unusedResult(T&&){}
+void unusedResult(T&&)
+{
+}
 
 namespace Texpainter::Ui
 {
