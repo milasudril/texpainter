@@ -27,7 +27,7 @@ namespace Texpainter::Model
 		    , m_rot{0}
 		    , m_scale{1.0, 1.0}
 		    , m_content{std::make_shared<PixelStore::Image>(std::move(img))}
-		    , m_resources{resources}
+		    , m_resources{&resources}
 		{
 		}
 
@@ -39,7 +39,7 @@ namespace Texpainter::Model
 		    , m_rot{0}
 		    , m_scale{1.0, 1.0}
 		    , m_content{std::make_shared<PixelStore::Image>(size)}
-		    , m_resources{resources}
+		    , m_resources{&resources}
 		{
 			fill(initial_color);
 		}
@@ -57,12 +57,12 @@ namespace Texpainter::Model
 		Layer linkedLayer() const
 		{
 			return Layer{
-			    m_resources, m_visibility_flags, m_loc, m_rot, m_scale, m_content, m_compose_opts};
+			    *m_resources, m_visibility_flags, m_loc, m_rot, m_scale, m_content, m_compose_opts};
 		}
 
 		Layer copiedLayer() const
 		{
-			return Layer{m_resources,
+			return Layer{*m_resources,
 			             m_visibility_flags,
 			             m_loc,
 			             m_rot,
@@ -169,7 +169,7 @@ namespace Texpainter::Model
 		std::shared_ptr<PixelStore::Image> m_content;
 		CompositingOptions m_compose_opts;
 		std::map<FilterGraph::NodeId, vec2_t> m_node_locations;
-		std::reference_wrapper<ResourcePool> m_resources;
+		ResourcePool* m_resources;
 
 		explicit Layer(ResourcePool& resources,
 		               size_t vis,
@@ -184,7 +184,7 @@ namespace Texpainter::Model
 		    , m_scale{scale}
 		    , m_content{content}
 		    , m_compose_opts{compose_opts}
-		    , m_resources{resources}
+		    , m_resources{&resources}
 		{
 		}
 	};
