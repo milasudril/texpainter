@@ -8,8 +8,8 @@
 
 #include "./brush.hpp"
 #include "./compositing_options.hpp"
-#include "./resource_pool.hpp"
 
+#include "pixel_store/image.hpp"
 #include "utils/angle.hpp"
 #include "utils/rect.hpp"
 #include "filtergraph/graph.hpp"
@@ -21,25 +21,26 @@ namespace Texpainter::Model
 	class Layer
 	{
 	public:
-		explicit Layer(ResourcePool& resources, PixelStore::Image&& img)
+		explicit Layer(PixelStore::Image&& img)
 		    : m_visibility_flags{Visible}
 		    , m_loc{0.0, 0.0}
 		    , m_rot{0}
 		    , m_scale{1.0, 1.0}
 		    , m_content{std::make_shared<PixelStore::Image>(std::move(img))}
-		    , m_resources{&resources}
+		    , m_content_filtered{m_content->size()}
+		    , m_content_up_to_date{false}
 		{
 		}
 
-		explicit Layer(ResourcePool& resources,
-		               Size2d size,
+		explicit Layer(Size2d size,
 		               PixelStore::Pixel initial_color = PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f})
 		    : m_visibility_flags{Visible}
 		    , m_loc{0.0, 0.0}
 		    , m_rot{0}
 		    , m_scale{1.0, 1.0}
 		    , m_content{std::make_shared<PixelStore::Image>(size)}
-		    , m_resources{&resources}
+		    , m_content_filtered{m_content->size()}
+		    , m_content_up_to_date{false}
 		{
 			fill(initial_color);
 		}
@@ -56,14 +57,12 @@ namespace Texpainter::Model
 
 		Layer linkedLayer() const
 		{
-			return Layer{
-			    *m_resources, m_visibility_flags, m_loc, m_rot, m_scale, m_content, m_compose_opts};
+			return Layer{m_visibility_flags, m_loc, m_rot, m_scale, m_content, m_compose_opts};
 		}
 
 		Layer copiedLayer() const
 		{
-			return Layer{*m_resources,
-			             m_visibility_flags,
+			return Layer{m_visibility_flags,
 			             m_loc,
 			             m_rot,
 			             m_scale,
@@ -152,11 +151,24 @@ namespace Texpainter::Model
 
 		Layer& compositingOptions(CompositingOptions&& opts)
 		{
-			m_compose_opts = std::move(opts);
+			m_compose_opts       = std::move(opts);
+			m_content_up_to_date = false;
 			return *this;
 		}
 
 		CompositingOptions const& compositingOptions() const { return m_compose_opts; }
+
+		PixelStore::Image const& filteredContent(FilterGraph::Graph const* filter) const
+		{
+			if(filter == nullptr) { return content(); }
+
+			if(m_content_up_to_date && filter == &m_compose_opts.filterGraph())
+			{ return m_content_filtered; }
+
+			m_content_filtered   = filter->process(content().pixels());
+			m_content_up_to_date = true;
+			return m_content_filtered;
+		}
 
 	private:
 		static constexpr size_t Visible  = 0x1;
@@ -166,13 +178,14 @@ namespace Texpainter::Model
 		vec2_t m_loc;
 		Angle m_rot;
 		vec2_t m_scale;
+
 		std::shared_ptr<PixelStore::Image> m_content;
 		CompositingOptions m_compose_opts;
+		mutable PixelStore::Image m_content_filtered;
+		mutable bool m_content_up_to_date;
 		std::map<FilterGraph::NodeId, vec2_t> m_node_locations;
-		ResourcePool* m_resources;
 
-		explicit Layer(ResourcePool& resources,
-		               size_t vis,
+		explicit Layer(size_t vis,
 		               vec2_t loc,
 		               Angle rot,
 		               vec2_t scale,
@@ -184,7 +197,8 @@ namespace Texpainter::Model
 		    , m_scale{scale}
 		    , m_content{content}
 		    , m_compose_opts{compose_opts}
-		    , m_resources{&resources}
+		    , m_content_filtered{m_content->size()}
+		    , m_content_up_to_date{false}
 		{
 		}
 	};
