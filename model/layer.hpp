@@ -26,9 +26,9 @@ namespace Texpainter::Model
 		    , m_loc{0.0, 0.0}
 		    , m_rot{0}
 		    , m_scale{1.0, 1.0}
-		    , m_content{std::make_shared<PixelStore::Image>(std::move(img))}
+		    , m_content{std::make_shared<ImageContent>(std::move(img))}
 		    , m_content_filtered{m_content->size()}
-		    , m_content_up_to_date{false}
+		    , m_update_count{0}
 		{
 		}
 
@@ -38,9 +38,9 @@ namespace Texpainter::Model
 		    , m_loc{0.0, 0.0}
 		    , m_rot{0}
 		    , m_scale{1.0, 1.0}
-		    , m_content{std::make_shared<PixelStore::Image>(size)}
+		    , m_content{std::make_shared<ImageContent>(size)}
 		    , m_content_filtered{m_content->size()}
-		    , m_content_up_to_date{false}
+		    , m_update_count{0}
 		{
 			fill(initial_color);
 		}
@@ -66,13 +66,13 @@ namespace Texpainter::Model
 			             m_loc,
 			             m_rot,
 			             m_scale,
-			             std::make_shared<PixelStore::Image>(*m_content),
+			             std::make_shared<ImageContent>(*m_content),
 			             m_compose_opts};
 		}
 
 		Layer& convertToCopy()
 		{
-			m_content = std::make_shared<PixelStore::Image>(*m_content);
+			m_content = std::make_shared<ImageContent>(*m_content);
 			return *this;
 		}
 
@@ -84,7 +84,7 @@ namespace Texpainter::Model
 			return *this;
 		}
 
-		PixelStore::Image const& content() const { return *m_content; }
+		PixelStore::Image const& content() const { return m_content->base(); }
 
 		vec2_t location() const { return m_loc; }
 
@@ -151,8 +151,8 @@ namespace Texpainter::Model
 
 		Layer& compositingOptions(CompositingOptions&& opts)
 		{
-			m_compose_opts       = std::move(opts);
-			m_content_up_to_date = false;
+			m_compose_opts = std::move(opts);
+			m_update_count = 0;
 			return *this;
 		}
 
@@ -162,11 +162,11 @@ namespace Texpainter::Model
 		{
 			if(filter == nullptr) { return content(); }
 
-			if(m_content_up_to_date && filter == &m_compose_opts.filterGraph())
+			if(m_update_count < m_content->updateCount() && filter == &m_compose_opts.filterGraph())
 			{ return m_content_filtered; }
 
-			m_content_filtered   = filter->process(content().pixels());
-			m_content_up_to_date = true;
+			m_content_filtered = filter->process(content().pixels());
+			m_update_count     = m_content->updateCount();
 			return m_content_filtered;
 		}
 
@@ -179,17 +179,47 @@ namespace Texpainter::Model
 		Angle m_rot;
 		vec2_t m_scale;
 
-		std::shared_ptr<PixelStore::Image> m_content;
+		class ImageContent: PixelStore::Image
+		{
+		public:
+			using PixelStore::Image::height;
+			using PixelStore::Image::pixels;
+			using PixelStore::Image::size;
+			using PixelStore::Image::width;
+
+			explicit ImageContent(Size2d size)
+			    : PixelStore::Image{size}
+			    , m_update_count{static_cast<size_t>(-1)}
+			{
+			}
+
+			explicit ImageContent(PixelStore::Image&& img)
+			    : PixelStore::Image{std::move(img)}
+			    , m_update_count{static_cast<size_t>(-1)}
+			{
+			}
+
+			void incUpdateCount() { ++m_update_count; }
+
+			size_t updateCount() const { return m_update_count; }
+
+			PixelStore::Image const& base() const { return *this; }
+
+		private:
+			size_t m_update_count;
+		};
+
+		std::shared_ptr<ImageContent> m_content;
 		CompositingOptions m_compose_opts;
 		mutable PixelStore::Image m_content_filtered;
-		mutable bool m_content_up_to_date;
+		mutable size_t m_update_count;
 		std::map<FilterGraph::NodeId, vec2_t> m_node_locations;
 
 		explicit Layer(size_t vis,
 		               vec2_t loc,
 		               Angle rot,
 		               vec2_t scale,
-		               std::shared_ptr<PixelStore::Image> const& content,
+		               std::shared_ptr<ImageContent> const& content,
 		               CompositingOptions const& compose_opts)
 		    : m_visibility_flags{vis}
 		    , m_loc{loc}
@@ -198,7 +228,7 @@ namespace Texpainter::Model
 		    , m_content{content}
 		    , m_compose_opts{compose_opts}
 		    , m_content_filtered{m_content->size()}
-		    , m_content_up_to_date{false}
+		    , m_update_count{0}
 		{
 		}
 	};

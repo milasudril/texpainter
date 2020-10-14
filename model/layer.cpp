@@ -64,7 +64,7 @@ Texpainter::Model::Layer& Texpainter::Model::Layer::paint(vec2_t origin,
 			if(brush(radius, d)) { pixels((col + w) % w, (row + h) % h) = color; }
 		}
 	}
-	m_content_up_to_date = false;
+	m_content->incUpdateCount();
 	return *this;
 }
 
