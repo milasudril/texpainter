@@ -162,7 +162,8 @@ namespace Texpainter::Model
 		{
 			if(filter == nullptr) { return content(); }
 
-			if(m_update_count < m_content->updateCount() && filter == &m_compose_opts.filterGraph())
+			if(m_update_count >= m_content->updateCount()
+			   && filter == &m_compose_opts.filterGraph())
 			{ return m_content_filtered; }
 
 			m_content_filtered = filter->process(content().pixels());
@@ -187,15 +188,11 @@ namespace Texpainter::Model
 			using PixelStore::Image::size;
 			using PixelStore::Image::width;
 
-			explicit ImageContent(Size2d size)
-			    : PixelStore::Image{size}
-			    , m_update_count{static_cast<size_t>(-1)}
-			{
-			}
+			explicit ImageContent(Size2d size): PixelStore::Image{size}, m_update_count{1} {}
 
 			explicit ImageContent(PixelStore::Image&& img)
 			    : PixelStore::Image{std::move(img)}
-			    , m_update_count{static_cast<size_t>(-1)}
+			    , m_update_count{1}
 			{
 			}
 
