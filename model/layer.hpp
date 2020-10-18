@@ -10,6 +10,7 @@
 #include "./compositing_options.hpp"
 
 #include "pixel_store/image.hpp"
+#include "pixel_store/palette.hpp"
 #include "utils/angle.hpp"
 #include "utils/rect.hpp"
 #include "filtergraph/graph.hpp"
@@ -21,6 +22,8 @@ namespace Texpainter::Model
 	class Layer
 	{
 	public:
+		using Palette = PixelStore::Palette<16>;
+
 		explicit Layer(PixelStore::Image&& img)
 		    : m_visibility_flags{Visible}
 		    , m_loc{0.0, 0.0}
@@ -171,6 +174,29 @@ namespace Texpainter::Model
 			return m_content_filtered;
 		}
 
+
+		auto const& palette() const
+		{
+			return m_palette;
+		}
+
+		Layer& palette(Palette const& pal)
+		{
+			m_palette = pal;
+			return *this;
+		}
+
+		auto currentColor() const
+		{
+			return m_current_color;
+		}
+
+		Layer& currentColor(PixelStore::ColorIndex index)
+		{
+			m_current_color = index;
+			return *this;
+		}
+
 	private:
 		static constexpr size_t Visible  = 0x1;
 		static constexpr size_t Isolated = 0x2;
@@ -207,11 +233,12 @@ namespace Texpainter::Model
 		};
 
 		std::shared_ptr<ImageContent> m_content;
-
+		Palette m_palette;
 		CompositingOptions m_compose_opts;
 		mutable PixelStore::Image m_content_filtered;
 		mutable size_t m_update_count;
 		std::map<FilterGraph::NodeId, vec2_t> m_node_locations;
+		PixelStore::ColorIndex m_current_color;
 
 		explicit Layer(size_t vis,
 		               vec2_t loc,
