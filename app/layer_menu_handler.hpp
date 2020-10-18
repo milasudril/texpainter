@@ -416,7 +416,7 @@ namespace Texpainter
 
 		void onActivated(Ui::MenuItem&,
 		                 Model::Document& doc,
-		                 MenuActionCallback<LayerActionNew::FromCurrentColor> on_completed)
+		                 MenuActionCallback<LayerActionNew::Empty> on_completed)
 		{
 			auto const size_max     = doc.canvasSize();
 			auto const size_default = Size2d{size_max.width() / 2, size_max.height() / 2};
@@ -428,22 +428,6 @@ namespace Texpainter
 			                                      size_max);
 			m_new_from_color_dlg->eventHandler<ControlId::NewFromCurrentColor>(*this);
 		}
-
-		void onActivated(Ui::MenuItem&,
-		                 Model::Document& doc,
-		                 MenuActionCallback<LayerActionNew::FromNoise> on_completed)
-		{
-			auto const size_max     = doc.canvasSize();
-			auto const size_default = Size2d{size_max.width() / 2, size_max.height() / 2};
-			m_new_from_noise =
-			    std::make_unique<LayerCreatorDlg>(std::pair{std::ref(doc), on_completed},
-			                                      r_dlg_owner,
-			                                      "Create new layer from noise",
-			                                      size_default,
-			                                      size_max);
-			m_new_from_noise->eventHandler<ControlId::NewFromNoise>(*this);
-		}
-
 
 		void onActivated(Ui::MenuItem&,
 		                 Model::Document& doc,

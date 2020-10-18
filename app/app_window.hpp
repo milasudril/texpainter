@@ -144,7 +144,7 @@ namespace Texpainter
 			update();
 		}
 
-		void operator()(Tag<LayerActionNew::FromCurrentColor>)
+		void operator()(Tag<LayerActionNew::Empty>)
 		{
 			m_pal_view.inputField().palette(
 			    currentLayer(*m_documents.currentDocument())->palette());

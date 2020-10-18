@@ -11,24 +11,23 @@ namespace Texpainter
 {
 	enum class LayerActionNew : int
 	{
-		FromCurrentColor,
-		FromFile,
-		FromNoise
+		Empty,
+		FromFile
 	};
 
 	constexpr auto end(Empty<LayerActionNew>)
 	{
-		return static_cast<LayerActionNew>(static_cast<int>(LayerActionNew::FromNoise) + 1);
+		return static_cast<LayerActionNew>(static_cast<int>(LayerActionNew::FromFile) + 1);
 	}
 
 	template<LayerActionNew>
 	struct LayerActionNewTraits;
 
 	template<>
-	struct LayerActionNewTraits<LayerActionNew::FromCurrentColor>
+	struct LayerActionNewTraits<LayerActionNew::Empty>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName() { return "From current color"; }
+		static constexpr char const* displayName() { return "Empty"; }
 	};
 
 	template<>
@@ -37,14 +36,6 @@ namespace Texpainter
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "From file"; }
 	};
-
-	template<>
-	struct LayerActionNewTraits<LayerActionNew::FromNoise>
-	{
-		using type = Ui::MenuItem;
-		static constexpr char const* displayName() { return "From noise"; }
-	};
-
 
 	enum class LayerAction : int
 	{
