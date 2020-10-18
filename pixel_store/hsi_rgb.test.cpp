@@ -66,11 +66,34 @@ namespace Testcases
 		assert(magenta_hsi.saturation == 1.0f);
 		assert(magenta_hsi.intensity == 1.0f / 3.0f);
 	}
+
+	void texpainterHsiRgbHsi()
+	{
+		auto const val_hsi = Texpainter::PixelStore::Hsi{0.25f, 1.0f, 1.0f / 3.0f, 1.0f};
+		auto const val_rgb = toRgb(val_hsi);
+		auto const val_hsi_2 = toHsi(val_rgb);
+
+		assert(val_hsi.hue == val_hsi_2.hue);
+		assert(val_hsi.saturation == val_hsi_2.saturation);
+		assert(val_hsi.intensity == val_hsi_2.intensity);
+	}
+
+	void texpainterRgbHsiRgb()
+	{
+		auto const val_rgb = Texpainter::PixelStore::Pixel{0.25f, 0.5f, 1.0f, 1.0f};
+		auto const val_hsi = toHsi(val_rgb);
+		auto const val_rgb_2 = toRgb(val_hsi);
+		assert(std::abs(val_rgb.red() - val_rgb_2.red()) < 1e-5);
+		assert(std::abs(val_rgb.green() - val_rgb_2.green()) < 1e-5);
+		assert(std::abs(val_rgb.blue() - val_rgb_2.blue() < 1e-5));
+	}
 }
 
 int main()
 {
 	//	Testcases::texpainterHsiToRgb();
 	//	Testcases::texpainterRgbToHsi();
+	Testcases::texpainterHsiRgbHsi();
+	Testcases::texpainterRgbHsiRgb();
 	return 0;
 }
