@@ -13,7 +13,6 @@ Texpainter::AppWindow::AppWindow(Ui::Container& container, PolymorphicRng rng)
     // Event handlers
     , m_doc_menu_handler{container}
     , m_layer_menu_handler{container, m_rng}
-    , m_palette_menu_handler{container, m_rng}
     , m_pal_view_eh{container, m_rng}
 
     // Widgets
@@ -72,32 +71,6 @@ void Texpainter::AppWindow::updateBrushSelector()
 	m_brush_size.value(Ui::logValue(brush.radius()));
 }
 
-void Texpainter::AppWindow::updatePaletteSelector()
-{
-	auto& pal_selector           = m_palette_selector.inputField();
-	auto const& current_document = *m_documents.currentDocument();
-
-	pal_selector.clear();
-	std::ranges::for_each(current_document.palettes().keys(),
-	                      [&pal_selector](auto const& name) { pal_selector.append(name.c_str()); });
-
-	auto const& current_pal_name = current_document.currentPalette();
-	auto const current_layer_idx = current_document.palettes().location(current_pal_name);
-	pal_selector.selected(static_cast<int>(current_layer_idx));
-
-	if(auto pal = currentPalette(current_document); pal != nullptr)
-	{
-		m_pal_view.palette(*pal)
-		    .highlightMode(current_document.currentColor(), Ui::PaletteView::HighlightMode::Read)
-		    .update();
-	}
-	else
-	{
-		PixelStore::Pixel color{0.0f, 0.0f, 0.0f, 0.0f};
-		m_pal_view.palette(std::span{&color, 1}).update();
-	}
-}
-
 void Texpainter::AppWindow::updateLayerInfo()
 {
 	auto const& current_document = *m_documents.currentDocument();
@@ -135,7 +108,6 @@ void Texpainter::AppWindow::update()
 {
 	updateLayerSelector();
 	updateBrushSelector();
-	updatePaletteSelector();
 	updateLayerInfo();
 	doRender();
 }
@@ -170,10 +142,10 @@ void Texpainter::AppWindow::paint(vec2_t loc)
 	    [loc,
 	     radius         = current_document.currentBrush().radius(),
 	     brush          = Model::BrushFunction{current_document.currentBrush().type()},
-	     color          = currentColor(current_document),
 	     &current_layer = current_document.currentLayer()](auto& layers) {
 		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
 			    {
+				    auto color       = currentColor(*layer);
 				    auto const scale = static_cast<float>(std::sqrt(layer->size().area()));
 				    layer->paint(loc, scale * radius, brush, color);
 			    }

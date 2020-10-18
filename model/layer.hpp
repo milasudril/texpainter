@@ -295,6 +295,8 @@ namespace Texpainter::Model
 	}
 
 	void outline(Layer const& layer, Span2d<PixelStore::Pixel> ret);
+
+	inline auto currentColor(Layer const& layer) { return layer.palette()[layer.currentColor()]; }
 }
 
 #endif

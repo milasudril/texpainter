@@ -146,11 +146,10 @@ namespace Texpainter
 
 		void operator()(Tag<FileAction::New>)
 		{
-			m_pal_view.eventHandler<ControlId::PaletteView>(*this);
+			m_pal_view.inputField().eventHandler<ControlId::PaletteView>(*this);
 			m_layer_selector.inputField().eventHandler<ControlId::LayerSelector>(*this);
 			m_brush_selector.inputField().eventHandler<ControlId::BrushSelector>(*this);
 			m_brush_size.eventHandler<ControlId::BrushSize>(*this);
-			m_palette_selector.inputField().eventHandler<ControlId::PaletteSelector>(*this);
 			m_img_view.eventHandler<ControlId::Canvas>(*this);
 			m_paint_info.content("");
 			update();
@@ -271,7 +270,6 @@ namespace Texpainter
 
 		void updateLayerSelector();
 		void updateBrushSelector();
-		void updatePaletteSelector();
 		void updateLayerInfo();
 		void update();
 		void doRender(Model::CompositingOptions const& compose_opts);
@@ -335,23 +333,6 @@ namespace Texpainter
 		auto brush             = current_document.currentBrush();
 		brush.radius(static_cast<float>(logValue(src.value())));
 		current_document.currentBrush(brush);
-		m_rows.killFocus();
-	}
-
-
-	template<>
-	inline void AppWindow::onChanged<AppWindow::ControlId::PaletteSelector>(Ui::Combobox& src)
-	{
-		auto const index       = Model::PaletteIndex{static_cast<uint32_t>(src.selected())};
-		auto& current_document = *m_documents.currentDocument();
-		auto const& palettes   = current_document.palettes();
-		if(auto pal_name = palettes.key(index); pal_name != nullptr)
-		{
-			current_document.currentPalette(Model::ItemName{*pal_name});
-			m_pal_view.palette(*palettes[index])
-			    .highlightMode(current_document.currentColor(),
-			                   Ui::PaletteView::HighlightMode::Read);
-		}
 		m_rows.killFocus();
 	}
 

@@ -13,15 +13,13 @@ namespace Texpainter::Model
 	public:
 		using element_type = uint32_t;
 
-		constexpr PaletteIndex(): m_value{std::numeric_limits<uint32_t>::max()} {}
+		constexpr PaletteIndex(): m_value{0} {}
 
 		constexpr explicit PaletteIndex(uint32_t val): m_value{val} {}
 
 		constexpr uint32_t value() const { return m_value; }
 
 		constexpr auto operator<=>(PaletteIndex const&) const = default;
-
-		constexpr bool valid() const { return m_value != std::numeric_limits<uint32_t>::max(); }
 
 		constexpr PaletteIndex& operator++()
 		{
