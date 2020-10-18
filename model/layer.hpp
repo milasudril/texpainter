@@ -175,21 +175,24 @@ namespace Texpainter::Model
 		}
 
 
-		auto const& palette() const
-		{
-			return m_palette;
-		}
+		auto const& palette() const { return m_palette; }
 
 		Layer& palette(Palette const& pal)
 		{
-			m_palette = pal;
+			m_palette      = pal;
+			m_update_count = 0;
 			return *this;
 		}
 
-		auto currentColor() const
+		Layer& colorModify(PixelStore::ColorIndex index, PixelStore::Pixel value)
 		{
-			return m_current_color;
+			assert(static_cast<size_t>(index.value()) < m_palette.size());
+			m_palette[index] = value;
+			m_update_count   = 0;
+			return *this;
 		}
+
+		auto currentColor() const { return m_current_color; }
 
 		Layer& currentColor(PixelStore::ColorIndex index)
 		{

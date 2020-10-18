@@ -56,35 +56,38 @@ namespace Texpainter
 		               int button,
 		               Model::Document& doc)
 		{
-			if(auto const current_color = doc.currentColor();
-			   current_color.valid() && colorIndexValid(doc, index))
+			switch(button)
 			{
-				switch(button)
-				{
-					case 1:
-						doc.currentColor(index);
-						pal_view.highlightMode(current_color, Ui::PaletteView::HighlightMode::None)
-						    .highlightMode(index, Ui::PaletteView::HighlightMode::Read)
-						    .update();
-						break;
+				case 1:
+					doc.layersModify([&view = pal_view, index, &doc](auto& layers) {
+						if(auto current_layer = layers[doc.currentLayer()];
+						   current_layer != nullptr)
+						{
+							auto current_color = current_layer->currentColor();
+							current_layer->currentColor(index);
+							view.highlightMode(current_color, Ui::PaletteView::HighlightMode::None)
+							    .highlightMode(index, Ui::PaletteView::HighlightMode::Read)
+							    .update();
+							return true;
+						}
+						return false;
+					});
+					break;
 
-					case 3:
-						pal_view
-						    .highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Write)
-						    .update();
-						m_color_picker =
-						    std::make_unique<ColorPicker>(ColorPickerData{pal_view, index, doc},
-						                                  r_dlg_owner,
-						                                  (std::string{"Select color number "}
-						                                   + std::to_string(index.value() + 1))
-						                                      .c_str(),
-						                                  m_rng,
-						                                  "Recently used: ",
-						                                  m_color_history);
-						m_color_picker->template eventHandler<0>(*this).widget().value(
-						    pal_view.color(index));
-						break;
-				}
+				case 3:
+					pal_view.highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Write)
+					    .update();
+					m_color_picker = std::make_unique<ColorPicker>(
+					    ColorPickerData{pal_view, index, doc},
+					    r_dlg_owner,
+					    (std::string{"Select color number "} + std::to_string(index.value() + 1))
+					        .c_str(),
+					    m_rng,
+					    "Recently used: ",
+					    m_color_history);
+					m_color_picker->template eventHandler<0>(*this).widget().value(
+					    pal_view.color(index));
+					break;
 			}
 		}
 
@@ -92,20 +95,23 @@ namespace Texpainter
 		void confirmPositive(ColorPicker& src)
 		{
 			auto const color_new = src.widget().value();
-			src.widget().document().palettesModify(
-			    [color_new    = color_new,
-			     sel_index    = src.widget().currentIndex(),
-			     &current_pal = src.widget().document().currentPalette()](auto& palettes) {
-				    (*palettes[current_pal])[sel_index] = color_new;
-				    return true;
-			    });
+			src.widget().document().layersModify([&doc      = src.widget().document(),
+			                                      sel_index = src.widget().currentIndex(),
+			                                      color_new = color_new](auto& layers) {
+				if(auto current_layer = layers[doc.currentLayer()]; current_layer != nullptr)
+				{
+					current_layer->colorModify(sel_index, color_new);
+					return true;
+				}
+				return false;
+			});
 
 			src.widget()
 			    .paletteView()
 			    .color(src.widget().currentIndex(), color_new)
 			    .highlightMode(src.widget().currentIndex(),
 			                   Texpainter::Ui::PaletteView::HighlightMode::None)
-			    .highlightMode(src.widget().document().currentColor(),
+			    .highlightMode(currentLayer(src.widget().document())->currentColor(),
 			                   Texpainter::Ui::PaletteView::HighlightMode::Read)
 			    .update();
 
@@ -123,7 +129,7 @@ namespace Texpainter
 			    .paletteView()
 			    .highlightMode(src.widget().currentIndex(),
 			                   Texpainter::Ui::PaletteView::HighlightMode::None)
-			    .highlightMode(src.widget().document().currentColor(),
+			    .highlightMode(currentLayer(src.widget().document())->currentColor(),
 			                   Texpainter::Ui::PaletteView::HighlightMode::Read)
 			    .update();
 
