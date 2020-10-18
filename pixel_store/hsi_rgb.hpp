@@ -19,10 +19,41 @@ namespace Texpainter::PixelStore
 		float alpha;
 	};
 
+	namespace detail
+	{
+		constexpr auto HueYellow = 1.0987067e-01f;
+		constexpr auto HueGreen  = 4.0303028e-01f;
+		constexpr auto HueBlue   = 5.8716667e-01f;
+
+		constexpr auto wrapHue(float value)
+		{
+			if(value < HueYellow) { return 0.25f * value / HueYellow; }
+
+			if(value < HueGreen)
+			{ return 0.25f + 0.25f * (value - HueYellow) / (HueGreen - HueYellow); }
+
+			if(value < HueBlue) { return 0.5f + 0.25f * (value - HueGreen) / (HueBlue - HueGreen); }
+
+			return 0.75f + 0.25f * (value - HueBlue) / (1.0f - HueBlue);
+		}
+
+		constexpr auto unwrapHue(float value)
+		{
+			if(value < 0.25f) { return 4.0f * value * HueYellow; }
+
+			if(value < 0.5f) { return HueYellow + 4.0f * (value - 0.25f) * (HueGreen - HueYellow); }
+
+			if(value < 0.75f) { return HueGreen + 4.0f * (value - 0.5f) * (HueBlue - HueGreen); }
+
+			return HueBlue + 4.0f * (value - 0.75f) * (1.0f - HueBlue);
+		}
+	}
+
+
 	inline Pixel toRgb(Hsi const& hsi)
 	{
 		auto tmp = [](Hsi const& hsi) {
-			auto const h = static_cast<float>(6.0f * hsi.hue);
+			auto const h = static_cast<float>(6.0f * detail::unwrapHue(hsi.hue));
 			auto const z = 1.0f - std::abs(std::fmod(h, 2.0f) - 1.0f);
 			auto const c = (3.0f * hsi.intensity * hsi.saturation) / (1.0f + z);
 			auto const x = c * z;
@@ -61,7 +92,7 @@ namespace Texpainter::PixelStore
 		h = h < 0.0f ? h + 6.0f : h;
 
 		auto const s = (i == 0.0f) ? 0.0f : 1.0f - min(pixel) / i;
-		return Hsi{h / 6.0f, s, i, pixel.alpha()};
+		return Hsi{detail::wrapHue(h / 6.0f), s, i, pixel.alpha()};
 	}
 }
 

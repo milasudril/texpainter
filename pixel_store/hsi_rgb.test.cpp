@@ -70,9 +70,7 @@ namespace Testcases
 
 int main()
 {
-	Testcases::texpainterHsiToRgb();
-	Testcases::texpainterRgbToHsi();
-	return 0;
-	Testcases::texpainterHsiToRgb();
+	//	Testcases::texpainterHsiToRgb();
+	//	Testcases::texpainterRgbToHsi();
 	return 0;
 }
