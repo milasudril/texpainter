@@ -21,31 +21,57 @@ namespace Texpainter::PixelStore
 
 	namespace detail
 	{
-		constexpr auto HueYellow = 1.0987067e-01f;
-		constexpr auto HueGreen  = 4.0303028e-01f;
-		constexpr auto HueBlue   = 5.8716667e-01f;
+		constexpr auto HueUnwrappedYellow = 1.0f / 6.0f;
+		constexpr auto HueUnwrappedGreen  = 3.4527740e-01f;
+		constexpr auto HueUnwrappedBlue   = 6.1349493e-01f;
+
+		constexpr auto HueWrappedYellow = 2.0f / 6.0f;
+		constexpr auto HueWrappedGreen  = 3.0f / 6.0f;
+		constexpr auto HueWrappedBlue   = 4.0f / 6.0f;
 
 		constexpr auto wrapHue(float value)
 		{
-			if(value < HueYellow) { return 0.25f * value / HueYellow; }
+			if(value < HueUnwrappedYellow) { return HueWrappedYellow * value / HueUnwrappedYellow; }
 
-			if(value < HueGreen)
-			{ return 0.25f + 0.25f * (value - HueYellow) / (HueGreen - HueYellow); }
+			if(value < HueUnwrappedGreen)
+			{
+				return HueWrappedYellow
+				       + (HueWrappedGreen - HueWrappedYellow) * (value - HueUnwrappedYellow)
+				             / (HueUnwrappedGreen - HueUnwrappedYellow);
+			}
 
-			if(value < HueBlue) { return 0.5f + 0.25f * (value - HueGreen) / (HueBlue - HueGreen); }
+			if(value < HueUnwrappedBlue)
+			{
+				return HueWrappedGreen
+				       + (HueWrappedBlue - HueWrappedGreen) * (value - HueUnwrappedGreen)
+				             / (HueUnwrappedBlue - HueUnwrappedGreen);
+			}
 
-			return 0.75f + 0.25f * (value - HueBlue) / (1.0f - HueBlue);
+			return HueWrappedBlue
+			       + (1.0f - HueWrappedBlue) * (value - HueUnwrappedBlue)
+			             / (1.0f - HueUnwrappedBlue);
 		}
 
 		constexpr auto unwrapHue(float value)
 		{
-			if(value < 0.25f) { return 4.0f * value * HueYellow; }
+			if(value < HueWrappedYellow) { return value * HueUnwrappedYellow / HueWrappedYellow; }
 
-			if(value < 0.5f) { return HueYellow + 4.0f * (value - 0.25f) * (HueGreen - HueYellow); }
+			if(value < HueWrappedGreen)
+			{
+				return HueUnwrappedYellow
+				       + (value - HueWrappedYellow) * (HueUnwrappedGreen - HueUnwrappedYellow)
+				             / (HueWrappedGreen - HueWrappedYellow);
+			}
 
-			if(value < 0.75f) { return HueGreen + 4.0f * (value - 0.5f) * (HueBlue - HueGreen); }
+			if(value < HueWrappedBlue)
+			{
+				return HueUnwrappedGreen
+				       + (value - HueWrappedGreen) * (HueUnwrappedBlue - HueUnwrappedGreen)
+				             / (HueWrappedBlue - HueWrappedGreen);
+			}
 
-			return HueBlue + 4.0f * (value - 0.75f) * (1.0f - HueBlue);
+			return HueUnwrappedBlue
+			       + (value - HueWrappedBlue) * (1.0f - HueUnwrappedBlue) / (1.0f - HueWrappedBlue);
 		}
 	}
 
