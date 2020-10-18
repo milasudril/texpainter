@@ -144,6 +144,12 @@ namespace Texpainter
 			update();
 		}
 
+		void operator()(Tag<LayerActionNew::FromCurrentColor>)
+		{
+			m_pal_view.inputField().palette(
+			    currentLayer(*m_documents.currentDocument())->palette());
+		}
+
 		void operator()(Tag<FileAction::New>)
 		{
 			m_pal_view.inputField().eventHandler<ControlId::PaletteView>(*this);
@@ -308,6 +314,7 @@ namespace Texpainter
 		{
 			current_document.currentLayer(Model::ItemName{*layer_name});
 			updateLayerInfo();
+			m_pal_view.inputField().palette(currentLayer(current_document)->palette());
 			doRender();
 		}
 		m_rows.killFocus();
