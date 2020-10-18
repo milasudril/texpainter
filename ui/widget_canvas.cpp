@@ -226,7 +226,7 @@ private:
 				auto e = reinterpret_cast<GdkEventButton const*>(event);
 				self->m_vt.on_mouse_down(self->r_eh,
 				                         *self,
-				                         WidgetCoordinates{e->x, e->y},
+				                         self->m_widgets->location(widget) + vec2_t{e->x, e->y},
 				                         ScreenCoordinates{e->x_root, e->y_root},
 				                         e->button,
 				                         i->second);

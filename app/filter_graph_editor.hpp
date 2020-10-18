@@ -366,13 +366,18 @@ namespace Texpainter
 
 	template<>
 	inline void FilterGraphEditor::onMouseDown<FilterGraphEditor::ControlId::NodeWidgets>(
-	    Canvas&, Ui::WidgetCoordinates, Ui::ScreenCoordinates, int button, FilterGraph::NodeId node)
+	    Canvas&,
+	    Ui::WidgetCoordinates loc,
+	    Ui::ScreenCoordinates,
+	    int button,
+	    FilterGraph::NodeId node)
 	{
 		if(button == 3)
 		{
 			if(node != FilterGraph::Graph::InputNodeId && node != FilterGraph::Graph::OutputNodeId)
 			{
-				m_sel_node = node;
+				m_sel_node      = node;
+				m_filtermenuloc = loc;
 				m_node_menu.show().popupAtCursor();
 			}
 		}
@@ -390,7 +395,7 @@ namespace Texpainter
 	inline void FilterGraphEditor::onActivated<FilterGraphEditor::ControlId::CopyNode>(
 	    Ui::MenuItem&)
 	{
-		insert(m_graph.node(m_sel_node)->clonedProcessor());
+		insert(m_graph.node(m_sel_node)->clonedProcessor(), m_filtermenuloc);
 	}
 
 	template<>
