@@ -8,6 +8,8 @@
 #include "./box.hpp"
 #include "./label.hpp"
 
+#include <memory>
+
 namespace Texpainter::Ui
 {
 	template<class Widget, class LabelType = Label, bool Reversed = false>

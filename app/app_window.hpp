@@ -262,8 +262,7 @@ namespace Texpainter
 		Ui::LabeledInput<Ui::Combobox> m_brush_selector;
 		Ui::Slider m_brush_size;
 		Ui::Separator m_sep1;
-		Ui::LabeledInput<Ui::Combobox> m_palette_selector;
-		Ui::PaletteView m_pal_view;
+		Ui::LabeledInput<Ui::PaletteView> m_pal_view;
 		Ui::Box m_info;
 		Ui::Label m_layer_info;
 		Ui::Label m_paint_info;

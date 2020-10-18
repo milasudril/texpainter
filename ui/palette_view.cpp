@@ -151,8 +151,8 @@ public:
 
 	void palette(std::span<PixelStore::Pixel const> pal)
 	{
-		m_colors         = PixelStore::Palette{pal};
-		m_highlight_mode = DataBlock<HighlightMode>{std::size(m_colors)};
+		m_colors         = std::vector<PixelStore::Pixel>{std::begin(pal), std::end(pal)};
+		m_highlight_mode = std::vector<HighlightMode>(std::size(m_colors));
 		std::ranges::fill(m_highlight_mode, HighlightMode::None);
 		recalculateWidgetSize();
 	}
@@ -180,13 +180,13 @@ public:
 		recalculateWidgetSize();
 	}
 
-	PixelStore::Pixel color(PixelStore::ColorIndex index) const { return m_colors[index]; }
+	PixelStore::Pixel color(PixelStore::ColorIndex index) const { return m_colors[index.value()]; }
 
 	void color(PixelStore::ColorIndex index, PixelStore::Pixel value)
 	{
 		if(index.value() < m_colors.size())
 		{
-			m_colors[index] = value;
+			m_colors[index.value()] = value;
 			update();
 		}
 	}
@@ -199,8 +199,8 @@ private:
 	Size2d m_min_size;
 	int m_n_cols;
 	int m_n_rows;
-	PixelStore::Palette m_colors;
-	DataBlock<HighlightMode> m_highlight_mode;
+	std::vector<PixelStore::Pixel> m_colors;
+	std::vector<HighlightMode> m_highlight_mode;
 
 	GtkDrawingArea* m_handle;
 	cairo_surface_t* m_background;
@@ -248,8 +248,8 @@ private:
 		auto const col = static_cast<int>(col_row[0]);
 		auto const row = static_cast<int>(col_row[1]);
 
-		return PixelStore::ColorIndex{
-		    std::min(m_colors.size(), static_cast<uint32_t>(m_n_cols * row + col))};
+		return PixelStore::ColorIndex{std::min(static_cast<uint32_t>(m_colors.size()),
+		                                       static_cast<uint32_t>(m_n_cols * row + col))};
 	}
 
 	static void size_callback(GtkWidget*, GdkRectangle*, gpointer self)

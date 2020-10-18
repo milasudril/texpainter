@@ -13,6 +13,7 @@
 #include "utils/polymorphic_rng.hpp"
 
 #include <utility>
+#include <span>
 
 namespace Texpainter::Ui
 {

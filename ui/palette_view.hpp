@@ -9,10 +9,12 @@
 #include "./container.hpp"
 #include "./dispatch_event.hpp"
 
-#include "pixel_store/palette.hpp"
+#include "pixel_store/pixel.hpp"
+#include "pixel_store/color_index.hpp"
 #include "utils/size_2d.hpp"
 
 #include <utility>
+#include <span>
 
 namespace Texpainter::Ui
 {

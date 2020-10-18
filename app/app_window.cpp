@@ -27,10 +27,9 @@ Texpainter::AppWindow::AppWindow(Ui::Container& container, PolymorphicRng rng)
                        "Brush: "}
     , m_brush_size{m_selectors, false}
     , m_sep1{m_selectors.insertMode(Ui::Box::InsertMode{4, 0})}
-    , m_palette_selector{m_selectors.insertMode(Ui::Box::InsertMode{0, 0}),
-                         Ui::Box::Orientation::Horizontal,
-                         "Palette: "}
-    , m_pal_view{m_selectors.insertMode(Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand})}
+    , m_pal_view{m_selectors.insertMode(Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand}),
+                 Ui::Box::Orientation::Horizontal,
+                 "Palette: "}
     , m_info{m_rows, Ui::Box::Orientation::Horizontal}
     , m_layer_info{m_info, ""}
     , m_paint_info{m_info.insertMode(Ui::Box::InsertMode{4, Ui::Box::Fill | Ui::Box::Expand}), ""}

@@ -207,6 +207,7 @@ namespace Texpainter::Model
 		};
 
 		std::shared_ptr<ImageContent> m_content;
+
 		CompositingOptions m_compose_opts;
 		mutable PixelStore::Image m_content_filtered;
 		mutable size_t m_update_count;
