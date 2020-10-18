@@ -9,7 +9,6 @@
 #include "./menu_action.hpp"
 #include "./doc_menu_handler.hpp"
 #include "./layer_menu_handler.hpp"
-#include "./palette_menu_handler.hpp"
 #include "./palette_view_event_handler.hpp"
 #include "./filter_graph_editor.hpp"
 #include "./document_manager.hpp"
@@ -100,21 +99,6 @@ namespace Texpainter
 			if(hasDocument())
 			{
 				m_layer_menu_handler.onActivated(
-				    item, *m_documents.currentDocument(), MenuActionCallback<action>{*this});
-			}
-		}
-
-		template<PaletteAction>
-		void onActivated(Ui::MenuItem&)
-		{
-		}
-
-		template<PaletteActionNew action>
-		void onActivated(Ui::MenuItem& item)
-		{
-			if(hasDocument())
-			{
-				m_palette_menu_handler.onActivated(
 				    item, *m_documents.currentDocument(), MenuActionCallback<action>{*this});
 			}
 		}
@@ -268,7 +252,6 @@ namespace Texpainter
 
 		DocMenuHandler m_doc_menu_handler;
 		LayerMenuHandler m_layer_menu_handler;
-		PaletteMenuHandler m_palette_menu_handler;
 		PaletteViewEventHandler m_pal_view_eh;
 
 		Ui::Box m_rows;

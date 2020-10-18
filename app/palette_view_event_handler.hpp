@@ -5,8 +5,6 @@
 #ifndef TEXPAINTER_APP_PALETTEVIEWEVENTHANDLER_HPP
 #define TEXPAINTER_APP_PALETTEVIEWEVENTHANDLER_HPP
 
-#include "./menu_palette.hpp"
-
 #include "utils/polymorphic_rng.hpp"
 #include "model/document.hpp"
 #include "ui/dialog.hpp"

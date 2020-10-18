@@ -9,8 +9,6 @@
 #include "./brush.hpp"
 #include "./item_name.hpp"
 
-#include "pixel_store/palette.hpp"
-#include "pixel_store/color_index.hpp"
 #include "utils/sorted_sequence.hpp"
 #include "utils/mutator.hpp"
 
@@ -23,7 +21,6 @@ namespace Texpainter::Model
 	{
 	public:
 		using LayerStack        = SortedSequence<ItemName, Layer, LayerIndex>;
-		using PaletteCollection = SortedSequence<ItemName, PixelStore::Palette, PaletteIndex>;
 
 		explicit Document(Size2d canvas_size)
 		    : m_canvas_size{canvas_size}
@@ -73,43 +70,6 @@ namespace Texpainter::Model
 		}
 
 
-		PaletteCollection const& palettes() const { return m_palettes; }
-
-		Document& palettes(PaletteCollection&& palettes_new)
-		{
-			m_palettes = std::move(palettes_new);
-			m_dirty    = true;
-			return *this;
-		}
-
-		template<Mutator<PaletteCollection> Func>
-		bool palettesModify(Func&& f)
-		{
-			m_dirty = f(m_palettes) || m_dirty;
-			return m_dirty;
-		}
-
-
-		auto const& currentPalette() const { return m_current_palette; }
-
-		Document& currentPalette(ItemName&& current_palette)
-		{
-			m_current_palette = std::move(current_palette);
-			m_current_color   = PixelStore::ColorIndex{0};
-			m_dirty           = true;
-			return *this;
-		}
-
-
-		PixelStore::ColorIndex currentColor() const { return m_current_color; }
-
-		Document& currentColor(PixelStore::ColorIndex i)
-		{
-			m_current_color = i;
-			m_dirty         = true;
-			return *this;
-		}
-
 		BrushInfo currentBrush() const { return m_current_brush; }
 
 		Document& currentBrush(BrushInfo brush)
@@ -122,8 +82,6 @@ namespace Texpainter::Model
 	private:
 		Size2d m_canvas_size;
 		LayerStack m_layers;
-		PaletteCollection m_palettes;
-		PixelStore::ColorIndex m_current_color;
 
 		ItemName m_current_layer;
 		ItemName m_current_palette;
@@ -131,27 +89,6 @@ namespace Texpainter::Model
 
 		bool m_dirty;
 	};
-
-	inline PixelStore::Palette const* currentPalette(Document const& doc)
-	{
-		auto const& palettes = doc.palettes();
-		return palettes[doc.currentPalette()];
-	}
-
-	inline PixelStore::Pixel currentColor(Document const& doc)
-	{
-		auto i                       = currentPalette(doc);
-		constexpr auto default_color = PixelStore::Pixel{1.0f / 3, 1.0f / 3, 1.0f / 3, 1.0f};
-		if(i == nullptr) { return default_color; }
-
-		return doc.currentColor() <= i->lastIndex() ? (*i)[doc.currentColor()] : default_color;
-	}
-
-	inline bool colorIndexValid(Document const& doc, PixelStore::ColorIndex index)
-	{
-		auto i = currentPalette(doc);
-		return (i == nullptr) ? false : (index.value() < i->size()) ? true : false;
-	}
 
 	inline Layer const* currentLayer(Document const& doc)
 	{
