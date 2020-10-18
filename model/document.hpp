@@ -20,7 +20,7 @@ namespace Texpainter::Model
 	class Document
 	{
 	public:
-		using LayerStack        = SortedSequence<ItemName, Layer, LayerIndex>;
+		using LayerStack = SortedSequence<ItemName, Layer, LayerIndex>;
 
 		explicit Document(Size2d canvas_size)
 		    : m_canvas_size{canvas_size}

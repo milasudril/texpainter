@@ -524,7 +524,7 @@ namespace Texpainter
 				return;
 			}
 			insertNewLayer(std::move(layer_info.name),
-			               Model::Layer{layer_info.size, currentColor(src.widget().first.get())},
+			               Model::Layer{layer_info.size, PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f}},
 			               src.widget().first.get());
 			src.widget().second();
 			m_new_from_color_dlg.reset();
