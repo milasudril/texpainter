@@ -8,84 +8,48 @@
 
 namespace Texpainter
 {
-	enum class PaletteActionNew : int
-	{
-		Empty,
-		Generate
-	};
-
-	constexpr auto end(Empty<PaletteActionNew>)
-	{
-		return static_cast<PaletteActionNew>(static_cast<int>(PaletteActionNew::Generate) + 1);
-	}
-
-	template<PaletteActionNew>
-	struct PaletteActionNewTraits;
-
-	template<>
-	struct PaletteActionNewTraits<PaletteActionNew::Empty>
-	{
-		using type = Ui::MenuItem;
-		static constexpr char const* displayName() { return "Empty"; }
-	};
-
-	template<>
-	struct PaletteActionNewTraits<PaletteActionNew::Generate>
-	{
-		using type = Ui::MenuItem;
-		static constexpr char const* displayName() { return "Generate"; }
-	};
-
 	enum class PaletteAction : int
 	{
-		New,
-		Load,
-		Store,
-		Rename,
-		Remove
+		Clear,
+		Generate,
+		Import,
+		Export
 	};
 
 	constexpr auto end(Empty<PaletteAction>)
 	{
-		return static_cast<PaletteAction>(static_cast<int>(PaletteAction::Remove) + 1);
+		return static_cast<PaletteAction>(static_cast<int>(PaletteAction::Export) + 1);
 	}
 
 	template<PaletteAction>
 	struct PaletteActionTraits;
 
 	template<>
-	struct PaletteActionTraits<PaletteAction::New>
+	struct PaletteActionTraits<PaletteAction::Clear>
 	{
-		using type = Ui::SubmenuBuilder<PaletteActionNew, PaletteActionNewTraits>;
-		static constexpr char const* displayName() { return "New"; }
+		using type = Ui::MenuItem;
+		static constexpr char const* displayName() { return "Clear"; }
 	};
 
 	template<>
-	struct PaletteActionTraits<PaletteAction::Load>
+	struct PaletteActionTraits<PaletteAction::Generate>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName() { return "Load"; }
+		static constexpr char const* displayName() { return "Generate"; }
 	};
 
 	template<>
-	struct PaletteActionTraits<PaletteAction::Store>
+	struct PaletteActionTraits<PaletteAction::Import>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName() { return "Store"; }
+		static constexpr char const* displayName() { return "Import"; }
 	};
 
 	template<>
-	struct PaletteActionTraits<PaletteAction::Rename>
+	struct PaletteActionTraits<PaletteAction::Export>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName() { return "Rename"; }
-	};
-
-	template<>
-	struct PaletteActionTraits<PaletteAction::Remove>
-	{
-		using type = Ui::MenuItem;
-		static constexpr char const* displayName() { return "Remove"; }
+		static constexpr char const* displayName() { return "Export"; }
 	};
 }
 

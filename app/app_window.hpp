@@ -104,12 +104,7 @@ namespace Texpainter
 			}
 		}
 
-		template<PaletteAction>
-		void onActivated(Ui::MenuItem&)
-		{
-		}
-
-		template<PaletteActionNew action>
+		template<PaletteAction action>
 		void onActivated(Ui::MenuItem& item)
 		{
 			if(hasDocument())
@@ -171,7 +166,7 @@ namespace Texpainter
 			update();
 		}
 
-		void operator()(Tag<PaletteActionNew::Empty>)
+		void operator()(Tag<PaletteAction::Clear>)
 		{
 			auto& current_layer = *currentLayer(*m_documents.currentDocument());
 			m_pal_view.inputField()
@@ -182,7 +177,7 @@ namespace Texpainter
 			update();
 		}
 
-		void operator()(Tag<PaletteActionNew::Generate>)
+		void operator()(Tag<PaletteAction::Generate>)
 		{
 			auto& current_layer = *currentLayer(*m_documents.currentDocument());
 			m_pal_view.inputField()

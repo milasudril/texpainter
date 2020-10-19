@@ -34,8 +34,8 @@ namespace Texpainter
 	public:
 		enum class ControlId : int
 		{
-			NewEmpty,
-			NewGenerated
+			Clear,
+			Generate
 		};
 
 		explicit PaletteMenuHandler(Ui::Container& dialog_owner, PolymorphicRng rng)
@@ -56,9 +56,18 @@ namespace Texpainter
 			confirmPositive(Tag<id>{}, src);
 		}
 
+		void onActivated(Ui::MenuItem&, Model::Document&, MenuActionCallback<PaletteAction::Import>)
+		{
+		}
+
+		void onActivated(Ui::MenuItem&, Model::Document&, MenuActionCallback<PaletteAction::Export>)
+		{
+		}
+
+
 		void onActivated(Ui::MenuItem&,
 		                 Model::Document& doc,
-		                 MenuActionCallback<PaletteActionNew::Empty> on_completed)
+		                 MenuActionCallback<PaletteAction::Clear> on_completed)
 		{
 			m_new_empty_dlg =
 			    std::make_unique<PaletteCreateDlg>(std::pair{std::ref(doc), on_completed},
@@ -66,19 +75,19 @@ namespace Texpainter
 			                                       "Create new palette",
 			                                       Ui::Box::Orientation::Horizontal,
 			                                       "Palette name: ");
-			m_new_empty_dlg->eventHandler<ControlId::NewEmpty>(*this);
+			m_new_empty_dlg->eventHandler<ControlId::Clear>(*this);
 		}
 
 		void onActivated(Ui::MenuItem&,
 		                 Model::Document& doc,
-		                 MenuActionCallback<PaletteActionNew::Generate> on_completed)
+		                 MenuActionCallback<PaletteAction::Generate> on_completed)
 		{
 			m_new_generated_dlg = std::make_unique<PaletteGenerateDlg>(
 			    std::pair{std::ref(doc), on_completed}, r_dlg_owner, "Generate palette");
-			m_new_generated_dlg->eventHandler<ControlId::NewGenerated>(*this);
+			m_new_generated_dlg->eventHandler<ControlId::Generate>(*this);
 		}
 
-		void confirmPositive(Tag<ControlId::NewEmpty>, PaletteCreateDlg& src)
+		void confirmPositive(Tag<ControlId::Clear>, PaletteCreateDlg& src)
 		{
 			modifyCurrentLayer(src.widget().first.get(), [](auto& layer) {
 				layer.palette(Model::Layer::Palette{});
@@ -88,9 +97,9 @@ namespace Texpainter
 			m_new_empty_dlg.reset();
 		}
 
-		void dismiss(Tag<ControlId::NewEmpty>, PaletteCreateDlg&) { m_new_empty_dlg.reset(); }
+		void dismiss(Tag<ControlId::Clear>, PaletteCreateDlg&) { m_new_empty_dlg.reset(); }
 
-		void confirmPositive(Tag<ControlId::NewGenerated>, PaletteGenerateDlg& src)
+		void confirmPositive(Tag<ControlId::Generate>, PaletteGenerateDlg& src)
 		{
 			modifyCurrentLayer(
 			    src.widget().first.get(),
@@ -103,10 +112,7 @@ namespace Texpainter
 			m_new_generated_dlg.reset();
 		}
 
-		void dismiss(Tag<ControlId::NewGenerated>, PaletteGenerateDlg&)
-		{
-			m_new_generated_dlg.reset();
-		}
+		void dismiss(Tag<ControlId::Generate>, PaletteGenerateDlg&) { m_new_generated_dlg.reset(); }
 
 		template<auto id, class DialogType>
 		void handleException(char const* msg, DialogType& src) requires requires
