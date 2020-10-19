@@ -32,6 +32,7 @@ namespace Texpainter::Model
 		    , m_content{std::make_shared<ImageContent>(std::move(img))}
 		    , m_content_filtered{m_content->size()}
 		    , m_update_count{0}
+		    , m_current_color{0}
 		{
 		}
 
@@ -44,6 +45,7 @@ namespace Texpainter::Model
 		    , m_content{std::make_shared<ImageContent>(size)}
 		    , m_content_filtered{m_content->size()}
 		    , m_update_count{0}
+		    , m_current_color{0}
 		{
 			fill(initial_color);
 		}
@@ -60,7 +62,13 @@ namespace Texpainter::Model
 
 		Layer linkedLayer() const
 		{
-			return Layer{m_visibility_flags, m_loc, m_rot, m_scale, m_content, m_compose_opts};
+			return Layer{m_visibility_flags,
+			             m_loc,
+			             m_rot,
+			             m_scale,
+			             m_content,
+			             m_compose_opts,
+			             m_current_color};
 		}
 
 		Layer copiedLayer() const
@@ -70,7 +78,8 @@ namespace Texpainter::Model
 			             m_rot,
 			             m_scale,
 			             std::make_shared<ImageContent>(*m_content),
-			             m_compose_opts};
+			             m_compose_opts,
+			             m_current_color};
 		}
 
 		Layer& convertToCopy()
@@ -248,7 +257,8 @@ namespace Texpainter::Model
 		               Angle rot,
 		               vec2_t scale,
 		               std::shared_ptr<ImageContent> const& content,
-		               CompositingOptions const& compose_opts)
+		               CompositingOptions const& compose_opts,
+		               PixelStore::ColorIndex current_color = PixelStore::ColorIndex{0})
 		    : m_visibility_flags{vis}
 		    , m_loc{loc}
 		    , m_rot{rot}
@@ -257,6 +267,7 @@ namespace Texpainter::Model
 		    , m_compose_opts{compose_opts}
 		    , m_content_filtered{m_content->size()}
 		    , m_update_count{0}
+		    , m_current_color{current_color}
 		{
 		}
 	};
