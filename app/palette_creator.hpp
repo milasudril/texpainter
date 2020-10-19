@@ -45,7 +45,6 @@ namespace Texpainter
 	public:
 		enum class ControlId : int
 		{
-			Name,
 			BaseHue,
 			Deco1,
 			Deco2,
@@ -55,13 +54,11 @@ namespace Texpainter
 
 		struct PaletteInfo
 		{
-			Model::ItemName name;
 			std::array<PixelStore::Pixel, 4> colors;
 		};
 
 		explicit PaletteCreator(Ui::Container& container)
 		    : m_root{container, Ui::Box::Orientation::Vertical}
-		    , m_name{m_root, Ui::Box::Orientation::Horizontal, "Name: "}
 		    , m_base_hue{m_root, Ui::Box::Orientation::Horizontal, "Base hue: "}
 		    , m_deco_1{m_root, Ui::Box::Orientation::Horizontal, "Deco 1: "}
 		    , m_deco_2{m_root, Ui::Box::Orientation::Horizontal, "Deco 2: "}
@@ -87,14 +84,10 @@ namespace Texpainter
 			updateSliders();
 		}
 
-		PaletteInfo value() const
-		{
-			return PaletteInfo{Model::ItemName{m_name.inputField().content()}, generateColors()};
-		}
+		PaletteInfo value() const { return PaletteInfo{generateColors()}; }
 
 	private:
 		Ui::Box m_root;
-		Ui::LabeledInput<Ui::TextEntry> m_name;
 		Ui::LabeledInput<SliderWithPalView> m_base_hue;
 		Ui::LabeledInput<SliderWithPalView> m_deco_1;
 		Ui::LabeledInput<SliderWithPalView> m_deco_2;

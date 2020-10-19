@@ -26,7 +26,8 @@ namespace Texpainter
 	{
 		using PaletteCreateDlg = Ui::Dialog<
 		    InheritFrom<std::pair<std::reference_wrapper<Model::Document>, SimpleCallback>,
-		                Ui::LabeledInput<Ui::TextEntry>>>;
+		                Ui::Label>,
+		    Ui::DialogYesNo>;
 		using PaletteGenerateDlg = Ui::Dialog<
 		    InheritFrom<std::pair<std::reference_wrapper<Model::Document>, SimpleCallback>,
 		                PaletteCreator>>;
@@ -51,6 +52,13 @@ namespace Texpainter
 		}
 
 		template<ControlId id, class Src>
+		void confirmNegative(Src& src)
+		{
+			confirmNegative(Tag<id>{}, src);
+		}
+
+
+		template<ControlId id, class Src>
 		void confirmPositive(Src& src)
 		{
 			confirmPositive(Tag<id>{}, src);
@@ -69,12 +77,11 @@ namespace Texpainter
 		                 Model::Document& doc,
 		                 MenuActionCallback<PaletteAction::Clear> on_completed)
 		{
-			m_new_empty_dlg =
-			    std::make_unique<PaletteCreateDlg>(std::pair{std::ref(doc), on_completed},
-			                                       r_dlg_owner,
-			                                       "Create new palette",
-			                                       Ui::Box::Orientation::Horizontal,
-			                                       "Palette name: ");
+			m_new_empty_dlg = std::make_unique<PaletteCreateDlg>(
+			    std::pair{std::ref(doc), on_completed},
+			    r_dlg_owner,
+			    "Create new palette",
+			    "Are you sure you want to replace the current palette?");
 			m_new_empty_dlg->eventHandler<ControlId::Clear>(*this);
 		}
 
@@ -97,7 +104,7 @@ namespace Texpainter
 			m_new_empty_dlg.reset();
 		}
 
-		void dismiss(Tag<ControlId::Clear>, PaletteCreateDlg&) { m_new_empty_dlg.reset(); }
+		void confirmNegative(Tag<ControlId::Clear>, PaletteCreateDlg&) { m_new_empty_dlg.reset(); }
 
 		void confirmPositive(Tag<ControlId::Generate>, PaletteGenerateDlg& src)
 		{
