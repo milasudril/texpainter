@@ -30,7 +30,7 @@ Texpainter::PixelStore::Palette<16> Texpainter::Model::generatePalette(
 		PixelStore::ColorIndex const index{
 		    IntensityLevels * static_cast<uint32_t>(base_colors.size()) + k};
 		ret[index] = PixelStore::Pixel{1.0f, 1.0f, 1.0f, 1.0f} / (3.0f * i);
-		i /= IntensityScaleFactor;
+		i *= IntensityScaleFactor;
 	}
 	return ret;
 }
