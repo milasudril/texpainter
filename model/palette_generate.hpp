@@ -1,13 +1,16 @@
-PixelStore::Palette pal{23};
-std::ranges::for_each(palette_info.colors, [&pal, k = 0u](auto val) mutable {
-	auto hsi = toHsi(val);
-	for(int l = 0; l < 5; ++l)
-	{
-		pal[PixelStore::ColorIndex{k}] = toRgb(hsi);
-		++k;
-		hsi.intensity /= 2.0f;
-	}
-});
-pal[PixelStore::ColorIndex{20}] = toRgb(PixelStore::Hsi{0.0f, 0.0f, 1.0f / 3.0, 1.0f});
-pal[PixelStore::ColorIndex{21}] = toRgb(PixelStore::Hsi{0.0f, 0.0f, 1.0f / (128.0f * 3.0), 1.0f});
-pal[PixelStore::ColorIndex{22}] = PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f};
+//@	{
+//@	 "targets":[{"name":"palette_generate.hpp","type":"include"}]
+//@	 ,"dependencies_extra":[{"ref":"palette_generate.o","rel":"implementation"}]
+//@	}
+
+#ifndef TEXPAINTER_MODEL_PALETTEGENERATE_HPP
+#define TEXPAINTER_MODEL_PALETTEGENERATE_HPP
+
+#include "pixel_store/palette.hpp"
+
+namespace Texpainter::Model
+{
+	PixelStore::Palette<16> generatePalette(std::array<PixelStore::Pixel, 4> const& base_colors);
+}
+
+#endif
