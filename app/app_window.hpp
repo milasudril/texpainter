@@ -146,8 +146,12 @@ namespace Texpainter
 
 		void operator()(Tag<LayerActionNew::Empty>)
 		{
-			m_pal_view.inputField().palette(
-			    currentLayer(*m_documents.currentDocument())->palette());
+			auto& current_layer = *currentLayer(*m_documents.currentDocument());
+			m_pal_view.inputField()
+			    .palette(current_layer.palette())
+			    .highlightMode(current_layer.currentColor(),
+			                   Texpainter::Ui::PaletteView::HighlightMode::Read);
+
 			update();
 		}
 

@@ -90,9 +90,9 @@ namespace Texpainter
 		template<auto>
 		void confirmPositive(ColorPicker& src)
 		{
-			src.widget()
-			    .paletteView().highlightMode(currentLayer(src.widget().document())->currentColor(),
-			                   Texpainter::Ui::PaletteView::HighlightMode::None);
+			src.widget().paletteView().highlightMode(
+			    currentLayer(src.widget().document())->currentColor(),
+			    Texpainter::Ui::PaletteView::HighlightMode::None);
 			auto const color_new = src.widget().value();
 			(void)modifyCurrentLayer(
 			    src.widget().document(),
