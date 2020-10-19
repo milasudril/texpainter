@@ -59,18 +59,14 @@ namespace Texpainter
 			switch(button)
 			{
 				case 1:
-					doc.layersModify([&view = pal_view, index, &doc](auto& layers) {
-						if(auto current_layer = layers[doc.currentLayer()];
-						   current_layer != nullptr)
-						{
-							auto current_color = current_layer->currentColor();
-							current_layer->currentColor(index);
-							view.highlightMode(current_color, Ui::PaletteView::HighlightMode::None)
-							    .highlightMode(index, Ui::PaletteView::HighlightMode::Read)
-							    .update();
-							return true;
-						}
-						return false;
+					modifyCurrentLayer(doc, [&view = pal_view, index](auto& layer) {
+						auto const current_color = layer.currentColor();
+						layer.currentColor(index);
+						(void)view
+						    .highlightMode(current_color, Ui::PaletteView::HighlightMode::None)
+						    .highlightMode(index, Ui::PaletteView::HighlightMode::Read)
+						    .update();
+						return true;
 					});
 					break;
 
@@ -94,17 +90,16 @@ namespace Texpainter
 		template<auto>
 		void confirmPositive(ColorPicker& src)
 		{
+			src.widget()
+			    .paletteView().highlightMode(currentLayer(src.widget().document())->currentColor(),
+			                   Texpainter::Ui::PaletteView::HighlightMode::None);
 			auto const color_new = src.widget().value();
-			src.widget().document().layersModify([&doc      = src.widget().document(),
-			                                      sel_index = src.widget().currentIndex(),
-			                                      color_new = color_new](auto& layers) {
-				if(auto current_layer = layers[doc.currentLayer()]; current_layer != nullptr)
-				{
-					current_layer->colorModify(sel_index, color_new);
-					return true;
-				}
-				return false;
-			});
+			(void)modifyCurrentLayer(
+			    src.widget().document(),
+			    [sel_index = src.widget().currentIndex(), color_new = color_new](auto& layer) {
+				    layer.colorModify(sel_index, color_new).currentColor(sel_index);
+				    return true;
+			    });
 
 			src.widget()
 			    .paletteView()
