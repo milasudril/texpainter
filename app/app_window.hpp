@@ -148,6 +148,7 @@ namespace Texpainter
 		{
 			m_pal_view.inputField().palette(
 			    currentLayer(*m_documents.currentDocument())->palette());
+			update();
 		}
 
 		void operator()(Tag<FileAction::New>)
