@@ -18,9 +18,9 @@ Texpainter::PixelStore::Palette<16> Texpainter::Model::generatePalette(
 		for(int l = 0; l < IntensityLevels; ++l)
 		{
 			ret[PixelStore::ColorIndex{k}] = toRgb(hsi);
-			ret[PixelStore::ColorIndex{k}].alpha(hsi.intensity);
 			++k;
 			hsi.intensity /= IntensityScaleFactor;
+			hsi.alpha /= IntensityScaleFactor;
 		}
 	});
 
@@ -29,7 +29,7 @@ Texpainter::PixelStore::Palette<16> Texpainter::Model::generatePalette(
 	{
 		PixelStore::ColorIndex const index{
 		    IntensityLevels * static_cast<uint32_t>(base_colors.size()) + k};
-		ret[index] = PixelStore::Pixel{1.0f, 1.0f, 1.0f, 1.0f} / (3.0f * i);
+		ret[index] = PixelStore::Pixel{1.0f, 1.0f, 1.0f, 3.0f} / (3.0f * i);
 		i *= IntensityScaleFactor;
 	}
 	return ret;
