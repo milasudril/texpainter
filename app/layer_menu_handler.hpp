@@ -433,13 +433,9 @@ namespace Texpainter
 		                 Model::Document& doc,
 		                 MenuActionCallback<LayerActionClearTransformation::Location> on_completed)
 		{
-			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
-				if(auto layer = layers[current_layer]; layer != nullptr)
-				{
-					layer->location(vec2_t{0.0, 0.0});
-					return true;
-				}
-				return false;
+			(void)modifyCurrentLayer(doc, [](auto& layer) {
+				layer.location(vec2_t{0.0, 0.0});
+				return true;
 			});
 
 			on_completed();
@@ -449,13 +445,9 @@ namespace Texpainter
 		                 Model::Document& doc,
 		                 MenuActionCallback<LayerActionClearTransformation::Rotation> on_completed)
 		{
-			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
-				if(auto layer = layers[current_layer]; layer != nullptr)
-				{
-					layer->rotation(Angle{0.0, Angle::Turns{}});
-					return true;
-				}
-				return false;
+			(void)modifyCurrentLayer(doc, [](auto& layer) {
+				layer.rotation(Angle{0.0, Angle::Turns{}});
+				return true;
 			});
 
 			on_completed();
@@ -465,13 +457,9 @@ namespace Texpainter
 		                 Model::Document& doc,
 		                 MenuActionCallback<LayerActionClearTransformation::Scale> on_completed)
 		{
-			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
-				if(auto layer = layers[current_layer]; layer != nullptr)
-				{
-					layer->scaleFactor(vec2_t{1.0, 1.0});
-					return true;
-				}
-				return false;
+			(void)modifyCurrentLayer(doc, [](auto& layer) {
+				layer.scaleFactor(vec2_t{1.0, 1.0});
+				return true;
 			});
 
 			on_completed();
@@ -481,15 +469,11 @@ namespace Texpainter
 		                 Model::Document& doc,
 		                 MenuActionCallback<LayerActionClearTransformation::All> on_completed)
 		{
-			doc.layersModify([&current_layer = doc.currentLayer()](auto& layers) {
-				if(auto layer = layers[current_layer]; layer != nullptr)
-				{
-					layer->scaleFactor(vec2_t{1.0, 1.0})
-					    .rotation(Angle{0.0, Angle::Turns{}})
-					    .location(vec2_t{0.0, 0.0});
-					return true;
-				}
-				return false;
+			(void)modifyCurrentLayer(doc, [](auto& layer) {
+				layer.scaleFactor(vec2_t{1.0, 1.0})
+				    .rotation(Angle{0.0, Angle::Turns{}})
+				    .location(vec2_t{0.0, 0.0});
+				return true;
 			});
 
 			on_completed();
@@ -549,17 +533,14 @@ namespace Texpainter
 		void confirmPositive(Tag<ControlId::CompositingOptions>, CompositingOptionsDlg& src)
 		{
 			auto& doc = src.widget().first.get();
-			doc.layersModify([&current_layer = doc.currentLayer(),
-			                  result         = src.widget().compositingOptionsWithGraph(),
-			                  node_locations = src.widget().nodeLocations()](auto& layers) mutable {
-				if(auto layer = layers[current_layer]; layer != nullptr)
-				{
-					layer->nodeLocations(std::move(node_locations))
-					    .compositingOptions(std::move(result));
-					return true;
-				}
-				return false;
-			});
+			modifyCurrentLayer(
+			    doc,
+			    [result         = src.widget().compositingOptionsWithGraph(),
+			     node_locations = src.widget().nodeLocations()](auto& layer) mutable {
+				    layer.nodeLocations(std::move(node_locations))
+				        .compositingOptions(std::move(result));
+				    return true;
+			    });
 
 			src.widget().second.onCompleted();
 			m_compositing_opts.reset();

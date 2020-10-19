@@ -115,6 +115,14 @@ namespace Texpainter::Model
 		return ret;
 	}
 
+	template<class Func>
+	bool modifyCurrentLayer(Document& doc, Func&& f)
+	{
+		return doc.layersModify([&doc, func = std::forward<Func>(f)](auto& layers) mutable {
+			if(auto layer = layers[doc.currentLayer()]; layer != nullptr) { return func(*layer); }
+			return false;
+		});
+	}
 
 }
 

@@ -137,18 +137,16 @@ void Texpainter::AppWindow::doRender(Model::CompositingOptions const& compose_op
 
 void Texpainter::AppWindow::paint(vec2_t loc)
 {
-	auto& current_document = *m_documents.currentDocument();
-	current_document.layersModify(
+	auto& doc = *m_documents.currentDocument();
+	(void)modifyCurrentLayer(
+	    doc,
 	    [loc,
-	     radius         = current_document.currentBrush().radius(),
-	     brush          = Model::BrushFunction{current_document.currentBrush().type()},
-	     &current_layer = current_document.currentLayer()](auto& layers) {
-		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
-			    {
-				    auto color       = currentColor(*layer);
-				    auto const scale = static_cast<float>(std::sqrt(layer->size().area()));
-				    layer->paint(loc, scale * radius, brush, color);
-			    }
+	     radius = doc.currentBrush().radius(),
+	     brush  = Model::BrushFunction{doc.currentBrush().type()}](auto& layer) {
+		    auto const scale = static_cast<float>(std::sqrt(layer.size().area()));
+		    auto const color = currentColor(layer);
+		    layer.paint(loc, scale * radius, brush, color);
+
 		    return true;
 	    });
 	doRender();
@@ -176,14 +174,11 @@ void Texpainter::AppWindow::grab(vec2_t loc_current)
 	info += toString(Δ𝒙);
 	m_paint_info.content(info.c_str());
 
-	current_document.layersModify(
-	    [loc = 𝒙, &current_layer = current_document.currentLayer()](auto& layers) {
-		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
-			    {
-				    layer->location(loc);
-			    }
-		    return true;
-	    });
+	(void)modifyCurrentLayer(current_document, [loc = 𝒙](auto& layer) {
+		layer.location(loc);
+		return true;
+	});
+
 	updateLayerInfo();
 	doRender();
 }
@@ -301,14 +296,11 @@ void Texpainter::AppWindow::scale(vec2_t loc_current)
 	info += toString(Ϙ𝐬);
 	m_paint_info.content(info.c_str());
 
-	current_document.layersModify(
-	    [factor = 𝐬, &current_layer = current_document.currentLayer()](auto& layers) {
-		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
-			    {
-				    layer->scaleFactor(factor);
-			    }
-		    return true;
-	    });
+	(void)modifyCurrentLayer(current_document, [factor = 𝐬](auto& layer) {
+		layer.scaleFactor(factor);
+		return true;
+	});
+
 	updateLayerInfo();
 	doRender();
 }
@@ -376,14 +368,11 @@ void Texpainter::AppWindow::rotate(vec2_t loc_current)
 	info += std::to_string(ΔΘ.turns());
 	m_paint_info.content(info.c_str());
 
-	current_document.layersModify(
-	    [rot = Θ, &current_layer = current_document.currentLayer()](auto& layers) {
-		    if(auto layer = layers[current_layer]; layer != nullptr) [[likely]]
-			    {
-				    layer->rotation(rot);
-			    }
-		    return true;
-	    });
+	(void)modifyCurrentLayer(current_document, [rot = Θ](auto& layer) {
+		layer.rotation(rot);
+		return true;
+	});
+
 	updateLayerInfo();
 	doRender();
 }
