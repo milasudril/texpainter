@@ -171,6 +171,28 @@ namespace Texpainter
 			update();
 		}
 
+		void operator()(Tag<PaletteActionNew::Empty>)
+		{
+			auto& current_layer = *currentLayer(*m_documents.currentDocument());
+			m_pal_view.inputField()
+			    .palette(current_layer.palette())
+			    .highlightMode(current_layer.currentColor(),
+			                   Texpainter::Ui::PaletteView::HighlightMode::Read);
+
+			update();
+		}
+
+		void operator()(Tag<PaletteActionNew::Generate>)
+		{
+			auto& current_layer = *currentLayer(*m_documents.currentDocument());
+			m_pal_view.inputField()
+			    .palette(current_layer.palette())
+			    .highlightMode(current_layer.currentColor(),
+			                   Texpainter::Ui::PaletteView::HighlightMode::Read);
+
+			update();
+		}
+
 		void operator()(Tag<FileAction::New>)
 		{
 			m_pal_view.inputField().eventHandler<ControlId::PaletteView>(*this);
