@@ -13,6 +13,7 @@ Texpainter::AppWindow::AppWindow(Ui::Container& container, PolymorphicRng rng)
     // Event handlers
     , m_doc_menu_handler{container}
     , m_layer_menu_handler{container, m_rng}
+    , m_palette_menu_handler{container, m_rng}
     , m_pal_view_eh{container, m_rng}
 
     // Widgets
