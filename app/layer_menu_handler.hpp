@@ -102,8 +102,7 @@ namespace Texpainter
 	public:
 		enum class ControlId : int
 		{
-			NewFromCurrentColor,
-			NewFromNoise,
+			NewEmpty,
 			Copy,
 			Link,
 			LinkToCopy,
@@ -420,13 +419,13 @@ namespace Texpainter
 		{
 			auto const size_max     = doc.canvasSize();
 			auto const size_default = Size2d{size_max.width() / 2, size_max.height() / 2};
-			m_new_from_color_dlg =
+			m_new_empty_dlg =
 			    std::make_unique<LayerCreatorDlg>(std::pair{std::ref(doc), on_completed},
 			                                      r_dlg_owner,
 			                                      "Create new layer from current color",
 			                                      size_default,
 			                                      size_max);
-			m_new_from_color_dlg->eventHandler<ControlId::NewFromCurrentColor>(*this);
+			m_new_empty_dlg->eventHandler<ControlId::NewEmpty>(*this);
 		}
 
 		void onActivated(Ui::MenuItem&,
@@ -480,7 +479,7 @@ namespace Texpainter
 		}
 
 
-		void confirmPositive(Tag<ControlId::NewFromCurrentColor>, LayerCreatorDlg& src)
+		void confirmPositive(Tag<ControlId::NewEmpty>, LayerCreatorDlg& src)
 		{
 			auto layer_info = src.widget().value();
 			if(!isSupported<PixelStore::Pixel>(layer_info.size))
@@ -495,40 +494,10 @@ namespace Texpainter
 			               Model::Layer{layer_info.size, PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f}},
 			               src.widget().first.get());
 			src.widget().second();
-			m_new_from_color_dlg.reset();
+			m_new_empty_dlg.reset();
 		}
 
-		void dismiss(Tag<ControlId::NewFromCurrentColor>, LayerCreatorDlg&)
-		{
-			m_new_from_color_dlg.reset();
-		}
-
-		void confirmPositive(Tag<ControlId::NewFromNoise>, LayerCreatorDlg& src)
-		{
-			auto layer_info = src.widget().value();
-			if(!isSupported<PixelStore::Pixel>(layer_info.size))
-			{
-				// FIXME:
-				//   "A layer of this size cannot be created. The number of bytes required to create a layer
-				//   of "
-				//  "this size exeeds the largest supported integer value."};
-				return;
-			}
-
-			PixelStore::Image noise{layer_info.size};
-			std::ranges::generate(noise.pixels(), [rng = m_rng]() mutable {
-				std::uniform_real_distribution U{0.0f, 1.0f};
-				return PixelStore::Pixel{U(rng), U(rng), U(rng), U(rng)};
-			});
-
-			insertNewLayer(std::move(layer_info.name),
-			               Model::Layer{std::move(noise)},
-			               src.widget().first.get());
-			src.widget().second();
-			m_new_from_noise.reset();
-		}
-
-		void dismiss(Tag<ControlId::NewFromNoise>, LayerCreatorDlg&) { m_new_from_noise.reset(); }
+		void dismiss(Tag<ControlId::NewEmpty>, LayerCreatorDlg&) { m_new_empty_dlg.reset(); }
 
 		void confirmPositive(Tag<ControlId::CompositingOptions>, CompositingOptionsDlg& src)
 		{
@@ -573,8 +542,7 @@ namespace Texpainter
 		std::unique_ptr<NameInputDlg> m_rename_dlg;
 		std::unique_ptr<ConfirmationDlg> m_delete_dlg;
 
-		std::unique_ptr<LayerCreatorDlg> m_new_from_color_dlg;
-		std::unique_ptr<LayerCreatorDlg> m_new_from_noise;
+		std::unique_ptr<LayerCreatorDlg> m_new_empty_dlg;
 
 		std::unique_ptr<CompositingOptionsDlg> m_compositing_opts;
 
