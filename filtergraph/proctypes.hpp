@@ -63,11 +63,11 @@ namespace Texpainter::FilterGraph
 		Output
 	};
 
-	template<PortDirection type>
-	class Port
+	template<PortDirection dir>
+	class PortIndex
 	{
 	public:
-		explicit constexpr Port(uint32_t val): m_value{val} {}
+		explicit constexpr PortIndex(uint32_t val): m_value{val} {}
 
 		constexpr uint32_t value() const { return m_value; }
 
@@ -75,20 +75,20 @@ namespace Texpainter::FilterGraph
 		uint32_t m_value;
 	};
 
-	template<PortDirection type>
-	constexpr bool operator==(Port<type> a, Port<type> b)
+	template<PortDirection dir>
+	constexpr bool operator==(PortIndex<dir> a, PortIndex<dir> b)
 	{
 		return a.value() == b.value();
 	}
 
-	template<PortDirection type>
-	constexpr bool operator!=(Port<type> a, Port<type> b)
+	template<PortDirection dir>
+	constexpr bool operator!=(PortIndex<dir> a, PortIndex<dir> b)
 	{
 		return !(a == b);
 	}
 
-	using InputPort  = Port<PortDirection::Input>;
-	using OutputPort = Port<PortDirection::Output>;
+	using InputPort  = PortIndex<PortDirection::Input>;
+	using OutputPort = PortIndex<PortDirection::Output>;
 
 
 	enum class PixelType : size_t
