@@ -80,10 +80,10 @@ namespace Texpainter
 			if(currentLayer(doc) != nullptr)
 			{
 				m_new_empty_dlg = std::make_unique<PaletteCreateDlg>(
-					std::pair{std::ref(doc), on_completed},
-					r_dlg_owner,
-					"Create new palette",
-					"Are you sure you want to replace the current palette?");
+				    std::pair{std::ref(doc), on_completed},
+				    r_dlg_owner,
+				    "Create new palette",
+				    "Are you sure you want to replace the current palette?");
 				m_new_empty_dlg->eventHandler<ControlId::Clear>(*this);
 			}
 		}
@@ -95,7 +95,7 @@ namespace Texpainter
 			if(currentLayer(doc) != nullptr)
 			{
 				m_new_generated_dlg = std::make_unique<PaletteGenerateDlg>(
-					std::pair{std::ref(doc), on_completed}, r_dlg_owner, "Generate palette");
+				    std::pair{std::ref(doc), on_completed}, r_dlg_owner, "Generate palette");
 				m_new_generated_dlg->eventHandler<ControlId::Generate>(*this);
 			}
 		}
