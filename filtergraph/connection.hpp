@@ -9,15 +9,16 @@
 
 namespace Texpainter::FilterGraph
 {
-	template<class PortType>
+	template<class PortDirection>
 	class Endpoint
 	{
-		using node_type = std::conditional_t<std::is_same_v<PortType, InputPort>, Node, Node const>;
+		using node_type =
+		    std::conditional_t<std::is_same_v<PortDirection, InputPort>, Node, Node const>;
 
 	public:
 		Endpoint(): r_node{nullptr}, m_port{0} {}
 
-		Endpoint(std::reference_wrapper<node_type> node, PortType port)
+		Endpoint(std::reference_wrapper<node_type> node, PortDirection port)
 		    : r_node{&node.get()}
 		    , m_port{port}
 		{
@@ -31,7 +32,7 @@ namespace Texpainter::FilterGraph
 
 	private:
 		node_type* r_node;
-		PortType m_port;
+		PortDirection m_port;
 	};
 
 	class Connection

@@ -63,8 +63,8 @@ namespace Texpainter
 		return a += offset;
 	}
 
-	using InputPortId  = PortId<FilterGraph::PortType::Input>;
-	using OutputPortId = PortId<FilterGraph::PortType::Output>;
+	using InputPortId  = PortId<FilterGraph::PortDirection::Input>;
+	using OutputPortId = PortId<FilterGraph::PortDirection::Output>;
 
 	template<class Mesh, class IdArrayIterator>
 	class ConnectorMove
