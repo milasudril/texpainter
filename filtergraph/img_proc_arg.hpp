@@ -22,6 +22,8 @@ namespace Texpainter::FilterGraph
 		using InputArgs  = InArgTuple<portTypes(Descriptor::InputPorts)>;
 		using OutputArgs = OutArgTuple<portTypes(Descriptor::OutputPorts)>;
 
+		ImgProcArg(): m_size{0, 0} {}
+
 		explicit ImgProcArg(Size2d size, InputArgs const& inputs, OutputArgs const& outputs)
 		    : m_size{size}
 		    , m_inputs{inputs}
