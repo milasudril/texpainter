@@ -27,7 +27,7 @@ namespace Texpainter
 					return PixelStore::Pixel{0.33f, 0.33f, 0.33f, 1.0f};
 
 				case FilterGraph::PixelType::GrayscaleComplex:
-					return PixelStore::Pixel{0.25f, 0.25f, 1.0f, 1.0f};
+					return PixelStore::Pixel{0.66f, 0.0f, 0.33f, 1.0f};
 			}
 			__builtin_unreachable();
 		}
