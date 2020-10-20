@@ -13,7 +13,7 @@ namespace Texpainter::FilterGraph
 	class Endpoint
 	{
 		using node_type =
-		    std::conditional_t<std::is_same_v<PortDirection, InputPort>, Node, Node const>;
+		    std::conditional_t<std::is_same_v<PortDirection, InputPortIndex>, Node, Node const>;
 
 	public:
 		Endpoint(): r_node{nullptr}, m_port{0} {}
@@ -38,11 +38,12 @@ namespace Texpainter::FilterGraph
 	class Connection
 	{
 	public:
-		explicit Connection(std::reference_wrapper<Node> node, InputPort port): m_sink{node, port}
+		explicit Connection(std::reference_wrapper<Node> node, InputPortIndex port)
+		    : m_sink{node, port}
 		{
 		}
 
-		explicit Connection(std::reference_wrapper<Node const> node, OutputPort port)
+		explicit Connection(std::reference_wrapper<Node const> node, OutputPortIndex port)
 		    : m_source{node, port}
 		{
 		}
@@ -55,21 +56,21 @@ namespace Texpainter::FilterGraph
 
 		auto source() const { return m_source; }
 
-		Connection& sink(std::reference_wrapper<Node> node, InputPort port)
+		Connection& sink(std::reference_wrapper<Node> node, InputPortIndex port)
 		{
 			m_sink = {node, port};
 			return *this;
 		}
 
-		Connection& source(std::reference_wrapper<Node const> node, OutputPort port)
+		Connection& source(std::reference_wrapper<Node const> node, OutputPortIndex port)
 		{
 			m_source = {node, port};
 			return *this;
 		}
 
 	private:
-		Endpoint<InputPort> m_sink;
-		Endpoint<OutputPort> m_source;
+		Endpoint<InputPortIndex> m_sink;
+		Endpoint<OutputPortIndex> m_source;
 	};
 
 	template<class ValidationCallback>

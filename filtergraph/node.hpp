@@ -22,9 +22,9 @@ namespace Texpainter::FilterGraph
 		class SourceNode
 		{
 		public:
-			SourceNode(): r_processor{nullptr}, m_index{OutputPort{0}} {}
+			SourceNode(): r_processor{nullptr}, m_index{OutputPortIndex{0}} {}
 
-			explicit SourceNode(Node const* node, OutputPort index)
+			explicit SourceNode(Node const* node, OutputPortIndex index)
 			    : m_last_usecount{0}
 			    , r_processor{node}
 			    , m_index{index}
@@ -42,7 +42,7 @@ namespace Texpainter::FilterGraph
 
 			Node const& processor() const { return *r_processor; }
 
-			OutputPort port() const { return m_index; }
+			OutputPortIndex port() const { return m_index; }
 
 			bool valid() const { return r_processor != nullptr; }
 
@@ -51,7 +51,7 @@ namespace Texpainter::FilterGraph
 		private:
 			mutable size_t m_last_usecount;
 			Node const* r_processor;
-			OutputPort m_index;
+			OutputPortIndex m_index;
 		};
 
 	public:
@@ -104,7 +104,9 @@ namespace Texpainter::FilterGraph
 		}
 
 
-		Node& connect(InputPort input, std::reference_wrapper<Node const> other, OutputPort output)
+		Node& connect(InputPortIndex input,
+		              std::reference_wrapper<Node const> other,
+		              OutputPortIndex output)
 		{
 			assert(input.value() < inputPorts().size());
 			assert(output.value() < other.get().outputPorts().size());
@@ -120,7 +122,7 @@ namespace Texpainter::FilterGraph
 			return *this;
 		}
 
-		Node& disconnect(InputPort input)
+		Node& disconnect(InputPortIndex input)
 		{
 			assert(input.value() < NodeArgument::MaxNumInputs);
 			m_inputs[input.value()].processor().r_consumers.find(this)->second.erase(input);
@@ -129,7 +131,7 @@ namespace Texpainter::FilterGraph
 			return *this;
 		}
 
-		bool isConnected(InputPort input) const
+		bool isConnected(InputPortIndex input) const
 		{
 			assert(input.value() < NodeArgument::MaxNumInputs);
 			return m_inputs[input.value()].valid();
@@ -169,7 +171,7 @@ namespace Texpainter::FilterGraph
 			//       be dead pointers left in the producer.
 			for(size_t k = 0; k < m_inputs.size(); ++k)
 			{
-				auto const port = InputPort{static_cast<uint32_t>(k)};
+				auto const port = InputPortIndex{static_cast<uint32_t>(k)};
 				if(isConnected(port)) { disconnect(port); }
 			}
 		}
@@ -181,9 +183,9 @@ namespace Texpainter::FilterGraph
 		std::unique_ptr<AbstractImageProcessor> m_proc;
 		mutable result_type m_result_cache;
 
-		struct InputPortCompare
+		struct InputPortIndexCompare
 		{
-			constexpr bool operator()(InputPort a, InputPort b) const
+			constexpr bool operator()(InputPortIndex a, InputPortIndex b) const
 			{
 				return a.value() < b.value();
 			}
@@ -193,7 +195,7 @@ namespace Texpainter::FilterGraph
 		//       as const from the consumer side.
 		//
 		// TODO: Using std::set here is slightly overkill when there are only 4 ports
-		mutable std::map<Node*, std::set<InputPort, InputPortCompare>> r_consumers;
+		mutable std::map<Node*, std::set<InputPortIndex, InputPortIndexCompare>> r_consumers;
 
 
 		void clear_result_cache()

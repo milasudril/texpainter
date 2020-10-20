@@ -51,7 +51,7 @@ namespace Texpainter::FilterGraph
 			    &m_nodes.insert(std::make_pair(OutputNodeId, std::move(output))).first->second;
 			m_current_id = NodeId{2};
 
-			connect(OutputNodeId, InputPort{0}, InputNodeId, OutputPort{0});
+			connect(OutputNodeId, InputPortIndex{0}, InputNodeId, OutputPortIndex{0});
 		}
 
 		Graph(Graph const& other);
@@ -90,7 +90,7 @@ namespace Texpainter::FilterGraph
 			return ret != std::end(m_nodes) ? &ret->second : nullptr;
 		}
 
-		Graph& connect(NodeId a, InputPort sink, NodeId b, OutputPort src)
+		Graph& connect(NodeId a, InputPortIndex sink, NodeId b, OutputPortIndex src)
 		{
 			assert(node(a) != nullptr && node(b) != nullptr);
 			m_nodes[a].connect(sink, m_nodes[b], src);
@@ -98,7 +98,7 @@ namespace Texpainter::FilterGraph
 			return *this;
 		}
 
-		Graph& disconnect(NodeId a, InputPort sink)
+		Graph& disconnect(NodeId a, InputPortIndex sink)
 		{
 			assert(node(a) != nullptr);
 			m_nodes[a].disconnect(sink);

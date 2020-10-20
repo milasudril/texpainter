@@ -165,7 +165,8 @@ void Texpainter::FilterGraphEditor::updateLocations()
 	m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
 }
 
-void Texpainter::FilterGraphEditor::onClicked(NodeWidget const& src, FilterGraph::InputPort port)
+void Texpainter::FilterGraphEditor::onClicked(NodeWidget const& src,
+                                              FilterGraph::InputPortIndex port)
 {
 	if(m_con_proc == nullptr)
 	{
@@ -185,7 +186,8 @@ void Texpainter::FilterGraphEditor::onClicked(NodeWidget const& src, FilterGraph
 	}
 }
 
-void Texpainter::FilterGraphEditor::onClicked(NodeWidget const& src, FilterGraph::OutputPort port)
+void Texpainter::FilterGraphEditor::onClicked(NodeWidget const& src,
+                                              FilterGraph::OutputPortIndex port)
 {
 	if(m_con_proc == nullptr)
 	{

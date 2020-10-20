@@ -97,10 +97,10 @@ namespace Testcases
 	{
 		Texpainter::FilterGraph::Node obj;
 		assert(!obj.hasProcessor());
-		assert(!obj.isConnected(Texpainter::FilterGraph::InputPort{0}));
-		assert(!obj.isConnected(Texpainter::FilterGraph::InputPort{1}));
-		assert(!obj.isConnected(Texpainter::FilterGraph::InputPort{2}));
-		assert(!obj.isConnected(Texpainter::FilterGraph::InputPort{3}));
+		assert(!obj.isConnected(Texpainter::FilterGraph::InputPortIndex{0}));
+		assert(!obj.isConnected(Texpainter::FilterGraph::InputPortIndex{1}));
+		assert(!obj.isConnected(Texpainter::FilterGraph::InputPortIndex{2}));
+		assert(!obj.isConnected(Texpainter::FilterGraph::InputPortIndex{3}));
 		assert(!isConnected(obj));
 	}
 
@@ -121,15 +121,16 @@ namespace Testcases
 		input_stub.no_inputs = true;
 		Texpainter::FilterGraph::Node input{std::make_unique<ImageProcessorStub>(input_stub)};
 
-		obj.connect(
-		       Texpainter::FilterGraph::InputPort{0}, input, Texpainter::FilterGraph::OutputPort{0})
-		    .connect(Texpainter::FilterGraph::InputPort{1},
+		obj.connect(Texpainter::FilterGraph::InputPortIndex{0},
+		            input,
+		            Texpainter::FilterGraph::OutputPortIndex{0})
+		    .connect(Texpainter::FilterGraph::InputPortIndex{1},
 		             input,
-		             Texpainter::FilterGraph::OutputPort{2});
+		             Texpainter::FilterGraph::OutputPortIndex{2});
 		obj(Texpainter::Size2d{1, 1});
 	}
 
-	void texpainterFilterGraphNodeInputPorts()
+	void texpainterFilterGraphNodeInputPortIndexs()
 	{
 		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>()};
 		assert(obj.hasProcessor());
@@ -137,7 +138,7 @@ namespace Testcases
 		assert(std::ranges::equal(ports, ImageProcessorStub::s_input_ports));
 	}
 
-	void texpainterFilterGraphNodeOutputPorts()
+	void texpainterFilterGraphNodeOutputPortIndexs()
 	{
 		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>()};
 		assert(obj.hasProcessor());
@@ -154,16 +155,17 @@ namespace Testcases
 		input_stub.no_inputs = true;
 		Texpainter::FilterGraph::Node input{std::make_unique<ImageProcessorStub>(input_stub)};
 
-		obj.connect(
-		       Texpainter::FilterGraph::InputPort{0}, input, Texpainter::FilterGraph::OutputPort{0})
-		    .connect(Texpainter::FilterGraph::InputPort{1},
+		obj.connect(Texpainter::FilterGraph::InputPortIndex{0},
+		            input,
+		            Texpainter::FilterGraph::OutputPortIndex{0})
+		    .connect(Texpainter::FilterGraph::InputPortIndex{1},
 		             input,
-		             Texpainter::FilterGraph::OutputPort{2});
+		             Texpainter::FilterGraph::OutputPortIndex{2});
 		assert(isConnected(obj));
 
-		obj.disconnect(Texpainter::FilterGraph::InputPort{0});
-		assert(!obj.isConnected(Texpainter::FilterGraph::InputPort{0}));
-		assert(obj.isConnected(Texpainter::FilterGraph::InputPort{1}));
+		obj.disconnect(Texpainter::FilterGraph::InputPortIndex{0});
+		assert(!obj.isConnected(Texpainter::FilterGraph::InputPortIndex{0}));
+		assert(obj.isConnected(Texpainter::FilterGraph::InputPortIndex{1}));
 		assert(!isConnected(obj));
 	}
 
@@ -178,11 +180,12 @@ namespace Testcases
 		input_stub.no_inputs = true;
 		Texpainter::FilterGraph::Node input{std::make_unique<ImageProcessorStub>(input_stub)};
 
-		obj.connect(
-		       Texpainter::FilterGraph::InputPort{0}, input, Texpainter::FilterGraph::OutputPort{0})
-		    .connect(Texpainter::FilterGraph::InputPort{1},
+		obj.connect(Texpainter::FilterGraph::InputPortIndex{0},
+		            input,
+		            Texpainter::FilterGraph::OutputPortIndex{0})
+		    .connect(Texpainter::FilterGraph::InputPortIndex{1},
 		             input,
-		             Texpainter::FilterGraph::OutputPort{2});
+		             Texpainter::FilterGraph::OutputPortIndex{2});
 
 		assert((std::ranges::all_of(obj.inputs(), [](auto item) { return item.valid(); })));
 		std::array<Texpainter::FilterGraph::Node const*, 2> nodes{&input, &input};
@@ -190,8 +193,9 @@ namespace Testcases
 			return &item_a.processor() == item_b;
 		})));
 
-		std::array<Texpainter::FilterGraph::OutputPort, 2> output_ports{
-		    Texpainter::FilterGraph::OutputPort{0}, Texpainter::FilterGraph::OutputPort{2}};
+		std::array<Texpainter::FilterGraph::OutputPortIndex, 2> output_ports{
+		    Texpainter::FilterGraph::OutputPortIndex{0},
+		    Texpainter::FilterGraph::OutputPortIndex{2}};
 		assert((std::ranges::equal(
 		    obj.inputs(), output_ports, [](auto const& item_a, auto const& item_b) {
 			    return item_a.port() == item_b;
@@ -250,8 +254,8 @@ int main()
 	Testcases::texpainterFilterGraphNodeDefaultState();
 	Testcases::texpainterFilterGraphNodeClonedProcessor();
 	Testcases::texpainterFilterGraphNodeCall();
-	Testcases::texpainterFilterGraphNodeInputPorts();
-	Testcases::texpainterFilterGraphNodeOutputPorts();
+	Testcases::texpainterFilterGraphNodeInputPortIndexs();
+	Testcases::texpainterFilterGraphNodeOutputPortIndexs();
 	Testcases::texpainterFilterGraphNodeDisconnect();
 	Testcases::texpainterFilterGraphNodeInputs();
 	Testcases::texpainterFilterGraphNodeParamNames();

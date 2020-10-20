@@ -36,13 +36,13 @@ namespace Texpainter
 		constexpr unsigned short insertPosition() = delete;
 
 		template<>
-		constexpr unsigned short insertPosition<FilterGraph::InputPort>()
+		constexpr unsigned short insertPosition<FilterGraph::InputPortIndex>()
 		{
 			return 0;
 		}
 
 		template<>
-		constexpr unsigned short insertPosition<FilterGraph::OutputPort>()
+		constexpr unsigned short insertPosition<FilterGraph::OutputPortIndex>()
 		{
 			return Ui::Box::PositionBack;
 		}
@@ -154,8 +154,8 @@ namespace Texpainter
 	class NodeEditor
 	{
 	public:
-		using InputConnector  = detail::Connector<FilterGraph::InputPort, NodeEditor>;
-		using OutputConnector = detail::Connector<FilterGraph::OutputPort, NodeEditor>;
+		using InputConnector  = detail::Connector<FilterGraph::InputPortIndex, NodeEditor>;
+		using OutputConnector = detail::Connector<FilterGraph::OutputPortIndex, NodeEditor>;
 		using ParamInput      = detail::ParamInput<NodeEditor>;
 
 		NodeEditor(Ui::Container& owner, std::reference_wrapper<FilterGraph::Node> node)

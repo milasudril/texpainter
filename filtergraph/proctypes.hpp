@@ -87,8 +87,8 @@ namespace Texpainter::FilterGraph
 		return !(a == b);
 	}
 
-	using InputPort  = PortIndex<PortDirection::Input>;
-	using OutputPort = PortIndex<PortDirection::Output>;
+	using InputPortIndex  = PortIndex<PortDirection::Input>;
+	using OutputPortIndex = PortIndex<PortDirection::Output>;
 
 
 	enum class PixelType : size_t

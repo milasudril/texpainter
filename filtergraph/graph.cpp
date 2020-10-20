@@ -38,8 +38,10 @@ namespace
 				        if(conn.valid())
 				        {
 					        auto id_b = ptr_to_id.find(&conn.processor())->second;
-					        g2.connect(
-					            id_a, Texpainter::FilterGraph::InputPort{k}, id_b, conn.port());
+					        g2.connect(id_a,
+					                   Texpainter::FilterGraph::InputPortIndex{k},
+					                   id_b,
+					                   conn.port());
 				        }
 				        ++k;
 			        });

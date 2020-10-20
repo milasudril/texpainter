@@ -63,8 +63,8 @@ namespace Texpainter
 		return a += offset;
 	}
 
-	using InputPortId  = PortId<FilterGraph::PortDirection::Input>;
-	using OutputPortId = PortId<FilterGraph::PortDirection::Output>;
+	using InputPortId       = PortId<FilterGraph::PortDirection::Input>;
+	using OutputPortIndexId = PortId<FilterGraph::PortDirection::Output>;
 
 	template<class Mesh, class IdArrayIterator>
 	class ConnectorMove
@@ -106,33 +106,33 @@ namespace Texpainter
 		void addPorts(FilterGraph::Node& node);
 		void addConnections(FilterGraph::Node const& node);
 
-		void addConnection(FilterGraph::Endpoint<FilterGraph::InputPort> const& in,
-		                   FilterGraph::Endpoint<FilterGraph::OutputPort> const& out)
+		void addConnection(FilterGraph::Endpoint<FilterGraph::InputPortIndex> const& in,
+		                   FilterGraph::Endpoint<FilterGraph::OutputPortIndex> const& out)
 		{
 			m_connectors.connect(m_input_port_map.find(&in.node())->second[in.port().value()],
 			                     m_output_port_map.find(&out.node())->second[out.port().value()]);
 		}
 
 
-		void addDummyConnection(FilterGraph::Endpoint<FilterGraph::InputPort> const& in)
+		void addDummyConnection(FilterGraph::Endpoint<FilterGraph::InputPortIndex> const& in)
 		{
 			m_connectors.connect(m_input_port_map.find(&in.node())->second[in.port().value()],
-			                     OutputPortId{0});
+			                     OutputPortIndexId{0});
 		}
 
-		void addDummyConnection(FilterGraph::Endpoint<FilterGraph::OutputPort> const& out)
+		void addDummyConnection(FilterGraph::Endpoint<FilterGraph::OutputPortIndex> const& out)
 		{
 			m_connectors.connect(InputPortId{0},
 			                     m_output_port_map.find(&out.node())->second[out.port().value()]);
 		}
 
-		void removeDummyConnection(FilterGraph::Endpoint<FilterGraph::InputPort> const& in)
+		void removeDummyConnection(FilterGraph::Endpoint<FilterGraph::InputPortIndex> const& in)
 		{
 			if(auto i = m_input_port_map.find(&in.node()); i != std::end(m_input_port_map))
-			{ m_connectors.disconnect(i->second[in.port().value()], OutputPortId{0}); }
+			{ m_connectors.disconnect(i->second[in.port().value()], OutputPortIndexId{0}); }
 		}
 
-		void removeDummyConnection(FilterGraph::Endpoint<FilterGraph::OutputPort> const& out)
+		void removeDummyConnection(FilterGraph::Endpoint<FilterGraph::OutputPortIndex> const& out)
 		{
 			if(auto i = m_output_port_map.find(&out.node()); i != std::end(m_output_port_map))
 			{ m_connectors.disconnect(InputPortId{0}, i->second[out.port().value()]); }
@@ -140,26 +140,26 @@ namespace Texpainter
 
 		void moveDummyConnectors(Texpainter::Ui::ToplevelCoordinates loc)
 		{
-			m_connectors.node(InputPortId{0})  = loc;
-			m_connectors.node(OutputPortId{0}) = loc;
+			m_connectors.node(InputPortId{0})       = loc;
+			m_connectors.node(OutputPortIndexId{0}) = loc;
 		}
 
 
 		void removePorts(FilterGraph::Node const& node);
 
-		void removeConnection(FilterGraph::Endpoint<FilterGraph::InputPort> const& in,
-		                      FilterGraph::Endpoint<FilterGraph::OutputPort> const& out)
+		void removeConnection(FilterGraph::Endpoint<FilterGraph::InputPortIndex> const& in,
+		                      FilterGraph::Endpoint<FilterGraph::OutputPortIndex> const& out)
 		{
 			m_connectors.disconnect(m_input_port_map.find(&in.node())->second[in.port().value()],
 			                        m_output_port_map.find(&out.node())->second[in.port().value()]);
 		}
 
-		void removeConnections(FilterGraph::Endpoint<FilterGraph::InputPort> const& in)
+		void removeConnections(FilterGraph::Endpoint<FilterGraph::InputPortIndex> const& in)
 		{
 			m_connectors.disconnect(inputPort(in));
 		}
 
-		void removeConnection(InputPortId a, OutputPortId b) { m_connectors.disconnect(a, b); }
+		void removeConnection(InputPortId a, OutputPortIndexId b) { m_connectors.disconnect(a, b); }
 
 		template<class InputConnectorList, class OutputConnectorList>
 		void updateLocation(FilterGraph::Node const& node,
@@ -189,18 +189,18 @@ namespace Texpainter
 			return m_output_port_map.find(&node)->second;
 		}
 
-		InputPortId inputPort(FilterGraph::Endpoint<FilterGraph::InputPort> const& sink) const
+		InputPortId inputPort(FilterGraph::Endpoint<FilterGraph::InputPortIndex> const& sink) const
 		{
 			return m_input_port_map.find(&sink.node())->second[sink.port().value()];
 		}
 
 	private:
 		InputPortId m_port_id_in{0};
-		OutputPortId m_port_id_out{0};
+		OutputPortIndexId m_port_id_out{0};
 
-		EdgeList<InputPortId, OutputPortId, Ui::ToplevelCoordinates> m_connectors;
+		EdgeList<InputPortId, OutputPortIndexId, Ui::ToplevelCoordinates> m_connectors;
 		std::map<FilterGraph::Node const*, std::vector<InputPortId>> m_input_port_map;
-		std::map<FilterGraph::Node const*, std::vector<OutputPortId>> m_output_port_map;
+		std::map<FilterGraph::Node const*, std::vector<OutputPortIndexId>> m_output_port_map;
 	};
 
 
@@ -268,19 +268,19 @@ namespace Texpainter
 		template<ControlId>
 		void onViewportMoved(Canvas& src);
 
-		void onClicked(NodeWidget const& src, FilterGraph::InputPort port);
+		void onClicked(NodeWidget const& src, FilterGraph::InputPortIndex port);
 
-		void onClicked(NodeWidget const& src, FilterGraph::OutputPort port);
+		void onClicked(NodeWidget const& src, FilterGraph::OutputPortIndex port);
 
-		void handleException(char const* msg, NodeWidget const&, FilterGraph::InputPort)
+		void handleException(char const* msg, NodeWidget const&, FilterGraph::InputPortIndex)
 		{
 			// TODO: Use NodeWidget and InputPort to format a better message
 			m_err_disp.show(r_owner.get(), "Texpainter", msg);
 		}
 
-		void handleException(char const* msg, NodeWidget const&, FilterGraph::OutputPort)
+		void handleException(char const* msg, NodeWidget const&, FilterGraph::OutputPortIndex)
 		{
-			// TODO: Use NodeWidget and OutputPort to format a better message
+			// TODO: Use NodeWidget and OutputPortIndex to format a better message
 			m_err_disp.show(r_owner.get(), "Texpainter", msg);
 		}
 
