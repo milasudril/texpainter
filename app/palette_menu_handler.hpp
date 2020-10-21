@@ -114,12 +114,14 @@ namespace Texpainter
 
 		void confirmPositive(Tag<ControlId::Generate>, PaletteGenerateDlg& src)
 		{
-			modifyCurrentLayer(
-			    src.widget().first.get(),
-			    [palette = Model::generatePalette(src.widget().value().colors)](auto& layer) {
-				    layer.palette(palette);
-				    return true;
-			    });
+			auto result = src.widget().value();
+			modifyCurrentLayer(src.widget().first.get(),
+			                   [palette = Model::generatePalette(result.colors,
+			                                                     result.by_intensity,
+			                                                     result.reversed)](auto& layer) {
+				                   layer.palette(palette);
+				                   return true;
+			                   });
 
 			src.widget().second();
 			m_new_generated_dlg.reset();

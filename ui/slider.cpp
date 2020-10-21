@@ -77,7 +77,7 @@ Texpainter::Ui::Slider::Impl::Impl(Container& cnt, bool vertical): Slider{*this}
 	    vertical ? GTK_ORIENTATION_VERTICAL : GTK_ORIENTATION_HORIZONTAL, 0, 1, 1e-3);
 	gtk_range_set_inverted(GTK_RANGE(widget), vertical);  //	GTK draws the slider upside down
 	gtk_scale_set_draw_value(GTK_SCALE(widget), FALSE);
-	gtk_widget_set_size_request(widget, vertical ? 32 : 128, vertical ? 96 : 32);
+	gtk_widget_set_size_request(widget, vertical ? 32 : 128, vertical ? 128 : 32);
 
 	g_signal_connect(widget, "value-changed", G_CALLBACK(changed_callback), this);
 	m_handle = GTK_SCALE(widget);

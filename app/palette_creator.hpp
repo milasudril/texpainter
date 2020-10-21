@@ -15,6 +15,20 @@
 
 namespace Texpainter
 {
+	namespace PaletteCreator_detail
+	{
+		constexpr auto genTicks()
+		{
+			std::array<Ui::Slider::TickMark, 12> ret;
+			for(size_t k = 0; k < ret.size(); ++k)
+			{
+				ret[k] =
+				    Ui::Slider::TickMark{Ui::SliderValue{k / static_cast<double>(ret.size())}, ""};
+			}
+			return ret;
+		}
+	}
+
 	class PaletteCreator
 	{
 		class SliderWithPalView
@@ -55,6 +69,8 @@ namespace Texpainter
 		struct PaletteInfo
 		{
 			std::array<PixelStore::Pixel, 4> colors;
+			bool by_intensity;
+			bool reversed;
 		};
 
 		explicit PaletteCreator(Ui::Container& container)
@@ -64,14 +80,28 @@ namespace Texpainter
 		    , m_deco_2{m_root, Ui::Box::Orientation::Horizontal, "Deco 2: "}
 		    , m_deco_3{m_root, Ui::Box::Orientation::Horizontal, "Deco 3: "}
 		    , m_saturation{m_root, Ui::Box::Orientation::Horizontal, "Saturation: ", false}
+		    , m_order{m_root, Ui::Box::Orientation::Horizontal}
+		    , m_order_label{m_order, "Order: "}
+		    , m_by_intensity{m_order, "By intensity"}
+		    , m_reversed{m_order, "Reversed"}
 		{
-			m_base_hue.inputField().slider().eventHandler<ControlId::BaseHue>(*this);
-			m_deco_1.inputField().slider().eventHandler<ControlId::Deco1>(*this).value(
-			    Ui::SliderValue{0.5});
-			m_deco_2.inputField().slider().eventHandler<ControlId::Deco2>(*this).value(
-			    Ui::SliderValue{0.5});
-			m_deco_3.inputField().slider().eventHandler<ControlId::Deco3>(*this).value(
-			    Ui::SliderValue{0.5});
+			constexpr auto ticks = PaletteCreator_detail::genTicks();
+			m_base_hue.inputField().slider().eventHandler<ControlId::BaseHue>(*this).ticks(ticks);
+			m_deco_1.inputField()
+			    .slider()
+			    .eventHandler<ControlId::Deco1>(*this)
+			    .value(Ui::SliderValue{0.5})
+			    .ticks(ticks);
+			m_deco_2.inputField()
+			    .slider()
+			    .eventHandler<ControlId::Deco2>(*this)
+			    .value(Ui::SliderValue{0.5})
+			    .ticks(ticks);
+			m_deco_3.inputField()
+			    .slider()
+			    .eventHandler<ControlId::Deco3>(*this)
+			    .value(Ui::SliderValue{0.5})
+			    .ticks(ticks);
 			m_saturation.inputField().eventHandler<ControlId::Saturation>(*this).value(
 			    Ui::SliderValue{1.0});
 
@@ -84,7 +114,10 @@ namespace Texpainter
 			updateSliders();
 		}
 
-		PaletteInfo value() const { return PaletteInfo{generateColors()}; }
+		PaletteInfo value() const
+		{
+			return PaletteInfo{generateColors(), m_by_intensity.state(), m_reversed.state()};
+		}
 
 	private:
 		Ui::Box m_root;
@@ -93,6 +126,10 @@ namespace Texpainter
 		Ui::LabeledInput<SliderWithPalView> m_deco_2;
 		Ui::LabeledInput<SliderWithPalView> m_deco_3;
 		Ui::LabeledInput<Ui::Slider> m_saturation;
+		Ui::Box m_order;
+		Ui::Label m_order_label;
+		Ui::Button m_by_intensity;
+		Ui::Button m_reversed;
 
 		std::array<PixelStore::Pixel, 4> generateColors() const
 		{
