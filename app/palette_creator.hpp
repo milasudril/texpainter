@@ -15,6 +15,20 @@
 
 namespace Texpainter
 {
+	namespace PaletteCreator_detail
+	{
+		constexpr auto genTicks()
+		{
+			std::array<Ui::Slider::TickMark, 12> ret;
+			for(size_t k = 0; k < ret.size(); ++k)
+			{
+				ret[k] =
+				    Ui::Slider::TickMark{Ui::SliderValue{k / static_cast<double>(ret.size())}, ""};
+			}
+			return ret;
+		}
+	}
+
 	class PaletteCreator
 	{
 		class SliderWithPalView
@@ -65,13 +79,23 @@ namespace Texpainter
 		    , m_deco_3{m_root, Ui::Box::Orientation::Horizontal, "Deco 3: "}
 		    , m_saturation{m_root, Ui::Box::Orientation::Horizontal, "Saturation: ", false}
 		{
-			m_base_hue.inputField().slider().eventHandler<ControlId::BaseHue>(*this);
-			m_deco_1.inputField().slider().eventHandler<ControlId::Deco1>(*this).value(
-			    Ui::SliderValue{0.5});
-			m_deco_2.inputField().slider().eventHandler<ControlId::Deco2>(*this).value(
-			    Ui::SliderValue{0.5});
-			m_deco_3.inputField().slider().eventHandler<ControlId::Deco3>(*this).value(
-			    Ui::SliderValue{0.5});
+			constexpr auto ticks = PaletteCreator_detail::genTicks();
+			m_base_hue.inputField().slider().eventHandler<ControlId::BaseHue>(*this).ticks(ticks);
+			m_deco_1.inputField()
+			    .slider()
+			    .eventHandler<ControlId::Deco1>(*this)
+			    .value(Ui::SliderValue{0.5})
+			    .ticks(ticks);
+			m_deco_2.inputField()
+			    .slider()
+			    .eventHandler<ControlId::Deco2>(*this)
+			    .value(Ui::SliderValue{0.5})
+			    .ticks(ticks);
+			m_deco_3.inputField()
+			    .slider()
+			    .eventHandler<ControlId::Deco3>(*this)
+			    .value(Ui::SliderValue{0.5})
+			    .ticks(ticks);
 			m_saturation.inputField().eventHandler<ControlId::Saturation>(*this).value(
 			    Ui::SliderValue{1.0});
 

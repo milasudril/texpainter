@@ -80,12 +80,10 @@ namespace Testcases
 
 	void texpainterRgbHsiRgb()
 	{
-		auto const val_rgb = Texpainter::PixelStore::Pixel{0.25f, 0.5f, 1.0f, 1.0f};
-		auto const val_hsi = toHsi(val_rgb);
-		printf("%.7e\n", val_hsi.hue);
+		auto const val_rgb   = Texpainter::PixelStore::Pixel{0.25f, 0.5f, 1.0f, 1.0f};
+		auto const val_hsi   = toHsi(val_rgb);
 		auto const val_rgb_2 = toRgb(val_hsi);
 		assert(std::abs(val_rgb.red() - val_rgb_2.red()) < 1e-5f);
-		printf("%.7e %.7e\n", val_rgb.green(), val_rgb_2.green());
 		assert(std::abs(val_rgb.green() - val_rgb_2.green()) < 1e-5f);
 		assert(std::abs(val_rgb.blue() - val_rgb_2.blue() < 1e-5f));
 	}

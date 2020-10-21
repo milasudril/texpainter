@@ -21,13 +21,20 @@ namespace Texpainter::PixelStore
 
 	namespace detail
 	{
-		constexpr auto HueUnwrappedYellow = 1.0f / 6.0f;
-		constexpr auto HueUnwrappedGreen  = 3.4527740e-01f;
-		constexpr auto HueUnwrappedBlue   = 6.1349493e-01f;
+		constexpr auto HueUnwrappedYellow   = 1.0f / 6.0f;
+		constexpr auto HueUnwrappedGreen    = 3.4527740e-01f;
+		constexpr auto HueUnwrappedBlue     = 6.1349493e-01f;
+		constexpr auto HueUnwrappedIndigo   = 6.9079286e-01f;
+		constexpr auto HueUnwrappedViolette = 7.5191814e-01f;
+		constexpr auto HueUnwrappedPink     = 9.2916709e-01f;
 
-		constexpr auto HueWrappedYellow = 2.0f / 6.0f;
-		constexpr auto HueWrappedGreen  = 3.0f / 6.0f;
-		constexpr auto HueWrappedBlue   = 4.0f / 6.0f;
+		constexpr auto HueWrappedYellow   = 4.0f / 12.0f;
+		constexpr auto HueWrappedGreen    = 6.0f / 12.0f;
+		constexpr auto HueWrappedBlue     = 8.0f / 12.0f;
+		constexpr auto HueWrappedIndigo   = 9.0f / 12.0f;
+		constexpr auto HueWrappedViolette = 10.0f / 12.0f;
+		constexpr auto HueWrappedPink     = 11.0f / 12.0f;
+
 
 		constexpr auto wrapHue(float value)
 		{
@@ -47,9 +54,30 @@ namespace Texpainter::PixelStore
 				             / (HueUnwrappedBlue - HueUnwrappedGreen);
 			}
 
-			return HueWrappedBlue
-			       + (1.0f - HueWrappedBlue) * (value - HueUnwrappedBlue)
-			             / (1.0f - HueUnwrappedBlue);
+			if(value < HueUnwrappedIndigo)
+			{
+				return HueWrappedBlue
+				       + (HueWrappedIndigo - HueWrappedBlue) * (value - HueUnwrappedBlue)
+				             / (HueUnwrappedIndigo - HueUnwrappedBlue);
+			}
+
+			if(value < HueUnwrappedViolette)
+			{
+				return HueWrappedIndigo
+				       + (HueWrappedViolette - HueWrappedIndigo) * (value - HueUnwrappedIndigo)
+				             / (HueUnwrappedViolette - HueUnwrappedIndigo);
+			}
+
+			if(value < HueUnwrappedPink)
+			{
+				return HueWrappedViolette
+				       + (HueWrappedPink - HueWrappedViolette) * (value - HueUnwrappedViolette)
+				             / (HueUnwrappedPink - HueUnwrappedViolette);
+			}
+
+			return HueWrappedPink
+			       + (1.0f - HueWrappedPink) * (value - HueUnwrappedPink)
+			             / (1.0f - HueUnwrappedPink);
 		}
 
 		constexpr auto unwrapHue(float value)
@@ -70,8 +98,29 @@ namespace Texpainter::PixelStore
 				             / (HueWrappedBlue - HueWrappedGreen);
 			}
 
-			return HueUnwrappedBlue
-			       + (value - HueWrappedBlue) * (1.0f - HueUnwrappedBlue) / (1.0f - HueWrappedBlue);
+			if(value < HueWrappedIndigo)
+			{
+				return HueUnwrappedBlue
+				       + (value - HueWrappedBlue) * (HueUnwrappedIndigo - HueUnwrappedBlue)
+				             / (HueWrappedIndigo - HueWrappedBlue);
+			}
+
+			if(value < HueWrappedViolette)
+			{
+				return HueUnwrappedIndigo
+				       + (value - HueWrappedIndigo) * (HueUnwrappedViolette - HueUnwrappedIndigo)
+				             / (HueWrappedViolette - HueWrappedIndigo);
+			}
+
+			if(value < HueWrappedPink)
+			{
+				return HueUnwrappedViolette
+				       + (value - HueWrappedViolette) * (HueUnwrappedPink - HueUnwrappedViolette)
+				             / (HueWrappedPink - HueWrappedViolette);
+			}
+
+			return HueUnwrappedPink
+			       + (value - HueWrappedPink) * (1.0f - HueUnwrappedPink) / (1.0f - HueWrappedPink);
 		}
 	}
 
