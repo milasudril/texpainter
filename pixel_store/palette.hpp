@@ -19,6 +19,10 @@ namespace Texpainter::PixelStore
 
 		auto end() const { return std::end(m_data); }
 
+		auto begin() { return std::begin(m_data); }
+
+		auto end() { return std::end(m_data); }
+
 		auto size() const { return std::size(m_data); }
 
 
