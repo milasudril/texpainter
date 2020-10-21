@@ -32,7 +32,7 @@ namespace Texpainter
 			__builtin_unreachable();
 		}
 
-		template<class PortType>
+		template<class PortIndex>
 		constexpr unsigned short insertPosition() = delete;
 
 		template<>
@@ -47,16 +47,16 @@ namespace Texpainter
 			return Ui::Box::PositionBack;
 		}
 
-		template<class PortType, class EventHandler>
+		template<class PortIndex, class EventHandler>
 		class Connector
 		{
 		public:
-			using type = PortType;
+			using type = PortIndex;
 
-			explicit Connector(Ui::Container& owner, type port, FilterGraph::PortInfo info)
+			explicit Connector(Ui::Container& owner, PortIndex port, FilterGraph::PortInfo info)
 			    : m_port{port}
 			    , m_root{owner, Ui::Box::Orientation::Horizontal}
-			    , m_connector{m_root.insertMode(Ui::Box::InsertMode{0, insertPosition<type>()}),
+			    , m_connector{m_root.insertMode(Ui::Box::InsertMode{0, insertPosition<PortIndex>()}),
 			                  portColor(info.type)}
 			    , m_label{m_root, info.name}
 			{
@@ -86,7 +86,7 @@ namespace Texpainter
 
 		private:
 			EventHandler* r_eh;
-			type m_port;
+			PortIndex m_port;
 			Ui::Box m_root;
 			Ui::FilledShape m_connector;
 			Ui::Label m_label;
