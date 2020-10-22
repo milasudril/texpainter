@@ -11,13 +11,13 @@ namespace
 	{
 	public:
 		static constexpr std::array<Texpainter::FilterGraph::PortInfo const, 2> s_input_ports{
-		    {{Texpainter::FilterGraph::PixelType::RGBA, "Input 1"},
-		     {Texpainter::FilterGraph::PixelType::GrayscaleReal, "Input 2"}}};
+		    {{Texpainter::FilterGraph::PortType::RGBA, "Input 1"},
+		     {Texpainter::FilterGraph::PortType::GrayscaleReal, "Input 2"}}};
 
 		static constexpr std::array<Texpainter::FilterGraph::PortInfo const, 3> s_output_ports{
-		    {{Texpainter::FilterGraph::PixelType::RGBA, "Output 1"},
-		     {Texpainter::FilterGraph::PixelType::GrayscaleComplex, "Output 2"},
-		     {Texpainter::FilterGraph::PixelType::GrayscaleReal, "Output 3"}}};
+		    {{Texpainter::FilterGraph::PortType::RGBA, "Output 1"},
+		     {Texpainter::FilterGraph::PortType::GrayscaleComplex, "Output 2"},
+		     {Texpainter::FilterGraph::PortType::GrayscaleReal, "Output 3"}}};
 
 		static constexpr std::array<Texpainter::FilterGraph::ParamName const, 3> s_param_names{
 		    "Param 1", "Param 2", "Param 3"};

@@ -30,16 +30,16 @@ namespace Testcases
 		static_assert(Texpainter::FilterGraph::ImageSource<
 		                  Texpainter::FilterGraph::RealValue>::InterfaceDescriptor::OutputPorts[0]
 		                  .type
-		              == Texpainter::FilterGraph::PixelType::GrayscaleReal);
+		              == Texpainter::FilterGraph::PortType::GrayscaleReal);
 		static_assert(Texpainter::FilterGraph::ImageSource<
 		                  Texpainter::FilterGraph::RgbaValue>::InterfaceDescriptor::OutputPorts[0]
 		                  .type
-		              == Texpainter::FilterGraph::PixelType::RGBA);
+		              == Texpainter::FilterGraph::PortType::RGBA);
 		static_assert(
 		    Texpainter::FilterGraph::ImageSource<
 		        Texpainter::FilterGraph::ComplexValue>::InterfaceDescriptor::OutputPorts[0]
 		        .type
-		    == Texpainter::FilterGraph::PixelType::GrayscaleComplex);
+		    == Texpainter::FilterGraph::PortType::GrayscaleComplex);
 	}
 
 	void texpainterFilterGraphImageSourceCall()

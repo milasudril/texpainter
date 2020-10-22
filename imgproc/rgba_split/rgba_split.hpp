@@ -16,8 +16,8 @@ namespace RgbaSplit
 	using Texpainter::FilterGraph::ImgProcArg;
 	using Texpainter::FilterGraph::ParamName;
 	using Texpainter::FilterGraph::ParamValue;
-	using Texpainter::FilterGraph::PixelType;
 	using Texpainter::FilterGraph::PortInfo;
+	using Texpainter::FilterGraph::PortType;
 	using Texpainter::FilterGraph::RealValue;
 	using Texpainter::FilterGraph::RgbaValue;
 
@@ -26,13 +26,13 @@ namespace RgbaSplit
 	public:
 		struct InterfaceDescriptor
 		{
-			static constexpr std::array<PortInfo, 1> InputPorts{{PixelType::RGBA, "Pixels"}};
+			static constexpr std::array<PortInfo, 1> InputPorts{{PortType::RGBA, "Pixels"}};
 
 			static constexpr std::array<PortInfo, 4> OutputPorts{
-			    {{PixelType::GrayscaleReal, "Red"},
-			     {PixelType::GrayscaleReal, "Green"},
-			     {PixelType::GrayscaleReal, "Blue"},
-			     {PixelType::GrayscaleReal, "Alpha"}}};
+			    {{PortType::GrayscaleReal, "Red"},
+			     {PortType::GrayscaleReal, "Green"},
+			     {PortType::GrayscaleReal, "Blue"},
+			     {PortType::GrayscaleReal, "Alpha"}}};
 
 			static constexpr std::array<ParamName, 0> ParamNames{};
 		};

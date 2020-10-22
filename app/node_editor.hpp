@@ -17,16 +17,16 @@ namespace Texpainter
 {
 	namespace detail
 	{
-		constexpr PixelStore::Pixel portColor(FilterGraph::PixelType type)
+		constexpr PixelStore::Pixel portColor(FilterGraph::PortType type)
 		{
 			switch(type)
 			{
-				case FilterGraph::PixelType::RGBA: return PixelStore::Pixel{0.5f, 0.5f, 0.0f, 1.0f};
+				case FilterGraph::PortType::RGBA: return PixelStore::Pixel{0.5f, 0.5f, 0.0f, 1.0f};
 
-				case FilterGraph::PixelType::GrayscaleReal:
+				case FilterGraph::PortType::GrayscaleReal:
 					return PixelStore::Pixel{0.33f, 0.33f, 0.33f, 1.0f};
 
-				case FilterGraph::PixelType::GrayscaleComplex:
+				case FilterGraph::PortType::GrayscaleComplex:
 					return PixelStore::Pixel{0.66f, 0.0f, 0.33f, 1.0f};
 			}
 			__builtin_unreachable();
@@ -56,7 +56,8 @@ namespace Texpainter
 			explicit Connector(Ui::Container& owner, PortIndex port, FilterGraph::PortInfo info)
 			    : m_port{port}
 			    , m_root{owner, Ui::Box::Orientation::Horizontal}
-			    , m_connector{m_root.insertMode(Ui::Box::InsertMode{0, insertPosition<PortIndex>()}),
+			    , m_connector{m_root.insertMode(
+			                      Ui::Box::InsertMode{0, insertPosition<PortIndex>()}),
 			                  portColor(info.type)}
 			    , m_label{m_root, info.name}
 			{

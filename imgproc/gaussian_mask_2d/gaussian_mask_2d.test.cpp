@@ -18,7 +18,7 @@ namespace Testcases
 		static_assert(GaussianMask2d::ImageProcessor::InterfaceDescriptor::OutputPorts.size() == 1);
 
 		static_assert(GaussianMask2d::ImageProcessor::InterfaceDescriptor::OutputPorts[0].type
-		              == GaussianMask2d::PixelType::GrayscaleReal);
+		              == GaussianMask2d::PortType::GrayscaleReal);
 	}
 
 	void gaussianMaskImageProcessorName()

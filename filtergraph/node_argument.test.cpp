@@ -9,10 +9,10 @@
 #include <cassert>
 #include <cstring>
 
-constexpr auto types = std::array<Texpainter::FilterGraph::PixelType, 3>{
-    Texpainter::FilterGraph::PixelType::GrayscaleReal,
-    Texpainter::FilterGraph::PixelType::GrayscaleComplex,
-    Texpainter::FilterGraph::PixelType::RGBA,
+constexpr auto types = std::array<Texpainter::FilterGraph::PortType, 3>{
+    Texpainter::FilterGraph::PortType::GrayscaleReal,
+    Texpainter::FilterGraph::PortType::GrayscaleComplex,
+    Texpainter::FilterGraph::PortType::RGBA,
 };
 
 using MyInArgTuple = Texpainter::FilterGraph::InArgTuple<types>;

@@ -20,7 +20,7 @@ namespace Testcases
 		              == 1);
 
 		static_assert(ButterworthMask1d::ImageProcessor::InterfaceDescriptor::OutputPorts[0].type
-		              == ButterworthMask1d::PixelType::GrayscaleReal);
+		              == ButterworthMask1d::PortType::GrayscaleReal);
 	}
 
 	void butterworthMask1dImageProcessorName()

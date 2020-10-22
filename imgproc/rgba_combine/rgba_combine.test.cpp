@@ -18,16 +18,16 @@ namespace Testcases
 		static_assert(RgbaCombine::ImageProcessor::InterfaceDescriptor::OutputPorts.size() == 1);
 
 		static_assert(RgbaCombine::ImageProcessor::InterfaceDescriptor::OutputPorts[0].type
-		              == RgbaCombine::PixelType::RGBA);
+		              == RgbaCombine::PortType::RGBA);
 
 		static_assert(RgbaCombine::ImageProcessor::InterfaceDescriptor::InputPorts[0].type
-		              == RgbaCombine::PixelType::GrayscaleReal);
+		              == RgbaCombine::PortType::GrayscaleReal);
 		static_assert(RgbaCombine::ImageProcessor::InterfaceDescriptor::InputPorts[1].type
-		              == RgbaCombine::PixelType::GrayscaleReal);
+		              == RgbaCombine::PortType::GrayscaleReal);
 		static_assert(RgbaCombine::ImageProcessor::InterfaceDescriptor::InputPorts[2].type
-		              == RgbaCombine::PixelType::GrayscaleReal);
+		              == RgbaCombine::PortType::GrayscaleReal);
 		static_assert(RgbaCombine::ImageProcessor::InterfaceDescriptor::InputPorts[3].type
-		              == RgbaCombine::PixelType::GrayscaleReal);
+		              == RgbaCombine::PortType::GrayscaleReal);
 	}
 	void rgbaCombineImageProcessorCall()
 	{

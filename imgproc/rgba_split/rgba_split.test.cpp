@@ -18,16 +18,16 @@ namespace Testcases
 		static_assert(RgbaSplit::ImageProcessor::InterfaceDescriptor::OutputPorts.size() == 4);
 
 		static_assert(RgbaSplit::ImageProcessor::InterfaceDescriptor::InputPorts[0].type
-		              == RgbaSplit::PixelType::RGBA);
+		              == RgbaSplit::PortType::RGBA);
 
 		static_assert(RgbaSplit::ImageProcessor::InterfaceDescriptor::OutputPorts[0].type
-		              == RgbaSplit::PixelType::GrayscaleReal);
+		              == RgbaSplit::PortType::GrayscaleReal);
 		static_assert(RgbaSplit::ImageProcessor::InterfaceDescriptor::OutputPorts[1].type
-		              == RgbaSplit::PixelType::GrayscaleReal);
+		              == RgbaSplit::PortType::GrayscaleReal);
 		static_assert(RgbaSplit::ImageProcessor::InterfaceDescriptor::OutputPorts[2].type
-		              == RgbaSplit::PixelType::GrayscaleReal);
+		              == RgbaSplit::PortType::GrayscaleReal);
 		static_assert(RgbaSplit::ImageProcessor::InterfaceDescriptor::OutputPorts[3].type
-		              == RgbaSplit::PixelType::GrayscaleReal);
+		              == RgbaSplit::PortType::GrayscaleReal);
 	}
 	void rgbaSplitImageProcessorCall()
 	{

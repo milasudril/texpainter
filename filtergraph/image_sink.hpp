@@ -18,7 +18,7 @@ namespace Texpainter::FilterGraph
 	public:
 		struct InterfaceDescriptor
 		{
-			static constexpr std::array<PortInfo, 1> InputPorts{{PixelType::RGBA, "Pixels"}};
+			static constexpr std::array<PortInfo, 1> InputPorts{{PortType::RGBA, "Pixels"}};
 			static constexpr std::array<PortInfo, 0> OutputPorts{};
 			static constexpr std::array<ParamName, 0> ParamNames{};
 		};

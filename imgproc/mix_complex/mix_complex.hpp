@@ -20,8 +20,8 @@ namespace MixComplex
 	using Texpainter::FilterGraph::ParamMap;
 	using Texpainter::FilterGraph::ParamName;
 	using Texpainter::FilterGraph::ParamValue;
-	using Texpainter::FilterGraph::PixelType;
 	using Texpainter::FilterGraph::PortInfo;
+	using Texpainter::FilterGraph::PortType;
 
 	class ImageProcessor
 	{
@@ -29,10 +29,10 @@ namespace MixComplex
 		struct InterfaceDescriptor
 		{
 			static constexpr std::array<PortInfo, 2> InputPorts{
-			    {PortInfo{PixelType::GrayscaleComplex, "Input A"},
-			     PortInfo{PixelType::GrayscaleComplex, "Input B"}}};
+			    {PortInfo{PortType::GrayscaleComplex, "Input A"},
+			     PortInfo{PortType::GrayscaleComplex, "Input B"}}};
 			static constexpr std::array<PortInfo, 1> OutputPorts{
-			    {PixelType::GrayscaleComplex, "Output"}};
+			    {PortType::GrayscaleComplex, "Output"}};
 
 			static constexpr std::array<ParamName, 1> ParamNames{"Blend factor"};
 		};

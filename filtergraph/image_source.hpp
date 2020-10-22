@@ -14,10 +14,10 @@ namespace Texpainter::FilterGraph
 	namespace detail
 	{
 		template<class T>
-		struct PixelTypeToImgSourceId;
+		struct PortTypeToImgSourceId;
 
 		template<>
-		struct PixelTypeToImgSourceId<RgbaValue>
+		struct PortTypeToImgSourceId<RgbaValue>
 		{
 			static constexpr auto id()
 			{
@@ -26,7 +26,7 @@ namespace Texpainter::FilterGraph
 		};
 
 		template<>
-		struct PixelTypeToImgSourceId<RealValue>
+		struct PortTypeToImgSourceId<RealValue>
 		{
 			static constexpr auto id()
 			{
@@ -35,7 +35,7 @@ namespace Texpainter::FilterGraph
 		};
 
 		template<>
-		struct PixelTypeToImgSourceId<ComplexValue>
+		struct PortTypeToImgSourceId<ComplexValue>
 		{
 			static constexpr auto id()
 			{
@@ -46,7 +46,7 @@ namespace Texpainter::FilterGraph
 
 	}
 
-	template<class PixelType>
+	template<class PortType>
 	class ImageSource
 	{
 	public:
@@ -54,7 +54,7 @@ namespace Texpainter::FilterGraph
 		{
 			static constexpr std::array<PortInfo, 0> InputPorts{};
 			static constexpr std::array<PortInfo, 1> OutputPorts{
-			    {{typeToPixelType<PixelType>(), "Pixels"}}};
+			    {{typeToPortType<PortType>(), "Pixels"}}};
 			static constexpr std::array<ParamName, 0> ParamNames{};
 		};
 
@@ -71,12 +71,12 @@ namespace Texpainter::FilterGraph
 
 		static constexpr char const* name() { return "Layer input"; }
 
-		static constexpr auto id() { return detail::PixelTypeToImgSourceId<PixelType>::id(); }
+		static constexpr auto id() { return detail::PortTypeToImgSourceId<PortType>::id(); }
 
-		void source(Span2d<PixelType const> src) { r_pixels = src; }
+		void source(Span2d<PortType const> src) { r_pixels = src; }
 
 	private:
-		Span2d<PixelType const> r_pixels;
+		Span2d<PortType const> r_pixels;
 	};
 }
 

@@ -19,7 +19,7 @@ namespace Texpainter::FilterGraph
 		class GenInArgTuple: public GenInArgTuple<types, index - 1>
 		{
 		private:
-			using type_ = typename PixelTypeToType<types[index - 1]>::type;
+			using type_ = typename PortTypeToType<types[index - 1]>::type;
 
 		public:
 			using type = std::add_pointer_t<std::add_const_t<type_>>;
@@ -45,7 +45,7 @@ namespace Texpainter::FilterGraph
 		class GenOutArgTuple: public GenOutArgTuple<types, index - 1>
 		{
 		private:
-			using type_ = typename PixelTypeToType<types[index - 1]>::type;
+			using type_ = typename PortTypeToType<types[index - 1]>::type;
 
 		public:
 			using type = std::add_pointer_t<type_>;
@@ -71,7 +71,7 @@ namespace Texpainter::FilterGraph
 	template<size_t N>
 	constexpr auto portTypes(std::array<PortInfo, N> const& ports)
 	{
-		std::array<PixelType, N> ret{};
+		std::array<PortType, N> ret{};
 		std::ranges::transform(ports, std::begin(ret), [](auto val) { return val.type; });
 		return ret;
 	}

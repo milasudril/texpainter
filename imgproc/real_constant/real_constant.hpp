@@ -20,8 +20,8 @@ namespace RealConstant
 	using Texpainter::FilterGraph::ParamMap;
 	using Texpainter::FilterGraph::ParamName;
 	using Texpainter::FilterGraph::ParamValue;
-	using Texpainter::FilterGraph::PixelType;
 	using Texpainter::FilterGraph::PortInfo;
+	using Texpainter::FilterGraph::PortType;
 	using Texpainter::FilterGraph::RealValue;
 
 	class ImageProcessor
@@ -31,7 +31,7 @@ namespace RealConstant
 		{
 			static constexpr std::array<PortInfo, 0> InputPorts{};
 			static constexpr std::array<PortInfo, 1> OutputPorts{
-			    {PixelType::GrayscaleReal, "Output"}};
+			    {PortType::GrayscaleReal, "Output"}};
 
 			static constexpr std::array<ParamName, 1> ParamNames{"Value"};
 		};

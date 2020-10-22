@@ -19,8 +19,8 @@ namespace GrayscaleNoise
 	using Texpainter::FilterGraph::ParamMap;
 	using Texpainter::FilterGraph::ParamName;
 	using Texpainter::FilterGraph::ParamValue;
-	using Texpainter::FilterGraph::PixelType;
 	using Texpainter::FilterGraph::PortInfo;
+	using Texpainter::FilterGraph::PortType;
 	using Texpainter::FilterGraph::RealValue;
 
 	class ImageProcessor
@@ -30,7 +30,7 @@ namespace GrayscaleNoise
 		{
 			static constexpr std::array<PortInfo, 0> InputPorts{};
 			static constexpr std::array<PortInfo, 1> OutputPorts{
-			    {PortInfo{PixelType::GrayscaleReal, "Output"}}};
+			    {PortInfo{PortType::GrayscaleReal, "Output"}}};
 
 			static constexpr std::array<ParamName, 0> ParamNames{};
 		};

@@ -18,10 +18,10 @@ namespace Testcases
 		static_assert(DftForward::ImageProcessor::InterfaceDescriptor::OutputPorts.size() == 1);
 
 		static_assert(DftForward::ImageProcessor::InterfaceDescriptor::OutputPorts[0].type
-		              == DftForward::PixelType::GrayscaleComplex);
+		              == DftForward::PortType::GrayscaleComplex);
 
 		static_assert(DftForward::ImageProcessor::InterfaceDescriptor::InputPorts[0].type
-		              == DftForward::PixelType::GrayscaleReal);
+		              == DftForward::PortType::GrayscaleReal);
 	}
 
 	void dftForwardImageProcessorName()

@@ -20,8 +20,8 @@ namespace GaussianMask2d
 	using Texpainter::FilterGraph::ParamMap;
 	using Texpainter::FilterGraph::ParamName;
 	using Texpainter::FilterGraph::ParamValue;
-	using Texpainter::FilterGraph::PixelType;
 	using Texpainter::FilterGraph::PortInfo;
+	using Texpainter::FilterGraph::PortType;
 	using Texpainter::FilterGraph::RealValue;
 
 	class ImageProcessor
@@ -31,7 +31,7 @@ namespace GaussianMask2d
 		{
 			static constexpr std::array<PortInfo, 0> InputPorts{};
 			static constexpr std::array<PortInfo, 1> OutputPorts{
-			    {PortInfo{PixelType::GrayscaleReal, "Output"}}};
+			    {PortInfo{PortType::GrayscaleReal, "Output"}}};
 
 			static constexpr std::array<ParamName, 3> ParamNames{
 			    "Semi-axis 1", "Semi-axis 2", "Orientation"};

@@ -19,8 +19,8 @@ namespace DftForward
 	using Texpainter::FilterGraph::ImgProcArg;
 	using Texpainter::FilterGraph::ParamName;
 	using Texpainter::FilterGraph::ParamValue;
-	using Texpainter::FilterGraph::PixelType;
 	using Texpainter::FilterGraph::PortInfo;
+	using Texpainter::FilterGraph::PortType;
 	using Texpainter::FilterGraph::RealValue;
 
 	namespace Dft = Texpainter::Dft;
@@ -33,9 +33,9 @@ namespace DftForward
 		struct InterfaceDescriptor
 		{
 			static constexpr std::array<PortInfo, 1> InputPorts{
-			    {PortInfo{PixelType::GrayscaleReal, "Pixels"}}};
+			    {PortInfo{PortType::GrayscaleReal, "Pixels"}}};
 			static constexpr std::array<PortInfo, 1> OutputPorts{
-			    {PixelType::GrayscaleComplex, "Image spectrum"}};
+			    {PortType::GrayscaleComplex, "Image spectrum"}};
 
 			static constexpr std::array<ParamName, 0> ParamNames{};
 		};

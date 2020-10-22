@@ -19,8 +19,8 @@ namespace NormalizeGrayscale
 	using Texpainter::FilterGraph::ParamMap;
 	using Texpainter::FilterGraph::ParamName;
 	using Texpainter::FilterGraph::ParamValue;
-	using Texpainter::FilterGraph::PixelType;
 	using Texpainter::FilterGraph::PortInfo;
+	using Texpainter::FilterGraph::PortType;
 	using Texpainter::FilterGraph::RealValue;
 
 	class ImageProcessor
@@ -29,9 +29,9 @@ namespace NormalizeGrayscale
 		struct InterfaceDescriptor
 		{
 			static constexpr std::array<PortInfo, 1> InputPorts{
-			    PortInfo{PixelType::GrayscaleReal, "Input"}};
+			    PortInfo{PortType::GrayscaleReal, "Input"}};
 			static constexpr std::array<PortInfo, 1> OutputPorts{
-			    {PortInfo{PixelType::GrayscaleReal, "Output"}}};
+			    {PortInfo{PortType::GrayscaleReal, "Output"}}};
 
 			static constexpr std::array<ParamName, 0> ParamNames{};
 		};

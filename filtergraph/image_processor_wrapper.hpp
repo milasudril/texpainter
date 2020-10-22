@@ -22,7 +22,7 @@ namespace Texpainter::FilterGraph
 		{
 			if constexpr(n != 0)
 			{
-				size_array[n - 1] = sizeof(typename PixelTypeToType<outputs[n - 1]>::type);
+				size_array[n - 1] = sizeof(typename PortTypeToType<outputs[n - 1]>::type);
 				get_sizes<outputs, n - 1>(size_array);
 			}
 		}

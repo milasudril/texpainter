@@ -16,8 +16,8 @@ namespace RgbaCombine
 	using Texpainter::FilterGraph::ImgProcArg;
 	using Texpainter::FilterGraph::ParamName;
 	using Texpainter::FilterGraph::ParamValue;
-	using Texpainter::FilterGraph::PixelType;
 	using Texpainter::FilterGraph::PortInfo;
+	using Texpainter::FilterGraph::PortType;
 	using Texpainter::FilterGraph::RealValue;
 	using Texpainter::FilterGraph::RgbaValue;
 
@@ -27,11 +27,11 @@ namespace RgbaCombine
 		struct InterfaceDescriptor
 		{
 			static constexpr std::array<PortInfo, 4> InputPorts{
-			    {PortInfo{PixelType::GrayscaleReal, "Red"},
-			     PortInfo{PixelType::GrayscaleReal, "Green"},
-			     PortInfo{PixelType::GrayscaleReal, "Blue"},
-			     PortInfo{PixelType::GrayscaleReal, "Alpha"}}};
-			static constexpr std::array<PortInfo, 1> OutputPorts{{PixelType::RGBA, "Pixels"}};
+			    {PortInfo{PortType::GrayscaleReal, "Red"},
+			     PortInfo{PortType::GrayscaleReal, "Green"},
+			     PortInfo{PortType::GrayscaleReal, "Blue"},
+			     PortInfo{PortType::GrayscaleReal, "Alpha"}}};
+			static constexpr std::array<PortInfo, 1> OutputPorts{{PortType::RGBA, "Pixels"}};
 
 			static constexpr std::array<ParamName, 0> ParamNames{};
 		};
