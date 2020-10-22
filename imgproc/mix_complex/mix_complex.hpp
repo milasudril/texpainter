@@ -29,10 +29,10 @@ namespace MixComplex
 		struct InterfaceDescriptor
 		{
 			static constexpr std::array<PortInfo, 2> InputPorts{
-			    {PortInfo{PortType::GrayscaleComplex, "Input A"},
-			     PortInfo{PortType::GrayscaleComplex, "Input B"}}};
+			    {PortInfo{PortType::GrayscaleComplexPixels, "Input A"},
+			     PortInfo{PortType::GrayscaleComplexPixels, "Input B"}}};
 			static constexpr std::array<PortInfo, 1> OutputPorts{
-			    {PortType::GrayscaleComplex, "Output"}};
+			    {PortType::GrayscaleComplexPixels, "Output"}};
 
 			static constexpr std::array<ParamName, 1> ParamNames{"Blend factor"};
 		};

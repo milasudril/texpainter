@@ -27,11 +27,11 @@ namespace RgbaCombine
 		struct InterfaceDescriptor
 		{
 			static constexpr std::array<PortInfo, 4> InputPorts{
-			    {PortInfo{PortType::GrayscaleReal, "Red"},
-			     PortInfo{PortType::GrayscaleReal, "Green"},
-			     PortInfo{PortType::GrayscaleReal, "Blue"},
-			     PortInfo{PortType::GrayscaleReal, "Alpha"}}};
-			static constexpr std::array<PortInfo, 1> OutputPorts{{PortType::RGBA, "Pixels"}};
+			    {PortInfo{PortType::GrayscaleRealPixels, "Red"},
+			     PortInfo{PortType::GrayscaleRealPixels, "Green"},
+			     PortInfo{PortType::GrayscaleRealPixels, "Blue"},
+			     PortInfo{PortType::GrayscaleRealPixels, "Alpha"}}};
+			static constexpr std::array<PortInfo, 1> OutputPorts{{PortType::RGBAPixels, "Pixels"}};
 
 			static constexpr std::array<ParamName, 0> ParamNames{};
 		};

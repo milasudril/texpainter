@@ -10,9 +10,9 @@
 #include <cstring>
 
 constexpr auto types = std::array<Texpainter::FilterGraph::PortType, 3>{
-    Texpainter::FilterGraph::PortType::GrayscaleReal,
-    Texpainter::FilterGraph::PortType::GrayscaleComplex,
-    Texpainter::FilterGraph::PortType::RGBA,
+    Texpainter::FilterGraph::PortType::GrayscaleRealPixels,
+    Texpainter::FilterGraph::PortType::GrayscaleComplexPixels,
+    Texpainter::FilterGraph::PortType::RGBAPixels,
 };
 
 using MyInArgTuple = Texpainter::FilterGraph::InArgTuple<types>;

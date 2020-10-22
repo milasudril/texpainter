@@ -30,7 +30,7 @@ namespace GrayscaleNoise
 		{
 			static constexpr std::array<PortInfo, 0> InputPorts{};
 			static constexpr std::array<PortInfo, 1> OutputPorts{
-			    {PortInfo{PortType::GrayscaleReal, "Output"}}};
+			    {PortInfo{PortType::GrayscaleRealPixels, "Output"}}};
 
 			static constexpr std::array<ParamName, 0> ParamNames{};
 		};

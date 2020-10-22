@@ -31,7 +31,7 @@ namespace RealConstant
 		{
 			static constexpr std::array<PortInfo, 0> InputPorts{};
 			static constexpr std::array<PortInfo, 1> OutputPorts{
-			    {PortType::GrayscaleReal, "Output"}};
+			    {PortType::GrayscaleRealPixels, "Output"}};
 
 			static constexpr std::array<ParamName, 1> ParamNames{"Value"};
 		};

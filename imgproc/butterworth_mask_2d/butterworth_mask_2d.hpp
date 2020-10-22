@@ -30,7 +30,7 @@ namespace ButterworthMask2d
 		{
 			static constexpr std::array<PortInfo, 0> InputPorts{};
 			static constexpr std::array<PortInfo, 1> OutputPorts{
-			    {PortInfo{PortType::GrayscaleReal, "Output"}}};
+			    {PortInfo{PortType::GrayscaleRealPixels, "Output"}}};
 
 			static constexpr std::array<ParamName, 4> ParamNames{
 			    "Semi-axis 1", "Semi-axis 2", "Order", "Orientation"};

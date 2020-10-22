@@ -11,14 +11,14 @@ namespace
 	struct Ports
 	{
 		static constexpr auto InputPorts = std::array<Texpainter::FilterGraph::PortInfo, 3>{
-		    {{Texpainter::FilterGraph::PortType::RGBA, "Input 1"},
-		     {Texpainter::FilterGraph::PortType::GrayscaleReal, "Input 2"},
-		     {Texpainter::FilterGraph::PortType::GrayscaleComplex, "Input 3"}}};
+		    {{Texpainter::FilterGraph::PortType::RGBAPixels, "Input 1"},
+		     {Texpainter::FilterGraph::PortType::GrayscaleRealPixels, "Input 2"},
+		     {Texpainter::FilterGraph::PortType::GrayscaleComplexPixels, "Input 3"}}};
 
 		static constexpr auto OutputPorts = std::array<Texpainter::FilterGraph::PortInfo, 3>{
-		    {{Texpainter::FilterGraph::PortType::GrayscaleComplex, "Output 1"},
-		     {Texpainter::FilterGraph::PortType::GrayscaleReal, "Output 2"},
-		     {Texpainter::FilterGraph::PortType::RGBA, "Output 3"}}};
+		    {{Texpainter::FilterGraph::PortType::GrayscaleComplexPixels, "Output 1"},
+		     {Texpainter::FilterGraph::PortType::GrayscaleRealPixels, "Output 2"},
+		     {Texpainter::FilterGraph::PortType::RGBAPixels, "Output 3"}}};
 
 		static constexpr auto ParamNames =
 		    std::array<Texpainter::FilterGraph::ParamName, 1>{nullptr};

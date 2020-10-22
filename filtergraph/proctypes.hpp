@@ -93,9 +93,9 @@ namespace Texpainter::FilterGraph
 
 	enum class PortType : size_t
 	{
-		RGBA,
-		GrayscaleReal,
-		GrayscaleComplex
+		RGBAPixels,
+		GrayscaleRealPixels,
+		GrayscaleComplexPixels
 	};
 
 	using RgbaValue    = Texpainter::PixelStore::Pixel;
@@ -106,19 +106,19 @@ namespace Texpainter::FilterGraph
 	struct PortTypeToType;
 
 	template<>
-	struct PortTypeToType<PortType::RGBA>
+	struct PortTypeToType<PortType::RGBAPixels>
 	{
 		using type = RgbaValue;
 	};
 
 	template<>
-	struct PortTypeToType<PortType::GrayscaleReal>
+	struct PortTypeToType<PortType::GrayscaleRealPixels>
 	{
 		using type = RealValue;
 	};
 
 	template<>
-	struct PortTypeToType<PortType::GrayscaleComplex>
+	struct PortTypeToType<PortType::GrayscaleComplexPixels>
 	{
 		using type = ComplexValue;
 	};
@@ -129,19 +129,19 @@ namespace Texpainter::FilterGraph
 	template<>
 	constexpr PortType typeToPortType<RgbaValue>()
 	{
-		return PortType::RGBA;
+		return PortType::RGBAPixels;
 	}
 
 	template<>
 	constexpr PortType typeToPortType<RealValue>()
 	{
-		return PortType::GrayscaleReal;
+		return PortType::GrayscaleRealPixels;
 	}
 
 	template<>
 	constexpr PortType typeToPortType<ComplexValue>()
 	{
-		return PortType::GrayscaleComplex;
+		return PortType::GrayscaleComplexPixels;
 	}
 
 

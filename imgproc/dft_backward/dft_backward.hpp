@@ -33,9 +33,9 @@ namespace DftBackward
 		struct InterfaceDescriptor
 		{
 			static constexpr std::array<PortInfo, 1> InputPorts{
-			    {PortInfo{PortType::GrayscaleComplex, "Image spectrum"}}};
+			    {PortInfo{PortType::GrayscaleComplexPixels, "Image spectrum"}}};
 			static constexpr std::array<PortInfo, 1> OutputPorts{
-			    {PortType::GrayscaleReal, "Pixels"}};
+			    {PortType::GrayscaleRealPixels, "Pixels"}};
 
 			static constexpr std::array<ParamName, 0> ParamNames{};
 		};

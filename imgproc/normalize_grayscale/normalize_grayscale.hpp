@@ -29,9 +29,9 @@ namespace NormalizeGrayscale
 		struct InterfaceDescriptor
 		{
 			static constexpr std::array<PortInfo, 1> InputPorts{
-			    PortInfo{PortType::GrayscaleReal, "Input"}};
+			    PortInfo{PortType::GrayscaleRealPixels, "Input"}};
 			static constexpr std::array<PortInfo, 1> OutputPorts{
-			    {PortInfo{PortType::GrayscaleReal, "Output"}}};
+			    {PortInfo{PortType::GrayscaleRealPixels, "Output"}}};
 
 			static constexpr std::array<ParamName, 0> ParamNames{};
 		};

@@ -26,13 +26,13 @@ namespace RgbaSplit
 	public:
 		struct InterfaceDescriptor
 		{
-			static constexpr std::array<PortInfo, 1> InputPorts{{PortType::RGBA, "Pixels"}};
+			static constexpr std::array<PortInfo, 1> InputPorts{{PortType::RGBAPixels, "Pixels"}};
 
 			static constexpr std::array<PortInfo, 4> OutputPorts{
-			    {{PortType::GrayscaleReal, "Red"},
-			     {PortType::GrayscaleReal, "Green"},
-			     {PortType::GrayscaleReal, "Blue"},
-			     {PortType::GrayscaleReal, "Alpha"}}};
+			    {{PortType::GrayscaleRealPixels, "Red"},
+			     {PortType::GrayscaleRealPixels, "Green"},
+			     {PortType::GrayscaleRealPixels, "Blue"},
+			     {PortType::GrayscaleRealPixels, "Alpha"}}};
 
 			static constexpr std::array<ParamName, 0> ParamNames{};
 		};

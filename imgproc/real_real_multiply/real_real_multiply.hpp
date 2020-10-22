@@ -28,10 +28,10 @@ namespace RealRealMultiply
 		struct InterfaceDescriptor
 		{
 			static constexpr std::array<PortInfo, 2> InputPorts{
-			    {PortInfo{PortType::GrayscaleReal, "Input A"},
-			     PortInfo{PortType::GrayscaleReal, "Input B"}}};
+			    {PortInfo{PortType::GrayscaleRealPixels, "Input A"},
+			     PortInfo{PortType::GrayscaleRealPixels, "Input B"}}};
 			static constexpr std::array<PortInfo, 1> OutputPorts{
-			    {PortType::GrayscaleReal, "Output"}};
+			    {PortType::GrayscaleRealPixels, "Output"}};
 
 			static constexpr std::array<ParamName, 0> ParamNames{};
 		};
