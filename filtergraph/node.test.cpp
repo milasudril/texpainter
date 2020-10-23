@@ -34,10 +34,10 @@ namespace
 		Texpainter::FilterGraph::ParamName* called_with_paramname{nullptr};
 
 	private:
-		std::array<Texpainter::Memblock, MaxNumOutputs> operator()(
-		    Texpainter::FilterGraph::NodeArgument const&) const override
+		using result_type = Texpainter::FilterGraph::AbstractImageProcessor::result_type;
+		result_type operator()(Texpainter::FilterGraph::NodeArgument const&) const override
 		{
-			return std::array<Texpainter::Memblock, MaxNumOutputs>{
+			return result_type{
 			    Texpainter::Memblock{1}, Texpainter::Memblock{1}, Texpainter::Memblock{1}};
 		}
 

@@ -33,7 +33,7 @@ namespace Texpainter::FilterGraph
 			static_assert(std::size(InterfaceDescriptor::OutputPorts) <= 4);
 			std::array<size_t, std::size(InterfaceDescriptor::OutputPorts)> sizes;
 			get_sizes<portTypes(InterfaceDescriptor::OutputPorts)>(sizes);
-			std::array<Memblock, 4> ret;
+			AbstractImageProcessor::result_type ret;
 			std::ranges::transform(
 			    sizes, std::begin(ret), [size](auto val) { return Memblock{size.area() * val}; });
 			return ret;
@@ -52,7 +52,7 @@ namespace Texpainter::FilterGraph
 	public:
 		explicit ImageProcessorWrapper(Proc&& proc): m_proc{std::move(proc)} {}
 
-		std::array<Memblock, 4> operator()(NodeArgument const& arg) const override
+		result_type operator()(NodeArgument const& arg) const override
 		{
 			using InterfaceDescriptor = typename Proc::InterfaceDescriptor;
 			auto ret = detail::alloc_output_buffers<InterfaceDescriptor>(arg.size());
