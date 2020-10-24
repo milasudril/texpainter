@@ -55,7 +55,7 @@ namespace Texpainter::FilterGraph
 		};
 
 	public:
-		using result_type = std::array<Memblock, 4>;
+		using result_type = AbstractImageProcessor::result_type;
 
 
 		explicit Node(std::unique_ptr<AbstractImageProcessor> proc)
