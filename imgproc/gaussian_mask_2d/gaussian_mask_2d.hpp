@@ -6,11 +6,10 @@
 #ifndef TEXPAINTER_IMGPROC_GAUSSIANMASK2D_GAUSSIANMASK2D_HPP
 #define TEXPAINTER_IMGPROC_GAUSSIANMASK2D_GAUSSIANMASK2D_HPP
 
-#include "filtergraph/proctypes.hpp"
+#include "filtergraph/port_info.hpp"
 #include "filtergraph/img_proc_arg.hpp"
 #include "filtergraph/image_processor_id.hpp"
 #include "filtergraph/param_map.hpp"
-#include "pixel_store/image.hpp"
 
 namespace GaussianMask2d
 {

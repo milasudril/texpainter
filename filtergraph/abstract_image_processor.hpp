@@ -6,13 +6,14 @@
 #define TEXPAINTER_FILTERGRAPH_ABSTRACTIMAGEPROCESSOR_HPP
 
 #include "./node_argument.hpp"
-#include "./proctypes.hpp"
+#include "./port_info.hpp"
 #include "./image_processor_id.hpp"
 #include "./img_proc_param.hpp"
 
 #include "utils/memblock.hpp"
 
 #include <memory>
+#include <span>
 
 namespace Texpainter::FilterGraph
 {

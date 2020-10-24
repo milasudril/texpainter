@@ -6,7 +6,7 @@
 #ifndef TEXPAINTER_IMGPROC_DFTFORWARD_DFTFORWARD_HPP
 #define TEXPAINTER_IMGPROC_DFTFORWARD_DFTFORWARD_HPP
 
-#include "filtergraph/proctypes.hpp"
+#include "filtergraph/port_info.hpp"
 #include "filtergraph/img_proc_arg.hpp"
 #include "filtergraph/image_processor_id.hpp"
 

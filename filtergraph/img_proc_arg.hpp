@@ -6,7 +6,6 @@
 #define TEXPAINTER_FILTERGRAPH_IMGPROCARG_HPP
 
 #include "./argtuple.hpp"
-#include "./proctypes.hpp"
 #include "./img_proc_interface_descriptor.hpp"
 
 #include "utils/size_2d.hpp"

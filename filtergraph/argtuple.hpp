@@ -5,7 +5,7 @@
 #ifndef TEXPAINTER_FILTERGRAPH_ARGTUPLE_HPP
 #define TEXPAINTER_FILTERGRAPH_ARGTUPLE_HPP
 
-#include "./proctypes.hpp"
+#include "./port_info.hpp"
 
 #include <array>
 #include <type_traits>

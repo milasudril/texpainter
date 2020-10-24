@@ -5,11 +5,12 @@
 #ifndef TEXPAINTER_FILTERGRAPH_IMGPROCINTERFACEDESCRIPTOR_HPP
 #define TEXPAINTER_FILTERGRAPH_IMGPROCINTERFACEDESCRIPTOR_HPP
 
-#include "./proctypes.hpp"
+#include "./port_info.hpp"
 #include "./img_proc_param.hpp"
 
 #include <concepts>
 #include <type_traits>
+#include <span>
 
 namespace Texpainter::FilterGraph
 {

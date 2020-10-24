@@ -6,7 +6,7 @@
 #define TEXPAINTER_FILTERGRAPH_IMAGEPROCESSORWRAPPER_HPP
 
 #include "./node_argument.hpp"
-#include "./proctypes.hpp"
+#include "./port_info.hpp"
 #include "./img_proc_arg.hpp"
 #include "./abstract_image_processor.hpp"
 #include "./image_processor.hpp"

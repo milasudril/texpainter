@@ -6,7 +6,7 @@
 #define TEXPAINTER_UTILS_SNAP_HPP
 
 #include <algorithm>
-//#include <array>
+#include <array>
 
 namespace Texpainter
 {

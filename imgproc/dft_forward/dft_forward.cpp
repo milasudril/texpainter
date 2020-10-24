@@ -4,6 +4,8 @@
 
 #include "./dft_forward.hpp"
 
+#include "pixel_store/image.hpp"
+
 using TempBuffer = Texpainter::PixelStore::BasicImage<DftForward::ComplexValue>;
 
 void DftForward::ImageProcessor::operator()(ImgProcArg<InterfaceDescriptor> const& args) const

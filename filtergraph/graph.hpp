@@ -12,6 +12,7 @@
 #include "./image_sink.hpp"
 #include "./image_processor_wrapper.hpp"
 
+#include "pixel_store/image.hpp"
 #include "utils/iter_pair.hpp"
 
 #include <algorithm>

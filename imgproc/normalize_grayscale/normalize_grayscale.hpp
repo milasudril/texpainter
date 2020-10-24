@@ -6,7 +6,7 @@
 #ifndef TEXPAINTER_IMGPROC_NORMALIZEGRAYSCALE_NORMALIZEGRAYSCALE_HPP
 #define TEXPAINTER_IMGPROC_NORMALIZEGRAYSCALE_NORMALIZEGRAYSCALE_HPP
 
-#include "filtergraph/proctypes.hpp"
+#include "filtergraph/port_info.hpp"
 #include "filtergraph/img_proc_arg.hpp"
 #include "filtergraph/image_processor_id.hpp"
 #include "filtergraph/param_map.hpp"

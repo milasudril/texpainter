@@ -5,9 +5,11 @@
 #ifndef TEXPAINTER_FILTERGRAPH_IMAGESOURCE_HPP
 #define TEXPAINTER_FILTERGRAPH_IMAGESOURCE_HPP
 
-#include "./proctypes.hpp"
+#include "./port_info.hpp"
 #include "./img_proc_arg.hpp"
 #include "./image_processor_id.hpp"
+
+#include "utils/span_2d.hpp"
 
 namespace Texpainter::FilterGraph
 {

@@ -6,7 +6,7 @@
 #ifndef TEXPAINTER_FILTERGRAPH_PARAMMAP_HPP
 #define TEXPAINTER_FILTERGRAPH_PARAMMAP_HPP
 
-#include "./proctypes.hpp"
+#include "./img_proc_param.hpp"
 
 #include "utils/fixed_flatmap.hpp"
 

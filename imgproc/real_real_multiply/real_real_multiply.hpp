@@ -1,11 +1,11 @@
 //@	{
-//@	 "targets":[{"name":"complex_real_multiply.hpp", "type":"include"}]
+//@	 "targets":[{"name":"real_real_multiply.hpp", "type":"include"}]
 //@	}
 
 #ifndef TEXPAINTER_IMGPROC_REALREALMULTIPLY_REALREALMULTIPLY_HPP
 #define TEXPAINTER_IMGPROC_REALREALMULTIPLY_REALREALMULTIPLY_HPP
 
-#include "filtergraph/proctypes.hpp"
+#include "filtergraph/port_info.hpp"
 #include "filtergraph/img_proc_arg.hpp"
 #include "filtergraph/image_processor_id.hpp"
 
