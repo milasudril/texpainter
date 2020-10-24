@@ -75,7 +75,8 @@
 				"includedir_format": "-I^",
 				"includedir_noscan": [],
 				"iquote": [
-					"."
+					".",
+					"libenum"
 				],
 				"iquote_format": "-iquote^",
 				"libcompile": {

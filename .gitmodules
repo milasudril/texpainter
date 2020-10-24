@@ -1,3 +1,6 @@
 [submodule "pcg-cpp"]
 	path = pcg-cpp
 	url = https://github.com/imneme/pcg-cpp
+[submodule "libenum"]
+	path = libenum
+	url = https://github.com/milasudril/libenum
