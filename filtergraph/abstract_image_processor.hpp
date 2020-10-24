@@ -8,6 +8,7 @@
 #include "./node_argument.hpp"
 #include "./proctypes.hpp"
 #include "./image_processor_id.hpp"
+#include "./img_proc_param.hpp"
 
 #include "utils/memblock.hpp"
 

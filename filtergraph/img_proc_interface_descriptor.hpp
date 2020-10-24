@@ -6,6 +6,7 @@
 #define TEXPAINTER_FILTERGRAPH_IMGPROCINTERFACEDESCRIPTOR_HPP
 
 #include "./proctypes.hpp"
+#include "./img_proc_param.hpp"
 
 #include <concepts>
 #include <type_traits>
