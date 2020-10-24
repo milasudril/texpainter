@@ -6,6 +6,7 @@
 #define TEXPAINTER_FILTERGRAPH_PROCTYPES_HPP
 
 #include "pixel_store/image.hpp"
+#include "libenum/variant.hpp"
 
 #include <compare>
 #include <cstddef>
