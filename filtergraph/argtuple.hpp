@@ -6,6 +6,7 @@
 #define TEXPAINTER_FILTERGRAPH_ARGTUPLE_HPP
 
 #include "./port_info.hpp"
+#include "./port_value.hpp"
 
 #include <array>
 #include <type_traits>
@@ -15,24 +16,6 @@ namespace Texpainter::FilterGraph
 {
 	namespace detail
 	{
-		template<class T>
-		struct ArgTypeConst
-		{
-			using type = T;
-		};
-
-		template<class T>
-		struct ArgTypeConst<std::unique_ptr<T[]>>
-		{
-			using type = T const*;
-		};
-
-		template<class T>
-		struct ArgTypeConst<std::unique_ptr<T>>
-		{
-			using type = T const*;
-		};
-
 		template<auto types, size_t index = types.size()>
 		class GenInArgTuple: public GenInArgTuple<types, index - 1>
 		{
@@ -40,7 +23,7 @@ namespace Texpainter::FilterGraph
 			using type_ = typename PortTypeToType<types[index - 1]>::type;
 
 		public:
-			using type = ArgTypeConst<type_>::type;
+			using type = InputPortType<type_>::type;
 
 			constexpr GenInArgTuple() = default;
 
