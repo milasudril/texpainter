@@ -11,6 +11,8 @@
 
 #include "libenum/variant.hpp"
 
+#include <functional>
+
 
 namespace Texpainter::FilterGraph
 {
@@ -21,25 +23,28 @@ namespace Texpainter::FilterGraph
 		{
 			T::element_type;
 		};
+	}
 
-		template<class T>
-		requires(!SmartPointer<T>) struct MakeInputType
-		{
-			using type = std::conditional_t<(sizeof(T) <= 16), T, T const*>;
-		};
+	template<class T>
+	requires(!detail::SmartPointer<T>) struct InputPortType
+	{
+		using type = std::conditional_t<(sizeof(T) <= 16), T, std::reference_wrapper<T const>>;
+	};
 
-		template<class T>
-		struct MakeInputType<std::unique_ptr<T[]>>
-		{
-			using type = T const*;
-		};
+	template<class T>
+	struct InputPortType<std::unique_ptr<T[]>>
+	{
+		using type = T const*;
+	};
 
-		template<class T>
-		struct MakeInputType<std::unique_ptr<T>>
-		{
-			using type = T const*;
-		};
+	template<class T>
+	struct InputPortType<std::unique_ptr<T>>
+	{
+		using type = T const*;
+	};
 
+	namespace detail
+	{
 		template<class T>
 		auto makeInputPortValue(T const& val) requires(sizeof(T) <= 16)
 		{
@@ -61,18 +66,21 @@ namespace Texpainter::FilterGraph
 		template<class T>
 		auto makeInputPortValue(T const& val) requires(sizeof(T) > 16)
 		{
-			return &val;
+			return std::ref(val);
 		}
 	}
 
-	template<PortType t>
-	struct MakeInputPortValue
+	namespace detail
 	{
-		using type = typename detail::MakeInputType<typename PortTypeToType<t>::type>::type;
-	};
+		template<PortType t>
+		struct MakeInputPortValue
+		{
+			using type = typename InputPortType<typename PortTypeToType<t>::type>::type;
+		};
+	}
 
 	using PortValue      = Enum::Variant<PortType, PortTypeToType>;
-	using InputPortValue = Enum::Variant<PortType, MakeInputPortValue>;
+	using InputPortValue = Enum::Variant<PortType, detail::MakeInputPortValue>;
 
 	inline InputPortValue makeInputPortValue(PortValue const& val)
 	{
