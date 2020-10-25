@@ -26,7 +26,7 @@ namespace RgbaSplit
 	public:
 		struct InterfaceDescriptor
 		{
-			static constexpr std::array<PortInfo, 1> InputPorts{{PortType::RGBAPixels, "Pixels"}};
+			static constexpr std::array<PortInfo, 1> InputPorts{{PortType::RgbaPixels, "Pixels"}};
 
 			static constexpr std::array<PortInfo, 4> OutputPorts{
 			    {{PortType::GrayscaleRealPixels, "Red"},
@@ -45,7 +45,7 @@ namespace RgbaSplit
 
 		std::span<ParamValue const> paramValues() const { return std::span<ParamValue const>{}; }
 
-		static constexpr char const* name() { return "RGBA split"; }
+		static constexpr char const* name() { return "Rgba split"; }
 
 		static constexpr auto id() { return ImageProcessorId{"369c906fb7cfe8a1e10f5e8012ab5e60"}; }
 

@@ -12,7 +12,7 @@ namespace
 {
 	static_assert(
 	    Texpainter::FilterGraph::ImageProcessor<
-	        Texpainter::FilterGraph::ImageSource<Texpainter::FilterGraph::PortType::RGBAPixels>>);
+	        Texpainter::FilterGraph::ImageSource<Texpainter::FilterGraph::PortType::RgbaPixels>>);
 }
 
 namespace Testcases
@@ -35,9 +35,9 @@ namespace Testcases
 		              == Texpainter::FilterGraph::PortType::GrayscaleRealPixels);
 		static_assert(
 		    Texpainter::FilterGraph::ImageSource<
-		        Texpainter::FilterGraph::PortType::RGBAPixels>::InterfaceDescriptor::OutputPorts[0]
+		        Texpainter::FilterGraph::PortType::RgbaPixels>::InterfaceDescriptor::OutputPorts[0]
 		        .type
-		    == Texpainter::FilterGraph::PortType::RGBAPixels);
+		    == Texpainter::FilterGraph::PortType::RgbaPixels);
 		static_assert(Texpainter::FilterGraph::ImageSource<
 		                  Texpainter::FilterGraph::PortType::GrayscaleComplexPixels>::
 		                  InterfaceDescriptor::OutputPorts[0]

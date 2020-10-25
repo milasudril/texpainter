@@ -31,7 +31,7 @@ namespace RgbaCombine
 			     PortInfo{PortType::GrayscaleRealPixels, "Green"},
 			     PortInfo{PortType::GrayscaleRealPixels, "Blue"},
 			     PortInfo{PortType::GrayscaleRealPixels, "Alpha"}}};
-			static constexpr std::array<PortInfo, 1> OutputPorts{{PortType::RGBAPixels, "Pixels"}};
+			static constexpr std::array<PortInfo, 1> OutputPorts{{PortType::RgbaPixels, "Pixels"}};
 
 			static constexpr std::array<ParamName, 0> ParamNames{};
 		};
@@ -44,7 +44,7 @@ namespace RgbaCombine
 
 		std::span<ParamValue const> paramValues() const { return std::span<ParamValue const>{}; }
 
-		static constexpr char const* name() { return "RGBA combine"; }
+		static constexpr char const* name() { return "Rgba combine"; }
 
 		static constexpr auto id() { return ImageProcessorId{"2f1a5a2f195dde21a8629191e66fdb2d"}; }
 

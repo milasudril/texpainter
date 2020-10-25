@@ -11,7 +11,7 @@ namespace Testcases
 	{
 		Texpainter::FilterGraph::Graph g;
 		g.insert(
-		    Texpainter::FilterGraph::ImageSource<Texpainter::FilterGraph::PortType::RGBAPixels>{});
+		    Texpainter::FilterGraph::ImageSource<Texpainter::FilterGraph::PortType::RgbaPixels>{});
 	}
 }
 

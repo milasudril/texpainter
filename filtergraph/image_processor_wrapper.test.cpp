@@ -15,14 +15,14 @@ namespace
 		struct InterfaceDescriptor
 		{
 			static constexpr auto InputPorts = std::array<Texpainter::FilterGraph::PortInfo, 3>{
-			    {{Texpainter::FilterGraph::PortType::RGBAPixels, "Input 1"},
+			    {{Texpainter::FilterGraph::PortType::RgbaPixels, "Input 1"},
 			     {Texpainter::FilterGraph::PortType::GrayscaleRealPixels, "Input 2"},
 			     {Texpainter::FilterGraph::PortType::GrayscaleComplexPixels, "Input 3"}}};
 
 			static constexpr auto OutputPorts = std::array<Texpainter::FilterGraph::PortInfo, 4>{
 			    {{Texpainter::FilterGraph::PortType::GrayscaleComplexPixels, "Output 1"},
 			     {Texpainter::FilterGraph::PortType::GrayscaleRealPixels, "Output 2"},
-			     {Texpainter::FilterGraph::PortType::RGBAPixels, "Output 3"},
+			     {Texpainter::FilterGraph::PortType::RgbaPixels, "Output 3"},
 			     {Texpainter::FilterGraph::PortType::GrayscaleRealPixels, "Output 4"}}};
 
 			static constexpr auto ParamNames =

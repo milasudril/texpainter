@@ -21,7 +21,7 @@ namespace Testcases
 		static_assert(Texpainter::FilterGraph::ImageSink::InterfaceDescriptor::OutputPorts.size()
 		              == 0);
 		static_assert(Texpainter::FilterGraph::ImageSink::InterfaceDescriptor::InputPorts[0].type
-		              == Texpainter::FilterGraph::PortType::RGBAPixels);
+		              == Texpainter::FilterGraph::PortType::RgbaPixels);
 	}
 
 	void texpainterFilterGraphImageSinkCall()

@@ -14,7 +14,7 @@ namespace Texpainter::PixelStore
 {
 	namespace ColorProfiles
 	{
-		struct LinearRGBA
+		struct LinearRgba
 		{
 			static constexpr auto toLinear(vec4_t a) { return a; }
 
@@ -103,42 +103,42 @@ namespace Texpainter::PixelStore
 
 		constexpr BasicPixel& operator+=(BasicPixel other)
 		{
-			static_assert(std::is_same_v<ColorProfiles::LinearRGBA, ColorProfile>);
+			static_assert(std::is_same_v<ColorProfiles::LinearRgba, ColorProfile>);
 			m_value += other.m_value;
 			return *this;
 		}
 
 		constexpr BasicPixel& operator-=(BasicPixel other)
 		{
-			static_assert(std::is_same_v<ColorProfiles::LinearRGBA, ColorProfile>);
+			static_assert(std::is_same_v<ColorProfiles::LinearRgba, ColorProfile>);
 			m_value -= other.m_value;
 			return *this;
 		}
 
 		constexpr BasicPixel& operator/=(BasicPixel other)
 		{
-			static_assert(std::is_same_v<ColorProfiles::LinearRGBA, ColorProfile>);
+			static_assert(std::is_same_v<ColorProfiles::LinearRgba, ColorProfile>);
 			m_value /= other.m_value;
 			return *this;
 		}
 
 		constexpr BasicPixel& operator*=(BasicPixel other)
 		{
-			static_assert(std::is_same_v<ColorProfiles::LinearRGBA, ColorProfile>);
+			static_assert(std::is_same_v<ColorProfiles::LinearRgba, ColorProfile>);
 			m_value *= other.m_value;
 			return *this;
 		}
 
 		constexpr BasicPixel& operator*=(float factor)
 		{
-			static_assert(std::is_same_v<ColorProfiles::LinearRGBA, ColorProfile>);
+			static_assert(std::is_same_v<ColorProfiles::LinearRgba, ColorProfile>);
 			m_value *= factor;
 			return *this;
 		}
 
 		constexpr BasicPixel& operator/=(float factor)
 		{
-			static_assert(std::is_same_v<ColorProfiles::LinearRGBA, ColorProfile>);
+			static_assert(std::is_same_v<ColorProfiles::LinearRgba, ColorProfile>);
 			m_value /= factor;
 			return *this;
 		}
@@ -150,7 +150,7 @@ namespace Texpainter::PixelStore
 	template<class ColorProfile>
 	constexpr auto toLinear(BasicPixel<ColorProfile> a)
 	{
-		return BasicPixel<ColorProfiles::LinearRGBA>{ColorProfile::toLinear(a.value())};
+		return BasicPixel<ColorProfiles::LinearRgba>{ColorProfile::toLinear(a.value())};
 	}
 
 	template<class ColorProfileA, class ColorProfileB>
@@ -195,7 +195,7 @@ namespace Texpainter::PixelStore
 		return a * c;
 	}
 
-	using Pixel = BasicPixel<ColorProfiles::LinearRGBA>;
+	using Pixel = BasicPixel<ColorProfiles::LinearRgba>;
 
 	constexpr Pixel black() { return Pixel{0.0f, 0.0f, 0.0f}; }
 

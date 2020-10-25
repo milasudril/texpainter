@@ -41,8 +41,8 @@ namespace Texpainter::FilterGraph
 
 		Graph(): m_valid_state{ValidationState::NotValidated}
 		{
-			auto input = std::make_unique<ImageProcessorWrapper<ImageSource<PortType::RGBAPixels>>>(
-			    ImageSource<PortType::RGBAPixels>{});
+			auto input = std::make_unique<ImageProcessorWrapper<ImageSource<PortType::RgbaPixels>>>(
+			    ImageSource<PortType::RgbaPixels>{});
 			auto output = std::make_unique<ImageProcessorWrapper<ImageSink>>(ImageSink{});
 			r_input     = &input->processor();
 			r_output    = &output->processor();
@@ -161,7 +161,7 @@ namespace Texpainter::FilterGraph
 		void clearValidationState() { m_valid_state = ValidationState::NotValidated; }
 
 	private:
-		ImageSource<PortType::RGBAPixels>* r_input;
+		ImageSource<PortType::RgbaPixels>* r_input;
 		ImageSink* r_output;
 		Node* r_input_node;
 		Node* r_output_node;

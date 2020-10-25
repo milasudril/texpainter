@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"compositing_options_editor.hpp","type":"include"}]}
 
-#ifndef TEXPAINTER_APP_COMPOSITINGEDITOROPTIONS_HPP
-#define TEXPAINTER_APP_COMPOSITINGEDITOROPTIONS_HPP
+#ifndef TEXPAINTER_APP_COMPOSITINGOPTIONSEDITOR_HPP
+#define TEXPAINTER_APP_COMPOSITINGOPTIONSEDITOR_HPP
 
 #include "./filter_graph_editor.hpp"
 

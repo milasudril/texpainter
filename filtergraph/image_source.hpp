@@ -19,7 +19,7 @@ namespace Texpainter::FilterGraph
 		struct PortTypeToImgSourceId;
 
 		template<>
-		struct PortTypeToImgSourceId<PortType::RGBAPixels>
+		struct PortTypeToImgSourceId<PortType::RgbaPixels>
 		{
 			static constexpr auto id()
 			{

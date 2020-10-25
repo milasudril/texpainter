@@ -11,11 +11,11 @@ namespace
 	{
 	public:
 		static constexpr std::array<Texpainter::FilterGraph::PortInfo const, 2> s_input_ports{
-		    {{Texpainter::FilterGraph::PortType::RGBAPixels, "Input 1"},
+		    {{Texpainter::FilterGraph::PortType::RgbaPixels, "Input 1"},
 		     {Texpainter::FilterGraph::PortType::GrayscaleRealPixels, "Input 2"}}};
 
 		static constexpr std::array<Texpainter::FilterGraph::PortInfo const, 3> s_output_ports{
-		    {{Texpainter::FilterGraph::PortType::RGBAPixels, "Output 1"},
+		    {{Texpainter::FilterGraph::PortType::RgbaPixels, "Output 1"},
 		     {Texpainter::FilterGraph::PortType::GrayscaleComplexPixels, "Output 2"},
 		     {Texpainter::FilterGraph::PortType::GrayscaleRealPixels, "Output 3"}}};
 

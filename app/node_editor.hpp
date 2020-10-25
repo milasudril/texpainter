@@ -21,7 +21,7 @@ namespace Texpainter
 		{
 			switch(type)
 			{
-				case FilterGraph::PortType::RGBAPixels:
+				case FilterGraph::PortType::RgbaPixels:
 					return PixelStore::Pixel{0.5f, 0.5f, 0.0f, 1.0f};
 
 				case FilterGraph::PortType::GrayscaleRealPixels:

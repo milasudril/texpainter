@@ -18,7 +18,7 @@ namespace Testcases
 		static_assert(RgbaCombine::ImageProcessor::InterfaceDescriptor::OutputPorts.size() == 1);
 
 		static_assert(RgbaCombine::ImageProcessor::InterfaceDescriptor::OutputPorts[0].type
-		              == RgbaCombine::PortType::RGBAPixels);
+		              == RgbaCombine::PortType::RgbaPixels);
 
 		static_assert(RgbaCombine::ImageProcessor::InterfaceDescriptor::InputPorts[0].type
 		              == RgbaCombine::PortType::GrayscaleRealPixels);

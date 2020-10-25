@@ -18,12 +18,12 @@ namespace Texpainter::FilterGraph
 {
 	enum class PortType : size_t
 	{
-		RGBAPixels,
+		RgbaPixels,
 		GrayscaleRealPixels,
-		GrayscaleComplexPixels
+		GrayscaleComplexPixels,
 	};
 
-	constexpr PortType begin(Enum::Empty<PortType>) { return PortType::RGBAPixels; }
+	constexpr PortType begin(Enum::Empty<PortType>) { return PortType::RgbaPixels; }
 	constexpr PortType end(Enum::Empty<PortType>)
 	{
 		return Enum::add(PortType::GrayscaleComplexPixels);
@@ -37,7 +37,7 @@ namespace Texpainter::FilterGraph
 	struct PortTypeToType;
 
 	template<>
-	struct PortTypeToType<PortType::RGBAPixels>
+	struct PortTypeToType<PortType::RgbaPixels>
 	{
 		using type = std::unique_ptr<RgbaValue[]>;
 
@@ -62,28 +62,5 @@ namespace Texpainter::FilterGraph
 			return std::make_unique<ComplexValue[]>(size.area());
 		}
 	};
-
-#if 0
-	template<class T>
-	constexpr PortType typeToPortType() = delete;
-
-	template<>
-	constexpr PortType typeToPortType<std::unique_ptr<RgbaValue[]>>()
-	{
-		return PortType::RGBAPixels;
-	}
-
-	template<>
-	constexpr PortType typeToPortType<std::unique_ptr<RealValue[]>>()
-	{
-		return PortType::GrayscaleRealPixels;
-	}
-
-	template<>
-	constexpr PortType typeToPortType<std::unique_ptr<ComplexValue[]>>()
-	{
-		return PortType::GrayscaleComplexPixels;
-	}
-#endif
 }
 #endif
