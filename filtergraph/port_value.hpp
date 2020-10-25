@@ -40,7 +40,25 @@ namespace Texpainter::FilterGraph
 	template<class T>
 	struct InputPortType<std::unique_ptr<T>>
 	{
-		using type = T const*;
+		using type = std::reference_wrapper<T const>;
+	};
+
+	template<class T>
+	struct OutputPortType
+	{
+		using type = std::reference_wrapper<T>;
+	};
+
+	template<class T>
+	struct OutputPortType<std::unique_ptr<T[]>>
+	{
+		using type = T*;
+	};
+
+	template<class T>
+	struct OutputPortType<std::unique_ptr<T>>
+	{
+		using type = std::reference_wrapper<T>;
 	};
 
 	namespace detail

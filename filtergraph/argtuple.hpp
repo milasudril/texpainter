@@ -42,24 +42,6 @@ namespace Texpainter::FilterGraph
 		{
 		};
 
-		template<class T>
-		struct ArgType
-		{
-			using type = T;
-		};
-
-		template<class T>
-		struct ArgType<std::unique_ptr<T[]>>
-		{
-			using type = T*;
-		};
-
-		template<class T>
-		struct ArgType<std::unique_ptr<T*>>
-		{
-			using type = T*;
-		};
-
 		template<auto types, size_t index = types.size()>
 		class GenOutArgTuple: public GenOutArgTuple<types, index - 1>
 		{
@@ -67,7 +49,7 @@ namespace Texpainter::FilterGraph
 			using type_ = typename PortTypeToType<types[index - 1]>::type;
 
 		public:
-			using type = ArgType<type_>::type;
+			using type = OutputPortType<type_>::type;
 
 			constexpr GenOutArgTuple() = default;
 
