@@ -15,6 +15,24 @@ namespace Texpainter::FilterGraph
 {
 	namespace detail
 	{
+		template<class T>
+		struct ArgTypeConst
+		{
+			using type = T;
+		};
+
+		template<class T>
+		struct ArgTypeConst<std::unique_ptr<T[]>>
+		{
+			using type = T const*;
+		};
+
+		template<class T>
+		struct ArgTypeConst<std::unique_ptr<T>>
+		{
+			using type = T const*;
+		};
+
 		template<auto types, size_t index = types.size()>
 		class GenInArgTuple: public GenInArgTuple<types, index - 1>
 		{
@@ -22,7 +40,7 @@ namespace Texpainter::FilterGraph
 			using type_ = typename PortTypeToType<types[index - 1]>::type;
 
 		public:
-			using type = std::add_pointer_t<std::add_const_t<type_>>;
+			using type = ArgTypeConst<type_>::type;
 
 			constexpr GenInArgTuple() = default;
 
@@ -41,6 +59,24 @@ namespace Texpainter::FilterGraph
 		{
 		};
 
+		template<class T>
+		struct ArgType
+		{
+			using type = T;
+		};
+
+		template<class T>
+		struct ArgType<std::unique_ptr<T[]>>
+		{
+			using type = T*;
+		};
+
+		template<class T>
+		struct ArgType<std::unique_ptr<T*>>
+		{
+			using type = T*;
+		};
+
 		template<auto types, size_t index = types.size()>
 		class GenOutArgTuple: public GenOutArgTuple<types, index - 1>
 		{
@@ -48,7 +84,7 @@ namespace Texpainter::FilterGraph
 			using type_ = typename PortTypeToType<types[index - 1]>::type;
 
 		public:
-			using type = std::add_pointer_t<type_>;
+			using type = ArgType<type_>::type;
 
 			constexpr GenOutArgTuple() = default;
 
@@ -66,6 +102,38 @@ namespace Texpainter::FilterGraph
 		class GenOutArgTuple<types, 0>
 		{
 		};
+
+		template<auto types, class T = std::make_integer_sequence<size_t, types.size()>>
+		struct GenOutputBuffers;
+
+		template<auto types, size_t index>
+		struct IntToType: public PortTypeToType<types[index]>
+		{
+		};
+
+		template<auto types, size_t... indices>
+		struct GenOutputBuffers<types, std::integer_sequence<size_t, indices...>>
+		{
+			using type = std::tuple<typename IntToType<types, indices>::type...>;
+		};
+
+		template<class T>
+		auto get_output_buffer(T& buffer)
+		{
+			return std::ref(buffer);
+		}
+
+		template<class T>
+		auto get_output_buffer(std::unique_ptr<T[]>& buffer)
+		{
+			return buffer.get();
+		}
+
+		template<class T>
+		auto get_output_buffer(std::unique_ptr<T>& buffer)
+		{
+			return std::ref(*buffer);
+		}
 	}
 
 	template<size_t N>
@@ -132,6 +200,34 @@ namespace Texpainter::FilterGraph
 
 	private:
 		detail::GenOutArgTuple<types, types.size()> m_data;
+	};
+
+	template<auto types>
+	class OutputBuffers
+	{
+	public:
+		static constexpr auto size() { return types.size(); }
+
+		template<size_t index>
+		constexpr void init(Size2d size)
+		{
+			std::get<index>(m_data) = PortTypeToType<types[index]>::createValue(size);
+		}
+
+		template<size_t index>
+		constexpr decltype(auto) take()
+		{
+			return std::move(std::get<index>(m_data));
+		}
+
+		template<size_t index>
+		constexpr decltype(auto) get()
+		{
+			return detail::get_output_buffer(std::get<index>(m_data));
+		}
+
+	private:
+		detail::GenOutputBuffers<types>::type m_data;
 	};
 }
 

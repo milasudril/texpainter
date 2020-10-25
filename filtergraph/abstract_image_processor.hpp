@@ -9,6 +9,7 @@
 #include "./port_info.hpp"
 #include "./image_processor_id.hpp"
 #include "./img_proc_param.hpp"
+#include "./port_value.hpp"
 
 #include "utils/memblock.hpp"
 
@@ -21,7 +22,7 @@ namespace Texpainter::FilterGraph
 	{
 	public:
 		static constexpr size_t MaxNumOutputs = 4;
-		using result_type                     = std::array<Memblock, MaxNumOutputs>;
+		using result_type                     = std::array<PortValue, MaxNumOutputs>;
 
 		virtual result_type operator()(NodeArgument const& arg) const               = 0;
 		virtual std::span<PortInfo const> inputPorts() const                        = 0;

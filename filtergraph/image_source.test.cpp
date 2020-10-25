@@ -10,46 +10,50 @@
 
 namespace
 {
-	static_assert(Texpainter::FilterGraph::ImageProcessor<
-	              Texpainter::FilterGraph::ImageSource<Texpainter::FilterGraph::RgbaValue>>);
+	static_assert(
+	    Texpainter::FilterGraph::ImageProcessor<
+	        Texpainter::FilterGraph::ImageSource<Texpainter::FilterGraph::PortType::RGBAPixels>>);
 }
 
 namespace Testcases
 {
 	void texpainterFilterGraphImageSourceInterfaceDescriptor()
 	{
-		static_assert(
-		    Texpainter::FilterGraph::ImageSource<
-		        Texpainter::FilterGraph::RealValue>::InterfaceDescriptor::InputPorts.size()
-		    == 0);
-		static_assert(
-		    Texpainter::FilterGraph::ImageSource<
-		        Texpainter::FilterGraph::RealValue>::InterfaceDescriptor::OutputPorts.size()
-		    >= 1);
+		static_assert(Texpainter::FilterGraph::ImageSource<
+		                  Texpainter::FilterGraph::PortType::GrayscaleRealPixels>::
+		                  InterfaceDescriptor::InputPorts.size()
+		              == 0);
+		static_assert(Texpainter::FilterGraph::ImageSource<
+		                  Texpainter::FilterGraph::PortType::GrayscaleRealPixels>::
+		                  InterfaceDescriptor::OutputPorts.size()
+		              >= 1);
 
 		static_assert(Texpainter::FilterGraph::ImageSource<
-		                  Texpainter::FilterGraph::RealValue>::InterfaceDescriptor::OutputPorts[0]
-		                  .type
+		                  Texpainter::FilterGraph::PortType::GrayscaleRealPixels>::
+		                  InterfaceDescriptor::OutputPorts[0]
+		                      .type
 		              == Texpainter::FilterGraph::PortType::GrayscaleRealPixels);
-		static_assert(Texpainter::FilterGraph::ImageSource<
-		                  Texpainter::FilterGraph::RgbaValue>::InterfaceDescriptor::OutputPorts[0]
-		                  .type
-		              == Texpainter::FilterGraph::PortType::RGBAPixels);
 		static_assert(
 		    Texpainter::FilterGraph::ImageSource<
-		        Texpainter::FilterGraph::ComplexValue>::InterfaceDescriptor::OutputPorts[0]
+		        Texpainter::FilterGraph::PortType::RGBAPixels>::InterfaceDescriptor::OutputPorts[0]
 		        .type
-		    == Texpainter::FilterGraph::PortType::GrayscaleComplexPixels);
+		    == Texpainter::FilterGraph::PortType::RGBAPixels);
+		static_assert(Texpainter::FilterGraph::ImageSource<
+		                  Texpainter::FilterGraph::PortType::GrayscaleComplexPixels>::
+		                  InterfaceDescriptor::OutputPorts[0]
+		                      .type
+		              == Texpainter::FilterGraph::PortType::GrayscaleComplexPixels);
 	}
 
 	void texpainterFilterGraphImageSourceCall()
 	{
 		std::array<Texpainter::FilterGraph::RealValue, 6> pixels{1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
 		auto size = Texpainter::Size2d{3, 2};
-		Texpainter::FilterGraph::ImageSource<Texpainter::FilterGraph::RealValue> src;
+		Texpainter::FilterGraph::ImageSource<Texpainter::FilterGraph::PortType::GrayscaleRealPixels>
+		    src;
 		src.source(Texpainter::Span2d{pixels.data(), size});
 		using InterfaceDescriptor = Texpainter::FilterGraph::ImageSource<
-		    Texpainter::FilterGraph::RealValue>::InterfaceDescriptor;
+		    Texpainter::FilterGraph::PortType::GrayscaleRealPixels>::InterfaceDescriptor;
 		using ImgProcArg = Texpainter::FilterGraph::ImgProcArg<InterfaceDescriptor>;
 		using InputArgs  = ImgProcArg::InputArgs;
 		using OutputArgs = ImgProcArg::OutputArgs;
@@ -63,12 +67,12 @@ namespace Testcases
 
 	void texpainterFilterGraphImageSourceName()
 	{
-		static_assert(
-		    Texpainter::FilterGraph::ImageSource<Texpainter::FilterGraph::RealValue>::name()
-		    != nullptr);
-		static_assert(
-		    *Texpainter::FilterGraph::ImageSource<Texpainter::FilterGraph::RealValue>::name()
-		    != '\0');
+		static_assert(Texpainter::FilterGraph::ImageSource<
+		                  Texpainter::FilterGraph::PortType::GrayscaleRealPixels>::name()
+		              != nullptr);
+		static_assert(*Texpainter::FilterGraph::ImageSource<
+		                  Texpainter::FilterGraph::PortType::GrayscaleRealPixels>::name()
+		              != '\0');
 	}
 }
 

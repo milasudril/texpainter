@@ -17,32 +17,34 @@ namespace Texpainter::FilterGraph
 {
 	namespace detail
 	{
-		template<auto outputs, size_t n = std::size(outputs)>
-		void get_sizes(auto& size_array)
+		template<class Buffers, size_t n = Buffers::size()>
+		void alloc_output_buffers(Buffers& buffers, Size2d size)
 		{
 			if constexpr(n != 0)
 			{
-				size_array[n - 1] = sizeof(typename PortTypeToType<outputs[n - 1]>::type);
-				get_sizes<outputs, n - 1>(size_array);
+				buffers.template init<n - 1>(size);
+				alloc_output_buffers<Buffers, n - 1>(buffers, size);
 			}
 		}
 
-		template<class InterfaceDescriptor>
-		auto alloc_output_buffers(Size2d size)
+		template<class Buffers, class OutputArgs, size_t n = Buffers::size()>
+		void get_output_buffers(Buffers& buffers, OutputArgs& args)
 		{
-			static_assert(std::size(InterfaceDescriptor::OutputPorts) <= 4);
-			std::array<size_t, std::size(InterfaceDescriptor::OutputPorts)> sizes;
-			get_sizes<portTypes(InterfaceDescriptor::OutputPorts)>(sizes);
-			AbstractImageProcessor::result_type ret;
-			std::ranges::transform(
-			    sizes, std::begin(ret), [size](auto val) { return Memblock{size.area() * val}; });
-			return ret;
+			if constexpr(n != 0)
+			{
+				args.template get<n - 1>() = buffers.template get<n - 1>();
+				get_output_buffers<Buffers, OutputArgs, n - 1>(buffers, args);
+			}
 		}
 
-		template<class T>
-		void do_cast(T& pointer, void* other)
+		template<class Buffers, size_t n = Buffers::size()>
+		void take_output_buffers(Buffers& buffers, std::array<PortValue, 4>& ret)
 		{
-			pointer = reinterpret_cast<std::decay_t<T>>(other);
+			if constexpr(n != 0)
+			{
+				ret[n - 1] = std::move(buffers.template take<n - 1>());
+				take_output_buffers<Buffers, n - 1>(buffers, ret);
+			}
 		}
 	}
 
@@ -55,20 +57,20 @@ namespace Texpainter::FilterGraph
 		result_type operator()(NodeArgument const& arg) const override
 		{
 			using InterfaceDescriptor = typename Proc::InterfaceDescriptor;
-			auto ret = detail::alloc_output_buffers<InterfaceDescriptor>(arg.size());
 
 			using InputArgs  = typename ImgProcArg<InterfaceDescriptor>::InputArgs;
 			using OutputArgs = typename ImgProcArg<InterfaceDescriptor>::OutputArgs;
 
-			OutputArgs args_out{};
-			detail::apply(
-			    [&ret, index = 0](auto&... args) mutable {
-				    (..., detail::do_cast(args, ret[index++].get()));
-			    },
-			    args_out);
+			OutputBuffers<portTypes(InterfaceDescriptor::OutputPorts)> outputs;
+			detail::alloc_output_buffers(outputs, arg.size());
+
+			OutputArgs args_out;
+			detail::get_output_buffers(outputs, args_out);
 
 			m_proc(ImgProcArg<InterfaceDescriptor>{arg.size(), arg.inputs<InputArgs>(), args_out});
 
+			result_type ret;
+			detail::take_output_buffers(outputs, ret);
 			return ret;
 		}
 

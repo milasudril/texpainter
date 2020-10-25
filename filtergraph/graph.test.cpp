@@ -10,7 +10,8 @@ namespace Testcases
 	void texpainterFilterGraphGraphInsert()
 	{
 		Texpainter::FilterGraph::Graph g;
-		g.insert(Texpainter::FilterGraph::ImageSource<Texpainter::PixelStore::Pixel>{});
+		g.insert(
+		    Texpainter::FilterGraph::ImageSource<Texpainter::FilterGraph::PortType::RGBAPixels>{});
 	}
 }
 

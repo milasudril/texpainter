@@ -37,8 +37,9 @@ namespace
 		using result_type = Texpainter::FilterGraph::AbstractImageProcessor::result_type;
 		result_type operator()(Texpainter::FilterGraph::NodeArgument const&) const override
 		{
-			return result_type{
-			    Texpainter::Memblock{1}, Texpainter::Memblock{1}, Texpainter::Memblock{1}};
+			return result_type{std::make_unique<Texpainter::FilterGraph::RgbaValue[]>(1),
+			                   std::make_unique<Texpainter::FilterGraph::ComplexValue[]>(1),
+			                   std::make_unique<Texpainter::FilterGraph::RealValue[]>(1)};
 		}
 
 		std::span<Texpainter::FilterGraph::PortInfo const> inputPorts() const override

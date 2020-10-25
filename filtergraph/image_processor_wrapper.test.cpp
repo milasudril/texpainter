@@ -90,10 +90,14 @@ namespace Testcases
 		auto args = obj.processor().args_result;
 
 		assert(args.size() == size);
-		assert(ret[0].get() == args.output<0>());
-		assert(ret[1].get() == args.output<1>());
-		assert(ret[2].get() == args.output<2>());
-		assert(ret[3].get() == args.output<3>());
+		assert(get_if<std::unique_ptr<Texpainter::FilterGraph::ComplexValue[]>>(&ret[0])->get()
+		       == args.output<0>());
+		assert(get_if<std::unique_ptr<Texpainter::FilterGraph::RealValue[]>>(&ret[1])->get()
+		       == args.output<1>());
+		assert(get_if<std::unique_ptr<Texpainter::FilterGraph::RgbaValue[]>>(&ret[2])->get()
+		       == args.output<2>());
+		assert(get_if<std::unique_ptr<Texpainter::FilterGraph::RealValue[]>>(&ret[3])->get()
+		       == args.output<3>());
 		assert(Testutils::MallocHook::blockSize(args.output<0>())
 		       == size.area() * sizeof(Texpainter::FilterGraph::ComplexValue));
 		assert(Testutils::MallocHook::blockSize(args.output<1>())

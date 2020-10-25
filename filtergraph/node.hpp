@@ -31,13 +31,12 @@ namespace Texpainter::FilterGraph
 			{
 			}
 
-			void const* operator()(Size2d size) const
+			auto const& operator()(Size2d size) const
 			{
 				assert(valid());
 				auto const& ret = (*r_processor)(size);
-				assert(ret[m_index.value()].valid());
 				m_last_usecount = r_processor->m_usecount;
-				return ret[m_index.value()].get();
+				return ret[m_index.value()];
 			}
 
 			Node const& processor() const { return *r_processor; }
@@ -89,13 +88,13 @@ namespace Texpainter::FilterGraph
 
 			if(!dirty()) { return m_result_cache; }
 
-			std::array<void const*, NodeArgument::MaxNumInputs> args{};
+			std::array<InputPortValue, NodeArgument::MaxNumInputs> args{};
 			auto const n_ports   = inputPorts().size();
 			auto const input_end = std::begin(m_inputs) + n_ports;
 			std::transform(std::begin(m_inputs),
 			               input_end,
 			               std::begin(args),
-			               [size](auto const& val) { return val(size); });
+			               [size](auto const& val) { return makeInputPortValue(val(size)); });
 
 			m_result_cache = (*m_proc)(NodeArgument{size, args});
 			++m_usecount;

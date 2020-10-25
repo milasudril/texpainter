@@ -6,11 +6,13 @@
 #define TEXPAINTER_FILTERGRAPH_PORTTYPE_HPP
 
 #include "pixel_store/pixel.hpp"
+#include "utils/size_2d.hpp"
 
-#include "libenum/variant.hpp"
+#include "libenum/enum.hpp"
 
 #include <complex>
 #include <cstddef>
+#include <memory>
 
 namespace Texpainter::FilterGraph
 {
@@ -37,40 +39,51 @@ namespace Texpainter::FilterGraph
 	template<>
 	struct PortTypeToType<PortType::RGBAPixels>
 	{
-		using type = RgbaValue;
+		using type = std::unique_ptr<RgbaValue[]>;
+
+		static type createValue(Size2d size) { return std::make_unique<RgbaValue[]>(size.area()); }
 	};
 
 	template<>
 	struct PortTypeToType<PortType::GrayscaleRealPixels>
 	{
-		using type = RealValue;
+		using type = std::unique_ptr<RealValue[]>;
+
+		static type createValue(Size2d size) { return std::make_unique<RealValue[]>(size.area()); }
 	};
 
 	template<>
 	struct PortTypeToType<PortType::GrayscaleComplexPixels>
 	{
-		using type = ComplexValue;
+		using type = std::unique_ptr<ComplexValue[]>;
+
+		static type createValue(Size2d size)
+		{
+			return std::make_unique<ComplexValue[]>(size.area());
+		}
 	};
 
+#if 0
 	template<class T>
 	constexpr PortType typeToPortType() = delete;
 
 	template<>
-	constexpr PortType typeToPortType<RgbaValue>()
+	constexpr PortType typeToPortType<std::unique_ptr<RgbaValue[]>>()
 	{
 		return PortType::RGBAPixels;
 	}
 
 	template<>
-	constexpr PortType typeToPortType<RealValue>()
+	constexpr PortType typeToPortType<std::unique_ptr<RealValue[]>>()
 	{
 		return PortType::GrayscaleRealPixels;
 	}
 
 	template<>
-	constexpr PortType typeToPortType<ComplexValue>()
+	constexpr PortType typeToPortType<std::unique_ptr<ComplexValue[]>>()
 	{
 		return PortType::GrayscaleComplexPixels;
 	}
+#endif
 }
 #endif
