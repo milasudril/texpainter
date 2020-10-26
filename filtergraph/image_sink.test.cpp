@@ -32,6 +32,8 @@ namespace Testcases
 		using ImgProcArg          = Texpainter::FilterGraph::ImgProcArg<InterfaceDescriptor>;
 		using InputArgs           = ImgProcArg::InputArgs;
 		using OutputArgs          = ImgProcArg::OutputArgs;
+		using OutputBuffers =
+		    Texpainter::FilterGraph::OutputBuffers<portTypes(InterfaceDescriptor::OutputPorts)>;
 
 		InputArgs args{};
 		std::array<Texpainter::FilterGraph::RgbaValue, 6> pixels{
@@ -46,7 +48,9 @@ namespace Testcases
 		std::array<Texpainter::FilterGraph::RgbaValue, 6> pixels_out{};
 		sink.sink(Texpainter::Span2d{pixels_out.data(), size});
 
-		sink(ImgProcArg{size, args, OutputArgs{}});
+		OutputBuffers buffers{size};
+
+		sink(ImgProcArg{size, args, OutputArgs{buffers}});
 		assert(std::ranges::equal(pixels, pixels_out, [](auto a, auto b) {
 			auto diff = a - b;
 			return diff.red() == 0.0f && diff.green() == 0.0f && diff.blue() == 0.0f

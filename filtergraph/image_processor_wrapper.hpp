@@ -17,16 +17,6 @@ namespace Texpainter::FilterGraph
 {
 	namespace detail
 	{
-		template<class Buffers, class OutputArgs, size_t n = Buffers::size()>
-		void get_output_buffers(Buffers& buffers, OutputArgs& args)
-		{
-			if constexpr(n != 0)
-			{
-				args.template get<n - 1>() = buffers.template get<n - 1>();
-				get_output_buffers<Buffers, OutputArgs, n - 1>(buffers, args);
-			}
-		}
-
 		template<class Buffers, size_t n = Buffers::size()>
 		void take_output_buffers(Buffers& buffers, std::array<PortValue, 4>& ret)
 		{
@@ -53,10 +43,8 @@ namespace Texpainter::FilterGraph
 
 			OutputBuffers<portTypes(InterfaceDescriptor::OutputPorts)> outputs{arg.size()};
 
-			OutputArgs args_out;
-			detail::get_output_buffers(outputs, args_out);
-
-			m_proc(ImgProcArg<InterfaceDescriptor>{arg.size(), arg.inputs<InputArgs>(), args_out});
+			m_proc(ImgProcArg<InterfaceDescriptor>{
+			    arg.size(), arg.inputs<InputArgs>(), OutputArgs{outputs}});
 
 			result_type ret;
 			detail::take_output_buffers(outputs, ret);

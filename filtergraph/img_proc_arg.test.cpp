@@ -38,15 +38,12 @@ namespace Testcases
 		    1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
 		std::array<Texpainter::FilterGraph::ComplexValue, size.area()> const input3{};
 
-		std::array<Texpainter::FilterGraph::ComplexValue, size.area()> output1{};
-		std::array<Texpainter::FilterGraph::RealValue, size.area()> output2{};
-		std::array<Texpainter::PixelStore::Pixel, size.area()> output3{};
-
+		Texpainter::FilterGraph::OutputBuffers<portTypes(Ports::OutputPorts)> outputs{size};
 
 		Texpainter::FilterGraph::ImgProcArg<Ports> const obj{
 		    size,
 		    InArgs{std::begin(input3), std::begin(input2), std::begin(input1)},
-		    OutArgs{std::begin(output3), std::begin(output2), std::begin(output1)}};
+		    Texpainter::FilterGraph::OutArgTuple{outputs}};
 
 		assert(obj.size() == size);
 
@@ -72,7 +69,7 @@ namespace Testcases
 		*ptr     = Texpainter::FilterGraph::ComplexValue{1, 2};
 		static_assert(std::is_same_v<decltype(ptr), Texpainter::FilterGraph::ComplexValue*>);
 		assert((*ptr == Texpainter::FilterGraph::ComplexValue{1, 2}));
-		assert(ptr == std::begin(output1));
+		assert(ptr == outputs.template get<0>());
 	}
 }
 

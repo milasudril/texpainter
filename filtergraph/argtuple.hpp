@@ -128,34 +128,6 @@ namespace Texpainter::FilterGraph
 		detail::GenInArgTuple<types, types.size()> m_data;
 	};
 
-	template<auto types>
-	class OutArgTuple
-	{
-	public:
-		template<class... Args>
-		constexpr explicit OutArgTuple(Args&&... args): m_data{std::forward<Args>(args)...}
-		{
-		}
-
-		static constexpr auto size() { return types.size(); }
-
-		template<size_t index>
-		constexpr auto& get()
-		{
-			static_assert(index < types.size());
-			return static_cast<detail::GenOutArgTuple<types, index + 1>&>(m_data).value;
-		}
-
-		template<size_t index>
-		constexpr auto get() const
-		{
-			static_assert(index < types.size());
-			return static_cast<detail::GenOutArgTuple<types, index + 1> const&>(m_data).value;
-		}
-
-	private:
-		detail::GenOutArgTuple<types, types.size()> m_data;
-	};
 
 	template<auto types>
 	class OutputBuffers
@@ -181,6 +153,42 @@ namespace Texpainter::FilterGraph
 		constexpr decltype(auto) get()
 		{
 			return detail::get_output_buffer(std::get<index>(m_data));
+		}
+
+	private:
+		storage_type m_data;
+	};
+
+	namespace detail
+	{
+		template<PortType t>
+		struct GenOutputPortType
+		{
+			using type = OutputPortType<typename PortTypeToType<t>::type>::type;
+		};
+	}
+
+	template<auto types>
+	class OutArgTuple
+	{
+		using storage_type = Enum::TupleFromTypeArray<types, detail::GenOutputPortType>;
+
+	public:
+		OutArgTuple() = default;
+
+		constexpr explicit OutArgTuple(OutputBuffers<types>& buffers)
+		    : m_data{createTuple<storage_type>(
+		        [&buffers]<class T>(T) { return buffers.template get<T::value>(); })}
+		{
+		}
+
+		static constexpr auto size() { return types.size(); }
+
+		template<size_t index>
+		constexpr auto get() const
+		{
+			static_assert(index < types.size());
+			return std::get<index>(m_data);
 		}
 
 	private:

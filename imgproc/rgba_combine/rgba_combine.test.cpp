@@ -48,26 +48,29 @@ namespace Testcases
 		using ImgProcArg          = RgbaCombine::ImgProcArg<InterfaceDescriptor>;
 		using InputArgs           = ImgProcArg::InputArgs;
 		using OutputArgs          = ImgProcArg::OutputArgs;
+		using OutputBuffers =
+		    Texpainter::FilterGraph::OutputBuffers<portTypes(InterfaceDescriptor::OutputPorts)>;
 
-		std::array<RgbaCombine::RgbaValue, 6> pixels_out{};
 		InputArgs in{};
 		in.get<0>() = red.data();
 		in.get<1>() = green.data();
 		in.get<2>() = blue.data();
 		in.get<3>() = alpha.data();
 
-		OutputArgs out{};
-		out.get<0>() = pixels_out.data();
+		Texpainter::Size2d size{3, 2};
+		OutputBuffers outputs{size};
 
 		RgbaCombine::ImageProcessor proc;
-		Texpainter::Size2d size{3, 2};
-		proc(ImgProcArg{size, in, out});
+		proc(ImgProcArg{size, in, OutputArgs{outputs}});
 
-		assert(std::ranges::equal(pixels_out_expected, pixels_out, [](auto a, auto b) {
-			auto diff = a - b;
-			return diff.red() == 0.0f && diff.green() == 0.0f && diff.blue() == 0.0f
-			       && diff.alpha() == 0.0f;
-		}));
+		assert(std::equal(std::begin(pixels_out_expected),
+		                  std::end(pixels_out_expected),
+		                  outputs.template get<0>(),
+		                  [](auto a, auto b) {
+			                  auto diff = a - b;
+			                  return diff.red() == 0.0f && diff.green() == 0.0f
+			                         && diff.blue() == 0.0f && diff.alpha() == 0.0f;
+		                  }));
 	}
 
 	void rgbaCombineImageProcessorName()
