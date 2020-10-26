@@ -8,6 +8,8 @@
 #include "./port_info.hpp"
 #include "./port_value.hpp"
 
+#include "libenum/tuple.hpp"
+
 #include <array>
 #include <type_traits>
 #include <cstddef>
@@ -66,20 +68,6 @@ namespace Texpainter::FilterGraph
 		template<auto types>
 		class GenOutArgTuple<types, 0>
 		{
-		};
-
-		template<auto types, class T = std::make_integer_sequence<size_t, types.size()>>
-		struct GenOutputBuffers;
-
-		template<auto types, size_t index>
-		struct IntToType: public PortTypeToType<types[index]>
-		{
-		};
-
-		template<auto types, size_t... indices>
-		struct GenOutputBuffers<types, std::integer_sequence<size_t, indices...>>
-		{
-			using type = std::tuple<typename IntToType<types, indices>::type...>;
 		};
 
 		template<class T>
@@ -192,7 +180,7 @@ namespace Texpainter::FilterGraph
 		}
 
 	private:
-		detail::GenOutputBuffers<types>::type m_data;
+		Enum::TupleFromTypeArray<types, PortTypeToType> m_data;
 	};
 }
 
