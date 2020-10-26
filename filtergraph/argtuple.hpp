@@ -8,6 +8,8 @@
 #include "./port_info.hpp"
 #include "./port_value.hpp"
 
+#include "utils/create_tuple.hpp"
+
 #include "libenum/tuple.hpp"
 
 #include <array>
@@ -158,14 +160,16 @@ namespace Texpainter::FilterGraph
 	template<auto types>
 	class OutputBuffers
 	{
-	public:
-		static constexpr auto size() { return types.size(); }
+		using storage_type = Enum::TupleFromTypeArray<types, PortTypeToType>;
 
-		template<size_t index>
-		constexpr void init(Size2d size)
+	public:
+		explicit OutputBuffers(Size2d size)
+		    : m_data{createTuple<storage_type>(
+		        [size]<class T>(T) { return PortTypeToType<types[T::value]>::createValue(size); })}
 		{
-			std::get<index>(m_data) = PortTypeToType<types[index]>::createValue(size);
 		}
+
+		static constexpr auto size() { return types.size(); }
 
 		template<size_t index>
 		constexpr decltype(auto) take()
@@ -180,7 +184,7 @@ namespace Texpainter::FilterGraph
 		}
 
 	private:
-		Enum::TupleFromTypeArray<types, PortTypeToType> m_data;
+		storage_type m_data;
 	};
 }
 
