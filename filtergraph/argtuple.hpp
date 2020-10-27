@@ -7,6 +7,7 @@
 
 #include "./port_info.hpp"
 #include "./port_value.hpp"
+#include "./node_argument.hpp"
 
 #include "utils/create_tuple.hpp"
 
@@ -20,58 +21,6 @@ namespace Texpainter::FilterGraph
 {
 	namespace detail
 	{
-		template<auto types, size_t index = types.size()>
-		class GenInArgTuple: public GenInArgTuple<types, index - 1>
-		{
-		private:
-			using type_ = typename PortTypeToType<types[index - 1]>::type;
-
-		public:
-			using type = InputPortType<type_>::type;
-
-			constexpr GenInArgTuple() = default;
-
-			template<class... Args>
-			constexpr GenInArgTuple(type val, Args&&... args)
-			    : GenInArgTuple<types, index - 1>{std::forward<Args>(args)...}
-			    , value{val}
-			{
-			}
-
-			type value;
-		};
-
-		template<auto types>
-		class GenInArgTuple<types, 0>
-		{
-		};
-
-		template<auto types, size_t index = types.size()>
-		class GenOutArgTuple: public GenOutArgTuple<types, index - 1>
-		{
-		private:
-			using type_ = typename PortTypeToType<types[index - 1]>::type;
-
-		public:
-			using type = OutputPortType<type_>::type;
-
-			constexpr GenOutArgTuple() = default;
-
-			template<class... Args>
-			constexpr GenOutArgTuple(type val, Args&&... args)
-			    : GenOutArgTuple<types, index - 1>{std::forward<Args>(args)...}
-			    , value{val}
-			{
-			}
-
-			type value;
-		};
-
-		template<auto types>
-		class GenOutArgTuple<types, 0>
-		{
-		};
-
 		template<class T>
 		auto get_output_buffer(T& buffer)
 		{
@@ -99,35 +48,52 @@ namespace Texpainter::FilterGraph
 		return ret;
 	}
 
+	namespace detail
+	{
+		template<PortType t>
+		struct GenInputPortType
+		{
+			using type = typename InputPortType<typename PortTypeToType<t>::type>::type;
+		};
+	}
+
+	template<class T>
+	void doStuffWithTArg(T);
+
+	template<class T>
+	void doStuffWithT();
+
+
 	template<auto types>
 	class InArgTuple
 	{
+		using storage_type = typename Enum::TupleFromTypeArray<types, detail::GenInputPortType>;
+
 	public:
-		template<class... Args>
-		constexpr explicit InArgTuple(Args&&... args): m_data{std::forward<Args>(args)...}
+		constexpr InArgTuple() = default;
+
+		constexpr explicit InArgTuple(NodeArgument const& args)
+		    : m_data{createTuple<storage_type>([&inputs = args.inputs()]<class Tag>(Tag) {
+			    using InputT  = typename detail::GenInputPortType<types[Tag::value]>::type;
+			    using OutputT = std::tuple_element_t<Tag::value, storage_type>;
+			    static_assert(std::is_same_v<InputT, OutputT>);
+			    return *Enum::get_if<InputT>(&inputs[Tag::value]);
+		    })}
 		{
 		}
 
 		static constexpr auto size() { return types.size(); }
 
 		template<size_t index>
-		constexpr auto& get()
-		{
-			static_assert(index < types.size());
-			return static_cast<detail::GenInArgTuple<types, index + 1>&>(m_data).value;
-		}
-
-		template<size_t index>
 		constexpr auto get() const
 		{
 			static_assert(index < types.size());
-			return static_cast<detail::GenInArgTuple<types, index + 1> const&>(m_data).value;
+			return std::get<index>(m_data);
 		}
 
 	private:
-		detail::GenInArgTuple<types, types.size()> m_data;
+		storage_type m_data;
 	};
-
 
 	template<auto types>
 	class OutputBuffers

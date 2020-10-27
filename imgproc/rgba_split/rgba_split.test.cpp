@@ -54,11 +54,8 @@ namespace Testcases
 		Texpainter::Size2d size{3, 2};
 
 		OutputBuffers outputs{size};
-		;
 
-		InputArgs in{};
-		in.get<0>() = pixels_in.data();
-
+		InputArgs in{Texpainter::FilterGraph::NodeArgument{size, {pixels_in.data()}}};
 
 		RgbaSplit::ImageProcessor proc;
 		proc(ImgProcArg{size, in, OutputArgs{outputs}});

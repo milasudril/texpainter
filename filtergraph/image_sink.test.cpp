@@ -35,7 +35,6 @@ namespace Testcases
 		using OutputBuffers =
 		    Texpainter::FilterGraph::OutputBuffers<portTypes(InterfaceDescriptor::OutputPorts)>;
 
-		InputArgs args{};
 		std::array<Texpainter::FilterGraph::RgbaValue, 6> pixels{
 		    Texpainter::FilterGraph::RgbaValue{1.0f, 0.0f, 0.0f, 1.0f},
 		    Texpainter::FilterGraph::RgbaValue{1.0f, 1.0f, 0.0f, 1.0f},
@@ -43,7 +42,8 @@ namespace Testcases
 		    Texpainter::FilterGraph::RgbaValue{0.0f, 1.0f, 1.0f, 1.0f},
 		    Texpainter::FilterGraph::RgbaValue{0.0f, 0.0f, 1.0, 1.0f},
 		    Texpainter::FilterGraph::RgbaValue{1.0f, 0.0f, 1.0, 1.0f}};
-		args.template get<0>() = pixels.data();
+
+		InputArgs args{Texpainter::FilterGraph::NodeArgument{size, {{pixels.data()}}}};
 
 		std::array<Texpainter::FilterGraph::RgbaValue, 6> pixels_out{};
 		sink.sink(Texpainter::Span2d{pixels_out.data(), size});

@@ -51,13 +51,10 @@ namespace Testcases
 		using OutputBuffers =
 		    Texpainter::FilterGraph::OutputBuffers<portTypes(InterfaceDescriptor::OutputPorts)>;
 
-		InputArgs in{};
-		in.get<0>() = red.data();
-		in.get<1>() = green.data();
-		in.get<2>() = blue.data();
-		in.get<3>() = alpha.data();
-
 		Texpainter::Size2d size{3, 2};
+		InputArgs in{Texpainter::FilterGraph::NodeArgument{
+		    size, {{red.data(), green.data(), blue.data(), alpha.data()}}}};
+
 		OutputBuffers outputs{size};
 
 		RgbaCombine::ImageProcessor proc;

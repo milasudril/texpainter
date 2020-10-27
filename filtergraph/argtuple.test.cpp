@@ -30,10 +30,8 @@ namespace Testcases
 		Texpainter::FilterGraph::RealValue x;
 		Texpainter::FilterGraph::ComplexValue y;
 		Texpainter::PixelStore::Pixel z;
-		MyArgTuple args;
-		args.get<0>() = &x;
-		args.get<1>() = &y;
-		args.get<2>() = &z;
+		MyArgTuple args{
+		    Texpainter::FilterGraph::NodeArgument{Texpainter::Size2d{1, 1}, {&x, &y, &z}}};
 
 		assert(std::as_const(args).get<0>() == &x);
 		assert(std::as_const(args).get<1>() == &y);

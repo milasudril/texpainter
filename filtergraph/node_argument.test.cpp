@@ -23,17 +23,17 @@ namespace Testcases
 	{
 		Texpainter::FilterGraph::RealValue const a{};
 		Texpainter::FilterGraph::ComplexValue const b{};
-		Texpainter::PixelStore::Pixel const c{};
+		Texpainter::FilterGraph::RgbaValue const c{};
 
 		Texpainter::Size2d size{23, 56};
 		Texpainter::FilterGraph::NodeArgument test{size, {&a, &b, &c}};
 
 		assert(test.size() == size);
 
-		auto inputs = test.inputs<MyInArgTuple>();
-		assert(inputs.get<0>() == &a);
-		assert(inputs.get<1>() == &b);
-		assert(inputs.get<2>() == &c);
+		auto const& inputs = test.inputs();
+		assert(*Enum::get_if<Texpainter::FilterGraph::RealValue const*>(&inputs[0]) == &a);
+		assert(*Enum::get_if<Texpainter::FilterGraph::ComplexValue const*>(&inputs[1]) == &b);
+		assert(*Enum::get_if<Texpainter::FilterGraph::RgbaValue const*>(&inputs[2]) == &c);
 	}
 }
 

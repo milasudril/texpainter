@@ -42,7 +42,8 @@ namespace Testcases
 
 		Texpainter::FilterGraph::ImgProcArg<Ports> const obj{
 		    size,
-		    InArgs{std::begin(input3), std::begin(input2), std::begin(input1)},
+		    InArgs{Texpainter::FilterGraph::NodeArgument{
+		        size, {{std::begin(input3), std::begin(input2), std::begin(input1)}}}},
 		    Texpainter::FilterGraph::OutArgTuple{outputs}};
 
 		assert(obj.size() == size);

@@ -43,8 +43,8 @@ namespace Texpainter::FilterGraph
 
 			OutputBuffers<portTypes(InterfaceDescriptor::OutputPorts)> outputs{arg.size()};
 
-			m_proc(ImgProcArg<InterfaceDescriptor>{
-			    arg.size(), arg.inputs<InputArgs>(), OutputArgs{outputs}});
+			m_proc(
+			    ImgProcArg<InterfaceDescriptor>{arg.size(), InputArgs{arg}, OutputArgs{outputs}});
 
 			result_type ret;
 			detail::take_output_buffers(outputs, ret);
