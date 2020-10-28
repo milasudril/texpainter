@@ -135,31 +135,7 @@ namespace Texpainter::FilterGraph
 	}
 
 	template<auto types>
-	class OutArgTuple
-	{
-		using storage_type = Enum::TupleFromTypeArray<types, detail::GenOutputPortType>;
-
-	public:
-		OutArgTuple() = default;
-
-		constexpr explicit OutArgTuple(OutputBuffers<types>& buffers)
-		    : m_data{createTuple<storage_type>(
-		        [&buffers]<class T>(T) { return buffers.template get<T::value>(); })}
-		{
-		}
-
-		static constexpr auto size() { return types.size(); }
-
-		template<size_t index>
-		constexpr auto get() const
-		{
-			static_assert(index < types.size());
-			return std::get<index>(m_data);
-		}
-
-	private:
-		storage_type m_data;
-	};
+	using OutArgTuple = Enum::TupleFromTypeArray<types, detail::GenOutputPortType>;
 }
 
 #endif

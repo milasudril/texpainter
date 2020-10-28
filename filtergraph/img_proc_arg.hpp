@@ -47,13 +47,13 @@ namespace Texpainter::FilterGraph
 		template<size_t index>
 		auto& output(uint32_t col, uint32_t row) const
 		{
-			return m_outputs.template get<index>()[row * m_size.width() + col];
+			return std::get<index>(m_outputs)[row * m_size.width() + col];
 		}
 
 		template<size_t index>
 		auto output() const
 		{
-			return m_outputs.template get<index>();
+			return std::get<index>(m_outputs);
 		}
 
 	private:

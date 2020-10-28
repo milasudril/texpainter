@@ -57,13 +57,10 @@ namespace Testcases
 		using ImgProcArg = Texpainter::FilterGraph::ImgProcArg<InterfaceDescriptor>;
 		using InputArgs  = ImgProcArg::InputArgs;
 		using OutputArgs = ImgProcArg::OutputArgs;
-		using OutputBuffers =
-		    Texpainter::FilterGraph::OutputBuffers<portTypes(InterfaceDescriptor::OutputPorts)>;
 
-		OutputBuffers outputs{size};
-
-		src(ImgProcArg{size, InputArgs{}, OutputArgs{outputs}});
-		assert(std::equal(std::begin(pixels), std::end(pixels), outputs.template get<0>()));
+		std::array<Texpainter::FilterGraph::RealValue, 6> pixels_out{};
+		src(ImgProcArg{size, InputArgs{}, OutputArgs{std::begin(pixels_out)}});
+		assert(std::ranges::equal(pixels, pixels_out));
 	}
 
 	void texpainterFilterGraphImageSourceName()

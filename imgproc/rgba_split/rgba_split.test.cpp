@@ -48,26 +48,26 @@ namespace Testcases
 		using ImgProcArg          = RgbaSplit::ImgProcArg<InterfaceDescriptor>;
 		using InputArgs           = ImgProcArg::InputArgs;
 		using OutputArgs          = ImgProcArg::OutputArgs;
-		using OutputBuffers =
-		    Texpainter::FilterGraph::OutputBuffers<portTypes(InterfaceDescriptor::OutputPorts)>;
 
 		Texpainter::Size2d size{3, 2};
 
-		OutputBuffers outputs{size};
+		std::array<RgbaSplit::RealValue, 6> red{};
+		std::array<RgbaSplit::RealValue, 6> green{};
+		std::array<RgbaSplit::RealValue, 6> blue{};
+		std::array<RgbaSplit::RealValue, 6> alpha{};
 
 		InputArgs in{Texpainter::FilterGraph::NodeArgument{size, {pixels_in.data()}}};
 
 		RgbaSplit::ImageProcessor proc;
-		proc(ImgProcArg{size, in, OutputArgs{outputs}});
+		proc(ImgProcArg{
+		    size,
+		    in,
+		    OutputArgs{std::begin(red), std::begin(green), std::begin(blue), std::begin(alpha)}});
 
-		assert(std::equal(
-		    std::begin(red_expected), std::end(red_expected), outputs.template get<0>()));
-		assert(std::equal(
-		    std::begin(green_expected), std::end(green_expected), outputs.template get<1>()));
-		assert(std::equal(
-		    std::begin(blue_expected), std::end(blue_expected), outputs.template get<2>()));
-		assert(std::equal(
-		    std::begin(alpha_expected), std::end(alpha_expected), outputs.template get<3>()));
+		assert(red_expected == red);
+		assert(green_expected == green);
+		assert(blue_expected == blue);
+		assert(alpha_expected == alpha);
 	}
 
 	void rgbaSplitImageProcessorName()
