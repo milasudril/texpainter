@@ -51,11 +51,12 @@ namespace Testcases
 
 		std::array<RgbaCombine::RgbaValue, 6> pixels_out{};
 		Texpainter::Size2d size{3, 2};
-		InputArgs in{Texpainter::FilterGraph::NodeArgument{
-		    size, {{red.data(), green.data(), blue.data(), alpha.data()}}}};
 
 		RgbaCombine::ImageProcessor proc;
-		proc(ImgProcArg{size, in, OutputArgs{std::begin(pixels_out)}});
+		proc(ImgProcArg{
+		    size,
+		    InputArgs{std::begin(red), std::begin(green), std::begin(blue), std::begin(alpha)},
+		    OutputArgs{std::begin(pixels_out)}});
 
 		assert(std::ranges::equal(pixels_out_expected, pixels_out, [](auto a, auto b) {
 			auto diff = a - b;

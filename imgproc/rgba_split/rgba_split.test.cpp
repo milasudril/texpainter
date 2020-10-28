@@ -56,12 +56,10 @@ namespace Testcases
 		std::array<RgbaSplit::RealValue, 6> blue{};
 		std::array<RgbaSplit::RealValue, 6> alpha{};
 
-		InputArgs in{Texpainter::FilterGraph::NodeArgument{size, {pixels_in.data()}}};
-
 		RgbaSplit::ImageProcessor proc;
 		proc(ImgProcArg{
 		    size,
-		    in,
+		    InputArgs{std::begin(pixels_in)},
 		    OutputArgs{std::begin(red), std::begin(green), std::begin(blue), std::begin(alpha)}});
 
 		assert(red_expected == red);

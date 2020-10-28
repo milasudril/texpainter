@@ -17,11 +17,13 @@ using MyArgTuple = Texpainter::FilterGraph::InArgTuple<types>;
 constexpr auto args = MyArgTuple{};
 
 static_assert(sizeof(MyArgTuple) == 3 * sizeof(void*));
-static_assert(std::is_same_v<decltype(args.get<0>()), Texpainter::FilterGraph::RealValue const*>);
-static_assert(
-    std::is_same_v<decltype(args.get<1>()), Texpainter::FilterGraph::ComplexValue const*>);
-static_assert(std::is_same_v<decltype(args.get<2>()), Texpainter::PixelStore::Pixel const*>);
-static_assert(std::size(args) == std::size(types));
+static_assert(std::is_same_v<std::decay_t<decltype(std::get<0>(args))>,
+                             Texpainter::FilterGraph::RealValue const*>);
+static_assert(std::is_same_v<std::decay_t<decltype(std::get<1>(args))>,
+                             Texpainter::FilterGraph::ComplexValue const*>);
+static_assert(std::is_same_v<std::decay_t<decltype(std::get<2>(args))>,
+                             Texpainter::PixelStore::Pixel const*>);
+static_assert(std::tuple_size_v<MyArgTuple> == std::size(types));
 
 namespace Testcases
 {
@@ -30,12 +32,11 @@ namespace Testcases
 		Texpainter::FilterGraph::RealValue x;
 		Texpainter::FilterGraph::ComplexValue y;
 		Texpainter::PixelStore::Pixel z;
-		MyArgTuple args{
-		    Texpainter::FilterGraph::NodeArgument{Texpainter::Size2d{1, 1}, {&x, &y, &z}}};
+		MyArgTuple args{&x, &y, &z};
 
-		assert(std::as_const(args).get<0>() == &x);
-		assert(std::as_const(args).get<1>() == &y);
-		assert(std::as_const(args).get<2>() == &z);
+		assert(std::get<0>(std::as_const(args)) == &x);
+		assert(std::get<1>(std::as_const(args)) == &y);
+		assert(std::get<2>(std::as_const(args)) == &z);
 	}
 }
 

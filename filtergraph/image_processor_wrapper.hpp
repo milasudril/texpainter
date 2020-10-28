@@ -44,9 +44,16 @@ namespace Texpainter::FilterGraph
 			OutputBuffers<portTypes(InterfaceDescriptor::OutputPorts)> outputs{arg.size()};
 
 			m_proc(ImgProcArg<InterfaceDescriptor>{
-			    arg.size(), InputArgs{arg}, createTuple<OutputArgs>([&outputs]<class T>(T) {
-				    return outputs.template get<T::value>();
-			    })});
+			    arg.size(),
+			    createTuple<InputArgs>([&inputs = arg.inputs()]<class Tag>(Tag) {
+				    constexpr auto types = portTypes(InterfaceDescriptor::InputPorts);
+				    using InputT  = typename detail::GenInputPortType<types[Tag::value]>::type;
+				    using OutputT = std::tuple_element_t<Tag::value, InputArgs>;
+				    static_assert(std::is_same_v<InputT, OutputT>);
+				    return *Enum::get_if<InputT>(&inputs[Tag::value]);
+			    }),
+			    createTuple<OutputArgs>(
+			        [&outputs]<class T>(T) { return outputs.template get<T::value>(); })});
 
 			result_type ret;
 			detail::take_output_buffers(outputs, ret);

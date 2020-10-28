@@ -57,43 +57,8 @@ namespace Texpainter::FilterGraph
 		};
 	}
 
-	template<class T>
-	void doStuffWithTArg(T);
-
-	template<class T>
-	void doStuffWithT();
-
-
 	template<auto types>
-	class InArgTuple
-	{
-		using storage_type = typename Enum::TupleFromTypeArray<types, detail::GenInputPortType>;
-
-	public:
-		constexpr InArgTuple() = default;
-
-		constexpr explicit InArgTuple(NodeArgument const& args)
-		    : m_data{createTuple<storage_type>([&inputs = args.inputs()]<class Tag>(Tag) {
-			    using InputT  = typename detail::GenInputPortType<types[Tag::value]>::type;
-			    using OutputT = std::tuple_element_t<Tag::value, storage_type>;
-			    static_assert(std::is_same_v<InputT, OutputT>);
-			    return *Enum::get_if<InputT>(&inputs[Tag::value]);
-		    })}
-		{
-		}
-
-		static constexpr auto size() { return types.size(); }
-
-		template<size_t index>
-		constexpr auto get() const
-		{
-			static_assert(index < types.size());
-			return std::get<index>(m_data);
-		}
-
-	private:
-		storage_type m_data;
-	};
+	using InArgTuple = typename Enum::TupleFromTypeArray<types, detail::GenInputPortType>;
 
 	template<auto types>
 	class OutputBuffers

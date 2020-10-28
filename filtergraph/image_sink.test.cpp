@@ -41,7 +41,7 @@ namespace Testcases
 		    Texpainter::FilterGraph::RgbaValue{0.0f, 0.0f, 1.0, 1.0f},
 		    Texpainter::FilterGraph::RgbaValue{1.0f, 0.0f, 1.0, 1.0f}};
 
-		InputArgs args{Texpainter::FilterGraph::NodeArgument{size, {{pixels.data()}}}};
+		InputArgs args{pixels.data()};
 
 		std::array<Texpainter::FilterGraph::RgbaValue, 6> pixels_out{};
 		sink.sink(Texpainter::Span2d{pixels_out.data(), size});
