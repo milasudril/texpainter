@@ -1,17 +1,17 @@
 //@	{
-//@	 "targets":[{"name":"normalize_grayscale.hpp", "type":"include"}]
-//@	,"dependencies_extra":[{"ref":"normalize_grayscale.o","rel":"implementation"}]
+//@	 "targets":[{"name":"map_grayscale_range.hpp", "type":"include"}]
+//@	,"dependencies_extra":[{"ref":"map_grayscale_range.o","rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_IMGPROC_NORMALIZEGRAYSCALE_NORMALIZEGRAYSCALE_HPP
-#define TEXPAINTER_IMGPROC_NORMALIZEGRAYSCALE_NORMALIZEGRAYSCALE_HPP
+#ifndef TEXPAINTER_IMGPROC_MAPGRAYSCAELRANGE_MAPGRAYSCALERANGE_HPP
+#define TEXPAINTER_IMGPROC_MAPGRAYSCAELRANGE_MAPGRAYSCALERANGE_HPP
 
 #include "filtergraph/port_info.hpp"
 #include "filtergraph/img_proc_arg.hpp"
 #include "filtergraph/image_processor_id.hpp"
 #include "filtergraph/param_map.hpp"
 
-namespace NormalizeGrayscale
+namespace MapGrayscaleRange
 {
 	using Texpainter::Size2d;
 	using Texpainter::FilterGraph::ImageProcessorId;
@@ -28,10 +28,13 @@ namespace NormalizeGrayscale
 	public:
 		struct InterfaceDescriptor
 		{
-			static constexpr std::array<PortInfo, 1> InputPorts{
-			    PortInfo{PortType::GrayscaleRealPixels, "Input"}};
+			static constexpr std::array<PortInfo, 3> InputPorts{
+			    {PortInfo{PortType::GrayscaleRealPixels, "Input"},
+			     PortInfo{PortType::RealValue, "Min"},
+			     PortInfo{PortType::RealValue, "Max"}}};
+
 			static constexpr std::array<PortInfo, 1> OutputPorts{
-			    {PortInfo{PortType::GrayscaleRealPixels, "Output"}}};
+			    PortInfo{PortType::GrayscaleRealPixels, "Output"}};
 
 			static constexpr std::array<ParamName, 2> ParamNames{"Min", "Max"};
 		};
@@ -44,9 +47,9 @@ namespace NormalizeGrayscale
 
 		std::span<ParamValue const> paramValues() const { return std::span<ParamValue const>{}; }
 
-		static constexpr char const* name() { return "Normalize grayscale"; }
+		static constexpr char const* name() { return "Map grayscale range"; }
 
-		static constexpr auto id() { return ImageProcessorId{"15cdd6a6bc1a1c9fa1722b6f9150b9de"}; }
+		static constexpr auto id() { return ImageProcessorId{"3ac11258778bab13c5afe2ae91f9751e"}; }
 
 	private:
 		ParamMap<InterfaceDescriptor> m_params;

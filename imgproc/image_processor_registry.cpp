@@ -18,6 +18,8 @@
 #include "./mix_complex/mix_complex.hpp"
 #include "./real_constant/real_constant.hpp"
 #include "./real_real_multiply/real_real_multiply.hpp"
+#include "./grayscale_range/grayscale_range.hpp"
+#include "./map_grayscale_range/map_grayscale_range.hpp"
 
 #include "filtergraph/image_processor_wrapper.hpp"
 #include "utils/fixed_flatmap.hpp"
@@ -55,7 +57,9 @@ namespace
 	    get_info<::MixGrayscale::ImageProcessor>(),
 	    get_info<::MixComplex::ImageProcessor>(),
 	    get_info<::RealConstant::ImageProcessor>(),
-	    get_info<::RealRealMultiply::ImageProcessor>()};
+	    get_info<::RealRealMultiply::ImageProcessor>(),
+	    get_info<::GrayscaleRange::ImageProcessor>(),
+	    get_info<::MapGrayscaleRange::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;

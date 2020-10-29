@@ -22,11 +22,14 @@ namespace Texpainter
 			switch(type)
 			{
 				case FilterGraph::PortType::RgbaPixels:
+				case FilterGraph::PortType::RgbaValue:
 					return PixelStore::Pixel{0.5f, 0.5f, 0.0f, 1.0f};
 
+				case FilterGraph::PortType::RealValue:
 				case FilterGraph::PortType::GrayscaleRealPixels:
 					return PixelStore::Pixel{0.33f, 0.33f, 0.33f, 1.0f};
 
+				case FilterGraph::PortType::ComplexValue:
 				case FilterGraph::PortType::GrayscaleComplexPixels:
 					return PixelStore::Pixel{0.66f, 0.0f, 0.33f, 1.0f};
 			}
