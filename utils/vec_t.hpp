@@ -3,6 +3,8 @@
 #ifndef TEXPAINTER_UTILS_VECT_HPP
 #define TEXPAINTER_UTILS_VECT_HPP
 
+#include "./compiler_flags.hpp"
+
 #include <cmath>
 #include <string>
 
@@ -55,6 +57,25 @@ namespace Texpainter
 		ret += ")";
 
 		return ret;
+	}
+
+	template<int dummy = 0>
+	constexpr auto chooseValIfInRange(vec4_t val,
+	                                  vec4_t if_too_small,
+	                                  vec4_t if_too_large,
+	                                  vec4_t if_nan) requires(CompilerFlags::HasNonFiniteMath)
+	{
+		return val < vec4_t{0.0f, 0.0f, 0.0f, 0.0f}
+		           ? if_too_small
+		           : (val > vec4_t{1.0f, 1.0f, 1.0f, 1.0f} ? if_too_large
+		                                                   : ((val != val) ? if_nan : val));
+	}
+
+	constexpr auto chooseValIfInRange(vec4_t val, vec4_t if_too_small, vec4_t if_too_large)
+	{
+		return val < vec4_t{0.0f, 0.0f, 0.0f, 0.0f}
+		           ? if_too_small
+		           : (val > vec4_t{1.0f, 1.0f, 1.0f, 1.0f}) ? if_too_large : val;
 	}
 }
 
