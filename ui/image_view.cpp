@@ -42,7 +42,6 @@ public:
 		g_signal_connect(G_OBJECT(widget), "button-press-event", G_CALLBACK(on_mouse_down), this);
 		g_signal_connect(G_OBJECT(widget), "button-release-event", G_CALLBACK(on_mouse_up), this);
 		g_signal_connect(G_OBJECT(widget), "motion-notify-event", G_CALLBACK(on_mouse_move), this);
-		//	gtk_widget_set_can_focus(widget, TRUE);
 
 		m_background      = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 32, 32);
 		auto const stride = cairo_image_surface_get_stride(m_background);
@@ -166,7 +165,10 @@ private:
 			for(uint32_t col = 0; col < w; ++col)
 			{
 				constexpr auto last_lut_entry = static_cast<int>(gamma_22.size() - 1);
-				auto val                      = read_ptr->value();
+				auto val                      = chooseValIfInRange(read_ptr->value(),
+                                              vec4_t{1.0f, 1.0f, 1.0f, 1.0f},
+                                              vec4_t{0.0f, 0.0f, 0.0f, 0.0f},
+                                              vec4_t{0.0f, 0.0f, 0.0f, 0.0f});
 
 				auto pixel_out = static_cast<float>(last_lut_entry) * val;
 
@@ -174,10 +176,6 @@ private:
 				                       static_cast<int>(pixel_out[1]),
 				                       static_cast<int>(pixel_out[2]),
 				                       static_cast<int>(pixel_out[3])};
-				auto constexpr max_val =
-				    vec4i_t{last_lut_entry, last_lut_entry, last_lut_entry, last_lut_entry};
-
-				as_ints = min(as_ints, max_val);
 
 				write_ptr[0] = gamma_22[as_ints[2]];
 				write_ptr[1] = gamma_22[as_ints[1]];
