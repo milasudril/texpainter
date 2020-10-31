@@ -166,9 +166,9 @@ private:
 			{
 				constexpr auto last_lut_entry = static_cast<int>(gamma_22.size() - 1);
 				auto val                      = chooseValIfInRange(read_ptr->value(),
-                                              vec4_t{1.0f, 1.0f, 1.0f, 1.0f},
-                                              vec4_t{0.0f, 0.0f, 0.0f, 0.0f},
-                                              vec4_t{0.0f, 0.0f, 0.0f, 0.0f});
+                                              row%3 == 0? vec4_t{0.0f, 0.0f, 0.0f, 0.0f} : vec4_t{1.0f, 1.0f, 1.0f, 1.0f},
+                                              row%3 != 0? vec4_t{0.0f, 0.0f, 0.0f, 0.0f} : vec4_t{1.0f, 1.0f, 1.0f, 1.0f},
+                                              col%3 != 0? vec4_t{0.0f, 0.0f, 0.0f, 0.0f} : vec4_t{1.0f, 1.0f, 1.0f, 1.0f});
 
 				auto pixel_out = static_cast<float>(last_lut_entry) * val;
 
