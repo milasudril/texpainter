@@ -8,6 +8,7 @@
 
 #include "./node.hpp"
 #include "./node_id.hpp"
+#include "./layer_input.hpp"
 #include "./image_source.hpp"
 #include "./image_sink.hpp"
 #include "./image_processor_wrapper.hpp"
@@ -31,6 +32,24 @@ namespace Texpainter::FilterGraph
 
 	ValidationResult validate(Graph const& g);
 
+	class Input
+	{
+	public:
+		explicit Input(Span2d<RgbaValue const> pixels, std::reference_wrapper<Palette const> pal)
+		    : r_pixels{pixels}
+		    , m_palette{pal}
+		{
+		}
+
+		auto pixels() const { return r_pixels; }
+
+		auto palette() const { return m_palette; }
+
+	private:
+		Span2d<RgbaValue const> r_pixels;
+		std::reference_wrapper<Palette const> m_palette;
+	};
+
 	class Graph
 	{
 	public:
@@ -41,8 +60,7 @@ namespace Texpainter::FilterGraph
 
 		Graph(): m_valid_state{ValidationState::NotValidated}
 		{
-			auto input = std::make_unique<ImageProcessorWrapper<ImageSource<PortType::RgbaPixels>>>(
-			    ImageSource<PortType::RgbaPixels>{});
+			auto input  = std::make_unique<ImageProcessorWrapper<LayerInput>>(LayerInput{});
 			auto output = std::make_unique<ImageProcessorWrapper<ImageSink>>(ImageSink{});
 			r_input     = &input->processor();
 			r_output    = &output->processor();
@@ -68,20 +86,20 @@ namespace Texpainter::FilterGraph
 			return *this;
 		}
 
-		PixelStore::Image process(Span2d<RgbaValue const> input, bool force_update = true) const
+		PixelStore::Image process(Input const& input, bool force_update = true) const
 		{
 			assert(valid());
-			r_input->source(input);
+			r_input->pixels(input.pixels()).palette(input.palette());
 			if(force_update) { r_input_node->forceUpdate(); }
 
-			PixelStore::Image ret{input.size()};
+			PixelStore::Image ret{input.pixels().size()};
 			r_output->sink(ret.pixels());
 			// NOTE: Since OutputNode does not use the internal image cache (it has no outputs)
 			//       and it may happen that it is not connected to the input node, we must always
 			//       recompute the output node. Otherwise, the contents of ret will be undefined,
 			//       in case we already have computed the output result.
 			r_output_node->forceUpdate();
-			(*r_output_node)(input.size());
+			(*r_output_node)(input.pixels().size());
 			return ret;
 		}
 
@@ -161,7 +179,7 @@ namespace Texpainter::FilterGraph
 		void clearValidationState() { m_valid_state = ValidationState::NotValidated; }
 
 	private:
-		ImageSource<PortType::RgbaPixels>* r_input;
+		LayerInput* r_input;
 		ImageSink* r_output;
 		Node* r_input_node;
 		Node* r_output_node;

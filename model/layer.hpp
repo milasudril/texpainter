@@ -178,7 +178,7 @@ namespace Texpainter::Model
 			   && filter == &m_compose_opts.filterGraph())
 			{ return m_content_filtered; }
 
-			m_content_filtered = filter->process(content().pixels());
+			m_content_filtered = filter->process(FilterGraph::Input{content().pixels(), m_palette});
 			m_update_count     = m_content->updateCount();
 			return m_content_filtered;
 		}
