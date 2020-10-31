@@ -6,6 +6,7 @@
 #define TEXPAINTER_FILTERGRAPH_PORTTYPE_HPP
 
 #include "pixel_store/pixel.hpp"
+#include "pixel_store/palette.hpp"
 #include "utils/size_2d.hpp"
 
 #include "libenum/enum.hpp"
@@ -23,15 +24,17 @@ namespace Texpainter::FilterGraph
 		GrayscaleComplexPixels,
 		RgbaValue,
 		RealValue,
-		ComplexValue
+		ComplexValue,
+		Palette
 	};
 
 	constexpr PortType begin(Enum::Empty<PortType>) { return PortType::RgbaPixels; }
-	constexpr PortType end(Enum::Empty<PortType>) { return Enum::add(PortType::ComplexValue); }
+	constexpr PortType end(Enum::Empty<PortType>) { return Enum::add(PortType::Palette); }
 
 	using RgbaValue    = Texpainter::PixelStore::Pixel;
 	using RealValue    = double;
 	using ComplexValue = std::complex<RealValue>;
+	using Palette      = PixelStore::Palette<16>;
 
 	template<PortType id>
 	struct PortTypeToType;
@@ -85,6 +88,14 @@ namespace Texpainter::FilterGraph
 		using type = ComplexValue;
 
 		static type createValue(Size2d) { return ComplexValue{}; }
+	};
+
+	template<>
+	struct PortTypeToType<PortType::Palette>
+	{
+		using type = Palette;
+
+		static type createValue(Size2d) { return Palette{}; }
 	};
 }
 #endif
