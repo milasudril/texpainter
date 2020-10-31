@@ -3,16 +3,10 @@
 //@	}
 
 #include "./graph.hpp"
-#include "./image_source.hpp"
 
 namespace Testcases
 {
-	void texpainterFilterGraphGraphInsert()
-	{
-		Texpainter::FilterGraph::Graph g;
-		g.insert(
-		    Texpainter::FilterGraph::ImageSource<Texpainter::FilterGraph::PortType::RgbaPixels>{});
-	}
+	void texpainterFilterGraphGraphInsert() { Texpainter::FilterGraph::Graph g; }
 }
 
 int main()

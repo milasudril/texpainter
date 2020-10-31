@@ -9,7 +9,6 @@
 #include "./node.hpp"
 #include "./node_id.hpp"
 #include "./layer_input.hpp"
-#include "./image_source.hpp"
 #include "./image_sink.hpp"
 #include "./image_processor_wrapper.hpp"
 
