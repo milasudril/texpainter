@@ -18,12 +18,12 @@ namespace RandomColor
 	using Texpainter::FilterGraph::ImageProcessorId;
 	using Texpainter::FilterGraph::ImgProcArg;
 	using Texpainter::FilterGraph::Palette;
+	using Texpainter::FilterGraph::ParamMap;
 	using Texpainter::FilterGraph::ParamName;
 	using Texpainter::FilterGraph::ParamValue;
 	using Texpainter::FilterGraph::PortInfo;
 	using Texpainter::FilterGraph::PortType;
 	using Texpainter::FilterGraph::RealValue;
-	using Texpainter::FilterGraph::ParamMap;
 
 	class ImageProcessor
 	{
@@ -31,34 +31,33 @@ namespace RandomColor
 		struct InterfaceDescriptor
 		{
 			static constexpr std::array<PortInfo, 2> InputPorts{
-			    {PortInfo{PortType::GrayscaleRealPixels, "Random src"},
-			     PortInfo{PortType::Palette, "Palette"}}};
+			    {PortInfo{PortType::Palette, "Palette"},
+			     PortInfo{PortType::GrayscaleRealPixels, "Random src"}
+
+			    }};
 			static constexpr std::array<PortInfo, 1> OutputPorts{{PortType::RgbaPixels, "Output"}};
 
-			static constexpr std::array<ParamName, Palette::size()> ParamNames{"0", "1", "2", "3",
-				"4", "5", "6", "7",
-				"8", "9", "A", "B",
-				"C", "D", "E", "F"
-			};
+			static constexpr std::array<ParamName, Palette::size()> ParamNames{
+			    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"};
 		};
 
 		ImageProcessor()
 		    : m_pdf{{1.0f,
-		            1.0f,
-		            1.0f,
-		            1.0f,
-		            1.0f,
-		            1.0f,
-		            1.0f,
-		            1.0f,
-		            1.0f,
-		            1.0f,
-		            1.0f,
-		            1.0f,
-		            1.0f,
-		            1.0f,
-		            1.0f,
-		            1.0f}}
+		             1.0f,
+		             1.0f,
+		             1.0f,
+		             1.0f,
+		             1.0f,
+		             1.0f,
+		             1.0f,
+		             1.0f,
+		             1.0f,
+		             1.0f,
+		             1.0f,
+		             1.0f,
+		             1.0f,
+		             1.0f,
+		             1.0f}}
 		{
 			std::ranges::fill(m_params.values(), ParamValue{1.0});
 		}
@@ -67,10 +66,10 @@ namespace RandomColor
 		{
 			auto const size = args.size().area();
 			std::transform(
-			    args.input<0>(),
-			    args.input<0>() + size,
+			    args.input<1>(),
+			    args.input<1>() + size,
 			    args.output<0>(),
-			    [&palette = args.input<1>().get(), &pdf = m_pdf](auto val) {
+			    [&palette = args.input<0>().get(), &pdf = m_pdf](auto val) {
 				    return palette[Palette::index_type{static_cast<uint32_t>(pdf.eventIndex(val))}];
 			    });
 		}
@@ -78,14 +77,14 @@ namespace RandomColor
 		void set(ParamName name, ParamValue val)
 		{
 			if(auto ptr = m_params.find(name); ptr != nullptr) [[likely]]
-			{
-				*ptr = val;
-				std::array<float, Palette::size()> weights;
-				std::ranges::transform(m_params.values(),
-									   std::begin(weights),
-									   [](auto val) {return static_cast<float>(val.value());});
-				m_pdf = DiscretePdf<float, Palette::size()>{weights};
-			}
+				{
+					*ptr = val;
+					std::array<float, Palette::size()> weights;
+					std::ranges::transform(m_params.values(), std::begin(weights), [](auto val) {
+						return static_cast<float>(val.value());
+					});
+					m_pdf = DiscretePdf<float, Palette::size()>{weights};
+				}
 		}
 
 		ParamValue get(ParamName name) const
