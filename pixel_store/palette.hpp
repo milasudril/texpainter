@@ -25,7 +25,7 @@ namespace Texpainter::PixelStore
 
 		constexpr auto end() { return std::end(m_data); }
 
-		constexpr auto size() const { return std::size(m_data); }
+		static constexpr auto size() { return Size; }
 
 
 		constexpr explicit Palette(Pixel color_init = Pixel{0.0f, 0.0f, 0.0f, 0.0f})
