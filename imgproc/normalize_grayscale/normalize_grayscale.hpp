@@ -14,6 +14,7 @@
 namespace NormalizeGrayscale
 {
 	using Texpainter::Size2d;
+	using Texpainter::Str;
 	using Texpainter::FilterGraph::ImageProcessorId;
 	using Texpainter::FilterGraph::ImgProcArg;
 	using Texpainter::FilterGraph::ParamMap;
@@ -36,13 +37,29 @@ namespace NormalizeGrayscale
 			static constexpr std::array<ParamName, 2> ParamNames{"Min", "Max"};
 		};
 
+		ImageProcessor()
+		{
+			*m_params.find<Str{"Min"}>() = ParamValue{0.0};
+			*m_params.find<Str{"Max"}>() = ParamValue{1.0};
+		}
+
 		void operator()(ImgProcArg<InterfaceDescriptor> const& args) const;
 
-		void set(ParamName, ParamValue) {}
+		void set(ParamName name, ParamValue val)
+		{
+			if(auto ptr = m_params.find(name); ptr != nullptr) [[likely]]
+				{
+					*ptr = val;
+				}
+		}
 
-		ParamValue get(ParamName) const { return ParamValue{0.0}; }
+		ParamValue get(ParamName name) const
+		{
+			auto ptr = m_params.find(name);
+			return ptr != nullptr ? *ptr : ParamValue{0.0};
+		}
 
-		std::span<ParamValue const> paramValues() const { return std::span<ParamValue const>{}; }
+		std::span<ParamValue const> paramValues() const { return m_params.values(); }
 
 		static constexpr char const* name() { return "Normalize grayscale"; }
 
