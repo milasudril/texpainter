@@ -17,6 +17,7 @@
 #include "ui/text_entry.hpp"
 #include "ui/labeled_input.hpp"
 #include "ui/error_message_dialog.hpp"
+#include "pixel_store/image_io.hpp"
 
 #include <random>
 #include <functional>
@@ -271,7 +272,6 @@ namespace Texpainter
 				m_compositing_opts->eventHandler<ControlId::CompositingOptions>(*this)
 				    .widget()
 				    .template eventHandler<0>(m_compositing_opts->widget().second);
-				//	m_fx_blend_editor_dlg->widget().eventHandler<ControlId::CompositingOptions>(*this);
 			}
 		}
 
@@ -426,6 +426,15 @@ namespace Texpainter
 			                                      size_default,
 			                                      size_max);
 			m_new_empty_dlg->eventHandler<ControlId::NewEmpty>(*this);
+		}
+
+		void onActivated(Ui::MenuItem&,
+		                 Model::Document& doc,
+		                 MenuActionCallback<LayerActionNew::FromFile> on_completed)
+		{
+			Model::Layer layer{PixelStore::load("test_pattern/test_pattern.exr")};
+			insertNewLayer(Model::ItemName{"Foo"}, std::move(layer), doc);
+			on_completed();
 		}
 
 		void onActivated(Ui::MenuItem&,

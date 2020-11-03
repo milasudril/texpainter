@@ -4,3 +4,6 @@
 [submodule "libenum"]
 	path = libenum
 	url = https://github.com/milasudril/libenum
+[submodule "test_pattern"]
+	path = test_pattern
+	url = https://github.com/milasudril/test_pattern
