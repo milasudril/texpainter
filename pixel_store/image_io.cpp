@@ -2,28 +2,47 @@
 
 #include "./image_io.hpp"
 
-#include <OpenEXR/ImfRgbaFile.h>
+#include <OpenEXR/ImfInputFile.h>
+#include <OpenEXR/ImfChannelList.h>
 #include <OpenEXR/ImfArray.h>
 
 Texpainter::PixelStore::Image Texpainter::PixelStore::load(const char* filename)
 {
-	Imf_2_3::RgbaInputFile src{filename};
-	auto box = src.dataWindow();
+	Imf::InputFile src{filename};
+
+	auto box = src.header().dataWindow();
+
 	auto w   = box.max.x - box.min.x + 1;
 	auto h   = box.max.y - box.min.y + 1;
 
 	if(w > 65535 || h > 65535)
 	{ throw std::runtime_error{std::string{"This image is too large."}}; }
 
-	Imf_2_3::Array2D<Imf_2_3::Rgba> temp{w, h};
-
-	src.setFrameBuffer(&temp[0][0], 1, w);
-	src.readPixels(box.min.y, box.max.y);
-
 	Image ret{static_cast<uint32_t>(w), static_cast<uint32_t>(h)};
-	std::transform(&temp[0][0], &temp[0][0] + ret.area(), ret.pixels().data(), [](auto in) {
-		return Pixel{in.r, in.g, in.b, in.a};
-	});
+	Imf::FrameBuffer fb;
+	fb.insert("R",
+	          Imf::Slice{Imf::FLOAT,
+	                     (char*)(ret.pixels().data()) + 0 * sizeof(float),
+	                     sizeof(Pixel),
+	                     sizeof(Pixel) * w});
+	fb.insert("G",
+	          Imf::Slice{Imf::FLOAT,
+	                     (char*)(ret.pixels().data()) + 1 * sizeof(float),
+	                     sizeof(Pixel),
+	                     sizeof(Pixel) * w});
+	fb.insert("B",
+	          Imf::Slice{Imf::FLOAT,
+	                     (char*)(ret.pixels().data()) + 2 * sizeof(float),
+	                     sizeof(Pixel),
+	                     sizeof(Pixel) * w});
+	fb.insert("A",
+	          Imf::Slice{Imf::FLOAT,
+	                     (char*)(ret.pixels().data()) + 3 * sizeof(float),
+	                     sizeof(Pixel),
+	                     sizeof(Pixel) * w});
+
+	src.setFrameBuffer(fb);
+	src.readPixels(box.min.y, box.max.y);
 
 	return ret;
 }
