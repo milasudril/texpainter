@@ -15,7 +15,7 @@ Utility application that can be used to create repeatable textures
 
 ### On *ubuntu
 
- 1. Install libfftw3-dev, and libgtk+-3.0-dev. If you do not have it, also install g++
+ 1. Install libfftw3-dev and libgtk+-3.0-dev and libopenexr-dev. If you do not have it, also install g++
     version 10 or later, since the code uses some new features from C++20.
  2. Install maike, currently avaiable in the ppa https://launchpad.net/~milasudril/+archive/ubuntu/maike
     That is,

@@ -8,9 +8,11 @@
 
 #include "./brush.hpp"
 #include "./compositing_options.hpp"
+#include "./item_name.hpp"
 
 #include "pixel_store/image.hpp"
 #include "pixel_store/palette.hpp"
+#include "pixel_store/image_io.hpp"
 #include "utils/angle.hpp"
 #include "utils/rect.hpp"
 #include "filtergraph/graph.hpp"
@@ -308,6 +310,22 @@ namespace Texpainter::Model
 	void outline(Layer const& layer, Span2d<PixelStore::Pixel> ret);
 
 	inline auto currentColor(Layer const& layer) { return layer.palette()[layer.currentColor()]; }
+
+	inline std::pair<ItemName, Layer> createLayerFromFile(char const* filename)
+	{
+		auto layer = Layer{PixelStore::load(filename)};
+
+		auto range = std::span{filename, strlen(filename)};
+
+		// Assume UNIX and not DOS
+		auto name_begin = std::find(std::rbegin(range), std::rend(range), '/').base();
+		auto name_end = std::find(std::rbegin(range), std::rend(range), '.').base() - 1;
+
+		if(name_begin >= name_end)
+		{ return std::make_pair(ItemName{std::string{name_begin, std::end(range)}}, std::move(layer));}
+
+		{ return std::make_pair(ItemName{std::string{name_begin, name_end}}, std::move(layer));}
+	}
 }
 
 #endif

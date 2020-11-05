@@ -432,8 +432,8 @@ namespace Texpainter
 		                 Model::Document& doc,
 		                 MenuActionCallback<LayerActionNew::FromFile> on_completed)
 		{
-			Model::Layer layer{PixelStore::load("test_pattern/test_pattern.exr")};
-			insertNewLayer(Model::ItemName{"Foo"}, std::move(layer), doc);
+			auto named_layer = Model::createLayerFromFile("test_pattern/test_pattern.exr");
+			insertNewLayer(std::move(named_layer.first), std::move(named_layer.second), doc);
 			on_completed();
 		}
 

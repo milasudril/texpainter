@@ -23,10 +23,18 @@ namespace Texpainter::Model
 
 			if(l == 0) { throw "Empty names are not allowed."; }
 
-			if(std::any_of(c_str, c_str + l, [](auto val) { return val >= 0 && val < ' '; }))
-			{ throw std::string{"\""} + c_str + "\" contains at least one illegal character."; }
+			if(std::any_of(c_str, c_str + l, [](auto val) { return val == 0; }))
+			{ throw std::string{"The name contains at least one illegal character."}; }
 
 			m_value = c_str;
+		}
+
+		explicit ItemName(std::string&& name):m_value{std::move(name)}
+		{
+			if(m_value.size() == 0) { throw "Empty names are not allowed."; }
+
+			if(std::ranges::any_of(std::begin(m_value), std::end(m_value), [](auto val) { return val == 0; }))
+			{ throw std::string{"The name contains at least one illegal character."}; }
 		}
 
 		std::string const& value() const { return m_value; }
