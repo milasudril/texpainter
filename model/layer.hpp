@@ -314,17 +314,8 @@ namespace Texpainter::Model
 	inline std::pair<ItemName, Layer> createLayerFromFile(char const* filename)
 	{
 		auto layer = Layer{PixelStore::load(filename)};
-
-		auto range = std::span{filename, strlen(filename)};
-
-		// Assume UNIX and not DOS
-		auto name_begin = std::find(std::rbegin(range), std::rend(range), '/').base();
-		auto name_end = std::find(std::rbegin(range), std::rend(range), '.').base() - 1;
-
-		if(name_begin >= name_end)
-		{ return std::make_pair(ItemName{std::string{name_begin, std::end(range)}}, std::move(layer));}
-
-		{ return std::make_pair(ItemName{std::string{name_begin, name_end}}, std::move(layer));}
+		return std::make_pair(createItemNameFromFilename(filename),
+		                      Layer{PixelStore::load(filename)});
 	}
 }
 

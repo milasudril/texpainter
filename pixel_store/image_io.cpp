@@ -12,8 +12,8 @@ Texpainter::PixelStore::Image Texpainter::PixelStore::load(const char* filename)
 
 	auto box = src.header().dataWindow();
 
-	auto w   = box.max.x - box.min.x + 1;
-	auto h   = box.max.y - box.min.y + 1;
+	auto w = box.max.x - box.min.x + 1;
+	auto h = box.max.y - box.min.y + 1;
 
 	if(w > 65535 || h > 65535)
 	{ throw std::runtime_error{std::string{"This image is too large."}}; }

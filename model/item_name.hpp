@@ -29,11 +29,12 @@ namespace Texpainter::Model
 			m_value = c_str;
 		}
 
-		explicit ItemName(std::string&& name):m_value{std::move(name)}
+		explicit ItemName(std::string&& name): m_value{std::move(name)}
 		{
 			if(m_value.size() == 0) { throw "Empty names are not allowed."; }
 
-			if(std::ranges::any_of(std::begin(m_value), std::end(m_value), [](auto val) { return val == 0; }))
+			if(std::ranges::any_of(
+			       std::begin(m_value), std::end(m_value), [](auto val) { return val == 0; }))
 			{ throw std::string{"The name contains at least one illegal character."}; }
 		}
 
@@ -51,6 +52,19 @@ namespace Texpainter::Model
 	std::string const& toString(ItemName const&& item) = delete;
 
 	inline bool operator<(ItemName const& a, ItemName const& b) { return a.value() < b.value(); }
+
+	inline ItemName createItemNameFromFilename(char const* filename)
+	{
+		auto range = std::span{filename, strlen(filename)};
+
+		// Assume UNIX and not DOS
+		auto name_begin = std::find(std::rbegin(range), std::rend(range), '/').base();
+		auto name_end   = std::find(std::rbegin(range), std::rend(range), '.').base() - 1;
+
+		if(name_begin >= name_end) { return ItemName{std::string{name_begin, std::end(range)}}; }
+
+		return ItemName{std::string{name_begin, name_end}};
+	}
 }
 
 #endif
