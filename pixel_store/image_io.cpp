@@ -79,4 +79,6 @@ void Texpainter::PixelStore::store(Span2d<Pixel const> pixels, char const* filen
 	                     sizeof(Pixel) * pixels.width()});
 
 	Imf::OutputFile dest{filename, header};
+	dest.setFrameBuffer(fb);
+	dest.writePixels(pixels.height());
 }
