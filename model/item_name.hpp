@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cstring>
 #include <compare>
+#include <span>
 
 namespace Texpainter::Model
 {
