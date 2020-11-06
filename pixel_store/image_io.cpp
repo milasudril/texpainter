@@ -3,6 +3,7 @@
 #include "./image_io.hpp"
 
 #include <OpenEXR/ImfInputFile.h>
+#include <OpenEXR/ImfOutputFile.h>
 #include <OpenEXR/ImfChannelList.h>
 #include <OpenEXR/ImfArray.h>
 
@@ -45,4 +46,37 @@ Texpainter::PixelStore::Image Texpainter::PixelStore::load(const char* filename)
 	src.readPixels(box.min.y, box.max.y);
 
 	return ret;
+}
+
+void Texpainter::PixelStore::store(Span2d<Pixel const> pixels, char const* filename)
+{
+	Imf::Header header{static_cast<int>(pixels.width()), static_cast<int>(pixels.height())};
+	header.channels().insert("R", Imf::Channel{Imf::FLOAT});
+	header.channels().insert("G", Imf::Channel{Imf::FLOAT});
+	header.channels().insert("B", Imf::Channel{Imf::FLOAT});
+	header.channels().insert("A", Imf::Channel{Imf::FLOAT});
+
+	Imf::FrameBuffer fb;
+	fb.insert("R",
+	          Imf::Slice{Imf::FLOAT,
+	                     (char*)(pixels.data()) + 0 * sizeof(float),
+	                     sizeof(Pixel),
+	                     sizeof(Pixel) * pixels.width()});
+	fb.insert("G",
+	          Imf::Slice{Imf::FLOAT,
+	                     (char*)(pixels.data()) + 1 * sizeof(float),
+	                     sizeof(Pixel),
+	                     sizeof(Pixel) * pixels.width()});
+	fb.insert("B",
+	          Imf::Slice{Imf::FLOAT,
+	                     (char*)(pixels.data()) + 2 * sizeof(float),
+	                     sizeof(Pixel),
+	                     sizeof(Pixel) * pixels.width()});
+	fb.insert("A",
+	          Imf::Slice{Imf::FLOAT,
+	                     (char*)(pixels.data()) + 3 * sizeof(float),
+	                     sizeof(Pixel),
+	                     sizeof(Pixel) * pixels.width()});
+
+	Imf::OutputFile dest{filename, header};
 }

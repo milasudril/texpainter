@@ -10,8 +10,14 @@
 
 namespace Texpainter::PixelStore
 {
-	Image load(const char* filename);
-	void store(Image const& img, const char* filename);
+	Image load(char const* filename);
+
+	void store(Span2d<Pixel const> pixels, char const* filename);
+
+	inline void store(Image const& img, char const* filename)
+	{
+		store(img.pixels(), filename);
+	}
 }
 
 #endif
