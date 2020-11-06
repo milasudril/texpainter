@@ -67,6 +67,8 @@ namespace Texpainter::Model
 
 		return ItemName{std::string{name_begin, name_end}};
 	}
+
+	inline std::string toFilename(ItemName const& name) { return toString(name); }
 }
 
 #endif
