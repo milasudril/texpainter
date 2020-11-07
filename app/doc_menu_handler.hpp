@@ -61,7 +61,7 @@ namespace Texpainter
 		{
 			if(auto current_doc = docs.currentDocument(); current_doc != nullptr)
 			{
-				store(render(*current_doc), "test.exr");
+				store(render(*current_doc, 2.0), "test.exr");
 				on_completed();
 			}
 		}

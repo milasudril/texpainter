@@ -95,21 +95,22 @@ void Texpainter::Model::render(Layer const& layer,
                                Span2d<PixelStore::Pixel> ret,
                                BlendFunction blend,
                                float opacity,
-                               FilterGraph::Graph const* filter)
+                               FilterGraph::Graph const* filter,
+                               double scale)
 {
 	auto const ϴ            = layer.rotation();
 	auto const rot_x        = vec2_t{cos(ϴ), sin(ϴ)};
 	auto const rot_y        = vec2_t{-sin(ϴ), cos(ϴ)};
-	auto const scale_factor = 1.0 / layer.scaleFactor();
+	auto const scale_factor = 1.0 / (scale * layer.scaleFactor());
 
 	auto const& src = layer.filteredContent(filter);
 	auto const origin_src =
 	    0.5 * vec2_t{static_cast<double>(src.width()), static_cast<double>(src.height())};
 	auto const loc_src_ret_coord =
-	    layer.location()
+	    layer.location() * scale
 	    + 0.5 * vec2_t{static_cast<double>(ret.width()), static_cast<double>(ret.height())};
 
-	auto const aabb         = 0.5 * axisAlignedBoundingBox(layer);
+	auto const aabb         = 0.5 * axisAlignedBoundingBox(layer, scale);
 	auto const begin_coords = loc_src_ret_coord - aabb;
 	auto const end_coords   = loc_src_ret_coord + aabb;
 

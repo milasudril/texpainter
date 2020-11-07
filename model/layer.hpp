@@ -274,11 +274,11 @@ namespace Texpainter::Model
 		}
 	};
 
-	inline vec2_t axisAlignedBoundingBox(Layer const& layer)
+	inline vec2_t axisAlignedBoundingBox(Layer const& layer, double scale = 1.0)
 	{
 		auto const size = layer.content().size();
 		auto const scaled_size =
-		    vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())}
+		    scale * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())}
 		    * layer.scaleFactor();
 
 		return axisAlignedBoundingBox(scaled_size, layer.rotation());
@@ -288,23 +288,26 @@ namespace Texpainter::Model
 	            Span2d<PixelStore::Pixel> ret,
 	            BlendFunction blend,
 	            float opacity,
-	            FilterGraph::Graph const* filter);
+	            FilterGraph::Graph const* filter,
+	            double scale = 1.0);
 
 	inline void render(Layer const& layer,
 	                   Span2d<PixelStore::Pixel> ret,
-	                   CompositingOptions const& compose_opts)
+	                   CompositingOptions const& compose_opts,
+	                   double scale = 1.0)
 	{
 		auto const& filter_graph = compose_opts.filterGraph();
 		render(layer,
 		       ret,
 		       compose_opts.blendFunction(),
 		       compose_opts.opacity(),
-		       filter_graph.valid() ? &filter_graph : nullptr);
+		       filter_graph.valid() ? &filter_graph : nullptr,
+		       scale);
 	}
 
-	inline void render(Layer const& layer, Span2d<PixelStore::Pixel> ret)
+	inline void render(Layer const& layer, Span2d<PixelStore::Pixel> ret, double scale = 1.0)
 	{
-		render(layer, ret, layer.compositingOptions());
+		render(layer, ret, layer.compositingOptions(), scale);
 	}
 
 	void outline(Layer const& layer, Span2d<PixelStore::Pixel> ret);

@@ -123,12 +123,14 @@ namespace Texpainter::Model
 		});
 	}
 
-	inline PixelStore::Image render(Document const& doc)
+	inline PixelStore::Image render(Document const& doc, double scale = 2.0)
 	{
-		PixelStore::Image canvas{doc.canvasSize()};
+		PixelStore::Image canvas{static_cast<uint32_t>(scale * doc.canvasSize().width()),
+		                         static_cast<uint32_t>(scale * doc.canvasSize().height())};
 		std::ranges::fill(canvas.pixels(), PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
-		std::ranges::for_each(visibleLayersByIndex(doc),
-		                      [&canvas](auto const& layer) { render(layer.get(), canvas); });
+		std::ranges::for_each(visibleLayersByIndex(doc), [&canvas, scale](auto const& layer) {
+			render(layer.get(), canvas, scale);
+		});
 
 		return canvas;
 	}
