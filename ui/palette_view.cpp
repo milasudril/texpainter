@@ -26,7 +26,7 @@ namespace
 				return Texpainter::PixelStore::BasicPixel<
 				    Texpainter::PixelStore::ColorProfiles::Gamma22>{
 				    Texpainter::PixelStore::Pixel{0.5f, 0.0f, 0.0f, 0.5f}};
-			default: abort();
+			default: __builtin_unreachable();
 		}
 	}
 }

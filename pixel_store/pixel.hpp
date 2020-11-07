@@ -28,7 +28,7 @@ namespace Texpainter::PixelStore
 				return vec4_t{std::pow(val[0], 2.2f),
 				              std::pow(val[1], 2.2f),
 				              std::pow(val[2], 2.2f),
-				              std::pow(val[3], 2.2f)};
+				              val[3]};
 			}
 
 			static constexpr vec4_t fromLinear(vec4_t val)
@@ -36,7 +36,7 @@ namespace Texpainter::PixelStore
 				return vec4_t{std::pow(val[0], 1.0f / 2.2f),
 				              std::pow(val[1], 1.0f / 2.2f),
 				              std::pow(val[2], 1.0f / 2.2f),
-				              std::pow(val[3], 1.0f / 2.2f)};
+				              val[3]};
 			}
 		};
 	}

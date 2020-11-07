@@ -181,7 +181,7 @@ private:
 				write_ptr[0] = gamma_22[as_ints[2]];
 				write_ptr[1] = gamma_22[as_ints[1]];
 				write_ptr[2] = gamma_22[as_ints[0]];
-				write_ptr[3] = gamma_22[as_ints[3]];
+				write_ptr[3] = 255.0f*read_ptr->alpha();
 
 				write_ptr += 4;
 				++read_ptr;
