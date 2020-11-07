@@ -21,6 +21,7 @@
 #include "./grayscale_range/grayscale_range.hpp"
 #include "./map_grayscale_range/map_grayscale_range.hpp"
 #include "./random_color/random_color.hpp"
+#include "./checkerboard/checkerboard.hpp"
 
 #include "filtergraph/image_processor_wrapper.hpp"
 #include "utils/fixed_flatmap.hpp"
@@ -61,7 +62,8 @@ namespace
 	    get_info<::RealRealMultiply::ImageProcessor>(),
 	    get_info<::GrayscaleRange::ImageProcessor>(),
 	    get_info<::MapGrayscaleRange::ImageProcessor>(),
-	    get_info<::RandomColor::ImageProcessor>()};
+	    get_info<::RandomColor::ImageProcessor>(),
+	    get_info<::Checkerboard::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
