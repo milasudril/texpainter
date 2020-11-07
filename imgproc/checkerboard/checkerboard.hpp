@@ -14,7 +14,6 @@
 namespace Checkerboard
 {
 	using Texpainter::Str;
-	using Texpainter::vec2_t;
 	using Texpainter::FilterGraph::ComplexValue;
 	using Texpainter::FilterGraph::ImageProcessorId;
 	using Texpainter::FilterGraph::ImgProcArg;
@@ -24,6 +23,11 @@ namespace Checkerboard
 	using Texpainter::FilterGraph::PortInfo;
 	using Texpainter::FilterGraph::PortType;
 	using Texpainter::FilterGraph::RealValue;
+
+	inline auto sizeFromParam(size_t size, GaussianMask2d::ParamValue val)
+	{
+		return 0.5 * std::exp2(std::lerp(-std::log2(size), 0.0, val.value()));
+	}
 
 	class ImageProcessor
 	{
@@ -39,19 +43,17 @@ namespace Checkerboard
 
 		void operator()(ImgProcArg<InterfaceDescriptor> const& args) const
 		{
-			auto dx = 2.0
-			          * static_cast<int>(0.5 * args.size().width()
-			                             * m_params.find<Str("Div x")>()->value())
+			auto const w = args.size().width();
+			auto const h = args.size().height();
+			auto dx = 2.0 * static_cast<int>(w * sizeFromParam(w, *m_params.find<Str("Div x")>()))
 			          / static_cast<double>(args.size().width());
-			auto dy = 2.0
-			          * static_cast<int>(0.5 * args.size().height()
-			                             * m_params.find<Str("Div y")>()->value())
-			          / static_cast<double>(args.size().height());
+			auto dy = 2.0 * static_cast<int>(h * sizeFromParam(h, *m_params.find<Str("Div y")>()))
+			          / static_cast<double>(h);
 
-			for(uint32_t row = 0; row < args.size().height(); ++row)
+			for(uint32_t row = 0; row < h; ++row)
 			{
 				auto const i = static_cast<uint32_t>(row * dy);
-				for(uint32_t col = 0; col < args.size().width(); ++col)
+				for(uint32_t col = 0; col < w; ++col)
 				{
 					auto const j             = static_cast<uint32_t>(col * dx);
 					args.output<0>(col, row) = (i % 2 == j % 2) ? 0.0 : 1.0;
