@@ -123,6 +123,15 @@ namespace Texpainter::Model
 		});
 	}
 
+	inline PixelStore::Image render(Document const& doc)
+	{
+		PixelStore::Image canvas{doc.canvasSize()};
+		std::ranges::fill(canvas.pixels(), PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
+		std::ranges::for_each(visibleLayersByIndex(doc),
+		                      [&canvas](auto const& layer) { render(layer.get(), canvas); });
+
+		return canvas;
+	}
 }
 
 #endif
