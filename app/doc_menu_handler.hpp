@@ -55,6 +55,16 @@ namespace Texpainter
 			confirmPositive(Tag<id>{}, src);
 		}
 
+		void onActivated(Ui::MenuItem&,
+		                 DocumentManager& docs,
+		                 MenuActionCallback<FileAction::Export> on_completed)
+		{
+			if(auto current_doc = docs.currentDocument(); current_doc != nullptr)
+			{
+				store(render(*current_doc), "test.exr");
+				on_completed();
+			}
+		}
 
 		void onActivated(Ui::MenuItem&,
 		                 DocumentManager& docs,
