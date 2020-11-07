@@ -248,8 +248,8 @@ private:
 		auto const col = static_cast<int>(col_row[0]);
 		auto const row = static_cast<int>(col_row[1]);
 
-		return PixelStore::ColorIndex{std::min(static_cast<uint32_t>(m_colors.size()),
-		                                       static_cast<uint32_t>(m_n_cols * row + col))};
+		return PixelStore::ColorIndex{static_cast<PixelStore::ColorIndex::element_type>(
+		    std::min(m_colors.size(), static_cast<size_t>(m_n_cols * row + col)))};
 	}
 
 	static void size_callback(GtkWidget*, GdkRectangle*, gpointer self)

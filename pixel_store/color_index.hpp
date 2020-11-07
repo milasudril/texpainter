@@ -5,23 +5,24 @@
 
 #include <cstdint>
 #include <compare>
+#include <concepts>
 
 namespace Texpainter::PixelStore
 {
 	class ColorIndex
 	{
 	public:
-		using element_type = uint32_t;
+		using element_type = uint8_t;
 
-		constexpr ColorIndex(): m_value{std::numeric_limits<uint32_t>::max()} {}
+		constexpr ColorIndex(): m_value{std::numeric_limits<element_type>::max()} {}
 
-		constexpr explicit ColorIndex(uint32_t val): m_value{val} {}
+		constexpr explicit ColorIndex(element_type val): m_value{val} {}
 
-		constexpr uint32_t value() const { return m_value; }
+		constexpr element_type value() const { return m_value; }
 
 		constexpr auto operator<=>(ColorIndex const&) const = default;
 
-		constexpr bool valid() const { return m_value != std::numeric_limits<uint32_t>::max(); }
+		constexpr bool valid() const { return m_value != std::numeric_limits<element_type>::max(); }
 
 		constexpr ColorIndex& operator++()
 		{
@@ -36,7 +37,7 @@ namespace Texpainter::PixelStore
 		}
 
 	private:
-		uint32_t m_value;
+		element_type m_value;
 	};
 }
 

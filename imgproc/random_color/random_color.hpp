@@ -65,13 +65,14 @@ namespace RandomColor
 		void operator()(ImgProcArg<InterfaceDescriptor> const& args) const
 		{
 			auto const size = args.size().area();
-			std::transform(
-			    args.input<1>(),
-			    args.input<1>() + size,
-			    args.output<0>(),
-			    [&palette = args.input<0>().get(), &pdf = m_pdf](auto val) {
-				    return palette[Palette::index_type{static_cast<uint32_t>(pdf.eventIndex(val))}];
-			    });
+			std::transform(args.input<1>(),
+			               args.input<1>() + size,
+			               args.output<0>(),
+			               [&palette = args.input<0>().get(), &pdf = m_pdf](auto val) {
+				               using IntegerType = Palette::index_type::element_type;
+				               auto index        = static_cast<IntegerType>(pdf.eventIndex(val));
+				               return palette[Palette::index_type{index}];
+			               });
 		}
 
 		void set(ParamName name, ParamValue val)

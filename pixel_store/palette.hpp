@@ -11,7 +11,7 @@
 
 namespace Texpainter::PixelStore
 {
-	template<size_t Size>
+	template<ColorIndex::element_type Size>
 	class Palette
 	{
 	public:
