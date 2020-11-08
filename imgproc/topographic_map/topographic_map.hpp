@@ -14,7 +14,6 @@ namespace TopographicMap
 {
 	using Texpainter::FilterGraph::ImageProcessorId;
 	using Texpainter::FilterGraph::ImgProcArg;
-	using Texpainter::FilterGraph::ParamMap;
 	using Texpainter::FilterGraph::ParamName;
 	using Texpainter::FilterGraph::ParamValue;
 	using Texpainter::FilterGraph::PortInfo;

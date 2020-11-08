@@ -25,6 +25,7 @@
 #include "./rgba_to_grayalpha/rgba_to_grayalpha.hpp"
 #include "./soft_clamp/soft_clamp.hpp"
 #include "./topographic_map/topographic_map.hpp"
+#include "./project_normal/project_normal.hpp"
 
 #include "filtergraph/image_processor_wrapper.hpp"
 #include "utils/fixed_flatmap.hpp"
@@ -69,7 +70,9 @@ namespace
 	    get_info<::Checkerboard::ImageProcessor>(),
 	    get_info<::RgbaToGrayAlpha::ImageProcessor>(),
 	    get_info<::SoftClamp::ImageProcessor>(),
-	    get_info<::TopographicMap::ImageProcessor>()};
+	    get_info<::TopographicMap::ImageProcessor>(),
+		get_info<::ProjectNormal::ImageProcessor>()
+	};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
