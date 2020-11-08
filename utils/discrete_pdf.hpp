@@ -2,8 +2,8 @@
 //@	"targets":[{"name":"discrete_pdf.hpp","type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_UTILS_DISCRETECDF_HPP
-#define TEXPAINTER_UTILS_DISCRETECDF_HPP
+#ifndef TEXPAINTER_UTILS_DISCRETEPDF_HPP
+#define TEXPAINTER_UTILS_DISCRETEPDF_HPP
 
 #include <algorithm>
 #include <numeric>

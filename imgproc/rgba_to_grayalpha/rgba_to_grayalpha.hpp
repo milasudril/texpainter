@@ -2,8 +2,8 @@
 //@	 "targets":[{"name":"rgba_to_grayalpha.hpp", "type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_IMGPROC_RGBA_TO_GRAYALPHA_HPP
-#define TEXPAINTER_IMGPROC_RGBA_TO_GRAYALPHA_HPP
+#ifndef TEXPAINTER_IMGPROC_RGBATOGRAYALPHA_RGBATOGRAYALPHA_HPP
+#define TEXPAINTER_IMGPROC_RGBATOGRAYALPHA_RGBATOGRAYALPHA_HPP
 
 #include "filtergraph/port_info.hpp"
 #include "filtergraph/img_proc_arg.hpp"

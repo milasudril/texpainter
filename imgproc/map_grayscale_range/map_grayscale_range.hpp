@@ -3,8 +3,8 @@
 //@	,"dependencies_extra":[{"ref":"map_grayscale_range.o","rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_IMGPROC_MAPGRAYSCAELRANGE_MAPGRAYSCALERANGE_HPP
-#define TEXPAINTER_IMGPROC_MAPGRAYSCAELRANGE_MAPGRAYSCALERANGE_HPP
+#ifndef TEXPAINTER_IMGPROC_MAPGRAYSCALERANGE_MAPGRAYSCALERANGE_HPP
+#define TEXPAINTER_IMGPROC_MAPGRAYSCALERANGE_MAPGRAYSCALERANGE_HPP
 
 #include "filtergraph/port_info.hpp"
 #include "filtergraph/img_proc_arg.hpp"

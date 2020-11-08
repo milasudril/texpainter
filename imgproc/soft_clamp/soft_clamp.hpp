@@ -2,8 +2,8 @@
 //@	 "targets":[{"name":"soft_clamp.hpp", "type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_IMGPROC_SOFTCLAMP_HPP
-#define TEXPAINTER_IMGPROC_SOFTCLAMP_HPP
+#ifndef TEXPAINTER_IMGPROC_SOFTCLAMP_SOFTCLAMP_HPP
+#define TEXPAINTER_IMGPROC_SOFTCLAMP_SOFTCLAMP_HPP
 
 #include "filtergraph/port_info.hpp"
 #include "filtergraph/img_proc_arg.hpp"

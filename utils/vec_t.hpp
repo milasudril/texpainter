@@ -23,6 +23,14 @@ namespace Texpainter
 
 	constexpr double length(vec2_t v) { return sqrt(dot(v, v)); }
 
+	constexpr float dot(vec4_t a, vec4_t b)
+	{
+		a *= b;
+		return a[0] + a[1] + a[2] + a[3];
+	}
+
+	constexpr float length(vec4_t v) { return sqrt(dot(v, v)); }
+
 	constexpr vec2_t transform(vec2_t v, vec2_t x_vec, vec2_t y_vec)
 	{
 		return vec2_t{dot(v, x_vec), dot(v, y_vec)};
