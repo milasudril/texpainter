@@ -8,6 +8,7 @@
 #include "pixel_store/pixel.hpp"
 #include "pixel_store/palette.hpp"
 #include "utils/size_2d.hpp"
+#include "model/topography_info.hpp"
 
 #include "libenum/enum.hpp"
 
@@ -22,6 +23,7 @@ namespace Texpainter::FilterGraph
 		RgbaPixels,
 		GrayscaleRealPixels,
 		GrayscaleComplexPixels,
+		TopographyData,
 		RgbaValue,
 		RealValue,
 		ComplexValue,
@@ -31,10 +33,11 @@ namespace Texpainter::FilterGraph
 	constexpr PortType begin(Enum::Empty<PortType>) { return PortType::RgbaPixels; }
 	constexpr PortType end(Enum::Empty<PortType>) { return Enum::add(PortType::Palette); }
 
-	using RgbaValue    = Texpainter::PixelStore::Pixel;
-	using RealValue    = double;
-	using ComplexValue = std::complex<RealValue>;
-	using Palette      = PixelStore::Palette<16>;
+	using RgbaValue      = PixelStore::Pixel;
+	using RealValue      = double;
+	using ComplexValue   = std::complex<RealValue>;
+	using Palette        = PixelStore::Palette<16>;
+	using TopographyInfo = Model::TopographyInfo;
 
 	template<PortType id>
 	struct PortTypeToType;
@@ -65,6 +68,18 @@ namespace Texpainter::FilterGraph
 			return std::make_unique<ComplexValue[]>(size.area());
 		}
 	};
+
+	template<>
+	struct PortTypeToType<PortType::TopographyData>
+	{
+		using type = std::unique_ptr<TopographyInfo[]>;
+
+		static type createValue(Size2d size)
+		{
+			return std::make_unique<TopographyInfo[]>(size.area());
+		}
+	};
+
 
 	template<>
 	struct PortTypeToType<PortType::RgbaValue>

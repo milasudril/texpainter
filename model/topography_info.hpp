@@ -9,10 +9,12 @@
 
 namespace Texpainter::Model
 {
-	class TopographyData
+	class TopographyInfo
 	{
 	public:
-		explicit TopographyData(float d_x, float d_y, float elevation)
+		TopographyInfo(): m_data{0.0f, 0.0f, 1.0f, 0.0f} {}
+
+		explicit TopographyInfo(float d_x, float d_y, float elevation)
 		{
 			vec4_t normal{-d_x, -d_y, 1.0f, 0.0f};
 			normal /= length(normal);
@@ -21,10 +23,7 @@ namespace Texpainter::Model
 
 		vec4_t value() const { return m_data; }
 
-		vec4_t normal() const
-		{
-			return vec4_t{m_data[0], m_data[1], m_data[2], 0.0f};
-		}
+		vec4_t normal() const { return vec4_t{m_data[0], m_data[1], m_data[2], 0.0f}; }
 
 		float elevation() const { return m_data[3]; }
 

@@ -4,7 +4,4 @@
 
 #include "./topography_info.hpp"
 
-int main()
-{
-	return 0;
-}
+int main() { return 0; }

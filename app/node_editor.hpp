@@ -33,6 +33,9 @@ namespace Texpainter
 				case FilterGraph::PortType::GrayscaleComplexPixels:
 					return PixelStore::Pixel{0.66f, 0.0f, 0.33f, 1.0f};
 
+				case FilterGraph::PortType::TopographyData:
+					return PixelStore::Pixel{0.33f, 0.0f, 0.66f, 1.0f};
+
 				case FilterGraph::PortType::Palette:
 					return PixelStore::Pixel{0.67f, 0.33f, 0.0f, 1.0f};
 			}
