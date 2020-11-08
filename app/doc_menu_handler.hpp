@@ -62,17 +62,16 @@ namespace Texpainter
 			if(auto current_doc = docs.currentDocument(); current_doc != nullptr)
 			{
 				// TODO: Move and improve this algorithm
-				auto tmp = render(*current_doc, 3.0);
+				auto tmp = render(*current_doc, 2.0);
 				PixelStore::Image img{current_doc->canvasSize()};
 				for(uint32_t row = 0; row < img.width(); ++row)
 				{
 					for(uint32_t col = 0; col < img.height(); ++col)
 					{
 						img(col, row) =
-						    (tmp(3 * col + 1, 3 * row + 0) + tmp(3 * col + 0, 3 * row + 1)
-						     + 4.0f * tmp(3 * col + 1, 3 * row + 1) + tmp(3 * col + 2, 3 * row + 1)
-						     + tmp(3 * col + 1, 3 * row + 2))
-						    / 8.0f;
+						    0.25f
+						    * (tmp(2 * col, 2 * row) + tmp(2 * col + 1, 2 * row)
+						       + tmp(2 * col, 2 * row + 1) + tmp(2 * col + 1, 2 * row + 1));
 					}
 				}
 				store(img, "test.exr");
