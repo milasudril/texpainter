@@ -23,6 +23,7 @@
 #include "./random_color/random_color.hpp"
 #include "./checkerboard/checkerboard.hpp"
 #include "./rgba_to_grayalpha/rgba_to_grayalpha.hpp"
+#include "./soft_clamp/soft_clamp.hpp"
 
 #include "filtergraph/image_processor_wrapper.hpp"
 #include "utils/fixed_flatmap.hpp"
@@ -65,7 +66,8 @@ namespace
 	    get_info<::MapGrayscaleRange::ImageProcessor>(),
 	    get_info<::RandomColor::ImageProcessor>(),
 	    get_info<::Checkerboard::ImageProcessor>(),
-	    get_info<::RgbaToGrayAlpha::ImageProcessor>()};
+	    get_info<::RgbaToGrayAlpha::ImageProcessor>(),
+	    get_info<::SoftClamp::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
