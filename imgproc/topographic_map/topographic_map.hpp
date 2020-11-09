@@ -37,13 +37,14 @@ namespace TopographicMap
 		void operator()(ImgProcArg<InterfaceDescriptor> const& arg) const
 		{
 			auto size = arg.size();
-			// FIXME: boundary conditions
-			for(uint32_t row = 1; row < size.height() - 1; ++row)
+			for(uint32_t row = 0; row < size.height(); ++row)
 			{
-				for(uint32_t col = 1; col < size.width() - 1; ++col)
+				for(uint32_t col = 0; col < size.width(); ++col)
 				{
-					auto const dx = arg.input<0>(col + 1, row) - arg.input<0>(col - 1, row);
-					auto const dy = arg.input<0>(col, row + 1) - arg.input<0>(col, row - 1);
+					auto const dx = arg.input<0>((col + 1 + size.width()) % size.width(), row)
+					                - arg.input<0>((col - 1 + size.width()) % size.width(), row);
+					auto const dy = arg.input<0>(col, (row + 1 + size.height()) % size.height())
+					                - arg.input<0>(col, (row - 1 + size.height()) % size.height());
 
 					arg.output<0>(col, row) =
 					    TopographyInfo{static_cast<float>(dx),
