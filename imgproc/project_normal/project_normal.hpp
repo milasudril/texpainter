@@ -15,6 +15,8 @@
 
 namespace ProjectNormal
 {
+	using Texpainter::Str;
+	using Texpainter::vec4_t;
 	using Texpainter::FilterGraph::ImageProcessorId;
 	using Texpainter::FilterGraph::ImgProcArg;
 	using Texpainter::FilterGraph::ParamMap;
@@ -23,8 +25,6 @@ namespace ProjectNormal
 	using Texpainter::FilterGraph::PortInfo;
 	using Texpainter::FilterGraph::PortType;
 	using Texpainter::FilterGraph::TopographyInfo;
-	using Texpainter::vec4_t;
-	using Texpainter::Str;
 
 	class ImageProcessor
 	{
@@ -42,14 +42,19 @@ namespace ProjectNormal
 
 		void operator()(ImgProcArg<InterfaceDescriptor> const& arg) const
 		{
-			auto const phi = 2.0*std::numbers::pi*m_params.find<Str{"Azimuth angle"}>()-> value();
-			auto const theta = std::numbers::pi*m_params.find<Str{"Zenith angle"}>()-> value();
-			vec4_t proj{static_cast<float>(sin(theta)*cos(phi)), static_cast<float>(sin(theta)*sin(phi)),
-				static_cast<float>(cos(theta)), 0.0f};
+			auto const phi =
+			    2.0 * std::numbers::pi * m_params.find<Str{"Azimuth angle"}>()->value();
+			auto const theta =
+			    0.5 * std::numbers::pi * m_params.find<Str{"Zenith angle"}>()->value();
+			vec4_t proj{static_cast<float>(sin(theta) * cos(phi)),
+			            static_cast<float>(sin(theta) * sin(phi)),
+			            static_cast<float>(cos(theta)),
+			            0.0f};
 
-			std::transform(arg.input<0>(), arg.input<0>() + arg.size().area(), arg.output<0>(), [proj](auto val){
-				return Texpainter::dot(val.value(), proj);
-			});
+			std::transform(arg.input<0>(),
+			               arg.input<0>() + arg.size().area(),
+			               arg.output<0>(),
+			               [proj](auto val) { return Texpainter::dot(val.value(), proj); });
 		}
 
 		void set(ParamName name, ParamValue value)

@@ -71,8 +71,7 @@ namespace
 	    get_info<::RgbaToGrayAlpha::ImageProcessor>(),
 	    get_info<::SoftClamp::ImageProcessor>(),
 	    get_info<::TopographicMap::ImageProcessor>(),
-		get_info<::ProjectNormal::ImageProcessor>()
-	};
+	    get_info<::ProjectNormal::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
