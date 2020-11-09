@@ -14,9 +14,9 @@ using Texpainter::vec2_t;
 
 namespace
 {
-	auto sizeFromParam(ButterworthMask2d::ParamValue val)
+	inline auto sizeFromParam(size_t size, ButterworthMask2d::ParamValue val)
 	{
-		return 0.5 * std::exp2(std::lerp(-16.0, 0.0, val.value()));
+		return 0.5 * std::exp2(std::lerp(-std::log2(size), 0.0, val.value()));
 	}
 
 	auto orderFromParam(ButterworthMask2d::ParamValue val)
@@ -30,10 +30,12 @@ void ButterworthMask2d::ImageProcessor::operator()(
 {
 	auto const size = args.size();
 
-	auto const r_x = sizeFromParam(*m_params.find<Str{"Semi-axis 1"}>());
-	auto const r_y = sizeFromParam(*m_params.find<Str{"Semi-axis 2"}>());
-	auto const n   = orderFromParam(*m_params.find<Str{"Order"}>());
-	auto const θ   = Angle{0.5 * m_params.find<Str{"Orientation"}>()->value(), Angle::Turns{}};
+	auto const r_x =
+	    sizeFromParam(static_cast<size_t>(sqrt(size.area())), *m_params.find<Str{"Semi-axis 1"}>());
+	auto const r_y =
+	    sizeFromParam(static_cast<size_t>(sqrt(size.area())), *m_params.find<Str{"Semi-axis 2"}>());
+	auto const n = orderFromParam(*m_params.find<Str{"Order"}>());
+	auto const θ = Angle{0.5 * m_params.find<Str{"Orientation"}>()->value(), Angle::Turns{}};
 
 	auto const rot_vec_x = vec2_t{cos(θ), -sin(θ)};
 	auto const rot_vec_y = vec2_t{sin(θ), cos(θ)};

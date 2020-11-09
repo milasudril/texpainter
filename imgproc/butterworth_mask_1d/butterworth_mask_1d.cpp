@@ -15,9 +15,9 @@ using Texpainter::vec2_t;
 
 namespace
 {
-	auto sizeFromParam(ButterworthMask1d::ParamValue val)
+	inline auto sizeFromParam(size_t size, ButterworthMask1d::ParamValue val)
 	{
-		return 0.5 * std::exp2(std::lerp(-16.0, 0.0, val.value()));
+		return 0.5 * std::exp2(std::lerp(-std::log2(size), 0.0, val.value()));
 	}
 
 	auto orderFromParam(ButterworthMask1d::ParamValue val)
@@ -31,7 +31,8 @@ void ButterworthMask1d::ImageProcessor::operator()(
 {
 	auto const size = args.size();
 
-	auto const r = sizeFromParam(*m_params.find<Str{"Radius"}>());
+	auto const r =
+	    sizeFromParam(static_cast<size_t>(sqrt(size.area())), *m_params.find<Str{"Radius"}>());
 	auto const n = orderFromParam(*m_params.find<Str{"Order"}>());
 	auto const θ = Angle{0.5 * m_params.find<Str{"Orientation"}>()->value(), Angle::Turns{}};
 

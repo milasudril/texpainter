@@ -24,7 +24,7 @@ namespace Checkerboard
 	using Texpainter::FilterGraph::PortType;
 	using Texpainter::FilterGraph::RealValue;
 
-	inline auto sizeFromParam(size_t size, GaussianMask2d::ParamValue val)
+	inline auto sizeFromParam(size_t size, Checkerboard::ParamValue val)
 	{
 		return 0.5 * std::exp2(std::lerp(-std::log2(size), 0.0, val.value()));
 	}
