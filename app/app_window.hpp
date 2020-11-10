@@ -200,6 +200,8 @@ namespace Texpainter
 			m_rows.killFocus();
 		}
 
+		void operator()(Tag<ControlId::PaletteView>, Ui::PaletteView&) { update(); }
+
 		template<auto, class... T>
 		void handleException(char const* msg, T&...)
 		{
@@ -397,7 +399,11 @@ namespace Texpainter
 	{
 		auto& current_document = *m_documents.currentDocument();
 		m_pal_view_eh.template onMouseUp<AppWindow::ControlId::PaletteView>(
-		    src, index, button, current_document);
+		    src,
+		    index,
+		    button,
+		    current_document,
+		    PaletteViewEventHandler::Callback<AppWindow::ControlId::PaletteView>{*this});
 	}
 }
 

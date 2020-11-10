@@ -10,6 +10,8 @@
 #include "ui/dialog.hpp"
 #include "ui/palette_view.hpp"
 #include "ui/color_picker.hpp"
+#include "utils/function_ref.hpp"
+#include "utils/empty.hpp"
 
 #include <random>
 
@@ -17,15 +19,30 @@ namespace Texpainter
 {
 	class PaletteViewEventHandler
 	{
+	public:
+		template<auto ControlId>
+		class Callback: public FunctionRef<void(Ui::PaletteView&)>
+		{
+		public:
+			template<class T>
+			explicit Callback(T& obj) requires(!std::same_as<std::decay_t<T>, Callback>)
+			    : FunctionRef<void(Ui::PaletteView&)>(obj, Tag<ControlId>{})
+			{
+			}
+		};
+
+	private:
 		class ColorPickerData
 		{
 		public:
 			explicit ColorPickerData(Ui::PaletteView& pal_view,
 			                         PixelStore::ColorIndex current_index,
-			                         Model::Document& doc)
+			                         Model::Document& doc,
+			                         FunctionRef<void(Ui::PaletteView&)> cb)
 			    : r_palette_view{pal_view}
 			    , m_current_index{current_index}
 			    , r_document{doc}
+			    , m_cb{cb}
 			{
 			}
 
@@ -35,10 +52,13 @@ namespace Texpainter
 
 			Ui::PaletteView& paletteView() { return r_palette_view.get(); }
 
+			void onCompleted() const { m_cb(r_palette_view.get()); }
+
 		private:
 			std::reference_wrapper<Ui::PaletteView> r_palette_view;
 			PixelStore::ColorIndex m_current_index;
 			std::reference_wrapper<Model::Document> r_document;
+			FunctionRef<void(Ui::PaletteView&)> m_cb;
 		};
 
 		using ColorPicker = Texpainter::Ui::Dialog<InheritFrom<ColorPickerData, Ui::ColorPicker>>;
@@ -50,11 +70,12 @@ namespace Texpainter
 		{
 		}
 
-		template<auto>
+		template<auto id>
 		void onMouseUp(Texpainter::Ui::PaletteView& pal_view,
 		               PixelStore::ColorIndex index,
 		               int button,
-		               Model::Document& doc)
+		               Model::Document& doc,
+		               Callback<id> cb)
 		{
 			switch(button)
 			{
@@ -74,7 +95,7 @@ namespace Texpainter
 					pal_view.highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Write)
 					    .update();
 					m_color_picker = std::make_unique<ColorPicker>(
-					    ColorPickerData{pal_view, index, doc},
+					    ColorPickerData{pal_view, index, doc, cb},
 					    r_dlg_owner,
 					    (std::string{"Select color number "} + std::to_string(index.value() + 1))
 					        .c_str(),
@@ -114,6 +135,7 @@ namespace Texpainter
 			            std::rbegin(m_color_history) + 1,
 			            std::rend(m_color_history));
 			m_color_history[0] = color_new;
+			src.widget().onCompleted();
 			m_color_picker.reset();
 		}
 
