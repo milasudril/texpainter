@@ -2,8 +2,8 @@
 //@	 "targets":[{"name":"project_normal.hpp", "type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_IMGPROC_PROJECTMAP_HPP
-#define TEXPAINTER_IMGPROC_PROJECTMAP_HPP
+#ifndef TEXPAINTER_IMGPROC_PROJECTNORMAL_PROJECTNORMAL_HPP
+#define TEXPAINTER_IMGPROC_PROJECTNORMAL_PROJECTNORMAL_HPP
 
 #include "filtergraph/port_info.hpp"
 #include "filtergraph/img_proc_arg.hpp"

@@ -2,8 +2,8 @@
 //@	 "targets":[{"name":"topographic_map.hpp", "type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_IMGPROC_TOPOGRAPHIC_MAP_HPP
-#define TEXPAINTER_IMGPROC_TOPOGRAPHIC_MAP_HPP
+#ifndef TEXPAINTER_IMGPROC_TOPOGRAPHICMAP_TOPOGRAPHICMAP_HPP
+#define TEXPAINTER_IMGPROC_TOPOGRAPHICMAP_TOPOGRAPHICMAP_HPP
 
 #include "filtergraph/port_info.hpp"
 #include "filtergraph/img_proc_arg.hpp"
