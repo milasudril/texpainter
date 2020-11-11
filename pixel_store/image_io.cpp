@@ -6,6 +6,7 @@
 #include <OpenEXR/ImfOutputFile.h>
 #include <OpenEXR/ImfChannelList.h>
 #include <OpenEXR/ImfArray.h>
+#include <OpenEXR/ImfTestFile.h>
 
 Texpainter::PixelStore::Image Texpainter::PixelStore::load(const char* filename)
 {
@@ -81,4 +82,9 @@ void Texpainter::PixelStore::store(Span2d<Pixel const> pixels, char const* filen
 	Imf::OutputFile dest{filename, header};
 	dest.setFrameBuffer(fb);
 	dest.writePixels(pixels.height());
+}
+
+bool Texpainter::PixelStore::fileValid(char const* filename)
+{
+	return Imf::isOpenExrFile(filename);
 }

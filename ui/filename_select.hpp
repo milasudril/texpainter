@@ -31,7 +31,7 @@ namespace Texpainter::Ui
 	                    char const* filter_name);
 
 	inline bool filenameSelect(Container const& cnt,
-	                           char const* working_dir,
+	                           std::filesystem::path const& working_dir,
 	                           std::filesystem::path& filename_in,
 	                           FilenameSelectMode mode)
 	{

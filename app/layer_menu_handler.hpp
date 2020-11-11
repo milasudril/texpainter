@@ -16,6 +16,7 @@
 #include "ui/dialog.hpp"
 #include "ui/text_entry.hpp"
 #include "ui/labeled_input.hpp"
+#include "ui/filename_select.hpp"
 #include "ui/error_message_dialog.hpp"
 #include "pixel_store/image_io.hpp"
 
@@ -428,13 +429,23 @@ namespace Texpainter
 			m_new_empty_dlg->eventHandler<ControlId::NewEmpty>(*this);
 		}
 
-		void onActivated(Ui::MenuItem&,
+		void onActivated(Ui::MenuItem& item,
 		                 Model::Document& doc,
 		                 MenuActionCallback<LayerActionNew::FromFile> on_completed)
 		{
-			auto named_layer = Model::createLayerFromFile("test_pattern/test_pattern.exr");
-			insertNewLayer(std::move(named_layer.first), std::move(named_layer.second), doc);
-			on_completed();
+			std::filesystem::path filename;
+			if(Ui::filenameSelect(
+			       item,
+			       std::filesystem::current_path(),
+			       filename,
+			       Ui::FilenameSelectMode::Open,
+			       [](char const* filename) { return PixelStore::fileValid(filename); },
+			       "Supported image files"))
+			{
+				auto named_layer = Model::createLayerFromFile(filename.c_str());
+				insertNewLayer(std::move(named_layer.first), std::move(named_layer.second), doc);
+				on_completed();
+			}
 		}
 
 		void onActivated(Ui::MenuItem&,
