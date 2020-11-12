@@ -12,6 +12,7 @@
 
 #include "ui/dialog.hpp"
 #include "ui/error_message_dialog.hpp"
+#include "ui/filename_select.hpp"
 #include "utils/inherit_from.hpp"
 
 namespace Texpainter
@@ -55,27 +56,34 @@ namespace Texpainter
 			confirmPositive(Tag<id>{}, src);
 		}
 
-		void onActivated(Ui::MenuItem&,
+		void onActivated(Ui::MenuItem& item,
 		                 DocumentManager& docs,
 		                 MenuActionCallback<FileAction::Export> on_completed)
 		{
 			if(auto current_doc = docs.currentDocument(); current_doc != nullptr)
 			{
-				// TODO: Move and improve this algorithm
-				auto tmp = render(*current_doc, 2.0);
-				PixelStore::Image img{current_doc->canvasSize()};
-				for(uint32_t row = 0; row < img.width(); ++row)
+				std::filesystem::path filename;
+				if(filenameSelect(item,
+	                           std::filesystem::current_path(),
+	                           filename,
+	                           Ui::FilenameSelectMode::Save))
 				{
-					for(uint32_t col = 0; col < img.height(); ++col)
+				// TODO: Move and improve this algorithm
+					auto tmp = render(*current_doc, 2.0);
+					PixelStore::Image img{current_doc->canvasSize()};
+					for(uint32_t row = 0; row < img.width(); ++row)
 					{
-						img(col, row) =
-						    0.25f
-						    * (tmp(2 * col, 2 * row) + tmp(2 * col + 1, 2 * row)
-						       + tmp(2 * col, 2 * row + 1) + tmp(2 * col + 1, 2 * row + 1));
+						for(uint32_t col = 0; col < img.height(); ++col)
+						{
+							img(col, row) =
+								0.25f
+								* (tmp(2 * col, 2 * row) + tmp(2 * col + 1, 2 * row)
+								+ tmp(2 * col, 2 * row + 1) + tmp(2 * col + 1, 2 * row + 1));
+						}
 					}
+					store(img, filename.c_str());
+					on_completed();
 				}
-				store(img, "test.exr");
-				on_completed();
 			}
 		}
 
