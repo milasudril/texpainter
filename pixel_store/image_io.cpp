@@ -46,6 +46,15 @@ Texpainter::PixelStore::Image Texpainter::PixelStore::load(const char* filename)
 	src.setFrameBuffer(fb);
 	src.readPixels(box.min.y, box.max.y);
 
+	if(!src.header().channels().findChannel("A"))
+	{
+		std::ranges::transform(ret.pixels(), std::begin(ret.pixels()), [](auto val) {
+			val.alpha(1.0f);
+			return val;
+		});
+	}
+
+
 	return ret;
 }
 
