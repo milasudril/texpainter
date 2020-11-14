@@ -88,7 +88,8 @@ Texpainter::FilterGraph::ValidationResult Texpainter::FilterGraph::validate(Grap
 	return result;
 }
 
-Texpainter::PixelStore::Image Texpainter::FilterGraph::Graph::process(Input const& input, bool force_update) const
+Texpainter::PixelStore::Image Texpainter::FilterGraph::Graph::process(Input const& input,
+                                                                      bool force_update) const
 {
 	assert(valid());
 	r_input->pixels(input.pixels()).palette(input.palette());
@@ -101,6 +102,16 @@ Texpainter::PixelStore::Image Texpainter::FilterGraph::Graph::process(Input cons
 	//       recompute the output node. Otherwise, the contents of ret will be undefined,
 	//       in case we already have computed the output result.
 	r_output_node->forceUpdate();
-	(*r_output_node)(input.pixels().size());
+
+	processGraphNodeRecursive(
+	    [size = input.pixels().size()](auto const& node, auto) {
+		    puts(node.name());
+		    node(size);
+		    return GraphProcessing::Continue;
+	    },
+	    *r_output_node);
+	puts("");
+
+	//	(*r_output_node)(input.pixels().size());
 	return ret;
 }
