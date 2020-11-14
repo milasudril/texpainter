@@ -90,22 +90,9 @@ namespace Texpainter::FilterGraph
 			return *this;
 		}
 
-		PixelStore::Image process(Input const& input, bool force_update = true) const
-		{
-			assert(valid());
-			r_input->pixels(input.pixels()).palette(input.palette());
-			if(force_update) { r_input_node->forceUpdate(); }
+		PixelStore::Image process(Input const& input, bool force_update = true) const;
 
-			PixelStore::Image ret{input.pixels().size()};
-			r_output->sink(ret.pixels());
-			// NOTE: Since OutputNode does not use the internal image cache (it has no outputs)
-			//       and it may happen that it is not connected to the input node, we must always
-			//       recompute the output node. Otherwise, the contents of ret will be undefined,
-			//       in case we already have computed the output result.
-			r_output_node->forceUpdate();
-			(*r_output_node)(input.pixels().size());
-			return ret;
-		}
+		std::vector<Node const*> compile() const;
 
 		auto node(NodeId id) const
 		{
