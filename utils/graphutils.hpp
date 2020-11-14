@@ -67,7 +67,7 @@ namespace Texpainter
 									}
 								};
 								visited[static_cast<size_t>(node_id)] = Mark::InProgress;
-								visitEdges(processEdge, *node);
+								visitEdges(std::move(processEdge), *node);
 								break;
 							}
 							case Mark::InProgress:
@@ -107,7 +107,7 @@ namespace Texpainter
 			graphutils_detail::processGraphNodeRecursive(cb, graph, node, nodes_to_visit, visited);
 		};
 
-		visitNodes(processNode, graph);
+		visitNodes(std::move(processNode), graph);
 	}
 }
 

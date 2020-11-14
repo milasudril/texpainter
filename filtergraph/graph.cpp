@@ -4,7 +4,8 @@
 
 #include "./graph.hpp"
 
-#include <stack>
+#include "utils/graphutils.hpp"
+
 #include <map>
 
 namespace
@@ -64,6 +65,11 @@ Texpainter::FilterGraph::Graph::Graph(Graph const& other)
 
 Texpainter::FilterGraph::ValidationResult Texpainter::FilterGraph::validate(Graph const& g)
 {
+#if 0
+	visitNodesInTopoOrder([](auto const&){}, g);
+	return Texpainter::FilterGraph::ValidationResult::NoError;
+
+#else
 	enum class State : int
 	{
 		Init,
@@ -116,4 +122,5 @@ Texpainter::FilterGraph::ValidationResult Texpainter::FilterGraph::validate(Grap
 	}
 
 	return Texpainter::FilterGraph::ValidationResult::NoError;
+#endif
 }

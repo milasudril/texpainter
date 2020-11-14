@@ -33,6 +33,8 @@ namespace Texpainter::FilterGraph
 
 		constexpr auto operator<=>(NodeId const& other) const = default;
 
+		constexpr explicit operator size_t() const { return m_value; }
+
 	private:
 		uint64_t m_value;
 	};
