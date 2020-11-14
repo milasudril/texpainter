@@ -98,10 +98,24 @@ Texpainter::PixelStore::Image Texpainter::FilterGraph::Graph::process(Input cons
 		nodes.reserve(size());
 		processGraphNodeRecursive(
 		    [&nodes](auto const& node, auto) {
-			    nodes.push_back(NodeState{std::cref(node), std::make_unique<SignalingCounter<size_t>>()});
+			    nodes.push_back(
+			        NodeState{std::cref(node), std::make_unique<SignalingCounter<size_t>>()});
 			    return GraphProcessing::Continue;
 		    },
 		    *r_output_node);
+
+		std::ranges::for_each(nodes, [&nodes](auto& item) {
+			std::ranges::for_each(
+			    item.node.get().inputs(), [&nodes, counter = item.counter.get()](auto& ref) {
+				    auto i =
+				        std::ranges::find_if(nodes, [&value = ref.processor()](auto const& item) {
+					        return &item.node.get() == &value;
+				        });
+				    assert(i != std::end(nodes));
+				    i->signal_counters[ref.port().value()].push_back(counter);
+			    });
+		});
+
 		m_node_array = std::move(nodes);
 	}
 
@@ -116,8 +130,13 @@ Texpainter::PixelStore::Image Texpainter::FilterGraph::Graph::process(Input cons
 	//       in case we already have computed the output result.
 	r_output_node->forceUpdate();
 
-	std::ranges::for_each(m_node_array, [size = input.pixels().size()](auto& item){
+	std::ranges::for_each(m_node_array, [size = input.pixels().size()](auto& item) {
+		puts(item.node.get().name());
+		item.counter->waitAndReset(item.node.get().inputPorts().size());
 		item.node(size);
+		std::ranges::for_each(item.signal_counters, [](auto& counter) {
+			std::ranges::for_each(counter, [](auto value) { ++(*value); });
+		});
 	});
 	puts("");
 	return ret;

@@ -16,9 +16,7 @@ namespace Texpainter
 	class SignalingCounter
 	{
 	public:
-		explicit SignalingCounter(): m_value{0}
-		{
-		}
+		explicit SignalingCounter(): m_value{0} {}
 
 		void waitAndReset(T value)
 		{
@@ -41,10 +39,7 @@ namespace Texpainter
 			return m_value == value;
 		}
 
-		bool operator!=(T value) const
-		{
-			return !(*this == value);
-		}
+		bool operator!=(T value) const { return !(*this == value); }
 
 	private:
 		mutable std::mutex m_mtx;

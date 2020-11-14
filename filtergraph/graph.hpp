@@ -193,6 +193,8 @@ namespace Texpainter::FilterGraph
 		{
 			std::reference_wrapper<Node const> node;
 			std::unique_ptr<SignalingCounter<size_t>> counter;
+			std::array<std::vector<SignalingCounter<size_t>*>, Node::MaxNumOutputs>
+			    signal_counters{};
 		};
 		mutable std::vector<NodeState> m_node_array;
 

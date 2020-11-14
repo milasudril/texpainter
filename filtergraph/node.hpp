@@ -56,6 +56,8 @@ namespace Texpainter::FilterGraph
 
 		using result_type = AbstractImageProcessor::result_type;
 
+		static constexpr size_t MaxNumOutputs = AbstractImageProcessor::MaxNumOutputs;
+
 		explicit Node(std::unique_ptr<AbstractImageProcessor> proc)
 		    : m_dirty{1}
 		    , m_usecount{static_cast<size_t>(-1)}
@@ -83,7 +85,6 @@ namespace Texpainter::FilterGraph
 
 		result_type const& operator()(Size2d size) const
 		{
-			printf("Called %s\n", name());
 			assert(FilterGraph::isConnected(*this));
 
 			if(!dirty()) { return m_result_cache; }
