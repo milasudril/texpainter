@@ -66,21 +66,18 @@ Texpainter::FilterGraph::Graph::Graph(Graph const& other)
 
 Texpainter::FilterGraph::ValidationResult Texpainter::FilterGraph::validate(Graph const& g)
 {
-#if 0
 	ValidationResult result{ValidationResult::NoError};
 	processGraphNodeRecursive(
 	    [&result]<class Tag>(auto const& node, Tag) {
 		    if constexpr(Tag::value == GraphProcessingEvent::LoopDetected)
 		    {
 			    result = ValidationResult::CyclicConnections;
-				puts("Loopp detected");
 			    return GraphProcessing::Stop;
 		    }
 		    else if constexpr(Tag::value == GraphProcessingEvent::ProcessNode)
 		    {
 			    if(!isConnected(node))
 			    {
-					puts("Node not connected");
 				    result = ValidationResult::InputsNotConnected;
 				    return GraphProcessing::Stop;
 			    }
@@ -89,59 +86,4 @@ Texpainter::FilterGraph::ValidationResult Texpainter::FilterGraph::validate(Grap
 	    },
 	    *g.node(Graph::OutputNodeId));
 	return result;
-
-#else
-	enum class State : int
-	{
-		Init,
-		InProgress,
-		Done
-	};
-
-	std::stack<Node const*> nodes;
-	std::map<Node const*, State> visited;
-
-	std::ranges::for_each(g.nodesWithId(), [&visited](auto const& item) {
-		visited.insert(std::make_pair(&item.second, State::Init));
-	});
-
-	nodes.push(g.node(Graph::OutputNodeId));
-	size_t peak_depth = 0;
-	while(!nodes.empty())
-	{
-		auto node  = nodes.top();
-		peak_depth = std::max(peak_depth, nodes.size());
-
-		if(peak_depth > 32) { return ValidationResult::GraphTooDeep; }
-
-		switch(visited[node])
-		{
-			case State::Init:
-				visited[node] = State::InProgress;
-				if(!isConnected(*node)) { return ValidationResult::InputsNotConnected; }
-
-				for(auto const& item: node->inputs())
-				{
-					switch(visited[&item.processor()])
-					{
-						case State::Init: nodes.push(&item.processor()); break;
-
-						case State::InProgress: return ValidationResult::CyclicConnections;
-
-						case State::Done: break;
-					}
-				};
-				break;
-
-			case State::InProgress:
-				visited[node] = State::Done;
-				nodes.pop();
-				break;
-
-			case State::Done: nodes.pop(); break;
-		}
-	}
-
-	return Texpainter::FilterGraph::ValidationResult::NoError;
-#endif
 }
