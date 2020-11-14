@@ -116,7 +116,9 @@ Texpainter::PixelStore::Image Texpainter::FilterGraph::Graph::process(Input cons
 	//       in case we already have computed the output result.
 	r_output_node->forceUpdate();
 
-	std::ranges::for_each(m_node_array, [size = input.pixels().size()](auto const& item) { item.node(size); });
+	std::ranges::for_each(m_node_array, [size = input.pixels().size()](auto& item){
+		item.node(size);
+	});
 	puts("");
 	return ret;
 }

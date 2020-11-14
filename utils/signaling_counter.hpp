@@ -16,28 +16,21 @@ namespace Texpainter
 	class SignalingCounter
 	{
 	public:
-		explicit SignalingCounter(T init_val = 0): m_value{init_val}
+		explicit SignalingCounter(): m_value{0}
 		{
 		}
 
-		void wait(T value)
+		void waitAndReset(T value)
 		{
 			std::unique_lock lock{m_mtx};
 			m_cv.wait(lock, [this, value]() { return m_value == value; });
+			m_value = 0;
 		}
 
 		SignalingCounter& operator++()
 		{
 			std::lock_guard lock{m_mtx};
 			++m_value;
-			m_cv.notify_one();
-			return *this;
-		}
-
-		SignalingCounter& operator--()
-		{
-			std::lock_guard lock{m_mtx};
-			--m_value;
 			m_cv.notify_one();
 			return *this;
 		}
@@ -51,16 +44,6 @@ namespace Texpainter
 		bool operator!=(T value) const
 		{
 			return !(*this == value);
-		}
-
-		void lock()
-		{
-			++(*this);
-		}
-
-		void unlock()
-		{
-			--(*this);
 		}
 
 	private:
