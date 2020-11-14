@@ -67,23 +67,25 @@ Texpainter::FilterGraph::Graph::Graph(Graph const& other)
 Texpainter::FilterGraph::ValidationResult Texpainter::FilterGraph::validate(Graph const& g)
 {
 #if 0
-	Texpainter::FilterGraph::ValidationResult result;
-	visitNodesInTopoOrder([&result]<class Tag>(auto const& node, Tag){
-		if constexpr(Tag::value == GraphProcessingEvent::LoopDetected)
-		{
-			result = ValidationResult::CyclicConnections;
-			return GraphProcssing::Stop;
-		}
-		else
-		{
-			if(!isConnected(node))
-			{
-				result = ValidationResult::InputsNotConnected;
-				return NodeProcess::Stop;
-			}
-			return GraphProcssing::Continue;
-		}
-	}, g);
+	ValidationResult result{ValidationResult::NoError};
+	visitNodesInTopoOrder(
+	    [&result]<class Tag>(auto const& node, Tag) {
+		    if constexpr(Tag::value == GraphProcessingEvent::LoopDetected)
+		    {
+			    result = ValidationResult::CyclicConnections;
+			    return GraphProcessing::Stop;
+		    }
+		    else if constexpr(Tag::value == GraphProcessingEvent::ProcessNode)
+		    {
+			    if(!isConnected(node))
+			    {
+				    result = ValidationResult::InputsNotConnected;
+				    return GraphProcessing::Stop;
+			    }
+			    return GraphProcessing::Continue;
+		    }
+	    },
+	    g);
 	return result;
 
 #else

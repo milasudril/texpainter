@@ -67,7 +67,11 @@ namespace Testcases
 
 		std::vector<Node const*> nodes_sorted;
 		Texpainter::visitNodesInTopoOrder(
-		    [&nodes_sorted](Node const& node) { nodes_sorted.push_back(&node); }, graph);
+		    [&nodes_sorted](Node const& node, auto) {
+			    nodes_sorted.push_back(&node);
+			    return Texpainter::GraphProcessing::Continue;
+		    },
+		    graph);
 
 		auto index_of = [](std::vector<Node const*> const& nodes, Node const* node) {
 			auto i = std::find(std::begin(nodes), std::end(nodes), node);
@@ -119,14 +123,17 @@ namespace Testcases
 		graph[9].m_edges  = std::vector<Edge>{&graph[4], &graph[5], &graph[6]};
 		graph[10].m_edges = std::vector<Edge>{&graph[9]};
 
-		try
-		{
-			Texpainter::visitNodesInTopoOrder([](Node const&) { abort(); }, graph);
-			abort();
-		}
-		catch(...)
-		{
-		}
+		auto loop_detected = false;
+
+		Texpainter::visitNodesInTopoOrder(
+		    [&loop_detected](Node const&, auto tag) {
+			    if(tag.value == Texpainter::GraphProcessingEvent::LoopDetected)
+			    { loop_detected = true; }
+			    return Texpainter::GraphProcessing::Continue;
+		    },
+		    graph);
+
+		assert(loop_detected);
 	}
 
 	void graphutilsProcessGraphNodeRecursive()
@@ -147,7 +154,10 @@ namespace Testcases
 
 		std::vector<Node const*> nodes_sorted;
 		Texpainter::processGraphNodeRecursive(
-		    [&nodes_sorted](Node const& node) { nodes_sorted.push_back(&node); },
+		    [&nodes_sorted](Node const& node, auto) {
+			    nodes_sorted.push_back(&node);
+			    return Texpainter::GraphProcessing::Continue;
+		    },
 		    graph,
 		    graph.m_nodes[9]);
 
@@ -183,7 +193,10 @@ namespace Testcases
 
 		std::vector<Node const*> nodes_sorted;
 		Texpainter::processGraphNodeRecursive(
-		    [&nodes_sorted](Node const& node) { nodes_sorted.push_back(&node); },
+		    [&nodes_sorted](Node const& node, auto) {
+			    nodes_sorted.push_back(&node);
+			    return Texpainter::GraphProcessing::Continue;
+		    },
 		    graph,
 		    graph.m_nodes[0]);
 

@@ -13,6 +13,18 @@
 
 namespace Texpainter
 {
+	enum class GraphProcessing : int
+	{
+		Continue,
+		Stop
+	};
+
+	enum class GraphProcessingEvent : int
+	{
+		ProcessNode,
+		LoopDetected
+	};
+
 	namespace graphutils_detail
 	{
 		enum class Mark : int
@@ -41,7 +53,7 @@ namespace Texpainter
 							case Mark::Init:
 							{
 								auto processEdge =
-								    [&graph, &nodes_to_visit, &visited](auto const& edge) {
+								    [&graph, &nodes_to_visit, &visited, &cb](auto const& edge) {
 									    Node const* other = reference(edge);
 									    if(other != nullptr)
 									    {
@@ -50,8 +62,13 @@ namespace Texpainter
 											    case Mark::Init: nodes_to_visit.push(other); break;
 
 											    case Mark::InProgress:
-												    throw std::runtime_error{
-												        "Cyclic dependency detected"};
+												    if(cb(*other,
+												          std::integral_constant<
+												              GraphProcessingEvent,
+												              GraphProcessingEvent::LoopDetected>{})
+												       == GraphProcessing::Stop)
+												    { return; }
+												    break;
 
 											    case Mark::Done: break;
 										    }
@@ -63,7 +80,11 @@ namespace Texpainter
 							}
 							case Mark::InProgress:
 								visited[node] = Mark::Done;
-								cb(*node);
+								if(cb(*node,
+								      std::integral_constant<GraphProcessingEvent,
+								                             GraphProcessingEvent::ProcessNode>{})
+								   == GraphProcessing::Stop)
+								{ return; }
 								nodes_to_visit.pop();
 								break;
 							default: nodes_to_visit.pop(); break;
