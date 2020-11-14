@@ -14,6 +14,7 @@
 
 #include "pixel_store/image.hpp"
 #include "utils/iter_pair.hpp"
+#include "utils/pair_iterator.hpp"
 
 #include <algorithm>
 
@@ -51,6 +52,8 @@ namespace Texpainter::FilterGraph
 
 	class Graph
 	{
+		using NodeMap = std::map<NodeId, Node>;
+
 	public:
 		static constexpr NodeId InputNodeId{0};
 		static constexpr NodeId OutputNodeId{1};
@@ -152,6 +155,18 @@ namespace Texpainter::FilterGraph
 
 		auto nodesWithId() { return IterPair{std::begin(m_nodes), std::end(m_nodes)}; }
 
+		auto nodes() const
+		{
+			using NodeIterator = PairIterator<1, NodeMap::const_iterator>;
+			return IterPair{NodeIterator{std::begin(m_nodes)}, NodeIterator{std::end(m_nodes)}};
+		}
+
+		auto nodes()
+		{
+			using NodeIterator = PairIterator<1, NodeMap::iterator>;
+			return IterPair{NodeIterator{std::begin(m_nodes)}, NodeIterator{std::end(m_nodes)}};
+		}
+
 		size_t size() const { return m_nodes.size(); }
 
 		auto get(NodeId id, ParamName paramname) const
@@ -193,7 +208,7 @@ namespace Texpainter::FilterGraph
 			ValidatedValid
 		};
 		mutable ValidationState m_valid_state;
-		std::map<NodeId, Node> m_nodes;
+		NodeMap m_nodes;
 		NodeId m_current_id;
 	};
 }
