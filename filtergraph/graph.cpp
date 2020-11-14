@@ -94,11 +94,11 @@ Texpainter::PixelStore::Image Texpainter::FilterGraph::Graph::process(Input cons
 	assert(valid());
 	if(m_node_array.size() == 0)
 	{
-		std::vector<std::reference_wrapper<Node const>> nodes;
+		std::vector<NodeState> nodes;
 		nodes.reserve(size());
 		processGraphNodeRecursive(
 		    [&nodes](auto const& node, auto) {
-			    nodes.push_back(std::cref(node));
+			    nodes.push_back(NodeState{std::cref(node), std::make_unique<SignalingCounter<size_t>>()});
 			    return GraphProcessing::Continue;
 		    },
 		    *r_output_node);
@@ -116,6 +116,7 @@ Texpainter::PixelStore::Image Texpainter::FilterGraph::Graph::process(Input cons
 	//       in case we already have computed the output result.
 	r_output_node->forceUpdate();
 
-	std::ranges::for_each(m_node_array, [size = input.pixels().size()](auto node) { node(size); });
+	std::ranges::for_each(m_node_array, [size = input.pixels().size()](auto const& item) { item.node(size); });
+	puts("");
 	return ret;
 }

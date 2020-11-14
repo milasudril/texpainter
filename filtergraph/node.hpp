@@ -83,6 +83,7 @@ namespace Texpainter::FilterGraph
 
 		result_type const& operator()(Size2d size) const
 		{
+			printf("Called %s\n", name());
 			assert(FilterGraph::isConnected(*this));
 
 			if(!dirty()) { return m_result_cache; }

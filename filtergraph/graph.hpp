@@ -15,6 +15,7 @@
 #include "pixel_store/image.hpp"
 #include "utils/iter_pair.hpp"
 #include "utils/pair_iterator.hpp"
+#include "utils/signaling_counter.hpp"
 
 #include <algorithm>
 
@@ -188,7 +189,12 @@ namespace Texpainter::FilterGraph
 		}
 
 	private:
-		mutable std::vector<std::reference_wrapper<Node const>> m_node_array;
+		struct NodeState
+		{
+			std::reference_wrapper<Node const> node;
+			std::unique_ptr<SignalingCounter<size_t>> counter;
+		};
+		mutable std::vector<NodeState> m_node_array;
 
 		LayerInput* r_input;
 		ImageSink* r_output;
