@@ -29,7 +29,7 @@ namespace Texpainter
 		{
 			std::lock_guard lock{m_mtx};
 			++m_value;
-			m_cv.notify_one();
+			m_cv.notify_all();
 			return *this;
 		}
 
