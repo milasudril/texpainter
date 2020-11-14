@@ -181,9 +181,15 @@ namespace Texpainter::FilterGraph
 			return m_valid_state == ValidationState::ValidatedValid;
 		}
 
-		void clearValidationState() { m_valid_state = ValidationState::NotValidated; }
+		void clearValidationState()
+		{
+			m_valid_state = ValidationState::NotValidated;
+			m_node_array.clear();
+		}
 
 	private:
+		mutable std::vector<std::reference_wrapper<Node const>> m_node_array;
+
 		LayerInput* r_input;
 		ImageSink* r_output;
 		Node* r_input_node;
