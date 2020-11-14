@@ -13,9 +13,10 @@ namespace
 	auto map_objects_to_node_id(Texpainter::FilterGraph::Graph const& g)
 	{
 		std::map<Texpainter::FilterGraph::Node const*, Texpainter::FilterGraph::NodeId> ret;
-		std::ranges::transform(g.nodesWithId(), std::inserter(ret, std::end(ret)), [](auto const& item) {
-			return std::make_pair(&item.second, item.first);
-		});
+		std::ranges::transform(
+		    g.nodesWithId(), std::inserter(ret, std::end(ret)), [](auto const& item) {
+			    return std::make_pair(&item.second, item.first);
+		    });
 		return ret;
 	}
 

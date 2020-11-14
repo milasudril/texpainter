@@ -11,17 +11,18 @@
 
 namespace
 {
+	struct Node;
+
 	struct Edge
 	{
-		Edge(int id): m_id{id} {}
-		int m_id;
+		Edge(Node* node): r_other{node} {}
+		Node* r_other;
 	};
 
-	int reference(Edge e) { return e.m_id; }
+	auto reference(Edge e) { return e.r_other; }
 
 	struct Node
 	{
-		int m_id;
 		std::vector<Edge> m_edges;
 	};
 
@@ -31,17 +32,13 @@ namespace
 		std::for_each(std::begin(node.m_edges), std::end(node.m_edges), f);
 	}
 
-	int id(Node const& node) { return node.m_id; }
-
 	struct Graph
 	{
 		using node_type = Node;
 		std::vector<Node> m_nodes;
+
+		Node& operator[](size_t index) { return m_nodes[index]; }
 	};
-
-	Node const& getNodeById(Graph const& g, int id) { return g.m_nodes[id]; }
-
-	size_t size(Graph const& g) { return g.m_nodes.size(); }
 
 	template<class F>
 	void visitNodes(F&& f, Graph const& g)
@@ -55,72 +52,72 @@ namespace Testcases
 	void graphutilsVisitNodesDag()
 	{
 		Graph graph;
-		graph.m_nodes.push_back(Node{0, std::vector<Edge>{1, 2, 3}});
-		graph.m_nodes.push_back(Node{1, std::vector<Edge>{4, 5, 6}});
-		graph.m_nodes.push_back(Node{2, std::vector<Edge>{4, 7, 8}});
-		graph.m_nodes.push_back(Node{3, std::vector<Edge>{8}});
-		graph.m_nodes.push_back(Node{4, std::vector<Edge>{10}});
-		graph.m_nodes.push_back(Node{5, std::vector<Edge>{10}});
-		graph.m_nodes.push_back(Node{6, std::vector<Edge>{10}});
-		graph.m_nodes.push_back(Node{7, std::vector<Edge>{10}});
-		graph.m_nodes.push_back(Node{8, std::vector<Edge>{10}});
-		graph.m_nodes.push_back(Node{9, std::vector<Edge>{4, 5, 6}});
-		graph.m_nodes.push_back(Node{10, std::vector<Edge>{}});
+		graph.m_nodes = std::vector<Node>(11);
+
+		graph[0].m_edges = std::vector<Edge>{&graph[1], &graph[2], &graph[3]};
+		graph[1].m_edges = std::vector<Edge>{&graph[4], &graph[5], &graph[6]};
+		graph[2].m_edges = std::vector<Edge>{&graph[4], &graph[7], &graph[8]};
+		graph[3].m_edges = std::vector<Edge>{&graph[8]};
+		graph[4].m_edges = std::vector<Edge>{&graph[10]};
+		graph[5].m_edges = std::vector<Edge>{&graph[10]};
+		graph[6].m_edges = std::vector<Edge>{&graph[10]};
+		graph[7].m_edges = std::vector<Edge>{&graph[10]};
+		graph[8].m_edges = std::vector<Edge>{&graph[10]};
+		graph[9].m_edges = std::vector<Edge>{&graph[4], &graph[5], &graph[6]};
 
 		std::vector<Node const*> nodes_sorted;
 		Texpainter::visitNodesInTopoOrder(
 		    [&nodes_sorted](Node const& node) { nodes_sorted.push_back(&node); }, graph);
 
-		auto index_of = [](auto const& nodes, int value) {
-			auto i = std::find_if(std::begin(nodes), std::end(nodes), [value](auto node) {
-				return node->m_id == value;
-			});
+		auto index_of = [](std::vector<Node const*> const& nodes, Node const* node) {
+			auto i = std::find(std::begin(nodes), std::end(nodes), node);
 			return i - std::begin(nodes);
 		};
 
-		auto s = size(graph);
-		std::vector<ptrdiff_t> node_index(s);
+		std::map<Node const*, ptrdiff_t> node_index;
 		std::for_each(std::begin(graph.m_nodes),
 		              std::end(graph.m_nodes),
-		              [index_of, &nodes_sorted, &node_index](auto node) {
-			              node_index[node.m_id] = index_of(nodes_sorted, node.m_id);
+		              [index_of, &nodes_sorted, &node_index](auto const& node) {
+			              node_index[&node] = index_of(nodes_sorted, &node);
 		              });
 
-		assert(node_index[10] == 0);
-		assert(node_index[10] < node_index[4]);
-		assert(node_index[10] < node_index[5]);
-		assert(node_index[10] < node_index[6]);
-		assert(node_index[10] < node_index[7]);
-		assert(node_index[10] < node_index[8]);
-		assert(node_index[4] < node_index[1]);
-		assert(node_index[4] < node_index[2]);
-		assert(node_index[4] < node_index[9]);
-		assert(node_index[5] < node_index[1]);
-		assert(node_index[5] < node_index[9]);
-		assert(node_index[6] < node_index[1]);
-		assert(node_index[6] < node_index[9]);
-		assert(node_index[7] < node_index[2]);
-		assert(node_index[8] < node_index[2]);
-		assert(node_index[8] < node_index[3]);
-		assert(node_index[1] < node_index[0]);
-		assert(node_index[2] < node_index[0]);
-		assert(node_index[3] < node_index[0]);
+		assert(node_index[&graph[10]] == 0);
+		assert(node_index[&graph[10]] < node_index[&graph[4]]);
+		assert(node_index[&graph[10]] < node_index[&graph[5]]);
+		assert(node_index[&graph[10]] < node_index[&graph[6]]);
+		assert(node_index[&graph[10]] < node_index[&graph[7]]);
+		assert(node_index[&graph[10]] < node_index[&graph[8]]);
+		assert(node_index[&graph[4]] < node_index[&graph[1]]);
+		assert(node_index[&graph[4]] < node_index[&graph[2]]);
+		assert(node_index[&graph[4]] < node_index[&graph[9]]);
+		assert(node_index[&graph[5]] < node_index[&graph[1]]);
+		assert(node_index[&graph[5]] < node_index[&graph[9]]);
+		assert(node_index[&graph[6]] < node_index[&graph[1]]);
+		assert(node_index[&graph[6]] < node_index[&graph[9]]);
+		assert(node_index[&graph[7]] < node_index[&graph[2]]);
+		assert(node_index[&graph[8]] < node_index[&graph[2]]);
+		assert(node_index[&graph[8]] < node_index[&graph[3]]);
+		assert(node_index[&graph[1]] < node_index[&graph[0]]);
+		assert(node_index[&graph[2]] < node_index[&graph[0]]);
+		assert(node_index[&graph[3]] < node_index[&graph[0]]);
 	}
 
-	void graphutilsVisitNodesNoDag()
+	void graphutilsVisitNodesNotADag()
 	{
 		Graph graph;
-		graph.m_nodes.push_back(Node{0, std::vector<Edge>{1, 2, 3}});
-		graph.m_nodes.push_back(Node{1, std::vector<Edge>{4, 5, 6}});
-		graph.m_nodes.push_back(Node{2, std::vector<Edge>{4, 7, 8}});
-		graph.m_nodes.push_back(Node{3, std::vector<Edge>{8}});
-		graph.m_nodes.push_back(Node{4, std::vector<Edge>{10}});
-		graph.m_nodes.push_back(Node{5, std::vector<Edge>{10}});
-		graph.m_nodes.push_back(Node{6, std::vector<Edge>{10}});
-		graph.m_nodes.push_back(Node{7, std::vector<Edge>{10}});
-		graph.m_nodes.push_back(Node{8, std::vector<Edge>{10}});
-		graph.m_nodes.push_back(Node{9, std::vector<Edge>{4, 5, 6}});
-		graph.m_nodes.push_back(Node{10, std::vector<Edge>{9}});
+		graph.m_nodes = std::vector<Node>(11);
+
+		graph[0].m_edges  = std::vector<Edge>{&graph[1], &graph[2], &graph[3]};
+		graph[1].m_edges  = std::vector<Edge>{&graph[4], &graph[5], &graph[6]};
+		graph[2].m_edges  = std::vector<Edge>{&graph[4], &graph[7], &graph[8]};
+		graph[3].m_edges  = std::vector<Edge>{&graph[8]};
+		graph[4].m_edges  = std::vector<Edge>{&graph[10]};
+		graph[5].m_edges  = std::vector<Edge>{&graph[10]};
+		graph[6].m_edges  = std::vector<Edge>{&graph[10]};
+		graph[7].m_edges  = std::vector<Edge>{&graph[10]};
+		graph[8].m_edges  = std::vector<Edge>{&graph[10]};
+		graph[9].m_edges  = std::vector<Edge>{&graph[4], &graph[5], &graph[6]};
+		graph[10].m_edges = std::vector<Edge>{&graph[9]};
 
 		try
 		{
@@ -135,17 +132,18 @@ namespace Testcases
 	void graphutilsProcessGraphNodeRecursive()
 	{
 		Graph graph;
-		graph.m_nodes.push_back(Node{0, std::vector<Edge>{1, 2, 3}});
-		graph.m_nodes.push_back(Node{1, std::vector<Edge>{4, 5, 6}});
-		graph.m_nodes.push_back(Node{2, std::vector<Edge>{4, 7, 8}});
-		graph.m_nodes.push_back(Node{3, std::vector<Edge>{8}});
-		graph.m_nodes.push_back(Node{4, std::vector<Edge>{10}});
-		graph.m_nodes.push_back(Node{5, std::vector<Edge>{10}});
-		graph.m_nodes.push_back(Node{6, std::vector<Edge>{10}});
-		graph.m_nodes.push_back(Node{7, std::vector<Edge>{10}});
-		graph.m_nodes.push_back(Node{8, std::vector<Edge>{10}});
-		graph.m_nodes.push_back(Node{9, std::vector<Edge>{4, 5, 6}});
-		graph.m_nodes.push_back(Node{10, std::vector<Edge>{}});
+		graph.m_nodes = std::vector<Node>(11);
+
+		graph[0].m_edges = std::vector<Edge>{&graph[1], &graph[2], &graph[3]};
+		graph[1].m_edges = std::vector<Edge>{&graph[4], &graph[5], &graph[6]};
+		graph[2].m_edges = std::vector<Edge>{&graph[4], &graph[7], &graph[8]};
+		graph[3].m_edges = std::vector<Edge>{&graph[8]};
+		graph[4].m_edges = std::vector<Edge>{&graph[10]};
+		graph[5].m_edges = std::vector<Edge>{&graph[10]};
+		graph[6].m_edges = std::vector<Edge>{&graph[10]};
+		graph[7].m_edges = std::vector<Edge>{&graph[10]};
+		graph[8].m_edges = std::vector<Edge>{&graph[10]};
+		graph[9].m_edges = std::vector<Edge>{&graph[4], &graph[5], &graph[6]};
 
 		std::vector<Node const*> nodes_sorted;
 		Texpainter::processGraphNodeRecursive(
@@ -153,35 +151,34 @@ namespace Testcases
 		    graph,
 		    graph.m_nodes[9]);
 
-		auto index_of = [](auto const& nodes, int value) {
-			auto i = std::find_if(std::begin(nodes), std::end(nodes), [value](auto node) {
-				return node->m_id == value;
-			});
+		auto index_of = [](std::vector<Node const*> const& nodes, Node const* node) {
+			auto i = std::find(std::begin(nodes), std::end(nodes), node);
 			return i - std::begin(nodes);
 		};
 
-		auto s = size(graph);
-		std::vector<ptrdiff_t> node_index(s);
+		std::map<Node const*, ptrdiff_t> node_index;
 		std::for_each(std::begin(graph.m_nodes),
 		              std::end(graph.m_nodes),
-		              [index_of, &nodes_sorted, &node_index](auto node) {
-			              node_index[node.m_id] = index_of(nodes_sorted, node.m_id);
+		              [index_of, &nodes_sorted, &node_index](auto const& node) {
+			              node_index[&node] = index_of(nodes_sorted, &node);
 		              });
 
-		assert(node_index[10] == 0);
-		assert(node_index[4] < node_index[9]);
-		assert(node_index[5] < node_index[9]);
-		assert(node_index[6] < node_index[9]);
+		assert(node_index[&graph[10]] == 0);
+		assert(node_index[&graph[4]] < node_index[&graph[9]]);
+		assert(node_index[&graph[5]] < node_index[&graph[9]]);
+		assert(node_index[&graph[6]] < node_index[&graph[9]]);
 	}
+
 
 	void graphutilsProcessGraphNodeRecursiveSimpleDiamond()
 	{
 		Graph graph;
-		graph.m_nodes.push_back(Node{0, std::vector<Edge>{1, 2, 3}});
-		graph.m_nodes.push_back(Node{1, std::vector<Edge>{4}});
-		graph.m_nodes.push_back(Node{2, std::vector<Edge>{4}});
-		graph.m_nodes.push_back(Node{3, std::vector<Edge>{4}});
-		graph.m_nodes.push_back(Node{4, std::vector<Edge>{}});
+		graph.m_nodes = std::vector<Node>(5);
+
+		graph[0].m_edges = std::vector<Edge>{&graph[1], &graph[2], &graph[3]};
+		graph[1].m_edges = std::vector<Edge>{&graph[4]};
+		graph[2].m_edges = std::vector<Edge>{&graph[4]};
+		graph[3].m_edges = std::vector<Edge>{&graph[4]};
 
 
 		std::vector<Node const*> nodes_sorted;
@@ -190,26 +187,23 @@ namespace Testcases
 		    graph,
 		    graph.m_nodes[0]);
 
-		auto index_of = [](auto const& nodes, int value) {
-			auto i = std::find_if(std::begin(nodes), std::end(nodes), [value](auto node) {
-				return node->m_id == value;
-			});
+		auto index_of = [](std::vector<Node const*> const& nodes, Node const* node) {
+			auto i = std::find(std::begin(nodes), std::end(nodes), node);
 			return i - std::begin(nodes);
 		};
 
-		auto s = size(graph);
-		std::vector<ptrdiff_t> node_index(s);
+		std::map<Node const*, ptrdiff_t> node_index;
 		std::for_each(std::begin(graph.m_nodes),
 		              std::end(graph.m_nodes),
-		              [index_of, &nodes_sorted, &node_index](auto node) {
-			              node_index[node.m_id] = index_of(nodes_sorted, node.m_id);
+		              [index_of, &nodes_sorted, &node_index](auto const& node) {
+			              node_index[&node] = index_of(nodes_sorted, &node);
 		              });
 
-		assert(node_index[4] == 0);
-		assert(node_index[0] > node_index[1]);
-		assert(node_index[1] > node_index[4]);
-		assert(node_index[2] > node_index[4]);
-		assert(node_index[3] > node_index[4]);
+		assert(node_index[&graph[4]] == 0);
+		assert(node_index[&graph[0]] > node_index[&graph[1]]);
+		assert(node_index[&graph[1]] > node_index[&graph[4]]);
+		assert(node_index[&graph[2]] > node_index[&graph[4]]);
+		assert(node_index[&graph[3]] > node_index[&graph[4]]);
 	}
 }
 
@@ -217,7 +211,7 @@ namespace Testcases
 int main()
 {
 	Testcases::graphutilsVisitNodesDag();
-	Testcases::graphutilsVisitNodesNoDag();
+	Testcases::graphutilsVisitNodesNotADag();
 	Testcases::graphutilsProcessGraphNodeRecursive();
 	Testcases::graphutilsProcessGraphNodeRecursiveSimpleDiamond();
 
