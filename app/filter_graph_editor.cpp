@@ -112,7 +112,7 @@ Texpainter::FilterGraphEditor::FilterGraphEditor(
     , r_owner{owner}
 {
 	m_linesegs = m_canvas.insert<Ui::LineSegmentRenderer>();
-	std::ranges::transform(m_graph.nodes(),
+	std::ranges::transform(m_graph.nodesWithId(),
 	                       std::inserter(m_node_editors, std::end(m_node_editors)),
 	                       MakeNodeEditor{m_canvas, node_locations});
 
@@ -122,8 +122,8 @@ Texpainter::FilterGraphEditor::FilterGraphEditor(
 	m_node_delete.eventHandler<ControlId::DeleteNode>(*this);
 
 	std::ranges::for_each(
-	    m_graph.nodes(), [&ports = m_ports](auto& node_item) { ports.addPorts(node_item.second); });
-	std::ranges::for_each(m_graph.nodes(), [&ports = m_ports](auto const& node_item) {
+	    m_graph.nodesWithId(), [&ports = m_ports](auto& node_item) { ports.addPorts(node_item.second); });
+	std::ranges::for_each(m_graph.nodesWithId(), [&ports = m_ports](auto const& node_item) {
 		ports.addConnections(node_item.second);
 	});
 }
@@ -133,7 +133,7 @@ std::map<Texpainter::FilterGraph::NodeId, Texpainter::vec2_t> Texpainter::Filter
 {
 	std::map<FilterGraph::NodeId, vec2_t> ret;
 	std::ranges::transform(
-	    m_graph.nodes(), std::inserter(ret, std::end(ret)), [&canvas = m_canvas](auto const& item) {
+	    m_graph.nodesWithId(), std::inserter(ret, std::end(ret)), [&canvas = m_canvas](auto const& item) {
 		    return std::pair{item.first, canvas.widgetLocation(item.first).value()};
 	    });
 

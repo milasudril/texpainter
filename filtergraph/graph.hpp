@@ -148,9 +148,9 @@ namespace Texpainter::FilterGraph
 			return *this;
 		}
 
-		auto nodes() const { return IterPair{std::begin(m_nodes), std::end(m_nodes)}; }
+		auto nodesWithId() const { return IterPair{std::begin(m_nodes), std::end(m_nodes)}; }
 
-		auto nodes() { return IterPair{std::begin(m_nodes), std::end(m_nodes)}; }
+		auto nodesWithId() { return IterPair{std::begin(m_nodes), std::end(m_nodes)}; }
 
 		size_t size() const { return m_nodes.size(); }
 
@@ -196,23 +196,6 @@ namespace Texpainter::FilterGraph
 		std::map<NodeId, Node> m_nodes;
 		NodeId m_current_id;
 	};
-
-	template<class Callback>
-	void visitNodes(Callback&& cb, Graph const& g)
-	{
-		std::ranges::for_each(g.nodes(), std::forward<Callback>(cb));
-	}
-
-	inline auto id(Graph::node_type const& node)
-	{
-		return node.first;
-	}
-
-	template<class Callback>
-	void visitEdges(Callback&& cb, Graph::node_type const& node)
-	{
-		std::ranges::for_each(node.second.inputs(), cb);
-	}
 }
 
 #endif

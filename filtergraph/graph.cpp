@@ -13,7 +13,7 @@ namespace
 	auto map_objects_to_node_id(Texpainter::FilterGraph::Graph const& g)
 	{
 		std::map<Texpainter::FilterGraph::Node const*, Texpainter::FilterGraph::NodeId> ret;
-		std::ranges::transform(g.nodes(), std::inserter(ret, std::end(ret)), [](auto const& item) {
+		std::ranges::transform(g.nodesWithId(), std::inserter(ret, std::end(ret)), [](auto const& item) {
 			return std::make_pair(&item.second, item.first);
 		});
 		return ret;
@@ -22,7 +22,7 @@ namespace
 	auto copy_nodes(Texpainter::FilterGraph::Graph const& g)
 	{
 		std::map<Texpainter::FilterGraph::NodeId, Texpainter::FilterGraph::Node> ret;
-		std::ranges::for_each(g.nodes(), [&ret](auto const& item) {
+		std::ranges::for_each(g.nodesWithId(), [&ret](auto const& item) {
 			ret.insert(std::make_pair(item.first, item.second.clonedProcessor()));
 		});
 		return ret;
@@ -32,7 +32,7 @@ namespace
 	                      Texpainter::FilterGraph::Graph& g2)
 	{
 		std::ranges::for_each(
-		    g1.nodes(), [&g2, ptr_to_id = map_objects_to_node_id(g1)](auto const& item) {
+		    g1.nodesWithId(), [&g2, ptr_to_id = map_objects_to_node_id(g1)](auto const& item) {
 			    std::ranges::for_each(
 			        item.second.inputs(),
 			        [&g2, &ptr_to_id, id_a = item.first, k = 0u](auto const& conn) mutable {
@@ -80,7 +80,7 @@ Texpainter::FilterGraph::ValidationResult Texpainter::FilterGraph::validate(Grap
 	std::stack<Node const*> nodes;
 	std::map<Node const*, State> visited;
 
-	std::ranges::for_each(g.nodes(), [&visited](auto const& item) {
+	std::ranges::for_each(g.nodesWithId(), [&visited](auto const& item) {
 		visited.insert(std::make_pair(&item.second, State::Init));
 	});
 
