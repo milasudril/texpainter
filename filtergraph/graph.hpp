@@ -58,7 +58,7 @@ namespace Texpainter::FilterGraph
 		static constexpr NodeId InputNodeId{0};
 		static constexpr NodeId OutputNodeId{1};
 
-		using node_type = std::pair<NodeId const, Node>;
+		using node_type = Node;
 
 		using NodeItem = std::pair<NodeId, std::reference_wrapper<Node>>;
 
@@ -211,6 +211,12 @@ namespace Texpainter::FilterGraph
 		NodeMap m_nodes;
 		NodeId m_current_id;
 	};
+
+	template<class Visitor>
+	void visitNodes(Visitor&& visitor, Graph const& g)
+	{
+		std::ranges::for_each(g.nodes(), std::forward<Visitor>(visitor));
+	}
 }
 
 #endif

@@ -19,12 +19,13 @@ namespace Texpainter::FilterGraph
 
 	class Node
 	{
-		class SourceNode
+	public:
+		class Source
 		{
 		public:
-			SourceNode(): r_processor{nullptr}, m_index{OutputPortIndex{0}} {}
+			Source(): r_processor{nullptr}, m_index{OutputPortIndex{0}} {}
 
-			explicit SourceNode(Node const* node, OutputPortIndex index)
+			explicit Source(Node const* node, OutputPortIndex index)
 			    : m_last_usecount{0}
 			    , r_processor{node}
 			    , m_index{index}
@@ -53,9 +54,7 @@ namespace Texpainter::FilterGraph
 			OutputPortIndex m_index;
 		};
 
-	public:
 		using result_type = AbstractImageProcessor::result_type;
-
 
 		explicit Node(std::unique_ptr<AbstractImageProcessor> proc)
 		    : m_dirty{1}
@@ -116,7 +115,7 @@ namespace Texpainter::FilterGraph
 			if(m_inputs[input.value()].valid())
 			{ m_inputs[input.value()].processor().r_consumers.find(this)->second.erase(input); }
 
-			m_inputs[input.value()] = SourceNode{&other.get(), output};
+			m_inputs[input.value()] = Source{&other.get(), output};
 			clear_result_cache();
 			return *this;
 		}
@@ -125,7 +124,7 @@ namespace Texpainter::FilterGraph
 		{
 			assert(input.value() < NodeArgument::MaxNumInputs);
 			m_inputs[input.value()].processor().r_consumers.find(this)->second.erase(input);
-			m_inputs[input.value()] = SourceNode{};
+			m_inputs[input.value()] = Source{};
 			clear_result_cache();
 			return *this;
 		}
@@ -136,7 +135,7 @@ namespace Texpainter::FilterGraph
 			return m_inputs[input.value()].valid();
 		}
 
-		std::span<SourceNode const> inputs() const
+		std::span<Source const> inputs() const
 		{
 			return {std::begin(m_inputs), std::begin(m_inputs) + inputPorts().size()};
 		}
@@ -162,7 +161,7 @@ namespace Texpainter::FilterGraph
 				std::ranges::for_each(item.second, [proc = item.first](auto port) {
 					// NOTE: Do not call disconnect here. This would screw up iterators.
 					//       Also, r_consumers will be destroyed anywas.
-					if(proc != nullptr) { proc->m_inputs[port.value()] = SourceNode{}; }
+					if(proc != nullptr) { proc->m_inputs[port.value()] = Source{}; }
 				});
 			});
 
@@ -178,7 +177,7 @@ namespace Texpainter::FilterGraph
 	private:
 		mutable size_t m_dirty;
 		mutable size_t m_usecount;
-		std::array<SourceNode, NodeArgument::MaxNumInputs> m_inputs;
+		std::array<Source, NodeArgument::MaxNumInputs> m_inputs;
 		std::unique_ptr<AbstractImageProcessor> m_proc;
 		mutable result_type m_result_cache;
 
@@ -215,6 +214,17 @@ namespace Texpainter::FilterGraph
 	{
 		return node.hasProcessor()
 		       && std::ranges::none_of(node.inputs(), [](auto node) { return !node.valid(); });
+	}
+
+	template<class Visitor>
+	void visitEdges(Visitor&& visitor, Node const& node)
+	{
+		std::ranges::for_each(node.inputs(), std::forward<Visitor>(visitor));
+	}
+
+	inline auto reference(Node::Source const& src)
+	{
+		return src.valid() ? &src.processor() : nullptr;
 	}
 }
 
