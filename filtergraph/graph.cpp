@@ -67,8 +67,24 @@ Texpainter::FilterGraph::Graph::Graph(Graph const& other)
 Texpainter::FilterGraph::ValidationResult Texpainter::FilterGraph::validate(Graph const& g)
 {
 #if 0
-	visitNodesInTopoOrder([](auto const&){}, g);
-	return Texpainter::FilterGraph::ValidationResult::NoError;
+	Texpainter::FilterGraph::ValidationResult result;
+	visitNodesInTopoOrder([&result]<class Tag>(auto const& node, Tag){
+		if constexpr(Tag::value == GraphProcessingEvent::LoopDetected)
+		{
+			result = ValidationResult::CyclicConnections;
+			return GraphProcssing::Stop;
+		}
+		else
+		{
+			if(!isConnected(node))
+			{
+				result = ValidationResult::InputsNotConnected;
+				return NodeProcess::Stop;
+			}
+			return GraphProcssing::Continue;
+		}
+	}, g);
+	return result;
 
 #else
 	enum class State : int
