@@ -34,9 +34,8 @@ namespace Texpainter
 			Done
 		};
 
-		template<class ItemCallback, class Graph, class Node>
+		template<class ItemCallback, class Node>
 		void processGraphNodeRecursive(ItemCallback&& cb,
-		                               Graph const& graph,
 		                               Node const& node,
 		                               std::stack<Node const*>& nodes_to_visit,
 		                               std::map<Node const*, Mark>& visited)
@@ -47,13 +46,13 @@ namespace Texpainter
 					nodes_to_visit.push(&node);
 					while(!nodes_to_visit.empty())
 					{
-						auto node = nodes_to_visit.top();
-						switch(visited[node])
+						auto node_next = nodes_to_visit.top();
+						switch(visited[node_next])
 						{
 							case Mark::Init:
 							{
 								auto processEdge =
-								    [&graph, &nodes_to_visit, &visited, &cb](auto const& edge) {
+								    [&nodes_to_visit, &visited, &cb](auto const& edge) {
 									    Node const* other = reference(edge);
 									    if(other != nullptr)
 									    {
@@ -74,13 +73,13 @@ namespace Texpainter
 										    }
 									    }
 								    };
-								visited[node] = Mark::InProgress;
-								visitEdges(std::move(processEdge), *node);
+								visited[node_next] = Mark::InProgress;
+								visitEdges(std::move(processEdge), *node_next);
 								break;
 							}
 							case Mark::InProgress:
-								visited[node] = Mark::Done;
-								if(cb(*node,
+								visited[node_next] = Mark::Done;
+								if(cb(*node_next,
 								      std::integral_constant<GraphProcessingEvent,
 								                             GraphProcessingEvent::ProcessNode>{})
 								   == GraphProcessing::Stop)
@@ -97,12 +96,12 @@ namespace Texpainter
 		}
 	}
 
-	template<class ItemCallback, class Graph, class Node>
-	void processGraphNodeRecursive(ItemCallback&& cb, Graph const& graph, Node const& node)
+	template<class ItemCallback, class Node>
+	void processGraphNodeRecursive(ItemCallback&& cb, Node const& node)
 	{
 		std::map<Node const*, graphutils_detail::Mark> visited;
-		std::stack<typename Graph::node_type const*> nodes_to_visit;
-		graphutils_detail::processGraphNodeRecursive(cb, graph, node, nodes_to_visit, visited);
+		std::stack<Node const*> nodes_to_visit;
+		graphutils_detail::processGraphNodeRecursive(cb, node, nodes_to_visit, visited);
 	}
 
 	template<class ItemCallback, class Graph>
@@ -112,8 +111,8 @@ namespace Texpainter
 		std::map<typename Graph::node_type const*, graphutils_detail::Mark> visited;
 		std::stack<typename Graph::node_type const*> nodes_to_visit;
 
-		auto processNode = [&cb, &graph, &nodes_to_visit, &visited](auto const& node) {
-			graphutils_detail::processGraphNodeRecursive(cb, graph, node, nodes_to_visit, visited);
+		auto processNode = [&cb, &nodes_to_visit, &visited](auto const& node) {
+			graphutils_detail::processGraphNodeRecursive(cb, node, nodes_to_visit, visited);
 		};
 
 		visitNodes(std::move(processNode), graph);

@@ -158,7 +158,6 @@ namespace Testcases
 			    nodes_sorted.push_back(&node);
 			    return Texpainter::GraphProcessing::Continue;
 		    },
-		    graph,
 		    graph.m_nodes[9]);
 
 		auto index_of = [](std::vector<Node const*> const& nodes, Node const* node) {
@@ -197,7 +196,6 @@ namespace Testcases
 			    nodes_sorted.push_back(&node);
 			    return Texpainter::GraphProcessing::Continue;
 		    },
-		    graph,
 		    graph.m_nodes[0]);
 
 		auto index_of = [](std::vector<Node const*> const& nodes, Node const* node) {

@@ -68,24 +68,26 @@ Texpainter::FilterGraph::ValidationResult Texpainter::FilterGraph::validate(Grap
 {
 #if 0
 	ValidationResult result{ValidationResult::NoError};
-	visitNodesInTopoOrder(
+	processGraphNodeRecursive(
 	    [&result]<class Tag>(auto const& node, Tag) {
 		    if constexpr(Tag::value == GraphProcessingEvent::LoopDetected)
 		    {
 			    result = ValidationResult::CyclicConnections;
+				puts("Loopp detected");
 			    return GraphProcessing::Stop;
 		    }
 		    else if constexpr(Tag::value == GraphProcessingEvent::ProcessNode)
 		    {
 			    if(!isConnected(node))
 			    {
+					puts("Node not connected");
 				    result = ValidationResult::InputsNotConnected;
 				    return GraphProcessing::Stop;
 			    }
 			    return GraphProcessing::Continue;
 		    }
 	    },
-	    g);
+	    *g.node(Graph::OutputNodeId));
 	return result;
 
 #else
