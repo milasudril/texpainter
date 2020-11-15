@@ -2,11 +2,6 @@
 
 
 #include "./app_window.hpp"
-
-#include "utils/default_rng.hpp"
-
-#include "pcg-cpp/include/pcg_random.hpp"
-
 #include <gtk/gtk.h>
 
 template<class T>
@@ -47,10 +42,7 @@ int main(int argc, char* argv[])
 	Texpainter::Ui::Window mainwin{"Texpainter"};
 	mainwin.resize(Texpainter::Size2d{800, 500});
 
-	pcg64 rng;
-	Texpainter::DefaultRng::engine(rng);
-
-	Texpainter::AppWindow app{mainwin, Texpainter::DefaultRng::engine()};
+	Texpainter::AppWindow app{mainwin};
 
 	MainwinEventHandler eh{app};
 	mainwin.eventHandler<0>(eh).show();

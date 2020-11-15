@@ -6,23 +6,14 @@
 #ifndef TEXPAINTER_UTILS_DEFAULTRNG_HPP
 #define TEXPAINTER_UTILS_DEFAULTRNG_HPP
 
-#include "./polymorphic_rng.hpp"
+
+#include "pcg-cpp/include/pcg_random.hpp"
+
 
 namespace Texpainter::DefaultRng
 {
-	namespace detail
-	{
-		void engine(PolymorphicRng rng);
-	}
-
-	template<class Rng>
-	void engine(Rng& rng)
-	{
-		detail::engine(PolymorphicRng{rng});
-	}
-
-
-	PolymorphicRng engine();
+	pcg64& engine();
+	void seed(uint64_t val);
 }
 
 #endif

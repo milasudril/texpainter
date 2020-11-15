@@ -2,19 +2,18 @@
 
 #include "./app_window.hpp"
 
-Texpainter::AppWindow::AppWindow(Ui::Container& container, PolymorphicRng rng)
+Texpainter::AppWindow::AppWindow(Ui::Container& container)
     :  // State
-    m_rng{rng}
-    , m_mouse_state{0}
+    m_mouse_state{0}
     , m_mod_state{0}
     , m_key_prev{0xff}
     , m_trans_mode{TransformationMode::Relative}
 
     // Event handlers
     , m_doc_menu_handler{container}
-    , m_layer_menu_handler{container, m_rng}
-    , m_palette_menu_handler{container, m_rng}
-    , m_pal_view_eh{container, m_rng}
+    , m_layer_menu_handler{container}
+    , m_palette_menu_handler{container}
+    , m_pal_view_eh{container}
 
     // Widgets
     , m_rows{container, Ui::Box::Orientation::Vertical}

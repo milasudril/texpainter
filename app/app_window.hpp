@@ -44,7 +44,7 @@ namespace Texpainter
 			Canvas
 		};
 
-		explicit AppWindow(Ui::Container& container, PolymorphicRng rng);
+		explicit AppWindow(Ui::Container& container);
 
 		bool hasDocument() const { return m_documents.currentDocument() != nullptr; }
 
@@ -211,7 +211,6 @@ namespace Texpainter
 	private:
 		DocumentManager m_documents;
 
-		PolymorphicRng m_rng;
 		uint32_t m_mouse_state;
 		Ui::KeyboardState m_key_state;
 		uint32_t m_mod_state;

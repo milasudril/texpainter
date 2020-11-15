@@ -39,11 +39,7 @@ namespace Texpainter
 			Generate
 		};
 
-		explicit PaletteMenuHandler(Ui::Container& dialog_owner, PolymorphicRng rng)
-		    : m_rng{rng}
-		    , r_dlg_owner{dialog_owner}
-		{
-		}
+		explicit PaletteMenuHandler(Ui::Container& dialog_owner): r_dlg_owner{dialog_owner} {}
 
 		template<ControlId id, class Src>
 		void dismiss(Src& src)
@@ -142,7 +138,6 @@ namespace Texpainter
 		}
 
 	private:
-		PolymorphicRng m_rng;
 		Ui::Container& r_dlg_owner;
 
 		std::unique_ptr<PaletteCreateDlg> m_new_empty_dlg;

@@ -6,6 +6,7 @@
 #define TEXPAINTER_APP_PALETTEVIEWEVENTHANDLER_HPP
 
 #include "utils/polymorphic_rng.hpp"
+#include "utils/default_rng.hpp"
 #include "model/document.hpp"
 #include "ui/dialog.hpp"
 #include "ui/palette_view.hpp"
@@ -64,11 +65,7 @@ namespace Texpainter
 		using ColorPicker = Texpainter::Ui::Dialog<InheritFrom<ColorPickerData, Ui::ColorPicker>>;
 
 	public:
-		explicit PaletteViewEventHandler(Ui::Container& dialog_owner, PolymorphicRng rng)
-		    : m_rng{rng}
-		    , r_dlg_owner{dialog_owner}
-		{
-		}
+		explicit PaletteViewEventHandler(Ui::Container& dialog_owner): r_dlg_owner{dialog_owner} {}
 
 		template<auto id>
 		void onMouseUp(Texpainter::Ui::PaletteView& pal_view,
@@ -99,7 +96,7 @@ namespace Texpainter
 					    r_dlg_owner,
 					    (std::string{"Select color number "} + std::to_string(index.value() + 1))
 					        .c_str(),
-					    m_rng,
+					    PolymorphicRng{DefaultRng::engine()},
 					    "Recently used: ",
 					    m_color_history);
 					m_color_picker->template eventHandler<0>(*this).widget().value(
@@ -161,7 +158,6 @@ namespace Texpainter
 		}
 
 	private:
-		PolymorphicRng m_rng;
 		std::array<PixelStore::Pixel, 8> m_color_history;
 
 		Ui::Container& r_dlg_owner;

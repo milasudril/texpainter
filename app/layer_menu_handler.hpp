@@ -11,7 +11,6 @@
 #include "./compositing_options_editor.hpp"
 #include "./menu_action_callback.hpp"
 
-#include "utils/polymorphic_rng.hpp"
 #include "model/document.hpp"
 #include "ui/dialog.hpp"
 #include "ui/text_entry.hpp"
@@ -113,11 +112,7 @@ namespace Texpainter
 			CompositingOptions
 		};
 
-		explicit LayerMenuHandler(Ui::Container& dialog_owner, PolymorphicRng rng)
-		    : r_dlg_owner{dialog_owner}
-		    , m_rng{rng}
-		{
-		}
+		explicit LayerMenuHandler(Ui::Container& dialog_owner): r_dlg_owner{dialog_owner} {}
 
 		void onActivated(Ui::MenuItem&,
 		                 Model::Document& doc,
@@ -554,7 +549,6 @@ namespace Texpainter
 
 	private:
 		Ui::Container& r_dlg_owner;
-		PolymorphicRng m_rng;
 
 		std::unique_ptr<NameInputDlg> m_copy_dlg;
 		std::unique_ptr<NameInputDlg> m_link_dlg;
