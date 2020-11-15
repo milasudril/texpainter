@@ -10,8 +10,6 @@
 #include "filtergraph/img_proc_arg.hpp"
 #include "filtergraph/image_processor_id.hpp"
 
-#include "dft/engine.hpp"
-
 namespace DftBackward
 {
 	using Texpainter::FilterGraph::ComplexValue;
@@ -23,13 +21,9 @@ namespace DftBackward
 	using Texpainter::FilterGraph::PortType;
 	using Texpainter::FilterGraph::RealValue;
 
-	namespace Dft = Texpainter::Dft;
-
 	class ImageProcessor
 	{
 	public:
-		ImageProcessor(): r_engine{&Dft::engineInstance()} {};
-
 		struct InterfaceDescriptor
 		{
 			static constexpr std::array<PortInfo, 1> InputPorts{
@@ -53,7 +47,6 @@ namespace DftBackward
 		static constexpr auto id() { return ImageProcessorId{"E4CA00ACA31445D47FB510B3102C9529"}; }
 
 	private:
-		Dft::Engine const* r_engine;
 	};
 }
 

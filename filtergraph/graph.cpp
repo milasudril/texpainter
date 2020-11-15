@@ -5,8 +5,7 @@
 #include "./graph.hpp"
 
 #include "utils/graphutils.hpp"
-
-#include <map>
+#include "sched/thread_pool.hpp"
 
 namespace
 {
@@ -49,6 +48,8 @@ namespace
 			        });
 		    });
 	}
+
+	Texpainter::Sched::ThreadPool workers;
 }
 
 Texpainter::FilterGraph::Graph::Graph(Graph const& other)
@@ -132,12 +133,17 @@ Texpainter::PixelStore::Image Texpainter::FilterGraph::Graph::process(Input cons
 	//       in case we already have computed the output result.
 	r_output_node->forceUpdate();
 
-	std::ranges::for_each(m_node_array, [size = input.pixels().size()](auto& item) {
-		item.counter->waitAndReset(item.node.get().inputPorts().size());
-		item.node(size);
-		std::ranges::for_each(item.signal_counters, [](auto& counter) {
-			std::ranges::for_each(counter, [](auto value) { ++(*value); });
+	Sched::SignalingCounter<size_t> task_counter;
+	std::ranges::for_each(m_node_array, [size = input.pixels().size(), &task_counter](auto& item) {
+		workers.addTask([&item, size, &task_counter]() {
+			item.counter->waitAndReset(item.node.get().inputPorts().size());
+			item.node(size);
+			std::ranges::for_each(item.signal_counters, [](auto& counter) {
+				std::ranges::for_each(counter, [](auto value) { ++(*value); });
+			});
+			++task_counter;
 		});
 	});
+	task_counter.waitAndReset(m_node_array.size());
 	return ret;
 }

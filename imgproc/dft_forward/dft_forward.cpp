@@ -5,8 +5,10 @@
 #include "./dft_forward.hpp"
 
 #include "pixel_store/image.hpp"
+#include "dft/engine.hpp"
 
 using TempBuffer = Texpainter::PixelStore::BasicImage<DftForward::ComplexValue>;
+namespace Dft    = Texpainter::Dft;
 
 void DftForward::ImageProcessor::operator()(ImgProcArg<InterfaceDescriptor> const& args) const
 {
@@ -25,7 +27,8 @@ void DftForward::ImageProcessor::operator()(ImgProcArg<InterfaceDescriptor> cons
 	}
 
 	auto const output = args.output<0>();
-	r_engine->run<Dft::Direction::Forward>(size, input_buffer.pixels().data(), output);
+	auto& engine      = Dft::engineInstance();
+	engine.run<Dft::Direction::Forward>(size, input_buffer.pixels().data(), output);
 	auto const A = size.area();
 	std::for_each(output, output + A, [A](auto& val) { return val /= A; });
 }

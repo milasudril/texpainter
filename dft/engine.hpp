@@ -56,7 +56,6 @@ namespace Texpainter::Dft
 					i->m_plan_bkwd = Plan<Direction::Backward>{size};
 				}
 			i->m_last_used = std::chrono::steady_clock::now();
-
 			return *i;
 		}
 	};
