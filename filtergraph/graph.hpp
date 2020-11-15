@@ -15,7 +15,7 @@
 #include "pixel_store/image.hpp"
 #include "utils/iter_pair.hpp"
 #include "utils/pair_iterator.hpp"
-#include "utils/signaling_counter.hpp"
+#include "sched/signaling_counter.hpp"
 
 #include <algorithm>
 
@@ -192,8 +192,8 @@ namespace Texpainter::FilterGraph
 		struct NodeState
 		{
 			std::reference_wrapper<Node const> node;
-			std::unique_ptr<SignalingCounter<size_t>> counter;
-			std::array<std::vector<SignalingCounter<size_t>*>, Node::MaxNumOutputs>
+			std::unique_ptr<Sched::SignalingCounter<size_t>> counter;
+			std::array<std::vector<Sched::SignalingCounter<size_t>*>, Node::MaxNumOutputs>
 			    signal_counters{};
 		};
 		mutable std::vector<NodeState> m_node_array;

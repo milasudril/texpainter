@@ -10,7 +10,7 @@
 #include <condition_variable>
 #include <mutex>
 
-namespace Texpainter
+namespace Texpainter::Sched
 {
 	template<class T>
 	class SignalingCounter
