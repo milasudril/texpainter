@@ -4,8 +4,12 @@
 
 #include "dft/engine.hpp"
 
+namespace
+{
+	thread_local Texpainter::Dft::Engine engine;
+}
+
 Texpainter::Dft::Engine const& Texpainter::Dft::engineInstance()
 {
-	static Engine engine;
 	return engine;
 }
