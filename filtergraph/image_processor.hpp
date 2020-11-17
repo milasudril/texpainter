@@ -38,7 +38,7 @@ namespace Texpainter::FilterGraph
 		{a.set(std::declval<ParamName>(), std::declval<ParamValue>())};
 
 		{
-			T::name()
+			std::as_const(a).name()
 		}
 		->std::same_as<char const*>;
 

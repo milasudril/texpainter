@@ -14,23 +14,40 @@
 #include "pixel_store/image_io.hpp"
 #include "utils/angle.hpp"
 #include "utils/rect.hpp"
+#include "filtergraph/port_info.hpp"
+#include "filtergraph/port_type.hpp"
+#include "filtergraph/img_proc_param.hpp"
+#include "filtergraph/img_proc_arg.hpp"
+#include "filtergraph/image_processor_id.hpp"
 
 #include <memory>
 #include <cassert>
 
 namespace Texpainter::Model
 {
+	class Patch;
+
+	void render(Patch const& patch, Span2d<PixelStore::Pixel> ret, double scale = 1.0);
+
 	class Patch
 	{
 	public:
 		using Palette = PixelStore::Palette<16>;
 
+		struct InterfaceDescriptor
+		{
+			static constexpr std::array<FilterGraph::PortInfo, 0> InputPorts{};
+			static constexpr std::array<FilterGraph::PortInfo, 2> OutputPorts{
+			    {{FilterGraph::PortType::RgbaPixels, "Pixels"},
+			     {FilterGraph::PortType::Palette, "Palette"}}};
+			static constexpr std::array<FilterGraph::ParamName, 0> ParamNames{};
+		};
+
 		explicit Patch(PixelStore::Image&& img)
 		    : m_loc{0.0, 0.0}
 		    , m_rot{0}
 		    , m_scale{1.0, 1.0}
-		    , m_content{std::make_shared<ImageContent>(std::move(img))}
-		    , m_update_count{0}
+		    , m_image{std::move(img)}
 		    , m_current_color{0}
 		{
 		}
@@ -40,49 +57,21 @@ namespace Texpainter::Model
 		    : m_loc{0.0, 0.0}
 		    , m_rot{0}
 		    , m_scale{1.0, 1.0}
-		    , m_content{std::make_shared<ImageContent>(size)}
-		    , m_update_count{0}
+		    , m_image{size}
 		    , m_current_color{0}
 		{
 			fill(initial_color);
-		}
-
-		Patch(Patch const& other) = delete;
-
-		~Patch() = default;
-
-		Patch(Patch&&) = default;
-
-		Patch& operator=(Patch&&) = default;
-
-		Patch& operator=(Patch const& other) = delete;
-
-		Patch linkedPatch() const
-		{
-			return Patch{m_loc, m_rot, m_scale, m_content, m_current_color};
-		}
-
-		Patch copiedPatch() const
-		{
-			return Patch{
-			    m_loc, m_rot, m_scale, std::make_shared<ImageContent>(*m_content), m_current_color};
-		}
-
-		Patch& convertToCopy()
-		{
-			m_content = std::make_shared<ImageContent>(*m_content);
-			return *this;
 		}
 
 		Patch& paint(vec2_t origin, float radius, BrushFunction brush, PixelStore::Pixel color);
 
 		Patch& fill(PixelStore::Pixel color)
 		{
-			std::ranges::fill(m_content->pixels(), color);
+			std::ranges::fill(m_image.pixels(), color);
 			return *this;
 		}
 
-		PixelStore::Image const& content() const { return m_content->base(); }
+		PixelStore::Image const& image() const { return m_image; }
 
 		vec2_t location() const { return m_loc; }
 
@@ -108,17 +97,13 @@ namespace Texpainter::Model
 			return *this;
 		}
 
-		auto size() const { return m_content->size(); }
-
-		bool hasNewContent() const { return m_update_count < m_content->updateCount(); }
-
+		auto size() const { return m_image.size(); }
 
 		auto const& palette() const { return m_palette; }
 
 		Patch& palette(Palette const& pal)
 		{
-			m_palette      = pal;
-			m_update_count = 0;
+			m_palette = pal;
 			return *this;
 		}
 
@@ -126,7 +111,6 @@ namespace Texpainter::Model
 		{
 			assert(static_cast<size_t>(index.value()) < m_palette.size());
 			m_palette[index] = value;
-			m_update_count   = 0;
 			return *this;
 		}
 
@@ -138,68 +122,50 @@ namespace Texpainter::Model
 			return *this;
 		}
 
+		void operator()(FilterGraph::ImgProcArg<InterfaceDescriptor> const& arg) const
+		{
+			render(*this, Texpainter::Span2d{arg.output<0>(), arg.size()});
+			arg.output<1>().get() = m_palette;
+		}
+
+		std::span<FilterGraph::ParamValue> paramValues() const
+		{
+			return std::span<FilterGraph::ParamValue>{};
+		}
+
+		FilterGraph::ParamValue get(FilterGraph::ParamName) const
+		{
+			return FilterGraph::ParamValue{0};
+		}
+
+		void set(FilterGraph::ParamName, FilterGraph::ParamValue) {}
+
+		char const* name() const { return ""; }
+
+		static constexpr FilterGraph::ImageProcessorId id()
+		{
+			return FilterGraph::ImageProcessorId{"025f50bc6ebc706daae991fc9679185c"};
+		}
+
+
 	private:
 		vec2_t m_loc;
 		Angle m_rot;
 		vec2_t m_scale;
-
-		class ImageContent: PixelStore::Image
-		{
-		public:
-			using PixelStore::Image::height;
-			using PixelStore::Image::pixels;
-			using PixelStore::Image::size;
-			using PixelStore::Image::width;
-
-			explicit ImageContent(Size2d size): PixelStore::Image{size}, m_update_count{1} {}
-
-			explicit ImageContent(PixelStore::Image&& img)
-			    : PixelStore::Image{std::move(img)}
-			    , m_update_count{1}
-			{
-			}
-
-			void incUpdateCount() { ++m_update_count; }
-
-			size_t updateCount() const { return m_update_count; }
-
-			PixelStore::Image const& base() const { return *this; }
-
-		private:
-			size_t m_update_count;
-		};
-
-		std::shared_ptr<ImageContent> m_content;
+		PixelStore::Image m_image;
 		Palette m_palette;
-		mutable size_t m_update_count;
 		PixelStore::ColorIndex m_current_color;
-
-		explicit Patch(vec2_t loc,
-		               Angle rot,
-		               vec2_t scale,
-		               std::shared_ptr<ImageContent> const& content,
-		               PixelStore::ColorIndex current_color = PixelStore::ColorIndex{0})
-		    : m_loc{loc}
-		    , m_rot{rot}
-		    , m_scale{scale}
-		    , m_content{content}
-		    , m_update_count{0}
-		    , m_current_color{current_color}
-		{
-		}
 	};
 
 	inline vec2_t axisAlignedBoundingBox(Patch const& patch, double scale = 1.0)
 	{
-		auto const size = patch.content().size();
+		auto const size = patch.image().size();
 		auto const scaled_size =
 		    scale * vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())}
 		    * patch.scaleFactor();
 
 		return axisAlignedBoundingBox(scaled_size, patch.rotation());
 	}
-
-	void render(Patch const& patch, Span2d<PixelStore::Pixel> ret, double scale = 1.0);
 
 	void outline(Patch const& patch, Span2d<PixelStore::Pixel> ret);
 

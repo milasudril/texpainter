@@ -40,8 +40,8 @@ Texpainter::Model::Patch& Texpainter::Model::Patch::paint(vec2_t origin,
                                                           BrushFunction brush,
                                                           PixelStore::Pixel color)
 {
-	auto const w = m_content->width();
-	auto const h = m_content->height();
+	auto const w = m_image.width();
+	auto const h = m_image.height();
 
 	auto const offset = 0.5 * vec2_t{static_cast<double>(w), static_cast<double>(h)};
 	auto const ϴ      = m_rot;
@@ -52,7 +52,7 @@ Texpainter::Model::Patch& Texpainter::Model::Patch::paint(vec2_t origin,
 	auto const r_vec        = vec2_t{static_cast<double>(radius), static_cast<double>(radius)};
 	auto const begin_coords = origin - r_vec;
 	auto const end_coords   = origin + r_vec;
-	auto pixels             = m_content->pixels();
+	auto pixels             = m_image.pixels();
 
 	for(int row = static_cast<int>(begin_coords[1]); row <= static_cast<int>(end_coords[1]); ++row)
 	{
@@ -64,7 +64,6 @@ Texpainter::Model::Patch& Texpainter::Model::Patch::paint(vec2_t origin,
 			if(brush(radius, d)) { pixels((col + w) % w, (row + h) % h) = color; }
 		}
 	}
-	m_content->incUpdateCount();
 	return *this;
 }
 
@@ -98,7 +97,7 @@ void Texpainter::Model::render(Patch const& patch, Span2d<PixelStore::Pixel> ret
 	auto const rot_y        = vec2_t{-sin(ϴ), cos(ϴ)};
 	auto const scale_factor = 1.0 / (scale * patch.scaleFactor());
 
-	auto const& src = patch.content();
+	auto const& src = patch.image();
 	auto const origin_src =
 	    0.5 * vec2_t{static_cast<double>(src.width()), static_cast<double>(src.height())};
 	auto const loc_src_ret_coord =
