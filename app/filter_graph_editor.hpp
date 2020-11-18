@@ -8,7 +8,7 @@
 
 #include "./node_editor.hpp"
 
-#include "filtergraph/graph.hpp"
+#include "model/compositor.hpp"
 #include "filtergraph/connection.hpp"
 #include "imgproc/image_processor_registry.hpp"
 #include "ui/widget_canvas.hpp"
@@ -223,7 +223,7 @@ namespace Texpainter
 		FilterGraphEditor& operator=(FilterGraphEditor&&) = delete;
 
 		FilterGraphEditor(Ui::Container& owner,
-		                  FilterGraph::Graph const& graph,
+		                  Model::Compositor const& graph,
 		                  std::map<FilterGraph::NodeId, vec2_t> const& node_locations);
 
 		FilterGraphEditor& insert(std::unique_ptr<FilterGraph::AbstractImageProcessor> node,
@@ -323,7 +323,7 @@ namespace Texpainter
 
 		void updateLocations();
 
-		FilterGraph::Graph const& filterGraph() const { return m_graph; }
+		Model::Compositor const& filterGraph() const { return m_graph; }
 
 		std::map<FilterGraph::NodeId, vec2_t> nodeLocations() const;
 
@@ -335,7 +335,7 @@ namespace Texpainter
 
 
 	private:
-		FilterGraph::Graph m_graph;
+		Model::Compositor m_graph;
 		void* r_eh;
 		void (*r_callback)(void*, FilterGraphEditor&);
 
@@ -374,7 +374,7 @@ namespace Texpainter
 	{
 		if(button == 3)
 		{
-			if(node != FilterGraph::Graph::InputNodeId && node != FilterGraph::Graph::OutputNodeId)
+			if(node != Model::Compositor::InputNodeId && node != Model::Compositor::OutputNodeId)
 			{
 				m_sel_node      = node;
 				m_filtermenuloc = loc;

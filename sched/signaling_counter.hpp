@@ -4,8 +4,8 @@
 //@		, "dependencies":[{"ref":"pthread", "rel":"external"}]}]
 //@	}
 
-#ifndef TEXPAINTER_SIGNALINGCOUNTER_HPP
-#define TEXPAINTER_SIGNALINGCOUNTER_HPP
+#ifndef TEXPAINTER_SCHED_SIGNALINGCOUNTER_HPP
+#define TEXPAINTER_SCHED_SIGNALINGCOUNTER_HPP
 
 #include <condition_variable>
 #include <mutex>

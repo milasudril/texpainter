@@ -95,7 +95,7 @@ void Texpainter::Model::render(Layer const& layer,
                                Span2d<PixelStore::Pixel> ret,
                                BlendFunction blend,
                                float opacity,
-                               FilterGraph::Graph const* filter,
+                               Compositor const* filter,
                                double scale)
 {
 	auto const ϴ            = layer.rotation();

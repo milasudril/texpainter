@@ -102,7 +102,7 @@ namespace
 
 Texpainter::FilterGraphEditor::FilterGraphEditor(
     Ui::Container& owner,
-    FilterGraph::Graph const& graph,
+    Model::Compositor const& graph,
     std::map<FilterGraph::NodeId, vec2_t> const& node_locations)
     : m_graph{graph}
     , r_callback{[](void*, FilterGraphEditor&) {}}

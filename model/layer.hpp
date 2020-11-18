@@ -146,7 +146,7 @@ namespace Texpainter::Model
 
 		FilterGraph::Graph const& filterGraph() const { return m_compose_opts.filterGraph(); }
 
-		Layer& filterGraph(FilterGraph::Graph&& graph)
+		Layer& filterGraph(Compositor&& graph)
 		{
 			m_compose_opts.filterGraph(std::move(graph));
 			return *this;
@@ -172,7 +172,7 @@ namespace Texpainter::Model
 
 		CompositingOptions const& compositingOptions() const { return m_compose_opts; }
 
-		PixelStore::Image const& filteredContent(FilterGraph::Graph const* filter) const
+		PixelStore::Image const& filteredContent(Compositor const* filter) const
 		{
 			if(filter == nullptr) { return content(); }
 
@@ -288,7 +288,7 @@ namespace Texpainter::Model
 	            Span2d<PixelStore::Pixel> ret,
 	            BlendFunction blend,
 	            float opacity,
-	            FilterGraph::Graph const* filter,
+	            Compositor const* filter,
 	            double scale = 1.0);
 
 	inline void render(Layer const& layer,

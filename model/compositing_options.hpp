@@ -4,19 +4,18 @@
 #define TEXPAINTER_MODEL_COMPOSITINGOPTIONS_HPP
 
 #include "./blend_function.hpp"
+#include "./compositor.hpp"
 
 #include "utils/maybe_owner.hpp"
-
-#include "filtergraph/graph.hpp"
 
 namespace Texpainter::Model
 {
 	class CompositingOptions
 	{
 	public:
-		CompositingOptions(): m_filtergraph{FilterGraph::Graph{}}, m_opacity{1.0f} {}
+		CompositingOptions(): m_filtergraph{Compositor{}}, m_opacity{1.0f} {}
 
-		explicit CompositingOptions(FilterGraph::Graph&& filtergraph,
+		explicit CompositingOptions(Compositor&& filtergraph,
 		                            BlendFunction blend_func,
 		                            float opacity)
 		    : m_filtergraph{std::move(filtergraph)}
@@ -25,7 +24,7 @@ namespace Texpainter::Model
 		{
 		}
 
-		explicit CompositingOptions(std::reference_wrapper<FilterGraph::Graph const> filtergraph,
+		explicit CompositingOptions(std::reference_wrapper<Compositor const> filtergraph,
 		                            BlendFunction blend_func,
 		                            float opacity)
 		    : m_filtergraph{filtergraph}
@@ -43,9 +42,9 @@ namespace Texpainter::Model
 
 		CompositingOptions& operator=(CompositingOptions const& other) = default;
 
-		FilterGraph::Graph const& filterGraph() const { return m_filtergraph.get(); }
+		Compositor const& filterGraph() const { return m_filtergraph.get(); }
 
-		CompositingOptions& filterGraph(FilterGraph::Graph&& filtergraph)
+		CompositingOptions& filterGraph(Compositor&& filtergraph)
 		{
 			m_filtergraph = MaybeOwner{std::move(filtergraph)};
 			return *this;
@@ -68,7 +67,7 @@ namespace Texpainter::Model
 		}
 
 	private:
-		MaybeOwner<FilterGraph::Graph> m_filtergraph;
+		MaybeOwner<Compositor> m_filtergraph;
 		BlendFunction m_blend_func;
 		float m_opacity;
 	};

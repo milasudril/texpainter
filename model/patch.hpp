@@ -3,8 +3,8 @@
 //@	,"dependencies_extra":[{"ref":"patch.o","rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_MODEL_LAYER_HPP
-#define TEXPAINTER_MODEL_LAYER_HPP
+#ifndef TEXPAINTER_MODEL_PATCH_HPP
+#define TEXPAINTER_MODEL_PATCH_HPP
 
 #include "./brush.hpp"
 #include "./item_name.hpp"
