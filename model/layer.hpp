@@ -144,7 +144,7 @@ namespace Texpainter::Model
 
 		auto size() const { return m_content->size(); }
 
-		FilterGraph::Graph const& filterGraph() const { return m_compose_opts.filterGraph(); }
+		Compositor const& filterGraph() const { return m_compose_opts.filterGraph(); }
 
 		Layer& filterGraph(Compositor&& graph)
 		{
