@@ -8,8 +8,6 @@
 
 #include "./node.hpp"
 #include "./node_id.hpp"
-#include "./layer_input.hpp"
-#include "./image_sink.hpp"
 #include "./image_processor_wrapper.hpp"
 
 #include "pixel_store/image.hpp"
@@ -29,54 +27,16 @@ namespace Texpainter::FilterGraph
 		GraphTooDeep
 	};
 
-	class Graph;
-
-	ValidationResult validate(Graph const& g);
-
-	class Input
-	{
-	public:
-		explicit Input(Span2d<RgbaValue const> pixels, std::reference_wrapper<Palette const> pal)
-		    : r_pixels{pixels}
-		    , m_palette{pal}
-		{
-		}
-
-		auto pixels() const { return r_pixels; }
-
-		auto palette() const { return m_palette; }
-
-	private:
-		Span2d<RgbaValue const> r_pixels;
-		std::reference_wrapper<Palette const> m_palette;
-	};
-
 	class Graph
 	{
 		using NodeMap = std::map<NodeId, Node>;
 
 	public:
-		static constexpr NodeId InputNodeId{0};
-		static constexpr NodeId OutputNodeId{1};
-
 		using node_type = Node;
 
 		using NodeItem = std::pair<NodeId, std::reference_wrapper<Node>>;
 
-		Graph(): m_valid_state{ValidationState::NotValidated}
-		{
-			auto input  = std::make_unique<ImageProcessorWrapper<LayerInput>>(LayerInput{});
-			auto output = std::make_unique<ImageProcessorWrapper<ImageSink>>(ImageSink{});
-			r_input     = &input->processor();
-			r_output    = &output->processor();
-			r_input_node =
-			    &m_nodes.insert(std::make_pair(InputNodeId, std::move(input))).first->second;
-			r_output_node =
-			    &m_nodes.insert(std::make_pair(OutputNodeId, std::move(output))).first->second;
-			m_current_id = NodeId{2};
-
-			connect(OutputNodeId, InputPortIndex{0}, InputNodeId, OutputPortIndex{0});
-		}
+		Graph() = default;
 
 		Graph(Graph const& other);
 
@@ -91,11 +51,13 @@ namespace Texpainter::FilterGraph
 			return *this;
 		}
 
-		PixelStore::Image process(Input const& input, bool force_update = true) const;
-
-		std::vector<Node const*> compile() const;
-
 		auto node(NodeId id) const
+		{
+			auto ret = m_nodes.find(id);
+			return ret != std::end(m_nodes) ? &ret->second : nullptr;
+		}
+
+		auto node(NodeId id)
 		{
 			auto ret = m_nodes.find(id);
 			return ret != std::end(m_nodes) ? &ret->second : nullptr;
@@ -105,7 +67,6 @@ namespace Texpainter::FilterGraph
 		{
 			assert(node(a) != nullptr && node(b) != nullptr);
 			m_nodes[a].connect(sink, m_nodes[b], src);
-			m_valid_state = ValidationState::NotValidated;
 			return *this;
 		}
 
@@ -113,7 +74,6 @@ namespace Texpainter::FilterGraph
 		{
 			assert(node(a) != nullptr);
 			m_nodes[a].disconnect(sink);
-			m_valid_state = ValidationState::NotValidated;
 			return *this;
 		}
 
@@ -133,9 +93,7 @@ namespace Texpainter::FilterGraph
 
 		Graph& erase(NodeId id)
 		{
-			assert(id != InputNodeId && id != OutputNodeId);
 			m_nodes.erase(id);
-			m_valid_state = ValidationState::NotValidated;
 			return *this;
 		}
 
@@ -171,44 +129,7 @@ namespace Texpainter::FilterGraph
 
 		auto currentId() const { return m_current_id; }
 
-		bool valid() const
-		{
-			if(m_valid_state == ValidationState::NotValidated) [[unlikely]]
-				{
-					m_valid_state = validate(*this) == ValidationResult::NoError
-					                    ? ValidationState::ValidatedValid
-					                    : ValidationState::ValidatedNotValid;
-				}
-			return m_valid_state == ValidationState::ValidatedValid;
-		}
-
-		void clearValidationState()
-		{
-			m_valid_state = ValidationState::NotValidated;
-			m_node_array.clear();
-		}
-
 	private:
-		struct NodeState
-		{
-			std::reference_wrapper<Node const> node;
-			std::unique_ptr<Sched::SignalingCounter<size_t>> counter;
-			std::array<std::vector<Sched::SignalingCounter<size_t>*>, Node::MaxNumOutputs>
-			    signal_counters{};
-		};
-		mutable std::vector<NodeState> m_node_array;
-
-		LayerInput* r_input;
-		ImageSink* r_output;
-		Node* r_input_node;
-		Node* r_output_node;
-		enum class ValidationState : size_t
-		{
-			NotValidated,
-			ValidatedNotValid,
-			ValidatedValid
-		};
-		mutable ValidationState m_valid_state;
 		NodeMap m_nodes;
 		NodeId m_current_id;
 	};
