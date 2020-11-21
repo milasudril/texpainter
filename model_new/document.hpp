@@ -18,19 +18,24 @@ namespace Texpainter::Model
 {
 	namespace detail
 	{
-		template<class Value>
-		auto insert(std::map<ItemName, Value>& map, ItemName&& name, Value&& val)
-		{
-			auto ip = map.insert(std::make_pair(std::move(name), std::move(val)));
-			if(ip.second) [[unlikely]]
-				{
-					return static_cast<Value*>(nullptr);
-				}
+		template<class T>
+		struct ImageProcessor;
 
-			return &ip.first->second;
-		}
+		template<>
+		struct ImageProcessor<WithStatus<PixelStore::Image>>
+		{
+			using type = ImageSource;
+		};
 	}
 
+	template<class T>
+	struct CompositorInput
+	{
+		T source;
+		std::reference_wrapper<
+		    FilterGraph::ImageProcessorWrapper<typename detail::ImageProcessor<T>::type>>
+		    processor;
+	};
 
 	class Document
 	{
@@ -62,10 +67,14 @@ namespace Texpainter::Model
 
 		auto insert(ItemName const& name, PixelStore::Image&& img)
 		{
-			if(!insertInputNode<ImageSource>(name)) [[unlikely]]
-			{ return static_cast<WithStatus<PixelStore::Image>*>(nullptr); }
-
-			return &m_images.insert(std::pair{name, WithStatus{std::move(img)}}).first->second;
+			if(auto node = insertInputNode<ImageSource>(name); node != nullptr) [[likely]]
+				{
+					return &m_images
+					            .insert(std::pair{
+					                name, CompositorInput{WithStatus{std::move(img)}, *node}})
+					            .first->second;
+				}
+			return static_cast<CompositorInput<WithStatus<PixelStore::Image>>*>(nullptr);
 		}
 
 		template<InplaceMutator<PixelStore::Image> Mutator>
@@ -77,7 +86,7 @@ namespace Texpainter::Model
 					return false;
 				}
 
-			return i->second.modify(std::forward<Mutator>(mut));
+			return i->second.source.modify(std::forward<Mutator>(mut));
 		}
 
 		auto const& palettes() const { return m_palettes; }
@@ -87,12 +96,12 @@ namespace Texpainter::Model
 			auto i = m_palettes.find(item);
 			return i != std::end(m_palettes) ? &i->second : nullptr;
 		}
-
+#if 0
 		auto insert(ItemName&& name, Palette&& pal)
 		{
 			return detail::insert(m_palettes, std::move(name), WithStatus{std::move(pal)});
 		}
-
+#endif
 		template<InplaceMutator<Palette> Mutator>
 		bool modifyPalette(Mutator&& mut, ItemName const& item)
 		{
@@ -108,21 +117,25 @@ namespace Texpainter::Model
 	private:
 		Size2d m_canvas_size;
 		Compositor m_compositor;
-		std::map<ItemName, WithStatus<PixelStore::Image>> m_images;
+		std::map<ItemName, CompositorInput<WithStatus<PixelStore::Image>>> m_images;
 		std::map<ItemName, WithStatus<Palette>> m_palettes;
 		std::map<ItemName, Compositor::NodeItem> m_input_nodes;
 		bool m_dirty;
 
 		template<class T>
-		bool insertInputNode(ItemName const& name)
+		FilterGraph::ImageProcessorWrapper<T>* insertInputNode(ItemName const& name)
 		{
 			auto i = m_input_nodes.find(name);
 			if(i == std::end(m_input_nodes)) [[unlikely]]
-			{ return false; }
+				{
+					return nullptr;
+				}
 
 			auto item = m_compositor.insert(T{std::string{toString(name)}});
 			m_input_nodes.insert(i, std::pair{name, item});
-			return true;
+
+			return dynamic_cast<FilterGraph::ImageProcessorWrapper<T>*>(
+			    &item.second.get().processor());
 		}
 	};
 
