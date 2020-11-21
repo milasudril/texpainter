@@ -1,12 +1,12 @@
 //@	{
-//@	  "targets":[{"name":"compositor_new.o", "type":"object"}]
+//@	  "targets":[{"name":"compositor.o", "type":"object"}]
 //@	}
 
-#include "./compositor_new.hpp"
+#include "./compositor.hpp"
 
 #include "utils/graphutils.hpp"
 
-Texpainter::FilterGraph::ValidationResult Texpainter::Model::validate(CompositorNew const& g)
+Texpainter::FilterGraph::ValidationResult Texpainter::Model::validate(Compositor const& g)
 {
 	using FilterGraph::ValidationResult;
 
@@ -28,11 +28,11 @@ Texpainter::FilterGraph::ValidationResult Texpainter::Model::validate(Compositor
 			    return GraphProcessing::Continue;
 		    }
 	    },
-	    *g.node(CompositorNew::OutputNodeId));
+	    *g.node(Compositor::OutputNodeId));
 	return result;
 }
 
-void Texpainter::Model::CompositorNew::process(Span2d<PixelStore::Pixel> canvas) const
+void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas) const
 {
 	assert(valid());
 	if(m_node_array.size() == 0) [[unlikely]]

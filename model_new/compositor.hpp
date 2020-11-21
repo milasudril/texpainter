@@ -1,10 +1,10 @@
 //@	{
-//@	  "targets":[{"name":"compositor_new.hpp", "type":"include"}]
-//@	 ,"dependencies_extra":[{"ref":"compositor_new.o","rel":"implementation"}]
+//@	  "targets":[{"name":"compositor_.hpp", "type":"include"}]
+//@	 ,"dependencies_extra":[{"ref":"compositor.o","rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_MODEL_COMPOSITORNEW_HPP
-#define TEXPAINTER_MODEL_COMPOSITORNEW_HPP
+#ifndef TEXPAINTER_MODEL_COMPOSITOR_HPP
+#define TEXPAINTER_MODEL_COMPOSITOR_HPP
 
 #include "filtergraph/graph.hpp"
 #include "filtergraph/layer_input.hpp"
@@ -19,11 +19,11 @@
 
 namespace Texpainter::Model
 {
-	class CompositorNew;
+	class Compositor;
 
-	Texpainter::FilterGraph::ValidationResult validate(CompositorNew const& g);
+	Texpainter::FilterGraph::ValidationResult validate(Compositor const& g);
 
-	class CompositorNew
+	class Compositor
 	{
 	public:
 		static constexpr FilterGraph::NodeId InputNodeId{0};
@@ -33,7 +33,7 @@ namespace Texpainter::Model
 		using InputPortIndex  = FilterGraph::InputPortIndex;
 		using OutputPortIndex = FilterGraph::OutputPortIndex;
 
-		CompositorNew(): m_valid_state{ValidationState::NotValidated}
+		Compositor(): m_valid_state{ValidationState::NotValidated}
 		{
 			using FilterGraph::ImageProcessorWrapper;
 			using FilterGraph::ImageSink;
@@ -52,7 +52,7 @@ namespace Texpainter::Model
 			        FilterGraph::OutputPortIndex{0});
 		}
 
-		CompositorNew(CompositorNew const& other): m_graph{other.m_graph}
+		Compositor(Compositor const& other): m_graph{other.m_graph}
 		{
 			using FilterGraph::ImageProcessorWrapper;
 			using FilterGraph::ImageSink;
@@ -66,8 +66,8 @@ namespace Texpainter::Model
 			                ->processor();
 		}
 
-		CompositorNew(CompositorNew&&) = default;
-		CompositorNew& operator=(CompositorNew&&) = default;
+		Compositor(Compositor&&) = default;
+		Compositor& operator=(Compositor&&) = default;
 
 		void process(Span2d<PixelStore::Pixel> canvas) const;
 
@@ -82,14 +82,14 @@ namespace Texpainter::Model
 			return m_graph.insert(std::forward<ImgProc>(proc));
 		}
 
-		CompositorNew& connect(NodeId a, InputPortIndex sink, NodeId b, OutputPortIndex src)
+		Compositor& connect(NodeId a, InputPortIndex sink, NodeId b, OutputPortIndex src)
 		{
 			m_graph.connect(a, sink, b, src);
 			m_valid_state = ValidationState::NotValidated;
 			return *this;
 		}
 
-		CompositorNew& disconnect(NodeId a, InputPortIndex sink)
+		Compositor& disconnect(NodeId a, InputPortIndex sink)
 		{
 			m_graph.disconnect(a, sink);
 			m_valid_state = ValidationState::NotValidated;
@@ -98,7 +98,7 @@ namespace Texpainter::Model
 
 		auto node(FilterGraph::NodeId id) const { return m_graph.node(id); }
 
-		CompositorNew& erase(FilterGraph::NodeId id)
+		Compositor& erase(FilterGraph::NodeId id)
 		{
 			m_graph.erase(id);
 			m_valid_state = ValidationState::NotValidated;
@@ -156,7 +156,7 @@ namespace Texpainter::Model
 		FilterGraph::Graph m_graph;
 	};
 
-	Texpainter::FilterGraph::ValidationResult validate(CompositorNew const& g);
+	Texpainter::FilterGraph::ValidationResult validate(Compositor const& g);
 }
 
 #endif

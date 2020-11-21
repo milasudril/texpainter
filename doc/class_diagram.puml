@@ -104,7 +104,6 @@ class Model::PaletteSource
 	-r_source: PixelStore::Image
 }
 
-
 Model::Document "1" *-> "N" PixelStore::Image : <<m_images>>
 Model::Document "1" *-> "N" PixelStore::Palette: <<m_palettes>>
 Model::Document "1" *-> "1" Model::Compositor : <<m_compositor>>
