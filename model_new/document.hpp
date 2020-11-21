@@ -33,6 +33,52 @@ namespace Texpainter::Model
 
 		Compositor const& compositor() const { return m_compositor.get(); }
 
+		template<InplaceMutator<Compositor> Mutator>
+		bool modifyCompositor(Mutator&& mut)
+		{
+			return m_compositor.modify(std::forward<Mutator>(mut));
+		}
+
+		auto const& images() const { return m_images; }
+
+		PixelStore::Image const* image(ItemName const& item) const
+		{
+			auto i = m_images.find(item);
+			return i != std::end(m_images) ? &i->second.get() : nullptr;
+		}
+
+		template<InplaceMutator<Compositor> Mutator>
+		bool modifyImage(Mutator&& mut, ItemName const& item)
+		{
+			auto i = m_images.find(item);
+			if(i == std::end(m_images)) [[unlikely]]
+				{
+					return false;
+				}
+
+			return i->second.modify(std::forward<Mutator>(mut));
+		}
+
+		auto const& palettes() const { return m_palettes; }
+
+		Palette const* palette(ItemName const& item) const
+		{
+			auto i = m_palettes.find(item);
+			return i != std::end(m_palettes) ? &i->second.get() : nullptr;
+		}
+
+		template<InplaceMutator<Compositor> Mutator>
+		bool modifyPalette(Mutator&& mut, ItemName const& item)
+		{
+			auto i = m_palettes.find(item);
+			if(i == std::end(m_palettes)) [[unlikely]]
+				{
+					return false;
+				}
+
+			return i->second.modify(std::forward<Mutator>(mut));
+		}
+
 	private:
 		Size2d m_canvas_size;
 		WithStatus<Compositor> m_compositor;

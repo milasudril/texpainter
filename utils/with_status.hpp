@@ -17,6 +17,8 @@ namespace Texpainter
 
 		T const& get() const { return m_content; }
 
+		T const* operator->() const { return m_content; }
+
 		template<InplaceMutator<T> Mutator>
 		auto modify(Mutator&& mut)
 		{
