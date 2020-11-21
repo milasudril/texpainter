@@ -5,6 +5,7 @@
 
 #include "./compositor.hpp"
 #include "./item_name.hpp"
+#include "./palette.hpp"
 
 #include "pixel_store/image.hpp"
 #include "utils/with_status.hpp"
@@ -33,7 +34,7 @@ namespace Texpainter::Model
 		Size2d m_canvas_size;
 		WithStatus<Compositor> m_compositior;
 		std::map<ItemName, WithStatus<PixelStore::Image>>;
-		std::map<ItemName, WithStatus<PixelStore::Palette<16>>>;
+		std::map<ItemName, WithStatus<Palette>>;
 		bool m_dirty;
 	};
 
