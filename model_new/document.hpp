@@ -21,9 +21,9 @@ namespace Texpainter::Model
 		auto insert(std::map<ItemName, Value>& map, ItemName&& name, Value&& val)
 		{
 			auto ip = map.insert(std::make_pair(std::move(name), std::move(val)));
-			if(ip.second) [[unlikely]] { return static_cast<Value*>(nullptr); }
+			if(ip.second) [[unlikely]] { return std::pair{ip.first, static_cast<Value*>(nullptr)}; }
 
-			return &ip.first->second;
+			return std::pair{ip.first, &ip.first->second};
 		}
 	}
 
@@ -58,7 +58,10 @@ namespace Texpainter::Model
 
 		auto insert(ItemName&& name, PixelStore::Image&& img)
 		{
-			return detail::insert(m_images, std::move(name), WithStatus{std::move(img)});
+			auto ret = detail::insert(m_images, std::move(name), WithStatus{std::move(img)});
+		//	auto node_item = m_compositor.insert(ImageSource{ret});
+		//	m_input_nodes.insert(ret.first, node_item.first);
+			return ret.second;
 		}
 
 		template<InplaceMutator<PixelStore::Image> Mutator>
@@ -83,7 +86,7 @@ namespace Texpainter::Model
 
 		auto insert(ItemName&& name, Palette&& pal)
 		{
-			return detail::insert(m_palettes, std::move(name), WithStatus{std::move(pal)});
+			return detail::insert(m_palettes, std::move(name), WithStatus{std::move(pal)}).second;
 		}
 
 		template<InplaceMutator<Palette> Mutator>
