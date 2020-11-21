@@ -62,12 +62,8 @@ namespace Texpainter::Model
 
 		auto insert(ItemName const& name, PixelStore::Image&& img)
 		{
-			auto i = m_input_nodes.find(name);
-			if(i == std::end(m_input_nodes)) [[unlikely]]
+			if(!insertInputNode<ImageSource>(name)) [[unlikely]]
 			{ return static_cast<WithStatus<PixelStore::Image>*>(nullptr); }
-
-			auto item = m_compositor.insert(ImageSource{std::string{toString(name)}});
-			m_input_nodes.insert(i, std::pair{name, item});
 
 			return &m_images.insert(std::pair{name, WithStatus{std::move(img)}}).first->second;
 		}
@@ -116,6 +112,18 @@ namespace Texpainter::Model
 		std::map<ItemName, WithStatus<Palette>> m_palettes;
 		std::map<ItemName, Compositor::NodeItem> m_input_nodes;
 		bool m_dirty;
+
+		template<class T>
+		bool insertInputNode(ItemName const& name)
+		{
+			auto i = m_input_nodes.find(name);
+			if(i == std::end(m_input_nodes)) [[unlikely]]
+			{ return false; }
+
+			auto item = m_compositor.insert(T{std::string{toString(name)}});
+			m_input_nodes.insert(i, std::pair{name, item});
+			return true;
+		}
 	};
 
 	inline PixelStore::Image render(Document const& document)
