@@ -41,13 +41,20 @@ namespace Texpainter::Model
 
 		auto const& images() const { return m_images; }
 
-		PixelStore::Image const* image(ItemName const& item) const
+		auto const image(ItemName const& item) const
 		{
 			auto i = m_images.find(item);
-			return i != std::end(m_images) ? &i->second.get() : nullptr;
+			return i != std::end(m_images) ? &i->second : nullptr;
 		}
 
-		template<InplaceMutator<Compositor> Mutator>
+		auto insert(ItemName&& item, PixelStore::Image&& img)
+		{
+			auto ip = m_images.insert(std::make_pair(std::move(item), std::move(img)));
+			if(ip.second) { return static_cast<WithStatus<PixelStore::Image>*>(nullptr); }
+			return &ip.first->second;
+		}
+
+		template<InplaceMutator<PixelStore::Image> Mutator>
 		bool modifyImage(Mutator&& mut, ItemName const& item)
 		{
 			auto i = m_images.find(item);
@@ -61,13 +68,20 @@ namespace Texpainter::Model
 
 		auto const& palettes() const { return m_palettes; }
 
-		Palette const* palette(ItemName const& item) const
+		auto const palette(ItemName const& item) const
 		{
 			auto i = m_palettes.find(item);
-			return i != std::end(m_palettes) ? &i->second.get() : nullptr;
+			return i != std::end(m_palettes) ? &i->second : nullptr;
 		}
 
-		template<InplaceMutator<Compositor> Mutator>
+		auto insert(ItemName&& item, Palette&& pal)
+		{
+			auto ip = m_palettes.insert(std::make_pair(std::move(item), std::move(pal)));
+			if(ip.second) { return static_cast<WithStatus<Palette>*>(nullptr); }
+			return &ip.first->second;
+		}
+
+		template<InplaceMutator<Palette> Mutator>
 		bool modifyPalette(Mutator&& mut, ItemName const& item)
 		{
 			auto i = m_palettes.find(item);
