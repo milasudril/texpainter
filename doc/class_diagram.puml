@@ -1,0 +1,134 @@
+@startuml
+set namespaceSeparator ::
+left to right direction
+
+class Model::Compositor
+class Dictionary
+class Model::Document
+class Memblock
+class Model::ImageSink
+class Model::ImageSource
+class Model::PaletteSource
+class PixelStore::Image
+class PixelStore::Palette
+class PixelStore::Pixel
+class WithStatus
+interface InplaceMutator
+
+class FilterGraph::Node
+interface FilterGraph::AbstractImageProcessor
+interface FilterGraph::ImageProcessor
+class FilterGraph::ImageProcessorWrapper
+
+class PixelStore::Pixel
+{
+	red():float
+	green():float
+	blue():float
+	alpha():float
+}
+
+class Memblock <T> <<using std::unique_ptr<T[]> >>
+
+class PixelStore::Image
+{
+	+size():Size2d <<const>>
+	+pixels():Span2d<Pixel>
+	-m_pixels:Memblock<Pixel>
+}
+
+class PixelStore::Palette
+{
+	colors:Pixel[16]
+}
+
+class Model::Document
+{
+	-m_compositor:WithStatus<Model::Compositor, bool>
+	-m_images:Dictionary<ItemName, WithStatus<Image, bool>>
+	-m_palettes:Dictionry<ItemName, WithStatus<Palette, bool>>
+}
+
+class WithStatus<T, StatusType>
+{
+	+modifyContent<InplaceMutator<T, StatusType> Mutator>(Mutator&&):void
+	+content(): T <<const>
+	+status():StatusType <<const>>
+	-m_content:T
+	-m_status:StatusType
+}
+
+class Dictionary <Key, Value> <<using std::map<Key, Value> >>
+{
+}
+
+interface InplaceMutator<ReturnType, Arg> <<Concept>>
+{
+	+operator()(Arg&):ReturnType
+}
+
+interface FilterGraph::ImageProcessor<T> <<Concept>>
+{
+}
+
+class FilterGraph::Node
+{
+	+processor():AbstractImageProcessor <<const>>
+	-m_proc:std::unique_ptr<AbstractImageProcessor>
+	-m_inputs:Node[4]
+}
+
+class Model::Compositor
+{
+	m_graph:FilterGraph::Graph
+	r_output: Model::ImageSink
+	r_output_node: FilterGraph::Node
+}
+
+class FilterGraph::ImageProcessorWrapper<T>
+{
+}
+
+class Model::ImageSink
+{
+	-r_sink: PixelStore::Image
+}
+
+class Model::ImageSource
+{
+	-r_source: PixelStore::Image
+}
+
+class Model::PaletteSource
+{
+	-r_source: PixelStore::Image
+}
+
+
+Model::Document "1" *-> "N" PixelStore::Image : <<m_images>>
+Model::Document "1" *-> "N" PixelStore::Palette: <<m_palettes>>
+Model::Document "1" *-> "1" Model::Compositor : <<m_compositor>>
+Model::Document ..> Dictionary : <<bind>>\n<Key = ItemName,\nValue = WithStatus<Image, bool>>
+Model::Document ..> WithStatus : <<bind>>\n<T = Image,\nStatusType = bool>
+Model::Document ..> WithStatus : <<bind>>\n<T = Palette,\nStatusType = bool>
+Model::Document ..> WithStatus : <<bind>>\n<T = Model::Compositor,\nStatusType = bool>
+Model::Document ..> Dictionary : <<bind>>\n<Key = ItemName,\nValue = WithStatus<Palette, bool>>
+Model::Compositor "1" *-> "N" Model::ImageSource : <<m_graph>>
+Model::Compositor "1" *-> "N" Model::PaletteSource : <<m_graph>>
+PixelStore::Image "1" *-> "N" PixelStore::Pixel : <<m_pixels>>
+PixelStore::Image ..> Memblock : <<bind>>\n<T = Pixel>
+PixelStore::Palette"1" *-> "16" PixelStore::Pixel : <<m_colors>>
+WithStatus ..> InplaceMutator : <<bind>>\n<ReturnType = StatusType,\nArg = T>
+FilterGraph::Node "1" *-> "1" FilterGraph::AbstractImageProcessor : <<m_proc>>
+FilterGraph::Node "1" o-> "0..4" FilterGraph::Node : <<m_inputs>>
+Model::ImageSink ..|> FilterGraph::ImageProcessor
+Model::ImageSource ..|> FilterGraph::ImageProcessor
+FilterGraph::Graph "1" *-> "1" FilterGraph::Node : <<m_nodes>>
+FilterGraph::ImageProcessorWrapper ..|> FilterGraph::AbstractImageProcessor
+Model::Compositor "1" *-> "1" Model::ImageSink : <<m_graph>>
+Model::Compositor "1" *-> "1" FilterGraph::Graph
+Model::ImageSink "1" o-> "1" PixelStore::Image : <<r_sink>>
+Model::ImageSource "1" o-> "1" PixelStore::Image : <<r_source>>
+Model::PaletteSource "1" o-> "1" PixelStore::Palette : <<r_source>>
+FilterGraph ..> PixelStore
+@enduml
