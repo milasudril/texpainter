@@ -3,7 +3,7 @@
 #ifndef TEXPAINTER_UTILS_WITHSTATUS_HPP
 #define TEXPAINTER_UTILS_WITHSTATUS_HPP
 
-#include "./mutator.hpp"
+#include "./inplace_mutator.hpp"
 
 namespace Texpainter
 {
