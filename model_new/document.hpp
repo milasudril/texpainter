@@ -9,6 +9,7 @@
 #include "./compositor.hpp"
 #include "./item_name.hpp"
 #include "./palette.hpp"
+#include "./image_source.hpp"
 
 #include "pixel_store/image.hpp"
 #include "utils/with_status.hpp"
@@ -21,9 +22,12 @@ namespace Texpainter::Model
 		auto insert(std::map<ItemName, Value>& map, ItemName&& name, Value&& val)
 		{
 			auto ip = map.insert(std::make_pair(std::move(name), std::move(val)));
-			if(ip.second) [[unlikely]] { return std::pair{ip.first, static_cast<Value*>(nullptr)}; }
+			if(ip.second) [[unlikely]]
+				{
+					return std::pair{ip.first->first, static_cast<Value*>(nullptr)};
+				}
 
-			return std::pair{ip.first, &ip.first->second};
+			return std::pair{ip.first->first, &ip.first->second};
 		}
 	}
 
@@ -58,9 +62,9 @@ namespace Texpainter::Model
 
 		auto insert(ItemName&& name, PixelStore::Image&& img)
 		{
-			auto ret = detail::insert(m_images, std::move(name), WithStatus{std::move(img)});
-		//	auto node_item = m_compositor.insert(ImageSource{ret});
-		//	m_input_nodes.insert(ret.first, node_item.first);
+			auto ret       = detail::insert(m_images, std::move(name), WithStatus{std::move(img)});
+			auto node_item = m_compositor.insert(ImageSource{ret.first.c_str()});
+			m_input_nodes.insert(std::make_pair(ret.first, node_item.first));
 			return ret.second;
 		}
 

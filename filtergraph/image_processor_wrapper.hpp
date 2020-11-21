@@ -90,7 +90,7 @@ namespace Texpainter::FilterGraph
 			return std::make_unique<ImageProcessorWrapper>(*this);
 		}
 
-		char const* name() const override { return Proc::name(); }
+		char const* name() const override { return m_proc.name(); }
 
 		ImageProcessorId id() const override { return Proc::id(); }
 
