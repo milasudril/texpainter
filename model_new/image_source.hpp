@@ -26,7 +26,7 @@ namespace Texpainter::Model
 			static constexpr std::array<FilterGraph::ParamName, 0> ParamNames{};
 		};
 
-		explicit ImageSource(char const* name): m_name{name} {}
+		explicit ImageSource(std::string&& name): m_name{std::move(name)} {}
 
 		void operator()(FilterGraph::ImgProcArg<InterfaceDescriptor> const& args) const
 		{

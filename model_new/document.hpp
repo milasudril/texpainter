@@ -24,10 +24,10 @@ namespace Texpainter::Model
 			auto ip = map.insert(std::make_pair(std::move(name), std::move(val)));
 			if(ip.second) [[unlikely]]
 				{
-					return std::pair{ip.first->first, static_cast<Value*>(nullptr)};
+					return static_cast<Value*>(nullptr);
 				}
 
-			return std::pair{ip.first->first, &ip.first->second};
+			return &ip.first->second;
 		}
 	}
 
@@ -60,12 +60,16 @@ namespace Texpainter::Model
 			return i != std::end(m_images) ? &i->second : nullptr;
 		}
 
-		auto insert(ItemName&& name, PixelStore::Image&& img)
+		auto insert(ItemName const& name, PixelStore::Image&& img)
 		{
-			auto ret       = detail::insert(m_images, std::move(name), WithStatus{std::move(img)});
-			auto node_item = m_compositor.insert(ImageSource{ret.first.c_str()});
-			m_input_nodes.insert(std::make_pair(ret.first, node_item.first));
-			return ret.second;
+			auto i = m_input_nodes.find(name);
+			if(i == std::end(m_input_nodes)) [[unlikely]]
+			{ return static_cast<WithStatus<PixelStore::Image>*>(nullptr); }
+
+			auto item = m_compositor.insert(ImageSource{std::string{toString(name)}});
+			m_input_nodes.insert(i, std::pair{name, item});
+
+			return &m_images.insert(std::pair{name, WithStatus{std::move(img)}}).first->second;
 		}
 
 		template<InplaceMutator<PixelStore::Image> Mutator>
@@ -90,7 +94,7 @@ namespace Texpainter::Model
 
 		auto insert(ItemName&& name, Palette&& pal)
 		{
-			return detail::insert(m_palettes, std::move(name), WithStatus{std::move(pal)}).second;
+			return detail::insert(m_palettes, std::move(name), WithStatus{std::move(pal)});
 		}
 
 		template<InplaceMutator<Palette> Mutator>
@@ -110,7 +114,7 @@ namespace Texpainter::Model
 		Compositor m_compositor;
 		std::map<ItemName, WithStatus<PixelStore::Image>> m_images;
 		std::map<ItemName, WithStatus<Palette>> m_palettes;
-		std::map<ItemName, Compositor::NodeId> m_input_nodes;
+		std::map<ItemName, Compositor::NodeItem> m_input_nodes;
 		bool m_dirty;
 	};
 
