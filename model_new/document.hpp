@@ -15,6 +15,19 @@
 
 namespace Texpainter::Model
 {
+	namespace detail
+	{
+		template<class Value>
+		auto insert(std::map<ItemName, Value>& map, ItemName&& name, Value&& val)
+		{
+			auto ip = map.insert(std::make_pair(std::move(name), std::move(val)));
+			if(ip.second) [[unlikely]] { return static_cast<Value*>(nullptr); }
+
+			return &ip.first->second;
+		}
+	}
+
+
 	class Document
 	{
 	public:
@@ -31,13 +44,9 @@ namespace Texpainter::Model
 			return *this;
 		}
 
-		Compositor const& compositor() const { return m_compositor.get(); }
+		Compositor const& compositor() const { return m_compositor; }
 
-		template<InplaceMutator<Compositor> Mutator>
-		bool modifyCompositor(Mutator&& mut)
-		{
-			return m_compositor.modify(std::forward<Mutator>(mut));
-		}
+		Compositor& compositor() { return m_compositor; }
 
 		auto const& images() const { return m_images; }
 
@@ -47,11 +56,9 @@ namespace Texpainter::Model
 			return i != std::end(m_images) ? &i->second : nullptr;
 		}
 
-		auto insert(ItemName&& item, PixelStore::Image&& img)
+		auto insert(ItemName&& name, PixelStore::Image&& img)
 		{
-			auto ip = m_images.insert(std::make_pair(std::move(item), std::move(img)));
-			if(ip.second) { return static_cast<WithStatus<PixelStore::Image>*>(nullptr); }
-			return &ip.first->second;
+			return detail::insert(m_images, std::move(name), WithStatus{std::move(img)});
 		}
 
 		template<InplaceMutator<PixelStore::Image> Mutator>
@@ -74,11 +81,9 @@ namespace Texpainter::Model
 			return i != std::end(m_palettes) ? &i->second : nullptr;
 		}
 
-		auto insert(ItemName&& item, Palette&& pal)
+		auto insert(ItemName&& name, Palette&& pal)
 		{
-			auto ip = m_palettes.insert(std::make_pair(std::move(item), std::move(pal)));
-			if(ip.second) { return static_cast<WithStatus<Palette>*>(nullptr); }
-			return &ip.first->second;
+			return detail::insert(m_palettes, std::move(name), WithStatus{std::move(pal)});
 		}
 
 		template<InplaceMutator<Palette> Mutator>
@@ -95,9 +100,10 @@ namespace Texpainter::Model
 
 	private:
 		Size2d m_canvas_size;
-		WithStatus<Compositor> m_compositor;
+		Compositor m_compositor;
 		std::map<ItemName, WithStatus<PixelStore::Image>> m_images;
 		std::map<ItemName, WithStatus<Palette>> m_palettes;
+		std::map<ItemName, Compositor::NodeId> m_input_nodes;
 		bool m_dirty;
 	};
 
