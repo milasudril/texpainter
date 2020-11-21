@@ -31,9 +31,9 @@ namespace Texpainter::Model
 
 	private:
 		Size2d m_canvas_size;
-		WithStatus<Compositor, bool> m_compositior;
-		std::map<ItemName, WithStatus<PixelStore::Image, bool>>;
-		std::map<ItemName, WithStatus<PixelStore::Palette<16>, bool>>;
+		WithStatus<Compositor> m_compositior;
+		std::map<ItemName, WithStatus<PixelStore::Image>>;
+		std::map<ItemName, WithStatus<PixelStore::Palette<16>>>;
 		bool m_dirty;
 	};
 
