@@ -3,8 +3,8 @@
 //@	 ,"dependencies_extra":[{"ref":"compositor.o","rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_MODEL_COMPOSITOR_HPP
-#define TEXPAINTER_MODEL_COMPOSITOR_HPP
+#ifndef TEXPAINTER_MODELNEW_COMPOSITOR_HPP
+#define TEXPAINTER_MODELNEW_COMPOSITOR_HPP
 
 #include "filtergraph/graph.hpp"
 #include "filtergraph/layer_input.hpp"

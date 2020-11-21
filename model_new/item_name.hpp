@@ -2,8 +2,8 @@
 //@	"targets":[{"name":"item_name.hpp","type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_MODEL_ITEMNAME_HPP
-#define TEXPAINTER_MODEL_ITEMNAME_HPP
+#ifndef TEXPAINTER_MODELNEW_ITEMNAME_HPP
+#define TEXPAINTER_MODELNEW_ITEMNAME_HPP
 
 #include <string>
 #include <algorithm>

@@ -11,30 +11,26 @@ namespace Texpainter
 	class WithStatus
 	{
 	public:
-		explicit WithStatus(T&& obj): m_content{obj}, m_dirty{false}{}
+		WithStatus(): m_dirty{false} {}
 
-		T const& get() const
-		{ return m_content; }
+		explicit WithStatus(T&& obj): m_content{obj}, m_dirty{false} {}
+
+		T const& get() const { return m_content; }
 
 		template<InplaceMutator<T> Mutator>
 		auto modify(Mutator&& mut)
 		{
 			auto result = mut(m_content);
-			m_dirty = m_dirty || result;
+			m_dirty     = m_dirty || result;
 			return result;
 		}
 
-		bool dirty() const
-		{
-			return m_dirty;
-		}
+		bool dirty() const { return m_dirty; }
 
-		void clearStatus()
-		{
-			m_dirty = false;
-		}
+		void clearStatus() { m_dirty = false; }
 
 	private:
+		T m_content;
 		bool m_dirty;
 	};
 }
