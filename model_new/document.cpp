@@ -18,12 +18,24 @@ bool Texpainter::Model::Document::dirty() const
 Texpainter::PixelStore::Image Texpainter::Model::render(Document const& document)
 {
 	PixelStore::Image ret{document.canvasSize()};
-	std::ranges::for_each(document.images(), [](auto& item) {
+	std::ranges::for_each(document.images(), [&document](auto& item) {
 		item.second.processor.get().processor().source(item.second.source.get().pixels());
+		if(item.second.source.dirty())
+		{
+			auto node_item = document.inputNodeItem(item.first);
+			assert(node_item != nullptr);
+			node_item->second.get().forceUpdate();
+		}
 	});
 
-	std::ranges::for_each(document.palettes(), [](auto& item) {
+	std::ranges::for_each(document.palettes(), [&document](auto& item) {
 		item.second.processor.get().processor().source(item.second.source.get());
+		if(item.second.source.dirty())
+		{
+			auto node_item = document.inputNodeItem(item.first);
+			assert(node_item != nullptr);
+			node_item->second.get().forceUpdate();
+		}
 	});
 
 	document.compositor().process(ret.pixels());

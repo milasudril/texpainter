@@ -26,6 +26,7 @@ namespace Testcases
 			img(2, 1) = Texpainter::PixelStore::Pixel{1.0f, 0.0f, 1.0f, 1.0f};
 			return true;
 		});
+		src.clearStatus();
 
 		auto node_item = doc.inputNodeItem(src_name);
 		assert(node_item != nullptr);
@@ -34,11 +35,31 @@ namespace Testcases
 		                         node_item->first,
 		                         Texpainter::FilterGraph::OutputPortIndex{0});
 
-		auto result = render(doc);
-		assert(std::ranges::equal(src.get().pixels(), result.pixels(), [](auto a, auto b) {
-			a -= b;
-			return a.red() == 0.0f && a.green() == 0.0f && a.blue() == 0.0f && a.alpha() == 0.0f;
-		}));
+		{
+			auto result = render(doc);
+			assert(std::ranges::equal(src.get().pixels(), result.pixels(), [](auto a, auto b) {
+				a -= b;
+				return a.red() == 0.0f && a.green() == 0.0f && a.blue() == 0.0f
+				       && a.alpha() == 0.0f;
+			}));
+		}
+
+		src.modify([](auto& img) noexcept {
+			assert((img.size() == Texpainter::Size2d{3, 2}));
+			img(0, 0) = Texpainter::PixelStore::Pixel{1.0f, 0.5f, 0.0f, 1.0f};
+			return true;
+		});
+
+		assert(src.dirty());
+
+		{
+			auto result = render(doc);
+			assert(std::ranges::equal(src.get().pixels(), result.pixels(), [](auto a, auto b) {
+				a -= b;
+				return a.red() == 0.0f && a.green() == 0.0f && a.blue() == 0.0f
+				       && a.alpha() == 0.0f;
+			}));
+		}
 	}
 }
 
