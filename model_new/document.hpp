@@ -9,8 +9,8 @@
 #include "./compositor.hpp"
 #include "./compositor_input.hpp"
 #include "./item_name.hpp"
-#include "./palette.hpp"
 #include "./image_source.hpp"
+#include "./palette_source.hpp"
 
 #include "pixel_store/image.hpp"
 #include "utils/with_status.hpp"
@@ -28,7 +28,7 @@ namespace Texpainter::Model
 		template<>
 		struct ImageProcessor<WithStatus<Palette>>
 		{
-			using type = ImageSource;
+			using type = PaletteSource;
 		};
 	}
 
