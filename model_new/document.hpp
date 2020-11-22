@@ -91,17 +91,19 @@ namespace Texpainter::Model
 			return insert(name, std::forward<Palette>(pal), *this, m_input_nodes);
 		}
 
+
+		Compositor::NodeItem const* inputNodeItem(ItemName const& name) const
+		{
+			auto i = m_input_nodes.find(name);
+			return i != std::end(m_input_nodes) ? &i->second : nullptr;
+		}
+
 	private:
 		std::map<ItemName, Compositor::NodeItem> m_input_nodes;
 		bool m_dirty;
 	};
 
-	inline PixelStore::Image render(Document const& document)
-	{
-		PixelStore::Image ret{document.canvasSize()};
-		document.compositor().process(ret.pixels());
-		return ret;
-	}
+	PixelStore::Image render(Document const& document);
 }
 
 #endif

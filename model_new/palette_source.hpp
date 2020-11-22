@@ -52,7 +52,7 @@ namespace Texpainter::Model
 			return FilterGraph::ImageProcessorId{"c03e38d618aeaa8716245ad14c4630b8"};
 		}
 
-		PaletteSource& palette(std::reference_wrapper<Palette const> src)
+		PaletteSource& source(std::reference_wrapper<Palette const> src)
 		{
 			r_pal = &src.get();
 			return *this;

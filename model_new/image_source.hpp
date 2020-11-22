@@ -11,6 +11,7 @@
 
 #include "utils/span_2d.hpp"
 
+#include <cassert>
 #include <string>
 
 namespace Texpainter::Model
@@ -52,7 +53,7 @@ namespace Texpainter::Model
 			return FilterGraph::ImageProcessorId{"66bc12285d8881c91ff74fcde23e992f"};
 		}
 
-		ImageSource& pixels(Span2d<FilterGraph::RgbaValue const> src)
+		ImageSource& source(Span2d<FilterGraph::RgbaValue const> src)
 		{
 			r_pixels = src;
 			return *this;
