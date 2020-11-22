@@ -42,12 +42,19 @@ namespace Testcases
 		auto i = std::ranges::adjacent_find(names);
 		assert(i == std::end(names));
 	}
+
+	void processorIdsValid()
+	{
+		auto ids = Texpainter::ImageProcessorRegistry::processorIds();
+		assert(std::ranges::find(ids, Texpainter::FilterGraph::InvalidImgProcId) == std::end(ids));
+	}
 }
 
 int main()
 {
 	Testcases::processorIdsUnique();
 	Testcases::processorNamesUnique();
+	Testcases::processorIdsValid();
 
 	return 0;
 }

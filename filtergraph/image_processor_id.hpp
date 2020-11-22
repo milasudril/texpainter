@@ -29,6 +29,12 @@ namespace Texpainter::FilterGraph
 	public:
 		ImageProcessorId() = default;
 
+		consteval explicit ImageProcessorId(char const val)
+		{
+			if(val != '0') { throw "Blah"; }
+			std::ranges::fill(m_data, static_cast<std::byte>(0));
+		}
+
 		template<size_t N>
 		consteval explicit ImageProcessorId(char const (&id)[N])
 		{
@@ -52,9 +58,12 @@ namespace Texpainter::FilterGraph
 
 		constexpr auto data() const { return m_data; }
 
+
 	private:
 		std::array<std::byte, 16> m_data;
 	};
+
+	constexpr auto InvalidImgProcId = ImageProcessorId{'0'};
 
 	constexpr bool operator==(ImageProcessorId a, ImageProcessorId b)
 	{

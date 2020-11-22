@@ -47,10 +47,7 @@ namespace Texpainter::Model
 
 		char const* name() const { return m_name.c_str(); }
 
-		static constexpr auto id()
-		{
-			return FilterGraph::ImageProcessorId{"c03e38d618aeaa8716245ad14c4630b8"};
-		}
+		static constexpr auto id() { return FilterGraph::InvalidImgProcId; }
 
 		PaletteSource& source(std::reference_wrapper<Palette const> src)
 		{

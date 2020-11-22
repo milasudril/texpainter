@@ -48,10 +48,7 @@ namespace Texpainter::Model
 
 		char const* name() const { return m_name.c_str(); }
 
-		static constexpr auto id()
-		{
-			return FilterGraph::ImageProcessorId{"66bc12285d8881c91ff74fcde23e992f"};
-		}
+		static constexpr auto id() { return FilterGraph::InvalidImgProcId; }
 
 		ImageSource& source(Span2d<FilterGraph::RgbaValue const> src)
 		{
