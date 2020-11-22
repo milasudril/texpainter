@@ -55,6 +55,8 @@ namespace Texpainter::Model
 
 	inline bool operator<(ItemName const& a, ItemName const& b) { return a.value() < b.value(); }
 
+	inline bool operator==(ItemName const& a, ItemName const& b) { return a.value() == b.value(); }
+
 	inline ItemName createItemNameFromFilename(char const* filename)
 	{
 		auto range = std::span{filename, strlen(filename)};

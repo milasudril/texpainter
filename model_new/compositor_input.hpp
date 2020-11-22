@@ -42,12 +42,12 @@ namespace Texpainter::Model
 		}
 
 		auto insert(ItemName const& name,
-		            T&& img,
+		            T&& source,
 		            Compositor& compositor,
 		            std::map<ItemName, Compositor::NodeItem>& nodes)
 		{
 			auto i = nodes.find(name);
-			if(i == std::end(nodes)) [[unlikely]]
+			if(i != std::end(nodes)) [[unlikely]]
 				{
 					return static_cast<CompositorInput<WithStatus<T>>*>(nullptr);
 				}
@@ -58,7 +58,8 @@ namespace Texpainter::Model
 			auto& node = dynamic_cast<FilterGraph::ImageProcessorWrapper<ImgProc>&>(
 			    item.second.get().processor());
 			return &m_inputs
-			            .insert(std::pair{name, CompositorInput{WithStatus{std::move(img)}, node}})
+			            .insert(
+			                std::pair{name, CompositorInput{WithStatus{std::move(source)}, node}})
 			            .first->second;
 		}
 
@@ -76,6 +77,7 @@ namespace Texpainter::Model
 			compositor.erase(i->second.first);
 			nodes.erase(i);
 			m_inputs.erase(item);
+			return true;
 		}
 
 		template<InplaceMutator<T> Mutator>

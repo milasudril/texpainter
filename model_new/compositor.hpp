@@ -1,5 +1,5 @@
 //@	{
-//@	  "targets":[{"name":"compositor_.hpp", "type":"include"}]
+//@	  "targets":[{"name":"compositor.hpp", "type":"include"}]
 //@	 ,"dependencies_extra":[{"ref":"compositor.o","rel":"implementation"}]
 //@	}
 
@@ -127,6 +127,8 @@ namespace Texpainter::Model
 			m_valid_state = ValidationState::NotValidated;
 			m_node_array.clear();
 		}
+
+		auto nodeCount() const { return m_graph.size(); }
 
 	private:
 		struct NodeState
