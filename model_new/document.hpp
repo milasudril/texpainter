@@ -66,7 +66,8 @@ namespace Texpainter::Model
 				auto name = m_owner.get().inputNodeName(id);
 				if(name == nullptr) [[unlikely]]
 					{
-						return false;
+						m_compositor.get().erase(id);
+						return true;
 					}
 
 				if(!m_owner.get().eraseImage(*name)) [[unlikely]]
