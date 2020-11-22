@@ -39,14 +39,14 @@ namespace Texpainter::Model
 	{
 		using CompositorInputManager<PixelStore::Image>::insert;
 		using CompositorInputManager<Palette>::insert;
+		using CompositorInputManager<PixelStore::Image>::erase;
+		using CompositorInputManager<Palette>::erase;
 
 	public:
 		using CompositorInputManager<PixelStore::Image>::get;
 		using CompositorInputManager<PixelStore::Image>::modify;
-		using CompositorInputManager<PixelStore::Image>::erase;
 		using CompositorInputManager<Palette>::get;
 		using CompositorInputManager<Palette>::modify;
-		using CompositorInputManager<Palette>::erase;
 
 		explicit Document(Size2d canvas_size): Size2d{canvas_size}, m_dirty{false} {}
 
@@ -78,6 +78,11 @@ namespace Texpainter::Model
 			return insert(name, std::forward<PixelStore::Image>(img), *this, m_input_nodes);
 		}
 
+		auto eraseImage(ItemName const& name)
+		{
+			return erase(std::type_identity<PixelStore::Image>{}, name, *this, m_input_nodes);
+		}
+
 
 		auto const& palettes() const { return get(std::type_identity<Palette>{}); }
 
@@ -91,12 +96,18 @@ namespace Texpainter::Model
 			return insert(name, std::forward<Palette>(pal), *this, m_input_nodes);
 		}
 
+		auto erasePalette(ItemName const& name)
+		{
+			return erase(std::type_identity<Palette>{}, name, *this, m_input_nodes);
+		}
+
 
 		Compositor::NodeItem const* inputNodeItem(ItemName const& name) const
 		{
 			auto i = m_input_nodes.find(name);
 			return i != std::end(m_input_nodes) ? &i->second : nullptr;
 		}
+
 
 	private:
 		std::map<ItemName, Compositor::NodeItem> m_input_nodes;

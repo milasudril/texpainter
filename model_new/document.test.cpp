@@ -61,10 +61,38 @@ namespace Testcases
 			}));
 		}
 	}
+
+	void texpainterModelDocumentInsertAndEraseImage()
+	{
+		Texpainter::Model::Document doc{Texpainter::Size2d{3, 2}};
+		auto const src_name = Texpainter::Model::ItemName{"Image source"};
+
+		auto input = doc.insert(src_name, Texpainter::PixelStore::Image{3, 2});
+		assert(input != nullptr);
+
+		assert(doc.inputNodeItem(src_name) != nullptr);
+		assert(doc.eraseImage(src_name));
+		assert(doc.inputNodeItem(src_name) == nullptr);
+	}
+
+	void texpainterModelDocumentInsertAndErasePalette()
+	{
+		Texpainter::Model::Document doc{Texpainter::Size2d{3, 2}};
+		auto const src_name = Texpainter::Model::ItemName{"Palette source"};
+
+		auto input = doc.insert(src_name, Texpainter::Model::Palette{});
+		assert(input != nullptr);
+
+		assert(doc.inputNodeItem(src_name) != nullptr);
+		assert(doc.erasePalette(src_name));
+		assert(doc.inputNodeItem(src_name) == nullptr);
+	}
 }
 
 int main()
 {
 	Testcases::texpainterModelDocumentRender();
+	Testcases::texpainterModelDocumentInsertAndEraseImage();
+	Testcases::texpainterModelDocumentInsertAndErasePalette();
 	return 0;
 }
