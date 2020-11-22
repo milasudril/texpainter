@@ -144,10 +144,8 @@ std::map<Texpainter::FilterGraph::NodeId, Texpainter::vec2_t> Texpainter::App::F
 }
 
 Texpainter::App::FilterGraphEditor& Texpainter::App::FilterGraphEditor::insert(
-    std::unique_ptr<FilterGraph::AbstractImageProcessor>, Ui::WidgetCoordinates)
+    std::unique_ptr<FilterGraph::AbstractImageProcessor> node, Ui::WidgetCoordinates insert_loc)
 {
-	//FIXME
-#if 0
 	auto item = m_doc.get().compositor().insert(std::move(node));
 
 	auto ip = m_node_editors.insert(std::pair{
@@ -157,7 +155,7 @@ Texpainter::App::FilterGraphEditor& Texpainter::App::FilterGraphEditor::insert(
 	m_ports.addPorts(item.second.get());
 
 	m_canvas.showWidgets();
-#endif
+
 	return *this;
 }
 

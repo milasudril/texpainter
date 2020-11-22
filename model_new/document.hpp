@@ -78,6 +78,14 @@ namespace Texpainter::Model
 				return true;
 			}
 
+			auto insert(std::unique_ptr<Texpainter::FilterGraph::AbstractImageProcessor> proc)
+			{
+				if(proc->id() == Texpainter::FilterGraph::InvalidImgProcId) [[unlikely]]
+				{throw std::string{"Failed to insert the selected image processor. Invalid id."};}
+
+				return m_compositor.get().insert(std::move(proc));
+			}
+
 		private:
 			std::reference_wrapper<Document> m_owner;
 			std::reference_wrapper<Compositor> m_compositor;
