@@ -41,15 +41,7 @@ namespace Texpainter::Model
 			r_output_node = &m_graph.insert(std::move(output)).second.get();
 		}
 
-		Compositor(Compositor const& other): m_graph{other.m_graph}
-		{
-			using FilterGraph::ImageProcessorWrapper;
-			using FilterGraph::ImageSink;
-
-			r_output_node = m_graph.node(OutputNodeId);
-			r_output = &dynamic_cast<ImageProcessorWrapper<ImageSink>*>(&r_output_node->processor())
-			                ->processor();
-		}
+		Compositor(Compositor const& other) = delete;
 
 		Compositor(Compositor&&) = default;
 		Compositor& operator=(Compositor&&) = default;
