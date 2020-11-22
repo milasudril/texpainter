@@ -7,7 +7,6 @@
 #define TEXPAINTER_MODELNEW_COMPOSITOR_HPP
 
 #include "filtergraph/graph.hpp"
-#include "filtergraph/layer_input.hpp"
 #include "filtergraph/image_sink.hpp"
 #include "pixel_store/image.hpp"
 #include "utils/iter_pair.hpp"
@@ -26,8 +25,7 @@ namespace Texpainter::Model
 	class Compositor
 	{
 	public:
-		static constexpr FilterGraph::NodeId InputNodeId{0};
-		static constexpr FilterGraph::NodeId OutputNodeId{1};
+		static constexpr FilterGraph::NodeId OutputNodeId{0};
 		using NodeItem        = FilterGraph::Graph::NodeItem;
 		using NodeId          = FilterGraph::NodeId;
 		using InputPortIndex  = FilterGraph::InputPortIndex;
@@ -37,31 +35,18 @@ namespace Texpainter::Model
 		{
 			using FilterGraph::ImageProcessorWrapper;
 			using FilterGraph::ImageSink;
-			using FilterGraph::LayerInput;
 
-			auto input    = std::make_unique<ImageProcessorWrapper<LayerInput>>(LayerInput{});
 			auto output   = std::make_unique<ImageProcessorWrapper<ImageSink>>(ImageSink{});
-			r_input       = &input->processor();
 			r_output      = &output->processor();
-			r_input_node  = &m_graph.insert(std::move(input)).second.get();
 			r_output_node = &m_graph.insert(std::move(output)).second.get();
-
-			connect(OutputNodeId,
-			        FilterGraph::InputPortIndex{0},
-			        InputNodeId,
-			        FilterGraph::OutputPortIndex{0});
 		}
 
 		Compositor(Compositor const& other): m_graph{other.m_graph}
 		{
 			using FilterGraph::ImageProcessorWrapper;
 			using FilterGraph::ImageSink;
-			using FilterGraph::LayerInput;
 
-			r_input_node  = m_graph.node(InputNodeId);
 			r_output_node = m_graph.node(OutputNodeId);
-			r_input = &dynamic_cast<ImageProcessorWrapper<LayerInput>*>(&r_input_node->processor())
-			               ->processor();
 			r_output = &dynamic_cast<ImageProcessorWrapper<ImageSink>*>(&r_output_node->processor())
 			                ->processor();
 		}
@@ -150,9 +135,7 @@ namespace Texpainter::Model
 		};
 		mutable ValidationState m_valid_state;
 
-		FilterGraph::LayerInput* r_input;
 		FilterGraph::ImageSink* r_output;
-		FilterGraph::Node* r_input_node;
 		FilterGraph::Node* r_output_node;
 
 		FilterGraph::Graph m_graph;
