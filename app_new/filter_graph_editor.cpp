@@ -121,12 +121,12 @@ Texpainter::App::FilterGraphEditor::FilterGraphEditor(
 	m_node_copy.eventHandler<ControlId::CopyNode>(*this);
 	m_node_delete.eventHandler<ControlId::DeleteNode>(*this);
 
-	std::ranges::for_each(m_doc.get().compositor().nodesWithId(), [&ports = m_ports](auto& node_item) {
-		ports.addPorts(node_item.second);
-	});
-	std::ranges::for_each(m_doc.get().compositor().nodesWithId(), [&ports = m_ports](auto const& node_item) {
-		ports.addConnections(node_item.second);
-	});
+	std::ranges::for_each(
+	    m_doc.get().compositor().nodesWithId(),
+	    [&ports = m_ports](auto& node_item) { ports.addPorts(node_item.second); });
+	std::ranges::for_each(
+	    m_doc.get().compositor().nodesWithId(),
+	    [&ports = m_ports](auto const& node_item) { ports.addConnections(node_item.second); });
 }
 
 std::map<Texpainter::FilterGraph::NodeId, Texpainter::vec2_t> Texpainter::App::FilterGraphEditor::
@@ -169,7 +169,7 @@ void Texpainter::App::FilterGraphEditor::updateLocations()
 }
 
 void Texpainter::App::FilterGraphEditor::onClicked(NodeWidget const& src,
-                                              FilterGraph::InputPortIndex port)
+                                                   FilterGraph::InputPortIndex port)
 {
 	if(m_con_proc == nullptr)
 	{
@@ -190,7 +190,7 @@ void Texpainter::App::FilterGraphEditor::onClicked(NodeWidget const& src,
 }
 
 void Texpainter::App::FilterGraphEditor::onClicked(NodeWidget const& src,
-                                              FilterGraph::OutputPortIndex port)
+                                                   FilterGraph::OutputPortIndex port)
 {
 	if(m_con_proc == nullptr)
 	{
@@ -211,8 +211,10 @@ void Texpainter::App::FilterGraphEditor::onClicked(NodeWidget const& src,
 }
 
 template<>
-void Texpainter::App::FilterGraphEditor::onMove<Texpainter::App::FilterGraphEditor::ControlId::NodeWidgets>(
-    Canvas& src, Ui::WidgetCoordinates, FilterGraph::NodeId id)
+void Texpainter::App::FilterGraphEditor::onMove<
+    Texpainter::App::FilterGraphEditor::ControlId::NodeWidgets>(Canvas& src,
+                                                                Ui::WidgetCoordinates,
+                                                                FilterGraph::NodeId id)
 {
 	auto node_edit_iter = m_node_editors.find(id);
 	if(node_edit_iter == std::end(m_node_editors)) { return; }
