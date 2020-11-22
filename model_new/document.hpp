@@ -66,11 +66,11 @@ namespace Texpainter::Model
 					return static_cast<CompositorInput<WithStatus<T>>*>(nullptr);
 				}
 
-			auto item = compositor.insert(T{std::string{toString(name)}});
+			using ImgProc = typename detail::ImageProcessor<WithStatus<T>>::type;
+			auto item     = compositor.insert(ImgProc{std::string{toString(name)}});
 			nodes.insert(i, std::pair{name, item});
-
-			auto& node =
-			    dynamic_cast<FilterGraph::ImageProcessorWrapper<T>>(item.second.get().processor());
+			auto& node = dynamic_cast<FilterGraph::ImageProcessorWrapper<ImgProc>&>(
+			    item.second.get().processor());
 			return &m_inputs
 			            .insert(std::pair{name, CompositorInput{WithStatus{std::move(img)}, node}})
 			            .first->second;
@@ -113,9 +113,16 @@ namespace Texpainter::Model
 	                private CompositorInputManager<PixelStore::Image>,
 	                private CompositorInputManager<Palette>
 	{
+		using CompositorInputManager<PixelStore::Image>::insert;
+		using CompositorInputManager<Palette>::insert;
+
 	public:
 		using CompositorInputManager<PixelStore::Image>::get;
+		using CompositorInputManager<PixelStore::Image>::modify;
+		using CompositorInputManager<PixelStore::Image>::erase;
 		using CompositorInputManager<Palette>::get;
+		using CompositorInputManager<Palette>::modify;
+		using CompositorInputManager<Palette>::erase;
 
 		explicit Document(Size2d canvas_size): Size2d{canvas_size}, m_dirty{false} {}
 
@@ -134,9 +141,31 @@ namespace Texpainter::Model
 
 		Compositor& compositor() { return static_cast<Compositor&>(*this); }
 
+
 		auto const& images() const { return get(std::type_identity<PixelStore::Image>{}); }
 
+		auto image(ItemName const& name) const
+		{
+			return get(std::type_identity<PixelStore::Image>{}, name);
+		}
+
+		auto insert(ItemName const& name, PixelStore::Image&& img)
+		{
+			return insert(name, std::forward<PixelStore::Image>(img), *this, m_input_nodes);
+		}
+
+
 		auto const& palettes() const { return get(std::type_identity<Palette>{}); }
+
+		auto palette(ItemName const& name) const
+		{
+			return get(std::type_identity<Palette>{}, name);
+		}
+
+		auto insert(ItemName const& name, Palette&& pal)
+		{
+			return insert(name, std::forward<Palette>(pal), *this, m_input_nodes);
+		}
 
 	private:
 		std::map<ItemName, Compositor::NodeItem> m_input_nodes;
