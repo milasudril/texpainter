@@ -394,16 +394,15 @@ namespace Texpainter::App
 	inline void FilterGraphEditor::onActivated<FilterGraphEditor::ControlId::CopyNode>(
 	    Ui::MenuItem&)
 	{
-		// FIXME: Different behavioiur on input nodes
-		insert(m_doc.get().compositor().node(m_sel_node)->clonedProcessor(), m_filtermenuloc);
+		insert(std::as_const(m_doc.get()).compositor().node(m_sel_node)->clonedProcessor(),
+		       m_filtermenuloc);
 	}
 
 	template<>
 	inline void FilterGraphEditor::onActivated<FilterGraphEditor::ControlId::DeleteNode>(
 	    Ui::MenuItem&)
 	{
-		// FIXME: Different behavioiur on input nodes
-		auto node = m_doc.get().compositor().node(m_sel_node);
+		auto node = std::as_const(m_doc.get()).compositor().node(m_sel_node);
 		m_ports.removePorts(*node);
 		m_node_editors.erase(m_sel_node);
 		m_doc.get().compositor().erase(m_sel_node);
