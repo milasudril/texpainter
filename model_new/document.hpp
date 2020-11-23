@@ -32,6 +32,70 @@ namespace Texpainter::Model
 		};
 	}
 
+	template<class Owner>
+	class CompositorProxy
+	{
+	public:
+		explicit CompositorProxy(Owner& owner, Compositor& comp): m_owner{owner}, m_compositor{comp}
+		{
+		}
+
+		CompositorProxy& connect(Compositor::NodeId a,
+		                         Compositor::InputPortIndex sink,
+		                         Compositor::NodeId b,
+		                         Compositor::OutputPortIndex src)
+		{
+			m_compositor.get().connect(a, sink, b, src);
+			return *this;
+		}
+
+		void clearValidationState() { m_compositor.get().clearValidationState(); }
+
+		auto nodesWithId() { return m_compositor.get().nodesWithId(); }
+
+		auto erase(Compositor::NodeId id)
+		{
+			auto name = m_owner.get().inputNodeName(id);
+			if(name == nullptr) [[likely]]
+				{
+					m_compositor.get().erase(id);
+					return true;
+				}
+
+			if(!m_owner.get().eraseImage(*name)) [[unlikely]]
+				{
+					return m_owner.get().erasePalette(*name);
+				}
+
+			return true;
+		}
+
+		auto insert(std::unique_ptr<Texpainter::FilterGraph::AbstractImageProcessor> proc)
+		{
+			if(proc->id() == Texpainter::FilterGraph::InvalidImgProcId) [[unlikely]]
+				{
+					throw std::string{"Failed to insert the selected image processor. Invalid id."};
+				}
+
+			return m_compositor.get().insert(std::move(proc));
+		}
+
+		std::optional<Compositor::NodeItem> copy(Compositor::NodeId id)
+		{
+			auto name = m_owner.get().inputNodeName(id);
+			if(name == nullptr) [[likely]]
+				{
+					return insert(m_compositor.get().node(id)->clonedProcessor());
+				}
+			// FIXME: Return a cookie that can be used to get a new ItemName
+			return std::optional<Compositor::NodeItem>{};
+		}
+
+	private:
+		std::reference_wrapper<Owner> m_owner;
+		std::reference_wrapper<Compositor> m_compositor;
+	};
+
 	class Document: private Size2d,
 	                private Compositor,
 	                private CompositorInputManager<PixelStore::Image>,
@@ -42,68 +106,6 @@ namespace Texpainter::Model
 		using CompositorInputManager<PixelStore::Image>::erase;
 		using CompositorInputManager<Palette>::erase;
 
-		class CompositorProxy
-		{
-		public:
-			explicit CompositorProxy(Document& owner, Compositor& comp)
-			    : m_owner{owner}
-			    , m_compositor{comp}
-			{
-			}
-
-			CompositorProxy& connect(NodeId a, InputPortIndex sink, NodeId b, OutputPortIndex src)
-			{
-				m_compositor.get().connect(a, sink, b, src);
-				return *this;
-			}
-
-			void clearValidationState() { m_compositor.get().clearValidationState(); }
-
-			auto nodesWithId() { return m_compositor.get().nodesWithId(); }
-
-			auto erase(Compositor::NodeId id)
-			{
-				auto name = m_owner.get().inputNodeName(id);
-				if(name == nullptr) [[likely]]
-					{
-						m_compositor.get().erase(id);
-						return true;
-					}
-
-				if(!m_owner.get().eraseImage(*name)) [[unlikely]]
-					{
-						return m_owner.get().erasePalette(*name);
-					}
-
-				return true;
-			}
-
-			auto insert(std::unique_ptr<Texpainter::FilterGraph::AbstractImageProcessor> proc)
-			{
-				if(proc->id() == Texpainter::FilterGraph::InvalidImgProcId) [[unlikely]]
-					{
-						throw std::string{
-						    "Failed to insert the selected image processor. Invalid id."};
-					}
-
-				return m_compositor.get().insert(std::move(proc));
-			}
-
-			std::optional<Compositor::NodeItem> copy(Compositor::NodeId id)
-			{
-				auto name = m_owner.get().inputNodeName(id);
-				if(name == nullptr) [[likely]]
-					{
-						return insert(m_compositor.get().node(id)->clonedProcessor());
-					}
-				// FIXME: Return a cookie that can be used to get a new ItemName
-				return std::optional<Compositor::NodeItem>{};
-			}
-
-		private:
-			std::reference_wrapper<Document> m_owner;
-			std::reference_wrapper<Compositor> m_compositor;
-		};
 
 	public:
 		using CompositorInputManager<PixelStore::Image>::get;
@@ -126,7 +128,7 @@ namespace Texpainter::Model
 
 		Compositor const& compositor() const { return static_cast<Compositor const&>(*this); }
 
-		CompositorProxy compositor()
+		CompositorProxy<Document> compositor()
 		{
 			return CompositorProxy{*this, static_cast<Compositor&>(*this)};
 		}
