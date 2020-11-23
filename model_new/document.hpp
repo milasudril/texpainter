@@ -64,7 +64,7 @@ namespace Texpainter::Model
 			auto erase(Compositor::NodeId id)
 			{
 				auto name = m_owner.get().inputNodeName(id);
-				if(name == nullptr) [[unlikely]]
+				if(name == nullptr) [[likely]]
 					{
 						m_compositor.get().erase(id);
 						return true;
@@ -81,9 +81,23 @@ namespace Texpainter::Model
 			auto insert(std::unique_ptr<Texpainter::FilterGraph::AbstractImageProcessor> proc)
 			{
 				if(proc->id() == Texpainter::FilterGraph::InvalidImgProcId) [[unlikely]]
-				{throw std::string{"Failed to insert the selected image processor. Invalid id."};}
+					{
+						throw std::string{
+						    "Failed to insert the selected image processor. Invalid id."};
+					}
 
 				return m_compositor.get().insert(std::move(proc));
+			}
+
+			std::optional<Compositor::NodeItem> copy(Compositor::NodeId id)
+			{
+				auto name = m_owner.get().inputNodeName(id);
+				if(name == nullptr) [[likely]]
+					{
+						return insert(m_compositor.get().node(id)->clonedProcessor());
+					}
+				// FIXME: Return a cookie that can be used to get a new ItemName
+				return std::optional<Compositor::NodeItem>{};
 			}
 
 		private:

@@ -394,8 +394,13 @@ namespace Texpainter::App
 	inline void FilterGraphEditor::onActivated<FilterGraphEditor::ControlId::CopyNode>(
 	    Ui::MenuItem&)
 	{
-		insert(std::as_const(m_doc.get()).compositor().node(m_sel_node)->clonedProcessor(),
-		       m_filtermenuloc);
+		auto item = m_doc.get().compositor().copy(m_sel_node);
+		auto ip   = m_node_editors.insert(std::pair{
+            item->first,
+            m_canvas.template insert<NodeWidget>(item->first, m_filtermenuloc, item->second)});
+		ip.first->second->eventHandler(*this);
+		m_ports.addPorts(item->second.get());
+		m_canvas.showWidgets();
 	}
 
 	template<>
