@@ -269,6 +269,9 @@ namespace Texpainter::App
 		template<ControlId>
 		void onViewportMoved(Canvas& src);
 
+		template<ControlId>
+		void onCopyCompleted(FilterGraph::NodeId, FilterGraph::Graph::NodeItem);
+
 		void onClicked(NodeWidget const& src, FilterGraph::InputPortIndex port);
 
 		void onClicked(NodeWidget const& src, FilterGraph::OutputPortIndex port);
@@ -391,16 +394,22 @@ namespace Texpainter::App
 	}
 
 	template<>
+	inline void FilterGraphEditor::onCopyCompleted<FilterGraphEditor::ControlId::CopyNode>(
+	    FilterGraph::NodeId, FilterGraph::Graph::NodeItem item)
+	{
+		auto ip = m_node_editors.insert(std::pair{
+		    item.first,
+		    m_canvas.template insert<NodeWidget>(item.first, m_filtermenuloc, item.second)});
+		ip.first->second->eventHandler(*this);
+		m_ports.addPorts(item.second.get());
+		m_canvas.showWidgets();
+	}
+
+	template<>
 	inline void FilterGraphEditor::onActivated<FilterGraphEditor::ControlId::CopyNode>(
 	    Ui::MenuItem&)
 	{
-		auto item = m_doc.get().compositor().copy(m_sel_node);
-		auto ip   = m_node_editors.insert(std::pair{
-            item->first,
-            m_canvas.template insert<NodeWidget>(item->first, m_filtermenuloc, item->second)});
-		ip.first->second->eventHandler(*this);
-		m_ports.addPorts(item->second.get());
-		m_canvas.showWidgets();
+		m_doc.get().compositor().copy<FilterGraphEditor::ControlId::CopyNode>(*this, m_sel_node);
 	}
 
 	template<>

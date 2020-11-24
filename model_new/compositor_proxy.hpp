@@ -5,7 +5,7 @@
 #include "./compositor.hpp"
 
 #ifndef TEXPAINTER_MODEL_COMPOSITORPROXY_HPP
-#define TEXPAINTER_MODEL_COMPOSITORPROXY_HPP
+	#define TEXPAINTER_MODEL_COMPOSITORPROXY_HPP
 
 namespace Texpainter::Model
 {
@@ -59,15 +59,16 @@ namespace Texpainter::Model
 			return m_compositor.get().insert(std::move(proc));
 		}
 
-		std::optional<Compositor::NodeItem> copy(Compositor::NodeId id)
+		template<auto CtrlId, class EventHandler>
+		void copy(EventHandler& eh, Compositor::NodeId id)
 		{
 			auto name = m_owner.get().inputNodeName(id);
 			if(name == nullptr) [[likely]]
 				{
-					return insert(m_compositor.get().node(id)->clonedProcessor());
+					eh.template onCopyCompleted<CtrlId>(
+					    id, insert(m_compositor.get().node(id)->clonedProcessor()));
+					return;
 				}
-			// FIXME: Return a cookie that can be used to get a new ItemName
-			return std::optional<Compositor::NodeItem>{};
 		}
 
 	private:
