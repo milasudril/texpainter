@@ -18,7 +18,10 @@
 #include "ui/menu_item.hpp"
 #include "ui/listbox.hpp"
 #include "ui/error_message_dialog.hpp"
+#include "ui/text_entry.hpp"
+#include "ui/labeled_input.hpp"
 #include "utils/edge_list.hpp"
+#include "utils/inherit_from.hpp"
 
 #include <limits>
 #include <cassert>
@@ -207,8 +210,11 @@ namespace Texpainter::App
 
 	class FilterGraphEditor
 	{
-		using Canvas     = Ui::WidgetCanvas<FilterGraph::NodeId>;
-		using NodeWidget = NodeEditor<FilterGraphEditor>;
+		using Canvas       = Ui::WidgetCanvas<FilterGraph::NodeId>;
+		using NodeWidget   = NodeEditor<FilterGraphEditor>;
+		using NameInputDlg = Texpainter::Ui::Dialog<
+		    InheritFrom<std::pair<FilterGraph::NodeId, Model::CompositorProxy<Model::Document>>,
+		                Ui::LabeledInput<Ui::TextEntry>>>;
 
 	public:
 		enum class ControlId : int
@@ -273,7 +279,7 @@ namespace Texpainter::App
 		void onCopyCompleted(FilterGraph::NodeId, FilterGraph::Graph::NodeItem);
 
 		template<ControlId>
-		void requestItemName(FilterGraph::NodeId, Model::CompositorProxy<Model::Document>&);
+		void requestItemName(FilterGraph::NodeId, Model::CompositorProxy<Model::Document>);
 
 		void onClicked(NodeWidget const& src, FilterGraph::InputPortIndex port);
 
@@ -481,7 +487,7 @@ namespace Texpainter::App
 
 	template<>
 	inline void FilterGraphEditor::requestItemName<FilterGraphEditor::ControlId::CopyNode>(
-	    FilterGraph::NodeId, Model::CompositorProxy<Model::Document>&)
+	    FilterGraph::NodeId, Model::CompositorProxy<Model::Document>)
 	{
 	}
 }
