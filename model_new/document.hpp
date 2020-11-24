@@ -129,12 +129,28 @@ namespace Texpainter::Model
 					return true;
 				}
 
-			if(!eraseImage(*name)) [[unlikely]]
-				{
-					return erasePalette(*name);
-				}
+			if(!eraseImage(*name)) { return erasePalette(*name); }
 
 			return true;
+		}
+
+		auto copy(Compositor::NodeId id, ItemName const& name_new)
+		{
+			auto name = inputNodeName(id);
+			assert(name != nullptr);
+
+			if(auto img = image(*name); img != nullptr)
+			{
+				insert(name_new, Texpainter::PixelStore::Image{img->source.get()});
+				return inputNodeItem(name_new);
+			}
+
+			if(auto pal = palette(*name); pal != nullptr)
+			{
+				insert(name_new, Texpainter::PixelStore::Palette{pal->source.get()});
+				return inputNodeItem(name_new);
+			}
+			__builtin_unreachable();
 		}
 
 

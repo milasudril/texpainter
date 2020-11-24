@@ -272,6 +272,9 @@ namespace Texpainter::App
 		template<ControlId>
 		void onCopyCompleted(FilterGraph::NodeId, FilterGraph::Graph::NodeItem);
 
+		template<ControlId>
+		void requestItemName(FilterGraph::NodeId, Model::CompositorProxy<Model::Document>&);
+
 		void onClicked(NodeWidget const& src, FilterGraph::InputPortIndex port);
 
 		void onClicked(NodeWidget const& src, FilterGraph::OutputPortIndex port);
@@ -474,6 +477,12 @@ namespace Texpainter::App
 	{
 		auto offset = src.viewportOffset();
 		m_linesegs->renderOffset(offset);
+	}
+
+	template<>
+	inline void FilterGraphEditor::requestItemName<FilterGraphEditor::ControlId::CopyNode>(
+	    FilterGraph::NodeId, Model::CompositorProxy<Model::Document>&)
+	{
 	}
 }
 

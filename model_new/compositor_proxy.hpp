@@ -55,16 +55,18 @@ namespace Texpainter::Model
 					    id, insert(m_compositor.get().node(id)->clonedProcessor()));
 					return;
 				}
-			//eh.template requestItemName<CtrlId>(id, *this);
+			eh.template requestItemName<CtrlId>(id, *this);
 		}
 
 		template<auto CtrlId, class EventHandler>
-		void insertNodeWithName(EventHandler& eh, Compositor::NodeId id, ItemName&& name_new)
+		void insertNodeWithName(EventHandler& eh, Compositor::NodeId id, ItemName const& name_new)
 		{
-			auto name = m_owner.get().inputNodeName(id);
-			if(name == nullptr) { throw std::string{"Image processor has no name."}; }
+			if(auto node_item = m_owner.copy(id, name_new); node_item != nullptr) [[likely]]
+				{
+					eh.template onCopyCompleted<CtrlId>(id, *node_item);
+				}
 
-			//eh.template onCopyCompleted<CtrlId>(id, copyNamedNode(m_owner.get(), copyNamedNode(*name)));
+			throw std::string{"An item with the given name already exist."};
 		}
 
 	private:
