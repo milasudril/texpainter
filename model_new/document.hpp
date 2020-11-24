@@ -120,6 +120,23 @@ namespace Texpainter::Model
 			return i != std::end(m_input_nodes) ? &i->first : nullptr;
 		}
 
+		auto erase(Compositor::NodeId id)
+		{
+			auto name = inputNodeName(id);
+			if(name == nullptr) [[likely]]
+				{
+					Compositor::erase(id);
+					return true;
+				}
+
+			if(!eraseImage(*name)) [[unlikely]]
+				{
+					return erasePalette(*name);
+				}
+
+			return true;
+		}
+
 
 	private:
 		std::map<ItemName, Compositor::NodeItem> m_input_nodes;

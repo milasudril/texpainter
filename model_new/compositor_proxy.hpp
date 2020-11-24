@@ -33,24 +33,7 @@ namespace Texpainter::Model
 
 		auto nodesWithId() { return m_compositor.get().nodesWithId(); }
 
-		auto erase(Compositor::NodeId id)
-		{
-			//return erase(m_owner.get(), id);
-
-			auto name = m_owner.get().inputNodeName(id);
-			if(name == nullptr) [[likely]]
-				{
-					m_compositor.get().erase(id);
-					return true;
-				}
-
-			if(!m_owner.get().eraseImage(*name)) [[unlikely]]
-				{
-					return m_owner.get().erasePalette(*name);
-				}
-
-			return true;
-		}
+		auto erase(Compositor::NodeId id) { return m_owner.get().erase(id); }
 
 		auto insert(std::unique_ptr<Texpainter::FilterGraph::AbstractImageProcessor> proc)
 		{
