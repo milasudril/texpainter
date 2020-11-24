@@ -3,6 +3,7 @@
 //@	}
 
 #include "./compositor.hpp"
+#include "./item_name.hpp"
 
 #ifndef TEXPAINTER_MODEL_COMPOSITORPROXY_HPP
 	#define TEXPAINTER_MODEL_COMPOSITORPROXY_HPP
@@ -34,6 +35,8 @@ namespace Texpainter::Model
 
 		auto erase(Compositor::NodeId id)
 		{
+			//return erase(m_owner.get(), id);
+
 			auto name = m_owner.get().inputNodeName(id);
 			if(name == nullptr) [[likely]]
 				{
@@ -69,6 +72,16 @@ namespace Texpainter::Model
 					    id, insert(m_compositor.get().node(id)->clonedProcessor()));
 					return;
 				}
+			//eh.template requestItemName<CtrlId>(id, *this);
+		}
+
+		template<auto CtrlId, class EventHandler>
+		void insertNodeWithName(EventHandler& eh, Compositor::NodeId id, ItemName&& name_new)
+		{
+			auto name = m_owner.get().inputNodeName(id);
+			if(name == nullptr) { throw std::string{"Image processor has no name."}; }
+
+			//eh.template onCopyCompleted<CtrlId>(id, copyNamedNode(m_owner.get(), copyNamedNode(*name)));
 		}
 
 	private:
