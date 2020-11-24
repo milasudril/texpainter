@@ -17,26 +17,13 @@
 
 namespace Texpainter::Model
 {
-	namespace detail
-	{
-		template<>
-		struct ImageProcessor<WithStatus<PixelStore::Image>>
-		{
-			using type = ImageSource;
-		};
-
-		template<>
-		struct ImageProcessor<WithStatus<Palette>>
-		{
-			using type = PaletteSource;
-		};
-	}
-
-	template<class Owner>
+	template<class NodeManager>
 	class CompositorProxy
 	{
 	public:
-		explicit CompositorProxy(Owner& owner, Compositor& comp): m_owner{owner}, m_compositor{comp}
+		explicit CompositorProxy(NodeManager& owner, Compositor& comp)
+		    : m_owner{owner}
+		    , m_compositor{comp}
 		{
 		}
 
@@ -92,9 +79,24 @@ namespace Texpainter::Model
 		}
 
 	private:
-		std::reference_wrapper<Owner> m_owner;
+		std::reference_wrapper<NodeManager> m_owner;
 		std::reference_wrapper<Compositor> m_compositor;
 	};
+
+	namespace detail
+	{
+		template<>
+		struct ImageProcessor<WithStatus<PixelStore::Image>>
+		{
+			using type = ImageSource;
+		};
+
+		template<>
+		struct ImageProcessor<WithStatus<Palette>>
+		{
+			using type = PaletteSource;
+		};
+	}
 
 	class Document: private Size2d,
 	                private Compositor,
