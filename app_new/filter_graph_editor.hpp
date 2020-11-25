@@ -210,9 +210,9 @@ namespace Texpainter::App
 
 	class FilterGraphEditor
 	{
-		using Canvas       = Ui::WidgetCanvas<FilterGraph::NodeId>;
-		using NodeWidget   = NodeEditor<FilterGraphEditor>;
-		using NameInputDlg = Texpainter::Ui::Dialog<
+		using Canvas           = Ui::WidgetCanvas<FilterGraph::NodeId>;
+		using NodeWidget       = NodeEditor<FilterGraphEditor>;
+		using NodeNameInputDlg = Texpainter::Ui::Dialog<
 		    InheritFrom<std::pair<FilterGraph::NodeId, Model::CompositorProxy<Model::Document>>,
 		                Ui::LabeledInput<Ui::TextEntry>>>;
 
@@ -367,6 +367,8 @@ namespace Texpainter::App
 		Ui::ErrorMessageDialog m_err_disp;
 		std::reference_wrapper<Ui::Container> r_owner;
 
+		std::unique_ptr<NodeNameInputDlg> m_copy_name;
+
 
 		void completeConnection()
 		{
@@ -487,8 +489,13 @@ namespace Texpainter::App
 
 	template<>
 	inline void FilterGraphEditor::requestItemName<FilterGraphEditor::ControlId::CopyNode>(
-	    FilterGraph::NodeId, Model::CompositorProxy<Model::Document>)
+	    FilterGraph::NodeId node_id, Model::CompositorProxy<Model::Document> compositor)
 	{
+		m_copy_name = std::make_unique<NodeNameInputDlg>(std::make_pair(node_id, compositor),
+		                                                 r_owner,
+		                                                 "Copy node",
+		                                                 Texpainter::Ui::Box::Orientation::Vertical,
+		                                                 "New name");
 	}
 }
 
