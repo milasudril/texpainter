@@ -344,6 +344,15 @@ namespace Texpainter::App
 			m_err_disp.show(r_owner.get(), "Texpainter", msg);
 		}
 
+		template<ControlId>
+		void confirmPositive(NodeNameInputDlg&);
+
+		template<ControlId>
+		void dismiss(NodeNameInputDlg&)
+		{
+			m_copy_name.reset();
+		}
+
 
 	private:
 		std::reference_wrapper<Model::Document> m_doc;
@@ -496,6 +505,17 @@ namespace Texpainter::App
 		                                                 "Copy node",
 		                                                 Texpainter::Ui::Box::Orientation::Vertical,
 		                                                 "New name");
+		m_copy_name->eventHandler<ControlId::CopyNode>(*this);
+	}
+
+	template<>
+	inline void FilterGraphEditor::confirmPositive<FilterGraphEditor::ControlId::CopyNode>(
+	    NodeNameInputDlg& src)
+	{
+		auto& widget = src.widget();
+		widget.second.insertNodeWithName<FilterGraphEditor::ControlId::CopyNode>(
+		    *this, widget.first, Model::ItemName{widget.inputField().content()});
+		m_copy_name.reset();
 	}
 }
 

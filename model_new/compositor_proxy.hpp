@@ -61,7 +61,7 @@ namespace Texpainter::Model
 		template<auto CtrlId, class EventHandler>
 		void insertNodeWithName(EventHandler& eh, Compositor::NodeId id, ItemName const& name_new)
 		{
-			if(auto node_item = m_owner.copy(id, name_new); node_item != nullptr) [[likely]]
+			if(auto node_item = m_owner.get().copy(id, name_new); node_item != nullptr) [[likely]]
 				{
 					eh.template onCopyCompleted<CtrlId>(id, *node_item);
 				}
