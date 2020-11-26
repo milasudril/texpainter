@@ -83,9 +83,9 @@ namespace Texpainter::App
 		DocumentEditor(): m_document{Size2d{512, 512}}, m_window_count{2}
 		{
 			m_windows.get<detail::ControlId::FilterGraphEditor>() =
-			    createWindow<detail::ControlId::FilterGraphEditor>("Texpainter", m_document);
+			    createWindow<detail::ControlId::FilterGraphEditor>("Texpainter: Filter graph", m_document);
 			m_windows.get<detail::ControlId::OutputWindow>() =
-			    createWindow<detail::ControlId::OutputWindow>("Texpainter");
+			    createWindow<detail::ControlId::OutputWindow>("Texpainter: Output");
 		}
 
 		template<detail::ControlId>
