@@ -11,6 +11,8 @@
 #include "ui/window.hpp"
 #include "ui/image_view.hpp"
 
+#include <gtk/gtk.h>
+
 namespace Texpainter::App
 {
 	template<class Widget>
@@ -25,27 +27,95 @@ namespace Texpainter::App
 			m_window.resize(Size2d{800, 500}).show();
 		}
 
+		auto& window() { return m_window; }
+
 	private:
 		Ui::Window m_window;
 		Widget m_widget;
 	};
 
-	class DocumentEditor
+	namespace detail
 	{
 		using FilterGraphEditorWindow = WidgetWithWindow<FilterGraphEditor>;
-		using OutputWindow = WidgetWithWindow<Ui::ImageView>;
+		using OutputWindow            = WidgetWithWindow<Ui::ImageView>;
 
-	public:
-		DocumentEditor(): m_document{Size2d{512, 512}}
+		enum class ControlId : int
 		{
-			m_filter = std::make_unique<FilterGraphEditorWindow>("Texpainter", m_document);
-			m_output_window = std::make_unique<OutputWindow>("Texpainter");
+			FilterGraphEditor,
+			OutputWindow
+		};
+
+		constexpr auto begin(Enum::Empty<ControlId>) { return ControlId::FilterGraphEditor; }
+
+		constexpr auto end(Enum::Empty<ControlId>)
+		{
+			return static_cast<ControlId>(static_cast<int>(ControlId::OutputWindow) + 1);
+		}
+
+		template<ControlId>
+		struct ControlIdToType;
+
+		template<>
+		struct ControlIdToType<ControlId::FilterGraphEditor>
+		{
+			using type = std::unique_ptr<FilterGraphEditorWindow>;
+		};
+
+		template<>
+		struct ControlIdToType<ControlId::OutputWindow>
+		{
+			using type = std::unique_ptr<OutputWindow>;
+		};
+	}
+
+	class DocumentEditor
+	{
+	public:
+		DocumentEditor(): m_document{Size2d{512, 512}}, m_window_count{2}
+		{
+			m_windows.get<detail::ControlId::FilterGraphEditor>() =
+			    createWindow<detail::FilterGraphEditorWindow, detail::ControlId::FilterGraphEditor>(
+			        "Texpainter", m_document);
+			m_windows.get<detail::ControlId::OutputWindow>() =
+			    createWindow<detail::OutputWindow, detail::ControlId::OutputWindow>("Texpainter");
+		}
+
+		template<detail::ControlId>
+		void onKeyUp(Ui::Window&, Ui::Scancode)
+		{
+		}
+
+		template<detail::ControlId>
+		void onKeyDown(Ui::Window&, Ui::Scancode)
+		{
+		}
+
+		template<detail::ControlId id>
+		void onClose(Ui::Window&)
+		{
+			--m_window_count;
+			m_windows.get<id>().reset();
+			if(m_window_count == 0) { gtk_main_quit(); }
+		}
+
+		template<detail::ControlId>
+		void handleException(char const*, Ui::Window&)
+		{
 		}
 
 	private:
 		Model::Document m_document;
-		std::unique_ptr<FilterGraphEditorWindow> m_filter;
-		std::unique_ptr<OutputWindow> m_output_window;
+		Enum::Tuple<detail::ControlId, detail::ControlIdToType> m_windows;
+
+		template<class T, detail::ControlId id, class... Args>
+		std::unique_ptr<T> createWindow(Args&&... args)
+		{
+			auto ret = std::make_unique<T>(std::forward<Args>(args)...);
+			ret->window().template eventHandler<id>(*this);
+			return ret;
+		}
+
+		size_t m_window_count;
 	};
 }
 
