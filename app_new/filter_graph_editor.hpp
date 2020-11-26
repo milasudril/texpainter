@@ -7,7 +7,6 @@
 #define TEXPAINTER_APP_FILTERGRAPHEDITOR_HPP
 
 #include "./node_editor.hpp"
-#include "./node_manager.hpp"
 
 #include "model_new/document.hpp"
 #include "filtergraph/connection.hpp"
