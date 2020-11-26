@@ -9,15 +9,16 @@
 #include "model_new/document.hpp"
 
 #include "ui/window.hpp"
+#include "ui/image_view.hpp"
 
 namespace Texpainter::App
 {
 	template<class Widget>
-	class WidgetWithWithWindow
+	class WidgetWithWindow
 	{
 	public:
 		template<class... Args>
-		explicit WidgetWithWithWindow(char const* title, Args&&... args)
+		explicit WidgetWithWindow(char const* title, Args&&... args)
 		    : m_window{title}
 		    , m_widget{m_window, std::forward<Args>(args)...}
 		{
@@ -31,17 +32,20 @@ namespace Texpainter::App
 
 	class DocumentEditor
 	{
-		using FilterGraphEditorWindow = WidgetWithWithWindow<FilterGraphEditor>;
+		using FilterGraphEditorWindow = WidgetWithWindow<FilterGraphEditor>;
+		using OutputWindow = WidgetWithWindow<Ui::ImageView>;
 
 	public:
 		DocumentEditor(): m_document{Size2d{512, 512}}
 		{
 			m_filter = std::make_unique<FilterGraphEditorWindow>("Texpainter", m_document);
+			m_output_window = std::make_unique<OutputWindow>("Texpainter");
 		}
 
 	private:
 		Model::Document m_document;
-		std::unique_ptr<WidgetWithWithWindow<FilterGraphEditor>> m_filter;
+		std::unique_ptr<FilterGraphEditorWindow> m_filter;
+		std::unique_ptr<OutputWindow> m_output_window;
 	};
 }
 
