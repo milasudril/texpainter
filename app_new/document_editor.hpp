@@ -70,14 +70,22 @@ namespace Texpainter::App
 
 	class DocumentEditor
 	{
+		template<detail::ControlId id, class... Args>
+		auto createWindow(Args&&... args)
+		{
+			using T  = typename detail::ControlIdToType<id>::type::element_type;
+			auto ret = std::make_unique<T>(std::forward<Args>(args)...);
+			ret->window().template eventHandler<id>(*this);
+			return ret;
+		}
+
 	public:
 		DocumentEditor(): m_document{Size2d{512, 512}}, m_window_count{2}
 		{
 			m_windows.get<detail::ControlId::FilterGraphEditor>() =
-			    createWindow<detail::FilterGraphEditorWindow, detail::ControlId::FilterGraphEditor>(
-			        "Texpainter", m_document);
+			    createWindow<detail::ControlId::FilterGraphEditor>("Texpainter", m_document);
 			m_windows.get<detail::ControlId::OutputWindow>() =
-			    createWindow<detail::OutputWindow, detail::ControlId::OutputWindow>("Texpainter");
+			    createWindow<detail::ControlId::OutputWindow>("Texpainter");
 		}
 
 		template<detail::ControlId>
@@ -106,14 +114,6 @@ namespace Texpainter::App
 	private:
 		Model::Document m_document;
 		Enum::Tuple<detail::ControlId, detail::ControlIdToType> m_windows;
-
-		template<class T, detail::ControlId id, class... Args>
-		std::unique_ptr<T> createWindow(Args&&... args)
-		{
-			auto ret = std::make_unique<T>(std::forward<Args>(args)...);
-			ret->window().template eventHandler<id>(*this);
-			return ret;
-		}
 
 		size_t m_window_count;
 	};
