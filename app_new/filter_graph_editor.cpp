@@ -100,10 +100,7 @@ namespace
 	};
 }
 
-Texpainter::App::FilterGraphEditor::FilterGraphEditor(
-    Ui::Container& owner,
-    Model::Document& doc,
-    std::map<FilterGraph::NodeId, vec2_t> const& node_locations)
+Texpainter::App::FilterGraphEditor::FilterGraphEditor(Ui::Container& owner, Model::Document& doc)
     : m_doc{doc}
     , r_callback{[](void*, FilterGraphEditor&) {}}
     , m_canvas{owner}
@@ -114,7 +111,7 @@ Texpainter::App::FilterGraphEditor::FilterGraphEditor(
 	m_linesegs = m_canvas.insert<Ui::LineSegmentRenderer>();
 	std::ranges::transform(m_doc.get().compositor().nodesWithId(),
 	                       std::inserter(m_node_editors, std::end(m_node_editors)),
-	                       MakeNodeEditor{m_canvas, node_locations});
+	                       MakeNodeEditor{m_canvas, m_doc.get().nodeLocations()});
 
 	m_canvas.eventHandler<ControlId::NodeWidgets>(*this);
 	std::ranges::for_each(m_node_editors, [this](auto& item) { item.second->eventHandler(*this); });

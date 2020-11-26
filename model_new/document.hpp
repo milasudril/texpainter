@@ -153,9 +153,12 @@ namespace Texpainter::Model
 			__builtin_unreachable();
 		}
 
+		auto const& nodeLocations() const { return m_node_locations; }
+
 
 	private:
 		std::map<ItemName, Compositor::NodeItem> m_input_nodes;
+		std::map<FilterGraph::NodeId, vec2_t> m_node_locations;
 		bool m_dirty;
 	};
 
