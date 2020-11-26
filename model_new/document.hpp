@@ -155,6 +155,12 @@ namespace Texpainter::Model
 
 		auto const& nodeLocations() const { return m_node_locations; }
 
+		Document& nodeLocations(std::map<FilterGraph::NodeId, vec2_t>&& locs)
+		{
+			m_node_locations = std::move(locs);
+			return *this;
+		}
+
 
 	private:
 		std::map<ItemName, Compositor::NodeItem> m_input_nodes;
