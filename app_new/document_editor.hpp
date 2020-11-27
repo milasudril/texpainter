@@ -3,7 +3,7 @@
 #ifndef TEXPAINTER_APP_DOCUMENTEDITOR_HPP
 #define TEXPAINTER_APP_DOCUMENTEDITOR_HPP
 
-// #include "./image_editor.hpp"
+#include "./image_editor.hpp"
 #include "./filter_graph_editor.hpp"
 
 #include "model_new/document.hpp"
@@ -37,11 +37,13 @@ namespace Texpainter::App
 	namespace detail
 	{
 		using FilterGraphEditorWindow = WidgetWithWindow<FilterGraphEditor>;
+		using ImageEditorWindow       = WidgetWithWindow<ImageEditor>;
 		using OutputWindow            = WidgetWithWindow<Ui::ImageView>;
 
 		enum class ControlId : int
 		{
 			FilterGraphEditor,
+			ImageEditor,
 			OutputWindow
 		};
 
@@ -59,6 +61,12 @@ namespace Texpainter::App
 		struct ControlIdToType<ControlId::FilterGraphEditor>
 		{
 			using type = std::unique_ptr<FilterGraphEditorWindow>;
+		};
+
+		template<>
+		struct ControlIdToType<ControlId::ImageEditor>
+		{
+			using type = std::unique_ptr<ImageEditorWindow>;
 		};
 
 		template<>
@@ -80,10 +88,13 @@ namespace Texpainter::App
 		}
 
 	public:
-		DocumentEditor(): m_document{Size2d{512, 512}}, m_window_count{2}
+		DocumentEditor(): m_document{Size2d{512, 512}}, m_window_count{3}
 		{
 			m_windows.get<detail::ControlId::FilterGraphEditor>() =
-			    createWindow<detail::ControlId::FilterGraphEditor>("Texpainter: Filter graph", m_document);
+			    createWindow<detail::ControlId::FilterGraphEditor>("Texpainter: Filter graph",
+			                                                       m_document);
+			m_windows.get<detail::ControlId::ImageEditor>() =
+			    createWindow<detail::ControlId::ImageEditor>("Texpainter: ImageEditor", m_document);
 			m_windows.get<detail::ControlId::OutputWindow>() =
 			    createWindow<detail::ControlId::OutputWindow>("Texpainter: Output");
 		}
