@@ -3,6 +3,10 @@
 #ifndef TEXPAINTER_APP_IMAGEEDITOR_HPP
 #define TEXPAINTER_APP_IMAGEEDITOR_HPP
 
+#include "./image_selector.hpp"
+#include "./brush_selector.hpp"
+#include "./palette_selector.hpp"
+
 #include "model_new/document.hpp"
 #include "ui/box.hpp"
 #include "ui/image_view.hpp"
@@ -38,11 +42,11 @@ namespace Texpainter::App
 		std::reference_wrapper<Model::Document> m_doc;
 		Ui::Box m_root;
 		Ui::Box m_selectors;
-		Ui::LabeledInput<Ui::Combobox> m_image_sel;
+		Ui::LabeledInput<ImageSelector> m_image_sel;
 		Ui::Separator m_sep_a;
-		Ui::LabeledInput<Ui::Combobox> m_brush_sel;
+		Ui::LabeledInput<BrushSelector> m_brush_sel;
 		Ui::Separator m_sep_b;
-		Ui::LabeledInput<Ui::Combobox> m_pal_sel;
+		Ui::LabeledInput<PaletteSelector> m_pal_sel;
 		Ui::PaletteView m_palette;
 		Ui::ImageView m_img_view;
 	};
