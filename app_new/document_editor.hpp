@@ -29,6 +29,8 @@ namespace Texpainter::App
 
 		auto& window() { return m_window; }
 
+		auto& widget() { return m_widget; }
+
 	private:
 		Ui::Window m_window;
 		Widget m_widget;
@@ -113,6 +115,12 @@ namespace Texpainter::App
 		void onClose(Ui::Window&)
 		{
 			--m_window_count;
+			if constexpr(id == detail::ControlId::FilterGraphEditor)
+			{
+				m_document.nodeLocations(m_windows.get<detail::ControlId::FilterGraphEditor>()
+				                             ->widget()
+				                             .nodeLocations());
+			}
 			m_windows.get<id>().reset();
 			if(m_window_count == 0) { gtk_main_quit(); }
 		}
