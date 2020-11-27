@@ -4,16 +4,25 @@
 #define TEXPAINTER_APP_PALETTESELECTOR_HPP
 
 #include "ui/combobox.hpp"
+#include "ui/palette_view.hpp"
 
 namespace Texpainter::App
 {
 	class PaletteSelector
 	{
 	public:
-		explicit PaletteSelector(Ui::Container& owner): m_selector{owner} {}
+		explicit PaletteSelector(Ui::Container& owner)
+		    : m_root{owner, Ui::Box::Orientation::Horizontal}
+		    , m_name{m_root}
+		    , m_palette{m_root.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
+		{
+		}
 
 	private:
-		Ui::Combobox m_selector;
+		Ui::Box m_root;
+		;
+		Ui::Combobox m_name;
+		Ui::PaletteView m_palette;
 	};
 }
 

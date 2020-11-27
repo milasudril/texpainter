@@ -8,11 +8,8 @@
 #include "./palette_selector.hpp"
 
 #include "model_new/document.hpp"
-#include "ui/box.hpp"
+
 #include "ui/image_view.hpp"
-#include "ui/palette_view.hpp"
-#include "ui/combobox.hpp"
-#include "ui/palette_view.hpp"
 #include "ui/labeled_input.hpp"
 #include "ui/separator.hpp"
 
@@ -31,9 +28,10 @@ namespace Texpainter::App
 		    , m_sep_a{m_selectors}
 		    , m_brush_sel{m_selectors, Ui::Box::Orientation::Horizontal, "Brush: "}
 		    , m_sep_b{m_selectors}
-		    , m_pal_sel{m_selectors, Ui::Box::Orientation::Horizontal, "Palette: "}
-		    , m_palette{m_selectors.insertMode(
-		          Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
+		    , m_pal_sel{m_selectors.insertMode(
+		                    Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand}),
+		                Ui::Box::Orientation::Horizontal,
+		                "Palette: "}
 		    , m_img_view{m_root.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
 		{
 		}
@@ -47,7 +45,6 @@ namespace Texpainter::App
 		Ui::LabeledInput<BrushSelector> m_brush_sel;
 		Ui::Separator m_sep_b;
 		Ui::LabeledInput<PaletteSelector> m_pal_sel;
-		Ui::PaletteView m_palette;
 		Ui::ImageView m_img_view;
 	};
 }
