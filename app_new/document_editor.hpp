@@ -126,17 +126,22 @@ namespace Texpainter::App
 		}
 
 		template<AppWindowType, class Source>
-		void handleException(char const*, Source&)
+		void handleException(char const* msg, Source&)
 		{
+			fprintf(stderr, "Error: %s\n", msg);
 		}
 
 		template<auto>
-		void handleException(char const*, Ui::MenuItem&)
-		{}
+		void handleException(char const* msg, Ui::MenuItem&)
+		{
+			fprintf(stderr, "Error: %s\n", msg);
+		}
 
 		template<auto>
 		void onActivated(Ui::MenuItem&)
-		{}
+		{
+			fprintf(stderr, "Unimplemented action\n");
+		}
 
 	private:
 		Model::Document m_document;
