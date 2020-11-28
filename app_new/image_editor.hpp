@@ -34,6 +34,7 @@ namespace Texpainter::App
 		                "Palette: "}
 		    , m_img_view{m_root.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
 		{
+			m_brush_sel.inputField().brush(m_doc.get().currentBrush());
 		}
 
 	private:
