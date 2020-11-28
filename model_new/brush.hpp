@@ -54,7 +54,8 @@ namespace Texpainter::Model
 	class BrushFunction
 	{
 	public:
-		explicit BrushFunction(BrushShape type): r_func{detail::brush_vtable[static_cast<int>(type)]}
+		explicit BrushFunction(BrushShape type)
+		    : r_func{detail::brush_vtable[static_cast<int>(type)]}
 		{
 		}
 
