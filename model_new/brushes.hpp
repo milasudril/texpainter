@@ -6,7 +6,7 @@
 #define TEXPAINTER_MODEL_BRUSHES_HPP
 
 #include "utils/vec_t.hpp"
-#include "utils/empty.hpp"
+#include "libenum/empty.hpp"
 
 #include <cstdint>
 
@@ -19,10 +19,13 @@ namespace Texpainter::Model
 		Square
 	};
 
-	constexpr BrushShape end(Empty<BrushShape>)
+	constexpr BrushShape begin(Enum::Empty<BrushShape>) { return BrushShape::Diamond; }
+
+	constexpr BrushShape end(Enum::Empty<BrushShape>)
 	{
 		return BrushShape{static_cast<uint32_t>(BrushShape::Square) + 1};
 	}
+
 	template<BrushShape>
 	struct BrushTraits;
 

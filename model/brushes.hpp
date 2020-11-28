@@ -8,6 +8,8 @@
 #include "utils/vec_t.hpp"
 #include "utils/empty.hpp"
 
+#include "libenum/enum.hpp"
+
 #include <cstdint>
 
 namespace Texpainter::Model
@@ -19,10 +21,13 @@ namespace Texpainter::Model
 		Square
 	};
 
-	constexpr BrushType end(Empty<BrushType>)
+	constexpr BrushType end(Enum::Empty<BrushType>)
 	{
 		return BrushType{static_cast<uint32_t>(BrushType::Square) + 1};
 	}
+
+	constexpr BrushType begin(Enum::Empty<BrushType>) { return BrushType::Diamond; }
+
 	template<BrushType>
 	struct BrushTraits;
 

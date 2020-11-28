@@ -8,6 +8,7 @@
 #include "./brushes.hpp"
 
 #include "utils/empty.hpp"
+#include "libenum/enum.hpp"
 
 namespace Texpainter::Model
 {
@@ -42,8 +43,8 @@ namespace Texpainter::Model
 		using BrushFunc = bool (*)(float radius, vec2_t location);
 		constexpr auto gen_brush_vtable()
 		{
-			std::array<BrushFunc, static_cast<size_t>(end(Empty<BrushType>{}))> ret{};
-			forEachEnumItem<BrushType>([&ret](auto item) {
+			std::array<BrushFunc, static_cast<size_t>(end(Enum::Empty<BrushType>{}))> ret{};
+			Enum::forEachEnumItem<BrushType>([&ret](auto item) {
 				ret[static_cast<int>(item.value)] = BrushTraits<item.value>::test;
 			});
 			return ret;

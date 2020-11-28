@@ -8,6 +8,8 @@
 #include "utils/empty.hpp"
 #include "pixel_store/pixel.hpp"
 
+#include "libenum/enum.hpp"
+
 #include <cstdint>
 
 namespace Texpainter::Model
@@ -19,7 +21,9 @@ namespace Texpainter::Model
 		AbsDifference
 	};
 
-	constexpr BlendMode end(Empty<BlendMode>)
+	constexpr BlendMode begin(Enum::Empty<BlendMode>) { return BlendMode::SourceOver; }
+
+	constexpr BlendMode end(Enum::Empty<BlendMode>)
 	{
 		return BlendMode{static_cast<uint32_t>(BlendMode::AbsDifference) + 1};
 	}

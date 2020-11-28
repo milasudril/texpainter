@@ -36,7 +36,7 @@ Texpainter::AppWindow::AppWindow(Ui::Container& container)
 
 
 {
-	forEachEnumItem<Model::BrushType>([&brush_sel = m_brush_selector.inputField()](auto tag) {
+	Enum::forEachEnumItem<Model::BrushType>([&brush_sel = m_brush_selector.inputField()](auto tag) {
 		brush_sel.append(Model::BrushTraits<tag.value>::displayName());
 	});
 	m_layer_info.oneline(true)
@@ -66,7 +66,7 @@ void Texpainter::AppWindow::updateBrushSelector()
 	auto const& current_document = *m_documents.currentDocument();
 	auto brush                   = current_document.currentBrush();
 	auto brush_index =
-	    static_cast<int>(end(Empty<Model::BrushType>{})) - 1 - static_cast<int>(brush.type());
+	    static_cast<int>(end(Enum::Empty<Model::BrushType>{})) - 1 - static_cast<int>(brush.type());
 	m_brush_selector.inputField().selected(brush_index);
 	m_brush_size.value(Ui::logValue(brush.radius()));
 }
@@ -93,9 +93,9 @@ void Texpainter::AppWindow::updateLayerInfo()
 			msg += std::to_string(layer.rotation().turns());
 			m_layer_info.content(msg.c_str());
 
-			auto& layer_menu = get<MainMenuItem::Layer>(m_menu.items()).items();
-			get<LayerAction::Isolate>(layer_menu).status(current_layer->isolated());
-			get<LayerAction::Hide>(layer_menu).status(!current_layer->visible());
+			auto& layer_menu = m_menu.items().get<MainMenuItem::Layer>().items();
+			layer_menu.get<LayerAction::Isolate>().status(current_layer->isolated());
+			layer_menu.get<LayerAction::Hide>().status(!current_layer->visible());
 		}
 	else
 	{

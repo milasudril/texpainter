@@ -15,7 +15,9 @@ namespace Texpainter
 		FromFile
 	};
 
-	constexpr auto end(Empty<LayerActionNew>)
+	constexpr auto begin(Enum::Empty<LayerActionNew>) { return LayerActionNew::Empty; }
+
+	constexpr auto end(Enum::Empty<LayerActionNew>)
 	{
 		return static_cast<LayerActionNew>(static_cast<int>(LayerActionNew::FromFile) + 1);
 	}
@@ -55,7 +57,9 @@ namespace Texpainter
 		Hide
 	};
 
-	constexpr auto end(Empty<LayerAction>)
+	constexpr auto begin(Enum::Empty<LayerAction>) { return LayerAction::New; }
+
+	constexpr auto end(Enum::Empty<LayerAction>)
 	{
 		return static_cast<LayerAction>(static_cast<int>(LayerAction::Hide) + 1);
 	}
@@ -114,7 +118,12 @@ namespace Texpainter
 		All
 	};
 
-	constexpr auto end(Empty<LayerActionClearTransformation>)
+	constexpr auto begin(Enum::Empty<LayerActionClearTransformation>)
+	{
+		return LayerActionClearTransformation::Rotation;
+	}
+
+	constexpr auto end(Enum::Empty<LayerActionClearTransformation>)
 	{
 		return static_cast<LayerActionClearTransformation>(
 		    static_cast<int>(LayerActionClearTransformation::All) + 1);

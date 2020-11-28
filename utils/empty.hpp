@@ -94,31 +94,6 @@ namespace Texpainter
 
 	namespace detail
 	{
-		template<auto enum_item>
-		struct VisitEnumItem
-		{
-			using EnumType = decltype(enum_item);
-
-			template<class Function>
-			constexpr static void process(Function&& f)
-			{
-				constexpr auto current_id = previous(enum_item);
-				if constexpr(static_cast<int>(current_id) != 0)
-				{ VisitEnumItem<current_id>::process(f); }
-				f(Tag<current_id>{});
-			}
-		};
-	}
-
-	template<class EnumType, class Function>
-	constexpr void forEachEnumItem(Function&& f)
-	{
-		detail::VisitEnumItem<end(Empty<EnumType>{})>::process(f);
-	}
-
-
-	namespace detail
-	{
 		template<class EnumType, int enum_item, template<auto> class EnumItemTraits>
 		struct MakeTupleFromEnum: public MakeTupleFromEnum<EnumType, enum_item - 1, EnumItemTraits>
 		{

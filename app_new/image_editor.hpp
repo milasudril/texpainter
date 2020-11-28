@@ -37,10 +37,7 @@ namespace Texpainter::App
 			m_brush_sel.inputField().brush(m_doc.get().currentBrush());
 		}
 
-		~ImageEditor()
-		{
-			m_doc.get().currentBrush(m_brush_sel.inputField().brush());
-		}
+		~ImageEditor() { m_doc.get().currentBrush(m_brush_sel.inputField().brush()); }
 
 	private:
 		std::reference_wrapper<Model::Document> m_doc;

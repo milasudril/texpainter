@@ -7,6 +7,8 @@
 
 #include "model/blend_modes.hpp"
 
+#include "libenum/enum.hpp"
+
 namespace Texpainter::Model
 {
 	class BlendFunctionInfo
@@ -47,8 +49,8 @@ namespace Texpainter::Model
 		                                                PixelStore::Pixel source);
 		constexpr auto gen_blendfunc_vtable()
 		{
-			std::array<BlendFunctionFunc, static_cast<size_t>(end(Empty<BlendMode>{}))> ret{};
-			forEachEnumItem<BlendMode>([&ret](auto item) {
+			std::array<BlendFunctionFunc, static_cast<size_t>(end(Enum::Empty<BlendMode>{}))> ret{};
+			Enum::forEachEnumItem<BlendMode>([&ret](auto item) {
 				ret[static_cast<int>(item.value)] = BlendModeTraits<item.value>::blend;
 			});
 			return ret;
