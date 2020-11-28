@@ -50,16 +50,13 @@ namespace Texpainter::Model
 		using CompositorInputManager<Palette>::get;
 		using CompositorInputManager<Palette>::modify;
 
-		explicit Document(Size2d canvas_size): Size2d{canvas_size}, m_dirty{false} {}
-
-		bool dirty() const;
+		explicit Document(Size2d canvas_size): Size2d{canvas_size} {}
 
 		Size2d canvasSize() const { return static_cast<Size2d>(*this); }
 
 		Document& canvasSize(Size2d size)
 		{
 			static_cast<Size2d&>(*this) = size;
-			m_dirty                     = true;
 			return *this;
 		}
 
@@ -165,7 +162,6 @@ namespace Texpainter::Model
 	private:
 		std::map<ItemName, Compositor::NodeItem> m_input_nodes;
 		std::map<FilterGraph::NodeId, vec2_t> m_node_locations;
-		bool m_dirty;
 	};
 
 	PixelStore::Image render(Document const& document);

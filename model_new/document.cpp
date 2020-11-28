@@ -6,15 +6,6 @@
 
 #include <algorithm>
 
-bool Texpainter::Model::Document::dirty() const
-{
-	return m_dirty /* || m_compositor.dirty() */
-	       || std::ranges::any_of(images(),
-	                              [](auto const& item) { return item.second.source.dirty(); })
-	       || std::ranges::any_of(palettes(),
-	                              [](auto const& item) { return item.second.source.dirty(); });
-}
-
 namespace
 {
 	void forceUpdateIfDirty(auto const& item, Texpainter::Model::Document const& doc)
