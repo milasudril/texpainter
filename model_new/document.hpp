@@ -163,19 +163,27 @@ namespace Texpainter::Model
 			return *this;
 		}
 
+		BrushInfo currentBrush() const { return m_current_brush; }
+
 		Document& currentBrush(BrushInfo brush)
 		{
 			m_current_brush = brush;
 			return *this;
 		}
 
-		BrushInfo currentBrush() const { return m_current_brush; }
+		ItemName const& currentImage() const { return m_current_image; }
 
+		Document& currentImage(ItemName&& item)
+		{
+			m_current_image = std::move(item);
+			return *this;
+		}
 
 	private:
 		std::map<ItemName, Compositor::NodeItem> m_input_nodes;
 		std::map<FilterGraph::NodeId, vec2_t> m_node_locations;
 		BrushInfo m_current_brush;
+		ItemName m_current_image;
 	};
 
 	PixelStore::Image render(Document const& document);
