@@ -175,7 +175,8 @@ namespace Texpainter::App
 	inline void DocumentEditor::onActivated<ImageAction::New>(Ui::MenuItem&)
 	{
 		// TODO: Show image creation dialog
-		m_document.insert(Model::ItemName{"test"}, PixelStore::Image{256, 256});
+		if(m_document.insert(Model::ItemName{"test"}, PixelStore::Image{256, 256}) == nullptr)
+		{ throw std::string{"Item already exists"}; }
 		m_document.currentImage(Model::ItemName{"test"});
 		auto node = m_document.inputNodeItem(Model::ItemName{"test"});
 		m_windows.get<AppWindowType::FilterGraphEditor>()->widget().insertNodeEditor(*node);
