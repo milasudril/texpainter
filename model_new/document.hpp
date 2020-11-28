@@ -12,6 +12,7 @@
 #include "./image_source.hpp"
 #include "./palette_source.hpp"
 #include "./compositor_proxy.hpp"
+#include "./brush.hpp"
 
 #include "pixel_store/image.hpp"
 #include "utils/with_status.hpp"
@@ -50,7 +51,11 @@ namespace Texpainter::Model
 		using CompositorInputManager<Palette>::get;
 		using CompositorInputManager<Palette>::modify;
 
-		explicit Document(Size2d canvas_size): Size2d{canvas_size} {}
+		explicit Document(Size2d canvas_size)
+		    : Size2d{canvas_size}
+		    , m_current_brush{BrushInfo{0.5f, BrushType::Circle}}
+		{
+		}
 
 		Size2d canvasSize() const { return static_cast<Size2d>(*this); }
 
@@ -158,10 +163,19 @@ namespace Texpainter::Model
 			return *this;
 		}
 
+		Document& currentBrush(BrushInfo brush)
+		{
+			m_current_brush = brush;
+			return *this;
+		}
+
+		BrushInfo currentBrush() const { return m_current_brush; }
+
 
 	private:
 		std::map<ItemName, Compositor::NodeItem> m_input_nodes;
 		std::map<FilterGraph::NodeId, vec2_t> m_node_locations;
+		BrushInfo m_current_brush;
 	};
 
 	PixelStore::Image render(Document const& document);
