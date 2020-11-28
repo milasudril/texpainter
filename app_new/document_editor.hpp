@@ -178,12 +178,11 @@ namespace Texpainter::App
 		if(m_document.insert(Model::ItemName{"test"}, PixelStore::Image{256, 256}) == nullptr)
 		{ throw std::string{"Item already exists"}; }
 		m_document.currentImage(Model::ItemName{"test"});
+
 		auto node = m_document.inputNodeItem(Model::ItemName{"test"});
 		m_windows.get<AppWindowType::FilterGraphEditor>()->widget().insertNodeEditor(*node);
 
-		// TODO: Set current image to the newly inserted one
 		m_windows.get<AppWindowType::ImageEditor>()->widget().refresh();
-		// TODO: Update other windows
 		m_windows.get<AppWindowType::ImageEditor>()->window().show();
 	}
 }
