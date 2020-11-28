@@ -3,7 +3,7 @@
 #ifndef TEXPAINTER_APP_BRUSHSELECTOR_HPP
 #define TEXPAINTER_APP_BRUSHSELECTOR_HPP
 
-#include "model_new/brushes.hpp"
+#include "model_new/brush.hpp"
 #include "ui/combobox.hpp"
 #include "ui/slider.hpp"
 #include "ui/box.hpp"
@@ -24,23 +24,16 @@ namespace Texpainter::App
 			});
 		}
 
-		template<Model::BrushType type>
-		BrushSelector& shape()
+		Model::BrushInfo brush() const
 		{
-			m_shapes.selected(static_cast<int>(type));
-			return *this;
+			return Model::BrushInfo{static_cast<float>(linValue(m_size.value())),
+			                        static_cast<Model::BrushType>(m_shapes.selected())};
 		}
 
-		Model::BrushType shape() const
+		BrushSelector& brush(Model::BrushInfo brush)
 		{
-			return static_cast<Model::BrushType>(m_shapes.selected());
-		}
-
-		double size() const { return linValue(m_size.value()); }
-
-		BrushSelector& size(double value)
-		{
-			m_size.value(Ui::linValue(value));
+			m_shapes.selected(static_cast<int>(brush.shape()));
+			m_size.value(Ui::linValue(brush.radius()));
 			return *this;
 		}
 

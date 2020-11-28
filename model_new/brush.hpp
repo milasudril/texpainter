@@ -16,13 +16,13 @@ namespace Texpainter::Model
 	public:
 		explicit BrushInfo(float r, BrushType t): m_radius{r}, m_type{t} {}
 
-		BrushInfo& type(BrushType t)
+		BrushInfo& shape(BrushType t)
 		{
 			m_type = t;
 			return *this;
 		}
 
-		BrushType type() const { return m_type; }
+		BrushType shape() const { return m_type; }
 
 		BrushInfo& radius(float r)
 		{
