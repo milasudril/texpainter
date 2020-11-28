@@ -170,6 +170,17 @@ namespace Texpainter::App
 	{
 		gtk_main_quit();
 	}
+
+	template<>
+	inline void DocumentEditor::onActivated<ImageAction::New>(Ui::MenuItem&)
+	{
+		// TODO: Show image creation dialog
+		m_document.insert(Model::ItemName{"test"}, PixelStore::Image{256, 256});
+		// TODO: Set current image to the newly inserted one
+		m_windows.get<AppWindowType::ImageEditor>()->widget().refresh();
+		// TODO: Update other windows
+		m_windows.get<AppWindowType::ImageEditor>()->window().show();
+	}
 }
 
 #endif

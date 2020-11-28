@@ -5,12 +5,34 @@
 
 #include "ui/combobox.hpp"
 
+#include <ranges>
+#include <algorithm>
+
 namespace Texpainter::App
 {
 	class ImageSelector
 	{
 	public:
 		explicit ImageSelector(Ui::Container& owner): m_selector{owner} {}
+
+		ImageSelector& clear()
+		{
+			m_selector.clear();
+			return *this;
+		}
+
+		template<std::ranges::input_range Source>
+		ImageSelector& appendFrom(Source&& src)
+		{
+			std::ranges::for_each(src, [&sel = m_selector](auto item) { sel.append(item); });
+			return *this;
+		}
+
+		ImageSelector& selected(int val)
+		{
+			m_selector.selected(val);
+			return *this;
+		}
 
 	private:
 		Ui::Combobox m_selector;

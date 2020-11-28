@@ -39,6 +39,17 @@ namespace Texpainter::App
 
 		~ImageEditor() { m_doc.get().currentBrush(m_brush_sel.inputField().brush()); }
 
+		ImageEditor& refresh()
+		{
+			auto& imgs = m_doc.get().images();
+			m_image_sel.inputField()
+			    .clear()
+			    .appendFrom(std::ranges::transform_view(
+			        imgs, [](auto const& item) { return item.first.c_str(); }))
+			    .selected(0);  // TODO: Get selected image from m_doc;
+			return *this;
+		}
+
 	private:
 		std::reference_wrapper<Model::Document> m_doc;
 		Ui::Box m_root;
