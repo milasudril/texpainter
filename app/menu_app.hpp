@@ -4,7 +4,8 @@
 #define TEXPAINTER_APP_MENUAPP_HPP
 
 #include "ui/menu_item.hpp"
-#include "utils/empty.hpp"
+
+#include "libenum/empty.hpp"
 
 namespace Texpainter
 {
@@ -15,7 +16,9 @@ namespace Texpainter
 		Quit
 	};
 
-	constexpr auto end(Empty<AppAction>)
+	constexpr auto begin(Enum::Empty<AppAction>) { return AppAction::Help; }
+
+	constexpr auto end(Enum::Empty<AppAction>)
 	{
 		return static_cast<AppAction>(static_cast<int>(AppAction::Quit) + 1);
 	}

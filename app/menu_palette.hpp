@@ -16,7 +16,9 @@ namespace Texpainter
 		Export
 	};
 
-	constexpr auto end(Empty<PaletteAction>)
+	constexpr auto begin(Enum::Empty<PaletteAction>) { return PaletteAction::Clear; }
+
+	constexpr auto end(Enum::Empty<PaletteAction>)
 	{
 		return static_cast<PaletteAction>(static_cast<int>(PaletteAction::Export) + 1);
 	}

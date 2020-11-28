@@ -5,6 +5,8 @@
 
 #include "ui/menu_item.hpp"
 
+#include "libenum/empty.hpp"
+
 namespace Texpainter
 {
 	enum class FileAction : int
@@ -18,7 +20,9 @@ namespace Texpainter
 		SetCanvasSize
 	};
 
-	constexpr auto end(Empty<FileAction>)
+	constexpr auto begin(Enum::Empty<FileAction>) { return FileAction::New; }
+
+	constexpr auto end(Enum::Empty<FileAction>)
 	{
 		return static_cast<FileAction>(static_cast<int>(FileAction::SetCanvasSize) + 1);
 	}

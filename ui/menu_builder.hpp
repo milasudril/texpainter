@@ -9,7 +9,8 @@
 #include "./menu_item.hpp"
 #include "./submenu.hpp"
 
-#include "utils/empty.hpp"
+#include "libenum/enum.hpp"
+#include "libenum/tuple.hpp"
 
 #include <type_traits>
 #include <memory>
@@ -24,8 +25,8 @@ namespace Texpainter::Ui
 
 		explicit SubmenuBuilder(Container& owner): m_root{owner}, m_items{m_root.menu()}
 		{
-			forEachEnumItem<EnumType>([this](auto tag) {
-				get<tag.value>(m_items).label(EnumTypeTraits<tag.value>::displayName());
+			Enum::forEachEnumItem<EnumType>([this](auto tag) {
+				m_items.template get<tag.value>().label(EnumTypeTraits<tag.value>::displayName());
 			});
 		}
 
@@ -38,16 +39,16 @@ namespace Texpainter::Ui
 		template<class EventHandler>
 		SubmenuBuilder& eventHandler(EventHandler& eh)
 		{
-			forEachEnumItem<EnumType>([this, &eh](auto tag) {
+			Enum::forEachEnumItem<EnumType>([this, &eh](auto tag) {
 				if constexpr(
 				    std::is_same_v<
 				        Ui::MenuItem,
 				        typename EnumTypeTraits<tag.value>::
 				            type> || std::is_same_v<Ui::CheckableMenuItem, typename EnumTypeTraits<tag.value>::type>)
-				{ get<tag.value>(m_items).template eventHandler<tag.value>(eh); }
+				{ m_items.template get<tag.value>().template eventHandler<tag.value>(eh); }
 				else
 				{
-					get<tag.value>(m_items).eventHandler(eh);
+					m_items.template get<tag.value>().eventHandler(eh);
 				}
 			});
 			return *this;
@@ -57,7 +58,7 @@ namespace Texpainter::Ui
 
 	private:
 		Submenu m_root;
-		TupleFromEnum<EnumType, EnumTypeTraits> m_items;
+		Enum::Tuple<EnumType, EnumTypeTraits> m_items;
 	};
 
 	template<class EnumType, template<EnumType> class EnumTypeTraits>
@@ -68,24 +69,24 @@ namespace Texpainter::Ui
 
 		explicit MenuBuilder(Container& owner): m_root{owner}, m_items{m_root}
 		{
-			forEachEnumItem<EnumType>([this](auto tag) {
-				get<tag.value>(m_items).label(EnumTypeTraits<tag.value>::displayName());
+			Enum::forEachEnumItem<EnumType>([this](auto tag) {
+				m_items.template get<tag.value>().label(EnumTypeTraits<tag.value>::displayName());
 			});
 		}
 
 		template<class EventHandler>
 		MenuBuilder& eventHandler(EventHandler& eh)
 		{
-			forEachEnumItem<EnumType>([this, &eh](auto tag) {
+			Enum::forEachEnumItem<EnumType>([this, &eh](auto tag) {
 				if constexpr(
 				    std::is_same_v<
 				        Ui::MenuItem,
 				        typename EnumTypeTraits<tag.value>::
 				            type> || std::is_same_v<Ui::CheckableMenuItem, typename EnumTypeTraits<tag.value>::type>)
-				{ get<tag.value>(m_items).template eventHandler<tag.value>(eh); }
+				{ m_items.template get<tag.value>().template eventHandler<tag.value>(eh); }
 				else
 				{
-					get<tag.value>(m_items).eventHandler(eh);
+					m_items.template get<tag.value>().eventHandler(eh);
 				}
 			});
 			return *this;
@@ -95,7 +96,7 @@ namespace Texpainter::Ui
 
 	private:
 		MenuBar m_root;
-		TupleFromEnum<EnumType, EnumTypeTraits> m_items;
+		Enum::Tuple<EnumType, EnumTypeTraits> m_items;
 	};
 }
 

@@ -11,6 +11,8 @@
 #include "ui/menu_item.hpp"
 #include "ui/menu_builder.hpp"
 
+#include "libenum/enum.hpp"
+
 namespace Texpainter
 {
 	enum class MainMenuItem : int
@@ -21,7 +23,9 @@ namespace Texpainter
 		Palette
 	};
 
-	constexpr auto end(Empty<MainMenuItem>)
+	constexpr auto begin(Enum::Empty<MainMenuItem>) { return MainMenuItem::Application; }
+
+	constexpr auto end(Enum::Empty<MainMenuItem>)
 	{
 		return static_cast<MainMenuItem>(static_cast<int>(MainMenuItem::Palette) + 1);
 	}

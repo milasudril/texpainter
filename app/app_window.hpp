@@ -367,8 +367,7 @@ namespace Texpainter
 	{
 		auto& current_document = *m_documents.currentDocument();
 		auto brush             = current_document.currentBrush();
-		auto brush_type        = static_cast<Model::BrushType>(
-            static_cast<int>(end(Empty<Model::BrushType>{})) - 1 - src.selected());
+		auto brush_type = Enum::add(end(Enum::Empty<Model::BrushType>{}), -(1 + src.selected()));
 		brush.type(brush_type);
 		current_document.currentBrush(brush);
 		m_rows.killFocus();
