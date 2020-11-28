@@ -115,6 +115,7 @@ namespace Texpainter::App
 		template<AppWindowType id>
 		void onClose(Ui::Window&)
 		{
+			puts("Close");
 			--m_window_count;
 			if constexpr(id == AppWindowType::FilterGraphEditor)
 			{
@@ -149,6 +150,12 @@ namespace Texpainter::App
 
 		size_t m_window_count;
 	};
+
+	template<>
+	inline void DocumentEditor::onActivated<AppAction::Quit>(Ui::MenuItem&)
+	{
+		gtk_main_quit();
+	}
 }
 
 #endif
