@@ -12,22 +12,22 @@
 
 namespace Texpainter::Model
 {
-	enum class BrushType : uint32_t
+	enum class BrushShape : uint32_t
 	{
 		Diamond,
 		Circle,
 		Square
 	};
 
-	constexpr BrushType end(Empty<BrushType>)
+	constexpr BrushShape end(Empty<BrushShape>)
 	{
-		return BrushType{static_cast<uint32_t>(BrushType::Square) + 1};
+		return BrushShape{static_cast<uint32_t>(BrushShape::Square) + 1};
 	}
-	template<BrushType>
+	template<BrushShape>
 	struct BrushTraits;
 
 	template<>
-	struct BrushTraits<BrushType::Diamond>
+	struct BrushTraits<BrushShape::Diamond>
 	{
 		static bool test(float radius, vec2_t loc)
 		{
@@ -41,7 +41,7 @@ namespace Texpainter::Model
 	};
 
 	template<>
-	struct BrushTraits<BrushType::Circle>
+	struct BrushTraits<BrushShape::Circle>
 	{
 		static bool test(float radius, vec2_t loc)
 		{
@@ -55,7 +55,7 @@ namespace Texpainter::Model
 	};
 
 	template<>
-	struct BrushTraits<BrushType::Square>
+	struct BrushTraits<BrushShape::Square>
 	{
 		static bool test(float radius, vec2_t loc)
 		{

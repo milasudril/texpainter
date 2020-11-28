@@ -14,15 +14,15 @@ namespace Texpainter::Model
 	class BrushInfo
 	{
 	public:
-		explicit BrushInfo(float r, BrushType t): m_radius{r}, m_type{t} {}
+		explicit BrushInfo(float r, BrushShape t): m_radius{r}, m_type{t} {}
 
-		BrushInfo& shape(BrushType t)
+		BrushInfo& shape(BrushShape t)
 		{
 			m_type = t;
 			return *this;
 		}
 
-		BrushType shape() const { return m_type; }
+		BrushShape shape() const { return m_type; }
 
 		BrushInfo& radius(float r)
 		{
@@ -34,7 +34,7 @@ namespace Texpainter::Model
 
 	private:
 		float m_radius;
-		BrushType m_type;
+		BrushShape m_type;
 	};
 
 	namespace detail
@@ -42,8 +42,8 @@ namespace Texpainter::Model
 		using BrushFunc = bool (*)(float radius, vec2_t location);
 		constexpr auto gen_brush_vtable()
 		{
-			std::array<BrushFunc, static_cast<size_t>(end(Empty<BrushType>{}))> ret{};
-			forEachEnumItem<BrushType>([&ret](auto item) {
+			std::array<BrushFunc, static_cast<size_t>(end(Empty<BrushShape>{}))> ret{};
+			forEachEnumItem<BrushShape>([&ret](auto item) {
 				ret[static_cast<int>(item.value)] = BrushTraits<item.value>::test;
 			});
 			return ret;
@@ -54,7 +54,7 @@ namespace Texpainter::Model
 	class BrushFunction
 	{
 	public:
-		explicit BrushFunction(BrushType type): r_func{detail::brush_vtable[static_cast<int>(type)]}
+		explicit BrushFunction(BrushShape type): r_func{detail::brush_vtable[static_cast<int>(type)]}
 		{
 		}
 

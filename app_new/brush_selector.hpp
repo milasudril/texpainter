@@ -19,7 +19,7 @@ namespace Texpainter::App
 		    , m_size{m_root.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand}),
 		             false}
 		{
-			forEachEnumItem<Model::BrushType>([&shapes = m_shapes]<class T>(T) {
+			forEachEnumItem<Model::BrushShape>([&shapes = m_shapes]<class T>(T) {
 				shapes.append(Model::BrushTraits<T::value>::displayName());
 			});
 		}
@@ -27,7 +27,7 @@ namespace Texpainter::App
 		Model::BrushInfo brush() const
 		{
 			return Model::BrushInfo{static_cast<float>(linValue(m_size.value())),
-			                        static_cast<Model::BrushType>(m_shapes.selected())};
+			                        static_cast<Model::BrushShape>(m_shapes.selected())};
 		}
 
 		BrushSelector& brush(Model::BrushInfo brush)

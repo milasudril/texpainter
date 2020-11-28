@@ -53,7 +53,7 @@ namespace Texpainter::Model
 
 		explicit Document(Size2d canvas_size)
 		    : Size2d{canvas_size}
-		    , m_current_brush{BrushInfo{0.5f, BrushType::Circle}}
+		    , m_current_brush{BrushInfo{0.5f, BrushShape::Circle}}
 		{
 		}
 
