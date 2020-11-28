@@ -35,6 +35,8 @@ namespace Texpainter::App
 
 		auto& widget() { return m_widget; }
 
+		auto& menu() { return m_menu; }
+
 	private:
 		Ui::Window m_window;
 		Ui::Box m_root;
@@ -94,6 +96,10 @@ namespace Texpainter::App
 			    createWindow<AppWindowType::ImageEditor>(m_document);
 
 			m_windows.get<AppWindowType::Output>() = createWindow<AppWindowType::Output>();
+
+			Enum::forEachEnumItem<AppWindowType>([this](auto item) {
+				m_windows.get<item.value>()->menu().eventHandler(*this);
+			});
 		}
 
 		template<AppWindowType>
@@ -119,10 +125,18 @@ namespace Texpainter::App
 			if(m_window_count == 0) { gtk_main_quit(); }
 		}
 
-		template<AppWindowType>
-		void handleException(char const*, Ui::Window&)
+		template<AppWindowType, class Source>
+		void handleException(char const*, Source&)
 		{
 		}
+
+		template<auto>
+		void handleException(char const*, Ui::MenuItem&)
+		{}
+
+		template<auto>
+		void onActivated(Ui::MenuItem&)
+		{}
 
 	private:
 		Model::Document m_document;
