@@ -23,7 +23,10 @@ namespace Texpainter::App
 		template<class... Args>
 		explicit WidgetWithWindow(char const* title, Args&&... args)
 		    : m_window{title}
-		    , m_widget{m_window, std::forward<Args>(args)...}
+		    , m_root{m_window, Ui::Box::Orientation::Vertical}
+		    , m_menu{m_root}
+		    , m_widget{m_root.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand}),
+		               std::forward<Args>(args)...}
 		{
 			m_window.resize(Size2d{800, 500}).show();
 		}
@@ -34,6 +37,8 @@ namespace Texpainter::App
 
 	private:
 		Ui::Window m_window;
+		Ui::Box m_root;
+		Ui::MenuBuilder<MainMenuItem, MainMenuItemTraits> m_menu;
 		Widget m_widget;
 	};
 
@@ -98,6 +103,7 @@ namespace Texpainter::App
 			                                                       m_document);
 			m_windows.get<detail::ControlId::ImageEditor>() =
 			    createWindow<detail::ControlId::ImageEditor>("Texpainter: ImageEditor", m_document);
+
 			m_windows.get<detail::ControlId::OutputWindow>() =
 			    createWindow<detail::ControlId::OutputWindow>("Texpainter: Output");
 		}
