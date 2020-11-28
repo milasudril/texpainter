@@ -350,6 +350,8 @@ namespace Texpainter::App
 			m_copy_name.reset();
 		}
 
+		void insertNodeEditor(FilterGraph::Graph::NodeItem item);
+
 
 	private:
 		std::reference_wrapper<Model::Document> m_doc;
@@ -414,12 +416,7 @@ namespace Texpainter::App
 	inline void FilterGraphEditor::onCopyCompleted<FilterGraphEditor::ControlId::CopyNode>(
 	    FilterGraph::NodeId, FilterGraph::Graph::NodeItem item)
 	{
-		auto ip = m_node_editors.insert(std::pair{
-		    item.first,
-		    m_canvas.template insert<NodeWidget>(item.first, m_filtermenuloc, item.second)});
-		ip.first->second->eventHandler(*this);
-		m_ports.addPorts(item.second.get());
-		m_canvas.showWidgets();
+		insertNodeEditor(item);
 	}
 
 	template<>
