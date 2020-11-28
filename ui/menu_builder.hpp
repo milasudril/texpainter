@@ -8,6 +8,7 @@
 #include "./menu_bar.hpp"
 #include "./menu_item.hpp"
 #include "./submenu.hpp"
+#include "./checkable_menu_item.hpp"
 
 #include "libenum/enum.hpp"
 #include "libenum/tuple.hpp"

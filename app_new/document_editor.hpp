@@ -5,6 +5,7 @@
 
 #include "./image_editor.hpp"
 #include "./filter_graph_editor.hpp"
+#include "./main_menu.hpp"
 
 #include "model_new/document.hpp"
 
