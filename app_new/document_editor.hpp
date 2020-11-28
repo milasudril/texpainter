@@ -97,9 +97,8 @@ namespace Texpainter::App
 
 			m_windows.get<AppWindowType::Output>() = createWindow<AppWindowType::Output>();
 
-			Enum::forEachEnumItem<AppWindowType>([this](auto item) {
-				m_windows.get<item.value>()->menu().eventHandler(*this);
-			});
+			Enum::forEachEnumItem<AppWindowType>(
+			    [this](auto item) { m_windows.get<item.value>()->menu().eventHandler(*this); });
 		}
 
 		template<AppWindowType>
@@ -115,7 +114,6 @@ namespace Texpainter::App
 		template<AppWindowType id>
 		void onClose(Ui::Window&)
 		{
-			puts("Close");
 			--m_window_count;
 			if constexpr(id == AppWindowType::FilterGraphEditor)
 			{
@@ -138,10 +136,26 @@ namespace Texpainter::App
 			fprintf(stderr, "Error: %s\n", msg);
 		}
 
-		template<auto>
-		void onActivated(Ui::MenuItem&)
+		template<auto id>
+		requires(!std::same_as<decltype(id), AppWindowType>) void onActivated(Ui::MenuItem&)
 		{
 			fprintf(stderr, "Unimplemented action\n");
+		}
+
+		template<AppWindowType item>
+		void onActivated(Ui::MenuItem&)
+		{
+			if(m_windows.get<item>() == nullptr)
+			{
+				if constexpr(item != AppWindowType::Output)
+				{ m_windows.get<item>() = createWindow<item>(m_document); }
+				else
+				{
+					m_windows.get<item>() = createWindow<item>();
+				}
+				++m_window_count;
+			}
+			m_windows.get<item>()->window().show();
 		}
 
 	private:

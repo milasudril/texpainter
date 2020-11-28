@@ -30,7 +30,11 @@ public:
 		gtk_container_add(GTK_CONTAINER(m_handle), handle);
 	}
 
-	void _show() { gtk_widget_show_all(GTK_WIDGET(m_handle)); }
+	void _show()
+	{
+		gtk_widget_show_all(GTK_WIDGET(m_handle));
+		gtk_window_present_with_time(m_handle, 0);
+	}
 
 	void _sensitive(bool val) { gtk_widget_set_sensitive(GTK_WIDGET(m_handle), val); }
 
