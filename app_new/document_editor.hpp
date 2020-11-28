@@ -49,24 +49,27 @@ namespace Texpainter::App
 		using OutputWindow            = WidgetWithWindow<Ui::ImageView>;
 
 		template<AppWindowType>
-		struct AppWindowTypeToType;
+		struct AppWindowTypeTraits;
 
 		template<>
-		struct AppWindowTypeToType<AppWindowType::FilterGraphEditor>
+		struct AppWindowTypeTraits<AppWindowType::FilterGraphEditor>
 		{
 			using type = std::unique_ptr<FilterGraphEditorWindow>;
+			static constexpr char const* name() { return "Texpainter: Filter graph"; }
 		};
 
 		template<>
-		struct AppWindowTypeToType<AppWindowType::ImageEditor>
+		struct AppWindowTypeTraits<AppWindowType::ImageEditor>
 		{
 			using type = std::unique_ptr<ImageEditorWindow>;
+			static constexpr char const* name() { return "Texpainter: Image editor"; }
 		};
 
 		template<>
-		struct AppWindowTypeToType<AppWindowType::Output>
+		struct AppWindowTypeTraits<AppWindowType::Output>
 		{
 			using type = std::unique_ptr<OutputWindow>;
+			static constexpr char const* name() { return "Texpainter: Output"; }
 		};
 	}
 
@@ -75,8 +78,9 @@ namespace Texpainter::App
 		template<AppWindowType id, class... Args>
 		auto createWindow(Args&&... args)
 		{
-			using T  = typename detail::AppWindowTypeToType<id>::type::element_type;
-			auto ret = std::make_unique<T>(std::forward<Args>(args)...);
+			using T  = typename detail::AppWindowTypeTraits<id>::type::element_type;
+			auto ret = std::make_unique<T>(detail::AppWindowTypeTraits<id>::name(),
+			                               std::forward<Args>(args)...);
 			ret->window().template eventHandler<id>(*this);
 			return ret;
 		}
@@ -85,13 +89,11 @@ namespace Texpainter::App
 		DocumentEditor(): m_document{Size2d{512, 512}}, m_window_count{3}
 		{
 			m_windows.get<AppWindowType::FilterGraphEditor>() =
-			    createWindow<AppWindowType::FilterGraphEditor>("Texpainter: Filter graph",
-			                                                       m_document);
+			    createWindow<AppWindowType::FilterGraphEditor>(m_document);
 			m_windows.get<AppWindowType::ImageEditor>() =
-			    createWindow<AppWindowType::ImageEditor>("Texpainter: ImageEditor", m_document);
+			    createWindow<AppWindowType::ImageEditor>(m_document);
 
-			m_windows.get<AppWindowType::Output>() =
-			    createWindow<AppWindowType::Output>("Texpainter: Output");
+			m_windows.get<AppWindowType::Output>() = createWindow<AppWindowType::Output>();
 		}
 
 		template<AppWindowType>
@@ -110,9 +112,8 @@ namespace Texpainter::App
 			--m_window_count;
 			if constexpr(id == AppWindowType::FilterGraphEditor)
 			{
-				m_document.nodeLocations(m_windows.get<AppWindowType::FilterGraphEditor>()
-				                             ->widget()
-				                             .nodeLocations());
+				m_document.nodeLocations(
+				    m_windows.get<AppWindowType::FilterGraphEditor>()->widget().nodeLocations());
 			}
 			m_windows.get<id>().reset();
 			if(m_window_count == 0) { gtk_main_quit(); }
@@ -125,7 +126,7 @@ namespace Texpainter::App
 
 	private:
 		Model::Document m_document;
-		Enum::Tuple<AppWindowType, detail::AppWindowTypeToType> m_windows;
+		Enum::Tuple<AppWindowType, detail::AppWindowTypeTraits> m_windows;
 
 		size_t m_window_count;
 	};
