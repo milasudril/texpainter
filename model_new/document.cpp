@@ -33,6 +33,8 @@ Texpainter::PixelStore::Image Texpainter::Model::render(Document const& document
 
 	PixelStore::Image ret{document.canvasSize()};
 	if(document.compositor().valid()) [[likely]]
-	{ document.compositor().process(ret.pixels()); }
+		{
+			document.compositor().process(ret.pixels());
+		}
 	return ret;
 }
