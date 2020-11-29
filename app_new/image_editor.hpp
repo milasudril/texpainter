@@ -42,17 +42,27 @@ namespace Texpainter::App
 		ImageEditor& refresh()
 		{
 			auto& imgs = m_doc.get().images();
-			auto i     = std::distance(
-                std::begin(imgs),
-                std::ranges::find_if(imgs, [&name = m_doc.get().currentImage()](auto const& item) {
-                    return item.first == name;
-                }));
+			if(std::size(imgs) == 0) [[unlikely]]
+				{
+					return *this;
+				}
+
+			auto i =
+			    std::ranges::find_if(imgs, [&name = m_doc.get().currentImage()](auto const& item) {
+				    return item.first == name;
+			    });
 
 			m_image_sel.inputField()
 			    .clear()
 			    .appendFrom(std::ranges::transform_view(
 			        imgs, [](auto const& item) { return item.first.c_str(); }))
-			    .selected(std::min(i, static_cast<ptrdiff_t>(std::size(imgs))));
+			    .selected(i == std::end(imgs) ? -1 : std::distance(std::begin(imgs), i));
+
+			if(i != std::end(imgs)) [[likely]]
+				{
+					m_img_view.image(i->second.source.get());
+				}
+
 			return *this;
 		}
 
