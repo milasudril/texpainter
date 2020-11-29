@@ -37,6 +37,8 @@ Texpainter::PixelStore::Image Texpainter::Model::render(Document const& document
 			document.compositor().process(ret.pixels());
 		}
 	else
-	{ std::ranges::fill(ret.pixels(), PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f}); }
+	{
+		std::ranges::fill(ret.pixels(), PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
+	}
 	return ret;
 }

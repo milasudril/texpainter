@@ -203,16 +203,15 @@ namespace Texpainter::App
 
 			m_document.currentImage(std::move(name));
 
-			if(auto img_editor=m_windows.get<AppWindowType::ImageEditor>().get(); img_editor != nullptr)
+			if(auto img_editor = m_windows.get<AppWindowType::ImageEditor>().get();
+			   img_editor != nullptr)
 			{
 				img_editor->widget().refresh();
 				img_editor->window().show();
 			}
 
 			if(auto output = m_windows.get<AppWindowType::Output>().get(); output != nullptr)
-			{
-				output->widget().image(render(m_document));
-			}
+			{ output->widget().image(render(m_document)); }
 		}
 	};
 
@@ -239,14 +238,15 @@ namespace Texpainter::App
 	{
 		std::filesystem::path filename;
 		if(Ui::filenameSelect(
-				item,
-				std::filesystem::current_path(),
-				filename,
-				Ui::FilenameSelectMode::Open,
-				[](char const* filename) { return PixelStore::fileValid(filename); },
-				"Supported image files"))
+		       item,
+		       std::filesystem::current_path(),
+		       filename,
+		       Ui::FilenameSelectMode::Open,
+		       [](char const* filename) { return PixelStore::fileValid(filename); },
+		       "Supported image files"))
 		{
-			insertImage(Model::createItemNameFromFilename(filename.c_str()),  PixelStore::load(filename.c_str()));
+			insertImage(Model::createItemNameFromFilename(filename.c_str()),
+			            PixelStore::load(filename.c_str()));
 		}
 	}
 }
