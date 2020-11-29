@@ -1,0 +1,250 @@
+{
+	"image_processors":
+	[
+		{
+			"name":"Add image spectra",
+			"input_types":["Spatial spectrum", "Spatial spectrum"],
+			"output_types":["Spatial spectrum"],
+			"category":"Arithmetic ops"
+		},
+		{
+			"name":"Add grayscale images",
+			"input_types":["Grayscale image", "Grayscale image"],
+			"output_types":["Grayscale image"],
+			"category":"Arithmetic ops"
+		},
+		{
+			"name":"Add RGBA images",
+			"input_types":["RGBA image", "RGBA image"],
+			"output_types":["RGBA image"],
+			"category":"Arithmetic ops"
+		},
+		{
+			"name":"Multiply image spectra",
+			"input_types":["Spatial spectrum", "Spatial spectrum"],
+			"output_types":["Spatial spectrum"],
+			"category":"Arithmetic ops"
+		},
+		{
+			"name":"Multiply image spectra",
+			"input_types":["Spatial spectrum", "Grayscale image"],
+			"output_types":["Spatial spectrum"],
+			"category":"Arithmetic ops"
+		},
+		{
+			"name":"Multiply grayscale images",
+			"input_types":["Grayscale image", "Grayscale image"],
+			"output_types":["Grayscale image"],
+			"category":"Arithmetic ops"
+		},
+		{
+			"name":"Multiply RGBA images",
+			"input_types":["RGBA image", "RGBA image"],
+			"output_types":["RGBA image"],
+			"category":"Arithmetic ops"
+		},
+		{
+			"name":"Mix image spectra",
+			"input_types":["Spatial spectrum", "Spatial spectrum", "Grayscale image"],
+			"output_types":["Spatial spectrum"],
+			"category":"Arithmetic ops"
+		},
+		{
+			"name":"Mix grayscale images",
+			"input_types":["Spatial spectrum", "Spatial spectrum", "Grayscale image"],
+			"output_types":["Grayscale image"],
+			"category":"Arithmetic ops"
+		},
+		{
+			"name":"Mix RGBA images",
+			"input_types":["Spatial spectrum", "Spatial spectrum", "Grayscale image"],
+			"output_types":["RGBA image"],
+			"category":"Arithmetic ops"
+		},
+		{
+			"name":"Checkerboard",
+			"input_types":[],
+			"output_types":["Grayscale image"],
+			"category":"Generators"
+		},
+		{
+			"name":"Butterworth mask",
+			"input_types":[],
+			"output_types":["Grayscale image"],
+			"category":"Generators"
+		},
+		{
+			"name":"Grayscale noise",
+			"input_types":[],
+			"output_types":["Grayscale image"],
+			"category":"Generators"
+		},{
+			"name":"RGBA noise",
+			"input_types":[],
+			"output_types":["RGBA image"],
+			"category":"Generators"
+		},
+		{
+			"name":"Gaussian mask",
+			"input_types":[],
+			"output_types":["Grayscale image"],
+			"category":"Generators"
+		},
+		{
+			"name":"Gingham squares",
+			"input_types":[],
+			"output_types":["Grayscale image"],
+			"category":"Generators"
+		},
+		{
+			"name":"Cracks",
+			"input_types":["Point array"],
+			"output_types":["Grayscale image"],
+			"category":"Generators"
+		},
+		{
+			"name":"Voronoi",
+			"input_types":["Point array"],
+			"output_types":["Grayscale image"],
+			"category":"Generators"
+		},
+		{
+			"name":"Polkadot",
+			"input_types":[""],
+			"output_types":["Grayscale image"],
+			"category":"Generators"
+		},
+		{
+			"name":"Split RGBA",
+			"input_types":["RGBA image"],
+			"output_types":["Grayscale image", "Grayscale image", "Grayscale image", "Grayscale image"],
+			"category":"Converters"
+		},
+		{
+			"name":"Combine RGBA",
+			"input_types":["Grayscale image", "Grayscale image", "Grayscale image", "Grayscale image"],
+			"output_types":["RGBA image"],
+			"category":"Converters"
+		},
+		{
+			"name":"Colormap",
+			"input_types":["Grayscale image", "Palette"],
+			"output_types":["RGBA image"],
+			"category":"Converters"
+		},
+		{
+			"name": "Spot detector",
+			"input_types":["Grayscale image"],
+			"output_types":["Point array"],
+			"category":"Converters"
+		}
+		,{
+			"name": "DFT Forward",
+			"input_types":["Grayscale image"],
+			"output_types":["Image spectrum"],
+			"category":"Converters"
+		}
+		,{
+			"name": "DFT Backward",
+			"input_types":["Image spectrum"],
+			"output_types":["Grayscale image"],
+			"category":"Converters"
+		}
+		,{
+			"name": "Topographic map",
+			"input_types":["Grayscale image"],
+			"output_types":["Topography data"],
+			"category":"Converters"
+		},{
+			"name": "Project normal",
+			"input_types":["Topography data"],
+			"output_types":["Grayscale image"],
+			"category":"Converters"
+		},{
+			"name": "Normal to polar",
+			"input_types":["Topography data"],
+			"output_types":["Grayscale image", "Grayscale image"],
+			"category":"Converters"
+		},{
+			"name": "Split image spectrum (Real Imag)",
+			"input_types": ["Image spectrum"],
+			"output_types": ["Grayscale image", "Grayscale image"],
+			"category":"Converters"
+		},{
+			"name": "Combine image spectrum (Real Imag)",
+			"input_types": ["Grayscale image", "Grayscale image"],
+			"output_types": ["Image spectrum"],
+			"category":"Converters"
+		},{
+			"name": "Split image spectrum (Amplitude Phase)",
+			"input_types": ["Image spectrum"],
+			"output_types": ["Grayscale image", "Grayscale image"],
+			"category":"Converters"
+		},{
+			"name": "Combine image spectrum (Amplitude Phase)",
+			"input_types": ["Grayscale image", "Grayscale image"],
+			"output_types": ["Image spectrum"],
+			"category":"Converters"
+		},{
+			"name": "Normalize grayscale image",
+			"input_types": ["Grayscale image"],
+			"output_types": ["Grayscale image"],
+			"category":"Dynamics"
+		},{
+			"name": "Soft clamp grayscale image",
+			"input_types": ["Grayscale image"],
+			"output_types": ["Grayscale image"],
+			"category":"Dynamics"
+		},{
+			"name": "Reduce contrast grayscale image",
+			"input_types":["Grayscale image"],
+			"output_types":["Grayscale image"],
+			"category":"Dynamics"
+		},{
+			"name": "Normalize RGBA image",
+			"input_types": ["Grayscale image"],
+			"output_types": ["Grayscale image"],
+			"category":"Dynamics"
+		},{
+			"name": "Soft clamp RGBA image",
+			"input_types": ["Grayscale image"],
+			"output_types": ["Grayscale image"],
+			"category":"Dynamics"
+		},{
+			"name": "Reduce contrast RGBA image",
+			"input_types":["Grayscale image"],
+			"output_types":["Grayscale image"],
+			"category":"Dynamics"
+		},{
+			"name": "Rotate grayscale image",
+			"input_types":["Grayscale image"],
+			"output_types":["Grayscale image"],
+			"category":["Spatial transformations"]
+		},{
+			"name": "Scale grayscale image",
+			"input_types":["Grayscale image"],
+			"output_types":["Grayscale image"],
+			"category":["Spatial transformations"]
+		},{
+			"name": "Translate grayscale image",
+			"input_types":["Grayscale image"],
+			"output_types":["Grayscale image"],
+			"category":["Spatial transformations"]
+		},{
+			"name": "Rotate RGBA image",
+			"input_types":["RGBA image"],
+			"output_types":["RGBA image"],
+			"category":["Spatial transformations"]
+		},{
+			"name": "Scale RGBA image",
+			"input_types":["RGBA image"],
+			"output_types":["RGBA image"],
+			"category":["Spatial transformations"]
+		},{
+			"name": "Translate RGBA image",
+			"input_types":["RGBA image"],
+			"output_types":["RGBA image"],
+			"category":["Spatial transformations"]
+		}
+	]
+}
