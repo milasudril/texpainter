@@ -89,7 +89,7 @@ namespace Texpainter::App
 			return ret;
 		}
 
-		using ImageCreateDlg = Ui::Dialog<ImageCreator>;
+		using ImageCreatorDlg = Ui::Dialog<ImageCreator>;
 
 	public:
 		DocumentEditor(): m_document{Size2d{512, 512}}, m_window_count{3}
@@ -162,13 +162,43 @@ namespace Texpainter::App
 			m_windows.get<item>()->window().show();
 		}
 
+		template<auto>
+		void handleException(char const* msg, ImageCreatorDlg&)
+		{
+			fprintf(stderr, "Error: %s\n", msg);
+		}
+
+		template<auto>
+		void dismiss(ImageCreatorDlg&)
+		{
+			m_img_creator.reset();
+		}
+
+		template<auto>
+		void confirmPositive(ImageCreatorDlg& src)
+		{
+			auto result = src.widget().imageInfo();
+			if(m_document.insert(result.name, PixelStore::Image{result.size}) == nullptr)
+			{ throw std::string{"Item already exists"}; }
+
+			auto node = m_document.inputNodeItem(result.name);
+			m_windows.get<AppWindowType::FilterGraphEditor>()->widget().insertNodeEditor(*node);
+
+			m_document.currentImage(std::move(result.name));
+
+			m_windows.get<AppWindowType::ImageEditor>()->widget().refresh();
+			m_windows.get<AppWindowType::ImageEditor>()->window().show();
+			m_img_creator.reset();
+		}
+
+
 	private:
 		Model::Document m_document;
 		Enum::Tuple<AppWindowType, detail::AppWindowTypeTraits> m_windows;
 
 		size_t m_window_count;
 
-		std::unique_ptr<ImageCreateDlg> m_img_creator;
+		std::unique_ptr<ImageCreatorDlg> m_img_creator;
 	};
 
 	template<>
@@ -180,25 +210,15 @@ namespace Texpainter::App
 	template<>
 	inline void DocumentEditor::onActivated<ImageAction::New>(Ui::MenuItem& item)
 	{
-		if(m_img_creator == nullptr)
-		{
-			m_img_creator = std::make_unique<ImageCreateDlg>(
-			    item, "Create new image", Size2d{512, 512}, Size2d{65535, 65535});
+		if(m_img_creator == nullptr) [[likely]]
+			{
+				m_img_creator = std::make_unique<ImageCreatorDlg>(
+				    item, "Create new image", Size2d{512, 512}, Size2d{65535, 65535});
+				m_img_creator->eventHandler<ImageAction::New>(*this);
 
-			// TODO: Set event handler
-		}
+				// TODO: Set event handler
+			}
 		m_img_creator->show();
-
-		// TODO: Move to on confirm
-		if(m_document.insert(Model::ItemName{"test"}, PixelStore::Image{256, 256}) == nullptr)
-		{ throw std::string{"Item already exists"}; }
-		m_document.currentImage(Model::ItemName{"test"});
-
-		auto node = m_document.inputNodeItem(Model::ItemName{"test"});
-		m_windows.get<AppWindowType::FilterGraphEditor>()->widget().insertNodeEditor(*node);
-
-		m_windows.get<AppWindowType::ImageEditor>()->widget().refresh();
-		m_windows.get<AppWindowType::ImageEditor>()->window().show();
 	}
 }
 

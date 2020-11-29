@@ -35,7 +35,7 @@ namespace Texpainter
 			Size2d size;
 		};
 
-		auto value() const
+		auto imageInfo() const
 		{
 			return ImageInfo{Model::ItemName{m_name.inputField().content()}, m_size.value()};
 		}
