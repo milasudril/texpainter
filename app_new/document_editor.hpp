@@ -12,6 +12,7 @@
 
 #include "ui/window.hpp"
 #include "ui/image_view.hpp"
+#include "ui/dialog.hpp"
 
 #include <gtk/gtk.h>
 
@@ -87,6 +88,8 @@ namespace Texpainter::App
 			ret->window().template eventHandler<id>(*this);
 			return ret;
 		}
+
+		using ImageCreateDlg = Ui::Dialog<ImageCreator>;
 
 	public:
 		DocumentEditor(): m_document{Size2d{512, 512}}, m_window_count{3}
@@ -164,6 +167,8 @@ namespace Texpainter::App
 		Enum::Tuple<AppWindowType, detail::AppWindowTypeTraits> m_windows;
 
 		size_t m_window_count;
+
+		std::unique_ptr<ImageCreateDlg> m_img_creator;
 	};
 
 	template<>
@@ -173,9 +178,18 @@ namespace Texpainter::App
 	}
 
 	template<>
-	inline void DocumentEditor::onActivated<ImageAction::New>(Ui::MenuItem&)
+	inline void DocumentEditor::onActivated<ImageAction::New>(Ui::MenuItem& item)
 	{
-		// TODO: Show image creation dialog
+		if(m_img_creator == nullptr)
+		{
+			m_img_creator = std::make_unique<ImageCreateDlg>(
+			    item, "Create new image", Size2d{512, 512}, Size2d{65535, 65535});
+
+			// TODO: Set event handler
+		}
+		m_img_creator->show();
+
+		// TODO: Move to on confirm
 		if(m_document.insert(Model::ItemName{"test"}, PixelStore::Image{256, 256}) == nullptr)
 		{ throw std::string{"Item already exists"}; }
 		m_document.currentImage(Model::ItemName{"test"});
