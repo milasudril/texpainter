@@ -31,6 +31,7 @@ namespace Texpainter::Model
 
 		void operator()(FilterGraph::ImgProcArg<InterfaceDescriptor> const& args) const
 		{
+			//	FIXME: This only works if source has the same size as canvas
 			std::ranges::copy(r_pixels, args.template output<0>());
 		}
 

@@ -9,12 +9,14 @@
 #include "./image_creator.hpp"
 
 #include "model_new/document.hpp"
-
+#include "pixel_store/image_io.hpp"
 #include "ui/window.hpp"
 #include "ui/image_view.hpp"
 #include "ui/dialog.hpp"
+#include "ui/filename_select.hpp"
 
 #include <gtk/gtk.h>
+#include <filesystem>
 
 namespace Texpainter::App
 {
@@ -178,16 +180,7 @@ namespace Texpainter::App
 		void confirmPositive(ImageCreatorDlg& src)
 		{
 			auto result = src.widget().imageInfo();
-			if(m_document.insert(result.name, PixelStore::Image{result.size}) == nullptr)
-			{ throw std::string{"Item already exists"}; }
-
-			auto node = m_document.inputNodeItem(result.name);
-			m_windows.get<AppWindowType::FilterGraphEditor>()->widget().insertNodeEditor(*node);
-
-			m_document.currentImage(std::move(result.name));
-
-			m_windows.get<AppWindowType::ImageEditor>()->widget().refresh();
-			m_windows.get<AppWindowType::ImageEditor>()->window().show();
+			insertImage(std::move(result.name), PixelStore::Image{result.size});
 			m_img_creator.reset();
 		}
 
@@ -199,6 +192,28 @@ namespace Texpainter::App
 		size_t m_window_count;
 
 		std::unique_ptr<ImageCreatorDlg> m_img_creator;
+
+		void insertImage(Model::ItemName&& name, PixelStore::Image&& img)
+		{
+			if(m_document.insert(name, std::move(img)) == nullptr)
+			{ throw std::string{"Item already exists"}; }
+
+			auto node = m_document.inputNodeItem(name);
+			m_windows.get<AppWindowType::FilterGraphEditor>()->widget().insertNodeEditor(*node);
+
+			m_document.currentImage(std::move(name));
+
+			if(auto img_editor=m_windows.get<AppWindowType::ImageEditor>().get(); img_editor != nullptr)
+			{
+				img_editor->widget().refresh();
+				img_editor->window().show();
+			}
+
+			if(auto output = m_windows.get<AppWindowType::Output>().get(); output != nullptr)
+			{
+				output->widget().image(render(m_document));
+			}
+		}
 	};
 
 	template<>
@@ -215,10 +230,24 @@ namespace Texpainter::App
 				m_img_creator = std::make_unique<ImageCreatorDlg>(
 				    item, "Create new image", Size2d{512, 512}, Size2d{65535, 65535});
 				m_img_creator->eventHandler<ImageAction::New>(*this);
-
-				// TODO: Set event handler
 			}
 		m_img_creator->show();
+	}
+
+	template<>
+	inline void DocumentEditor::onActivated<ImageAction::Import>(Ui::MenuItem& item)
+	{
+		std::filesystem::path filename;
+		if(Ui::filenameSelect(
+				item,
+				std::filesystem::current_path(),
+				filename,
+				Ui::FilenameSelectMode::Open,
+				[](char const* filename) { return PixelStore::fileValid(filename); },
+				"Supported image files"))
+		{
+			insertImage(Model::createItemNameFromFilename(filename.c_str()),  PixelStore::load(filename.c_str()));
+		}
 	}
 }
 
