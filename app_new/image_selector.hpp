@@ -34,6 +34,13 @@ namespace Texpainter::App
 			return *this;
 		}
 
+		template<auto id, class EventHandler>
+		ImageSelector& eventHandler(EventHandler& eh)
+		{
+			m_selector.eventHandler<id>(eh);
+			return *this;
+		}
+
 	private:
 		Ui::Combobox m_selector;
 	};

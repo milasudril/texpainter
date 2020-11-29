@@ -19,6 +19,11 @@ namespace Texpainter::App
 {
 	class ImageEditor
 	{
+		enum class ControlId : int
+		{
+			ImageSelector
+		};
+
 	public:
 		explicit ImageEditor(Ui::Container& owner, Model::Document& doc)
 		    : m_doc{doc}
@@ -34,7 +39,8 @@ namespace Texpainter::App
 		                "Palette: "}
 		    , m_img_view{m_root.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
 		{
-			m_brush_sel.inputField().brush(m_doc.get().currentBrush());
+			refresh();
+			m_image_sel.inputField().eventHandler<ControlId::ImageSelector>(*this);
 		}
 
 		~ImageEditor() { m_doc.get().currentBrush(m_brush_sel.inputField().brush()); }
@@ -63,8 +69,32 @@ namespace Texpainter::App
 					m_img_view.image(i->second.source.get());
 				}
 
+			m_brush_sel.inputField().brush(m_doc.get().currentBrush());
+
 			return *this;
 		}
+
+		template<auto>
+		void onChanged(Ui::Combobox& src)
+		{
+			auto& imgs = m_doc.get().images();
+			auto i = std::ranges::find_if(imgs, [k = 0, K = src.selected()](auto const&) mutable {
+				if(k == K) { return true; }
+				++k;
+				return false;
+			});
+
+			if(i == std::end(imgs)) { return; }
+
+			m_doc.get().currentImage(Model::ItemName{i->first});
+			refresh();
+		}
+
+		template<auto, class T>
+		void handleException(char const*, T&)
+		{
+		}
+
 
 	private:
 		std::reference_wrapper<Model::Document> m_doc;
