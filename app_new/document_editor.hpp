@@ -88,6 +88,7 @@ namespace Texpainter::App
 			auto ret = std::make_unique<T>(detail::AppWindowTypeTraits<id>::name(),
 			                               std::forward<Args>(args)...);
 			ret->window().template eventHandler<id>(*this);
+			ret->menu().eventHandler(*this);
 			return ret;
 		}
 
@@ -102,9 +103,6 @@ namespace Texpainter::App
 			    createWindow<AppWindowType::ImageEditor>(m_document);
 
 			m_windows.get<AppWindowType::Output>() = createWindow<AppWindowType::Output>();
-
-			Enum::forEachEnumItem<AppWindowType>(
-			    [this](auto item) { m_windows.get<item.value>()->menu().eventHandler(*this); });
 		}
 
 		template<AppWindowType>
