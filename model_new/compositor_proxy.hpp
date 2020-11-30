@@ -64,6 +64,7 @@ namespace Texpainter::Model
 			if(auto node_item = m_owner.get().copy(id, name_new); node_item != nullptr) [[likely]]
 				{
 					eh.template onCopyCompleted<CtrlId>(id, *node_item);
+					return;
 				}
 
 			throw std::string{"An item with the given name already exist."};
