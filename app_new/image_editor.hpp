@@ -53,17 +53,13 @@ namespace Texpainter::App
 					return *this;
 				}
 
-			auto i =
-			    std::ranges::find_if(imgs, [&name = m_doc.get().currentImage()](auto const& item) {
-				    return item.first == name;
-			    });
-
 			m_image_sel.inputField()
 			    .clear()
 			    .appendFrom(std::ranges::transform_view(
 			        imgs, [](auto const& item) { return item.first.c_str(); }))
-			    .selected(i == std::end(imgs) ? -1 : std::distance(std::begin(imgs), i));
+			    .selected(m_doc.get().currentImage().c_str());
 
+			auto i = imgs.find(m_doc.get().currentImage());
 			if(i != std::end(imgs)) [[likely]]
 				{
 					m_img_view.image(i->second.source.get());

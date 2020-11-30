@@ -28,7 +28,7 @@ namespace Texpainter::App
 			return *this;
 		}
 
-		ImageSelector& selected(int val)
+		ImageSelector& selected(char const* val)
 		{
 			m_selector.selected(val);
 			return *this;
