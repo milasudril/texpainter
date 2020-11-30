@@ -14,7 +14,7 @@ public:
 
 	void replace(int index, const char* option)
 	{
-		auto i  = selected();
+		auto i  = selectedInt();
 		auto eh = r_eh;
 		r_eh    = nullptr;
 		gtk_combo_box_text_remove(m_handle, index);
@@ -31,7 +31,7 @@ public:
 		r_eh = eh;
 	}
 
-	int selected() const noexcept { return gtk_combo_box_get_active(GTK_COMBO_BOX(m_handle)); }
+	int selectedInt() const noexcept { return gtk_combo_box_get_active(GTK_COMBO_BOX(m_handle)); }
 
 	void clear() noexcept
 	{
@@ -81,8 +81,6 @@ Texpainter::Ui::Combobox& Texpainter::Ui::Combobox::selected(int index) noexcept
 	return *this;
 }
 
-int Texpainter::Ui::Combobox::selected() const noexcept { return m_impl->selected(); }
-
 Texpainter::Ui::Combobox& Texpainter::Ui::Combobox::clear() noexcept
 {
 	m_impl->clear();
@@ -111,3 +109,11 @@ Texpainter::Ui::Combobox::Impl::~Impl()
 	r_eh   = nullptr;
 	gtk_widget_destroy(GTK_WIDGET(m_handle));
 }
+
+template<>
+int Texpainter::Ui::Combobox::selected<int>() const noexcept
+{
+	return m_impl->selectedInt();
+}
+
+int Texpainter::Ui::Combobox::selected() const noexcept { return selected<int>(); }

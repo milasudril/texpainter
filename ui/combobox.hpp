@@ -39,6 +39,11 @@ namespace Texpainter::Ui
 
 		Combobox& selected(int index) noexcept;
 
+		Combobox& selected(char const* item) noexcept;
+
+		template<class T>
+		T selected() const noexcept;
+
 		int selected() const noexcept;
 
 		Combobox& clear() noexcept;
