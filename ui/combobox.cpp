@@ -22,19 +22,22 @@ public:
 
 	void replace(int index, const char* option)
 	{
-		auto i  = selectedInt();
-		auto eh = r_eh;
-		r_eh    = nullptr;
+		{
+			auto i  = selectedInt();
+			auto eh = r_eh;
+			r_eh    = nullptr;
+			gtk_combo_box_text_remove(m_handle, index);
+			gtk_combo_box_text_insert(m_handle, index, NULL, option);
+			gtk_combo_box_set_active(GTK_COMBO_BOX(m_handle), i);
+			r_eh = eh;
+		}
 
-		gtk_combo_box_text_remove(m_handle, index);
-		gtk_combo_box_text_insert(m_handle, index, NULL, option);
-		gtk_combo_box_set_active(GTK_COMBO_BOX(m_handle), i);
-
-		m_index_to_string[index]  = option;
-		m_string_to_index[option] = index;
-		m_string_to_index.erase(option);
-
-		r_eh = eh;
+		{
+			auto i = m_index_to_string.find(index);
+			m_string_to_index.erase(i->second);
+			m_index_to_string[index]  = option;
+			m_string_to_index[option] = index;
+		}
 	}
 
 	void selected(int index) noexcept
