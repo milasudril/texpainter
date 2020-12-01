@@ -179,11 +179,21 @@ namespace Texpainter::Model
 			return *this;
 		}
 
+		PixelStore::ColorIndex currentColor() const { return m_current_color; }
+
+		Document& currentColor(PixelStore::ColorIndex i)
+		{
+			m_current_color = i;
+			return *this;
+		}
+
 	private:
 		std::map<ItemName, Compositor::NodeItem> m_input_nodes;
+
 		std::map<FilterGraph::NodeId, vec2_t> m_node_locations;
 		BrushInfo m_current_brush;
 		ItemName m_current_image;
+		PixelStore::ColorIndex m_current_color;
 	};
 
 	PixelStore::Image render(Document const& document);

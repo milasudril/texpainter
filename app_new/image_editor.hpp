@@ -21,7 +21,8 @@ namespace Texpainter::App
 	{
 		enum class ControlId : int
 		{
-			ImageSelector
+			ImageSelector,
+			PaletteSelector
 		};
 
 	public:
@@ -41,6 +42,7 @@ namespace Texpainter::App
 		{
 			refresh();
 			m_image_sel.inputField().eventHandler<ControlId::ImageSelector>(*this);
+			m_pal_sel.inputField().eventHandler<ControlId::PaletteSelector>(*this);
 		}
 
 		~ImageEditor() { m_doc.get().currentBrush(m_brush_sel.inputField().brush()); }
@@ -71,19 +73,19 @@ namespace Texpainter::App
 		}
 
 		template<auto>
-		void onChanged(Ui::Combobox& src)
+		void onChanged(Ui::Combobox& src);
+
+		template<auto>
+		void onMouseDown(Ui::PaletteView& src, PixelStore::ColorIndex index, int button);
+
+		template<auto, class... T>
+		void onMouseUp(T&&...)
 		{
-			auto& imgs = m_doc.get().images();
-			auto i = std::ranges::find_if(imgs, [k = 0, K = src.selected()](auto const&) mutable {
-				if(k == K) { return true; }
-				++k;
-				return false;
-			});
+		}
 
-			if(i == std::end(imgs)) { return; }
-
-			m_doc.get().currentImage(Model::ItemName{i->first});
-			refresh();
+		template<auto, class... T>
+		void onMouseMove(T&&...)
+		{
 		}
 
 		template<auto, class T>
@@ -103,6 +105,37 @@ namespace Texpainter::App
 		Ui::LabeledInput<PaletteSelector> m_pal_sel;
 		Ui::ImageView m_img_view;
 	};
+
+	template<>
+	inline void ImageEditor::onChanged<ImageEditor::ControlId::ImageSelector>(Ui::Combobox& src)
+	{
+		m_doc.get().currentImage(Model::ItemName{src.selected<char const*>()});
+		refresh();
+	}
+
+	template<>
+	inline void ImageEditor::onChanged<ImageEditor::ControlId::PaletteSelector>(Ui::Combobox&)
+	{
+	}
+
+	template<>
+	inline void ImageEditor::onMouseDown<ImageEditor::ControlId::PaletteSelector>(
+	    Ui::PaletteView& src, PixelStore::ColorIndex index, int button)
+	{
+		switch(button)
+		{
+			case 1:
+			{
+				auto const current_color = m_doc.get().currentColor();
+				m_doc.get().currentColor(index);
+				src.highlightMode(current_color, Ui::PaletteView::HighlightMode::None)
+				    .highlightMode(index, Ui::PaletteView::HighlightMode::Read)
+				    .update();
+				break;
+			}
+			case 3: break;
+		}
+	}
 }
 
 #endif

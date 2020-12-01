@@ -18,9 +18,16 @@ namespace Texpainter::App
 		{
 		}
 
+		template<auto id, class EventHandler>
+		PaletteSelector& eventHandler(EventHandler& eh)
+		{
+			m_name.eventHandler<id>(eh);
+			m_palette.eventHandler<id>(eh);
+			return *this;
+		}
+
 	private:
 		Ui::Box m_root;
-		;
 		Ui::Combobox m_name;
 		Ui::PaletteView m_palette;
 	};
