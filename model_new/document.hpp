@@ -173,9 +173,9 @@ namespace Texpainter::Model
 
 		ItemName const& currentImage() const { return m_current_image; }
 
-		Document& currentImage(ItemName&& item)
+		Document& currentImage(ItemName&& name)
 		{
-			m_current_image = std::move(item);
+			m_current_image = std::move(name);
 			return *this;
 		}
 
@@ -187,6 +187,14 @@ namespace Texpainter::Model
 			return *this;
 		}
 
+		ItemName const& currentPalette() const { return m_current_palette; }
+
+		Document& currentPalette(ItemName&& name)
+		{
+			m_current_palette = std::move(name);
+			return *this;
+		}
+
 	private:
 		std::map<ItemName, Compositor::NodeItem> m_input_nodes;
 
@@ -194,6 +202,7 @@ namespace Texpainter::Model
 		BrushInfo m_current_brush;
 		ItemName m_current_image;
 		PixelStore::ColorIndex m_current_color;
+		ItemName m_current_palette;
 	};
 
 	PixelStore::Image render(Document const& document);

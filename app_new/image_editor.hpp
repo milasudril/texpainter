@@ -114,8 +114,10 @@ namespace Texpainter::App
 	}
 
 	template<>
-	inline void ImageEditor::onChanged<ImageEditor::ControlId::PaletteSelector>(Ui::Combobox&)
+	inline void ImageEditor::onChanged<ImageEditor::ControlId::PaletteSelector>(Ui::Combobox& src)
 	{
+		m_doc.get().currentPalette(Model::ItemName{src.selected<char const*>()});
+		refresh();
 	}
 
 	template<>
