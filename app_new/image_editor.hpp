@@ -49,18 +49,30 @@ namespace Texpainter::App
 
 		ImageEditor& refreshImageSelector()
 		{
-			auto& imgs = m_doc.get().images();
+			auto& imgs        = m_doc.get().images();
+			auto& current_img = m_doc.get().currentImage();
 			m_image_sel.inputField()
 			    .clear()
 			    .appendFrom(std::ranges::transform_view(
 			        imgs, [](auto const& item) { return item.first.c_str(); }))
 			    .selected(m_doc.get().currentImage().c_str());
 
-			auto i = imgs.find(m_doc.get().currentImage());
-			if(i != std::end(imgs)) [[likely]]
+			if(auto i = imgs.find(current_img); i != std::end(imgs)) [[likely]]
 				{
 					m_img_view.image(i->second.source.get());
 				}
+			return *this;
+		}
+
+		ImageEditor& refreshPaletteSelector()
+		{
+			auto& pals        = m_doc.get().palettes();
+			auto& current_pal = m_doc.get().currentPalette();
+			m_pal_sel.inputField()
+			    .clear()
+			    .appendFrom(std::ranges::transform_view(
+			        pals, [](auto const& item) { return item.first.c_str(); }))
+			    .selected(current_pal, pals);
 			return *this;
 		}
 
@@ -72,7 +84,7 @@ namespace Texpainter::App
 
 		ImageEditor& refresh()
 		{
-			return refreshImageSelector().refreshBrushSelector();
+			return refreshImageSelector().refreshBrushSelector().refreshPaletteSelector();
 		}
 
 		template<auto>
