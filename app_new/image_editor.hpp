@@ -47,14 +47,9 @@ namespace Texpainter::App
 
 		~ImageEditor() { m_doc.get().currentBrush(m_brush_sel.inputField().brush()); }
 
-		ImageEditor& refresh()
+		ImageEditor& refreshImageSelector()
 		{
 			auto& imgs = m_doc.get().images();
-			if(std::size(imgs) == 0) [[unlikely]]
-				{
-					return *this;
-				}
-
 			m_image_sel.inputField()
 			    .clear()
 			    .appendFrom(std::ranges::transform_view(
@@ -66,10 +61,18 @@ namespace Texpainter::App
 				{
 					m_img_view.image(i->second.source.get());
 				}
-
-			m_brush_sel.inputField().brush(m_doc.get().currentBrush());
-
 			return *this;
+		}
+
+		ImageEditor& refreshBrushSelector()
+		{
+			m_brush_sel.inputField().brush(m_doc.get().currentBrush());
+			return *this;
+		}
+
+		ImageEditor& refresh()
+		{
+			return refreshImageSelector().refreshBrushSelector();
 		}
 
 		template<auto>
