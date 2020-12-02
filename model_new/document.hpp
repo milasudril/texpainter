@@ -195,6 +195,8 @@ namespace Texpainter::Model
 			return *this;
 		}
 
+		PixelStore::Palette<8> const& colorHistory() const { return m_color_history; }
+
 	private:
 		std::map<ItemName, Compositor::NodeItem> m_input_nodes;
 
@@ -203,6 +205,7 @@ namespace Texpainter::Model
 		ItemName m_current_image;
 		PixelStore::ColorIndex m_current_color;
 		ItemName m_current_palette;
+		PixelStore::Palette<8> m_color_history;
 	};
 
 	PixelStore::Image render(Document const& document);

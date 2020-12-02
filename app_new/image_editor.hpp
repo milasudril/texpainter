@@ -12,6 +12,10 @@
 #include "ui/image_view.hpp"
 #include "ui/labeled_input.hpp"
 #include "ui/separator.hpp"
+#include "ui/color_picker.hpp"
+#include "ui/dialog.hpp"
+
+#include "utils/default_rng.hpp"
 
 #include <utility>
 
@@ -22,8 +26,11 @@ namespace Texpainter::App
 		enum class ControlId : int
 		{
 			ImageSelector,
-			PaletteSelector
+			PaletteSelector,
+			ColorPicker
 		};
+
+		using ColorPickerDlg = Ui::Dialog<Ui::ColorPicker>;
 
 	public:
 		explicit ImageEditor(Ui::Container& owner, Model::Document& doc)
@@ -108,6 +115,25 @@ namespace Texpainter::App
 		{
 		}
 
+		template<auto>
+		void dismiss(ColorPickerDlg&)
+		{
+			m_color_picker.reset();
+		}
+
+		template<auto>
+		void confirmPositive(ColorPickerDlg& src)
+		{
+			auto color_new = src.widget().value();
+			printf("%.7f %.7f %.7f %.7f\n",
+			       color_new.red(),
+			       color_new.green(),
+			       color_new.blue(),
+			       color_new.alpha());
+			refresh();
+			m_color_picker.reset();
+		}
+
 
 	private:
 		std::reference_wrapper<Model::Document> m_doc;
@@ -119,6 +145,8 @@ namespace Texpainter::App
 		Ui::Separator m_sep_b;
 		Ui::LabeledInput<PaletteSelector> m_pal_sel;
 		Ui::ImageView m_img_view;
+
+		std::unique_ptr<ColorPickerDlg> m_color_picker;
 	};
 
 	template<>
@@ -150,7 +178,21 @@ namespace Texpainter::App
 				    .update();
 				break;
 			}
-			case 3: break;
+
+			case 3:
+			{
+				src.highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Write)
+				    .update();
+				m_color_picker = std::make_unique<ColorPickerDlg>(
+				    m_selectors,
+				    (std::string{"Select color number "} + std::to_string(index.value() + 1))
+				        .c_str(),
+				    PolymorphicRng{DefaultRng::engine()},
+				    "Recently used: ",
+				    m_doc.get().colorHistory());
+				m_color_picker->eventHandler<ImageEditor::ControlId::ColorPicker>(*this);
+				break;
+			}
 		}
 	}
 }
