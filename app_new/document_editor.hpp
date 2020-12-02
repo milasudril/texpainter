@@ -92,7 +92,8 @@ namespace Texpainter::App
 			return ret;
 		}
 
-		using ImageCreatorDlg = Ui::Dialog<ImageCreator>;
+		using ImageCreatorDlg        = Ui::Dialog<ImageCreator>;
+		using EmptyPaletteCreatorDlg = Ui::Dialog<Ui::LabeledInput<Ui::TextEntry>>;
 
 	public:
 		DocumentEditor(): m_document{Size2d{512, 512}}, m_window_count{3}
@@ -169,6 +170,12 @@ namespace Texpainter::App
 		}
 
 		template<auto>
+		void handleException(char const* msg, EmptyPaletteCreatorDlg&)
+		{
+			fprintf(stderr, "Error: %s\n", msg);
+		}
+
+		template<auto>
 		void dismiss(ImageCreatorDlg&)
 		{
 			m_img_creator.reset();
@@ -178,8 +185,22 @@ namespace Texpainter::App
 		void confirmPositive(ImageCreatorDlg& src)
 		{
 			auto result = src.widget().imageInfo();
-			insertImage(std::move(result.name), PixelStore::Image{result.size});
+			insert(std::move(result.name), PixelStore::Image{result.size});
 			m_img_creator.reset();
+		}
+
+		template<auto>
+		void dismiss(EmptyPaletteCreatorDlg&)
+		{
+			m_empty_pal_creator.reset();
+		}
+
+		template<auto>
+		void confirmPositive(EmptyPaletteCreatorDlg& src)
+		{
+			auto result = src.widget().inputField().content();
+			insert(Model::ItemName(result), Model::Palette{});
+			m_empty_pal_creator.reset();
 		}
 
 
@@ -190,8 +211,9 @@ namespace Texpainter::App
 		size_t m_window_count;
 
 		std::unique_ptr<ImageCreatorDlg> m_img_creator;
+		std::unique_ptr<EmptyPaletteCreatorDlg> m_empty_pal_creator;
 
-		void insertImage(Model::ItemName&& name, PixelStore::Image&& img)
+		void insert(Model::ItemName&& name, PixelStore::Image&& img)
 		{
 			if(m_document.insert(name, std::move(img)) == nullptr)
 			{ throw std::string{"Item already exists"}; }
@@ -200,6 +222,27 @@ namespace Texpainter::App
 			m_windows.get<AppWindowType::FilterGraphEditor>()->widget().insertNodeEditor(*node);
 
 			m_document.currentImage(std::move(name));
+
+			if(auto img_editor = m_windows.get<AppWindowType::ImageEditor>().get();
+			   img_editor != nullptr)
+			{
+				img_editor->widget().refresh();
+				img_editor->window().show();
+			}
+
+			if(auto output = m_windows.get<AppWindowType::Output>().get(); output != nullptr)
+			{ output->widget().image(render(m_document)); }
+		}
+
+		void insert(Model::ItemName&& name, Model::Palette&& pal)
+		{
+			if(m_document.insert(name, std::move(pal)) == nullptr)
+			{ throw std::string{"Item already exists"}; }
+
+			auto node = m_document.inputNodeItem(name);
+			m_windows.get<AppWindowType::FilterGraphEditor>()->widget().insertNodeEditor(*node);
+
+			m_document.currentPalette(std::move(name));
 
 			if(auto img_editor = m_windows.get<AppWindowType::ImageEditor>().get();
 			   img_editor != nullptr)
@@ -243,9 +286,21 @@ namespace Texpainter::App
 		       [](char const* filename) { return PixelStore::fileValid(filename); },
 		       "Supported image files"))
 		{
-			insertImage(Model::createItemNameFromFilename(filename.c_str()),
-			            PixelStore::load(filename.c_str()));
+			insert(Model::createItemNameFromFilename(filename.c_str()),
+			       PixelStore::load(filename.c_str()));
 		}
+	}
+
+	template<>
+	inline void DocumentEditor::onActivated<PaletteAction::New>(Ui::MenuItem& item)
+	{
+		if(m_empty_pal_creator == nullptr) [[likely]]
+			{
+				m_empty_pal_creator = std::make_unique<EmptyPaletteCreatorDlg>(
+				    item, "Create empty palette", Ui::Box::Orientation::Horizontal, "Name");
+				m_empty_pal_creator->eventHandler<PaletteAction::New>(*this);
+			}
+		m_empty_pal_creator->show();
 	}
 }
 
