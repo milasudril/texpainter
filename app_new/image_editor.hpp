@@ -95,7 +95,8 @@ namespace Texpainter::App
 			    .clear()
 			    .appendFrom(std::ranges::transform_view(
 			        pals, [](auto const& item) { return item.first.c_str(); }))
-			    .selected(current_pal, pals);
+			    .selected(current_pal, pals)
+			    .highlightMode(m_doc.get().currentColor(), Ui::PaletteView::HighlightMode::Read);
 			return *this;
 		}
 
@@ -134,6 +135,7 @@ namespace Texpainter::App
 		template<auto>
 		void dismiss(ColorPickerDlg&)
 		{
+			refreshPaletteSelector();
 			m_color_picker.reset();
 		}
 
@@ -148,9 +150,7 @@ namespace Texpainter::App
 			    },
 			    m_doc.get().currentPalette());
 			m_doc.get().currentColor(src.widget().currentIndex());
-			m_pal_sel.inputField().highlightMode(src.widget().currentIndex(),
-			                                     Ui::PaletteView::HighlightMode::Read);
-			refresh();
+			refreshPaletteSelector();
 			m_color_picker.reset();
 		}
 
