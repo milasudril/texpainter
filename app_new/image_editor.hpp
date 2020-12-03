@@ -16,6 +16,7 @@
 #include "ui/dialog.hpp"
 
 #include "utils/default_rng.hpp"
+#include "utils/inherit_from.hpp"
 
 #include <utility>
 
@@ -30,7 +31,22 @@ namespace Texpainter::App
 			ColorPicker
 		};
 
-		using ColorPickerDlg = Ui::Dialog<Ui::ColorPicker>;
+		class ColorPickerData
+		{
+		public:
+			explicit ColorPickerData(PixelStore::ColorIndex current_index)
+			    : m_current_index{current_index}
+			{
+			}
+
+			PixelStore::ColorIndex currentIndex() const { return m_current_index; }
+
+		private:
+			PixelStore::ColorIndex m_current_index;
+		};
+
+		using ColorPickerDlg =
+		    Texpainter::Ui::Dialog<InheritFrom<ColorPickerData, Ui::ColorPicker>>;
 
 	public:
 		explicit ImageEditor(Ui::Container& owner, Model::Document& doc)
@@ -124,12 +140,16 @@ namespace Texpainter::App
 		template<auto>
 		void confirmPositive(ColorPickerDlg& src)
 		{
-			auto color_new = src.widget().value();
-			printf("%.7f %.7f %.7f %.7f\n",
-			       color_new.red(),
-			       color_new.green(),
-			       color_new.blue(),
-			       color_new.alpha());
+			m_doc.get().modify(
+			    [index = src.widget().currentIndex(),
+			     color = src.widget().value()](Model::Palette& pal) noexcept {
+				    pal[index] = color;
+				    return true;
+			    },
+			    m_doc.get().currentPalette());
+			m_doc.get().currentColor(src.widget().currentIndex());
+			m_pal_sel.inputField().highlightMode(src.widget().currentIndex(),
+			                                     Ui::PaletteView::HighlightMode::Read);
 			refresh();
 			m_color_picker.reset();
 		}
@@ -184,6 +204,7 @@ namespace Texpainter::App
 				src.highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Write)
 				    .update();
 				m_color_picker = std::make_unique<ColorPickerDlg>(
+				    index,
 				    m_selectors,
 				    (std::string{"Select color number "} + std::to_string(index.value() + 1))
 				        .c_str(),

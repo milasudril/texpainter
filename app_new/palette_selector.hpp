@@ -58,6 +58,13 @@ namespace Texpainter::App
 			return *this;
 		}
 
+		PaletteSelector& highlightMode(PixelStore::ColorIndex index,
+		                               Ui::PaletteView::HighlightMode mode)
+		{
+			m_palette.highlightMode(index, mode).update();
+			return *this;
+		}
+
 	private:
 		Ui::Box m_root;
 		Ui::Combobox m_name;
