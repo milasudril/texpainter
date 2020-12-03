@@ -17,6 +17,9 @@
 #include "pixel_store/image.hpp"
 #include "utils/with_status.hpp"
 
+#include <algorithm>
+#include <iterator>
+
 namespace Texpainter::Model
 {
 	namespace detail
@@ -196,6 +199,15 @@ namespace Texpainter::Model
 		}
 
 		PixelStore::Palette<8> const& colorHistory() const { return m_color_history; }
+
+		Document& saveColor(PixelStore::Pixel color)
+		{
+			std::rotate(std::rbegin(m_color_history),
+			            std::rbegin(m_color_history) + 1,
+			            std::rend(m_color_history));
+			m_color_history[PixelStore::ColorIndex{0}] = color;
+			return *this;
+		}
 
 	private:
 		std::map<ItemName, Compositor::NodeItem> m_input_nodes;

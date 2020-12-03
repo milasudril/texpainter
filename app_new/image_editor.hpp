@@ -149,7 +149,7 @@ namespace Texpainter::App
 				    return true;
 			    },
 			    m_doc.get().currentPalette());
-			m_doc.get().currentColor(src.widget().currentIndex());
+			m_doc.get().currentColor(src.widget().currentIndex()).saveColor(src.widget().value());
 			refreshPaletteSelector();
 			m_color_picker.reset();
 		}
