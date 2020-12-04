@@ -7,13 +7,16 @@
 #include "./filter_graph_editor.hpp"
 #include "./main_menu.hpp"
 #include "./image_creator.hpp"
+#include "./palette_creator.hpp"
 
 #include "model_new/document.hpp"
+#include "model_new/palette_generate.hpp"
 #include "pixel_store/image_io.hpp"
 #include "ui/window.hpp"
 #include "ui/image_view.hpp"
 #include "ui/dialog.hpp"
 #include "ui/filename_select.hpp"
+
 
 #include <gtk/gtk.h>
 #include <filesystem>
@@ -94,6 +97,7 @@ namespace Texpainter::App
 
 		using ImageCreatorDlg        = Ui::Dialog<ImageCreator>;
 		using EmptyPaletteCreatorDlg = Ui::Dialog<Ui::LabeledInput<Ui::TextEntry>>;
+		using PaletteGenerateDlg     = Ui::Dialog<PaletteCreator>;
 
 	public:
 		DocumentEditor(): m_document{Size2d{512, 512}}, m_window_count{3}
@@ -176,6 +180,12 @@ namespace Texpainter::App
 		}
 
 		template<auto>
+		void handleException(char const* msg, PaletteGenerateDlg&)
+		{
+			fprintf(stderr, "Error: %s\n", msg);
+		}
+
+		template<auto>
 		void dismiss(ImageCreatorDlg&)
 		{
 			m_img_creator.reset();
@@ -199,8 +209,23 @@ namespace Texpainter::App
 		void confirmPositive(EmptyPaletteCreatorDlg& src)
 		{
 			auto result = src.widget().inputField().content();
-			insert(Model::ItemName(result), Model::Palette{});
+			insert(Model::ItemName{result}, Model::Palette{});
 			m_empty_pal_creator.reset();
+		}
+
+		template<auto>
+		void dismiss(PaletteGenerateDlg&)
+		{
+			m_gen_palette.reset();
+		}
+
+		template<auto>
+		void confirmPositive(PaletteGenerateDlg& src)
+		{
+			auto result = src.widget().value();
+			insert(std::move(result.name),
+			       Model::generatePalette(result.colors, result.by_intensity, result.reversed));
+			m_gen_palette.reset();
 		}
 
 
@@ -212,6 +237,7 @@ namespace Texpainter::App
 
 		std::unique_ptr<ImageCreatorDlg> m_img_creator;
 		std::unique_ptr<EmptyPaletteCreatorDlg> m_empty_pal_creator;
+		std::unique_ptr<PaletteGenerateDlg> m_gen_palette;
 
 		void insert(Model::ItemName&& name, PixelStore::Image&& img)
 		{
@@ -301,6 +327,17 @@ namespace Texpainter::App
 				m_empty_pal_creator->eventHandler<PaletteAction::New>(*this);
 			}
 		m_empty_pal_creator->show();
+	}
+
+	template<>
+	inline void DocumentEditor::onActivated<PaletteAction::Generate>(Ui::MenuItem& item)
+	{
+		if(m_gen_palette == nullptr) [[likely]]
+			{
+				m_gen_palette = std::make_unique<PaletteGenerateDlg>(item, "Generate palette");
+				m_gen_palette->eventHandler<PaletteAction::Generate>(*this);
+			}
+		m_gen_palette->show();
 	}
 }
 
