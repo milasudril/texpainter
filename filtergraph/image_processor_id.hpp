@@ -7,6 +7,7 @@
 
 #include <array>
 #include <cstdint>
+#include <algorithm>
 
 namespace Texpainter::FilterGraph
 {

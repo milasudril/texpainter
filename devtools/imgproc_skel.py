@@ -63,7 +63,7 @@ def makeParamMapObject(param_names):
 	if len(imgproc.paramNames()) == 0:
 		return ''
 	else:
-		return 'ParamMap<InterfaceDescriptor> params;'
+		return 'Texpainter::FilterGraph::ParamMap<InterfaceDescriptor> params;'
 
 def makeParamAccessors(param_names):
 	if len(imgproc.paramNames()) == 0:
@@ -99,8 +99,7 @@ template = string.Template("""//@	{
 #include "filtergraph/image_processor_id.hpp"
 #include "filtergraph/port_info.hpp"
 #include "filtergraph/img_proc_arg.hpp"
-#include "filtergraph/param_name.hpp"
-#include "filtergraph/param_value.hpp"
+#include "filtergraph/img_proc_param.hpp"
 $param_map_include
 $user_includes
 namespace $namespace_name
@@ -191,7 +190,7 @@ def makeIncludeGuard(filename):
 	return '_'.join(parts)
 
 
-imgproc = ImgProc(name='Foo Bar baz', param_default_values = [0], param_names=['Param 1', 'Param \\2', 'Param "3"'])
+imgproc = ImgProc(name='Foo Bar baz', param_default_values = [0, 0, 0], param_names=['Param 1', 'Param \\2', 'Param "3"'])
 
 main_substitutes = dict()
 main_substitutes['processor_name'] = imgproc.name()
