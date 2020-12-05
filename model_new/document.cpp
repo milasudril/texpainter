@@ -42,3 +42,25 @@ Texpainter::PixelStore::Image Texpainter::Model::render(Document const& document
 	}
 	return ret;
 }
+
+void Texpainter::Model::paint(Document& doc, vec2_t location)
+{
+	auto brush       = doc.currentBrush();
+	auto palette_ref = doc.palette(doc.currentPalette());
+	if(palette_ref == nullptr) [[unlikely]]
+		{
+			return;
+		}
+
+	auto const& palette = palette_ref->source.get();
+
+	doc.modify(
+		[location,
+			brush_radius = brush.radius(),
+			brush_func   = BrushFunction{brush.shape()},
+			color        = palette[doc.currentColor()]](PixelStore::Image& img) noexcept {
+			paint(img.pixels(), location, brush_radius, brush_func, color);
+			return true;
+		},
+		doc.currentImage());
+}
