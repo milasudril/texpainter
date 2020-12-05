@@ -98,8 +98,12 @@ namespace Texpainter::App
 			auto& current_img = m_doc.get().currentImage();
 			if(auto i = imgs.find(current_img); i != std::end(imgs)) [[likely]]
 				{
-					m_img_view.image(i->second.source.get());
+					m_img_view.image(i->second.source.get().pixels());
 				}
+			else
+			{
+				m_img_view.image(Span2d<PixelStore::Pixel>{});
+			}
 			return *this;
 		}
 

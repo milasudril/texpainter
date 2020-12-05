@@ -9,7 +9,8 @@
 #include "./container.hpp"
 #include "./dispatch_event.hpp"
 
-#include "pixel_store/image.hpp"
+#include "pixel_store/pixel.hpp"
+#include "utils/span_2d.hpp"
 
 #include <utility>
 
@@ -64,7 +65,7 @@ namespace Texpainter::Ui
 			     }});
 		}
 
-		ImageView& image(PixelStore::Image const& img);
+		ImageView& image(Span2d<PixelStore::Pixel const> img);
 
 		ImageView& clear();
 

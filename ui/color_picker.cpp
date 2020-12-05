@@ -12,6 +12,7 @@
 #include "./palette_view.hpp"
 
 #include "pixel_store/hsi_rgb.hpp"
+#include "pixel_store/image.hpp"
 #include "utils/numconv.hpp"
 
 #include <gtk/gtk.h>

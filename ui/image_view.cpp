@@ -97,8 +97,16 @@ public:
 			}
 	}
 
-	void image(PixelStore::Image const& img)
+	void image(Span2d<PixelStore::Pixel const> img)
 	{
+		if(img.size() == Size2d{0, 0}) [[unlikely]]
+			{
+				if(m_img_surface != nullptr) { cairo_surface_destroy(m_img_surface); }
+				m_img_surface = nullptr;
+				gtk_widget_queue_draw(GTK_WIDGET(m_handle));
+				return;
+			}
+
 		if(img.size() != m_size_current || m_img_surface == nullptr) [[unlikely]]
 			{
 				auto surface =
@@ -150,7 +158,7 @@ private:
 	cairo_surface_t* m_img_surface;
 	Size2d m_size_current;
 
-	void update(PixelStore::Image const& img)
+	void update(Span2d<PixelStore::Pixel const> img)
 	{
 		auto const stride = cairo_image_surface_get_stride(m_img_surface);
 		cairo_surface_flush(m_img_surface);
@@ -158,7 +166,7 @@ private:
 		assert(data != nullptr);
 		auto const w  = img.width();
 		auto const h  = img.height();
-		auto read_ptr = std::data(img.pixels());
+		auto read_ptr = std::data(img);
 		for(uint32_t row = 0; row < h; ++row)
 		{
 			auto write_ptr = data + row * stride;
@@ -253,7 +261,7 @@ Texpainter::Ui::ImageView::ImageView(Container& cnt): m_impl{new Impl{cnt}} {}
 
 Texpainter::Ui::ImageView::~ImageView() { delete m_impl; }
 
-Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::image(PixelStore::Image const& img)
+Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::image(Span2d<PixelStore::Pixel const> img)
 {
 	m_impl->image(img);
 	return *this;
