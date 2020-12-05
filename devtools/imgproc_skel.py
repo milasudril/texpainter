@@ -6,16 +6,26 @@ import os
 
 
 class ImgProc:
-	__name = ''
 	__params = dict()
 	__output_ports = dict()
 	__input_ports = dict()
+	__user_includes = []
 
-	def __init__(self, name, params, input_ports, output_ports):
+	def __init__(self,
+		name,
+		body,
+		processor_id,
+		input_ports=[],
+		output_ports=[],
+		params=[],
+		user_includes=[]):
 		self.__name = name
-		self.__params = params
+		self.__body = body
+		self.__user_includes = user_includes
 		self.__input_ports = input_ports
 		self.__output_ports = output_ports
+		self.__params = params
+		self.__processor_id = processor_id
 
 	def name(self):
 		return self.__name
@@ -29,7 +39,14 @@ class ImgProc:
 	def outputPorts(self):
 		return self.__output_ports
 
-	pass
+	def userIncludes(self):
+		return self.__user_includes
+
+	def body(self):
+		return self.__body
+
+	def processorId(self):
+		return self.__processor_id
 
 
 def stringEscape(string):
@@ -54,7 +71,7 @@ def makePortArray(name, ports):
 		items.append('PortInfo{PortType::%s, "%s"}' % (value, stringEscape(key)))
 
 	return 'static constexpr std::array<PortInfo, %d> %s{{%s}};' % (len(items), name,
-		','.join(items))
+		', '.join(items))
 
 
 def makeParamNameArray(param_names):
@@ -63,7 +80,7 @@ def makeParamNameArray(param_names):
 		escaped_names.append('"' + stringEscape(name) + '"')
 
 	return 'static constexpr std::array<ParamName, %d> ParamNames{%s};' % (len(escaped_names),
-		','.join(escaped_names))
+		', '.join(escaped_names))
 
 
 def makeDefaultCtor(param_default_values):
@@ -72,10 +89,13 @@ def makeDefaultCtor(param_default_values):
 	else:
 		params_init = []
 		for param in param_default_values:
-			params_init.append('ParamValue{%.17e}' % param)
+			formatted_number = '%.17g' % param
+			if not '.' in formatted_number:
+				formatted_number += '.0'
+			params_init.append('ParamValue{%s}' % formatted_number)
 		return '''explicit ImageProcessor():params{{%s}}
 		{
-		}''' % ','.join(params_init)
+		}''' % ', '.join(params_init)
 
 
 def makeParamMapObject(param_names):
@@ -122,7 +142,9 @@ template = string.Template("""//@	{
 #include "filtergraph/img_proc_arg.hpp"
 #include "filtergraph/img_proc_param.hpp"
 $param_map_include
+
 $user_includes
+
 namespace $namespace_name
 {
 	using Texpainter::Size2d;
@@ -147,7 +169,7 @@ namespace $namespace_name
 
 		void operator()(ImgProcArg<InterfaceDescriptor> const& args) const
 		{
-			$call_operator
+			$img_proc_body
 		}
 
 		$param_accessors
@@ -217,8 +239,11 @@ imgproc = ImgProc(name='Foo Bar baz',
 	'Param \\2': 1.0,
 	'Param "3"': 3.0
 	},
+	processor_id=secrets.token_hex(16),
+	body='(void)args;',
 	input_ports={'Input': 'GrayscaleRealPixels'},
-	output_ports={'Output': 'GrayscaleComplexPixels'})
+	output_ports={'Output': 'GrayscaleComplexPixels'},
+	user_includes=['#include <algorithm>'])
 
 main_substitutes = dict()
 main_substitutes['processor_name'] = imgproc.name()
@@ -226,15 +251,14 @@ main_substitutes['include_file'] = makeIncludeFileName(main_substitutes['process
 main_substitutes['namespace_name'] = makeNamespaceName(main_substitutes['processor_name'])
 main_substitutes['include_guard'] = makeIncludeGuard(main_substitutes['include_file'])
 main_substitutes['param_map_include'] = makeParamMapInclude(imgproc.params().keys())
-main_substitutes['user_includes'] = ''
+main_substitutes['user_includes'] = '\n'.join(imgproc.userIncludes())
 main_substitutes['input_ports'] = makePortArray('InputPorts', imgproc.inputPorts())
 main_substitutes['output_ports'] = makePortArray('OutputPorts', imgproc.outputPorts())
 main_substitutes['param_names'] = makeParamNameArray(imgproc.params().keys())
 main_substitutes['default_ctor'] = makeDefaultCtor(imgproc.params().values())
-main_substitutes['call_operator'] = ''
+main_substitutes['img_proc_body'] = imgproc.body()
 main_substitutes['param_accessors'] = makeParamAccessors(imgproc.params().keys())
-main_substitutes['processor_id'] = secrets.token_hex(16)
+main_substitutes['processor_id'] = imgproc.processorId()
 main_substitutes['param_map'] = makeParamMapObject(imgproc.params().keys())
-main_substitutes['user_state'] = ''
 
 print(template.substitute(main_substitutes))
