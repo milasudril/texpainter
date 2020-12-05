@@ -74,9 +74,10 @@ namespace Texpainter::Model
 					return false;
 				}
 
+			if(m_inputs.erase(item) == 0) { return false; }
+
 			compositor.erase(i->second.first);
 			nodes.erase(i);
-			m_inputs.erase(item);
 			return true;
 		}
 
