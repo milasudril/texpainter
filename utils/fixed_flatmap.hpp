@@ -29,6 +29,10 @@ namespace Texpainter
 		using key_type    = std::decay_t<decltype(Keys::items[0])>;
 		using mapped_type = Value;
 
+		FixedFlatmap() = default;
+
+		explicit FixedFlatmap(std::array<mapped_type, size()>&& init):m_vals{init}{}
+
 		static constexpr auto size() { return std::size(Keys::items); }
 
 		static constexpr auto const& keys() { return s_keys; }
