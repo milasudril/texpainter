@@ -37,6 +37,14 @@ namespace Texpainter::App
 			return *this;
 		}
 
+		template<auto id, class EventHandler>
+		BrushSelector& eventHandler(EventHandler& eh)
+		{
+			m_shapes.eventHandler<id>(eh);
+			m_size.eventHandler<id>(eh);
+			return *this;
+		}
+
 	private:
 		Ui::Box m_root;
 		Ui::Combobox m_shapes;

@@ -27,6 +27,7 @@ namespace Texpainter::App
 		enum class ControlId : int
 		{
 			ImageSelector,
+			BrushSelector,
 			PaletteSelector,
 			ColorPicker,
 			DrawingArea
@@ -50,6 +51,8 @@ namespace Texpainter::App
 		    Texpainter::Ui::Dialog<InheritFrom<ColorPickerData, Ui::ColorPicker>>;
 
 	public:
+		ImageEditor(ImageEditor&&) = delete;
+
 		explicit ImageEditor(Ui::Container& owner, Model::Document& doc)
 		    : m_doc{doc}
 		    , m_draw_mode{false}
@@ -67,6 +70,7 @@ namespace Texpainter::App
 		{
 			refresh();
 			m_image_sel.inputField().eventHandler<ControlId::ImageSelector>(*this);
+			m_brush_sel.inputField().eventHandler<ControlId::BrushSelector>(*this);
 			m_pal_sel.inputField().eventHandler<ControlId::PaletteSelector>(*this);
 			m_img_view.eventHandler<ControlId::DrawingArea>(*this);
 		}
@@ -124,6 +128,9 @@ namespace Texpainter::App
 
 		template<auto>
 		void onChanged(Ui::Combobox& src);
+
+		template<auto>
+		void onChanged(Ui::Slider& src);
 
 		template<auto>
 		void onMouseDown(Ui::PaletteView& src, PixelStore::ColorIndex index, int button);
@@ -255,6 +262,20 @@ namespace Texpainter::App
 				break;
 			}
 		}
+	}
+
+	template<>
+	inline void ImageEditor::onChanged<ImageEditor::ControlId::BrushSelector>(Ui::Combobox& src)
+	{
+		auto brush = m_doc.get().currentBrush();
+		m_doc.get().currentBrush(brush.shape(static_cast<Model::BrushShape>(src.selected())));
+	}
+
+	template<>
+	inline void ImageEditor::onChanged<ImageEditor::ControlId::BrushSelector>(Ui::Slider& src)
+	{
+		auto brush = m_doc.get().currentBrush();
+		m_doc.get().currentBrush(brush.radius(static_cast<float>(src.value().value())));
 	}
 }
 
