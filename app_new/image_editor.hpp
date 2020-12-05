@@ -73,6 +73,7 @@ namespace Texpainter::App
 			m_brush_sel.inputField().eventHandler<ControlId::BrushSelector>(*this);
 			m_pal_sel.inputField().eventHandler<ControlId::PaletteSelector>(*this);
 			m_img_view.eventHandler<ControlId::DrawingArea>(*this);
+			eventHandler<0>(*this);
 		}
 
 		~ImageEditor() { m_doc.get().currentBrush(m_brush_sel.inputField().brush()); }
@@ -179,7 +180,7 @@ namespace Texpainter::App
 			{
 				m_draw_mode = true;
 				paint(m_doc, loc_window);
-				refreshImageView();
+				on_updated(r_eh, *this);
 			}
 		}
 
@@ -195,14 +196,33 @@ namespace Texpainter::App
 			if(m_draw_mode) [[likely]]
 				{
 					paint(m_doc, loc_window);
-					refreshImageView();
+					on_updated(r_eh, *this);
+					;
 				}
+		}
+
+		template<auto id, class EventHandler>
+		ImageEditor& eventHandler(EventHandler& eh)
+		{
+			r_eh       = &eh;
+			on_updated = [](void* self, ImageEditor& src) {
+				reinterpret_cast<EventHandler*>(self)->template onUpdated<id>(src);
+			};
+			return *this;
 		}
 
 
 	private:
 		std::reference_wrapper<Model::Document> m_doc;
 		bool m_draw_mode;
+		void* r_eh;
+		void (*on_updated)(void*, ImageEditor&);
+
+		template<auto>
+		void onUpdated(ImageEditor& src)
+		{
+			src.refresh();
+		}
 
 		Ui::Box m_root;
 		Ui::Box m_selectors;
@@ -220,14 +240,14 @@ namespace Texpainter::App
 	inline void ImageEditor::onChanged<ImageEditor::ControlId::ImageSelector>(Ui::Combobox& src)
 	{
 		m_doc.get().currentImage(Model::ItemName{src.selected<char const*>()});
-		refresh();
+		on_updated(r_eh, *this);
 	}
 
 	template<>
 	inline void ImageEditor::onChanged<ImageEditor::ControlId::PaletteSelector>(Ui::Combobox& src)
 	{
 		m_doc.get().currentPalette(Model::ItemName{src.selected<char const*>()});
-		refresh();
+		on_updated(r_eh, *this);
 	}
 
 	template<>
