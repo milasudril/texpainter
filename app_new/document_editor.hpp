@@ -92,6 +92,7 @@ namespace Texpainter::App
 			                               std::forward<Args>(args)...);
 			ret->window().template eventHandler<id>(*this);
 			ret->menu().eventHandler(*this);
+			ret->widget().template eventHandler<id>(*this);
 			return ret;
 		}
 
@@ -228,6 +229,29 @@ namespace Texpainter::App
 			m_gen_palette.reset();
 		}
 
+		template<AppWindowType id, class Src>
+		void onUpdated(Src& src)
+		{
+			if constexpr(id == AppWindowType::ImageEditor) { src.refresh(); }
+
+			if(auto output = m_windows.get<AppWindowType::Output>().get(); output != nullptr)
+			{ output->widget().image(render(m_document)); }
+		}
+
+		template<auto, class T>
+		void onMouseDown(T&&...)
+		{
+		}
+
+		template<auto, class T>
+		void onMouseUp(T&&...)
+		{
+		}
+
+		template<auto, class T>
+		void onMouseMove(T&&...)
+		{
+		}
 
 	private:
 		Model::Document m_document;

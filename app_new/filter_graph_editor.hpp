@@ -239,7 +239,7 @@ namespace Texpainter::App
 			r_eh       = &eh;
 			r_callback = [](void* eh, FilterGraphEditor& src) {
 				auto self = reinterpret_cast<EventHandler*>(eh);
-				self->template graphUpdated<id>(src);
+				self->template onUpdated<id>(src);
 			};
 			return *this;
 		}
