@@ -7,22 +7,27 @@ import os
 
 class ImgProc:
 	__name = ''
-	__param_names = []
-	__param_default_values = []
+	__params = dict()
+	__output_ports = dict()
+	__input_ports = dict()
 
-	def __init__(self, name, param_names, param_default_values):
+	def __init__(self, name, params, input_ports, output_ports):
 		self.__name = name
-		self.__param_names = param_names
-		self.__param_default_values = param_default_values
+		self.__params = params
+		self.__input_ports  = input_ports
+		self.__output_ports = output_ports
 
 	def name(self):
 		return self.__name
 
-	def paramNames(self):
-		return self.__param_names
+	def params(self):
+		return self.__params
 
-	def paramDefaultValues(self):
-		return self.__param_default_values
+	def inputPorts():
+		return self.__input_ports
+
+	def outputPorts():
+		return self.__output_ports
 
 	pass
 
@@ -35,11 +40,13 @@ def stringEscape(string):
 		result += c
 	return result
 
+
 def makeParamMapInclude(param_names):
 	if len(param_names) == 0:
 		return ''
 	else:
 		return '#include "filtergraph/param_map.hpp"'
+
 
 def makeParamNameArray(param_names):
 	escaped_names = []
@@ -47,26 +54,30 @@ def makeParamNameArray(param_names):
 		escaped_names.append('"' + stringEscape(name) + '"')
 
 	return 'static constexpr std::array<ParamName, %d> ParamNames{%s};' % (len(escaped_names),
-                                                                       ','.join(escaped_names))
+																			','.join(escaped_names))
+
+
 def makeDefaultCtor(param_default_values):
 	if len(param_default_values) == 0:
 		return ''
 	else:
 		params_init = []
 		for param in param_default_values:
-			params_init.append('ParamValue{%.17g}'%param)
+			params_init.append('ParamValue{%.17e}' % param)
 		return '''explicit ImageProcessor():params{{%s}}
 		{
-		}'''%','.join(params_init)
+		}''' % ','.join(params_init)
+
 
 def makeParamMapObject(param_names):
-	if len(imgproc.paramNames()) == 0:
+	if len(param_names) == 0:
 		return ''
 	else:
 		return 'Texpainter::FilterGraph::ParamMap<InterfaceDescriptor> params;'
 
+
 def makeParamAccessors(param_names):
-	if len(imgproc.paramNames()) == 0:
+	if len(param_names) == 0:
 		return '''void set(ParamName, ParamValue) {}
 
 		ParamValue get(ParamName) const { return ParamValue{0.0}; }
@@ -88,6 +99,7 @@ def makeParamAccessors(param_names):
 		}
 
 		std::span<ParamValue const> paramValues() const { return params.values(); }'''
+
 
 template = string.Template("""//@	{
 //@	 "targets":[{"name":"$include_file", "type":"include"}]
@@ -190,24 +202,31 @@ def makeIncludeGuard(filename):
 	return '_'.join(parts)
 
 
-imgproc = ImgProc(name='Foo Bar baz', param_default_values = [0, 0, 0], param_names=['Param 1', 'Param \\2', 'Param "3"'])
+imgproc = ImgProc(name='Foo Bar baz',
+					params={
+						'Param 1': 0.0,
+						'Param \\2': 1.0,
+						'Param "3"': 3.0
+					},
+					input_ports=dict(),
+					output_ports=dict())
 
 main_substitutes = dict()
 main_substitutes['processor_name'] = imgproc.name()
 main_substitutes['include_file'] = makeIncludeFileName(main_substitutes['processor_name'])
 main_substitutes['namespace_name'] = makeNamespaceName(main_substitutes['processor_name'])
 main_substitutes['include_guard'] = makeIncludeGuard(main_substitutes['include_file'])
-main_substitutes['param_map_include'] = makeParamMapInclude(imgproc.paramNames())
+main_substitutes['param_map_include'] = makeParamMapInclude(imgproc.params().keys())
 main_substitutes['user_includes'] = ''
 main_substitutes['imported_types'] = ''
 main_substitutes['input_ports'] = 'static constexpr std::array<PortInfo, 0> InputPorts{};'
 main_substitutes['output_ports'] = 'static constexpr std::array<PortInfo, 0> OutputPorts{};'
-main_substitutes['param_names'] = makeParamNameArray(imgproc.paramNames())
-main_substitutes['default_ctor'] = makeDefaultCtor(imgproc.paramDefaultValues())
+main_substitutes['param_names'] = makeParamNameArray(imgproc.params().keys())
+main_substitutes['default_ctor'] = makeDefaultCtor(imgproc.params().values())
 main_substitutes['call_operator'] = ''
-main_substitutes['param_accessors'] = makeParamAccessors(imgproc.paramNames())
+main_substitutes['param_accessors'] = makeParamAccessors(imgproc.params().keys())
 main_substitutes['processor_id'] = secrets.token_hex(16)
-main_substitutes['param_map'] =  makeParamMapObject(imgproc.paramNames())
+main_substitutes['param_map'] = makeParamMapObject(imgproc.params().keys())
 main_substitutes['user_state'] = ''
 
 print(template.substitute(main_substitutes))
