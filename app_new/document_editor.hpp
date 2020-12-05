@@ -230,9 +230,10 @@ namespace Texpainter::App
 		}
 
 		template<AppWindowType id, class Src>
-		void onUpdated(Src& src)
+		void onUpdated(Src&)
 		{
-			if constexpr(id == AppWindowType::ImageEditor) { src.refresh(); }
+			if(auto editor = m_windows.get<AppWindowType::ImageEditor>().get(); editor != nullptr)
+				[[likely]] { editor->widget().refresh(); }
 
 			if(auto output = m_windows.get<AppWindowType::Output>().get(); output != nullptr)
 			{ output->widget().image(render(m_document)); }
