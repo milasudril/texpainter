@@ -55,12 +55,13 @@ void Texpainter::Model::paint(Document& doc, vec2_t location)
 	auto const& palette = palette_ref->source.get();
 
 	doc.modify(
-		[location,
-			brush_radius = brush.radius(),
-			brush_func   = BrushFunction{brush.shape()},
-			color        = palette[doc.currentColor()]](PixelStore::Image& img) noexcept {
-			paint(img.pixels(), location, brush_radius, brush_func, color);
-			return true;
-		},
-		doc.currentImage());
+	    [location,
+	     brush_radius = static_cast<double>(brush.radius()),
+	     brush_func   = BrushFunction{brush.shape()},
+	     color        = palette[doc.currentColor()]](PixelStore::Image& img) noexcept {
+		    auto r = 0.5 * brush_radius * sqrt(img.area());
+		    paint(img.pixels(), location, r, brush_func, color);
+		    return true;
+	    },
+	    doc.currentImage());
 }
