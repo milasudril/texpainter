@@ -92,7 +92,7 @@ column_limit=100
 #
 # For options FIXED, and VALIGN-RIGHT are only available when USE_TABS is
 # enabled.
-continuation_align_style=VALIGN-RIGHT
+continuation_align_style=FIXED
 
 # Indent width used for line continuations.
 continuation_indent_width=4

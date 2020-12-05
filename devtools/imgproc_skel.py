@@ -14,7 +14,7 @@ class ImgProc:
 	def __init__(self, name, params, input_ports, output_ports):
 		self.__name = name
 		self.__params = params
-		self.__input_ports  = input_ports
+		self.__input_ports = input_ports
 		self.__output_ports = output_ports
 
 	def name(self):
@@ -23,10 +23,10 @@ class ImgProc:
 	def params(self):
 		return self.__params
 
-	def inputPorts():
+	def inputPorts(self):
 		return self.__input_ports
 
-	def outputPorts():
+	def outputPorts(self):
 		return self.__output_ports
 
 	pass
@@ -48,13 +48,22 @@ def makeParamMapInclude(param_names):
 		return '#include "filtergraph/param_map.hpp"'
 
 
+def makePortArray(name, ports):
+	items = []
+	for key, value in ports.items():
+		items.append('PortInfo{PortType::%s, "%s"}' % (value, stringEscape(key)))
+
+	return 'static constexpr std::array<PortInfo, %d> %s{{%s}};' % (len(items), name,
+		','.join(items))
+
+
 def makeParamNameArray(param_names):
 	escaped_names = []
 	for name in param_names:
 		escaped_names.append('"' + stringEscape(name) + '"')
 
 	return 'static constexpr std::array<ParamName, %d> ParamNames{%s};' % (len(escaped_names),
-																			','.join(escaped_names))
+		','.join(escaped_names))
 
 
 def makeDefaultCtor(param_default_values):
@@ -123,7 +132,7 @@ namespace $namespace_name
 	using Texpainter::FilterGraph::ParamValue;
 	using Texpainter::FilterGraph::PortInfo;
 	using Texpainter::FilterGraph::PortType;
-	$imported_types
+
 	class ImageProcessor
 	{
 	public:
@@ -203,13 +212,13 @@ def makeIncludeGuard(filename):
 
 
 imgproc = ImgProc(name='Foo Bar baz',
-					params={
-						'Param 1': 0.0,
-						'Param \\2': 1.0,
-						'Param "3"': 3.0
-					},
-					input_ports=dict(),
-					output_ports=dict())
+	params={
+	'Param 1': 0.0,
+	'Param \\2': 1.0,
+	'Param "3"': 3.0
+	},
+	input_ports={'Input': 'GrayscaleRealPixels'},
+	output_ports={'Output': 'GrayscaleComplexPixels'})
 
 main_substitutes = dict()
 main_substitutes['processor_name'] = imgproc.name()
@@ -218,9 +227,8 @@ main_substitutes['namespace_name'] = makeNamespaceName(main_substitutes['process
 main_substitutes['include_guard'] = makeIncludeGuard(main_substitutes['include_file'])
 main_substitutes['param_map_include'] = makeParamMapInclude(imgproc.params().keys())
 main_substitutes['user_includes'] = ''
-main_substitutes['imported_types'] = ''
-main_substitutes['input_ports'] = 'static constexpr std::array<PortInfo, 0> InputPorts{};'
-main_substitutes['output_ports'] = 'static constexpr std::array<PortInfo, 0> OutputPorts{};'
+main_substitutes['input_ports'] = makePortArray('InputPorts', imgproc.inputPorts())
+main_substitutes['output_ports'] = makePortArray('OutputPorts', imgproc.outputPorts())
 main_substitutes['param_names'] = makeParamNameArray(imgproc.params().keys())
 main_substitutes['default_ctor'] = makeDefaultCtor(imgproc.params().values())
 main_substitutes['call_operator'] = ''
