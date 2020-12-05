@@ -40,7 +40,7 @@ namespace Texpainter::Model
 
 	namespace detail
 	{
-		using BrushFunc = bool (*)(float radius, vec2_t location);
+		using BrushFunc = bool (*)(vec2_t location, double radius);
 		constexpr auto gen_brush_vtable()
 		{
 			std::array<BrushFunc, static_cast<size_t>(end(Enum::Empty<BrushShape>{}))> ret{};
@@ -60,9 +60,9 @@ namespace Texpainter::Model
 		{
 		}
 
-		decltype(auto) operator()(float radius, vec2_t location) const
+		decltype(auto) operator()(vec2_t location, double radius) const
 		{
-			return r_func(radius, location);
+			return r_func(location, radius);
 		}
 
 	private:

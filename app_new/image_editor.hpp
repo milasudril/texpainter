@@ -28,7 +28,8 @@ namespace Texpainter::App
 		{
 			ImageSelector,
 			PaletteSelector,
-			ColorPicker
+			ColorPicker,
+			DrawingArea
 		};
 
 		class ColorPickerData
@@ -51,6 +52,7 @@ namespace Texpainter::App
 	public:
 		explicit ImageEditor(Ui::Container& owner, Model::Document& doc)
 		    : m_doc{doc}
+		    , m_draw_mode{false}
 		    , m_root{owner, Ui::Box::Orientation::Vertical}
 		    , m_selectors{m_root, Ui::Box::Orientation::Horizontal}
 		    , m_image_sel{m_selectors, Ui::Box::Orientation::Horizontal, "Image: "}
@@ -66,20 +68,29 @@ namespace Texpainter::App
 			refresh();
 			m_image_sel.inputField().eventHandler<ControlId::ImageSelector>(*this);
 			m_pal_sel.inputField().eventHandler<ControlId::PaletteSelector>(*this);
+			m_img_view.eventHandler<ControlId::DrawingArea>(*this);
 		}
 
 		~ImageEditor() { m_doc.get().currentBrush(m_brush_sel.inputField().brush()); }
 
 		ImageEditor& refreshImageSelector()
 		{
-			auto& imgs        = m_doc.get().images();
-			auto& current_img = m_doc.get().currentImage();
+			auto& imgs = m_doc.get().images();
 			m_image_sel.inputField()
 			    .clear()
 			    .appendFrom(std::ranges::transform_view(
 			        imgs, [](auto const& item) { return item.first.c_str(); }))
 			    .selected(m_doc.get().currentImage().c_str());
 
+
+			refreshImageView();
+			return *this;
+		}
+
+		ImageEditor& refreshImageView()
+		{
+			auto& imgs        = m_doc.get().images();
+			auto& current_img = m_doc.get().currentImage();
 			if(auto i = imgs.find(current_img); i != std::end(imgs)) [[likely]]
 				{
 					m_img_view.image(i->second.source.get());
@@ -154,9 +165,38 @@ namespace Texpainter::App
 			m_color_picker.reset();
 		}
 
+		template<auto>
+		void onMouseDown(Ui::ImageView&, vec2_t loc_window, vec2_t, int button)
+		{
+			if(button == 1)
+			{
+				m_draw_mode = true;
+				paint(m_doc, loc_window);
+				refreshImageView();
+			}
+		}
+
+		template<auto>
+		void onMouseUp(Ui::ImageView&, vec2_t, vec2_t, int)
+		{
+			m_draw_mode = false;
+		}
+
+		template<auto>
+		void onMouseMove(Ui::ImageView&, vec2_t loc_window, vec2_t)
+		{
+			if(m_draw_mode) [[likely]]
+				{
+					paint(m_doc, loc_window);
+					refreshImageView();
+				}
+		}
+
 
 	private:
 		std::reference_wrapper<Model::Document> m_doc;
+		bool m_draw_mode;
+
 		Ui::Box m_root;
 		Ui::Box m_selectors;
 		Ui::LabeledInput<ImageSelector> m_image_sel;

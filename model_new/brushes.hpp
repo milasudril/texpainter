@@ -32,7 +32,7 @@ namespace Texpainter::Model
 	template<>
 	struct BrushTraits<BrushShape::Diamond>
 	{
-		static bool test(float radius, vec2_t loc)
+		static bool test(vec2_t loc, double radius)
 		{
 			auto loc_abs = loc < 0 ? -loc : loc;
 			return loc_abs[0] + loc_abs[1] <= radius;
@@ -46,7 +46,7 @@ namespace Texpainter::Model
 	template<>
 	struct BrushTraits<BrushShape::Circle>
 	{
-		static bool test(float radius, vec2_t loc)
+		static bool test(vec2_t loc, double radius)
 		{
 			auto d2 = dot(loc, loc);
 			return d2 <= radius * radius;
@@ -60,7 +60,7 @@ namespace Texpainter::Model
 	template<>
 	struct BrushTraits<BrushShape::Square>
 	{
-		static bool test(float radius, vec2_t loc)
+		static bool test(vec2_t loc, double radius)
 		{
 			auto loc_abs = loc < 0 ? -loc : loc;
 			auto loc_max = std::max(loc_abs[0], loc_abs[1]);
