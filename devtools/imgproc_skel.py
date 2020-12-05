@@ -6,6 +6,9 @@ import os
 
 
 class ImgProc:
+	__name = ''
+	__param_names = []
+
 	def __init__(self, name, param_names):
 		self.__name = name
 		self.__param_names = param_names
@@ -34,8 +37,43 @@ def makeParamNameArray(param_names):
 		escaped_names.append('"' + stringEscape(name) + '"')
 
 	return 'static constexpr std::array<ParamName, %d> ParamNames{%s};' % (len(escaped_names),
-																			','.join(escaped_names))
+                                                                       ','.join(escaped_names))
 
+def makeParamMapInclude(param_names):
+	if len(imgproc.paramNames()) == 0:
+		return ''
+	else:
+		return '#include "filtergraph/param_map.hpp"'
+
+def makeParamMapObject(param_names):
+	if len(imgproc.paramNames()) == 0:
+		return ''
+	else:
+		return 'ParamMap<InterfaceDescriptor> params;'
+
+def makeParamAccessors(param_names):
+	if len(imgproc.paramNames()) == 0:
+		return '''void set(ParamName, ParamValue) {}
+
+		ParamValue get(ParamName) const { return ParamValue{0.0}; }
+
+		std::span<ParamValue const> paramValues() const { return std::span<ParamValue const>{}; }'''
+	else:
+		return '''void set(ParamName name, ParamValue value)
+		{
+			if(auto ptr = params.find(name); ptr != nullptr) [[likely]]
+			{
+				*ptr = value;
+			}
+		}
+
+		ParamValue get(ParamName name) const
+		{
+			auto ptr = params.find(name);
+			return ptr != nullptr ? *ptr : ParamValue{0.0};
+		}
+
+		std::span<ParamValue const> paramValues() const { return params.values(); }'''
 
 template = string.Template("""//@	{
 //@	 "targets":[{"name":"$include_file", "type":"include"}]
@@ -146,18 +184,16 @@ main_substitutes['processor_name'] = imgproc.name()
 main_substitutes['include_file'] = makeIncludeFileName(main_substitutes['processor_name'])
 main_substitutes['namespace_name'] = makeNamespaceName(main_substitutes['processor_name'])
 main_substitutes['include_guard'] = makeIncludeGuard(main_substitutes['include_file'])
-main_substitutes['param_map_include'] = '' if len(imgproc.paramNames()) == 0 \
-                                           else '#include "filtergraph/param_map.hpp"'
+main_substitutes['param_map_include'] = makeParamMapInclude(imgproc.paramNames())
 main_substitutes['user_includes'] = ''
 main_substitutes['imported_types'] = ''
 main_substitutes['input_ports'] = 'static constexpr std::array<PortInfo, 0> InputPorts{};'
 main_substitutes['output_ports'] = 'static constexpr std::array<PortInfo, 0> OutputPorts{};'
 main_substitutes['param_names'] = makeParamNameArray(imgproc.paramNames())
 main_substitutes['call_operator'] = ''
-main_substitutes['param_accessors'] = ''
+main_substitutes['param_accessors'] = makeParamAccessors(imgproc.paramNames())
 main_substitutes['processor_id'] = secrets.token_hex(16)
-main_substitutes['param_map'] =  '' if len(imgproc.paramNames()) == 0 \
-                                    else 'ParamMap<InterfaceDescriptor> params;'
+main_substitutes['param_map'] =  makeParamMapObject(imgproc.paramNames())
 main_substitutes['user_state'] = ''
 
 print(template.substitute(main_substitutes))
