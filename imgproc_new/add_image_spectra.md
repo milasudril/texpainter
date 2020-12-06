@@ -13,29 +13,46 @@ __B:__ (Grayscale complex pixels) Second operand
 
 __Sum:__ (Grayscale complex pixels) The sum of `A` and `B`
 
+## Parameters
+
+__Gain A:__ (= 0.5) Amplification factor for `A`, between -1.0 evFS and +1.0 evFS. 0.5 maps to
+0 evFS.
+
+__Gain B:__ (= 0.5) Amplification factor for `B`, between -1.0 evFS and +1.0 evFS. 0.5 maps to
+0 evFS.
+
 ## Implementation
 
-The implementation of this image processor is trivial. Simply call `std::transform`, with the
-`std::plus` function object, as defined in the C++ standard library.
+To loop through all pixels in `A` and `B`, `std::transform` is used. As callback to `std::function`,
+a function object with access to the mapped parameter values are used. The function object returns
+a weighted sum of its two arguments, where the weights are deterimened by the parameters.
 
 __Includes:__
 
 ```
 #include <algorithm>
-#include <functional>
+#include <cmath>
 ```
 
 __Source code:__
 
 ```c++
-void main(auto const& args)
+inline double mapParamenter(ParamValue val)
 {
-    auto const size = args.size().area();
-    std::transform(input<0>(args),
-                   input<0>(args) + size,
-                   input<1>(args),
-                   output<0>(args),
-                   std::plus{});
+	return std::exp2(std::lerp(-1.0, 1.0, val.value()));
+}
+
+void main(auto const& args, auto const& params)
+{
+	auto const size = args.size().area();
+	std::transform(input<0>(args),
+	               input<0>(args) + size,
+	               input<1>(args),
+	               output<0>(args),
+	               [gain_a = mapParameter(param<Str{"Gain A"}>()),
+	               gain_b = mapParamenter(param<Str{"Gain B"}>())](auto a, auto b) {
+	               	return gain_a*a + gain_b*b;
+                   });
 }
 ```
 
