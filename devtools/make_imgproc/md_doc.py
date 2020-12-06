@@ -2,7 +2,6 @@ class Paragraph:
 	def __init__(self):
 		self.paragraphs = dict()  # Insertion order preserved as of Python 3.7
 		self.text = ''
-		self.level = 0
 
 def headingLevel(md_line):
 	level = 0
@@ -29,18 +28,19 @@ def loadParagraphs(md_lines):
 			if heading_level == 0:
 				current_paragraph.text += line
 			elif heading_level > current_heading_level:
-				current_paragraph.paragraphs[line[heading_level:]] = Paragraph()
-				current_paragraph.level = 1
+				header = line[heading_level + 1:].strip()
+				current_paragraph.paragraphs[header] = Paragraph()
 				contexts.append(current_paragraph)
-				current_paragraph = current_paragraph.paragraphs[line[heading_level:]]
+				current_paragraph = current_paragraph.paragraphs[header]
 				current_heading_level = heading_level
 			else:
 				for k in range(0,  current_heading_level - heading_level + 1):
 					current_paragraph = contexts.pop()
 
-				current_paragraph.paragraphs[line[heading_level:]] = Paragraph()
+				header = line[heading_level + 1:].strip()
+				current_paragraph.paragraphs[header] = Paragraph()
 				contexts.append(current_paragraph)
-				current_paragraph = current_paragraph.paragraphs[line[heading_level:]]
+				current_paragraph = current_paragraph.paragraphs[header]
 				current_heading_level = heading_level
 
 	return root
