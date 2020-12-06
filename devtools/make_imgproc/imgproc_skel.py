@@ -7,6 +7,50 @@ import imgproc
 
 ImgProc = imgproc.ImgProc
 
+def makeIncludeFileName(name):
+	return name.replace(' ', '_').lower() + '.hpp'
+
+def makeNamespaceName(name):
+	parts = name.split(' ')
+	ret = []
+	for item in parts:
+		ret.append(item.capitalize())
+	return ''.join(ret)
+
+
+def splitall(path):
+	allparts = []
+	while 1:
+		parts = os.path.split(path)
+		if parts[0] == path:  # sentinel for absolute paths
+			allparts.insert(0, parts[0])
+			break
+		elif parts[1] == path:  # sentinel for relative paths
+			allparts.insert(0, parts[1])
+			break
+		else:
+			path = parts[0]
+		allparts.insert(0, parts[1])
+	return allparts
+
+
+def makeIncludeGuard(filename):
+	cwd = os.path.split(os.getcwd())[1]
+	path = splitall(filename)
+	if path[0] == '.':
+		path = path[1:]
+	path = [cwd] + path
+
+	parts = []
+	for item in path:
+		res = item.replace('_', '')
+		res = res.replace('-', '')
+		res = res.replace('.', '_')
+		res = res.upper()
+		parts.append(res)
+
+	return '_'.join(parts)
+
 def stringEscape(string):
 	result = ''
 	for c in string:
@@ -16,12 +60,23 @@ def stringEscape(string):
 	return result
 
 
-def makeParamMapInclude(param_names):
-	if len(param_names) == 0:
+def makeParamMapInclude(params):
+	if len(params) == 0:
 		return ''
 	else:
 		return '#include "filtergraph/param_map.hpp"'
 
+def makeImplDecl(params):
+	if len(params) == 0:
+		return 'void main(auto const& args);'
+	else:
+		return 'void main(auto const& args, auto const& params);'
+
+def makeCallOperator(params):
+	if len(params) == 0:
+		return 'impl::main(args);'
+	else:
+		return 'impl::main(args, params);'
 
 def makePortArray(name, ports):
 	items = []
@@ -113,6 +168,11 @@ namespace $namespace_name
 	using Texpainter::FilterGraph::PortInfo;
 	using Texpainter::FilterGraph::PortType;
 
+	namespace impl
+	{
+		$impl_decl
+	}
+
 	class ImageProcessor
 	{
 	public:
@@ -127,7 +187,7 @@ namespace $namespace_name
 
 		void operator()(ImgProcArg<InterfaceDescriptor> const& args) const
 		{
-			$img_proc_body
+			$call_operator
 		}
 
 		$param_accessors
@@ -141,54 +201,15 @@ namespace $namespace_name
 	};
 }
 
+namespace $namespace_name::impl
+{
+
+$img_proc_body
+
+}
+
 #endif
 """)
-
-
-def makeIncludeFileName(name):
-	return name.replace(' ', '_').lower() + '.hpp'
-
-
-def makeNamespaceName(name):
-	parts = name.split(' ')
-	ret = []
-	for item in parts:
-		ret.append(item.capitalize())
-	return ''.join(ret)
-
-
-def splitall(path):
-	allparts = []
-	while 1:
-		parts = os.path.split(path)
-		if parts[0] == path:  # sentinel for absolute paths
-			allparts.insert(0, parts[0])
-			break
-		elif parts[1] == path:  # sentinel for relative paths
-			allparts.insert(0, parts[1])
-			break
-		else:
-			path = parts[0]
-		allparts.insert(0, parts[1])
-	return allparts
-
-
-def makeIncludeGuard(filename):
-	cwd = os.path.split(os.getcwd())[1]
-	path = splitall(filename)
-	if path[0] == '.':
-		path = path[1:]
-	path = [cwd] + path
-
-	parts = []
-	for item in path:
-		res = item.replace('_', '')
-		res = res.replace('-', '')
-		res = res.replace('.', '_')
-		res = res.upper()
-		parts.append(res)
-
-	return '_'.join(parts)
 
 
 imgproc = ImgProc(name='Foo Bar baz',
@@ -198,25 +219,29 @@ imgproc = ImgProc(name='Foo Bar baz',
 	'Param "3"': 3.0
 	},
 	processor_id=secrets.token_hex(16),
-	body='(void)args;',
+	body='''void main(auto const&, auto const&)
+{
+}''',
 	input_ports={'Input': 'GrayscaleRealPixels'},
 	output_ports={'Output': 'GrayscaleComplexPixels'},
 	user_includes=['#include <algorithm>'])
 
 main_substitutes = dict()
 main_substitutes['processor_name'] = imgproc.name()
-main_substitutes['include_file'] = makeIncludeFileName(main_substitutes['processor_name'])
-main_substitutes['namespace_name'] = makeNamespaceName(main_substitutes['processor_name'])
+main_substitutes['include_file'] = makeIncludeFileName(imgproc.name())
+main_substitutes['namespace_name'] = makeNamespaceName(imgproc.name())
 main_substitutes['include_guard'] = makeIncludeGuard(main_substitutes['include_file'])
 main_substitutes['param_map_include'] = makeParamMapInclude(imgproc.params().keys())
 main_substitutes['user_includes'] = '\n'.join(imgproc.userIncludes())
+main_substitutes['impl_decl'] = makeImplDecl(imgproc.params())
 main_substitutes['input_ports'] = makePortArray('InputPorts', imgproc.inputPorts())
 main_substitutes['output_ports'] = makePortArray('OutputPorts', imgproc.outputPorts())
 main_substitutes['param_names'] = makeParamNameArray(imgproc.params().keys())
 main_substitutes['default_ctor'] = makeDefaultCtor(imgproc.params().values())
-main_substitutes['img_proc_body'] = imgproc.body()
+main_substitutes['call_operator'] = makeCallOperator(imgproc.params())
 main_substitutes['param_accessors'] = makeParamAccessors(imgproc.params().keys())
 main_substitutes['processor_id'] = imgproc.processorId()
 main_substitutes['param_map'] = makeParamMapObject(imgproc.params().keys())
+main_substitutes['img_proc_body'] = imgproc.body()
 
 print(template.substitute(main_substitutes))
