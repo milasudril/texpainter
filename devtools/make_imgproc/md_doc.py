@@ -37,7 +37,10 @@ def loadParagraphs(md_lines):
 		else:
 			line = line.strip()
 			if len(line) != 0:
-				para_text += line
+				if len(para_text) == 0:
+					para_text = line
+				else:
+					para_text += ' ' + line
 			else:
 				line = para_text
 				para_text = ''
