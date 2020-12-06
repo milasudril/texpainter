@@ -5,10 +5,10 @@ class Paragraph:
 		self.paragraphs = dict()  # Insertion order preserved as of Python 3.7
 		self.text = []
 
-def makeHeader(md_line, current_level):
-#	match = re.match(r'__[^:]*:__', md_line)
-#	if match:
-#		return (current_level + 1, md_line[2:md_line.find(':')], md_line[match.end():])
+def makeHeader(md_line):
+	match = re.match(r'^__[^:]*:__', md_line)
+	if match:
+		return (0, md_line[2:md_line.find(':')], md_line[match.end():].strip())
 
 	level = 0
 	for ch in md_line:
@@ -17,7 +17,7 @@ def makeHeader(md_line, current_level):
 		else:
 			if level != 0 and ch == ' ':
 				return (level, md_line[level:].strip())
-			return (level, md_line, md_line)
+			return (level, '', md_line)
 
 def loadParagraphs(md_lines):
 	current_heading_level = 0
@@ -25,6 +25,7 @@ def loadParagraphs(md_lines):
 	current_paragraph = root
 	contexts = []
 	is_code_block = False
+	has_inline_header = False
 	para_text = ''
 	for line in md_lines:
 		if line.startswith('```'):
@@ -42,29 +43,44 @@ def loadParagraphs(md_lines):
 				else:
 					para_text += ' ' + line
 			else:
-				line = para_text
+				line = para_text.strip()
 				para_text = ''
-				res = makeHeader(line, current_heading_level)
+				res = makeHeader(line)
 				if res != None:
 					heading_level = res[0]
 					if heading_level == 0:
-						current_paragraph.text.append(res[2])
+						if len(res[1]) != 0:
+							if has_inline_header:
+								current_paragraph = contexts.pop()
+							header = res[1]
+							current_paragraph.paragraphs[header] = Paragraph()
+							contexts.append(current_paragraph)
+							current_paragraph = current_paragraph.paragraphs[header]
+							has_inline_header = True
+						if len(res[2]) != 0:
+							current_paragraph.text.append(res[2])
+
 					elif heading_level > current_heading_level:
-						header = res[1] #line[heading_level + 1:].strip()
+						header = res[1]
 						current_paragraph.paragraphs[header] = Paragraph()
 						contexts.append(current_paragraph)
 						current_paragraph = current_paragraph.paragraphs[header]
 						current_heading_level = heading_level
 					else:
+						if has_inline_header:
+							has_inline_header = False
+							current_paragraph = contexts.pop()
+
 						for k in range(0,  current_heading_level - heading_level + 1):
 							current_paragraph = contexts.pop()
 
-						header = header = res[1] # line[heading_level + 1:].strip()
+						header = header = res[1]
 						current_paragraph.paragraphs[header] = Paragraph()
 						contexts.append(current_paragraph)
 						current_paragraph = current_paragraph.paragraphs[header]
 						current_heading_level = heading_level
 
+	print(para_text)
 	return root
 
 
