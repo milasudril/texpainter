@@ -1,16 +1,11 @@
-class ImgProc:
-	__params = dict()
-	__output_ports = dict()
-	__input_ports = dict()
-	__user_includes = []
-
+class ImageProcessor:
 	def __init__(self,
 		name,
 		body,
 		processor_id,
-		input_ports=[],
-		output_ports=[],
-		params=[],
+		input_ports=dict(),
+		output_ports=dict(),
+		params=dict(),
 		user_includes=[]):
 		self.__name = name
 		self.__body = body

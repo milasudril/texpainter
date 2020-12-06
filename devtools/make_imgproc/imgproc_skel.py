@@ -3,9 +3,9 @@
 import secrets
 import string
 import os
-import imgproc
+import make_imgproc.imgproc
 
-ImgProc = imgproc.ImgProc
+ImgProc = make_imgproc.imgproc.ImageProcessor
 
 def makeIncludeFileName(name):
 	return name.replace(' ', '_').lower() + '.hpp'
@@ -216,37 +216,23 @@ $img_proc_body
 #endif
 """)
 
+def makeCppSource(imgproc):
+	main_substitutes = dict()
+	main_substitutes['processor_name'] = imgproc.name()
+	main_substitutes['include_file'] = makeIncludeFileName(imgproc.name())
+	main_substitutes['namespace_name'] = makeNamespaceName(imgproc.name())
+	main_substitutes['include_guard'] = makeIncludeGuard(main_substitutes['include_file'])
+	main_substitutes['param_map_include'] = makeParamMapInclude(imgproc.params().keys())
+	main_substitutes['user_includes'] = '\n'.join(imgproc.userIncludes())
+	main_substitutes['impl_decl'] = makeImplDecl(imgproc.params())
+	main_substitutes['input_ports'] = makePortArray('InputPorts', imgproc.inputPorts())
+	main_substitutes['output_ports'] = makePortArray('OutputPorts', imgproc.outputPorts())
+	main_substitutes['param_names'] = makeParamNameArray(imgproc.params().keys())
+	main_substitutes['default_ctor'] = makeDefaultCtor(imgproc.params().values())
+	main_substitutes['call_operator'] = makeCallOperator(imgproc.params())
+	main_substitutes['param_accessors'] = makeParamAccessors(imgproc.params().keys())
+	main_substitutes['processor_id'] = imgproc.processorId()
+	main_substitutes['param_map'] = makeParamMapObject(imgproc.params().keys())
+	main_substitutes['img_proc_body'] = imgproc.body()
 
-imgproc = ImgProc(name='Foo Bar baz',
-	params={
-	'Param 1': 0.0,
-	'Param \\2': 1.0,
-	'Param "3"': 3.0
-	},
-	processor_id=secrets.token_hex(16),
-	body='''void main(auto const&, auto const&)
-{
-}''',
-	input_ports={'Input': 'GrayscaleRealPixels'},
-	output_ports={'Output': 'GrayscaleComplexPixels'},
-	user_includes=['#include <algorithm>'])
-
-main_substitutes = dict()
-main_substitutes['processor_name'] = imgproc.name()
-main_substitutes['include_file'] = makeIncludeFileName(imgproc.name())
-main_substitutes['namespace_name'] = makeNamespaceName(imgproc.name())
-main_substitutes['include_guard'] = makeIncludeGuard(main_substitutes['include_file'])
-main_substitutes['param_map_include'] = makeParamMapInclude(imgproc.params().keys())
-main_substitutes['user_includes'] = '\n'.join(imgproc.userIncludes())
-main_substitutes['impl_decl'] = makeImplDecl(imgproc.params())
-main_substitutes['input_ports'] = makePortArray('InputPorts', imgproc.inputPorts())
-main_substitutes['output_ports'] = makePortArray('OutputPorts', imgproc.outputPorts())
-main_substitutes['param_names'] = makeParamNameArray(imgproc.params().keys())
-main_substitutes['default_ctor'] = makeDefaultCtor(imgproc.params().values())
-main_substitutes['call_operator'] = makeCallOperator(imgproc.params())
-main_substitutes['param_accessors'] = makeParamAccessors(imgproc.params().keys())
-main_substitutes['processor_id'] = imgproc.processorId()
-main_substitutes['param_map'] = makeParamMapObject(imgproc.params().keys())
-main_substitutes['img_proc_body'] = imgproc.body()
-
-print(template.substitute(main_substitutes))
+	return template.substitute(main_substitutes)
