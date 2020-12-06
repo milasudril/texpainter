@@ -24,7 +24,7 @@ __Includes:__
 
 __Source code:__
 
-```
+```c++
 void main(auto const& args)
 {
 	auto const size = args.size().area();
