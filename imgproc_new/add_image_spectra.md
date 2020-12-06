@@ -6,6 +6,7 @@ a new spectrum that is the sum of `A` and `B`.
 ## Input ports
 
 __A__: (Grayscale complex pixels) First operand
+
 __B__: (Grayscale complex pixels) Second operand
 
 ## Output ports
@@ -14,9 +15,14 @@ __Sum__: (Grayscale complex pixels) The sum of `A` and `B`
 
 ## Implementation
 
+__Includes:__
+
 ```
 #include <algorithm>
+#include <functional>
 ```
+
+__Source code:__
 
 ```
 void main(auto const& args)
