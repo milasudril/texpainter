@@ -6,14 +6,27 @@ f = open('../imgproc_new/add_image_spectra.md')
 doc = make_imgproc.md_doc.loadParagraphs(f)
 f.close()
 
+def getDefaultParamValue(value):
+	text = value.text[0]
+	if text.startswith('(= '):
+		return float(text[3:text.find(')')])
+	return 0.0
+
+
+def getParams(params):
+	ret = dict()
+	for key, value in params.items():
+		ret[key] = getDefaultParamValue(value)
+	return ret
+
 for title, content in doc.paragraphs.items():
 	imgproc = make_imgproc.imgproc.ImageProcessor(title,
 		body = ''.join(content.paragraphs['Implementation'].paragraphs['Source code'].text),
 		processor_id = content.paragraphs['Tags'].paragraphs['Id'].text[0],
 		input_ports = content.paragraphs['Input ports'].paragraphs,
 		output_ports = content.paragraphs['Output ports'].paragraphs,
-		params = content.paragraphs['Parameters'].paragraphs
-		)
+		params = getParams(content.paragraphs['Parameters'].paragraphs),
+		user_includes = content.paragraphs['Implementation'].paragraphs['Includes'].text)
 
 	print(make_imgproc.imgproc_skel.makeCppSource(imgproc))
 
