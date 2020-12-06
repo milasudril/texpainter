@@ -28,6 +28,8 @@ def loadParagraphs(md_lines):
 	for line in md_lines:
 		if line.startswith('```'):
 			is_code_block = not is_code_block
+		elif is_code_block:
+			current_paragraph.text += line
 		else:
 			res = makeHeader(line, current_heading_level)
 			heading_level = res[0]
