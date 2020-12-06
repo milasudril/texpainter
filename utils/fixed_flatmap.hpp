@@ -31,7 +31,9 @@ namespace Texpainter
 
 		FixedFlatmap() = default;
 
-		explicit FixedFlatmap(std::array<mapped_type, std::size(Keys::items)>&& init):m_vals{init}{}
+		explicit FixedFlatmap(std::array<mapped_type, std::size(Keys::items)>&& init): m_vals{init}
+		{
+		}
 
 		static constexpr auto size() { return std::size(Keys::items); }
 

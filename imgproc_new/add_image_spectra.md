@@ -23,9 +23,10 @@ __Gain B:__ (= 0.5) Amplification factor for `B`, between -1.0 evFS and +1.0 evF
 
 ## Implementation
 
-To loop through all pixels in `A` and `B`, `std::transform` is used. As callback to `std::function`,
-a function object with access to the mapped parameter values are used. The function object returns
-a weighted sum of its two arguments, where the weights are deterimened by the parameters.
+To loop through all pixels in `A` and `B`, `std::transform` is used. As callback to
+`std::transform`, a function object with access to the mapped parameter values are used.
+The function object returns a weighted sum of its two arguments, where the weights are
+deterimened by the parameters.
 
 __Includes:__
 
@@ -37,7 +38,7 @@ __Includes:__
 __Source code:__
 
 ```c++
-inline double mapParamenter(ParamValue val)
+inline double mapParameter(ParamValue val)
 {
 	return std::exp2(std::lerp(-1.0, 1.0, val.value()));
 }
@@ -49,8 +50,8 @@ void main(auto const& args, auto const& params)
 	               input<0>(args) + size,
 	               input<1>(args),
 	               output<0>(args),
-	               [gain_a = mapParameter(param<Str{"Gain A"}>()),
-	               gain_b = mapParamenter(param<Str{"Gain B"}>())](auto a, auto b) {
+	               [gain_a = mapParameter(param<Str{"Gain A"}>(params)),
+	               gain_b = mapParameter(param<Str{"Gain B"}>(params))](auto a, auto b) {
 	               	return gain_a*a + gain_b*b;
                    });
 }

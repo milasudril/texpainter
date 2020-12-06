@@ -52,7 +52,6 @@ namespace Texpainter::FilterGraph
 	auto param(ParamMap<InterfaceDescriptor> const& params)
 	{
 		return *params.template find<Key>();
-
 	}
 
 }
