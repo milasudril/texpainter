@@ -47,6 +47,14 @@ namespace Texpainter::FilterGraph
 	template<class InterfaceDescriptor>
 	using ParamMap = Texpainter::
 	    FixedFlatmap<detail::ParamNames<InterfaceDescriptor>, ParamValue, detail::ParamNameCompare>;
+
+	template<auto Key, class InterfaceDescriptor>
+	auto param(ParamMap<InterfaceDescriptor> const& params)
+	{
+		return *params.template find<Key>();
+
+	}
+
 }
 
 #endif

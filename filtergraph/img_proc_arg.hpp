@@ -61,6 +61,30 @@ namespace Texpainter::FilterGraph
 		InputArgs m_inputs;
 		OutputArgs m_outputs;
 	};
+
+	template<size_t index, ImgProcInterfaceDescriptor Descriptor>
+	auto input(Descriptor const& d, uint32_t col, uint32_t row)
+	{
+		return d.template input<index>(col, row);
+	}
+
+	template<size_t index, ImgProcInterfaceDescriptor Descriptor>
+	auto input(Descriptor const& d)
+	{
+		return d.template input<index>();
+	}
+
+	template<size_t index, ImgProcInterfaceDescriptor Descriptor>
+	auto output(Descriptor const& d, uint32_t col, uint32_t row)
+	{
+		return d.template output<index>(col, row);
+	}
+
+	template<size_t index, ImgProcInterfaceDescriptor Descriptor>
+	auto output(Descriptor const& d)
+	{
+		return d.template output<index>();
+	}
 }
 
 #endif

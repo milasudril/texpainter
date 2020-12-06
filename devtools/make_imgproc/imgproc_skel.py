@@ -70,13 +70,16 @@ def makeImplDecl(params):
 	if len(params) == 0:
 		return 'void main(auto const& args);'
 	else:
-		return 'void main(auto const& args, auto const& params);'
+		return '''using Texpainter::Str;
+		using Texpainter::FilterGraph::param;
+
+		void main(auto const& args, auto const& params);'''
 
 def makeCallOperator(params):
 	if len(params) == 0:
 		return 'impl::main(args);'
 	else:
-		return 'impl::main(args, params);'
+		return '''impl::main(args, params);'''
 
 def makePortArray(name, ports):
 	items = []
@@ -170,6 +173,8 @@ namespace $namespace_name
 
 	namespace impl
 	{
+		using Texpainter::FilterGraph::input;
+		using Texpainter::FilterGraph::output;
 		$impl_decl
 	}
 
