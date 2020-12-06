@@ -10,8 +10,8 @@ doc = make_imgproc.md_doc.loadParagraphs(lines)
 def dump(para, level):
 	for title, content in para.items():
 		for k in range(0, level + 1):
-			print('#', end = '')
-		print(title, end = '')
+			print('-', end = '')
+		print(' %s'%title, end = '')
 		print(content.text, end = '')
 		dump(content.paragraphs, level + 1)
 dump(doc.paragraphs, 0)

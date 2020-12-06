@@ -10,7 +10,9 @@ def headingLevel(md_line):
 		if ch == '#':
 			level = level + 1
 		else:
-			return level
+			if level != 0 and ch == ' ':
+				return level
+			return 0
 
 def loadParagraphs(md_lines):
 	current_heading_level = 0
