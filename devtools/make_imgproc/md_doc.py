@@ -3,7 +3,7 @@ import re
 class Paragraph:
 	def __init__(self):
 		self.paragraphs = dict()  # Insertion order preserved as of Python 3.7
-		self.text = ''
+		self.text = []
 
 def makeHeader(md_line, current_level):
 #	match = re.match(r'__[^:]*:__', md_line)
@@ -25,31 +25,42 @@ def loadParagraphs(md_lines):
 	current_paragraph = root
 	contexts = []
 	is_code_block = False
+	para_text = ''
 	for line in md_lines:
 		if line.startswith('```'):
+			if is_code_block:
+				current_paragraph.text.append(para_text)
+				para_text = ''
 			is_code_block = not is_code_block
 		elif is_code_block:
-			current_paragraph.text += line
+			para_text += line
 		else:
-			res = makeHeader(line, current_heading_level)
-			heading_level = res[0]
-			if heading_level == 0:
-				current_paragraph.text += res[2]
-			elif heading_level > current_heading_level:
-				header = res[1] #line[heading_level + 1:].strip()
-				current_paragraph.paragraphs[header] = Paragraph()
-				contexts.append(current_paragraph)
-				current_paragraph = current_paragraph.paragraphs[header]
-				current_heading_level = heading_level
+			line = line.strip()
+			if len(line) != 0:
+				para_text += line
 			else:
-				for k in range(0,  current_heading_level - heading_level + 1):
-					current_paragraph = contexts.pop()
+				line = para_text
+				para_text = ''
+				res = makeHeader(line, current_heading_level)
+				if res != None:
+					heading_level = res[0]
+					if heading_level == 0:
+						current_paragraph.text.append(res[2])
+					elif heading_level > current_heading_level:
+						header = res[1] #line[heading_level + 1:].strip()
+						current_paragraph.paragraphs[header] = Paragraph()
+						contexts.append(current_paragraph)
+						current_paragraph = current_paragraph.paragraphs[header]
+						current_heading_level = heading_level
+					else:
+						for k in range(0,  current_heading_level - heading_level + 1):
+							current_paragraph = contexts.pop()
 
-				header = header = res[1] # line[heading_level + 1:].strip()
-				current_paragraph.paragraphs[header] = Paragraph()
-				contexts.append(current_paragraph)
-				current_paragraph = current_paragraph.paragraphs[header]
-				current_heading_level = heading_level
+						header = header = res[1] # line[heading_level + 1:].strip()
+						current_paragraph.paragraphs[header] = Paragraph()
+						contexts.append(current_paragraph)
+						current_paragraph = current_paragraph.paragraphs[header]
+						current_heading_level = heading_level
 
 	return root
 
