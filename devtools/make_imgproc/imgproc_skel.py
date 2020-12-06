@@ -201,6 +201,10 @@ namespace $namespace_name
 
 		static constexpr auto id() { return ImageProcessorId{"$processor_id"}; }
 
+		static constexpr char const* description() { return "$description"; }
+
+		static constexpr char const* category() { return "$category"; }
+
 	private:
 		$param_map
 	};
@@ -234,5 +238,8 @@ def makeCppSource(imgproc):
 	main_substitutes['processor_id'] = imgproc.processorId()
 	main_substitutes['param_map'] = makeParamMapObject(imgproc.params().keys())
 	main_substitutes['img_proc_body'] = imgproc.body()
+	main_substitutes['description'] = stringEscape(imgproc.description())
+	main_substitutes['category'] = stringEscape(imgproc.category())
+
 
 	return template.substitute(main_substitutes)

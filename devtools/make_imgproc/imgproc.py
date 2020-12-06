@@ -6,7 +6,9 @@ class ImageProcessor:
 		input_ports=dict(),
 		output_ports=dict(),
 		params=dict(),
-		user_includes=[]):
+		user_includes=[],
+		description = '',
+		category = ''):
 		self.__name = name
 		self.__body = body
 		self.__user_includes = user_includes
@@ -14,6 +16,8 @@ class ImageProcessor:
 		self.__output_ports = output_ports
 		self.__params = params
 		self.__processor_id = processor_id
+		self.__description = description
+		self.__category = category
 
 	def name(self):
 		return self.__name
@@ -35,3 +39,9 @@ class ImageProcessor:
 
 	def processorId(self):
 		return self.__processor_id
+
+	def description(self):
+		return self.__description
+
+	def category(self):
+		return self.__category

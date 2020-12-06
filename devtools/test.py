@@ -42,7 +42,9 @@ for title, content in doc.paragraphs.items():
 		input_ports = getPorts(content.paragraphs['Input ports'].paragraphs),
 		output_ports = getPorts(content.paragraphs['Output ports'].paragraphs),
 		params = getParams(content.paragraphs['Parameters'].paragraphs),
-		user_includes = content.paragraphs['Implementation'].paragraphs['Includes'].text)
+		user_includes = content.paragraphs['Implementation'].paragraphs['Includes'].text,
+		description = '\\n\\n'.join(content.text),
+		category = content.paragraphs['Tags'].paragraphs['Category'].text[0])
 
 	print(make_imgproc.imgproc_skel.makeCppSource(imgproc))
 
