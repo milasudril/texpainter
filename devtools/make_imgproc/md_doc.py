@@ -18,24 +18,28 @@ def loadParagraphs(md_lines):
 	current_paragraph = root
 	contexts = []
 	para_count = 0
+	is_code_block = False
 	for line in md_lines:
-		heading_level = headingLevel(line)
-		if heading_level == 0:
-			current_paragraph.text += line
-		elif heading_level > current_heading_level:
-			current_paragraph.paragraphs[line[heading_level:]] = Paragraph()
-			current_paragraph.level = 1
-			contexts.append(current_paragraph)
-			current_paragraph = current_paragraph.paragraphs[line[heading_level:]]
-			current_heading_level = heading_level
+		if line.startswith('```'):
+			is_code_block = not is_code_block
 		else:
-			for k in range(0,  current_heading_level - heading_level + 1):
-				current_paragraph = contexts.pop()
+			heading_level = headingLevel(line)
+			if heading_level == 0:
+				current_paragraph.text += line
+			elif heading_level > current_heading_level:
+				current_paragraph.paragraphs[line[heading_level:]] = Paragraph()
+				current_paragraph.level = 1
+				contexts.append(current_paragraph)
+				current_paragraph = current_paragraph.paragraphs[line[heading_level:]]
+				current_heading_level = heading_level
+			else:
+				for k in range(0,  current_heading_level - heading_level + 1):
+					current_paragraph = contexts.pop()
 
-			current_paragraph.paragraphs[line[heading_level:]] = Paragraph()
-			contexts.append(current_paragraph)
-			current_paragraph = current_paragraph.paragraphs[line[heading_level:]]
-			current_heading_level = heading_level
+				current_paragraph.paragraphs[line[heading_level:]] = Paragraph()
+				contexts.append(current_paragraph)
+				current_paragraph = current_paragraph.paragraphs[line[heading_level:]]
+				current_heading_level = heading_level
 
 	return root
 
