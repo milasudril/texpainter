@@ -143,123 +143,18 @@
 			"plugin": "targetcxx"
 		},
 		{
-			"config": {},
-			"filename_exts": [
-				".cp"
-			],
-			"name": "targetcp_default",
-			"plugin": "targetcp"
-		},
-		{
-			"config": {
-				"command": {
-					"args": [
-						"--",
-						"{script}",
-						"{args}"
-					],
-					"name": "python3"
+			"plugin": "targettrivial",
+			"name": "imgproc",
+			"filename_exts":[".imgproc"],
+			"config":
+			{
+				"filename_ext":".hpp",
+				"command":
+				{
+					"args":["{source}", "{target}"],
+					"name":"devtools/imgproc_gen/make_imgproc.py"
 				}
-			},
-			"filename_exts": [
-				".py"
-			],
-			"name": "targetpython_default",
-			"plugin": "targetpython"
-		},
-		{
-			"config": {
-				"tar": {
-					"command": {
-						"args": [
-							"{target_strip}",
-							"{root_append}",
-							"{compressor}",
-							"-cf",
-							"{target}",
-							"-T",
-							"-"
-						],
-						"name": "tar"
-					},
-					"compressors": {
-						"bzip2": "-j",
-						"gzip": "-z",
-						"lzma": "-J"
-					},
-					"root_append": "--transform=s,\\\\(.*\\\\),^\\\\1,g",
-					"target_strip": "--transform=s,\\^^,,g"
-				},
-				"zip": {
-					"create": {
-						"args": [
-							"-@",
-							"{target}"
-						],
-						"name": "zip"
-					},
-					"rename": {
-						"args": [
-							"-w",
-							"{target}"
-						],
-						"name": "zipnote"
-					}
-				}
-			},
-			"filename_exts": [
-				".archive"
-			],
-			"name": "targetarchive_default",
-			"plugin": "targetarchive"
-		},
-		{
-			"config": {
-				"command": {
-					"args": [
-						"{script}",
-						"{args}"
-					],
-					"name": "bash"
-				}
-			},
-			"filename_exts": [
-				".sh"
-			],
-			"name": "targetbash_default",
-			"plugin": "targetbash"
-		},
-		{
-			"config": {
-				"filter": {
-					"args": [
-						"{depfile}",
-						"{source}"
-					],
-					"name": "xsltproc"
-				}
-			},
-			"filename_exts": [
-				".xml"
-			],
-			"name": "targetxml_default",
-			"plugin": "targetxml"
-		},
-		{
-			"config": {
-				"command": {
-					"args": [
-						"{script}",
-						"{args}"
-					],
-					"name": "octave-cli"
-				}
-			},
-			"filename_exts": [
-				".m"
-			],
-			"name": "targetoctave_default",
-			"plugin": "targetoctave"
+			}
 		}
 	],
 	"targetinfo": {

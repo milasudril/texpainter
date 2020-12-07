@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
-
 import secrets
 import string
 import os
-import make_imgproc.imgproc
+import image_processor
 
-ImgProc = make_imgproc.imgproc.ImageProcessor
+ImgProc = image_processor.ImageProcessor
 
 def makeIncludeFileName(name):
 	return name.replace(' ', '_').lower() + '.hpp'
