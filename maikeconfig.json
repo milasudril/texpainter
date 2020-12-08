@@ -145,7 +145,7 @@
 		{
 			"plugin": "targettrivial",
 			"name": "imgproc",
-			"filename_exts":[".imgproc"],
+			"filename_exts":[".imgproc.md"],
 			"config":
 			{
 				"filename_ext":".hpp",
