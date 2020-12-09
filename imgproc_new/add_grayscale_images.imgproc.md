@@ -1,7 +1,7 @@
 # Add grayscale images
 
-This image processor takes two grayscale images `A` and `B` and computes their sum. The output `Sum` is
-a new spectrum that is the sum of `A` and `B`.
+This image processor takes two grayscale images `A` and `B` and computes their sum. The output `Sum`
+is the sum of `A` and `B`.
 
 ## Input ports
 

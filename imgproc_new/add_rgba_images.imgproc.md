@@ -1,7 +1,7 @@
 # Add RGBA images
 
 This image processor takes two RGBA images `A` and `B` and computes their sum. The output `Sum` is
-a new spectrum that is the sum of `A` and `B`.
+the sum of `A` and `B`.
 
 ## Input ports
 
