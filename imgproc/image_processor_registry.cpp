@@ -3,7 +3,8 @@
 //@		"include_targets":[
 //@		"../imgproc_new/add_grayscale_images.imgproc.hpp",
 //@		"../imgproc_new/add_image_spectra.imgproc.hpp",
-//@		"../imgproc_new/add_rgba_images.imgproc.hpp"
+//@		"../imgproc_new/add_rgba_images.imgproc.hpp",
+//@		"../imgproc_new/multiply_grayscale_images.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -22,7 +23,6 @@
 #include "./mix_grayscale/mix_grayscale.hpp"
 #include "./mix_complex/mix_complex.hpp"
 #include "./real_constant/real_constant.hpp"
-#include "./real_real_multiply/real_real_multiply.hpp"
 #include "./grayscale_range/grayscale_range.hpp"
 #include "./map_grayscale_range/map_grayscale_range.hpp"
 #include "./random_color/random_color.hpp"
@@ -58,6 +58,7 @@ namespace
 		get_info<::AddImageSpectra::ImageProcessor>(),
 		get_info<::AddGrayscaleImages::ImageProcessor>(),
 		get_info<::AddRgbaImages::ImageProcessor>(),
+		get_info<::MultiplyGrayscaleImages::ImageProcessor>(),
 	    get_info<::RgbaCombine::ImageProcessor>(),
 	    get_info<::RgbaSplit::ImageProcessor>(),
 	    get_info<::GaussianMask2d::ImageProcessor>(),
@@ -71,7 +72,6 @@ namespace
 	    get_info<::MixGrayscale::ImageProcessor>(),
 	    get_info<::MixComplex::ImageProcessor>(),
 	    get_info<::RealConstant::ImageProcessor>(),
-	    get_info<::RealRealMultiply::ImageProcessor>(),
 	    get_info<::GrayscaleRange::ImageProcessor>(),
 	    get_info<::MapGrayscaleRange::ImageProcessor>(),
 	    get_info<::RandomColor::ImageProcessor>(),

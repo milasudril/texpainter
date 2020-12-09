@@ -46,7 +46,7 @@ def makeImgproc(doc):
 			processor_id = content.paragraphs['Tags'].paragraphs['Id'].text[0],
 			input_ports = getPorts(content.paragraphs['Input ports'].paragraphs),
 			output_ports = getPorts(content.paragraphs['Output ports'].paragraphs),
-			params = getParams(content.paragraphs['Parameters'].paragraphs),
+			params = getParams(content.paragraphs['Parameters'].paragraphs if 'Parameters' in content.paragraphs else dict()),
 			user_includes = content.paragraphs['Implementation'].paragraphs['Includes'].text,
 			description = '\\n\\n'.join(content.text),
 			category = content.paragraphs['Tags'].paragraphs['Category'].text[0],
