@@ -8,7 +8,9 @@ class ImageProcessor:
 		params=dict(),
 		user_includes=[],
 		description = '',
-		category = ''):
+		category = '',
+		impl_start = 0,
+		user_includes_start = 0):
 		self.__name = name
 		self.__body = body
 		self.__user_includes = user_includes
@@ -18,6 +20,8 @@ class ImageProcessor:
 		self.__processor_id = processor_id
 		self.__description = description
 		self.__category = category
+		self.__impl_start = impl_start
+		self.__user_includes_start = user_includes_start
 
 	def name(self):
 		return self.__name
@@ -45,3 +49,9 @@ class ImageProcessor:
 
 	def category(self):
 		return self.__category
+
+	def implStart(self):
+		return self.__impl_start
+
+	def userIncludesStart(self):
+		return self.__user_includes_start

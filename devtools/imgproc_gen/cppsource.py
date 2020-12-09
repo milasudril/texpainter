@@ -156,7 +156,7 @@ template = string.Template("""//@	{
 #include "filtergraph/img_proc_arg.hpp"
 #include "filtergraph/img_proc_param.hpp"
 $param_map_include
-
+#line $user_includes_start "$src_file"
 $user_includes
 
 namespace $namespace_name
@@ -210,7 +210,7 @@ namespace $namespace_name
 
 namespace $namespace_name::impl
 {
-
+#line $impl_start "$src_file"
 $img_proc_body
 
 }
@@ -218,7 +218,7 @@ $img_proc_body
 #endif
 """)
 
-def makeCppSource(imgproc):
+def makeCppSource(imgproc, src_file):
 	main_substitutes = dict()
 	main_substitutes['processor_name'] = imgproc.name()
 	main_substitutes['include_file'] = makeIncludeFileName(imgproc.name())
@@ -238,6 +238,9 @@ def makeCppSource(imgproc):
 	main_substitutes['img_proc_body'] = imgproc.body()
 	main_substitutes['description'] = stringEscape(imgproc.description())
 	main_substitutes['category'] = stringEscape(imgproc.category())
+	main_substitutes['impl_start'] = str(imgproc.implStart())
+	main_substitutes['user_includes_start'] = str(imgproc.userIncludesStart())
+	main_substitutes['src_file'] = src_file
 
 
 	return template.substitute(main_substitutes)

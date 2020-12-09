@@ -5,6 +5,7 @@ class Paragraph:
 	def __init__(self):
 		self.paragraphs = dict()  # Insertion order preserved as of Python 3.7
 		self.text = []
+		self.line_no = 0
 
 
 def makeHeader(md_line):
@@ -22,7 +23,7 @@ def makeHeader(md_line):
 			return (level, '', md_line)
 
 
-def processLine(line, current_heading_level, current_paragraph, contexts, has_inline_header):
+def processLine(line, line_no, current_heading_level, current_paragraph, contexts, has_inline_header):
 	res = makeHeader(line)
 	if res != None:
 		heading_level = res[0]
@@ -34,6 +35,7 @@ def processLine(line, current_heading_level, current_paragraph, contexts, has_in
 				current_paragraph.paragraphs[header] = Paragraph()
 				contexts.append(current_paragraph)
 				current_paragraph = current_paragraph.paragraphs[header]
+				current_paragraph.line_no = line_no
 				has_inline_header = True
 			if len(res[2]) != 0:
 				current_paragraph.text.append(res[2])
@@ -43,6 +45,7 @@ def processLine(line, current_heading_level, current_paragraph, contexts, has_in
 			current_paragraph.paragraphs[header] = Paragraph()
 			contexts.append(current_paragraph)
 			current_paragraph = current_paragraph.paragraphs[header]
+			current_paragraph.line_no = line_no
 			current_heading_level = heading_level
 		else:
 			if has_inline_header:
@@ -56,6 +59,7 @@ def processLine(line, current_heading_level, current_paragraph, contexts, has_in
 			current_paragraph.paragraphs[header] = Paragraph()
 			contexts.append(current_paragraph)
 			current_paragraph = current_paragraph.paragraphs[header]
+			current_paragraph.line_no = line_no
 			current_heading_level = heading_level
 
 	return (current_heading_level, current_paragraph, contexts, has_inline_header)
@@ -69,11 +73,14 @@ def loadParagraphs(md_lines):
 	is_code_block = False
 	has_inline_header = False
 	para_text = ''
+	line_no = 1
 	for line in md_lines:
 		if line.startswith('```'):
 			if is_code_block:
 				current_paragraph.text.append(para_text)
 				para_text = ''
+			else:
+				current_paragraph.line_no = line_no
 			is_code_block = not is_code_block
 		elif is_code_block:
 			para_text += line
@@ -88,9 +95,10 @@ def loadParagraphs(md_lines):
 				line = para_text.strip()
 				para_text = ''
 				current_heading_level, current_paragraph, contexts, has_inline_header = processLine(
-					line, current_heading_level, current_paragraph, contexts, has_inline_header)
+					line, line_no, current_heading_level, current_paragraph, contexts, has_inline_header)
+		line_no = line_no + 1
 
-	processLine(para_text.strip(), current_heading_level, current_paragraph, contexts,
+	processLine(para_text.strip(), line_no, current_heading_level, current_paragraph, contexts,
 		has_inline_header)
 
 	return root

@@ -45,23 +45,22 @@ def makeImgproc(doc):
 			params = getParams(content.paragraphs['Parameters'].paragraphs),
 			user_includes = content.paragraphs['Implementation'].paragraphs['Includes'].text,
 			description = '\\n\\n'.join(content.text),
-			category = content.paragraphs['Tags'].paragraphs['Category'].text[0])
-
-	print()
-	return  cppsource.makeCppSource(imgproc)
+			category = content.paragraphs['Tags'].paragraphs['Category'].text[0],
+			user_includes_start = content.paragraphs['Implementation'].paragraphs['Includes'].line_no + 1,
+			impl_start = content.paragraphs['Implementation'].paragraphs['Source code'].line_no + 1)
 
 def loadDocument(filename):
 	with open(filename) as f:
 		return md_doc.loadParagraphs(f)
 
-def writeImgproc(imgproc, filename):
-	str = cppsource.makeCppSource(imgproc)
-	with open(filename, 'w') as f:
+def writeImgproc(imgproc, src, target):
+	str = cppsource.makeCppSource(imgproc, src)
+	with open(target, 'w') as f:
 		f.write(str)
 
 doc = loadDocument(sys.argv[1])
 imgproc = makeImgproc(doc)
-writeImgproc(imgproc, sys.argv[2])
+writeImgproc(imgproc, sys.argv[1], sys.argv[2])
 
 
 
