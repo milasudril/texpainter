@@ -1,5 +1,10 @@
 //@	{
-//@	"targets":[{"name":"image_processor_registry.o","type":"object"}]
+//@	"targets":[{"name":"image_processor_registry.o","type":"object",
+//@		"include_targets":[
+//@		"../imgproc_new/add_grayscale_images.imgproc.hpp",
+//@		"../imgproc_new/add_image_spectra.imgproc.hpp",
+//@		"../imgproc_new/add_rgba_images.imgproc.hpp"
+//@	]}]
 //@	}
 
 #include "./image_processor_registry.hpp"
@@ -50,6 +55,9 @@ namespace
 	}
 
 	constexpr ImageProcessorInfo s_processors[] = {
+		get_info<::AddImageSpectra::ImageProcessor>(),
+		get_info<::AddGrayscaleImages::ImageProcessor>(),
+		get_info<::AddRgbaImages::ImageProcessor>(),
 	    get_info<::RgbaCombine::ImageProcessor>(),
 	    get_info<::RgbaSplit::ImageProcessor>(),
 	    get_info<::GaussianMask2d::ImageProcessor>(),
