@@ -1,7 +1,7 @@
 # Add RGBA images
 
-This image processor takes two RGBA images `A` and `B` and computes their sum. The output `Sum` is
-the sum of `A` and `B`.
+This image processor takes two RGBA images `A` and `B` and computes their pixel-wise sum. The output
+`Sum` is the pixel-wise sum of `A` and `B`.
 
 ## Input ports
 

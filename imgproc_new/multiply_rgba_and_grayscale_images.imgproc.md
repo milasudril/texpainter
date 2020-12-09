@@ -1,17 +1,17 @@
-# Multiply grayscale images
+# Multiply RGBA and grayscale images
 
-This image processor takes two grayscale images `A` and `B` and computes their pixel-wise product.
-The output `Product` is the pixel-wise product of `A` and `B`.
+This image processor takes one RGBA image `A`, and one grayscale image `B`, and computes their
+pixel-wise product. The output `Product` is the pixel-wise product of `A` and `B`.
 
 ## Input ports
 
-__A:__ (Grayscale real pixels) First operand
+__A:__ (RGBA pixels) First operand
 
 __B:__ (Grayscale real pixels) Second operand
 
 ## Output ports
 
-__Product:__ (Grayscale real pixels) The product of `A` and `B`
+__Product:__ (RGBA pixels) The product of `A` and `B`
 
 ## Implementation
 
@@ -41,6 +41,6 @@ inline void main(auto const& args)
 
 ## Tags
 
-__Id:__ 487b4182c3b147b1fa04162cf9c17723
+__Id:__ 478f69b7dafaa1594c345df283d82021
 
 __Category:__ Arithmetic operators

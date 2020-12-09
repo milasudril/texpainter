@@ -4,7 +4,8 @@
 //@		"../imgproc_new/add_grayscale_images.imgproc.hpp",
 //@		"../imgproc_new/add_image_spectra.imgproc.hpp",
 //@		"../imgproc_new/add_rgba_images.imgproc.hpp",
-//@		"../imgproc_new/multiply_grayscale_images.imgproc.hpp"
+//@		"../imgproc_new/multiply_grayscale_images.imgproc.hpp",
+//@		"../imgproc_new/multiply_rgba_and_grayscale_images.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -59,6 +60,7 @@ namespace
 		get_info<::AddGrayscaleImages::ImageProcessor>(),
 		get_info<::AddRgbaImages::ImageProcessor>(),
 		get_info<::MultiplyGrayscaleImages::ImageProcessor>(),
+		get_info<::MultiplyRgbaAndGrayscaleImages::ImageProcessor>(),
 	    get_info<::RgbaCombine::ImageProcessor>(),
 	    get_info<::RgbaSplit::ImageProcessor>(),
 	    get_info<::GaussianMask2d::ImageProcessor>(),

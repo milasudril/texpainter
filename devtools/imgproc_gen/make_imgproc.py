@@ -24,7 +24,7 @@ def translateType(str):
 		return 'GrayscaleRealPixels'
 	if str == 'RGBA pixels':
 		return 'RgbaPixels'
-	raise Exception('Unsupported port type')
+	raise Exception('Unsupported port type ' + str)
 
 def getType(value):
 	text = value.text[0]

@@ -1,7 +1,7 @@
 # Add image spectra
 
-This image processor takes two image spectra `A` and `B` and computes their sum. The output `Sum` is
-a new spectrum that is the sum of `A` and `B`.
+This image processor takes two image spectra `A` and `B` and computes their pixel-wise sum. The
+output `Sum` is a new spectrum that is the pixel-wise sum of `A` and `B`.
 
 ## Input ports
 
