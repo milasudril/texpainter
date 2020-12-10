@@ -143,18 +143,21 @@
 			"plugin": "targetcxx"
 		},
 		{
-			"plugin": "targettrivial",
+			"config": {
+				"command": {
+					"args": [
+						"{source}",
+						"{target}"
+					],
+					"name": "devtools/imgproc_gen/make_imgproc.py"
+				},
+				"filename_ext": ".hpp"
+			},
+			"filename_exts": [
+				".imgproc.md"
+			],
 			"name": "imgproc",
-			"filename_exts":[".imgproc.md"],
-			"config":
-			{
-				"filename_ext":".hpp",
-				"command":
-				{
-					"args":["{source}", "{target}"],
-					"name":"devtools/imgproc_gen/make_imgproc.py"
-				}
-			}
+			"plugin": "targettrivial"
 		}
 	],
 	"targetinfo": {

@@ -18,7 +18,7 @@ def getParams(params):
 	return ret
 
 def translateType(str):
-	if str == 'Grayscale complex pixels':
+	if str == 'Image spectrum':
 		return 'GrayscaleComplexPixels'
 	if str == 'Grayscale real pixels':
 		return 'GrayscaleRealPixels'

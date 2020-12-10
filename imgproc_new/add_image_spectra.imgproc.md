@@ -5,13 +5,13 @@ output `Sum` is a new spectrum that is the pixel-wise sum of `A` and `B`.
 
 ## Input ports
 
-__A:__ (Grayscale complex pixels) First operand
+__A:__ (Image spectrum) First operand
 
-__B:__ (Grayscale complex pixels) Second operand
+__B:__ (Image spectrum) Second operand
 
 ## Output ports
 
-__Sum:__ (Grayscale complex pixels) The sum of `A` and `B`
+__Sum:__ (Image spectrum) The sum of `A` and `B`
 
 ## Parameters
 

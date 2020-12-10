@@ -5,7 +5,8 @@
 //@		"../imgproc_new/add_image_spectra.imgproc.hpp",
 //@		"../imgproc_new/add_rgba_images.imgproc.hpp",
 //@		"../imgproc_new/multiply_grayscale_images.imgproc.hpp",
-//@		"../imgproc_new/multiply_rgba_and_grayscale_images.imgproc.hpp"
+//@		"../imgproc_new/multiply_rgba_and_grayscale_images.imgproc.hpp",
+//@		"../imgproc_new/multiply_image_spectrum_and_grayscale_image.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -16,7 +17,6 @@
 #include "./gaussian_mask_2d/gaussian_mask_2d.hpp"
 #include "./dft_forward/dft_forward.hpp"
 #include "./dft_backward/dft_backward.hpp"
-#include "./complex_real_multiply/complex_real_multiply.hpp"
 #include "./butterworth_mask_2d/butterworth_mask_2d.hpp"
 #include "./butterworth_mask_1d/butterworth_mask_1d.hpp"
 #include "./normalize_grayscale/normalize_grayscale.hpp"
@@ -56,17 +56,17 @@ namespace
 	}
 
 	constexpr ImageProcessorInfo s_processors[] = {
-		get_info<::AddImageSpectra::ImageProcessor>(),
-		get_info<::AddGrayscaleImages::ImageProcessor>(),
-		get_info<::AddRgbaImages::ImageProcessor>(),
-		get_info<::MultiplyGrayscaleImages::ImageProcessor>(),
-		get_info<::MultiplyRgbaAndGrayscaleImages::ImageProcessor>(),
+	    get_info<::AddImageSpectra::ImageProcessor>(),
+	    get_info<::AddGrayscaleImages::ImageProcessor>(),
+	    get_info<::AddRgbaImages::ImageProcessor>(),
+	    get_info<::MultiplyGrayscaleImages::ImageProcessor>(),
+	    get_info<::MultiplyRgbaAndGrayscaleImages::ImageProcessor>(),
+	    get_info<::MultiplyImageSpectrumAndGrayscaleImage::ImageProcessor>(),
 	    get_info<::RgbaCombine::ImageProcessor>(),
 	    get_info<::RgbaSplit::ImageProcessor>(),
 	    get_info<::GaussianMask2d::ImageProcessor>(),
 	    get_info<::DftForward::ImageProcessor>(),
 	    get_info<::DftBackward::ImageProcessor>(),
-	    get_info<::ComplexRealMultiply::ImageProcessor>(),
 	    get_info<::ButterworthMask2d::ImageProcessor>(),
 	    get_info<::ButterworthMask1d::ImageProcessor>(),
 	    get_info<::NormalizeGrayscale::ImageProcessor>(),
