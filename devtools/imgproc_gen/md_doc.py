@@ -6,6 +6,8 @@ class Paragraph:
 		self.paragraphs = dict()  # Insertion order preserved as of Python 3.7
 		self.text = []
 		self.line_no = 0
+		self.is_code_block = False
+		self.is_inline_header = False
 
 
 def makeHeader(md_line):
@@ -36,6 +38,7 @@ def processLine(line, line_no, current_heading_level, current_paragraph, context
 				contexts.append(current_paragraph)
 				current_paragraph = current_paragraph.paragraphs[header]
 				current_paragraph.line_no = line_no
+				current_paragraph.is_inline_header = True
 				has_inline_header = True
 			if len(res[2]) != 0:
 				current_paragraph.text.append(res[2])
@@ -81,6 +84,7 @@ def loadParagraphs(md_lines):
 				para_text = ''
 			else:
 				current_paragraph.line_no = line_no
+				current_paragraph.is_code_block = True
 			is_code_block = not is_code_block
 		elif is_code_block:
 			para_text += line
