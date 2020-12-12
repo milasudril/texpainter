@@ -6,6 +6,7 @@ all:
 format:
 	find -name '*.hpp' -or -name '*.cpp' | xargs clang-format -i
 	find -name '*.json' -exec bash -c 'jq --tab --sort-keys . "{}" > .fmt && mv .fmt "{}"' \;
+	find -name '*.imgproc.md' | xargs devtools/imgproc_gen/format_imgproc.py
 
 .PHONY:
 imgproc_id:
