@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"size_input.hpp","type":"include"}]}
 
-#ifndef TEXPAINTER_APP_SIZEINPUT_HPP
-#define TEXPAINTER_APP_SIZEINPUT_HPP
+#ifndef TEXPAINTER_APPNEW_SIZEINPUT_HPP
+#define TEXPAINTER_APPNEW_SIZEINPUT_HPP
 
 #include "ui/box.hpp"
 #include "ui/labeled_input.hpp"

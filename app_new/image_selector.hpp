@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"image_selector.hpp","type":"include"}]}
 
-#ifndef TEXPAINTER_APP_IMAGESELECTOR_HPP
-#define TEXPAINTER_APP_IMAGESELECTOR_HPP
+#ifndef TEXPAINTER_APPNEW_IMAGESELECTOR_HPP
+#define TEXPAINTER_APPNEW_IMAGESELECTOR_HPP
 
 #include "ui/combobox.hpp"
 

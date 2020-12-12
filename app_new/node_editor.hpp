@@ -2,8 +2,8 @@
 //@	"targets":[{"name":"node_editor.hpp","type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_APP_NODEEDITOR_HPP
-#define TEXPAINTER_APP_NODEEDITOR_HPP
+#ifndef TEXPAINTER_APPNEW_NODEEDITOR_HPP
+#define TEXPAINTER_APPNEW_NODEEDITOR_HPP
 
 #include "filtergraph/node.hpp"
 #include "ui/label.hpp"

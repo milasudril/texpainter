@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"app_menu.hpp","type":"include"}]}
 
-#ifndef TEXPAINTER_APP_APPMENU_HPP
-#define TEXPAINTER_APP_APPMENU_HPP
+#ifndef TEXPAINTER_APPNEW_APPMENU_HPP
+#define TEXPAINTER_APPNEW_APPMENU_HPP
 
 #include "ui/menu_item.hpp"
 

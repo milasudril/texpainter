@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"image_editor.hpp","type":"include"}]}
 
-#ifndef TEXPAINTER_APP_IMAGEEDITOR_HPP
-#define TEXPAINTER_APP_IMAGEEDITOR_HPP
+#ifndef TEXPAINTER_APPNEW_IMAGEEDITOR_HPP
+#define TEXPAINTER_APPNEW_IMAGEEDITOR_HPP
 
 #include "./image_selector.hpp"
 #include "./brush_selector.hpp"

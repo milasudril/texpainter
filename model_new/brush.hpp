@@ -2,8 +2,8 @@
 //@	"targets":[{"name":"brush.hpp","type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_MODEL_BRUSH_HPP
-#define TEXPAINTER_MODEL_BRUSH_HPP
+#ifndef TEXPAINTER_MODELNEW_BRUSH_HPP
+#define TEXPAINTER_MODELNEW_BRUSH_HPP
 
 #include "./brushes.hpp"
 

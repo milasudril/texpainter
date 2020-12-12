@@ -48,5 +48,7 @@ for filename in sys.argv[1:]:
 				f.__next__()
 			lines.append(line_to_print)
 
-	with open(filename, 'w') as f:
-		f.write(''.join(lines))
+	result = ''.join(lines)
+	if result != open(filename).read():
+		with open(filename, 'w') as f:
+			f.write(result)
