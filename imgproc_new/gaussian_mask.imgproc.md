@@ -14,7 +14,7 @@ This image processor has no input ports.
 
 ## Output ports
 
-__Intensity:__ (Grayscale image) The generated intensity (pure balck and pure white)
+__Intensity:__ (Grayscale image) The generated intensity function
 
 ## Parameters
 

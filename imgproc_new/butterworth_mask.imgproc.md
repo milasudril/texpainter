@@ -14,7 +14,7 @@ This image processor has no input ports.
 
 ## Output ports
 
-__Intensity:__ (Grayscale image) The generated intensity (pure balck and pure white)
+__Intensity:__ (Grayscale image) The generated intensity function
 
 ## Parameters
 
@@ -28,7 +28,7 @@ __Orientation:__ (= 0.0) Orientation of the mask. 1.0 maps to π.
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include "utils/angle.hpp"
@@ -36,7 +36,7 @@ __Includes:__
 #include <cmath>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 inline auto sizeFromParam(size_t size, ParamValue val)

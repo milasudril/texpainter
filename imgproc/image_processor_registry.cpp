@@ -14,7 +14,8 @@
 //@		"../imgproc_new/mix_image_spectra.imgproc.hpp",
 //@		"../imgproc_new/checkerboard.imgproc.hpp",
 //@		"../imgproc_new/butterworth_mask.imgproc.hpp",
-//@		"../imgproc_new/gaussian_mask.imgproc.hpp"
+//@		"../imgproc_new/gaussian_mask.imgproc.hpp",
+//@		"../imgproc_new/grayscale_noise.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -25,7 +26,6 @@
 #include "./dft_forward/dft_forward.hpp"
 #include "./dft_backward/dft_backward.hpp"
 #include "./normalize_grayscale/normalize_grayscale.hpp"
-#include "./grayscale_noise/grayscale_noise.hpp"
 #include "./mix_grayscale/mix_grayscale.hpp"
 #include "./mix_complex/mix_complex.hpp"
 #include "./real_constant/real_constant.hpp"
@@ -39,6 +39,9 @@
 
 #include "filtergraph/image_processor_wrapper.hpp"
 #include "utils/fixed_flatmap.hpp"
+
+//HACK must have a static reference to default_rng for linking to work properly
+#include "utils/default_rng.hpp"
 
 namespace
 {
@@ -74,12 +77,12 @@ namespace
 	    get_info<::Checkerboard::ImageProcessor>(),
 	    get_info<::ButterworthMask::ImageProcessor>(),
 	    get_info<::GaussianMask::ImageProcessor>(),
+	    get_info<::GrayscaleNoise::ImageProcessor>(),
 	    get_info<::RgbaCombine::ImageProcessor>(),
 	    get_info<::RgbaSplit::ImageProcessor>(),
 	    get_info<::DftForward::ImageProcessor>(),
 	    get_info<::DftBackward::ImageProcessor>(),
 	    get_info<::NormalizeGrayscale::ImageProcessor>(),
-	    get_info<::GrayscaleNoise::ImageProcessor>(),
 	    get_info<::MixGrayscale::ImageProcessor>(),
 	    get_info<::MixComplex::ImageProcessor>(),
 	    get_info<::RealConstant::ImageProcessor>(),
