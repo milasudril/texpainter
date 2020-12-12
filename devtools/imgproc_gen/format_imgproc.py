@@ -42,10 +42,11 @@ def printDocument(doc, level=0, f=sys.stdout):
 			if len(content.text) != 0:
 				if content.is_code_block:
 					print('```c++', file=f)
-				print('\n'.join(content.text), file=f)
-				if content.is_code_block:
+					print('\n'.join(content.text), file=f)
 					print('```', file=f)
-				print('', file=f)
+				else:
+					print('\n\n'.join(content.text), file=f)
+					print('', file=f)
 
 		printDocument(content, level + 1, f)
 

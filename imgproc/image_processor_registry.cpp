@@ -12,7 +12,8 @@
 //@		"../imgproc_new/mix_rgba_images.imgproc.hpp",
 //@		"../imgproc_new/mix_grayscale_images.imgproc.hpp",
 //@		"../imgproc_new/mix_image_spectra.imgproc.hpp",
-//@		"../imgproc_new/checkerboard.imgproc.hpp"
+//@		"../imgproc_new/checkerboard.imgproc.hpp",
+//@		"../imgproc_new/butterworth_mask.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -72,6 +73,8 @@ namespace
 	    get_info<::MixRgbaImages::ImageProcessor>(),
 	    get_info<::MixGrayscaleImages::ImageProcessor>(),
 	    get_info<::MixImageSpectra::ImageProcessor>(),
+	    get_info<::Checkerboard::ImageProcessor>(),
+	    get_info<::ButterworthMask::ImageProcessor>(),
 	    get_info<::RgbaCombine::ImageProcessor>(),
 	    get_info<::RgbaSplit::ImageProcessor>(),
 	    get_info<::GaussianMask2d::ImageProcessor>(),
@@ -87,7 +90,6 @@ namespace
 	    get_info<::GrayscaleRange::ImageProcessor>(),
 	    get_info<::MapGrayscaleRange::ImageProcessor>(),
 	    get_info<::RandomColor::ImageProcessor>(),
-	    get_info<::Checkerboard::ImageProcessor>(),
 	    get_info<::RgbaToGrayAlpha::ImageProcessor>(),
 	    get_info<::SoftClamp::ImageProcessor>(),
 	    get_info<::TopographicMap::ImageProcessor>(),
