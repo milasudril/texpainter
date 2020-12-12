@@ -24,8 +24,6 @@
 #include "./gaussian_mask_2d/gaussian_mask_2d.hpp"
 #include "./dft_forward/dft_forward.hpp"
 #include "./dft_backward/dft_backward.hpp"
-#include "./butterworth_mask_2d/butterworth_mask_2d.hpp"
-#include "./butterworth_mask_1d/butterworth_mask_1d.hpp"
 #include "./normalize_grayscale/normalize_grayscale.hpp"
 #include "./grayscale_noise/grayscale_noise.hpp"
 #include "./mix_grayscale/mix_grayscale.hpp"
@@ -80,8 +78,6 @@ namespace
 	    get_info<::GaussianMask2d::ImageProcessor>(),
 	    get_info<::DftForward::ImageProcessor>(),
 	    get_info<::DftBackward::ImageProcessor>(),
-	    get_info<::ButterworthMask2d::ImageProcessor>(),
-	    get_info<::ButterworthMask1d::ImageProcessor>(),
 	    get_info<::NormalizeGrayscale::ImageProcessor>(),
 	    get_info<::GrayscaleNoise::ImageProcessor>(),
 	    get_info<::MixGrayscale::ImageProcessor>(),
