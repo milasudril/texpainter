@@ -23,9 +23,9 @@ def getParams(params):
 def translateType(str):
 	if str == 'Image spectrum':
 		return 'GrayscaleComplexPixels'
-	if str == 'Grayscale real pixels':
+	if str == 'Grayscale image':
 		return 'GrayscaleRealPixels'
-	if str == 'RGBA pixels':
+	if str == 'RGBA image':
 		return 'RgbaPixels'
 	raise Exception('Unsupported port type ' + str)
 

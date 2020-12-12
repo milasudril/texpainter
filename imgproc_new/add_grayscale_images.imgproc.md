@@ -4,13 +4,13 @@ This image processor takes two grayscale images `A` and `B` and computes their p
 
 ## Input ports
 
-__A:__ (Grayscale real pixels) First operand
+__A:__ (Grayscale image) First operand
 
-__B:__ (Grayscale real pixels) Second operand
+__B:__ (Grayscale image) Second operand
 
 ## Output ports
 
-__Sum:__ (Grayscale real pixels) The sum of `A` and `B`
+__Sum:__ (Grayscale image) The sum of `A` and `B`
 
 ## Parameters
 

@@ -4,13 +4,13 @@ This image processor takes two RGBA images `A` and `B` and computes their pixel-
 
 ## Input ports
 
-__A:__ (RGBA pixels) First operand
+__A:__ (RGBA image) First operand
 
-__B:__ (RGBA pixels) Second operand
+__B:__ (RGBA image) Second operand
 
 ## Output ports
 
-__Product:__ (RGBA pixels) The product of `A` and `B`
+__Product:__ (RGBA image) The product of `A` and `B`
 
 ## Implementation
 

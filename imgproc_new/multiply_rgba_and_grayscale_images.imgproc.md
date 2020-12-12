@@ -4,13 +4,13 @@ This image processor takes one RGBA image `A`, and one grayscale image `B`, and 
 
 ## Input ports
 
-__A:__ (RGBA pixels) First operand
+__A:__ (RGBA image) First operand
 
-__B:__ (Grayscale real pixels) Second operand
+__B:__ (Grayscale image) Second operand
 
 ## Output ports
 
-__Product:__ (RGBA pixels) The product of `A` and `B`
+__Product:__ (RGBA image) The product of `A` and `B`
 
 ## Implementation
 

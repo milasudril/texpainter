@@ -6,7 +6,7 @@ This image processor takes one image spectrum `A`, and one grayscale image `B`, 
 
 __A:__ (Image spectrum) First operand
 
-__B:__ (Grayscale real pixels) Second operand
+__B:__ (Grayscale image) Second operand
 
 ## Output ports
 

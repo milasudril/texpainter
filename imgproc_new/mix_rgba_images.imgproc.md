@@ -2,15 +2,15 @@
 
 ## Input ports
 
-__A:__ (RGBA pixels)
+__A:__ (RGBA image)
 
-__B:__ (RGBA pixels)
+__B:__ (RGBA image)
 
-__Factor:__ (Grayscale real pixels)
+__Factor:__ (Grayscale image)
 
 ## Output ports
 
-__Output:__ (RGBA pixels)
+__Output:__ (RGBA image)
 
 ## Implementation
 
