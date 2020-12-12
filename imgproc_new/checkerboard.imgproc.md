@@ -12,7 +12,7 @@ __Intensity:__ (Grayscale image) The generated intensity (pure balck and pure wh
 
 __Div x:__ (= 0.5) The number of cells per pattern period
 
-__Aspect ratio:__ (=1.0) The aspect ratio of cells. 1.0 means that they are squares
+__Aspect ratio:__ (= 1.0) The aspect ratio of cells. 1.0 means that they are squares
 
 ## Implementation
 

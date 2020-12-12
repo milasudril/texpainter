@@ -103,13 +103,13 @@ def makeParamNameArray(param_names):
 		', '.join(escaped_names))
 
 
-def makeDefaultCtor(param_default_values):
-	if len(param_default_values) == 0:
+def makeDefaultCtor(params):
+	if len(params) == 0:
 		return ''
 	else:
 		params_init = []
-		for param in param_default_values:
-			formatted_number = '%.17g' % param
+		for key, value in sorted(params.items()):
+			formatted_number = '%.17g' % value
 			if not '.' in formatted_number:
 				formatted_number += '.0'
 			params_init.append('ParamValue{%s}' % formatted_number)
@@ -237,7 +237,7 @@ def makeCppSource(imgproc, src_file):
 	main_substitutes['input_ports'] = makePortArray('InputPorts', imgproc.inputPorts())
 	main_substitutes['output_ports'] = makePortArray('OutputPorts', imgproc.outputPorts())
 	main_substitutes['param_names'] = makeParamNameArray(imgproc.params().keys())
-	main_substitutes['default_ctor'] = makeDefaultCtor(imgproc.params().values())
+	main_substitutes['default_ctor'] = makeDefaultCtor(imgproc.params())
 	main_substitutes['call_operator'] = makeCallOperator(imgproc.params())
 	main_substitutes['param_accessors'] = makeParamAccessors(imgproc.params().keys())
 	main_substitutes['processor_id'] = imgproc.processorId()
