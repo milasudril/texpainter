@@ -38,7 +38,7 @@ namespace Checkerboard
 			static constexpr std::array<PortInfo, 1> OutputPorts{
 			    {PortType::GrayscaleRealPixels, "Intensity"}};
 
-			static constexpr std::array<ParamName, 2> ParamNames{"Div x", "Div y"};
+			static constexpr std::array<ParamName, 2> ParamNames{"Div x", "Aspect ratio"};
 		};
 
 		void operator()(ImgProcArg<InterfaceDescriptor> const& args) const
@@ -47,8 +47,7 @@ namespace Checkerboard
 			auto const h = args.size().height();
 			auto dx = 2.0 * static_cast<int>(w * sizeFromParam(w, *m_params.find<Str("Div x")>()))
 			          / static_cast<double>(args.size().width());
-			auto dy = 2.0 * static_cast<int>(h * sizeFromParam(h, *m_params.find<Str("Div y")>()))
-			          / static_cast<double>(h);
+			auto dy = dx * m_params.find<Str{"Aspect ratio"}>()->value();
 
 			for(uint32_t row = 0; row < h; ++row)
 			{
@@ -79,7 +78,7 @@ namespace Checkerboard
 
 		static constexpr char const* name() { return "Checkerboard"; }
 
-		static constexpr auto id() { return ImageProcessorId{"e4d16426a79aa08fce89ff14942e1938"}; }
+		static constexpr auto id() { return ImageProcessorId{"133c5997f18cfa25316c73b1dc17cfeb"}; }
 
 	private:
 		ParamMap<InterfaceDescriptor> m_params;
