@@ -25,7 +25,8 @@ def makeHeader(md_line):
 			return (level, '', md_line)
 
 
-def processLine(line, line_no, current_heading_level, current_paragraph, contexts, has_inline_header):
+def processLine(line, line_no, current_heading_level, current_paragraph, contexts,
+	has_inline_header):
 	res = makeHeader(line)
 	if res != None:
 		heading_level = res[0]
@@ -99,7 +100,8 @@ def loadParagraphs(md_lines):
 				line = para_text.strip()
 				para_text = ''
 				current_heading_level, current_paragraph, contexts, has_inline_header = processLine(
-					line, line_no, current_heading_level, current_paragraph, contexts, has_inline_header)
+					line, line_no, current_heading_level, current_paragraph, contexts,
+					has_inline_header)
 		line_no = line_no + 1
 
 	processLine(para_text.strip(), line_no, current_heading_level, current_paragraph, contexts,

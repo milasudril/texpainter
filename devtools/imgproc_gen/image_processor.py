@@ -7,10 +7,10 @@ class ImageProcessor:
 		output_ports=dict(),
 		params=dict(),
 		user_includes=[],
-		description = '',
-		category = '',
-		impl_start = 0,
-		user_includes_start = 0):
+		description='',
+		category='',
+		impl_start=0,
+		user_includes_start=0):
 		self.__name = name
 		self.__body = body
 		self.__user_includes = user_includes

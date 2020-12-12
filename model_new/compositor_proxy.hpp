@@ -75,4 +75,5 @@ namespace Texpainter::Model
 		std::reference_wrapper<Compositor> m_compositor;
 	};
 }
+
 #endif

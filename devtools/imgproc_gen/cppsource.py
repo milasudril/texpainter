@@ -5,8 +5,10 @@ import image_processor
 
 ImgProc = image_processor.ImageProcessor
 
+
 def makeIncludeFileName(name):
 	return name.replace(' ', '_').lower() + '.hpp'
+
 
 def makeNamespaceName(name):
 	parts = name.split(' ')
@@ -49,6 +51,7 @@ def makeIncludeGuard(filename):
 
 	return '_'.join(parts)
 
+
 def stringEscape(string):
 	result = ''
 	for c in string:
@@ -64,6 +67,7 @@ def makeParamMapInclude(params):
 	else:
 		return '#include "filtergraph/param_map.hpp"'
 
+
 def makeImplDecl(params):
 	if len(params) == 0:
 		return 'void main(auto const& args);'
@@ -73,11 +77,13 @@ def makeImplDecl(params):
 
 		void main(auto const& args, auto const& params);'''
 
+
 def makeCallOperator(params):
 	if len(params) == 0:
 		return 'impl::main(args);'
 	else:
 		return '''impl::main(args, params);'''
+
 
 def makePortArray(name, ports):
 	items = []
@@ -218,6 +224,7 @@ $img_proc_body
 #endif
 """)
 
+
 def makeCppSource(imgproc, src_file):
 	main_substitutes = dict()
 	main_substitutes['processor_name'] = imgproc.name()
@@ -241,6 +248,5 @@ def makeCppSource(imgproc, src_file):
 	main_substitutes['impl_start'] = str(imgproc.implStart())
 	main_substitutes['user_includes_start'] = str(imgproc.userIncludesStart())
 	main_substitutes['src_file'] = src_file
-
 
 	return template.substitute(main_substitutes)

@@ -6,44 +6,49 @@ import image_processor
 import subprocess
 import io
 
+
 def loadDocument(filename):
 	with open(filename) as f:
 		return md_doc.loadParagraphs(f)
+
 
 def firstRec(doc):
 	for title, content in doc.paragraphs.items():
 		return (title, content)
 
+
 def formatSrc(string):
 	pipe = subprocess.Popen(['clang-format'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-	return pipe.communicate(input = string.encode('utf-8'))[0].decode('utf-8').strip()
+	return pipe.communicate(input=string.encode('utf-8'))[0].decode('utf-8').strip()
 
-def printDocument(doc, level = 0, f = sys.stdout):
+
+def printDocument(doc, level=0, f=sys.stdout):
 	for title, content in doc.paragraphs.items():
 		if content.is_inline_header:
-			print('__%s:__ '%title, end ='', file = f)
+			print('__%s:__ ' % title, end='', file=f)
 
 			if len(content.text) != 0:
 				if content.is_code_block:
-					print('\n\n```c++', file = f)
-				print('\n'.join(content.text), file = f)
+					print('\n\n```c++', file=f)
+				print('\n'.join(content.text), file=f)
 				if content.is_code_block:
-					print('```', file = f)
-				print('', file = f)
+					print('```', file=f)
+				print('', file=f)
 
 		else:
 			for k in range(0, level + 1):
-				print('#', end = '', file = f)
-			print(' %s\n'%title, file = f)
+				print('#', end='', file=f)
+			print(' %s\n' % title, file=f)
 			if len(content.text) != 0:
 				if content.is_code_block:
-					print('```c++', file = f)
-				print('\n'.join(content.text), file = f)
+					print('```c++', file=f)
+				print('\n'.join(content.text), file=f)
 				if content.is_code_block:
-					print('```', file = f)
-				print('', file = f)
+					print('```', file=f)
+				print('', file=f)
 
 		printDocument(content, level + 1, f)
+
 
 def formatFile(filename):
 	doc = loadDocument(filename)
@@ -66,7 +71,8 @@ def formatFile(filename):
 			return
 
 	with open(filename, 'w') as output:
-		print(f.getvalue(), end = '', file = output)
+		print(f.getvalue(), end='', file=output)
+
 
 for filename in sys.argv[1:]:
 	formatFile(filename)
