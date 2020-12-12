@@ -179,6 +179,7 @@ namespace $namespace_name
 	{
 		using Texpainter::FilterGraph::input;
 		using Texpainter::FilterGraph::output;
+		using Texpainter::FilterGraph::RgbaValue;
 		$impl_decl
 	}
 

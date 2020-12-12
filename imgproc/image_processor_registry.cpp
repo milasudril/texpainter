@@ -15,7 +15,8 @@
 //@		"../imgproc_new/checkerboard.imgproc.hpp",
 //@		"../imgproc_new/butterworth_mask.imgproc.hpp",
 //@		"../imgproc_new/gaussian_mask.imgproc.hpp",
-//@		"../imgproc_new/grayscale_noise.imgproc.hpp"
+//@		"../imgproc_new/grayscale_noise.imgproc.hpp",
+//@		"../imgproc_new/rgba_noise.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -78,6 +79,7 @@ namespace
 	    get_info<::ButterworthMask::ImageProcessor>(),
 	    get_info<::GaussianMask::ImageProcessor>(),
 	    get_info<::GrayscaleNoise::ImageProcessor>(),
+	    get_info<::RgbaNoise::ImageProcessor>(),
 	    get_info<::RgbaCombine::ImageProcessor>(),
 	    get_info<::RgbaSplit::ImageProcessor>(),
 	    get_info<::DftForward::ImageProcessor>(),

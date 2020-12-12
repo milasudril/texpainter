@@ -18,13 +18,13 @@ __Aspect ratio:__ (= 1.0) The aspect ratio of cells. 1.0 means that they are squ
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <cmath>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 inline auto sizeFromParam(size_t size, ParamValue val)

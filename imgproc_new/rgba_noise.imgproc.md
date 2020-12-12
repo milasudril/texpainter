@@ -1,6 +1,6 @@
-# Grayscale noise
+# RGBA noise
 
-This image processor generates grayscale white noise.
+This image processor generates RGBA white noise.
 
 ## Input ports
 
@@ -8,7 +8,7 @@ This image processor has no input ports.
 
 ## Output ports
 
-__Intensity:__ (Grayscale image) The generated intensity function
+__Intensity:__ (RGBA image) The generated intensity function
 
 ## Implementation
 
@@ -28,13 +28,15 @@ void main(auto const& args)
 	auto const size = args.size().area();
 	std::generate(output<0>(args),
 	              output<0>(args) + size,
-	              [U   = std::uniform_real_distribution{0.0, 1.0},
-	               rng = Texpainter::DefaultRng::engine()]() mutable { return U(rng); });
+	              [U   = std::uniform_real_distribution{0.0f, 1.0f},
+	               rng = Texpainter::DefaultRng::engine()]() mutable {
+		              return RgbaValue{U(rng), U(rng), U(rng), U(rng)};
+	              });
 }
 ```
 
 ## Tags
 
-__Id:__ 5d03472443bfc964fea98df862b20bf6
+__Id:__ 8f926e6ad5f96aaebc86f5f8bb70068e
 
 __Category:__ Generators
