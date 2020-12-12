@@ -13,7 +13,8 @@
 //@		"../imgproc_new/mix_grayscale_images.imgproc.hpp",
 //@		"../imgproc_new/mix_image_spectra.imgproc.hpp",
 //@		"../imgproc_new/checkerboard.imgproc.hpp",
-//@		"../imgproc_new/butterworth_mask.imgproc.hpp"
+//@		"../imgproc_new/butterworth_mask.imgproc.hpp",
+//@		"../imgproc_new/gaussian_mask.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -21,7 +22,6 @@
 
 #include "./rgba_combine/rgba_combine.hpp"
 #include "./rgba_split/rgba_split.hpp"
-#include "./gaussian_mask_2d/gaussian_mask_2d.hpp"
 #include "./dft_forward/dft_forward.hpp"
 #include "./dft_backward/dft_backward.hpp"
 #include "./normalize_grayscale/normalize_grayscale.hpp"
@@ -73,9 +73,9 @@ namespace
 	    get_info<::MixImageSpectra::ImageProcessor>(),
 	    get_info<::Checkerboard::ImageProcessor>(),
 	    get_info<::ButterworthMask::ImageProcessor>(),
+	    get_info<::GaussianMask::ImageProcessor>(),
 	    get_info<::RgbaCombine::ImageProcessor>(),
 	    get_info<::RgbaSplit::ImageProcessor>(),
-	    get_info<::GaussianMask2d::ImageProcessor>(),
 	    get_info<::DftForward::ImageProcessor>(),
 	    get_info<::DftBackward::ImageProcessor>(),
 	    get_info<::NormalizeGrayscale::ImageProcessor>(),
