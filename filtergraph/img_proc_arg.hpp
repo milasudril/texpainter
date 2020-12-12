@@ -75,7 +75,7 @@ namespace Texpainter::FilterGraph
 	}
 
 	template<size_t index, ImgProcInterfaceDescriptor Descriptor>
-	auto output(ImgProcArg<Descriptor> const& d, uint32_t col, uint32_t row)
+	auto& output(ImgProcArg<Descriptor> const& d, uint32_t col, uint32_t row)
 	{
 		return d.template output<index>(col, row);
 	}

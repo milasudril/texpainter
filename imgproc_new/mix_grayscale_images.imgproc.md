@@ -14,7 +14,7 @@ __Output:__ (Grayscale image)
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include "utils/n_ary_transform.hpp"
@@ -22,7 +22,7 @@ __Includes:__
 #include <algorithm>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& args)

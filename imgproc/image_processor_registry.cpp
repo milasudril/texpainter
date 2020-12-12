@@ -11,7 +11,8 @@
 //@		"../imgproc_new/multiply_rgba_images.imgproc.hpp",
 //@		"../imgproc_new/mix_rgba_images.imgproc.hpp",
 //@		"../imgproc_new/mix_grayscale_images.imgproc.hpp",
-//@		"../imgproc_new/mix_image_spectra.imgproc.hpp"
+//@		"../imgproc_new/mix_image_spectra.imgproc.hpp",
+//@		"../imgproc_new/checkerboard.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -32,7 +33,6 @@
 #include "./grayscale_range/grayscale_range.hpp"
 #include "./map_grayscale_range/map_grayscale_range.hpp"
 #include "./random_color/random_color.hpp"
-#include "./checkerboard/checkerboard.hpp"
 #include "./rgba_to_grayalpha/rgba_to_grayalpha.hpp"
 #include "./soft_clamp/soft_clamp.hpp"
 #include "./topographic_map/topographic_map.hpp"
