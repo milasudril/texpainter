@@ -3,6 +3,7 @@
 import sys
 import os
 
+
 def splitall(path):
 	allparts = []
 	while 1:

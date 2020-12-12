@@ -53,4 +53,3 @@ void main(auto const& args, auto const& params)
 __Id:__ 50b448d8742d60fb2bf7b1ef8be2b8da
 
 __Category:__ Arithmetic operators
-

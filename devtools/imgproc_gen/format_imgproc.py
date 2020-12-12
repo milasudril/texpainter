@@ -65,13 +65,14 @@ def formatFile(filename):
 
 	f = io.StringIO()
 	printDocument(doc, 0, f)
+	result = f.getvalue().strip()
 	with open(filename) as doc_orig:
 		orig = doc_orig.read()
-		if orig == f.getvalue():
+		if orig == result:
 			return
 
 	with open(filename, 'w') as output:
-		print(f.getvalue(), end='', file=output)
+		print(result, end='', file=output)
 
 
 for filename in sys.argv[1:]:
