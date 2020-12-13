@@ -19,13 +19,13 @@
 //@		"../imgproc_new/rgba_noise.imgproc.hpp",
 //@		"../imgproc_new/split_rgba_image.imgproc.hpp",
 //@		"../imgproc_new/make_rgba_image.imgproc.hpp",
-//@		"../imgproc_new/apply_colormap.imgproc.hpp"
+//@		"../imgproc_new/apply_colormap.imgproc.hpp",
+//@		"../imgproc_new/dft_forward.imgproc.hpp"
 //@	]}]
 //@	}
 
 #include "./image_processor_registry.hpp"
 
-#include "./dft_forward/dft_forward.hpp"
 #include "./dft_backward/dft_backward.hpp"
 #include "./normalize_grayscale/normalize_grayscale.hpp"
 #include "./mix_grayscale/mix_grayscale.hpp"
