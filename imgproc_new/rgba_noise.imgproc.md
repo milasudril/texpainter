@@ -2,10 +2,6 @@
 
 This image processor generates RGBA white noise.
 
-## Input ports
-
-This image processor has no input ports.
-
 ## Output ports
 
 __Intensity:__ (RGBA image) The generated intensity function

@@ -8,10 +8,6 @@ where
 
 $$\vec{r} = \begin{bmatrix} \frac{1}{s} & 0 \\ 0 & \frac{1}{s \sigma} \end{bmatrix}R(\theta)((x, y) - O)$$
 
-## Input ports
-
-This image processor has no input ports.
-
 ## Output ports
 
 __Intensity:__ (Grayscale image) The generated intensity function

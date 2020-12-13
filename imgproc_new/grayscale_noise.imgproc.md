@@ -2,10 +2,6 @@
 
 This image processor generates grayscale white noise.
 
-## Input ports
-
-This image processor has no input ports.
-
 ## Output ports
 
 __Intensity:__ (Grayscale image) The generated intensity function
