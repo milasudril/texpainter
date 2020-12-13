@@ -18,7 +18,8 @@
 //@		"../imgproc_new/grayscale_noise.imgproc.hpp",
 //@		"../imgproc_new/rgba_noise.imgproc.hpp",
 //@		"../imgproc_new/split_rgba_image.imgproc.hpp",
-//@		"../imgproc_new/make_rgba_image.imgproc.hpp"
+//@		"../imgproc_new/make_rgba_image.imgproc.hpp",
+//@		"../imgproc_new/apply_colormap.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -32,7 +33,6 @@
 #include "./real_constant/real_constant.hpp"
 #include "./grayscale_range/grayscale_range.hpp"
 #include "./map_grayscale_range/map_grayscale_range.hpp"
-#include "./random_color/random_color.hpp"
 #include "./rgba_to_grayalpha/rgba_to_grayalpha.hpp"
 #include "./soft_clamp/soft_clamp.hpp"
 #include "./topographic_map/topographic_map.hpp"
@@ -82,6 +82,7 @@ namespace
 	    get_info<::RgbaNoise::ImageProcessor>(),
 	    get_info<::SplitRgbaImage::ImageProcessor>(),
 	    get_info<::MakeRgbaImage::ImageProcessor>(),
+	    get_info<::ApplyColormap::ImageProcessor>(),
 	    get_info<::DftForward::ImageProcessor>(),
 	    get_info<::DftBackward::ImageProcessor>(),
 	    get_info<::NormalizeGrayscale::ImageProcessor>(),
@@ -90,7 +91,6 @@ namespace
 	    get_info<::RealConstant::ImageProcessor>(),
 	    get_info<::GrayscaleRange::ImageProcessor>(),
 	    get_info<::MapGrayscaleRange::ImageProcessor>(),
-	    get_info<::RandomColor::ImageProcessor>(),
 	    get_info<::RgbaToGrayAlpha::ImageProcessor>(),
 	    get_info<::SoftClamp::ImageProcessor>(),
 	    get_info<::TopographicMap::ImageProcessor>(),

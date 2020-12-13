@@ -18,13 +18,13 @@ __Output:__ (RGBA image) The input image
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include "utils/n_ary_transform.hpp"
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& args)
