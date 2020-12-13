@@ -29,6 +29,8 @@ def translateType(str):
 		return 'RgbaPixels'
 	if str == 'Palette':
 		return 'Palette'
+	if str == 'Topography data':
+		return 'TopographyData'
 	raise Exception('Unsupported port type ' + str)
 
 

@@ -22,7 +22,8 @@
 //@		"../imgproc_new/make_rgba_image.imgproc.hpp",
 //@		"../imgproc_new/apply_colormap.imgproc.hpp",
 //@		"../imgproc_new/dft_forward.imgproc.hpp",
-//@		"../imgproc_new/dft_backward.imgproc.hpp"
+//@		"../imgproc_new/dft_backward.imgproc.hpp",
+//@		"../imgproc_new/make_topographic_map.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -33,7 +34,6 @@
 #include "./map_grayscale_range/map_grayscale_range.hpp"
 #include "./rgba_to_grayalpha/rgba_to_grayalpha.hpp"
 #include "./soft_clamp/soft_clamp.hpp"
-#include "./topographic_map/topographic_map.hpp"
 #include "./project_normal/project_normal.hpp"
 
 #include "filtergraph/image_processor_wrapper.hpp"
@@ -85,12 +85,12 @@ namespace
 	    get_info<::ApplyColormap::ImageProcessor>(),
 	    get_info<::DftForward::ImageProcessor>(),
 	    get_info<::DftBackward::ImageProcessor>(),
+	    get_info<::MakeTopographicMap::ImageProcessor>(),
 	    get_info<::NormalizeGrayscale::ImageProcessor>(),
 	    get_info<::GrayscaleRange::ImageProcessor>(),
 	    get_info<::MapGrayscaleRange::ImageProcessor>(),
 	    get_info<::RgbaToGrayAlpha::ImageProcessor>(),
 	    get_info<::SoftClamp::ImageProcessor>(),
-	    get_info<::TopographicMap::ImageProcessor>(),
 	    get_info<::ProjectNormal::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>

@@ -182,6 +182,7 @@ namespace $namespace_name
 		using Texpainter::FilterGraph::RgbaValue;
 		using Texpainter::FilterGraph::ComplexValue;
 		using Texpainter::FilterGraph::Palette;
+		using Texpainter::FilterGraph::TopographyInfo;
 		$impl_decl
 	}
 
