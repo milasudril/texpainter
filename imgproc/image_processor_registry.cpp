@@ -17,6 +17,7 @@
 //@		"../imgproc_new/gaussian_mask.imgproc.hpp",
 //@		"../imgproc_new/grayscale_noise.imgproc.hpp",
 //@		"../imgproc_new/rgba_noise.imgproc.hpp",
+//@		"../imgproc_new/real_constant.imgproc.hpp",
 //@		"../imgproc_new/split_rgba_image.imgproc.hpp",
 //@		"../imgproc_new/make_rgba_image.imgproc.hpp",
 //@		"../imgproc_new/apply_colormap.imgproc.hpp",
@@ -28,7 +29,6 @@
 #include "./image_processor_registry.hpp"
 
 #include "./normalize_grayscale/normalize_grayscale.hpp"
-#include "./real_constant/real_constant.hpp"
 #include "./grayscale_range/grayscale_range.hpp"
 #include "./map_grayscale_range/map_grayscale_range.hpp"
 #include "./rgba_to_grayalpha/rgba_to_grayalpha.hpp"
@@ -78,6 +78,7 @@ namespace
 	    get_info<::ButterworthMask::ImageProcessor>(),
 	    get_info<::GaussianMask::ImageProcessor>(),
 	    get_info<::GrayscaleNoise::ImageProcessor>(),
+	    get_info<::RealConstant::ImageProcessor>(),
 	    get_info<::RgbaNoise::ImageProcessor>(),
 	    get_info<::SplitRgbaImage::ImageProcessor>(),
 	    get_info<::MakeRgbaImage::ImageProcessor>(),
@@ -85,7 +86,6 @@ namespace
 	    get_info<::DftForward::ImageProcessor>(),
 	    get_info<::DftBackward::ImageProcessor>(),
 	    get_info<::NormalizeGrayscale::ImageProcessor>(),
-	    get_info<::RealConstant::ImageProcessor>(),
 	    get_info<::GrayscaleRange::ImageProcessor>(),
 	    get_info<::MapGrayscaleRange::ImageProcessor>(),
 	    get_info<::RgbaToGrayAlpha::ImageProcessor>(),
