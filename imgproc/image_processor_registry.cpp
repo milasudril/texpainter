@@ -24,7 +24,8 @@
 //@		"../imgproc_new/apply_colormap.imgproc.hpp",
 //@		"../imgproc_new/dft_forward.imgproc.hpp",
 //@		"../imgproc_new/dft_backward.imgproc.hpp",
-//@		"../imgproc_new/make_topographic_map.imgproc.hpp"
+//@		"../imgproc_new/make_topographic_map.imgproc.hpp",
+//@		"../imgproc_new/project_normal_vector.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -87,11 +88,11 @@ namespace
 	    get_info<::DftForward::ImageProcessor>(),
 	    get_info<::DftBackward::ImageProcessor>(),
 	    get_info<::MakeTopographicMap::ImageProcessor>(),
+	    get_info<::ProjectNormal::ImageProcessor>(),
 	    get_info<::NormalizeGrayscale::ImageProcessor>(),
 	    get_info<::GrayscaleRange::ImageProcessor>(),
 	    get_info<::MapGrayscaleRange::ImageProcessor>(),
-	    get_info<::SoftClamp::ImageProcessor>(),
-	    get_info<::ProjectNormal::ImageProcessor>()};
+	    get_info<::SoftClamp::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;

@@ -4,22 +4,22 @@ This image computes the DFT of a grayscale image.
 
 ## Input ports
 
-__Input:__ (Image spectrum) The computed image spectrum
+__Input:__ (Image spectrum) The image spectrum (re)construct the image from
 
 ## Output ports
 
-__Output:__ (Grayscale image) The input image
+__Output:__ (Grayscale image) The result. Notice that it is possible that the output contains out-of-range values.
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include "dft/engine.hpp"
 #include "pixel_store/image.hpp"
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 using TempBuffer = Texpainter::PixelStore::BasicImage<ComplexValue>;
