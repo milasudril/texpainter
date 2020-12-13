@@ -35,7 +35,6 @@
 #include "./grayscale_range/grayscale_range.hpp"
 #include "./map_grayscale_range/map_grayscale_range.hpp"
 #include "./soft_clamp/soft_clamp.hpp"
-#include "./project_normal/project_normal.hpp"
 
 #include "filtergraph/image_processor_wrapper.hpp"
 #include "utils/fixed_flatmap.hpp"
@@ -88,7 +87,7 @@ namespace
 	    get_info<::DftForward::ImageProcessor>(),
 	    get_info<::DftBackward::ImageProcessor>(),
 	    get_info<::MakeTopographicMap::ImageProcessor>(),
-	    get_info<::ProjectNormal::ImageProcessor>(),
+	    get_info<::ProjectNormalVector::ImageProcessor>(),
 	    get_info<::NormalizeGrayscale::ImageProcessor>(),
 	    get_info<::GrayscaleRange::ImageProcessor>(),
 	    get_info<::MapGrayscaleRange::ImageProcessor>(),
