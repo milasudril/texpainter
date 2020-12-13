@@ -20,13 +20,13 @@
 //@		"../imgproc_new/split_rgba_image.imgproc.hpp",
 //@		"../imgproc_new/make_rgba_image.imgproc.hpp",
 //@		"../imgproc_new/apply_colormap.imgproc.hpp",
-//@		"../imgproc_new/dft_forward.imgproc.hpp"
+//@		"../imgproc_new/dft_forward.imgproc.hpp",
+//@		"../imgproc_new/dft_backward.imgproc.hpp"
 //@	]}]
 //@	}
 
 #include "./image_processor_registry.hpp"
 
-#include "./dft_backward/dft_backward.hpp"
 #include "./normalize_grayscale/normalize_grayscale.hpp"
 #include "./mix_grayscale/mix_grayscale.hpp"
 #include "./mix_complex/mix_complex.hpp"
@@ -41,8 +41,9 @@
 #include "filtergraph/image_processor_wrapper.hpp"
 #include "utils/fixed_flatmap.hpp"
 
-//HACK must have a static reference to default_rng for linking to work properly
+//HACK must have a static references to these for linking to work properly
 #include "utils/default_rng.hpp"
+#include "dft/engine.hpp"
 
 namespace
 {
