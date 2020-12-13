@@ -25,13 +25,13 @@
 //@		"../imgproc_new/dft_forward.imgproc.hpp",
 //@		"../imgproc_new/dft_backward.imgproc.hpp",
 //@		"../imgproc_new/make_topographic_map.imgproc.hpp",
-//@		"../imgproc_new/project_normal_vector.imgproc.hpp"
+//@		"../imgproc_new/project_normal_vector.imgproc.hpp",
+//@		"../imgproc_new/normalize_grayscale_image.imgproc.hpp"
 //@	]}]
 //@	}
 
 #include "./image_processor_registry.hpp"
 
-#include "./normalize_grayscale/normalize_grayscale.hpp"
 #include "./grayscale_range/grayscale_range.hpp"
 #include "./map_grayscale_range/map_grayscale_range.hpp"
 #include "./soft_clamp/soft_clamp.hpp"
@@ -88,7 +88,7 @@ namespace
 	    get_info<::DftBackward::ImageProcessor>(),
 	    get_info<::MakeTopographicMap::ImageProcessor>(),
 	    get_info<::ProjectNormalVector::ImageProcessor>(),
-	    get_info<::NormalizeGrayscale::ImageProcessor>(),
+	    get_info<::NormalizeGrayscaleImage::ImageProcessor>(),
 	    get_info<::GrayscaleRange::ImageProcessor>(),
 	    get_info<::MapGrayscaleRange::ImageProcessor>(),
 	    get_info<::SoftClamp::ImageProcessor>()};
