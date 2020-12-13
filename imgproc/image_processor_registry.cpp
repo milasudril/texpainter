@@ -28,8 +28,6 @@
 #include "./image_processor_registry.hpp"
 
 #include "./normalize_grayscale/normalize_grayscale.hpp"
-#include "./mix_grayscale/mix_grayscale.hpp"
-#include "./mix_complex/mix_complex.hpp"
 #include "./real_constant/real_constant.hpp"
 #include "./grayscale_range/grayscale_range.hpp"
 #include "./map_grayscale_range/map_grayscale_range.hpp"
@@ -87,8 +85,6 @@ namespace
 	    get_info<::DftForward::ImageProcessor>(),
 	    get_info<::DftBackward::ImageProcessor>(),
 	    get_info<::NormalizeGrayscale::ImageProcessor>(),
-	    get_info<::MixGrayscale::ImageProcessor>(),
-	    get_info<::MixComplex::ImageProcessor>(),
 	    get_info<::RealConstant::ImageProcessor>(),
 	    get_info<::GrayscaleRange::ImageProcessor>(),
 	    get_info<::MapGrayscaleRange::ImageProcessor>(),
