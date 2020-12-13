@@ -55,14 +55,17 @@ def formatFile(filename):
 	doc = loadDocument(filename)
 	title, content = firstRec(doc)
 	src_old = ''.join(content.paragraphs['Implementation'].paragraphs['Source code'].text)
-	includes_old = ''.join(content.paragraphs['Implementation'].paragraphs['Includes'].text)
+	includes_old = ''.join(
+		content.paragraphs['Implementation'].paragraphs['Includes'].text
+	) if 'Includes' in content.paragraphs['Implementation'].paragraphs else ''
 	src_new = formatSrc(src_old)
 	includes_new = formatSrc(includes_old)
 	if src_old == src_new and includes_old == includes_new:
 		return
 
 	content.paragraphs['Implementation'].paragraphs['Source code'].text = src_new.split('\n')
-	content.paragraphs['Implementation'].paragraphs['Includes'].text = includes_new.split('\n')
+	if 'Includes' in content.paragraphs['Implementation'].paragraphs:
+		content.paragraphs['Implementation'].paragraphs['Includes'].text = includes_new.split('\n')
 
 	f = io.StringIO()
 	printDocument(doc, 0, f)

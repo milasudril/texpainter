@@ -55,11 +55,12 @@ def makeImgproc(doc):
 			output_ports=getPorts(content.paragraphs['Output ports'].paragraphs),
 			params=getParams(content.paragraphs['Parameters'].paragraphs if 'Parameters' in
 			content.paragraphs else dict()),
-			user_includes=content.paragraphs['Implementation'].paragraphs['Includes'].text,
+			user_includes=content.paragraphs['Implementation'].paragraphs['Includes'].text
+			if 'Includes' in content.paragraphs['Implementation'].paragraphs else [],
+			user_includes_start=content.paragraphs['Implementation'].paragraphs['Includes'].line_no
+			+ 1 if 'Includes' in content.paragraphs['Implementation'].paragraphs else 0,
 			description='\\n\\n'.join(content.text),
 			category=content.paragraphs['Tags'].paragraphs['Category'].text[0],
-			user_includes_start=content.paragraphs['Implementation'].paragraphs['Includes'].line_no
-			+ 1,
 			impl_start=content.paragraphs['Implementation'].paragraphs['Source code'].line_no + 1)
 
 

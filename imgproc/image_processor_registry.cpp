@@ -16,14 +16,14 @@
 //@		"../imgproc_new/butterworth_mask.imgproc.hpp",
 //@		"../imgproc_new/gaussian_mask.imgproc.hpp",
 //@		"../imgproc_new/grayscale_noise.imgproc.hpp",
-//@		"../imgproc_new/rgba_noise.imgproc.hpp"
+//@		"../imgproc_new/rgba_noise.imgproc.hpp",
+//@		"../imgproc_new/split_rgba_image.imgproc.hpp"
 //@	]}]
 //@	}
 
 #include "./image_processor_registry.hpp"
 
 #include "./rgba_combine/rgba_combine.hpp"
-#include "./rgba_split/rgba_split.hpp"
 #include "./dft_forward/dft_forward.hpp"
 #include "./dft_backward/dft_backward.hpp"
 #include "./normalize_grayscale/normalize_grayscale.hpp"
@@ -81,7 +81,7 @@ namespace
 	    get_info<::GrayscaleNoise::ImageProcessor>(),
 	    get_info<::RgbaNoise::ImageProcessor>(),
 	    get_info<::RgbaCombine::ImageProcessor>(),
-	    get_info<::RgbaSplit::ImageProcessor>(),
+	    get_info<::SplitRgbaImage::ImageProcessor>(),
 	    get_info<::DftForward::ImageProcessor>(),
 	    get_info<::DftBackward::ImageProcessor>(),
 	    get_info<::NormalizeGrayscale::ImageProcessor>(),
