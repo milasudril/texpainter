@@ -19,7 +19,7 @@
 //@		"../imgproc_new/rgba_noise.imgproc.hpp",
 //@		"../imgproc_new/real_constant.imgproc.hpp",
 //@		"../imgproc_new/split_rgba_image.imgproc.hpp",
-//@		"../imgproc_new/rgba_to_gray_alpha.imgproc.hpp",
+//@		"../imgproc_new/rgba_to_gray_and_alpha.imgproc.hpp",
 //@		"../imgproc_new/make_rgba_image.imgproc.hpp",
 //@		"../imgproc_new/apply_colormap.imgproc.hpp",
 //@		"../imgproc_new/dft_forward.imgproc.hpp",

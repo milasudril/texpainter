@@ -4,6 +4,8 @@ import sys
 import md_doc
 import cppsource
 import image_processor
+import json
+import subprocess
 
 
 def getDefaultParamValue(value):
@@ -74,12 +76,42 @@ def loadDocument(filename):
 		return md_doc.loadParagraphs(f)
 
 
-def writeImgproc(imgproc, src, target):
-	str = cppsource.makeCppSource(imgproc, src)
+def validate(cppsource, compiler):
+	args = []
+	args.append(compiler[0])
+	args.extend(
+		['-x', 'c++', '-std=c++20', '-Wall', '-Wextra', '-O3', '-Werror', '-c', '-o', '/dev/null'])
+	for item in compiler[1]:
+		args.append('-iquote%s' % item)
+	args.append('-')
+
+	pipe = subprocess.Popen(args, stdin=subprocess.PIPE)
+	pipe.communicate(input=cppsource.encode('utf-8'))
+	return pipe.returncode
+
+
+def writeImgproc(cppsource, target):
 	with open(target, 'w') as f:
-		f.write(str)
+		f.write(cppsource)
 
 
-doc = loadDocument(sys.argv[1])
+def getConfig(maikecfg):
+	with open(maikecfg) as f:
+		return json.load(f)
+
+
+def getCompiler(config):
+	for item in config['target_hooks']:
+		if item['name'] == 'targetcxx_default':
+			return (item['config']['objcompile']['name'], item['config']['iquote'])
+
+
+config = getConfig(sys.argv[1] + '/maikeconfig.json')
+compiler = getCompiler(config)
+doc = loadDocument(sys.argv[2])
 imgproc = makeImgproc(doc)
-writeImgproc(imgproc, sys.argv[1], sys.argv[2])
+cppsource = cppsource.makeCppSource(imgproc, sys.argv[2])
+validation_result = validate(cppsource, compiler)
+if validation_result == 0:
+	writeImgproc(cppsource, sys.argv[3])
+exit(validation_result)

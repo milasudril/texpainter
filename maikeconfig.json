@@ -146,6 +146,7 @@
 			"config": {
 				"command": {
 					"args": [
+						"__targets",
 						"{source}",
 						"{target}"
 					],

@@ -22,6 +22,12 @@ __Blue:__ (= 1.0) The amount of blue to be used in the output
 
 ## Implementation
 
+__Includes:__ 
+
+```c++
+#include <numeric>
+```
+
 __Source code:__ 
 
 ```c++
