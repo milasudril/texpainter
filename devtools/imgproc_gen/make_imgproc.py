@@ -51,7 +51,8 @@ def makeImgproc(doc):
 			title,
 			body=''.join(content.paragraphs['Implementation'].paragraphs['Source code'].text),
 			processor_id=content.paragraphs['Tags'].paragraphs['Id'].text[0],
-			input_ports=getPorts(content.paragraphs['Input ports'].paragraphs) if 'Input ports' in content.paragraphs else dict(),
+			input_ports=getPorts(content.paragraphs['Input ports'].paragraphs)
+			if 'Input ports' in content.paragraphs else dict(),
 			output_ports=getPorts(content.paragraphs['Output ports'].paragraphs),
 			params=getParams(content.paragraphs['Parameters'].paragraphs if 'Parameters' in
 			content.paragraphs else dict()),
