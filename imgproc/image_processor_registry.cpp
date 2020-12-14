@@ -32,8 +32,6 @@
 
 #include "./image_processor_registry.hpp"
 
-#include "./grayscale_range/grayscale_range.hpp"
-#include "./map_grayscale_range/map_grayscale_range.hpp"
 #include "./soft_clamp/soft_clamp.hpp"
 
 #include "filtergraph/image_processor_wrapper.hpp"
@@ -89,8 +87,6 @@ namespace
 	    get_info<::MakeTopographicMap::ImageProcessor>(),
 	    get_info<::ProjectNormalVector::ImageProcessor>(),
 	    get_info<::NormalizeGrayscaleImage::ImageProcessor>(),
-	    get_info<::GrayscaleRange::ImageProcessor>(),
-	    get_info<::MapGrayscaleRange::ImageProcessor>(),
 	    get_info<::SoftClamp::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
