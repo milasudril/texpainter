@@ -1,33 +1,34 @@
 //@	{
 //@	"targets":[{"name":"image_processor_registry.o","type":"object",
 //@		"include_targets":[
-//@		"../imgproc/add_grayscale_images.imgproc.hpp",
-//@		"../imgproc/add_image_spectra.imgproc.hpp",
-//@		"../imgproc/add_rgba_images.imgproc.hpp",
-//@		"../imgproc/multiply_grayscale_images.imgproc.hpp",
-//@		"../imgproc/multiply_rgba_and_grayscale_images.imgproc.hpp",
-//@		"../imgproc/multiply_image_spectrum_and_grayscale_image.imgproc.hpp",
-//@		"../imgproc/multiply_image_spectra.imgproc.hpp",
-//@		"../imgproc/multiply_rgba_images.imgproc.hpp",
-//@		"../imgproc/mix_rgba_images.imgproc.hpp",
-//@		"../imgproc/mix_grayscale_images.imgproc.hpp",
-//@		"../imgproc/mix_image_spectra.imgproc.hpp",
-//@		"../imgproc/checkerboard.imgproc.hpp",
-//@		"../imgproc/butterworth_mask.imgproc.hpp",
-//@		"../imgproc/gaussian_mask.imgproc.hpp",
-//@		"../imgproc/grayscale_noise.imgproc.hpp",
-//@		"../imgproc/rgba_noise.imgproc.hpp",
-//@		"../imgproc/real_constant.imgproc.hpp",
-//@		"../imgproc/split_rgba_image.imgproc.hpp",
-//@		"../imgproc/rgba_to_gray_and_alpha.imgproc.hpp",
-//@		"../imgproc/make_rgba_image.imgproc.hpp",
-//@		"../imgproc/apply_colormap.imgproc.hpp",
-//@		"../imgproc/dft_forward.imgproc.hpp",
-//@		"../imgproc/dft_backward.imgproc.hpp",
-//@		"../imgproc/make_topographic_map.imgproc.hpp",
-//@		"../imgproc/project_normal_vector.imgproc.hpp",
-//@		"../imgproc/normalize_grayscale_image.imgproc.hpp",
-//@		"../imgproc/soft_clamp_grayscale_image.imgproc.hpp"
+//@		"./add_grayscale_images.imgproc.hpp",
+//@		"./add_image_spectra.imgproc.hpp",
+//@		"./add_rgba_images.imgproc.hpp",
+//@		"./multiply_grayscale_images.imgproc.hpp",
+//@		"./multiply_rgba_and_grayscale_images.imgproc.hpp",
+//@		"./multiply_image_spectrum_and_grayscale_image.imgproc.hpp",
+//@		"./multiply_image_spectra.imgproc.hpp",
+//@		"./multiply_rgba_images.imgproc.hpp",
+//@		"./mix_rgba_images.imgproc.hpp",
+//@		"./mix_grayscale_images.imgproc.hpp",
+//@		"./mix_image_spectra.imgproc.hpp",
+//@		"./checkerboard.imgproc.hpp",
+//@		"./butterworth_mask.imgproc.hpp",
+//@		"./gaussian_mask.imgproc.hpp",
+//@		"./grayscale_noise.imgproc.hpp",
+//@		"./rgba_noise.imgproc.hpp",
+//@		"./real_constant.imgproc.hpp",
+//@		"./split_rgba_image.imgproc.hpp",
+//@		"./rgba_to_gray_and_alpha.imgproc.hpp",
+//@		"./make_rgba_image.imgproc.hpp",
+//@		"./apply_colormap.imgproc.hpp",
+//@		"./dft_forward.imgproc.hpp",
+//@		"./dft_backward.imgproc.hpp",
+//@		"./make_topographic_map.imgproc.hpp",
+//@		"./project_normal_vector.imgproc.hpp",
+//@		"./normalize_grayscale_image.imgproc.hpp",
+//@		"./soft_clamp_grayscale_image.imgproc.hpp",
+//@		"./translate_grayscale_image.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -86,7 +87,8 @@ namespace
 	    get_info<::MakeTopographicMap::ImageProcessor>(),
 	    get_info<::ProjectNormalVector::ImageProcessor>(),
 	    get_info<::NormalizeGrayscaleImage::ImageProcessor>(),
-	    get_info<::SoftClampGrayscaleImage::ImageProcessor>()};
+	    get_info<::SoftClampGrayscaleImage::ImageProcessor>(),
+	    get_info<::TranslateGrayscaleImage::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
