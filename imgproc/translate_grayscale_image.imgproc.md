@@ -32,7 +32,7 @@ void main(auto const& args, auto const& params)
 	auto const h = args.size().height();
 
 	auto const Δx = mapParameter(param<Str{"Δx"}>(params), w);
-	auto const Δy = mapParameter(param<Str{"Δy"}>(params), w);
+	auto const Δy = mapParameter(param<Str{"Δy"}>(params), h);
 
 	for(uint32_t row = 0; row < h; ++row)
 	{

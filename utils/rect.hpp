@@ -20,6 +20,15 @@ namespace Texpainter
 		return vec2_t{std::max(std::abs(corner_a_rot[0]), std::abs(corner_b_rot[0])),
 		              std::max(std::abs(corner_a_rot[1]), std::abs(corner_b_rot[1]))};
 	}
+
+	inline vec2_t axisAlignedBoundingBox(vec2_t size)
+	{
+		auto const corner_a = size;
+		auto const corner_b = corner_a * vec2_t{1.0, -1.0};
+
+		return vec2_t{std::max(std::abs(corner_a[0]), std::abs(corner_b[0])),
+		              std::max(std::abs(corner_a[1]), std::abs(corner_b[1]))};
+	}
 }
 
 #endif

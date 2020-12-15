@@ -29,7 +29,9 @@
 //@		"./normalize_grayscale_image.imgproc.hpp",
 //@		"./soft_clamp_grayscale_image.imgproc.hpp",
 //@		"./translate_grayscale_image.imgproc.hpp",
-//@		"./translate_rgba_image.imgproc.hpp"
+//@		"./translate_rgba_image.imgproc.hpp",
+//@		"./tiled_scale_grayscale_image.imgproc.hpp",
+//@		"./scale_grayscale_image.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -90,7 +92,9 @@ namespace
 	    get_info<::NormalizeGrayscaleImage::ImageProcessor>(),
 	    get_info<::SoftClampGrayscaleImage::ImageProcessor>(),
 	    get_info<::TranslateGrayscaleImage::ImageProcessor>(),
-	    get_info<::TranslateRgbaImage::ImageProcessor>()};
+	    get_info<::TranslateRgbaImage::ImageProcessor>(),
+	    get_info<::TiledScaleGrayscaleImage::ImageProcessor>(),
+	    get_info<::ScaleGrayscaleImage::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
