@@ -1,14 +1,14 @@
-# Translate grayscale image
+# Translate RGBA image
 
-This image processor takes a grayscale image and translates its pixels with a given offset. Boundary conditions are set to periodic. That is, if a part of the source image would end up outside the image, it will wrap aruond to the opposite edge.
+This image processor takes a RGBA image and translates its pixels with a given offset. Boundary conditions are set to periodic. That is, if a part of the source image would end up outside the image, it will wrap aruond to the opposite edge.
 
 ## Input ports
 
-__Input:__ (Grayscale image) Input image
+__Input:__ (RGBA image) Input image
 
 ## Output ports
 
-__Output:__ (Grayscale image) Output image
+__Output:__ (RGBA image) Output image
 
 ## Parameters
 
@@ -46,6 +46,6 @@ void main(auto const& args, auto const& params)
 
 ## Tags
 
-__Id:__ 2a54afec8ce138f2596b09c024f0e7a0
+__Id:__ 164d7e1d2b58993004b2c442d017934e
 
 __Category:__ Spatial transformations
