@@ -16,15 +16,17 @@ __Horz scale factor:__ (= 1.0)
 
 __Vert scale factor:__ (= 1.0)
 
+__Fill mode:__ (= 0.0)
+
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include "utils/rect.hpp"
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 inline double mapParameter(ParamValue value) { return std::lerp(-1.0, 1.0, value.value()); }
@@ -56,11 +58,9 @@ void main(auto const& args, auto const& params)
 		{
 			auto const loc   = vec2_t{static_cast<double>(col), static_cast<double>(row)};
 			auto const src   = O + (loc - O) / s;
-			auto const src_x = static_cast<int32_t>(src[0]);
-			auto const src_y = static_cast<int32_t>(src[1]);
-			if(src_x >= 0 && src_x < static_cast<int32_t>(w) && src_y >= 0
-			   && src_y < static_cast<int32_t>(h))
-				[[likely]] { output<0>(args, col, row) = input<0>(args, src_x, src_y); }
+			auto const src_x = std::clamp(static_cast<int32_t>(src[0]), 0, static_cast<int32_t>(w - 1));
+			auto const src_y = std::clamp(static_cast<int32_t>(src[1]), 0, static_cast<int32_t>(h - 1));
+			output<0>(args, col, row) = input<0>(args, src_x, src_y);
 		}
 	}
 }
