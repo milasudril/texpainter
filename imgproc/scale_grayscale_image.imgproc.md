@@ -1,22 +1,26 @@
 # Scale grayscale image
 
+This image processor scales a grayscale image by a given factor between -1.0 and 1.0.
+
 ## Input ports
 
-__Input:__ (Grayscale image)
+__Input:__ (Grayscale image) The input image
 
 ## Output ports
 
-__Output:__ (Grayscale image)
+__Output:__ (Grayscale image) The output image
 
 ## Parameters
 
-__Scale factor:__ (= 1.0)
+The following parameters affect the scale factor:
 
-__Horz scale factor:__ (= 1.0)
+__Scale factor:__ (= 1.0) Isotropic scale factor
 
-__Vert scale factor:__ (= 1.0)
+__Horz scale factor:__ (= 1.0) Horizontal scale factor
 
-__Fill mode:__ (= 0.0)
+__Vert scale factor:__ (= 1.0) Vertical scale factor The effective scale horizontal scale factor is `Scale factor` × `Horz scale factor`. The effective vertical horizontal scale factor is `Scale factor` × `Vert scale factor`. Notice that a negative value can be set if it is desired to mirror the image.
+
+__Fill mode:__ (= 0.0) The method to be used when painting outside the resulting image. If smaller than 0.5, the values outside the resulting image will be zero. Otherwise, the resulting image will be tiled.
 
 ## Implementation
 

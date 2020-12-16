@@ -152,6 +152,12 @@
 					],
 					"name": "devtools/imgproc_gen/make_imgproc.py"
 				},
+				"dependencies": [
+					{
+						"ref": "maikeconfig.json",
+						"rel": "misc"
+					}
+				],
 				"filename_ext": ".hpp"
 			},
 			"filename_exts": [
