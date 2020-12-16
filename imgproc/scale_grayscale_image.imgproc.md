@@ -12,7 +12,7 @@ __Output:__ (Grayscale image) The output image
 
 ## Parameters
 
-This image processor takes four parameters. There of these are three parameters that affect the scale factor, `Scale factor`, `Horz scale factor`, and `Vert scale factor`. The effective horizontal scale factor is `Scale factor` × `Horz scale factor`. The effective vertical horizontal scale factor is `Scale factor` × `Vert scale factor`. Notice that a negative value can be set if it is desired to mirror the image.
+This image processor takes four parameters. Three of these are three parameters that affect the scale factor, `Scale factor`, `Horz scale factor`, and `Vert scale factor`. The effective horizontal scale factor is `Scale factor` × `Horz scale factor`. The effective vertical horizontal scale factor is `Scale factor` × `Vert scale factor`. Notice that a negative value can be set if it is desired to mirror the image.
 
 __Scale factor:__ (= 1.0) Isotropic scale factor
 
@@ -24,13 +24,13 @@ __Fill mode:__ (= 0.0) The method to be used when painting outside the resulting
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include "utils/rect.hpp"
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 using Texpainter::vec2_t;
