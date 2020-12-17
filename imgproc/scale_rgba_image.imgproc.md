@@ -1,14 +1,14 @@
-# Scale grayscale image
+# Scale RGBA image
 
-This image processor scales a grayscale image by a given factor between -1.0 and 1.0.
+This image processor scales a RGBA image by a given factor between -1.0 and 1.0.
 
 ## Input ports
 
-__Input:__ (Grayscale image) The input image
+__Input:__ (RGBA image) The input image
 
 ## Output ports
 
-__Output:__ (Grayscale image) The output image
+__Output:__ (RGBA image) The output image
 
 ## Parameters
 
@@ -102,6 +102,6 @@ void main(auto const& args, auto const& params)
 
 ## Tags
 
-__Id:__ 18cb587cdc572bdd556b8a587d9c0f3c
+__Id:__ 85378f5367b9bfd4b94097cca01ee315
 
 __Category:__ Spatial transformations
