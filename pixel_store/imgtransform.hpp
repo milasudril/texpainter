@@ -60,6 +60,57 @@ namespace Texpainter::PixelStore
 			}
 		}
 	}
+
+	template<class PixelType>
+	void renderTiled(Span2d<PixelType const> src, PixelType* sink, Angle ϴ)
+	{
+		auto const rot_x    = vec2_t{cos(ϴ), -sin(ϴ)};
+		auto const rot_y    = vec2_t{sin(ϴ), cos(ϴ)};
+		auto const w        = src.size().width();
+		auto const h        = src.size().height();
+		auto const size_vec = vec2_t{static_cast<double>(w), static_cast<double>(h)};
+
+		auto const O = 0.5 * size_vec;
+
+		for(uint32_t row = 0; row < h; ++row)
+		{
+			for(uint32_t col = 0; col < w; ++col)
+			{
+				auto const loc_ret = vec2_t{static_cast<double>(col), static_cast<double>(row)};
+				auto const src_pos = Texpainter::transform(loc_ret - O, rot_x, rot_y) + O;
+				auto src_x         = static_cast<int32_t>(src_pos[0]);
+				auto src_y         = static_cast<int32_t>(src_pos[1]);
+
+				sink[row * w + col] = src((src_x + w) % w, (src_y + h) % h);
+			}
+		}
+	}
+
+	template<class PixelType>
+	void renderCentered(Span2d<PixelType const> src, PixelType* sink, Angle ϴ)
+	{
+		auto const rot_x    = vec2_t{cos(ϴ), -sin(ϴ)};
+		auto const rot_y    = vec2_t{sin(ϴ), cos(ϴ)};
+		auto const w        = src.size().width();
+		auto const h        = src.size().height();
+		auto const size_vec = vec2_t{static_cast<double>(w), static_cast<double>(h)};
+
+		auto const O = 0.5 * size_vec;
+
+		for(uint32_t row = 0; row < h; ++row)
+		{
+			for(uint32_t col = 0; col < w; ++col)
+			{
+				auto const loc_ret = vec2_t{static_cast<double>(col), static_cast<double>(row)};
+				auto const src_pos = Texpainter::transform(loc_ret - O, rot_x, rot_y) + O;
+				auto src_x         = static_cast<int32_t>(src_pos[0]);
+				auto src_y         = static_cast<int32_t>(src_pos[1]);
+
+				if(src_pos[0] >= 0 && src_pos[0] < w && src_pos[1] >= 0 && src_pos[1] < h)
+					[[likely]] { sink[row * w + col] = src(src_x, src_y); }
+			}
+		}
+	}
 }
 
 #endif

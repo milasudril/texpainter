@@ -18,51 +18,39 @@ __Fill mode:__ (= 0.0) The method to be used when painting outside the resulting
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include "utils/rect.hpp"
 #include "utils/vec_t.hpp"
+#include "pixel_store/imgtransform.hpp"
 
 #include <numbers>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
+using Texpainter::Angle;
+using Texpainter::Span2d;
 using Texpainter::vec2_t;
+using Texpainter::PixelStore::renderCentered;
+using Texpainter::PixelStore::renderTiled;
 
-inline double angle(ParamValue val)
+inline Angle angle(ParamValue val)
 {
-	return std::numbers::pi*std::lerp(-1, 1, val.value());
+	return Angle{std::lerp(-0.5, 0.5, val.value()), Angle::Turns{}};
 }
 
 void main(auto const& args, auto const& params)
 {
-	auto const ϴ            = angle(param<Str{"Angle"}>(params));
-	auto const rot_x        = vec2_t{cos(ϴ), sin(ϴ)};
-	auto const rot_y        = vec2_t{-sin(ϴ), cos(ϴ)};
-	auto const size = args.size();
-	auto const size_vec = vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
-
-	auto const O = 0.5 * size_vec;
-
-	for(uint32_t row = 0; row < size.height(); ++row)
+	auto const ϴ = angle(param<Str{"Angle"}>(params));
+	if(param<Str{"Fill mode"}>(params).value() < 0.5)
+	{ renderCentered(Span2d{input<0>(args), args.size()}, output<0>(args), ϴ); }
+	else
 	{
-		for(uint32_t col = 0; col < size.width(); ++col)
-		{
-			auto const loc_ret = vec2_t{static_cast<double>(col), static_cast<double>(row)};
-			auto const src_pos = Texpainter::transform(loc_ret - O, rot_x, rot_y) + O;
-			auto src_x = static_cast<int32_t>(src_pos[0]);
-			auto src_y = static_cast<int32_t>(src_pos[1]);
-/*			if(src_pos[0] >= 0 && src_pos[0] < size.width() && src_pos[1] >= 0
-			   && src_pos[1] < size.height()) [[likely]]*/
-			{
-				output<0>(args, col, row) = input<0>(args, (src_x + size.width())%size.width(), (src_y + size.height())%size.height());
-			}
-		}
+		renderTiled(Span2d{input<0>(args), args.size()}, output<0>(args), ϴ);
 	}
-
 }
 ```
 

@@ -96,8 +96,7 @@ namespace
 	    get_info<::TranslateRgbaImage::ImageProcessor>(),
 	    get_info<::ScaleGrayscaleImage::ImageProcessor>(),
 	    get_info<::ScaleRgbaImage::ImageProcessor>(),
-		get_info<::RotateGrayscaleImage::ImageProcessor>()
-	};
+	    get_info<::RotateGrayscaleImage::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
