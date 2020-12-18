@@ -3,12 +3,12 @@
 //@	,"dependencies_extra":[{"ref":"filter_graph_editor.o","rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_APP_FILTERGRAPHEDITOR_HPP
-#define TEXPAINTER_APP_FILTERGRAPHEDITOR_HPP
+#ifndef TEXPAINTER_APPNEW_FILTERGRAPHEDITOR_HPP
+#define TEXPAINTER_APPNEW_FILTERGRAPHEDITOR_HPP
 
 #include "./node_editor.hpp"
 
-#include "model/compositor.hpp"
+#include "model/document.hpp"
 #include "filtergraph/connection.hpp"
 #include "imgproc/image_processor_registry.hpp"
 #include "ui/widget_canvas.hpp"
@@ -17,12 +17,15 @@
 #include "ui/menu_item.hpp"
 #include "ui/listbox.hpp"
 #include "ui/error_message_dialog.hpp"
+#include "ui/text_entry.hpp"
+#include "ui/labeled_input.hpp"
 #include "utils/edge_list.hpp"
+#include "utils/inherit_from.hpp"
 
 #include <limits>
 #include <cassert>
 
-namespace Texpainter
+namespace Texpainter::App
 {
 	template<auto Tag>
 	class PortId
@@ -206,8 +209,11 @@ namespace Texpainter
 
 	class FilterGraphEditor
 	{
-		using Canvas     = Ui::WidgetCanvas<FilterGraph::NodeId>;
-		using NodeWidget = NodeEditor<FilterGraphEditor>;
+		using Canvas           = Ui::WidgetCanvas<FilterGraph::NodeId>;
+		using NodeWidget       = NodeEditor<FilterGraphEditor>;
+		using NodeNameInputDlg = Texpainter::Ui::Dialog<
+		    InheritFrom<std::pair<FilterGraph::NodeId, Model::CompositorProxy<Model::Document>>,
+		                Ui::LabeledInput<Ui::TextEntry>>>;
 
 	public:
 		enum class ControlId : int
@@ -222,9 +228,7 @@ namespace Texpainter
 
 		FilterGraphEditor& operator=(FilterGraphEditor&&) = delete;
 
-		FilterGraphEditor(Ui::Container& owner,
-		                  Model::Compositor const& graph,
-		                  std::map<FilterGraph::NodeId, vec2_t> const& node_locations);
+		FilterGraphEditor(Ui::Container& owner, Model::Document& doc);
 
 		FilterGraphEditor& insert(std::unique_ptr<FilterGraph::AbstractImageProcessor> node,
 		                          Ui::WidgetCoordinates loc = Ui::WidgetCoordinates{50.0, 50.0});
@@ -235,7 +239,7 @@ namespace Texpainter
 			r_eh       = &eh;
 			r_callback = [](void* eh, FilterGraphEditor& src) {
 				auto self = reinterpret_cast<EventHandler*>(eh);
-				self->template graphUpdated<id>(src);
+				self->template onUpdated<id>(src);
 			};
 			return *this;
 		}
@@ -267,6 +271,12 @@ namespace Texpainter
 
 		template<ControlId>
 		void onViewportMoved(Canvas& src);
+
+		template<ControlId>
+		void onCopyCompleted(FilterGraph::NodeId, FilterGraph::Graph::NodeItem);
+
+		template<ControlId>
+		void requestItemName(FilterGraph::NodeId, Model::CompositorProxy<Model::Document>);
 
 		void onClicked(NodeWidget const& src, FilterGraph::InputPortIndex port);
 
@@ -315,15 +325,13 @@ namespace Texpainter
 			m_ports.removeConnections(conn.sink());
 			m_ports.removeDummyConnection(conn.source());
 			establish(conn);
-			m_graph.clearValidationState();
+			m_doc.get().compositor().clearValidationState();
 			m_ports.addConnection(conn.sink(), conn.source());
 			m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
 			r_callback(r_eh, *this);
 		}
 
 		void updateLocations();
-
-		Model::Compositor const& filterGraph() const { return m_graph; }
 
 		std::map<FilterGraph::NodeId, vec2_t> nodeLocations() const;
 
@@ -333,9 +341,20 @@ namespace Texpainter
 			m_err_disp.show(r_owner.get(), "Texpainter", msg);
 		}
 
+		template<ControlId>
+		void confirmPositive(NodeNameInputDlg&);
+
+		template<ControlId>
+		void dismiss(NodeNameInputDlg&)
+		{
+			m_copy_name.reset();
+		}
+
+		void insertNodeEditor(FilterGraph::Graph::NodeItem item);
+
 
 	private:
-		Model::Compositor m_graph;
+		std::reference_wrapper<Model::Document> m_doc;
 		void* r_eh;
 		void (*r_callback)(void*, FilterGraphEditor&);
 
@@ -356,6 +375,8 @@ namespace Texpainter
 		Ui::ErrorMessageDialog m_err_disp;
 		std::reference_wrapper<Ui::Container> r_owner;
 
+		std::unique_ptr<NodeNameInputDlg> m_copy_name;
+
 
 		void completeConnection()
 		{
@@ -374,7 +395,7 @@ namespace Texpainter
 	{
 		if(button == 3)
 		{
-			if(node != Model::Compositor::InputNodeId && node != Model::Compositor::OutputNodeId)
+			if(node != Model::Compositor::OutputNodeId)
 			{
 				m_sel_node      = node;
 				m_filtermenuloc = loc;
@@ -392,20 +413,27 @@ namespace Texpainter
 	}
 
 	template<>
+	inline void FilterGraphEditor::onCopyCompleted<FilterGraphEditor::ControlId::CopyNode>(
+	    FilterGraph::NodeId, FilterGraph::Graph::NodeItem item)
+	{
+		insertNodeEditor(item);
+	}
+
+	template<>
 	inline void FilterGraphEditor::onActivated<FilterGraphEditor::ControlId::CopyNode>(
 	    Ui::MenuItem&)
 	{
-		insert(m_graph.node(m_sel_node)->clonedProcessor(), m_filtermenuloc);
+		m_doc.get().compositor().copy<FilterGraphEditor::ControlId::CopyNode>(*this, m_sel_node);
 	}
 
 	template<>
 	inline void FilterGraphEditor::onActivated<FilterGraphEditor::ControlId::DeleteNode>(
 	    Ui::MenuItem&)
 	{
-		auto node = m_graph.node(m_sel_node);
+		auto node = std::as_const(m_doc.get()).compositor().node(m_sel_node);
 		m_ports.removePorts(*node);
 		m_node_editors.erase(m_sel_node);
-		m_graph.erase(m_sel_node);
+		m_doc.get().compositor().erase(m_sel_node);
 		m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
 		r_callback(r_eh, *this);
 	}
@@ -460,6 +488,28 @@ namespace Texpainter
 	{
 		auto offset = src.viewportOffset();
 		m_linesegs->renderOffset(offset);
+	}
+
+	template<>
+	inline void FilterGraphEditor::requestItemName<FilterGraphEditor::ControlId::CopyNode>(
+	    FilterGraph::NodeId node_id, Model::CompositorProxy<Model::Document> compositor)
+	{
+		m_copy_name = std::make_unique<NodeNameInputDlg>(std::make_pair(node_id, compositor),
+		                                                 r_owner,
+		                                                 "Copy node",
+		                                                 Texpainter::Ui::Box::Orientation::Vertical,
+		                                                 "New name");
+		m_copy_name->eventHandler<ControlId::CopyNode>(*this);
+	}
+
+	template<>
+	inline void FilterGraphEditor::confirmPositive<FilterGraphEditor::ControlId::CopyNode>(
+	    NodeNameInputDlg& src)
+	{
+		auto& widget = src.widget();
+		widget.second.insertNodeWithName<FilterGraphEditor::ControlId::CopyNode>(
+		    *this, widget.first, Model::ItemName{widget.inputField().content()});
+		m_copy_name.reset();
 	}
 }
 

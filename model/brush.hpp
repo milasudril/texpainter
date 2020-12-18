@@ -2,28 +2,28 @@
 //@	"targets":[{"name":"brush.hpp","type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_MODEL_BRUSH_HPP
-#define TEXPAINTER_MODEL_BRUSH_HPP
+#ifndef TEXPAINTER_MODELNEW_BRUSH_HPP
+#define TEXPAINTER_MODELNEW_BRUSH_HPP
 
 #include "./brushes.hpp"
 
-#include "utils/empty.hpp"
 #include "libenum/enum.hpp"
+#include <array>
 
 namespace Texpainter::Model
 {
 	class BrushInfo
 	{
 	public:
-		explicit BrushInfo(float r, BrushType t): m_radius{r}, m_type{t} {}
+		explicit BrushInfo(float r, BrushShape t): m_radius{r}, m_type{t} {}
 
-		BrushInfo& type(BrushType t)
+		BrushInfo& shape(BrushShape t)
 		{
 			m_type = t;
 			return *this;
 		}
 
-		BrushType type() const { return m_type; }
+		BrushShape shape() const { return m_type; }
 
 		BrushInfo& radius(float r)
 		{
@@ -35,16 +35,16 @@ namespace Texpainter::Model
 
 	private:
 		float m_radius;
-		BrushType m_type;
+		BrushShape m_type;
 	};
 
 	namespace detail
 	{
-		using BrushFunc = bool (*)(float radius, vec2_t location);
+		using BrushFunc = bool (*)(vec2_t location, double radius);
 		constexpr auto gen_brush_vtable()
 		{
-			std::array<BrushFunc, static_cast<size_t>(end(Enum::Empty<BrushType>{}))> ret{};
-			Enum::forEachEnumItem<BrushType>([&ret](auto item) {
+			std::array<BrushFunc, static_cast<size_t>(end(Enum::Empty<BrushShape>{}))> ret{};
+			Enum::forEachEnumItem<BrushShape>([&ret](auto item) {
 				ret[static_cast<int>(item.value)] = BrushTraits<item.value>::test;
 			});
 			return ret;
@@ -55,13 +55,14 @@ namespace Texpainter::Model
 	class BrushFunction
 	{
 	public:
-		explicit BrushFunction(BrushType type): r_func{detail::brush_vtable[static_cast<int>(type)]}
+		explicit BrushFunction(BrushShape type)
+		    : r_func{detail::brush_vtable[static_cast<int>(type)]}
 		{
 		}
 
-		decltype(auto) operator()(float radius, vec2_t location) const
+		decltype(auto) operator()(vec2_t location, double radius) const
 		{
-			return r_func(radius, location);
+			return r_func(location, radius);
 		}
 
 	private:

@@ -1,11 +1,10 @@
-//@	{"targets":[{"name":"layer_creator.hpp","type":"include"}]}
+//@	{"targets":[{"name":"image_creator.hpp","type":"include"}]}
 
-#ifndef TEXPAINTER_APP_LAYERCREATOR_HPP
-#define TEXPAINTER_APP_LAYERCREATOR_HPP
+#ifndef TEXPAINTER_APPNEW_IMAGECREATOR_HPP
+#define TEXPAINTER_APPNEW_IMAGECREATOR_HPP
 
 #include "./size_input.hpp"
 
-#include "model/layer.hpp"
 #include "model/item_name.hpp"
 #include "ui/box.hpp"
 #include "ui/labeled_input.hpp"
@@ -13,7 +12,7 @@
 
 namespace Texpainter
 {
-	class LayerCreator
+	class ImageCreator
 	{
 	public:
 		enum class ControlId : int
@@ -22,7 +21,7 @@ namespace Texpainter
 			Height
 		};
 
-		explicit LayerCreator(Ui::Container& container, Size2d default_size, Size2d max_size)
+		explicit ImageCreator(Ui::Container& container, Size2d default_size, Size2d max_size)
 		    : m_root{container, Ui::Box::Orientation::Vertical}
 		    , m_name{m_root, Ui::Box::Orientation::Horizontal, "Name: "}
 		    , m_size{m_root, default_size, max_size}
@@ -30,15 +29,15 @@ namespace Texpainter
 			m_name.inputField().focus();
 		}
 
-		struct LayerInfo
+		struct ImageInfo
 		{
 			Model::ItemName name;
 			Size2d size;
 		};
 
-		auto value() const
+		auto imageInfo() const
 		{
-			return LayerInfo{Model::ItemName{m_name.inputField().content()}, m_size.value()};
+			return ImageInfo{Model::ItemName{m_name.inputField().content()}, m_size.value()};
 		}
 
 	private:

@@ -1,139 +1,229 @@
-//@	{"targets":[{"name":"document.hpp", "type":"include"}]}
+//@	{
+//@	 "targets":[{"name":"document.hpp", "type":"include"}]
+//@	,"dependencies_extra":[{"ref":"document.o", "rel":"implementation"}]
+//@	}
 
-#ifndef TEXPAINTER_MODEL_DOCUMENT_HPP
-#define TEXPAINTER_MODEL_DOCUMENT_HPP
+#ifndef TEXPAINTER_MODELNEW_DOCUMENT_HPP
+#define TEXPAINTER_MODELNEW_DOCUMENT_HPP
 
-#include "./layer.hpp"
-#include "./layer_index.hpp"
-#include "./brush.hpp"
+#include "./compositor_proxy.hpp"
+#include "./compositor_input.hpp"
 #include "./item_name.hpp"
+#include "./image_source.hpp"
+#include "./palette_source.hpp"
+#include "./compositor_proxy.hpp"
+#include "./brush.hpp"
+#include "./paint.hpp"
 
-#include "utils/sorted_sequence.hpp"
-#include "utils/mutator.hpp"
+#include "pixel_store/image.hpp"
+#include "utils/with_status.hpp"
 
-#include <string>
-#include <cassert>
+#include <algorithm>
+#include <iterator>
 
 namespace Texpainter::Model
 {
-	class Document
+	namespace detail
 	{
+		template<>
+		struct ImageProcessor<WithStatus<PixelStore::Image>>
+		{
+			using type = ImageSource;
+		};
+
+		template<>
+		struct ImageProcessor<WithStatus<Palette>>
+		{
+			using type = PaletteSource;
+		};
+	}
+
+	class Document: private Size2d,
+	                private Compositor,
+	                private CompositorInputManager<PixelStore::Image>,
+	                private CompositorInputManager<Palette>
+	{
+		using CompositorInputManager<PixelStore::Image>::insert;
+		using CompositorInputManager<Palette>::insert;
+		using CompositorInputManager<PixelStore::Image>::erase;
+		using CompositorInputManager<Palette>::erase;
+
+
 	public:
-		using LayerStack = SortedSequence<ItemName, Layer, LayerIndex>;
+		using CompositorInputManager<PixelStore::Image>::get;
+		using CompositorInputManager<PixelStore::Image>::modify;
+		using CompositorInputManager<Palette>::get;
+		using CompositorInputManager<Palette>::modify;
 
 		explicit Document(Size2d canvas_size)
-		    : m_canvas_size{canvas_size}
-		    , m_current_brush{1.0f / 64.0f, BrushType::Circle}
-		    , m_dirty{false}
+		    : Size2d{canvas_size}
+		    , m_current_brush{BrushInfo{0.5f, BrushShape::Circle}}
 		{
 		}
 
-		bool dirty() const { return m_dirty; }
-
-		Size2d canvasSize() const { return m_canvas_size; }
+		Size2d canvasSize() const { return static_cast<Size2d>(*this); }
 
 		Document& canvasSize(Size2d size)
 		{
-			m_canvas_size = size;
-			m_dirty       = true;
+			static_cast<Size2d&>(*this) = size;
 			return *this;
 		}
 
+		Compositor const& compositor() const { return static_cast<Compositor const&>(*this); }
 
-		LayerStack const& layers() const { return m_layers; }
-
-		auto layersByIndex() const { return m_layers.valuesByIndex(); }
-
-		Document& layers(LayerStack&& layers_new)
+		CompositorProxy<Document> compositor()
 		{
-			m_layers = std::move(layers_new);
-			m_dirty  = true;
+			return CompositorProxy{*this, static_cast<Compositor&>(*this)};
+		}
+
+
+		auto const& images() const { return get(std::type_identity<PixelStore::Image>{}); }
+
+		auto image(ItemName const& name) const
+		{
+			return get(std::type_identity<PixelStore::Image>{}, name);
+		}
+
+		auto insert(ItemName const& name, PixelStore::Image&& img)
+		{
+			return insert(name, std::forward<PixelStore::Image>(img), *this, m_input_nodes);
+		}
+
+		bool eraseImage(ItemName const& name)
+		{
+			return erase(std::type_identity<PixelStore::Image>{}, name, *this, m_input_nodes);
+		}
+
+
+		auto const& palettes() const { return get(std::type_identity<Palette>{}); }
+
+		auto palette(ItemName const& name) const
+		{
+			return get(std::type_identity<Palette>{}, name);
+		}
+
+		auto insert(ItemName const& name, Palette&& pal)
+		{
+			return insert(name, std::forward<Palette>(pal), *this, m_input_nodes);
+		}
+
+		bool erasePalette(ItemName const& name)
+		{
+			return erase(std::type_identity<Palette>{}, name, *this, m_input_nodes);
+		}
+
+
+		Compositor::NodeItem const* inputNodeItem(ItemName const& name) const
+		{
+			auto i = m_input_nodes.find(name);
+			return i != std::end(m_input_nodes) ? &i->second : nullptr;
+		}
+
+		ItemName const* inputNodeName(Compositor::NodeId id) const
+		{
+			auto i = std::ranges::find_if(
+			    m_input_nodes, [id](auto const& item) { return item.second.first == id; });
+			return i != std::end(m_input_nodes) ? &i->first : nullptr;
+		}
+
+		auto erase(Compositor::NodeId id)
+		{
+			auto name = inputNodeName(id);
+			if(name == nullptr) [[likely]]
+				{
+					Compositor::erase(id);
+					return true;
+				}
+
+			if(!eraseImage(*name)) { return erasePalette(*name); }
+
+			return true;
+		}
+
+		auto copy(Compositor::NodeId id, ItemName const& name_new)
+		{
+			auto name = inputNodeName(id);
+			assert(name != nullptr);
+
+			if(auto img = image(*name); img != nullptr)
+			{
+				insert(name_new, Texpainter::PixelStore::Image{img->source.get()});
+				return inputNodeItem(name_new);
+			}
+
+			if(auto pal = palette(*name); pal != nullptr)
+			{
+				insert(name_new, Texpainter::PixelStore::Palette{pal->source.get()});
+				return inputNodeItem(name_new);
+			}
+			__builtin_unreachable();
+		}
+
+		auto const& nodeLocations() const { return m_node_locations; }
+
+		Document& nodeLocations(std::map<FilterGraph::NodeId, vec2_t>&& locs)
+		{
+			m_node_locations = std::move(locs);
 			return *this;
 		}
-
-		template<Mutator<LayerStack> Func>
-		bool layersModify(Func&& f)
-		{
-			m_dirty = f(m_layers) || m_dirty;
-			return m_dirty;
-		}
-
-		auto const& currentLayer() const { return m_current_layer; }
-
-		Document& currentLayer(ItemName&& current_layer)
-		{
-			assert(m_layers[current_layer] != nullptr);
-			m_current_layer = std::move(current_layer);
-			m_dirty         = true;
-			return *this;
-		}
-
 
 		BrushInfo currentBrush() const { return m_current_brush; }
 
 		Document& currentBrush(BrushInfo brush)
 		{
 			m_current_brush = brush;
-			m_dirty         = true;
+			return *this;
+		}
+
+		ItemName const& currentImage() const { return m_current_image; }
+
+		Document& currentImage(ItemName&& name)
+		{
+			m_current_image = std::move(name);
+			return *this;
+		}
+
+		PixelStore::ColorIndex currentColor() const { return m_current_color; }
+
+		Document& currentColor(PixelStore::ColorIndex i)
+		{
+			m_current_color = i;
+			return *this;
+		}
+
+		ItemName const& currentPalette() const { return m_current_palette; }
+
+		Document& currentPalette(ItemName&& name)
+		{
+			m_current_palette = std::move(name);
+			return *this;
+		}
+
+		PixelStore::Palette<8> const& colorHistory() const { return m_color_history; }
+
+		Document& saveColor(PixelStore::Pixel color)
+		{
+			std::rotate(std::rbegin(m_color_history),
+			            std::rbegin(m_color_history) + 1,
+			            std::rend(m_color_history));
+			m_color_history[PixelStore::ColorIndex{0}] = color;
 			return *this;
 		}
 
 	private:
-		Size2d m_canvas_size;
-		LayerStack m_layers;
+		std::map<ItemName, Compositor::NodeItem> m_input_nodes;
 
-		ItemName m_current_layer;
-		ItemName m_current_palette;
+		std::map<FilterGraph::NodeId, vec2_t> m_node_locations;
 		BrushInfo m_current_brush;
-
-		bool m_dirty;
+		ItemName m_current_image;
+		PixelStore::ColorIndex m_current_color;
+		ItemName m_current_palette;
+		PixelStore::Palette<8> m_color_history;
 	};
 
-	inline Layer const* currentLayer(Document const& doc)
-	{
-		auto const& layers = doc.layers();
-		return layers[doc.currentLayer()];
-	}
+	PixelStore::Image render(Document const& document);
 
-
-	inline auto visibleLayersByIndex(Document const& doc)
-	{
-		auto layers = doc.layersByIndex();
-		std::vector<std::reference_wrapper<Layer const>> ret;
-		ret.reserve(doc.layers().size().value());
-		if(std::ranges::any_of(layers, [](auto const& layer) { return layer.isolated(); }))
-		{
-			std::ranges::copy_if(layers, std::back_inserter(ret), [](auto const& layer) {
-				return layer.visible() && layer.isolated();
-			});
-			return ret;
-		}
-
-		std::ranges::copy_if(
-		    layers, std::back_inserter(ret), [](auto const& layer) { return layer.visible(); });
-		return ret;
-	}
-
-	template<class Func>
-	bool modifyCurrentLayer(Document& doc, Func&& f)
-	{
-		return doc.layersModify([&doc, func = std::forward<Func>(f)](auto& layers) mutable {
-			if(auto layer = layers[doc.currentLayer()]; layer != nullptr) { return func(*layer); }
-			return false;
-		});
-	}
-
-	inline PixelStore::Image render(Document const& doc, double scale = 2.0)
-	{
-		PixelStore::Image canvas{static_cast<uint32_t>(scale * doc.canvasSize().width()),
-		                         static_cast<uint32_t>(scale * doc.canvasSize().height())};
-		std::ranges::fill(canvas.pixels(), PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
-		std::ranges::for_each(visibleLayersByIndex(doc), [&canvas, scale](auto const& layer) {
-			render(layer.get(), canvas, scale);
-		});
-
-		return canvas;
-	}
+	void paint(Document& doc, vec2_t location);
 }
 
 #endif

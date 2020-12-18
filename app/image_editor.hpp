@@ -7,7 +7,7 @@
 #include "./brush_selector.hpp"
 #include "./palette_selector.hpp"
 
-#include "model_new/document.hpp"
+#include "model/document.hpp"
 
 #include "ui/image_view.hpp"
 #include "ui/labeled_input.hpp"

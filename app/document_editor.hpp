@@ -9,8 +9,8 @@
 #include "./image_creator.hpp"
 #include "./palette_creator.hpp"
 
-#include "model_new/document.hpp"
-#include "model_new/palette_generate.hpp"
+#include "model/document.hpp"
+#include "model/palette_generate.hpp"
 #include "pixel_store/image_io.hpp"
 #include "ui/window.hpp"
 #include "ui/image_view.hpp"

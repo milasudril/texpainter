@@ -3,8 +3,8 @@
 #ifndef TEXPAINTER_APPNEW_PALETTESELECTOR_HPP
 #define TEXPAINTER_APPNEW_PALETTESELECTOR_HPP
 
-#include "model_new/palette.hpp"
-#include "model_new/item_name.hpp"
+#include "model/palette.hpp"
+#include "model/item_name.hpp"
 
 #include "ui/combobox.hpp"
 #include "ui/palette_view.hpp"

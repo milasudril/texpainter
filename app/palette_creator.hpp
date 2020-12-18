@@ -1,10 +1,11 @@
 //@	{"targets":[{"name":"palette_creator.hpp","type":"include"}]}
 
-#ifndef TEXPAINTER_APP_PALETTECREATOR_HPP
-#define TEXPAINTER_APP_PALETTECREATOR_HPP
+#ifndef TEXPAINTER_APPNEW_PALETTECREATOR_HPP
+#define TEXPAINTER_APPNEW_PALETTECREATOR_HPP
 
 #include "./size_input.hpp"
 
+#include "model/item_name.hpp"
 #include "pixel_store/palette.hpp"
 #include "pixel_store/hsi_rgb.hpp"
 #include "ui/box.hpp"
@@ -68,6 +69,7 @@ namespace Texpainter
 
 		struct PaletteInfo
 		{
+			Model::ItemName name;
 			std::array<PixelStore::Pixel, 4> colors;
 			bool by_intensity;
 			bool reversed;
@@ -75,6 +77,7 @@ namespace Texpainter
 
 		explicit PaletteCreator(Ui::Container& container)
 		    : m_root{container, Ui::Box::Orientation::Vertical}
+		    , m_name{m_root, Ui::Box::Orientation::Horizontal, "Name: "}
 		    , m_base_hue{m_root, Ui::Box::Orientation::Horizontal, "Base hue: "}
 		    , m_deco_1{m_root, Ui::Box::Orientation::Horizontal, "Deco 1: "}
 		    , m_deco_2{m_root, Ui::Box::Orientation::Horizontal, "Deco 2: "}
@@ -116,11 +119,15 @@ namespace Texpainter
 
 		PaletteInfo value() const
 		{
-			return PaletteInfo{generateColors(), m_by_intensity.state(), m_reversed.state()};
+			return PaletteInfo{Model::ItemName{m_name.inputField().content()},
+			                   generateColors(),
+			                   m_by_intensity.state(),
+			                   m_reversed.state()};
 		}
 
 	private:
 		Ui::Box m_root;
+		Ui::LabeledInput<Ui::TextEntry> m_name;
 		Ui::LabeledInput<SliderWithPalView> m_base_hue;
 		Ui::LabeledInput<SliderWithPalView> m_deco_1;
 		Ui::LabeledInput<SliderWithPalView> m_deco_2;

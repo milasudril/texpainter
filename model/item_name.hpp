@@ -2,8 +2,8 @@
 //@	"targets":[{"name":"item_name.hpp","type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_MODEL_ITEMNAME_HPP
-#define TEXPAINTER_MODEL_ITEMNAME_HPP
+#ifndef TEXPAINTER_MODELNEW_ITEMNAME_HPP
+#define TEXPAINTER_MODELNEW_ITEMNAME_HPP
 
 #include <string>
 #include <algorithm>
@@ -54,6 +54,8 @@ namespace Texpainter::Model
 	std::string const& toString(ItemName const&& item) = delete;
 
 	inline bool operator<(ItemName const& a, ItemName const& b) { return a.value() < b.value(); }
+
+	inline bool operator==(ItemName const& a, ItemName const& b) { return a.value() == b.value(); }
 
 	inline ItemName createItemNameFromFilename(char const* filename)
 	{

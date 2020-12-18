@@ -5,12 +5,6 @@
 #include "./compositor.hpp"
 
 #include "utils/graphutils.hpp"
-#include "sched/thread_pool.hpp"
-
-namespace
-{
-	Texpainter::Sched::ThreadPool workers;
-}
 
 Texpainter::FilterGraph::ValidationResult Texpainter::Model::validate(Compositor const& g)
 {
@@ -38,8 +32,7 @@ Texpainter::FilterGraph::ValidationResult Texpainter::Model::validate(Compositor
 	return result;
 }
 
-Texpainter::PixelStore::Image Texpainter::Model::Compositor::process(Input const& input,
-                                                                     bool force_update) const
+void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas) const
 {
 	assert(valid());
 	if(m_node_array.size() == 0) [[unlikely]]
@@ -71,11 +64,8 @@ Texpainter::PixelStore::Image Texpainter::Model::Compositor::process(Input const
 			m_node_array = std::move(nodes);
 		}
 
-	r_input->pixels(input.pixels()).palette(input.palette());
-	if(force_update) { r_input_node->forceUpdate(); }
+	r_output->sink(canvas);
 
-	PixelStore::Image ret{input.pixels().size()};
-	r_output->sink(ret.pixels());
 	// NOTE: Since OutputNode does not use the internal image cache (it has no outputs)
 	//       and it may happen that it is not connected to the input node, we must always
 	//       recompute the output node. Otherwise, the contents of ret will be undefined,
@@ -83,7 +73,8 @@ Texpainter::PixelStore::Image Texpainter::Model::Compositor::process(Input const
 	r_output_node->forceUpdate();
 
 	Sched::SignalingCounter<size_t> task_counter;
-	std::ranges::for_each(m_node_array, [size = input.pixels().size(), &task_counter](auto& item) {
+
+	auto schedule_task = [&workers = m_workers, size = canvas.size(), &task_counter](auto& item) {
 		workers.addTask([&item, size, &task_counter]() {
 			item.counter->waitAndReset(item.node.get().inputPorts().size());
 			item.node(size);
@@ -92,7 +83,8 @@ Texpainter::PixelStore::Image Texpainter::Model::Compositor::process(Input const
 			});
 			++task_counter;
 		});
-	});
+	};
+
+	std::ranges::for_each(m_node_array, schedule_task);
 	task_counter.waitAndReset(m_node_array.size());
-	return ret;
 }

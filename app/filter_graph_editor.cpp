@@ -19,7 +19,7 @@ namespace
 	}
 }
 
-void Texpainter::PortMap::addPorts(Texpainter::FilterGraph::Node& node)
+void Texpainter::App::PortMap::addPorts(Texpainter::FilterGraph::Node& node)
 {
 	auto input_port_ids = gen_ports_ids(m_port_id_in, node.inputPorts().size());
 	m_port_id_in += input_port_ids.size();
@@ -38,7 +38,7 @@ void Texpainter::PortMap::addPorts(Texpainter::FilterGraph::Node& node)
 	m_output_port_map.insert(std::pair{&node, std::move(output_port_ids)});
 }
 
-void Texpainter::PortMap::removePorts(FilterGraph::Node const& node)
+void Texpainter::App::PortMap::removePorts(FilterGraph::Node const& node)
 {
 	std::ranges::for_each(m_output_port_map.find(&node)->second,
 	                      [&connections = m_connectors](auto item) { connections.remove(item); });
@@ -49,7 +49,7 @@ void Texpainter::PortMap::removePorts(FilterGraph::Node const& node)
 	m_input_port_map.erase(&node);
 }
 
-void Texpainter::PortMap::addConnections(Texpainter::FilterGraph::Node const& node)
+void Texpainter::App::PortMap::addConnections(Texpainter::FilterGraph::Node const& node)
 {
 	std::ranges::for_each(
 	    node.inputs(),
@@ -69,7 +69,7 @@ namespace
 	template<class Canvas>
 	class MakeNodeEditor
 	{
-		using NodeWidget = Texpainter::NodeEditor<Texpainter::FilterGraphEditor>;
+		using NodeWidget = Texpainter::App::NodeEditor<Texpainter::App::FilterGraphEditor>;
 
 	public:
 		explicit MakeNodeEditor(
@@ -100,11 +100,8 @@ namespace
 	};
 }
 
-Texpainter::FilterGraphEditor::FilterGraphEditor(
-    Ui::Container& owner,
-    Model::Compositor const& graph,
-    std::map<FilterGraph::NodeId, vec2_t> const& node_locations)
-    : m_graph{graph}
+Texpainter::App::FilterGraphEditor::FilterGraphEditor(Ui::Container& owner, Model::Document& doc)
+    : m_doc{doc}
     , r_callback{[](void*, FilterGraphEditor&) {}}
     , m_canvas{owner}
     , m_node_copy{m_node_menu, "Copy"}
@@ -112,29 +109,29 @@ Texpainter::FilterGraphEditor::FilterGraphEditor(
     , r_owner{owner}
 {
 	m_linesegs = m_canvas.insert<Ui::LineSegmentRenderer>();
-	std::ranges::transform(m_graph.nodesWithId(),
+	std::ranges::transform(m_doc.get().compositor().nodesWithId(),
 	                       std::inserter(m_node_editors, std::end(m_node_editors)),
-	                       MakeNodeEditor{m_canvas, node_locations});
+	                       MakeNodeEditor{m_canvas, m_doc.get().nodeLocations()});
 
 	m_canvas.eventHandler<ControlId::NodeWidgets>(*this);
 	std::ranges::for_each(m_node_editors, [this](auto& item) { item.second->eventHandler(*this); });
 	m_node_copy.eventHandler<ControlId::CopyNode>(*this);
 	m_node_delete.eventHandler<ControlId::DeleteNode>(*this);
 
-	std::ranges::for_each(m_graph.nodesWithId(), [&ports = m_ports](auto& node_item) {
-		ports.addPorts(node_item.second);
-	});
-	std::ranges::for_each(m_graph.nodesWithId(), [&ports = m_ports](auto const& node_item) {
-		ports.addConnections(node_item.second);
-	});
+	std::ranges::for_each(
+	    m_doc.get().compositor().nodesWithId(),
+	    [&ports = m_ports](auto& node_item) { ports.addPorts(node_item.second); });
+	std::ranges::for_each(
+	    m_doc.get().compositor().nodesWithId(),
+	    [&ports = m_ports](auto const& node_item) { ports.addConnections(node_item.second); });
 }
 
-std::map<Texpainter::FilterGraph::NodeId, Texpainter::vec2_t> Texpainter::FilterGraphEditor::
+std::map<Texpainter::FilterGraph::NodeId, Texpainter::vec2_t> Texpainter::App::FilterGraphEditor::
     nodeLocations() const
 {
 	std::map<FilterGraph::NodeId, vec2_t> ret;
 	std::ranges::transform(
-	    m_graph.nodesWithId(),
+	    m_doc.get().compositor().nodesWithId(),
 	    std::inserter(ret, std::end(ret)),
 	    [&canvas = m_canvas](auto const& item) {
 		    return std::pair{item.first, canvas.widgetLocation(item.first).value()};
@@ -143,10 +140,10 @@ std::map<Texpainter::FilterGraph::NodeId, Texpainter::vec2_t> Texpainter::Filter
 	return ret;
 }
 
-Texpainter::FilterGraphEditor& Texpainter::FilterGraphEditor::insert(
+Texpainter::App::FilterGraphEditor& Texpainter::App::FilterGraphEditor::insert(
     std::unique_ptr<FilterGraph::AbstractImageProcessor> node, Ui::WidgetCoordinates insert_loc)
 {
-	auto item = m_graph.insert(std::move(node));
+	auto item = m_doc.get().compositor().insert(std::move(node));
 
 	auto ip = m_node_editors.insert(std::pair{
 	    item.first, m_canvas.template insert<NodeWidget>(item.first, insert_loc, item.second)});
@@ -159,7 +156,7 @@ Texpainter::FilterGraphEditor& Texpainter::FilterGraphEditor::insert(
 	return *this;
 }
 
-void Texpainter::FilterGraphEditor::updateLocations()
+void Texpainter::App::FilterGraphEditor::updateLocations()
 {
 	std::ranges::for_each(m_node_editors, [&ports = m_ports](auto const& item) {
 		ports.updateLocation(item.second->node(), item.second->inputs(), item.second->outputs());
@@ -168,8 +165,8 @@ void Texpainter::FilterGraphEditor::updateLocations()
 	m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
 }
 
-void Texpainter::FilterGraphEditor::onClicked(NodeWidget const& src,
-                                              FilterGraph::InputPortIndex port)
+void Texpainter::App::FilterGraphEditor::onClicked(NodeWidget const& src,
+                                                   FilterGraph::InputPortIndex port)
 {
 	if(m_con_proc == nullptr)
 	{
@@ -189,8 +186,8 @@ void Texpainter::FilterGraphEditor::onClicked(NodeWidget const& src,
 	}
 }
 
-void Texpainter::FilterGraphEditor::onClicked(NodeWidget const& src,
-                                              FilterGraph::OutputPortIndex port)
+void Texpainter::App::FilterGraphEditor::onClicked(NodeWidget const& src,
+                                                   FilterGraph::OutputPortIndex port)
 {
 	if(m_con_proc == nullptr)
 	{
@@ -211,8 +208,10 @@ void Texpainter::FilterGraphEditor::onClicked(NodeWidget const& src,
 }
 
 template<>
-void Texpainter::FilterGraphEditor::onMove<Texpainter::FilterGraphEditor::ControlId::NodeWidgets>(
-    Canvas& src, Ui::WidgetCoordinates, FilterGraph::NodeId id)
+void Texpainter::App::FilterGraphEditor::onMove<
+    Texpainter::App::FilterGraphEditor::ControlId::NodeWidgets>(Canvas& src,
+                                                                Ui::WidgetCoordinates,
+                                                                FilterGraph::NodeId id)
 {
 	auto node_edit_iter = m_node_editors.find(id);
 	if(node_edit_iter == std::end(m_node_editors)) { return; }
@@ -221,4 +220,14 @@ void Texpainter::FilterGraphEditor::onMove<Texpainter::FilterGraphEditor::Contro
 	m_ports.updateLocation(editor.node(), editor.inputs(), editor.outputs(), src.viewportOffset());
 
 	m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
+}
+
+void Texpainter::App::FilterGraphEditor::insertNodeEditor(FilterGraph::Graph::NodeItem item)
+{
+	auto ip = m_node_editors.insert(
+	    std::pair{item.first,
+	              m_canvas.template insert<NodeWidget>(item.first, m_filtermenuloc, item.second)});
+	ip.first->second->eventHandler(*this);
+	m_ports.addPorts(item.second.get());
+	m_canvas.showWidgets();
 }

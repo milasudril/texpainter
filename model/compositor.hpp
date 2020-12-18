@@ -3,40 +3,21 @@
 //@	 ,"dependencies_extra":[{"ref":"compositor.o","rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_MODEL_COMPOSITOR_HPP
-#define TEXPAINTER_MODEL_COMPOSITOR_HPP
+#ifndef TEXPAINTER_MODELNEW_COMPOSITOR_HPP
+#define TEXPAINTER_MODELNEW_COMPOSITOR_HPP
 
 #include "filtergraph/graph.hpp"
-#include "filtergraph/layer_input.hpp"
 #include "filtergraph/image_sink.hpp"
 #include "pixel_store/image.hpp"
 #include "utils/iter_pair.hpp"
 #include "utils/pair_iterator.hpp"
 #include "sched/signaling_counter.hpp"
+#include "sched/thread_pool.hpp"
 
 #include <algorithm>
 
 namespace Texpainter::Model
 {
-	class Input
-	{
-	public:
-		explicit Input(Span2d<PixelStore::Pixel const> pixels,
-		               std::reference_wrapper<PixelStore::Palette<16> const> pal)
-		    : r_pixels{pixels}
-		    , m_palette{pal}
-		{
-		}
-
-		auto pixels() const { return r_pixels; }
-
-		auto palette() const { return m_palette; }
-
-	private:
-		Span2d<PixelStore::Pixel const> r_pixels;
-		std::reference_wrapper<PixelStore::Palette<16> const> m_palette;
-	};
-
 	class Compositor;
 
 	Texpainter::FilterGraph::ValidationResult validate(Compositor const& g);
@@ -44,8 +25,7 @@ namespace Texpainter::Model
 	class Compositor
 	{
 	public:
-		static constexpr FilterGraph::NodeId InputNodeId{0};
-		static constexpr FilterGraph::NodeId OutputNodeId{1};
+		static constexpr FilterGraph::NodeId OutputNodeId{0};
 		using NodeItem        = FilterGraph::Graph::NodeItem;
 		using NodeId          = FilterGraph::NodeId;
 		using InputPortIndex  = FilterGraph::InputPortIndex;
@@ -55,39 +35,18 @@ namespace Texpainter::Model
 		{
 			using FilterGraph::ImageProcessorWrapper;
 			using FilterGraph::ImageSink;
-			using FilterGraph::LayerInput;
 
-			auto input    = std::make_unique<ImageProcessorWrapper<LayerInput>>(LayerInput{});
 			auto output   = std::make_unique<ImageProcessorWrapper<ImageSink>>(ImageSink{});
-			r_input       = &input->processor();
 			r_output      = &output->processor();
-			r_input_node  = &m_graph.insert(std::move(input)).second.get();
 			r_output_node = &m_graph.insert(std::move(output)).second.get();
-
-			connect(OutputNodeId,
-			        FilterGraph::InputPortIndex{0},
-			        InputNodeId,
-			        FilterGraph::OutputPortIndex{0});
 		}
 
-		Compositor(Compositor const& other): m_graph{other.m_graph}
-		{
-			using FilterGraph::ImageProcessorWrapper;
-			using FilterGraph::ImageSink;
-			using FilterGraph::LayerInput;
-
-			r_input_node  = m_graph.node(InputNodeId);
-			r_output_node = m_graph.node(OutputNodeId);
-			r_input = &dynamic_cast<ImageProcessorWrapper<LayerInput>*>(&r_input_node->processor())
-			               ->processor();
-			r_output = &dynamic_cast<ImageProcessorWrapper<ImageSink>*>(&r_output_node->processor())
-			                ->processor();
-		}
+		Compositor(Compositor const& other) = delete;
 
 		Compositor(Compositor&&) = default;
 		Compositor& operator=(Compositor&&) = default;
 
-		PixelStore::Image process(Input const& input, bool force_update = true) const;
+		void process(Span2d<PixelStore::Pixel> canvas) const;
 
 		NodeItem insert(std::unique_ptr<FilterGraph::AbstractImageProcessor> proc)
 		{
@@ -146,6 +105,8 @@ namespace Texpainter::Model
 			m_node_array.clear();
 		}
 
+		auto nodeCount() const { return m_graph.size(); }
+
 	private:
 		struct NodeState
 		{
@@ -156,6 +117,7 @@ namespace Texpainter::Model
 			    signal_counters{};
 		};
 		mutable std::vector<NodeState> m_node_array;
+		mutable Texpainter::Sched::ThreadPool m_workers;
 
 		enum class ValidationState : size_t
 		{
@@ -165,9 +127,7 @@ namespace Texpainter::Model
 		};
 		mutable ValidationState m_valid_state;
 
-		FilterGraph::LayerInput* r_input;
 		FilterGraph::ImageSink* r_output;
-		FilterGraph::Node* r_input_node;
 		FilterGraph::Node* r_output_node;
 
 		FilterGraph::Graph m_graph;

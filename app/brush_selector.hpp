@@ -3,7 +3,7 @@
 #ifndef TEXPAINTER_APPNEW_BRUSHSELECTOR_HPP
 #define TEXPAINTER_APPNEW_BRUSHSELECTOR_HPP
 
-#include "model_new/brush.hpp"
+#include "model/brush.hpp"
 #include "ui/combobox.hpp"
 #include "ui/slider.hpp"
 #include "ui/box.hpp"
