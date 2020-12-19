@@ -189,8 +189,12 @@ namespace
 	constexpr auto make_imgprocs_by_name()
 	{
 		auto ret = make_imgproc_list();
-		std::ranges::sort(
-		    ret, [](auto const& a, auto const& b) { return CompareFunc{}(a.name, b.name); });
+		std::ranges::sort(ret, [](auto const& a, auto const& b) {
+			auto const res = strcmp(a.name, b.name);
+			if(res < 0) { return true; }
+			if(res == 0) { return strcmp(a.category, b.category) < 0; }
+			return false;
+		});
 		return ret;
 	}
 
