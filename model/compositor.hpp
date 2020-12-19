@@ -6,8 +6,9 @@
 #ifndef TEXPAINTER_MODEL_COMPOSITOR_HPP
 #define TEXPAINTER_MODEL_COMPOSITOR_HPP
 
+#include "./image_sink.hpp"
+
 #include "filtergraph/graph.hpp"
-#include "filtergraph/image_sink.hpp"
 #include "pixel_store/image.hpp"
 #include "utils/iter_pair.hpp"
 #include "utils/pair_iterator.hpp"

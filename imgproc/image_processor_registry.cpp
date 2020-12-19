@@ -62,8 +62,10 @@ namespace
 	template<Texpainter::FilterGraph::ImageProcessor Proc>
 	constexpr ImageProcessorInfo get_info()
 	{
-		return ImageProcessorInfo{
-		    Proc::name(), Proc::category(), Proc::id(), Texpainter::FilterGraph::createImageProcessor<Proc>};
+		return ImageProcessorInfo{Proc::name(),
+		                          Proc::category(),
+		                          Proc::id(),
+		                          Texpainter::FilterGraph::createImageProcessor<Proc>};
 	}
 
 	constexpr ImageProcessorInfo s_processors[] = {

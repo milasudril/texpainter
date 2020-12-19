@@ -2,12 +2,12 @@
 //@	 "targets":[{"name":"image_sink.hpp", "type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_FILTERGRAPH_IMAGESINK_HPP
-#define TEXPAINTER_FILTERGRAPH_IMAGESINK_HPP
+#ifndef TEXPAINTER_MODEL_IMAGESINK_HPP
+#define TEXPAINTER_MODEL_IMAGESINK_HPP
 
-#include "./port_info.hpp"
-#include "./img_proc_arg.hpp"
-#include "./image_processor_id.hpp"
+#include "filtergraph/port_info.hpp"
+#include "filtergraph/img_proc_arg.hpp"
+#include "filtergraph/image_processor_id.hpp"
 
 #include "utils/span_2d.hpp"
 
@@ -37,7 +37,7 @@ namespace Texpainter::FilterGraph
 
 		std::span<ParamValue const> paramValues() const { return std::span<ParamValue const>{}; }
 
-		static constexpr char const* name() { return "Layer output"; }
+		static constexpr char const* name() { return "Output image"; }
 
 		static constexpr auto id() { return ImageProcessorId{"4332d23feb31f1daf36caf312aca0911"}; }
 

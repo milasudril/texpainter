@@ -4,7 +4,7 @@
 
 #include "./image_sink.hpp"
 
-#include "./image_processor.hpp"
+#include "filtergraph/image_processor.hpp"
 
 #include <cassert>
 
