@@ -55,6 +55,8 @@ namespace Texpainter::Ui
 
 		TextEntry& enabled(bool status) noexcept;
 
+		TextEntry& continuousUpdate(bool status) noexcept;
+
 	protected:
 		using EventHandlerFunc = void (*)(void* event_handler, TextEntry& self);
 		TextEntry& eventHandler(void* event_handler, EventHandlerFunc f);

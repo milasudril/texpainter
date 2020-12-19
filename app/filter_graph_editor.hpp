@@ -7,6 +7,7 @@
 #define TEXPAINTER_APP_FILTERGRAPHEDITOR_HPP
 
 #include "./node_editor.hpp"
+#include "./image_processor_selector.hpp"
 
 #include "model/document.hpp"
 #include "filtergraph/connection.hpp"
@@ -15,7 +16,6 @@
 #include "ui/line_segment_renderer.hpp"
 #include "ui/menu.hpp"
 #include "ui/menu_item.hpp"
-#include "ui/listbox.hpp"
 #include "ui/error_message_dialog.hpp"
 #include "ui/text_entry.hpp"
 #include "ui/labeled_input.hpp"
@@ -211,9 +211,10 @@ namespace Texpainter::App
 	{
 		using Canvas           = Ui::WidgetCanvas<FilterGraph::NodeId>;
 		using NodeWidget       = NodeEditor<FilterGraphEditor>;
-		using NodeNameInputDlg = Texpainter::Ui::Dialog<
+		using NodeNameInputDlg = Ui::Dialog<
 		    InheritFrom<std::pair<FilterGraph::NodeId, Model::CompositorProxy<Model::Document>>,
 		                Ui::LabeledInput<Ui::TextEntry>>>;
+		using ImageProcessorSelectorDlg = Ui::Dialog<ImageProcessorSelector>;
 
 	public:
 		enum class ControlId : int
@@ -265,9 +266,6 @@ namespace Texpainter::App
 
 		template<ControlId>
 		void onActivated(Ui::MenuItem& src);
-
-		template<ControlId>
-		void onActivated(Ui::Listbox& src, int item);
 
 		template<ControlId>
 		void onViewportMoved(Canvas& src);
@@ -350,6 +348,22 @@ namespace Texpainter::App
 			m_copy_name.reset();
 		}
 
+		template<ControlId>
+		void confirmPositive(ImageProcessorSelectorDlg& src)
+		{
+			if(auto name = src.widget().value(); name != nullptr)
+			{
+				insert(ImageProcessorRegistry::createImageProcessor(name), m_filtermenuloc);
+				m_filtermenu.reset();
+			}
+		}
+
+		template<ControlId>
+		void dismiss(ImageProcessorSelectorDlg&)
+		{
+			m_filtermenu.reset();
+		}
+
 		void insertNodeEditor(FilterGraph::Graph::NodeItem item);
 
 
@@ -365,7 +379,7 @@ namespace Texpainter::App
 		Canvas m_canvas;
 		std::unique_ptr<Ui::LineSegmentRenderer> m_linesegs;
 		std::map<FilterGraph::NodeId, Canvas::WidgetHandle<NodeWidget>> m_node_editors;
-		Canvas::WidgetHandle<Ui::Listbox> m_filtermenu;
+		std::unique_ptr<ImageProcessorSelectorDlg> m_filtermenu;
 		Ui::WidgetCoordinates m_filtermenuloc;
 		Ui::Menu m_node_menu;
 		Ui::MenuItem m_node_copy;
@@ -462,25 +476,12 @@ namespace Texpainter::App
 				break;
 			case 3:
 				m_filtermenuloc = loc;
-				m_filtermenu.reset();  // Reset first so the same id can be reused
-				m_filtermenu = m_canvas.insert<Ui::Listbox>(
-				    FilterGraph::NodeId{static_cast<uint64_t>(-1)}, loc);
-				std::ranges::for_each(
-				    ImageProcessorRegistry::imageProcessorsByName(),
-				    [&menu = *m_filtermenu](auto item) { menu.append(item.name); });
+				m_filtermenu =
+				    std::make_unique<ImageProcessorSelectorDlg>(r_owner, "Select image processor");
 				m_filtermenu->eventHandler<ControlId::FilterMenu>(*this);
 				m_canvas.showWidgets();
 				break;
 		}
-	}
-
-	template<>
-	inline void FilterGraphEditor::onActivated<FilterGraphEditor::ControlId::FilterMenu>(
-	    Ui::Listbox& box, int item)
-	{
-		auto name = box.get(item);
-		insert(ImageProcessorRegistry::createImageProcessor(name), m_filtermenuloc);
-		m_filtermenu.reset();
 	}
 
 	template<>

@@ -16,6 +16,9 @@ public:
 
 	void append(const char* option)
 	{
+		auto eh = r_eh;
+		r_eh    = nullptr;
+
 		auto label = GTK_LABEL(gtk_label_new(option));
 		gtk_label_set_justify(label, GTK_JUSTIFY_LEFT);
 		gtk_widget_set_halign(GTK_WIDGET(label), GTK_ALIGN_START);
@@ -26,6 +29,7 @@ public:
 
 		m_row_index[row] = static_cast<int>(m_index_row.size());
 		m_index_row.push_back(row);
+		r_eh = eh;
 	}
 
 	void selected(int index) noexcept
@@ -39,20 +43,23 @@ public:
 	int selected() const noexcept
 	{
 		auto list = gtk_list_box_get_selected_rows(m_handle);
-		auto row  = GTK_LIST_BOX_ROW(list->data);
+		if(list == nullptr) { return -1; }
+		auto row = GTK_LIST_BOX_ROW(list->data);
 		g_list_free(list);
 
 		return m_row_index.find(row)->second;
 	}
 
-	void eventHandler(void* event_handler, EventHandlerFunc func)
+	void eventHandler(void* event_handler, EventHandlerFunc func) noexcept
 	{
 		r_eh   = event_handler;
 		r_func = func;
 	}
 
-	void scrollIntoView(int index)
+	void scrollIntoView(int index) noexcept
 	{
+		auto eh  = r_eh;
+		r_eh     = nullptr;
 		auto row = m_index_row[index];
 		int x{};
 		int y{};
@@ -60,12 +67,31 @@ public:
 		auto adjustment = gtk_list_box_get_adjustment(m_handle);
 		gtk_adjustment_set_value(
 		    adjustment, static_cast<double>(y) - 0.33 * gtk_adjustment_get_page_size(adjustment));
+		r_eh = eh;
 	}
 
-	char const* get(int index) const
+	char const* get(int index) const noexcept
 	{
+		if(index == -1) { return nullptr; }
 		return gtk_label_get_text(GTK_LABEL(gtk_bin_get_child(GTK_BIN(m_index_row[index]))));
 	}
+
+	void clear() noexcept
+	{
+		auto eh       = r_eh;
+		r_eh          = nullptr;
+		auto children = gtk_container_get_children(GTK_CONTAINER(m_handle));
+		for(auto iter = children; iter != NULL; iter = g_list_next(iter))
+		{
+			gtk_widget_destroy(GTK_WIDGET(iter->data));
+		}
+		g_list_free(children);
+		r_eh = eh;
+		m_index_row.clear();
+		m_row_index.clear();
+	}
+
+	void update() noexcept { gtk_widget_show_all(GTK_WIDGET(m_root)); }
 
 private:
 	void* r_eh;
@@ -137,3 +163,15 @@ Texpainter::Ui::Listbox& Texpainter::Ui::Listbox::scrollIntoView(int row) noexce
 }
 
 char const* Texpainter::Ui::Listbox::get(int index) const noexcept { return m_impl->get(index); }
+
+Texpainter::Ui::Listbox& Texpainter::Ui::Listbox::clear() noexcept
+{
+	m_impl->clear();
+	return *this;
+}
+
+Texpainter::Ui::Listbox& Texpainter::Ui::Listbox::update() noexcept
+{
+	m_impl->update();
+	return *this;
+}

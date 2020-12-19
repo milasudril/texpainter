@@ -56,12 +56,33 @@ public:
 		gtk_widget_set_sensitive(GTK_WIDGET(m_handle), status ? TRUE : FALSE);
 	}
 
+	void continuousUpdate(bool status) { m_continues_update = status; }
+
 private:
 	void* r_eh;
+	bool m_continues_update;
 	EventHandlerFunc r_func;
 	GtkEntry* m_handle;
 
-	static gboolean focus_callback(GtkWidget* widget, GdkEvent* event, gpointer data);
+	static gboolean focus_callback(GtkWidget*, GdkEvent*, gpointer data)
+	{
+		auto self = reinterpret_cast<Impl*>(data);
+		if(self->r_eh != nullptr)
+		{
+			if(self->r_eh != nullptr) { self->r_func(self->r_eh, *self); }
+		}
+		return FALSE;
+	}
+
+	static gboolean key_release(GtkWidget*, GdkEvent*, void* data)
+	{
+		auto self = reinterpret_cast<Impl*>(data);
+		if(self->r_eh != nullptr && self->m_continues_update)
+		{
+			if(self->r_eh != nullptr) { self->r_func(self->r_eh, *self); }
+		}
+		return FALSE;
+	}
 };
 
 Texpainter::Ui::TextEntry::TextEntry(Container& cnt) { m_impl = new Impl(cnt); }
@@ -108,10 +129,14 @@ Texpainter::Ui::TextEntry& Texpainter::Ui::TextEntry::focus()
 }
 
 
-Texpainter::Ui::TextEntry::Impl::Impl(Container& cnt): TextEntry{*this}, r_eh{nullptr}
+Texpainter::Ui::TextEntry::Impl::Impl(Container& cnt)
+    : TextEntry{*this}
+    , r_eh{nullptr}
+    , m_continues_update{false}
 {
 	auto widget = gtk_entry_new();
 	g_signal_connect(widget, "focus-out-event", G_CALLBACK(focus_callback), this);
+	g_signal_connect(widget, "key-release-event", G_CALLBACK(key_release), this);
 	m_handle = GTK_ENTRY(widget);
 
 	if(s_style_refcount == 0)
@@ -144,18 +169,14 @@ Texpainter::Ui::TextEntry::Impl::~Impl()
 	gtk_widget_destroy(GTK_WIDGET(m_handle));
 }
 
-gboolean Texpainter::Ui::TextEntry::Impl::focus_callback(GtkWidget*, GdkEvent*, gpointer data)
-{
-	auto self = reinterpret_cast<Impl*>(data);
-	if(self->r_eh != nullptr)
-	{
-		if(self->r_eh != nullptr) { self->r_func(self->r_eh, *self); }
-	}
-	return FALSE;
-}
-
 Texpainter::Ui::TextEntry& Texpainter::Ui::TextEntry::enabled(bool status) noexcept
 {
 	m_impl->enabled(status);
+	return *this;
+}
+
+Texpainter::Ui::TextEntry& Texpainter::Ui::TextEntry::continuousUpdate(bool status) noexcept
+{
+	m_impl->continuousUpdate(status);
 	return *this;
 }

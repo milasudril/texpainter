@@ -53,6 +53,10 @@ namespace Texpainter::Ui
 			});
 		}
 
+		Texpainter::Ui::Listbox& clear() noexcept;
+
+		Texpainter::Ui::Listbox& update() noexcept;
+
 	private:
 		using EventHandlerFunc = void (*)(void* event_handler, Listbox& self, int index);
 		Listbox& eventHandler(void* event_handler, EventHandlerFunc f);
