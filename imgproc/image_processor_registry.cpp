@@ -198,7 +198,10 @@ namespace
 	{
 		auto ret = make_imgproc_list();
 		std::ranges::sort(ret, [](auto const& a, auto const& b) {
-			return CompareFunc{}(a.category, b.category);
+			auto const res = strcmp(a.category, b.category);
+			if(res < 0) { return true; }
+			if(res == 0) { return strcmp(a.name, b.name) < 0; }
+			return false;
 		});
 		return ret;
 	}
