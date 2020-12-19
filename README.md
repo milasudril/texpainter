@@ -1,4 +1,6 @@
+# Texpainter
 
+Texpainter is a utility program intended for creating tilable textures. It consists of *very* basic raster graphics editor (more basic than Ms Paint, though it supports transparency), combined with a powerful node based compositor, through which multiple images can be processed and combined to a single image.
 
 ## How to compile
 
