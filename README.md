@@ -1,15 +1,4 @@
-Utility application that can be used to create repeatable textures
 
-## Planned features
-
- * Tile display (done)
- * Palette-based painting
- * Wrap-around paint (done)
- * Export to exr
- * Different noise generation tools (Filtered noise, Cracks, and Voronoi)
- * "Real time" image filters (in progress)
- * Import image
- * Layer stack (locrot transform + mirror symmetry) (done)
 
 ## How to compile
 
