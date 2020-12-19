@@ -465,8 +465,9 @@ namespace Texpainter::App
 				m_filtermenu.reset();  // Reset first so the same id can be reused
 				m_filtermenu = m_canvas.insert<Ui::Listbox>(
 				    FilterGraph::NodeId{static_cast<uint64_t>(-1)}, loc);
-				std::ranges::for_each(ImageProcessorRegistry::processorNames(),
-				                      [&menu = *m_filtermenu](auto item) { menu.append(item); });
+				std::ranges::for_each(
+				    ImageProcessorRegistry::imageProcessorsByName(),
+				    [&menu = *m_filtermenu](auto item) { menu.append(item.name); });
 				m_filtermenu->eventHandler<ControlId::FilterMenu>(*this);
 				m_canvas.showWidgets();
 				break;

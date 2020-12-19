@@ -8,17 +8,14 @@
 
 namespace
 {
-	struct CompareId
+	struct Compare
 	{
 		constexpr bool operator()(Texpainter::FilterGraph::ImageProcessorId const& a,
 		                          Texpainter::FilterGraph::ImageProcessorId const& b) const
 		{
 			return std::ranges::lexicographical_compare(a.data(), b.data());
 		}
-	};
 
-	struct CompareName
-	{
 		constexpr bool operator()(char const* a, char const* b) const { return strcmp(a, b) < 0; }
 	};
 }
@@ -27,8 +24,9 @@ namespace Testcases
 {
 	void processorIdsUnique()
 	{
-		auto ids = Texpainter::ImageProcessorRegistry::processorIds();
-		assert(std::ranges::is_sorted(ids, CompareId{}));
+		auto procs = Texpainter::ImageProcessorRegistry::imageProcessorsById();
+		auto ids   = std::ranges::transform_view{procs, [](auto const& item) { return item.id; }};
+		assert(std::ranges::is_sorted(ids, Compare{}));
 
 		auto i = std::ranges::adjacent_find(ids);
 		assert(i == std::end(ids));
@@ -36,8 +34,9 @@ namespace Testcases
 
 	void processorNamesUnique()
 	{
-		auto names = Texpainter::ImageProcessorRegistry::processorNames();
-		assert(std::ranges::is_sorted(names, CompareName{}));
+		auto procs = Texpainter::ImageProcessorRegistry::imageProcessorsById();
+		auto names = std::ranges::transform_view{procs, [](auto const& item) { return item.id; }};
+		assert(std::ranges::is_sorted(names, Compare{}));
 
 		auto i = std::ranges::adjacent_find(names);
 		assert(i == std::end(names));
@@ -45,7 +44,8 @@ namespace Testcases
 
 	void processorIdsValid()
 	{
-		auto ids = Texpainter::ImageProcessorRegistry::processorIds();
+		auto procs = Texpainter::ImageProcessorRegistry::imageProcessorsById();
+		auto ids   = std::ranges::transform_view{procs, [](auto const& item) { return item.id; }};
 		assert(std::ranges::find(ids, Texpainter::FilterGraph::InvalidImgProcId) == std::end(ids));
 	}
 }
@@ -55,6 +55,5 @@ int main()
 	Testcases::processorIdsUnique();
 	Testcases::processorNamesUnique();
 	Testcases::processorIdsValid();
-
 	return 0;
 }

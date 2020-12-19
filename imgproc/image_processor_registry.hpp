@@ -17,8 +17,16 @@ namespace Texpainter::ImageProcessorRegistry
 	std::unique_ptr<FilterGraph::AbstractImageProcessor> createImageProcessor(
 	    FilterGraph::ImageProcessorId const& id);
 
-	std::span<FilterGraph::ImageProcessorId const> processorIds();
-	std::span<char const* const> processorNames();
+	struct ImageProcessorInfo
+	{
+		FilterGraph::ImageProcessorId id;
+		char const* name;
+		char const* category;
+	};
+
+	std::span<ImageProcessorInfo const> imageProcessorsById();
+	std::span<ImageProcessorInfo const> imageProcessorsByName();
+	std::span<ImageProcessorInfo const> imageProcessorsByCategory();
 }
 
 #endif

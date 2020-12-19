@@ -51,24 +51,22 @@ namespace
 	using ImageProcessorFactory =
 	    std::unique_ptr<Texpainter::FilterGraph::AbstractImageProcessor> (*)();
 
-	struct ImageProcessorInfo
+	struct ImageProcessorDetailedInfo
 	{
-		char const* name;
-		char const* category;
-		Texpainter::FilterGraph::ImageProcessorId id;
+		Texpainter::ImageProcessorRegistry::ImageProcessorInfo info;
 		ImageProcessorFactory factory;
 	};
 
 	template<Texpainter::FilterGraph::ImageProcessor Proc>
-	constexpr ImageProcessorInfo get_info()
+	constexpr ImageProcessorDetailedInfo get_info()
 	{
-		return ImageProcessorInfo{Proc::name(),
-		                          Proc::category(),
-		                          Proc::id(),
-		                          Texpainter::FilterGraph::createImageProcessor<Proc>};
+		return ImageProcessorDetailedInfo{Proc::id(),
+		                                  Proc::name(),
+		                                  Proc::category(),
+		                                  Texpainter::FilterGraph::createImageProcessor<Proc>};
 	}
 
-	constexpr ImageProcessorInfo s_processors[] = {
+	constexpr ImageProcessorDetailedInfo s_processors[] = {
 	    get_info<::AddImageSpectra::ImageProcessor>(),
 	    get_info<::AddGrayscaleImages::ImageProcessor>(),
 	    get_info<::AddRgbaImages::ImageProcessor>(),
@@ -106,13 +104,15 @@ namespace
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
 
-	struct CompareId
+	struct CompareFunc
 	{
 		constexpr bool operator()(Texpainter::FilterGraph::ImageProcessorId const& a,
 		                          Texpainter::FilterGraph::ImageProcessorId const& b) const
 		{
 			return std::ranges::lexicographical_compare(a.data(), b.data());
 		}
+
+		constexpr bool operator()(char const* a, char const* b) const { return strcmp(a, b) < 0; }
 	};
 
 	constexpr auto get_img_proc_ids()
@@ -120,7 +120,7 @@ namespace
 		std::array<Texpainter::FilterGraph::ImageProcessorId, std::size(s_processors)> ret;
 		for(size_t k = 0; k < std::size(ret); ++k)
 		{
-			ret[k] = s_processors[k].id;
+			ret[k] = s_processors[k].info.id;
 		}
 		return ret;
 	}
@@ -130,20 +130,14 @@ namespace
 		static constexpr auto items = get_img_proc_ids();
 	};
 
-	using IdToProcMap = FixedFlatmap<ImageProcessorIds, ImageProcessorFactory, CompareId>;
-
-
-	struct CompareName
-	{
-		constexpr bool operator()(char const* a, char const* b) const { return strcmp(a, b) < 0; }
-	};
+	using IdToProcMap = FixedFlatmap<ImageProcessorIds, ImageProcessorFactory, CompareFunc>;
 
 	constexpr auto get_img_proc_names()
 	{
 		std::array<char const*, std::size(s_processors)> ret;
 		for(size_t k = 0; k < std::size(ret); ++k)
 		{
-			ret[k] = s_processors[k].name;
+			ret[k] = s_processors[k].info.name;
 		}
 		return ret;
 	}
@@ -153,14 +147,14 @@ namespace
 		static constexpr auto items = get_img_proc_names();
 	};
 
-	using NameToProcMap = FixedFlatmap<ImageProcessorNames, ImageProcessorFactory, CompareName>;
+	using NameToProcMap = FixedFlatmap<ImageProcessorNames, ImageProcessorFactory, CompareFunc>;
 
 	constexpr auto make_id_to_processor()
 	{
 		IdToProcMap ret;
 		for(size_t k = 0; k < std::size(s_processors); ++k)
 		{
-			*ret.find(s_processors[k].id) = s_processors[k].factory;
+			*ret.find(s_processors[k].info.id) = s_processors[k].factory;
 		}
 		return ret;
 	}
@@ -170,13 +164,51 @@ namespace
 		NameToProcMap ret;
 		for(size_t k = 0; k < std::size(s_processors); ++k)
 		{
-			*ret.find(s_processors[k].name) = s_processors[k].factory;
+			*ret.find(s_processors[k].info.name) = s_processors[k].factory;
 		}
+		return ret;
+	}
+
+	constexpr auto make_imgproc_list()
+	{
+		std::array<Texpainter::ImageProcessorRegistry::ImageProcessorInfo, std::size(s_processors)>
+		    ret;
+		std::ranges::transform(
+		    s_processors, std::begin(ret), [](auto const& val) { return val.info; });
+		return ret;
+	}
+
+	constexpr auto make_imgprocs_by_id()
+	{
+		auto ret = make_imgproc_list();
+		std::ranges::sort(ret,
+		                  [](auto const& a, auto const& b) { return CompareFunc{}(a.id, b.id); });
+		return ret;
+	}
+
+	constexpr auto make_imgprocs_by_name()
+	{
+		auto ret = make_imgproc_list();
+		std::ranges::sort(
+		    ret, [](auto const& a, auto const& b) { return CompareFunc{}(a.name, b.name); });
+		return ret;
+	}
+
+	constexpr auto make_imgprocs_by_category()
+	{
+		auto ret = make_imgproc_list();
+		std::ranges::sort(ret, [](auto const& a, auto const& b) {
+			return CompareFunc{}(a.category, b.category);
+		});
 		return ret;
 	}
 
 	constexpr auto id_to_processor   = make_id_to_processor();
 	constexpr auto name_to_processor = make_name_to_processor();
+
+	constexpr auto imgprocs_by_id       = make_imgprocs_by_id();
+	constexpr auto imgprocs_by_name     = make_imgprocs_by_name();
+	constexpr auto imgprocs_by_category = make_imgprocs_by_category();
 }
 
 
@@ -195,13 +227,20 @@ std::unique_ptr<Texpainter::FilterGraph::AbstractImageProcessor> Texpainter::
 	return i != nullptr ? (*i)() : nullptr;
 }
 
-std::span<Texpainter::FilterGraph::ImageProcessorId const> Texpainter::ImageProcessorRegistry::
-    processorIds()
+std::span<Texpainter::ImageProcessorRegistry::ImageProcessorInfo const> Texpainter::
+    ImageProcessorRegistry::imageProcessorsById()
 {
-	return id_to_processor.keys();
+	return imgprocs_by_id;
 }
 
-std::span<char const* const> Texpainter::ImageProcessorRegistry::processorNames()
+std::span<Texpainter::ImageProcessorRegistry::ImageProcessorInfo const> Texpainter::
+    ImageProcessorRegistry::imageProcessorsByName()
 {
-	return name_to_processor.keys();
+	return imgprocs_by_name;
+}
+
+std::span<Texpainter::ImageProcessorRegistry::ImageProcessorInfo const> Texpainter::
+    ImageProcessorRegistry::imageProcessorsByCategory()
+{
+	return imgprocs_by_category;
 }
