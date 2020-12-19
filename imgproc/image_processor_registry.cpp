@@ -54,6 +54,7 @@ namespace
 	struct ImageProcessorInfo
 	{
 		char const* name;
+		char const* category;
 		Texpainter::FilterGraph::ImageProcessorId id;
 		ImageProcessorFactory factory;
 	};
@@ -62,7 +63,7 @@ namespace
 	constexpr ImageProcessorInfo get_info()
 	{
 		return ImageProcessorInfo{
-		    Proc::name(), Proc::id(), Texpainter::FilterGraph::createImageProcessor<Proc>};
+		    Proc::name(), Proc::category(), Proc::id(), Texpainter::FilterGraph::createImageProcessor<Proc>};
 	}
 
 	constexpr ImageProcessorInfo s_processors[] = {
