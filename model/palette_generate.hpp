@@ -3,8 +3,8 @@
 //@	 ,"dependencies_extra":[{"ref":"palette_generate.o","rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_MODELNEW_PALETTEGENERATE_HPP
-#define TEXPAINTER_MODELNEW_PALETTEGENERATE_HPP
+#ifndef TEXPAINTER_MODEL_PALETTEGENERATE_HPP
+#define TEXPAINTER_MODEL_PALETTEGENERATE_HPP
 
 #include "pixel_store/palette.hpp"
 

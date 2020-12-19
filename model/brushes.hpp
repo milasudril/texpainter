@@ -2,8 +2,8 @@
 //@	"targets":[{"name":"brushes.hpp","type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_MODELNEW_BRUSHES_HPP
-#define TEXPAINTER_MODELNEW_BRUSHES_HPP
+#ifndef TEXPAINTER_MODEL_BRUSHES_HPP
+#define TEXPAINTER_MODEL_BRUSHES_HPP
 
 #include "utils/vec_t.hpp"
 #include "libenum/empty.hpp"

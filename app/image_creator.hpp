@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"image_creator.hpp","type":"include"}]}
 
-#ifndef TEXPAINTER_APPNEW_IMAGECREATOR_HPP
-#define TEXPAINTER_APPNEW_IMAGECREATOR_HPP
+#ifndef TEXPAINTER_APP_IMAGECREATOR_HPP
+#define TEXPAINTER_APP_IMAGECREATOR_HPP
 
 #include "./size_input.hpp"
 

@@ -2,8 +2,8 @@
 //@	 "targets":[{"name":"compositor_input.hpp", "type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_MODELNEW_COMPOSITORINPUT_HPP
-#define TEXPAINTER_MODELNEW_COMPOSITORINPUT_HPP
+#ifndef TEXPAINTER_MODEL_COMPOSITORINPUT_HPP
+#define TEXPAINTER_MODEL_COMPOSITORINPUT_HPP
 
 #include "./compositor.hpp"
 #include "./item_name.hpp"

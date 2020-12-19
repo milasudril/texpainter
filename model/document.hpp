@@ -3,8 +3,8 @@
 //@	,"dependencies_extra":[{"ref":"document.o", "rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_MODELNEW_DOCUMENT_HPP
-#define TEXPAINTER_MODELNEW_DOCUMENT_HPP
+#ifndef TEXPAINTER_MODEL_DOCUMENT_HPP
+#define TEXPAINTER_MODEL_DOCUMENT_HPP
 
 #include "./compositor_proxy.hpp"
 #include "./compositor_input.hpp"

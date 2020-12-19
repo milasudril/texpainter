@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"app_windows.hpp","type":"include"}]}
 
-#ifndef TEXPAINTER_APPNEW_APPWINDOWS_HPP
-#define TEXPAINTER_APPNEW_APPWINDOWS_HPP
+#ifndef TEXPAINTER_APP_APPWINDOWS_HPP
+#define TEXPAINTER_APP_APPWINDOWS_HPP
 
 #include "ui/menu_item.hpp"
 

@@ -5,8 +5,8 @@
 #include "./compositor.hpp"
 #include "./item_name.hpp"
 
-#ifndef TEXPAINTER_MODELNEW_COMPOSITORPROXY_HPP
-#define TEXPAINTER_MODELNEW_COMPOSITORPROXY_HPP
+#ifndef TEXPAINTER_MODEL_COMPOSITORPROXY_HPP
+#define TEXPAINTER_MODEL_COMPOSITORPROXY_HPP
 
 namespace Texpainter::Model
 {

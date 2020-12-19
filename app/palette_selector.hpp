@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"palette_selector.hpp","type":"include"}]}
 
-#ifndef TEXPAINTER_APPNEW_PALETTESELECTOR_HPP
-#define TEXPAINTER_APPNEW_PALETTESELECTOR_HPP
+#ifndef TEXPAINTER_APP_PALETTESELECTOR_HPP
+#define TEXPAINTER_APP_PALETTESELECTOR_HPP
 
 #include "model/palette.hpp"
 #include "model/item_name.hpp"

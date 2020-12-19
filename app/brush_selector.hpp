@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"brush_selector.hpp","type":"include"}]}
 
-#ifndef TEXPAINTER_APPNEW_BRUSHSELECTOR_HPP
-#define TEXPAINTER_APPNEW_BRUSHSELECTOR_HPP
+#ifndef TEXPAINTER_APP_BRUSHSELECTOR_HPP
+#define TEXPAINTER_APP_BRUSHSELECTOR_HPP
 
 #include "model/brush.hpp"
 #include "ui/combobox.hpp"

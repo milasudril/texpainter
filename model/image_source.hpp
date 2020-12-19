@@ -2,8 +2,8 @@
 //@	 "targets":[{"name":"image_source.hpp", "type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_MODELNEW_IMAGESOURCE_HPP
-#define TEXPAINTER_MODELNEW_IMAGESOURCE_HPP
+#ifndef TEXPAINTER_MODEL_IMAGESOURCE_HPP
+#define TEXPAINTER_MODEL_IMAGESOURCE_HPP
 
 #include "filtergraph/port_info.hpp"
 #include "filtergraph/img_proc_arg.hpp"
