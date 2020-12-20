@@ -191,6 +191,8 @@ public:
 		}
 	}
 
+	std::span<PixelStore::Pixel const> palette() const { return m_colors; }
+
 
 private:
 	void* r_eh;
@@ -358,4 +360,9 @@ Texpainter::Ui::PaletteView& Texpainter::Ui::PaletteView::color(PixelStore::Colo
 {
 	m_impl->color(index, value);
 	return *this;
+}
+
+std::span<Texpainter::PixelStore::Pixel const> Texpainter::Ui::PaletteView::palette() const
+{
+	return m_impl->palette();
 }

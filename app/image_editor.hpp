@@ -272,17 +272,20 @@ namespace Texpainter::App
 
 			case 3:
 			{
-				src.highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Write)
-				    .update();
-				m_color_picker = std::make_unique<ColorPickerDlg>(
-				    index,
-				    m_selectors,
-				    (std::string{"Select color number "} + std::to_string(index.value() + 1))
-				        .c_str(),
-				    PolymorphicRng{DefaultRng::engine()},
-				    "Recently used: ",
-				    m_doc.get().colorHistory());
-				m_color_picker->eventHandler<ImageEditor::ControlId::ColorPicker>(*this);
+				if(src.palette().size() > 1)
+				{
+					src.highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Write)
+						.update();
+					m_color_picker = std::make_unique<ColorPickerDlg>(
+						index,
+						m_selectors,
+						(std::string{"Select color number "} + std::to_string(index.value() + 1))
+							.c_str(),
+						PolymorphicRng{DefaultRng::engine()},
+						"Recently used: ",
+						m_doc.get().colorHistory());
+					m_color_picker->eventHandler<ImageEditor::ControlId::ColorPicker>(*this);
+				}
 				break;
 			}
 		}
