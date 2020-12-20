@@ -123,15 +123,8 @@ namespace Texpainter::Ui
 		    Button(cnt, ""), Button(cnt, ""), Button(cnt, ""), Button(cnt, ""), Button(cnt, "")};
 	}
 
-	enum class InitialFocus : int
-	{
-		NoChange,
-		DefaultButton
-	};
-
 	template<class Widget,
-	         class DialogTraits = DialogOkCancel,
-	         InitialFocus Focus = InitialFocus::DefaultButton>
+	         class DialogTraits = DialogOkCancel>
 	class Dialog
 	{
 	public:
@@ -298,8 +291,6 @@ namespace Texpainter::Ui
 				assert(ButtonIndex::user2() != -1);
 				m_buttons[ButtonIndex::user2()].label(DialogTraits::user2());
 			}
-
-			if constexpr(Focus != InitialFocus::NoChange) { focus_select(); }
 
 			m_window.modal(true).show().resize(Size2d{1, 1});
 		}
