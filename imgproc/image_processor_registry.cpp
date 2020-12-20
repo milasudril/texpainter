@@ -34,7 +34,8 @@
 //@		"./scale_rgba_image.imgproc.hpp",
 //@		"./rotate_grayscale_image.imgproc.hpp",
 //@		"./rotate_rgba_image.imgproc.hpp",
-//@		"./rgba_source_over.imgproc.hpp"
+//@		"./rgba_source_over.imgproc.hpp",
+//@		"./normalize_rgba_image.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -101,7 +102,8 @@ namespace
 	    get_info<::ScaleRgbaImage::ImageProcessor>(),
 	    get_info<::RotateGrayscaleImage::ImageProcessor>(),
 	    get_info<::RotateRgbaImage::ImageProcessor>(),
-	    get_info<::RgbaSourceOver::ImageProcessor>()};
+	    get_info<::RgbaSourceOver::ImageProcessor>(),
+	    get_info<::NormalizeRgbaImage::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
