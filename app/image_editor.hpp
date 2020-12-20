@@ -272,9 +272,9 @@ namespace Texpainter::App
 
 			case 3:
 			{
-				if(src.palette().size() > 1)
+				if(auto current_pal = m_doc.get().palette(m_doc.get().currentPalette());
+				   current_pal != nullptr)
 				{
-					auto& doc = m_doc.get();
 					src.highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Write)
 					    .update();
 					m_color_picker = std::make_unique<ColorPickerDlg>(
@@ -284,10 +284,10 @@ namespace Texpainter::App
 					        .c_str(),
 					    PolymorphicRng{DefaultRng::engine()},
 					    "Recently used: ",
-					    doc.colorHistory());
+					    m_doc.get().colorHistory());
 					m_color_picker->eventHandler<ImageEditor::ControlId::ColorPicker>(*this)
 					    .widget()
-					    .value(doc.palette(doc.currentPalette())->source.get()[index]);
+					    .value(current_pal->source.get()[index]);
 				}
 				break;
 			}
