@@ -11,8 +11,6 @@
 #include "./img_proc_param.hpp"
 #include "./port_value.hpp"
 
-#include "utils/memblock.hpp"
-
 #include <memory>
 #include <span>
 

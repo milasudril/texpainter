@@ -9,8 +9,6 @@
 #include "./image_processor_id.hpp"
 #include "./img_proc_interface_descriptor.hpp"
 
-#include "utils/memblock.hpp"
-
 #include <concepts>
 
 namespace Texpainter::FilterGraph

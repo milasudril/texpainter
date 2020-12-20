@@ -11,8 +11,6 @@
 #include "./abstract_image_processor.hpp"
 #include "./image_processor.hpp"
 
-#include "utils/memblock.hpp"
-
 namespace Texpainter::FilterGraph
 {
 	namespace detail

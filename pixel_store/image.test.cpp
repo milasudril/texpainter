@@ -36,7 +36,7 @@ namespace
 		return buff.m_height;
 	}
 
-	template<Texpainter::Trivial T>
+	template<class T>
 	void write(std::span<T> data, Buffer& buff)
 	{
 		buff.m_data.resize(sizeof(T) * std::size(data));
@@ -45,7 +45,7 @@ namespace
 		       sizeof(T) * std::size(data));
 	}
 
-	template<Texpainter::Trivial T>
+	template<class T>
 	void read(std::span<T> data, Buffer const& buff)
 	{
 		memcpy(static_cast<void*>(std::data(data)),
