@@ -12,51 +12,79 @@ namespace
 	constexpr auto IntensityLevels = 3;
 }
 
-Texpainter::PixelStore::Palette<16> Texpainter::Model::generatePaletteByHue(
-    std::array<PixelStore::Pixel, 4> const& base_colors)
+namespace
 {
-	Texpainter::PixelStore::Palette<16> ret;
-	constexpr auto IntensityScaleFactor = 2.0f;
-	std::ranges::for_each(base_colors, [&ret, k = PixelStore::ColorIndex{0}](auto val) mutable {
-		auto hsi = toHsi(val);
-		for(int l = 0; l < IntensityLevels; ++l)
-		{
-			ret[k] = toRgb(hsi);
-			++k;
-			hsi.intensity /= IntensityScaleFactor;
-			hsi.alpha /= IntensityScaleFactor;
-		}
-	});
-
-	auto i = 1.0f;
-	for(int k = 0; k < IntensityLevels; ++k)
+	Texpainter::Model::Palette generatePaletteByHue(
+	    std::array<Texpainter::PixelStore::Pixel, 4> const& base_colors,
+	    bool intensity_to_intensity,
+	    bool intensity_to_alpha)
 	{
-		PixelStore::ColorIndex const index{static_cast<PixelStore::ColorIndex::element_type>(
-		    IntensityLevels * base_colors.size() + k)};
-		ret[index] = PixelStore::Pixel{1.0f, 1.0f, 1.0f, 3.0f} / (3.0f * i);
-		i *= IntensityScaleFactor;
+		Texpainter::Model::Palette ret;
+		constexpr auto IntensityScaleFactor = 2.0f;
+		std::ranges::for_each(base_colors,
+		                      [&ret,
+		                       k = Texpainter::PixelStore::ColorIndex{0},
+		                       intensity_to_intensity,
+		                       intensity_to_alpha](auto val) mutable {
+			                      auto hsi = toHsi(val);
+			                      for(int l = 0; l < IntensityLevels; ++l)
+			                      {
+				                      ret[k] = toRgb(hsi);
+				                      ++k;
+				                      if(intensity_to_intensity)
+				                      { hsi.intensity /= IntensityScaleFactor; }
+
+				                      if(intensity_to_alpha) { hsi.alpha /= IntensityScaleFactor; }
+			                      }
+		                      });
+
+		auto i = 1.0f;
+		for(int k = 0; k < IntensityLevels; ++k)
+		{
+			Texpainter::PixelStore::ColorIndex const index{
+			    static_cast<Texpainter::PixelStore::ColorIndex::element_type>(
+			        IntensityLevels * base_colors.size() + k)};
+			ret[index] = intensity_to_alpha
+			                 ? Texpainter::PixelStore::Pixel{1.0f, 1.0f, 1.0f, 3.0f} / (3.0f * i)
+			                 : Texpainter::PixelStore::Pixel{1.0f, 1.0f, 1.0f, 0.0f} / (3.0f * i)
+			                       + Texpainter::PixelStore::Pixel{0.0, 0.0, 0.0, 1.0};
+			i *= IntensityScaleFactor;
+		}
+		return ret;
 	}
-	return ret;
+
+	Texpainter::Model::Palette orderByIntensity(Texpainter::Model::Palette const& pal)
+	{
+		Texpainter::Model::Palette ret;
+
+		auto constexpr NumColors = 5;
+
+		for(size_t k = 0; k < NumColors; ++k)
+		{
+			for(size_t l = 0; l < static_cast<size_t>(IntensityLevels); ++l)
+			{
+				auto const src_index = Texpainter::PixelStore::ColorIndex{
+				    static_cast<Texpainter::PixelStore::ColorIndex::element_type>(
+				        k * IntensityLevels + l)};
+				auto const dest_index = Texpainter::PixelStore::ColorIndex{
+				    static_cast<Texpainter::PixelStore::ColorIndex::element_type>(l * NumColors
+				                                                                  + k)};
+				ret[dest_index] = pal[src_index];
+			}
+		}
+		return ret;
+	}
 }
 
-Texpainter::PixelStore::Palette<16> Texpainter::Model::generatePaletteByIntensity(
-    std::array<PixelStore::Pixel, 4> const& base_colors)
+
+Texpainter::Model::Palette Texpainter::Model::generatePalette(PaletteParameters const& params)
 {
-	auto tmp = generatePaletteByHue(base_colors);
-	Texpainter::PixelStore::Palette<16> ret;
+	auto ret = generatePaletteByHue(
+	    params.colors, params.intensity_to_intensity, params.intensity_to_alpha);
 
-	auto const NumColors = base_colors.size() + 1;  // +1 beacuse gray tones
+	if(params.by_intensity) { ret = orderByIntensity(ret); }
 
-	for(size_t k = 0; k < NumColors; ++k)
-	{
-		for(size_t l = 0; l < static_cast<size_t>(IntensityLevels); ++l)
-		{
-			auto const src_index = PixelStore::ColorIndex{
-			    static_cast<PixelStore::ColorIndex::element_type>(k * IntensityLevels + l)};
-			auto const dest_index = PixelStore::ColorIndex{
-			    static_cast<PixelStore::ColorIndex::element_type>(l * NumColors + k)};
-			ret[dest_index] = tmp[src_index];
-		}
-	}
+	if(params.reversed) { std::ranges::reverse(ret); }
+
 	return ret;
 }

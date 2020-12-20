@@ -6,29 +6,22 @@
 #ifndef TEXPAINTER_MODEL_PALETTEGENERATE_HPP
 #define TEXPAINTER_MODEL_PALETTEGENERATE_HPP
 
-#include "pixel_store/palette.hpp"
+#include "./palette.hpp"
 
 #include <algorithm>
 
 namespace Texpainter::Model
 {
-	PixelStore::Palette<16> generatePaletteByHue(
-	    std::array<PixelStore::Pixel, 4> const& base_colors);
-
-	PixelStore::Palette<16> generatePaletteByIntensity(
-	    std::array<PixelStore::Pixel, 4> const& base_colors);
-
-	inline auto generatePalette(std::array<PixelStore::Pixel, 4> const& base_colors,
-	                            bool by_intensity,
-	                            bool reversed)
+	struct PaletteParameters
 	{
-		auto ret = by_intensity ? generatePaletteByIntensity(base_colors)
-		                        : generatePaletteByHue(base_colors);
+		std::array<PixelStore::Pixel, 4> colors;
+		bool intensity_to_intensity;
+		bool intensity_to_alpha;
+		bool by_intensity;
+		bool reversed;
+	};
 
-		if(reversed) { std::ranges::reverse(ret); }
-
-		return ret;
-	}
+	Palette generatePalette(PaletteParameters const& params);
 }
 
 #endif

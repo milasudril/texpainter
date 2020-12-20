@@ -224,8 +224,7 @@ namespace Texpainter::App
 		void confirmPositive(PaletteGenerateDlg& src)
 		{
 			auto result = src.widget().value();
-			insert(std::move(result.name),
-			       Model::generatePalette(result.colors, result.by_intensity, result.reversed));
+			insert(std::move(result.name), generatePalette(result.params));
 			m_gen_palette.reset();
 		}
 

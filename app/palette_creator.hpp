@@ -6,6 +6,7 @@
 #include "./size_input.hpp"
 
 #include "model/item_name.hpp"
+#include "model/palette_generate.hpp"
 #include "pixel_store/palette.hpp"
 #include "pixel_store/hsi_rgb.hpp"
 #include "ui/box.hpp"
@@ -70,9 +71,7 @@ namespace Texpainter
 		struct PaletteInfo
 		{
 			Model::ItemName name;
-			std::array<PixelStore::Pixel, 4> colors;
-			bool by_intensity;
-			bool reversed;
+			Model::PaletteParameters params;
 		};
 
 		explicit PaletteCreator(Ui::Container& container)
@@ -83,6 +82,10 @@ namespace Texpainter
 		    , m_deco_2{m_root, Ui::Box::Orientation::Horizontal, "Deco 2: "}
 		    , m_deco_3{m_root, Ui::Box::Orientation::Horizontal, "Deco 3: "}
 		    , m_saturation{m_root, Ui::Box::Orientation::Horizontal, "Saturation: ", false}
+		    , m_intensity_map{m_root, Ui::Box::Orientation::Horizontal}
+		    , m_intensity_map_label{m_intensity_map, "Map intensity: "}
+		    , m_to_intensity{m_intensity_map, "To intensity"}
+		    , m_to_alpha{m_intensity_map, "To alpha"}
 		    , m_order{m_root, Ui::Box::Orientation::Horizontal}
 		    , m_order_label{m_order, "Order: "}
 		    , m_by_intensity{m_order, "By intensity"}
@@ -107,6 +110,8 @@ namespace Texpainter
 			    .ticks(ticks);
 			m_saturation.inputField().eventHandler<ControlId::Saturation>(*this).value(
 			    Ui::SliderValue{1.0});
+			m_to_alpha.state(true);
+			m_to_intensity.state(true);
 
 			updateSliders();
 		}
@@ -121,6 +126,8 @@ namespace Texpainter
 		{
 			return PaletteInfo{Model::ItemName{m_name.inputField().content()},
 			                   generateColors(),
+			                   m_to_intensity.state(),
+			                   m_to_alpha.state(),
 			                   m_by_intensity.state(),
 			                   m_reversed.state()};
 		}
@@ -133,6 +140,10 @@ namespace Texpainter
 		Ui::LabeledInput<SliderWithPalView> m_deco_2;
 		Ui::LabeledInput<SliderWithPalView> m_deco_3;
 		Ui::LabeledInput<Ui::Slider> m_saturation;
+		Ui::Box m_intensity_map;
+		Ui::Label m_intensity_map_label;
+		Ui::Button m_to_intensity;
+		Ui::Button m_to_alpha;
 		Ui::Box m_order;
 		Ui::Label m_order_label;
 		Ui::Button m_by_intensity;
