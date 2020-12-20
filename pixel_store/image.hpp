@@ -24,9 +24,13 @@ namespace Texpainter::PixelStore
 
 		explicit BasicImage(uint32_t width, uint32_t height): BasicImage{Size2d{width, height}} {}
 
-		explicit BasicImage(Size2d size): m_size{size}, m_data{std::make_unique<PixelType[]>(size.area())} {}
+		explicit BasicImage(Size2d size)
+		    : m_size{size}
+		    , m_data{std::make_unique<PixelType[]>(size.area())}
+		{
+		}
 
-		BasicImage(BasicImage const& src): BasicImage{src.pixels()}{}
+		BasicImage(BasicImage const& src): BasicImage{src.pixels()} {}
 
 		BasicImage& operator=(BasicImage&&) = default;
 
