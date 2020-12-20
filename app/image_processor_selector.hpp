@@ -88,9 +88,8 @@ namespace Texpainter::App
 			auto selected = m_listbox.get(m_listbox.selected());
 			std::string sel{selected != nullptr ? selected : ""};
 			m_listbox.clear();
-			std::ranges::for_each(imgprocs, [&list = m_listbox](auto item) {
-				list.append(item.name);
-			});
+			std::ranges::for_each(imgprocs,
+			                      [&list = m_listbox](auto item) { list.append(item.name); });
 			m_listbox.update();
 
 			if(sel.size() != 0) { select(sel.c_str()); }
