@@ -123,8 +123,7 @@ namespace Texpainter::Ui
 		    Button(cnt, ""), Button(cnt, ""), Button(cnt, ""), Button(cnt, ""), Button(cnt, "")};
 	}
 
-	template<class Widget,
-	         class DialogTraits = DialogOkCancel>
+	template<class Widget, class DialogTraits = DialogOkCancel>
 	class Dialog
 	{
 	public:
