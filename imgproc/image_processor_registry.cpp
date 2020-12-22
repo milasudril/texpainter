@@ -36,7 +36,7 @@
 //@		"./rotate_rgba_image.imgproc.hpp",
 //@		"./rgba_source_over.imgproc.hpp",
 //@		"./normalize_rgba_image.imgproc.hpp",
-//@		"./ngon_mask.imgproc.hpp"
+//@		"./polygon_mask.imgproc.hpp"
 //@	]}]
 //@	}
 
