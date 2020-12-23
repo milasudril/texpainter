@@ -99,7 +99,10 @@ namespace Texpainter::Ui
 
 		struct EventHandlerVtable
 		{
-			void (*on_move_canvas)(void*, WidgetCanvasDetail&, ToplevelCoordinates);
+			void (*on_move_canvas)(void*,
+			                       WidgetCanvasDetail&,
+			                       WidgetCoordinates,
+			                       ToplevelCoordinates);
 			void (*on_move)(void*, WidgetCanvasDetail&, WidgetCoordinates, ClientId);
 			void (*on_mouse_down)(
 			    void*, WidgetCanvasDetail&, WidgetCoordinates, ScreenCoordinates, int, ClientId);
@@ -175,9 +178,13 @@ namespace Texpainter::Ui
 			WidgetCanvasDetail::eventHandler(
 			    &eh,
 			    EventHandlerVtable{
-			        [](void* event_handler, WidgetCanvasDetail& self, ToplevelCoordinates loc) {
+			        [](void* event_handler,
+			           WidgetCanvasDetail& self,
+			           WidgetCoordinates loc_window,
+			           ToplevelCoordinates loc) {
 				        auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				        obj.template onMouseMove<id>(static_cast<WidgetCanvas&>(self), loc);
+				        obj.template onMouseMove<id>(
+				            static_cast<WidgetCanvas&>(self), loc_window, loc);
 			        },
 			        [](void* event_handler,
 			           WidgetCanvasDetail& self,

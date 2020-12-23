@@ -259,7 +259,6 @@ namespace Texpainter::App
 			    || state.isPressed(Ui::Scancodes::ShiftRight))
 			   && state.isPressed(Ui::Scancodes::A))
 			{
-				m_filtermenuloc = Ui::WidgetCoordinates{0.0, 0.0};
 				m_filtermenu =
 				    std::make_unique<ImageProcessorSelectorDlg>(r_owner, "Select image processor");
 				m_filtermenu->eventHandler<ControlId::FilterMenu>(*this);
@@ -274,7 +273,9 @@ namespace Texpainter::App
 		void onMove(Canvas& src, Ui::WidgetCoordinates, FilterGraph::NodeId);
 
 		template<ControlId>
-		void onMouseMove(Canvas& src, Ui::ToplevelCoordinates loc);
+		void onMouseMove(Canvas& src,
+		                 Ui::WidgetCoordinates loc_window,
+		                 Ui::ToplevelCoordinates loc);
 
 		template<ControlId>
 		void onMouseDown(Canvas& src, Ui::WidgetCoordinates, Ui::ScreenCoordinates, int button);
@@ -435,10 +436,11 @@ namespace Texpainter::App
 
 	template<>
 	inline void FilterGraphEditor::onMouseMove<FilterGraphEditor::ControlId::NodeWidgets>(
-	    Canvas& src, Ui::ToplevelCoordinates loc)
+	    Canvas& src, Ui::WidgetCoordinates loc_window, Ui::ToplevelCoordinates loc)
 	{
 		m_ports.moveDummyConnectors(loc + src.viewportOffset());
 		m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
+		m_filtermenuloc = loc_window;
 	}
 
 	template<>

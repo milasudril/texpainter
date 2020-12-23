@@ -258,15 +258,17 @@ private:
 		auto self = reinterpret_cast<Impl*>(user_data);
 		if(self->r_eh != nullptr)
 		{
-			auto event_move = reinterpret_cast<GdkEventMotion const*>(event);
+			auto e = reinterpret_cast<GdkEventMotion const*>(event);
 			int loc_x{};
 			int loc_y{};
 			gtk_widget_translate_coordinates(
 			    widget, gtk_widget_get_toplevel(widget), 0, 0, &loc_x, &loc_y);
 
 			auto offset = vec2_t{static_cast<double>(loc_x), static_cast<double>(loc_y)};
-			self->m_vt.on_move_canvas(
-			    self->r_eh, *self, ToplevelCoordinates{event_move->x, event_move->y} + offset);
+			self->m_vt.on_move_canvas(self->r_eh,
+			                          *self,
+			                          WidgetCoordinates{e->x, e->y},
+			                          ToplevelCoordinates{e->x, e->y} + offset);
 			return FALSE;
 		}
 		return FALSE;

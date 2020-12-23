@@ -35,7 +35,4 @@ void Texpainter::Ui::Context::run()
 	gtk_key_snooper_remove(snooper);
 }
 
-void Texpainter::Ui::Context::exit()
-{
-	gtk_main_quit();
-}
+void Texpainter::Ui::Context::exit() { gtk_main_quit(); }
