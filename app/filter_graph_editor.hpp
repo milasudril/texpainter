@@ -257,7 +257,7 @@ namespace Texpainter::App
 		{
 			if((state.isPressed(Ui::Scancodes::ShiftLeft)
 			    || state.isPressed(Ui::Scancodes::ShiftRight))
-			   && state.lastKey() == Ui::Scancodes::A)
+			   && state.lastKey() == Ui::Scancodes::A && state.numberOfPressedKeys() == 2)
 			{
 				m_filtermenu =
 				    std::make_unique<ImageProcessorSelectorDlg>(r_owner, "Select image processor");

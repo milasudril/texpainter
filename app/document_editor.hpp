@@ -18,7 +18,6 @@
 #include "ui/filename_select.hpp"
 #include "ui/context.hpp"
 
-#include <gtk/gtk.h>
 #include <filesystem>
 
 namespace Texpainter::App
@@ -314,7 +313,7 @@ namespace Texpainter::App
 	template<>
 	inline void DocumentEditor::onActivated<AppAction::Quit>(Ui::MenuItem&)
 	{
-		gtk_main_quit();
+		Ui::Context::get().exit();
 	}
 
 	template<>

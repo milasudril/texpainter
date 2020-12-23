@@ -29,6 +29,8 @@ namespace Texpainter::Ui
 
 		bool isPressed(Scancode key) const { return m_key_state[key] != nullptr; }
 
+		size_t numberOfPressedKeys() const { return m_key_state.size(); }
+
 	private:
 		SortedSequence<Ui::Scancode, bool> m_key_state;
 	};
