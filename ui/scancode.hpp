@@ -32,6 +32,7 @@ namespace Texpainter::Ui
 		constexpr Scancode Escape{1};
 		constexpr Scancode ShiftLeft{42};
 		constexpr Scancode ShiftRight{54};
+		constexpr Scancode AltLeft{56};
 		constexpr Scancode A{30};
 	}
 }

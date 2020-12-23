@@ -20,6 +20,9 @@ void Texpainter::Ui::Context::run()
 	auto snooper = gtk_key_snooper_install(
 	    [](GtkWidget*, GdkEventKey* event, gpointer obj) {
 		    auto scancode = Scancode{static_cast<uint8_t>(event->hardware_keycode - 8)};
+			if(scancode == Scancodes::AltLeft)
+			{ return FALSE; }
+
 		    auto& self    = *reinterpret_cast<Context*>(obj);
 
 		    if(event->type == GDK_KEY_PRESS) { self.m_key_state.press(scancode); }
