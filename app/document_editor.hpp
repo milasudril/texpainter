@@ -136,7 +136,7 @@ namespace Texpainter::App
 				    m_windows.get<AppWindowType::FilterGraphEditor>()->widget().nodeLocations());
 			}
 			m_windows.get<id>().reset();
-			if(m_window_count == 0) { gtk_main_quit(); }
+			if(m_window_count == 0) { Ui::Context::get().exit(); }
 		}
 
 		template<AppWindowType, class Source>

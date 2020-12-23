@@ -26,6 +26,8 @@ namespace Texpainter::Ui
 
 		void run();
 
+		void exit();
+
 		KeyboardState const& keyboardState() const { return m_key_state; }
 
 	private:

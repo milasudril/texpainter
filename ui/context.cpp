@@ -11,7 +11,6 @@
 
 Texpainter::Ui::Context::Context()
 {
-	printf("%p\n", this);
 	gtk_disable_setlocale();
 	gtk_init(nullptr, nullptr);
 }
@@ -34,4 +33,9 @@ void Texpainter::Ui::Context::run()
 	    this);
 	gtk_main();
 	gtk_key_snooper_remove(snooper);
+}
+
+void Texpainter::Ui::Context::exit()
+{
+	gtk_main_quit();
 }
