@@ -16,7 +16,7 @@
 #include "ui/image_view.hpp"
 #include "ui/dialog.hpp"
 #include "ui/filename_select.hpp"
-#include "ui/keyboard_state.hpp"
+#include "ui/context.hpp"
 
 #include <gtk/gtk.h>
 #include <filesystem>
@@ -112,18 +112,18 @@ namespace Texpainter::App
 		}
 
 		template<AppWindowType>
-		void onKeyUp(Ui::Window&, Ui::Scancode scancode)
+		void onKeyUp(Ui::Window&, Ui::Scancode)
 		{
-			m_key_state.release(scancode);
 		}
 
 		template<AppWindowType window>
-		void onKeyDown(Ui::Window&, Ui::Scancode scancode)
+		void onKeyDown(Ui::Window&, Ui::Scancode)
 		{
-			printf("%u\n", scancode.value());
-			m_key_state.press(scancode);
 			if constexpr(window != AppWindowType::Output)
-			{ m_windows.template get<window>()->widget().onKeyDown(m_key_state); }
+			{
+				m_windows.template get<window>()->widget().onKeyDown(
+				    Ui::Context::get().keyboardState());
+			}
 		}
 
 		template<AppWindowType id>
@@ -263,7 +263,6 @@ namespace Texpainter::App
 		Enum::Tuple<AppWindowType, detail::AppWindowTypeTraits> m_windows;
 
 		size_t m_window_count;
-		Ui::KeyboardState m_key_state;
 
 		std::unique_ptr<ImageCreatorDlg> m_img_creator;
 		std::unique_ptr<EmptyPaletteCreatorDlg> m_empty_pal_creator;
