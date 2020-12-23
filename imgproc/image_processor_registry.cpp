@@ -105,8 +105,7 @@ namespace
 	    get_info<::NormalizeRgbaImage::ImageProcessor>(),
 	    get_info<::MakeRadialGradient::ImageProcessor>(),
 	    get_info<::ExponentialDecay::ImageProcessor>(),
-	    get_info<::ButterworthDecay::ImageProcessor>()
-	};
+	    get_info<::ButterworthDecay::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;

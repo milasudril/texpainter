@@ -9,8 +9,6 @@
 
 #include "utils/sorted_sequence.hpp"
 
-#include <optional>
-
 namespace Texpainter::Ui
 {
 	class KeyboardState
@@ -28,6 +26,8 @@ namespace Texpainter::Ui
 			--keys_end;
 			return *keys_end;
 		}
+
+		bool isPressed(Scancode key) const { return m_key_state[key] != nullptr; }
 
 	private:
 		SortedSequence<Ui::Scancode, bool> m_key_state;

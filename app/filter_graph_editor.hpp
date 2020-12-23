@@ -19,6 +19,7 @@
 #include "ui/error_message_dialog.hpp"
 #include "ui/text_entry.hpp"
 #include "ui/labeled_input.hpp"
+#include "ui/keyboard_state.hpp"
 #include "utils/edge_list.hpp"
 #include "utils/inherit_from.hpp"
 
@@ -252,6 +253,20 @@ namespace Texpainter::App
 		                 int button,
 		                 FilterGraph::NodeId);
 
+		void onKeyDown(Ui::KeyboardState const& state)
+		{
+			if((state.isPressed(Ui::Scancodes::ShiftLeft)
+			    || state.isPressed(Ui::Scancodes::ShiftRight))
+			   && state.isPressed(Ui::Scancodes::A))
+			{
+				m_filtermenuloc = Ui::WidgetCoordinates{0.0, 0.0};
+				m_filtermenu =
+				    std::make_unique<ImageProcessorSelectorDlg>(r_owner, "Select image processor");
+				m_filtermenu->eventHandler<ControlId::FilterMenu>(*this);
+			}
+		}
+
+
 		template<ControlId>
 		void onRealized(Canvas& src);
 
@@ -479,7 +494,6 @@ namespace Texpainter::App
 				m_filtermenu =
 				    std::make_unique<ImageProcessorSelectorDlg>(r_owner, "Select image processor");
 				m_filtermenu->eventHandler<ControlId::FilterMenu>(*this);
-				m_canvas.showWidgets();
 				break;
 		}
 	}

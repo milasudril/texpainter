@@ -14,6 +14,7 @@
 #include "ui/separator.hpp"
 #include "ui/color_picker.hpp"
 #include "ui/dialog.hpp"
+#include "ui/keyboard_state.hpp"
 
 #include "utils/default_rng.hpp"
 #include "utils/inherit_from.hpp"
@@ -130,6 +131,8 @@ namespace Texpainter::App
 		{
 			return refreshImageSelector().refreshBrushSelector().refreshPaletteSelector();
 		}
+
+		void onKeyDown(Ui::KeyboardState const&) {}
 
 		template<auto>
 		void onChanged(Ui::Combobox& src);
