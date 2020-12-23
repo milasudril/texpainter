@@ -106,14 +106,13 @@ public:
 		if(m_clients.size() != 0)
 		{
 			auto res = calculateCanvasSize();
-			gtk_widget_set_size_request(
-			    GTK_WIDGET(m_handle), res.second.width(), res.second.height());
+			gtk_widget_set_size_request(GTK_WIDGET(m_handle), res.width(), res.height());
 
 			auto x_adj = gtk_scrolled_window_get_hadjustment(m_root);
 			auto y_adj = gtk_scrolled_window_get_vadjustment(m_root);
 
-			gtk_adjustment_set_upper(x_adj, res.second.width() + 16);   // Compensate for scrollbars
-			gtk_adjustment_set_upper(y_adj, res.second.height() + 16);  // Compensate for scrollbars
+			gtk_adjustment_set_upper(x_adj, res.width() + 16);   // Compensate for scrollbars
+			gtk_adjustment_set_upper(y_adj, res.height() + 16);  // Compensate for scrollbars
 		}
 	}
 
@@ -153,24 +152,21 @@ private:
 		                 vec2_t{static_cast<double>(w), static_cast<double>(h)}};
 	}
 
-	std::pair<GtkFrame*, Size2d> calculateCanvasSize() const
+	Size2d calculateCanvasSize() const
 	{
-		auto i      = std::ranges::max_element(m_clients, [this](auto const& a, auto const& b) {
-            auto box_a    = widgetLocationAndSize(a.first);
-            auto box_b    = widgetLocationAndSize(b.first);
-            auto corner_a = box_a.first + box_a.second;
-            auto corner_b = box_b.first + box_b.second;
+		std::vector<WidgetCoordinates> locations;
+		locations.reserve(m_clients.size());
+		std::ranges::transform(m_clients, std::back_inserter(locations), [this](auto const& item) {
+			auto loc = widgetLocationAndSize(item.first);
+			return loc.first + loc.second;
+		});
 
-            if(corner_a.x() < corner_b.x()) { return true; }
+		auto const w =
+		    std::ranges::max_element(locations, [](auto a, auto b) { return a.x() < b.x(); })->x();
+		auto const h =
+		    std::ranges::max_element(locations, [](auto a, auto b) { return a.y() < b.y(); })->y();
 
-            if(corner_a.x() == corner_b.x()) { return corner_b.y() < corner_b.y(); }
-
-            return false;
-        });
-		auto ret    = widgetLocationAndSize(i->first);
-		auto corner = ret.first + ret.second;
-		return std::pair{
-		    i->first, Size2d{static_cast<uint32_t>(corner.x()), static_cast<uint32_t>(corner.y())}};
+		return Size2d{static_cast<uint32_t>(w), static_cast<uint32_t>(h)};
 	}
 
 	void scrollIntoView(GtkFrame* container)
