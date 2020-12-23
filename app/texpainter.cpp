@@ -1,15 +1,13 @@
-//@	{"targets":[{"name":"texpainter","type":"application", "pkgconfig_libs":["gtk+-3.0"]}]}
-
+//@	{"targets":[{"name":"texpainter","type":"application"}]}
 
 #include "./document_editor.hpp"
-#include <gtk/gtk.h>
+#include "ui/context.hpp"
 
-int main(int argc, char* argv[])
+int main()
 {
-	gtk_disable_setlocale();
-	gtk_init(&argc, &argv);
+	auto& context = Texpainter::Ui::Context::get();
 
 	Texpainter::App::DocumentEditor editor;
 
-	gtk_main();
+	context.run();
 }
