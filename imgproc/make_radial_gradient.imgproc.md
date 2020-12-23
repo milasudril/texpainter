@@ -18,14 +18,14 @@ __Number of vertices:__ (= 1.0) The number of vertices. 0.0 maps to four vertice
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <cmath>
 #include <numbers>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 template<int n>
