@@ -13,7 +13,6 @@
 //@		"./mix_grayscale_images.imgproc.hpp",
 //@		"./mix_image_spectra.imgproc.hpp",
 //@		"./checkerboard.imgproc.hpp",
-//@		"./butterworth_mask.imgproc.hpp",
 //@		"./grayscale_noise.imgproc.hpp",
 //@		"./rgba_noise.imgproc.hpp",
 //@		"./real_constant.imgproc.hpp",
@@ -83,7 +82,6 @@ namespace
 	    get_info<::MixGrayscaleImages::ImageProcessor>(),
 	    get_info<::MixImageSpectra::ImageProcessor>(),
 	    get_info<::Checkerboard::ImageProcessor>(),
-	    get_info<::ButterworthMask::ImageProcessor>(),
 	    get_info<::GrayscaleNoise::ImageProcessor>(),
 	    get_info<::RealConstant::ImageProcessor>(),
 	    get_info<::RgbaNoise::ImageProcessor>(),
@@ -107,7 +105,8 @@ namespace
 	    get_info<::NormalizeRgbaImage::ImageProcessor>(),
 	    get_info<::MakeRadialGradient::ImageProcessor>(),
 	    get_info<::ExponentialDecay::ImageProcessor>(),
-	    get_info<::ButterworthDecay::ImageProcessor>()};
+	    get_info<::ButterworthDecay::ImageProcessor>()
+	};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
