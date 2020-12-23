@@ -36,7 +36,7 @@
 //@		"./rotate_rgba_image.imgproc.hpp",
 //@		"./rgba_source_over.imgproc.hpp",
 //@		"./normalize_rgba_image.imgproc.hpp",
-//@		"./polygon_mask.imgproc.hpp"
+//@		"./make_radial_gradient.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -105,7 +105,7 @@ namespace
 	    get_info<::RotateRgbaImage::ImageProcessor>(),
 	    get_info<::RgbaSourceOver::ImageProcessor>(),
 	    get_info<::NormalizeRgbaImage::ImageProcessor>(),
-	    get_info<::PolygonMask::ImageProcessor>()};
+	    get_info<::MakeRadialGradient::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;

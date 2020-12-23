@@ -161,6 +161,8 @@ template = string.Template("""//@	{
 #include "filtergraph/port_info.hpp"
 #include "filtergraph/img_proc_arg.hpp"
 #include "filtergraph/img_proc_param.hpp"
+#include "utils/vec_t.hpp"
+#include "utils/angle.hpp"
 $param_map_include
 #line $user_includes_start "$src_file"
 $user_includes
@@ -185,6 +187,7 @@ namespace $namespace_name
 		using Texpainter::FilterGraph::Palette;
 		using Texpainter::FilterGraph::TopographyInfo;
 		using Texpainter::vec2_t;
+		using Texpainter::Angle;
 		$impl_decl
 	}
 
