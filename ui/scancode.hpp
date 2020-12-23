@@ -30,6 +30,9 @@ namespace Texpainter::Ui
 		constexpr Scancode Return{28};
 		constexpr Scancode ReturnNumpad{96};
 		constexpr Scancode Escape{1};
+		constexpr Scancode ShiftLeft{42};
+		constexpr Scancode ShiftRight{54};
+		constexpr Scancode A{30};
 	}
 }
 
