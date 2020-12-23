@@ -10,7 +10,7 @@ __Number of vertices:__ (= 1.0) The number of vertices. 0.0 maps to four vertice
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include "utils/vec_t.hpp"
@@ -19,7 +19,7 @@ __Includes:__
 #include <numbers>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 template<int n>
@@ -45,7 +45,7 @@ void main(auto const& args, auto const& params)
 {
 	auto const w = args.size().width();
 	auto const h = args.size().height();
-	auto const r = 0.5 * sqrt(args.size().area());
+	auto const r = 0.25 * args.size().area();
 
 	auto O           = 0.5 * vec2_t{static_cast<double>(w), static_cast<double>(h)};
 	auto const n     = static_cast<int>(std::lerp(
@@ -55,8 +55,7 @@ void main(auto const& args, auto const& params)
 	{
 		for(uint32_t x = 0; x < w; ++x)
 		{
-			output<0>(args, x, y) =
-			    sqrt(norm2(vec2_t{static_cast<double>(x), static_cast<double>(y)} - O)) / r;
+			output<0>(args, x, y) = norm2(vec2_t{static_cast<double>(x), static_cast<double>(y)} - O) / r;
 		}
 	}
 }
