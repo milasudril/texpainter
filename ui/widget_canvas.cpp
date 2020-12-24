@@ -55,7 +55,11 @@ public:
 		}
 	}
 
-	void _show() noexcept { gtk_widget_show_all(GTK_WIDGET(m_handle)); }
+	void _show() noexcept
+	{
+		gtk_widget_show_all(GTK_WIDGET(m_handle));
+		Context::get().flushFwkEvents();
+	}
 
 	void _sensitive(bool val) { gtk_widget_set_sensitive(GTK_WIDGET(m_handle), val); }
 

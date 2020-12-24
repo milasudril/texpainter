@@ -121,7 +121,7 @@ Texpainter::Ui::FilledShape::Impl::Impl(Container& cnt,
 	g_signal_connect(G_OBJECT(widget), "size-allocate", G_CALLBACK(size_callback), this);
 	g_signal_connect(G_OBJECT(widget), "button-release-event", G_CALLBACK(clicked_callack), this);
 	g_signal_connect(G_OBJECT(widget), "button-press-event", G_CALLBACK(on_mouse_down), this);
-	g_signal_connect(G_OBJECT(widget), "map", G_CALLBACK(on_realized), this);
+	g_signal_connect(G_OBJECT(widget), "map-event", G_CALLBACK(on_realized), this);
 	gtk_widget_add_events(widget, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 
 	m_handle = GTK_DRAWING_AREA(widget);

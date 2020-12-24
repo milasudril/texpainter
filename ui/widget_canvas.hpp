@@ -10,6 +10,7 @@
 #include "./widget_coordinates.hpp"
 #include "./screen_coordinates.hpp"
 #include "./toplevel_coordinates.hpp"
+#include "./context.hpp"
 
 #include <utility>
 #include <memory>
@@ -147,15 +148,15 @@ namespace Texpainter::Ui
 		template<class WidgetType>
 		using WidgetHandle = WidgetCanvasDetail::WidgetHandle<WidgetType>;
 
-		template<class WidgetType, class... WidgetParams>
-		decltype(auto) insert(ClientIdType id, WidgetCoordinates loc, WidgetParams&&... params)
+		template<class WidgetType, class CompletionCallback, class... WidgetParams>
+		decltype(auto) insert(CompletionCallback&& cb, ClientIdType id, WidgetCoordinates loc, WidgetParams&&... params)
 		{
 			auto ptr = new WidgetType{clientId(ClientId{id})
 			                              .insertLocation(loc)
 			                              .insertMode(InsertMode::Movable)
 			                              .asContainer(),
 			                          std::forward<WidgetParams>(params)...};
-
+			Context::get().scheduleAction(0, cb, id, std::ref(*ptr));
 			return WidgetHandle<WidgetType>{ptr, WidgetDeleter{*m_impl}};
 		}
 

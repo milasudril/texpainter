@@ -57,4 +57,13 @@ void Texpainter::Ui::Context::run()
 	gtk_key_snooper_remove(snooper);
 }
 
+
+void Texpainter::Ui::Context::flushFwkEvents() const
+{
+	while(gtk_events_pending())
+	{
+		gtk_main_iteration();
+	}
+}
+
 void Texpainter::Ui::Context::exit() { m_stop = true; }
