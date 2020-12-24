@@ -53,6 +53,12 @@ private:
 		auto const w = gtk_widget_get_allocated_width(widget);
 		auto const h = gtk_widget_get_allocated_height(widget);
 
+		if(w < 2 && h > 1)  // It may happen that we have not yet computed the size
+		{
+			gtk_widget_queue_resize(widget);
+			return FALSE;
+		}
+
 		auto const size = vec2_t{static_cast<double>(w), static_cast<double>(h)};
 		auto const O    = size / 2.0;
 		auto const upper_left =
@@ -89,12 +95,6 @@ private:
 		if(obj.r_eh != nullptr && event_button->button == 1) { return FALSE; }
 		return TRUE;
 	}
-
-	static void on_realized(GtkWidget* widget, gpointer)
-	{
-		auto const h = gtk_widget_get_allocated_height(widget);
-		gtk_widget_set_size_request(widget, h, -1);
-	}
 };
 
 Texpainter::Ui::FilledShape::FilledShape(Container& cnt,
@@ -121,7 +121,6 @@ Texpainter::Ui::FilledShape::Impl::Impl(Container& cnt,
 	g_signal_connect(G_OBJECT(widget), "size-allocate", G_CALLBACK(size_callback), this);
 	g_signal_connect(G_OBJECT(widget), "button-release-event", G_CALLBACK(clicked_callack), this);
 	g_signal_connect(G_OBJECT(widget), "button-press-event", G_CALLBACK(on_mouse_down), this);
-	g_signal_connect(G_OBJECT(widget), "map-event", G_CALLBACK(on_realized), this);
 	gtk_widget_add_events(widget, GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 
 	m_handle = GTK_DRAWING_AREA(widget);
