@@ -36,7 +36,8 @@
 //@		"./normalize_rgba_image.imgproc.hpp",
 //@		"./make_radial_gradient.imgproc.hpp",
 //@		"./exponential_decay.imgproc.hpp",
-//@		"./butterworth_decay.imgproc.hpp"
+//@		"./butterworth_decay.imgproc.hpp",
+//@		"./gingham.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -105,7 +106,8 @@ namespace
 	    get_info<::NormalizeRgbaImage::ImageProcessor>(),
 	    get_info<::MakeRadialGradient::ImageProcessor>(),
 	    get_info<::ExponentialDecay::ImageProcessor>(),
-	    get_info<::ButterworthDecay::ImageProcessor>()};
+	    get_info<::ButterworthDecay::ImageProcessor>(),
+	    get_info<::Gingham::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
