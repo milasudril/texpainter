@@ -155,6 +155,7 @@ namespace Texpainter::Ui
 			                              .insertMode(InsertMode::Movable)
 			                              .asContainer(),
 			                          std::forward<WidgetParams>(params)...};
+
 			return WidgetHandle<WidgetType>{ptr, WidgetDeleter{*m_impl}};
 		}
 
