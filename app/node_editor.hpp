@@ -189,6 +189,7 @@ namespace Texpainter::App
 		    , m_output_sep{m_content.insertMode(Ui::Box::InsertMode{2, 0})}
 		    , m_output_col{m_content.insertMode(Ui::Box::InsertMode{0, 0}),
 		                   Ui::Box::Orientation::Vertical}
+		    , m_num_completed_connectors{0}
 		{
 			m_name.oneline(true).alignment(0.5);
 
@@ -246,7 +247,9 @@ namespace Texpainter::App
 		template<class Connector>
 		void onCompleted(Connector const& src)
 		{
-			r_eh->onCompleted(*this, src.port());
+			++m_num_completed_connectors;
+			if(m_num_completed_connectors == m_inputs.size() + m_outputs.size())
+			{ r_eh->onCompleted(*this, src.port()); }
 		}
 
 	private:
@@ -265,6 +268,7 @@ namespace Texpainter::App
 		std::vector<InputConnector> m_inputs;
 		std::vector<ParamInput> m_params;
 		std::vector<OutputConnector> m_outputs;
+		size_t m_num_completed_connectors;
 	};
 }
 

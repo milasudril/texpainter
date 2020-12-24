@@ -300,6 +300,12 @@ namespace Texpainter::App
 		void onCompleted(NodeWidget const& src, PortType)
 		{
 			m_ports.updateLocation(src.node(), src.inputs(), src.outputs());
+			++m_num_completed_nodes;
+			if(m_num_completed_nodes == m_node_editors.size() && m_being_initialized)
+			{
+				m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
+				m_being_initialized = false;
+			}
 		}
 
 		void handleException(char const* msg, NodeWidget const&, FilterGraph::InputPortIndex)
@@ -410,7 +416,8 @@ namespace Texpainter::App
 		std::reference_wrapper<Ui::Container> r_owner;
 
 		std::unique_ptr<NodeNameInputDlg> m_copy_name;
-
+		size_t m_num_completed_nodes{};
+		bool m_being_initialized{true};
 
 		void completeConnection()
 		{

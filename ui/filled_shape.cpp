@@ -28,7 +28,7 @@ public:
 
 	void eventHandler(void* event_handler, Vtable const& vt)
 	{
-		r_eh   = event_handler;
+		r_eh = event_handler;
 		m_vt = vt;
 	}
 

@@ -39,27 +39,29 @@ namespace Texpainter::Ui
 		template<auto id, class EventHandler>
 		FilledShape& eventHandler(EventHandler& eh)
 		{
-			return eventHandler(&eh, {[](void* event_handler, FilledShape& self) {
-				auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				dispatchEvent<id>(
-				    [](EventHandler& eh, auto&&... args) {
-					    eh.template onClicked<id>(std::forward<decltype(args)>(args)...);
-				    },
-				    obj,
-				    self);
-			},[](void* event_handler, FilledShape& self){
-				auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
-				dispatchEvent<id>(
-				    [](EventHandler& eh, auto&&... args) {
-					    eh.template onCompleted<id>(std::forward<decltype(args)>(args)...);
-				    },
-				    obj,
-				    self);
-			}});
+			return eventHandler(
+			    &eh,
+			    {[](void* event_handler, FilledShape& self) {
+				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				     dispatchEvent<id>(
+				         [](EventHandler& eh, auto&&... args) {
+					         eh.template onClicked<id>(std::forward<decltype(args)>(args)...);
+				         },
+				         obj,
+				         self);
+			     },
+			     [](void* event_handler, FilledShape& self) {
+				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				     dispatchEvent<id>(
+				         [](EventHandler& eh, auto&&... args) {
+					         eh.template onCompleted<id>(std::forward<decltype(args)>(args)...);
+				         },
+				         obj,
+				         self);
+			     }});
 		}
 
 		ToplevelCoordinates location() const;
-
 
 
 	protected:
