@@ -296,6 +296,12 @@ namespace Texpainter::App
 
 		void onClicked(NodeWidget const& src, FilterGraph::OutputPortIndex port);
 
+		template<class PortType>
+		void onCompleted(NodeWidget const& src, PortType)
+		{
+			m_ports.updateLocation(src.node(), src.inputs(), src.outputs());
+		}
+
 		void handleException(char const* msg, NodeWidget const&, FilterGraph::InputPortIndex)
 		{
 			// TODO: Use NodeWidget and InputPort to format a better message
@@ -382,14 +388,12 @@ namespace Texpainter::App
 
 		void insertNodeEditor(FilterGraph::Graph::NodeItem item);
 
-
 	private:
 		std::reference_wrapper<Model::Document> m_doc;
 		void* r_eh;
 		void (*r_callback)(void*, FilterGraphEditor&);
 
 		PortMap m_ports;
-
 		FilterGraph::NodeId m_sel_node;
 
 		Canvas m_canvas;

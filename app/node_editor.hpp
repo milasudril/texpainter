@@ -90,6 +90,12 @@ namespace Texpainter::App
 			}
 
 			template<int>
+			void onCompleted(Ui::FilledShape&)
+			{
+				r_eh->onCompleted(*this);
+			}
+
+			template<int>
 			void handleException(char const* msg, Ui::FilledShape&)
 			{
 				r_eh->handleException(msg, *this);
@@ -235,6 +241,12 @@ namespace Texpainter::App
 		void handleException(char const* msg, Connector& src)
 		{
 			r_eh->handleException(msg, *this, src.port());
+		}
+
+		template<class Connector>
+		void onCompleted(Connector const& src)
+		{
+			r_eh->onCompleted(*this, src.port());
 		}
 
 	private:

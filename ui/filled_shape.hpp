@@ -39,7 +39,7 @@ namespace Texpainter::Ui
 		template<auto id, class EventHandler>
 		FilledShape& eventHandler(EventHandler& eh)
 		{
-			return eventHandler(&eh, [](void* event_handler, FilledShape& self) {
+			return eventHandler(&eh, {[](void* event_handler, FilledShape& self) {
 				auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
 				dispatchEvent<id>(
 				    [](EventHandler& eh, auto&&... args) {
@@ -47,17 +47,33 @@ namespace Texpainter::Ui
 				    },
 				    obj,
 				    self);
-			});
+			},[](void* event_handler, FilledShape& self){
+				auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				dispatchEvent<id>(
+				    [](EventHandler& eh, auto&&... args) {
+					    eh.template onCompleted<id>(std::forward<decltype(args)>(args)...);
+				    },
+				    obj,
+				    self);
+			}});
 		}
 
 		ToplevelCoordinates location() const;
+
+
 
 	protected:
 		class Impl;
 		Impl* m_impl;
 		explicit FilledShape(Impl& impl): m_impl(&impl) {}
-		using EventHandlerFunc = void (*)(void* event_handler, FilledShape& self);
-		FilledShape& eventHandler(void* event_handler, EventHandlerFunc f);
+
+		struct Vtable
+		{
+			void (*on_clicked)(void* event_handler, FilledShape& self);
+			void (*on_completed)(void* event_handler, FilledShape& self);
+		};
+
+		FilledShape& eventHandler(void* event_handler, Vtable const& f);
 	};
 }
 

@@ -26,19 +26,20 @@ public:
 		       + 0.5 * (size + size * m_loc);
 	}
 
-	void eventHandler(void* event_handler, EventHandlerFunc f)
+	void eventHandler(void* event_handler, Vtable const& vt)
 	{
 		r_eh   = event_handler;
-		r_func = f;
+		m_vt = vt;
 	}
 
 private:
 	void* r_eh;
-	EventHandlerFunc r_func;
+	Vtable m_vt;
 
 	PixelStore::Pixel m_color;
 	double m_radius;
 	vec2_t m_loc;
+	bool m_completed;
 
 	GtkDrawingArea* m_handle;
 
@@ -57,6 +58,12 @@ private:
 		{
 			gtk_widget_queue_resize(widget);
 			return FALSE;
+		}
+
+		if(!self->m_completed && self->r_eh != nullptr)
+		{
+			self->m_vt.on_completed(self->r_eh, *self);
+			self->m_completed = true;
 		}
 
 		auto const size = vec2_t{static_cast<double>(w), static_cast<double>(h)};
@@ -82,7 +89,7 @@ private:
 		auto event_button = reinterpret_cast<GdkEventButton const*>(e);
 		if(obj.r_eh != nullptr && event_button->button == 1)
 		{
-			obj.r_func(obj.r_eh, obj);
+			obj.m_vt.on_clicked(obj.r_eh, obj);
 			return FALSE;
 		}
 		return TRUE;
@@ -115,6 +122,7 @@ Texpainter::Ui::FilledShape::Impl::Impl(Container& cnt,
     , m_color{color}
     , m_radius{radius}
     , m_loc{location}
+    , m_completed{false}
 {
 	auto widget = gtk_drawing_area_new();
 	g_signal_connect(G_OBJECT(widget), "draw", G_CALLBACK(draw_callback), this);
@@ -140,8 +148,8 @@ Texpainter::Ui::ToplevelCoordinates Texpainter::Ui::FilledShape::location() cons
 }
 
 Texpainter::Ui::FilledShape& Texpainter::Ui::FilledShape::eventHandler(void* event_handler,
-                                                                       EventHandlerFunc f)
+                                                                       Vtable const& vt)
 {
-	m_impl->eventHandler(event_handler, f);
+	m_impl->eventHandler(event_handler, vt);
 	return *this;
 }

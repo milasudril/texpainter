@@ -88,7 +88,6 @@ namespace Texpainter::App
 			        imgs, [](auto const& item) { return item.first.c_str(); }))
 			    .selected(m_doc.get().currentImage().c_str());
 
-
 			refreshImageView();
 			return *this;
 		}
