@@ -299,7 +299,8 @@ namespace Texpainter::App
 		template<class PortType>
 		void onCompleted(NodeWidget const& src, PortType)
 		{
-			m_ports.updateLocation(src.node(), src.inputs(), src.outputs());
+			m_ports.updateLocation(
+			    src.node(), src.inputs(), src.outputs(), m_canvas.viewportOffset());
 			++m_num_completed_nodes;
 			if(m_num_completed_nodes == m_node_editors.size() && m_being_initialized)
 			{
