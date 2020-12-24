@@ -39,9 +39,9 @@ namespace Texpainter::Ui
 		template<class F, class... Args>
 		void scheduleAction(uint64_t iteration_offset, F&& func, Args&&... args)
 		{
-			m_actions.push(std::pair{m_event_index + iteration_offset,
-			                         UniqueFunction<void()>{std::bind_front(
-			                             std::forward<F>(func), std::forward<Args>(args)...)}});
+			m_actions.push(
+			    std::pair{m_event_index + iteration_offset,
+			              UniqueFunction<void()>{std::bind_front(std::forward<F>(func), std::forward<Args>(args)...)}});
 		}
 
 
