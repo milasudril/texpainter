@@ -149,7 +149,10 @@ namespace Texpainter::Ui
 		using WidgetHandle = WidgetCanvasDetail::WidgetHandle<WidgetType>;
 
 		template<class WidgetType, class CompletionCallback, class... WidgetParams>
-		decltype(auto) insert(CompletionCallback&& cb, ClientIdType id, WidgetCoordinates loc, WidgetParams&&... params)
+		decltype(auto) insert(CompletionCallback&& cb,
+		                      ClientIdType id,
+		                      WidgetCoordinates loc,
+		                      WidgetParams&&... params)
 		{
 			auto ptr = new WidgetType{clientId(ClientId{id})
 			                              .insertLocation(loc)

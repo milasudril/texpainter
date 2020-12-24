@@ -72,7 +72,8 @@ namespace
 		using NodeWidget = Texpainter::App::NodeEditor<Texpainter::App::FilterGraphEditor>;
 
 	public:
-		explicit MakeNodeEditor(Texpainter::App::FilterGraphEditor& owner,
+		explicit MakeNodeEditor(
+		    Texpainter::App::FilterGraphEditor& owner,
 		    Canvas& canvas,
 		    std::map<Texpainter::FilterGraph::NodeId, Texpainter::vec2_t> const& node_locs)
 		    : r_owner{owner}
@@ -88,10 +89,11 @@ namespace
 			auto const loc = i != std::end(r_node_locs)
 			                     ? Texpainter::vec2_t{i->second}
 			                     : Texpainter::vec2_t{20.0 + 200.0 * k, 20.0};
-			auto tmp = r_canvas.template insert<NodeWidget>([&owner = r_owner](auto id, auto& widget){
-				owner.widgetCreated(id, widget);
-			},
-			    item.first, Texpainter::Ui::WidgetCoordinates{loc}, item.second);
+			auto tmp = r_canvas.template insert<NodeWidget>(
+			    [&owner = r_owner](auto id, auto& widget) { owner.widgetCreated(id, widget); },
+			    item.first,
+			    Texpainter::Ui::WidgetCoordinates{loc},
+			    item.second);
 			++k;
 			return std::pair{item.first, std::move(tmp)};
 		}
@@ -149,10 +151,13 @@ Texpainter::App::FilterGraphEditor& Texpainter::App::FilterGraphEditor::insert(
 {
 	auto item = m_doc.get().compositor().insert(std::move(node));
 
-	auto ip = m_node_editors.insert(std::pair{
-	    item.first, m_canvas.template insert<NodeWidget>([this](auto id, auto& widget){
-			widgetCreated(id, widget);
-		}, item.first, insert_loc, item.second)});
+	auto ip = m_node_editors.insert(
+	    std::pair{item.first,
+	              m_canvas.template insert<NodeWidget>(
+	                  [this](auto id, auto& widget) { widgetCreated(id, widget); },
+	                  item.first,
+	                  insert_loc,
+	                  item.second)});
 	ip.first->second->eventHandler(*this);
 
 	m_ports.addPorts(item.second.get());
@@ -174,6 +179,7 @@ void Texpainter::App::FilterGraphEditor::updateLocations()
 void Texpainter::App::FilterGraphEditor::onClicked(NodeWidget const& src,
                                                    FilterGraph::InputPortIndex port)
 {
+	m_ports.updateLocation(src.node(), src.inputs(), src.outputs());
 	if(m_con_proc == nullptr)
 	{
 		m_con_proc = std::make_unique<FilterGraph::Connection>(src.node(), port);
@@ -195,6 +201,7 @@ void Texpainter::App::FilterGraphEditor::onClicked(NodeWidget const& src,
 void Texpainter::App::FilterGraphEditor::onClicked(NodeWidget const& src,
                                                    FilterGraph::OutputPortIndex port)
 {
+	m_ports.updateLocation(src.node(), src.inputs(), src.outputs());
 	if(m_con_proc == nullptr)
 	{
 		m_con_proc = std::make_unique<FilterGraph::Connection>(src.node(), port);
@@ -232,9 +239,11 @@ void Texpainter::App::FilterGraphEditor::insertNodeEditor(FilterGraph::Graph::No
 {
 	auto ip = m_node_editors.insert(
 	    std::pair{item.first,
-	              m_canvas.template insert<NodeWidget>([this](auto id, auto& widget){
-			widgetCreated(id, widget);
-		},item.first, m_filtermenuloc, item.second)});
+	              m_canvas.template insert<NodeWidget>(
+	                  [this](auto id, auto& widget) { widgetCreated(id, widget); },
+	                  item.first,
+	                  m_filtermenuloc,
+	                  item.second)});
 	ip.first->second->eventHandler(*this);
 	m_ports.addPorts(item.second.get());
 	m_canvas.showWidgets();
