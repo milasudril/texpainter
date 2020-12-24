@@ -382,10 +382,6 @@ namespace Texpainter::App
 
 		void insertNodeEditor(FilterGraph::Graph::NodeItem item);
 
-		void widgetCreated(FilterGraph::NodeId, NodeWidget const& widget)
-		{
-			m_ports.updateLocation(widget.node(), widget.inputs(), widget.outputs());
-		}
 
 	private:
 		std::reference_wrapper<Model::Document> m_doc;

@@ -32,8 +32,6 @@ namespace Texpainter::Ui
 
 		void exit();
 
-		void flushFwkEvents() const;
-
 		KeyboardState const& keyboardState() const { return m_key_state; }
 
 		template<class F, class... Args>
@@ -41,7 +39,7 @@ namespace Texpainter::Ui
 		{
 			m_actions.push(
 			    std::pair{m_event_index + iteration_offset,
-			              UniqueFunction<void()>{std::bind_front(std::forward<F>(func), std::forward<Args>(args)...)}});
+			              std::bind_front(std::forward<F>(func), std::forward<Args>(args)...)});
 		}
 
 
