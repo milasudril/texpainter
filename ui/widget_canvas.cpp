@@ -174,9 +174,15 @@ private:
 		auto size_loc = widgetLocationAndSize(container);
 		auto x_adj    = gtk_scrolled_window_get_hadjustment(m_root);
 		auto y_adj    = gtk_scrolled_window_get_vadjustment(m_root);
+		auto const w  = gtk_widget_get_allocated_width(GTK_WIDGET(m_root));
+		auto const h  = gtk_widget_get_allocated_height(GTK_WIDGET(m_root));
 
-		gtk_adjustment_set_value(x_adj, size_loc.first.x());
-		gtk_adjustment_set_value(y_adj, size_loc.first.y());
+		auto const size_vec = vec2_t{static_cast<double>(w), static_cast<double>(h)};
+		auto const offset   = -0.5 * (size_vec - size_loc.second);
+		auto const new_pos  = size_loc.first + offset;
+
+		gtk_adjustment_set_value(x_adj, new_pos.x());
+		gtk_adjustment_set_value(y_adj, new_pos.y());
 	}
 
 	static gboolean widgets_mouse_move(GtkWidget* widget, GdkEvent* event, gpointer user_data)
