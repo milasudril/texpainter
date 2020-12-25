@@ -38,7 +38,8 @@
 //@		"./exponential_decay.imgproc.hpp",
 //@		"./butterworth_decay.imgproc.hpp",
 //@		"./gingham.imgproc.hpp",
-//@		"./soft_clamp_rgba_image.imgproc.hpp"
+//@		"./soft_clamp_rgba_image.imgproc.hpp",
+//@		"./grayscale_wave_distortion.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -109,7 +110,8 @@ namespace
 	    get_info<::ExponentialDecay::ImageProcessor>(),
 	    get_info<::ButterworthDecay::ImageProcessor>(),
 	    get_info<::Gingham::ImageProcessor>(),
-	    get_info<::SoftClampRgbaImage::ImageProcessor>()};
+	    get_info<::SoftClampRgbaImage::ImageProcessor>(),
+	    get_info<::GrayscaleWaveDistortion::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
