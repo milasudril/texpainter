@@ -109,7 +109,7 @@ namespace Texpainter::App
 			                       : ImageProcessorRegistry::imageProcessorsByName();
 
 			auto i = std::ranges::find_if(
-			    items, [val](auto const& item) { return strstr(item.name, val) != nullptr; });
+			    items, [val](auto const& item) { return strcasestr(item.name, val) != nullptr; });
 			if(i == std::end(items)) { return; }
 
 			auto const index = i - std::begin(items);
