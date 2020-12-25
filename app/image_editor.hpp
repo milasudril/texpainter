@@ -176,6 +176,7 @@ namespace Texpainter::App
 			    m_doc.get().currentPalette());
 			m_doc.get().currentColor(src.widget().currentIndex()).saveColor(src.widget().value());
 			refreshPaletteSelector();
+			on_updated(r_eh, *this);
 			m_color_picker.reset();
 		}
 
@@ -203,7 +204,6 @@ namespace Texpainter::App
 				{
 					paint(m_doc, loc_window);
 					on_updated(r_eh, *this);
-					;
 				}
 		}
 
