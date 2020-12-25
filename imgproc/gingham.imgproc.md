@@ -32,11 +32,14 @@ inline auto sizeFromParam(size_t size, ParamValue val)
 	return 0.5 * std::exp2(std::lerp(-std::log2(size), 0.0, val.value()));
 }
 
+constexpr RealValue pattern[2][2] = {0.0, 0.5, 0.5, 1.0};
+
 void main(auto const& args, auto const& params)
 {
 	auto const w = args.size().width();
 	auto const h = args.size().height();
-	auto dx      = 2.0 * static_cast<int>(w * sizeFromParam(w, param<Str{"Div x"}>(params)))
+
+	auto dx = 2.0 * static_cast<int>(w * sizeFromParam(w, param<Str{"Div x"}>(params)))
 	          / static_cast<double>(w);
 	auto dy = dx * param<Str{"Aspect ratio"}>(params).value();
 
@@ -46,22 +49,8 @@ void main(auto const& args, auto const& params)
 		for(uint32_t col = 0; col < w; ++col)
 		{
 			auto const j = static_cast<uint32_t>(col * dx);
-			if(i % 2 == 0)
-			{
-				if(j % 2 == 0) { output<0>(args, col, row) = 0.0; }
-				else
-				{
-					output<0>(args, col, row) = 0.5;
-				}
-			}
-			else
-			{
-				if(j % 2 == 0) { output<0>(args, col, row) = 0.5; }
-				else
-				{
-					output<0>(args, col, row) = 1.0;
-				}
-			}
+
+			output<0>(args, col, row) = pattern[i % 2][j % 2];
 		}
 	}
 }
