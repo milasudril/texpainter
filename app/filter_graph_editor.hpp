@@ -395,6 +395,16 @@ namespace Texpainter::App
 
 		void insertNodeEditor(FilterGraph::Graph::NodeItem item);
 
+		template<ControlId>
+		void onActivated(Ui::Listbox& src, int index)
+		{
+			if(auto name = src.get(index); name != nullptr)
+			{
+				insert(ImageProcessorRegistry::createImageProcessor(name), m_filtermenuloc);
+				m_filtermenu.reset();
+			}
+		}
+
 	private:
 		std::reference_wrapper<Model::Document> m_doc;
 		void* r_eh;
@@ -507,7 +517,9 @@ namespace Texpainter::App
 				m_filtermenuloc = loc;
 				m_filtermenu =
 				    std::make_unique<ImageProcessorSelectorDlg>(r_owner, "Select image processor");
-				m_filtermenu->eventHandler<ControlId::FilterMenu>(*this);
+				m_filtermenu->eventHandler<ControlId::FilterMenu>(*this)
+				    .widget()
+				    .eventHandler<ControlId::FilterMenu>(*this);
 				break;
 		}
 	}

@@ -60,6 +60,13 @@ namespace Texpainter::App
 		template<auto>
 		void onClicked(Ui::Button& src);
 
+		template<auto id, class EventHandler>
+		ImageProcessorSelector& eventHandler(EventHandler& eh)
+		{
+			m_listbox.template eventHandler<id>(eh);
+			return *this;
+		}
+
 	private:
 		Ui::Box m_root;
 		Ui::LabeledInput<Ui::TextEntry> m_search;
