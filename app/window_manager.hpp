@@ -71,7 +71,6 @@ namespace Texpainter::App
 			auto ret = std::make_unique<T>(
 			    AppWindowTypeTraits<id>::name(), *this, std::forward<Args>(args)...);
 			ret->window().template eventHandler<id>(*this);
-			//	ret->menu().eventHandler(*this);
 			ret->widget().template eventHandler<id>(*this);
 			return ret;
 		}
@@ -154,6 +153,62 @@ namespace Texpainter::App
 				++m_window_count;
 			}
 			m_windows.get<item>()->window().show();
+		}
+
+		template<class Source>
+		void onActivated(Enum::Tag<ImageAction::New>, Ui::MenuItem&, Source& src)
+		{
+			if(m_img_creator == nullptr) [[likely]]
+				{
+					m_img_creator = std::make_unique<ImageCreatorDlg>(
+					    src.window(), "Create new image", Size2d{512, 512}, Size2d{65535, 65535});
+					m_img_creator->eventHandler<ImageAction::New>(*this);
+				}
+			m_img_creator->show();
+		}
+
+		template<class Source>
+		void onActivated(Enum::Tag<ImageAction::Import>, Ui::MenuItem&, Source& src)
+		{
+			std::filesystem::path filename;
+			if(Ui::filenameSelect(
+			       src.window(),
+			       std::filesystem::current_path(),
+			       filename,
+			       Ui::FilenameSelectMode::Open,
+			       [](char const* filename) { return PixelStore::fileValid(filename); },
+			       "Supported image files"))
+			{
+				insert(Model::createItemNameFromFilename(filename.c_str()),
+				       PixelStore::load(filename.c_str()));
+			}
+		}
+
+		template<class Source>
+		void onActivated(Enum::Tag<PaletteAction::New>, Ui::MenuItem&, Source& src)
+		{
+			if(m_empty_pal_creator == nullptr) [[likely]]
+				{
+					m_empty_pal_creator =
+					    std::make_unique<EmptyPaletteCreatorDlg>(src.window(),
+					                                             "Create empty palette",
+					                                             Ui::Box::Orientation::Horizontal,
+					                                             "Name");
+					m_empty_pal_creator->eventHandler<PaletteAction::New>(*this);
+				}
+			m_empty_pal_creator->show();
+		}
+
+		template<class Source>
+		void onActivated(Enum::Tag<PaletteAction::Generate>, Ui::MenuItem&, Source& src)
+		{
+			if(m_gen_palette == nullptr) [[likely]]
+				{
+					m_gen_palette =
+					    std::make_unique<PaletteGenerateDlg>(src.window(), "Generate palette");
+					m_gen_palette->eventHandler<PaletteAction::Generate>(*this);
+				}
+			m_gen_palette->show();
 		}
 
 		template<auto>
@@ -297,60 +352,6 @@ namespace Texpainter::App
 				[[likely]] { output->widget().refresh(); }
 		}
 	};
-
-#if 0
-	template<>
-	inline void WindowManager::onActivated<ImageAction::New>(Ui::MenuItem& item)
-	{
-		if(m_img_creator == nullptr) [[likely]]
-			{
-				m_img_creator = std::make_unique<ImageCreatorDlg>(
-				    item, "Create new image", Size2d{512, 512}, Size2d{65535, 65535});
-				m_img_creator->eventHandler<ImageAction::New>(*this);
-			}
-		m_img_creator->show();
-	}
-
-	template<>
-	inline void WindowManager::onActivated<ImageAction::Import>(Ui::MenuItem& item)
-	{
-		std::filesystem::path filename;
-		if(Ui::filenameSelect(
-		       item,
-		       std::filesystem::current_path(),
-		       filename,
-		       Ui::FilenameSelectMode::Open,
-		       [](char const* filename) { return PixelStore::fileValid(filename); },
-		       "Supported image files"))
-		{
-			insert(Model::createItemNameFromFilename(filename.c_str()),
-			       PixelStore::load(filename.c_str()));
-		}
-	}
-
-	template<>
-	inline void WindowManager::onActivated<PaletteAction::New>(Ui::MenuItem& item)
-	{
-		if(m_empty_pal_creator == nullptr) [[likely]]
-			{
-				m_empty_pal_creator = std::make_unique<EmptyPaletteCreatorDlg>(
-				    item, "Create empty palette", Ui::Box::Orientation::Horizontal, "Name");
-				m_empty_pal_creator->eventHandler<PaletteAction::New>(*this);
-			}
-		m_empty_pal_creator->show();
-	}
-
-	template<>
-	inline void WindowManager::onActivated<PaletteAction::Generate>(Ui::MenuItem& item)
-	{
-		if(m_gen_palette == nullptr) [[likely]]
-			{
-				m_gen_palette = std::make_unique<PaletteGenerateDlg>(item, "Generate palette");
-				m_gen_palette->eventHandler<PaletteAction::Generate>(*this);
-			}
-		m_gen_palette->show();
-	}
-#endif
 }
 
 #endif
