@@ -1,7 +1,7 @@
-//@	{"targets":[{"name":"document_editor.hpp","type":"include"}]}
+//@	{"targets":[{"name":"window_manager.hpp","type":"include"}]}
 
-#ifndef TEXPAINTER_APP_DOCUMENTEDITOR_HPP
-#define TEXPAINTER_APP_DOCUMENTEDITOR_HPP
+#ifndef TEXPAINTER_APP_WINDOWMANAGER_HPP
+#define TEXPAINTER_APP_WINDOWMANAGER_HPP
 
 #include "./image_editor.hpp"
 #include "./filter_graph_editor.hpp"

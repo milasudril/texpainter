@@ -1,6 +1,6 @@
 //@	{"targets":[{"name":"texpainter","type":"application"}]}
 
-#include "./document_editor.hpp"
+#include "./window_manager.hpp"
 #include "ui/context.hpp"
 
 int main()
