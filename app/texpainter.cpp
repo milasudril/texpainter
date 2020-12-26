@@ -6,8 +6,6 @@
 int main()
 {
 	auto& context = Texpainter::Ui::Context::get();
-
-	Texpainter::App::DocumentEditor editor;
-
+	Texpainter::App::WindowManager wm;
 	context.run();
 }

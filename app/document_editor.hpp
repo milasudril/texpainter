@@ -81,7 +81,7 @@ namespace Texpainter::App
 		};
 	}
 
-	class DocumentEditor
+	class WindowManager
 	{
 		template<AppWindowType id, class... Args>
 		auto createWindow(Args&&... args)
@@ -100,7 +100,7 @@ namespace Texpainter::App
 		using PaletteGenerateDlg     = Ui::Dialog<PaletteCreator>;
 
 	public:
-		DocumentEditor(): m_document{Size2d{512, 512}}, m_window_count{3}
+		[[nodiscard]] WindowManager(): m_document{Size2d{512, 512}}, m_window_count{3}
 		{
 			m_windows.get<AppWindowType::FilterGraphEditor>() =
 			    createWindow<AppWindowType::FilterGraphEditor>(m_document);
@@ -311,13 +311,13 @@ namespace Texpainter::App
 	};
 
 	template<>
-	inline void DocumentEditor::onActivated<AppAction::Quit>(Ui::MenuItem&)
+	inline void WindowManager::onActivated<AppAction::Quit>(Ui::MenuItem&)
 	{
 		Ui::Context::get().exit();
 	}
 
 	template<>
-	inline void DocumentEditor::onActivated<ImageAction::New>(Ui::MenuItem& item)
+	inline void WindowManager::onActivated<ImageAction::New>(Ui::MenuItem& item)
 	{
 		if(m_img_creator == nullptr) [[likely]]
 			{
@@ -329,7 +329,7 @@ namespace Texpainter::App
 	}
 
 	template<>
-	inline void DocumentEditor::onActivated<ImageAction::Import>(Ui::MenuItem& item)
+	inline void WindowManager::onActivated<ImageAction::Import>(Ui::MenuItem& item)
 	{
 		std::filesystem::path filename;
 		if(Ui::filenameSelect(
@@ -346,7 +346,7 @@ namespace Texpainter::App
 	}
 
 	template<>
-	inline void DocumentEditor::onActivated<PaletteAction::New>(Ui::MenuItem& item)
+	inline void WindowManager::onActivated<PaletteAction::New>(Ui::MenuItem& item)
 	{
 		if(m_empty_pal_creator == nullptr) [[likely]]
 			{
@@ -358,7 +358,7 @@ namespace Texpainter::App
 	}
 
 	template<>
-	inline void DocumentEditor::onActivated<PaletteAction::Generate>(Ui::MenuItem& item)
+	inline void WindowManager::onActivated<PaletteAction::Generate>(Ui::MenuItem& item)
 	{
 		if(m_gen_palette == nullptr) [[likely]]
 			{
