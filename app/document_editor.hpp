@@ -8,6 +8,7 @@
 #include "./main_menu.hpp"
 #include "./image_creator.hpp"
 #include "./palette_creator.hpp"
+#include "./document_previewer.hpp"
 
 #include "model/document.hpp"
 #include "model/palette_generate.hpp"
@@ -52,8 +53,6 @@ namespace Texpainter::App
 
 	namespace detail
 	{
-		using DocumentPreviewer = Ui::ImageView;
-
 		using FilterGraphEditWindow = DocumentEditor<FilterGraphEditor>;
 		using ImageEditWindow       = DocumentEditor<ImageEditor>;
 		using DocumentPreviewWindow = DocumentEditor<DocumentPreviewer>;
@@ -108,8 +107,8 @@ namespace Texpainter::App
 			    createWindow<AppWindowType::FilterGraphEditor>(m_document);
 			m_windows.get<AppWindowType::ImageEditor>() =
 			    createWindow<AppWindowType::ImageEditor>(m_document);
-
-			m_windows.get<AppWindowType::Output>() = createWindow<AppWindowType::Output>();
+			m_windows.get<AppWindowType::Output>() =
+			    createWindow<AppWindowType::Output>(m_document);
 		}
 
 		template<AppWindowType>
@@ -163,12 +162,7 @@ namespace Texpainter::App
 		{
 			if(m_windows.get<item>() == nullptr)
 			{
-				if constexpr(item != AppWindowType::Output)
-				{ m_windows.get<item>() = createWindow<item>(m_document); }
-				else
-				{
-					m_windows.get<item>() = createWindow<item>();
-				}
+				m_windows.get<item>() = createWindow<item>(m_document);
 				++m_window_count;
 			}
 			m_windows.get<item>()->window().show();
@@ -241,7 +235,7 @@ namespace Texpainter::App
 				[[likely]] { editor->widget().refresh(); }
 
 			if(auto output = m_windows.get<AppWindowType::Output>().get(); output != nullptr)
-			{ output->widget().image(render(m_document)); }
+				[[likely]] { output->widget().refresh(); }
 		}
 
 		template<auto, class T>
@@ -287,7 +281,7 @@ namespace Texpainter::App
 			}
 
 			if(auto output = m_windows.get<AppWindowType::Output>().get(); output != nullptr)
-			{ output->widget().image(render(m_document)); }
+				[[likely]] { output->widget().refresh(); }
 		}
 
 		void insert(Model::ItemName&& name, Model::Palette&& pal)
@@ -308,7 +302,7 @@ namespace Texpainter::App
 			}
 
 			if(auto output = m_windows.get<AppWindowType::Output>().get(); output != nullptr)
-			{ output->widget().image(render(m_document)); }
+				[[likely]] { output->widget().refresh(); }
 		}
 	};
 
