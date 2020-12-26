@@ -25,45 +25,53 @@ namespace Texpainter::App
 {
 	namespace detail
 	{
-		using FilterGraphEditWindow = DocumentEditor<FilterGraphEditor>;
-		using ImageEditWindow       = DocumentEditor<ImageEditor>;
-		using DocumentPreviewWindow = DocumentEditor<DocumentPreviewer>;
+		template<class EventHandler>
+		using FilterGraphEditWindow = DocumentEditor<FilterGraphEditor, EventHandler>;
 
-		template<AppWindowType>
+		template<class EventHandler>
+		using ImageEditWindow = DocumentEditor<ImageEditor, EventHandler>;
+
+		template<class EventHandler>
+		using DocumentPreviewWindow = DocumentEditor<DocumentPreviewer, EventHandler>;
+
+		template<AppWindowType, class EventHandler>
 		struct AppWindowTypeTraits;
 
-		template<>
-		struct AppWindowTypeTraits<AppWindowType::FilterGraphEditor>
+		template<class EventHandler>
+		struct AppWindowTypeTraits<AppWindowType::FilterGraphEditor, EventHandler>
 		{
-			using type = std::unique_ptr<FilterGraphEditWindow>;
+			using type = std::unique_ptr<FilterGraphEditWindow<EventHandler>>;
 			static constexpr char const* name() { return "Texpainter: Compositor"; }
 		};
 
-		template<>
-		struct AppWindowTypeTraits<AppWindowType::ImageEditor>
+		template<class EventHandler>
+		struct AppWindowTypeTraits<AppWindowType::ImageEditor, EventHandler>
 		{
-			using type = std::unique_ptr<ImageEditWindow>;
+			using type = std::unique_ptr<ImageEditWindow<EventHandler>>;
 			static constexpr char const* name() { return "Texpainter: Image editor"; }
 		};
 
-		template<>
-		struct AppWindowTypeTraits<AppWindowType::DocumentPreviewer>
+		template<class EventHandler>
+		struct AppWindowTypeTraits<AppWindowType::DocumentPreviewer, EventHandler>
 		{
-			using type = std::unique_ptr<DocumentPreviewWindow>;
+			using type = std::unique_ptr<DocumentPreviewWindow<EventHandler>>;
 			static constexpr char const* name() { return "Texpainter: Document preview"; }
 		};
 	}
 
 	class WindowManager
 	{
+		template<auto id>
+		using AppWindowTypeTraits = detail::AppWindowTypeTraits<id, WindowManager>;
+
 		template<AppWindowType id, class... Args>
 		auto createWindow(Args&&... args)
 		{
-			using T  = typename detail::AppWindowTypeTraits<id>::type::element_type;
-			auto ret = std::make_unique<T>(detail::AppWindowTypeTraits<id>::name(),
-			                               std::forward<Args>(args)...);
+			using T  = typename AppWindowTypeTraits<id>::type::element_type;
+			auto ret = std::make_unique<T>(
+			    AppWindowTypeTraits<id>::name(), *this, std::forward<Args>(args)...);
 			ret->window().template eventHandler<id>(*this);
-			ret->menu().eventHandler(*this);
+			//	ret->menu().eventHandler(*this);
 			ret->widget().template eventHandler<id>(*this);
 			return ret;
 		}
@@ -111,26 +119,34 @@ namespace Texpainter::App
 			if(m_window_count == 0) { Ui::Context::get().exit(); }
 		}
 
-		template<AppWindowType, class Source>
+		template<auto id, class Source>
 		void handleException(char const* msg, Source&)
 		{
 			fprintf(stderr, "Error: %s\n", msg);
 		}
 
-		template<auto>
-		void handleException(char const* msg, Ui::MenuItem&)
+		template<auto id, class Source>
+		void handleException(Enum::Tag<id>, char const* msg, Ui::MenuItem&, Source&)
 		{
 			fprintf(stderr, "Error: %s\n", msg);
 		}
 
-		template<auto id>
-		requires(!std::same_as<decltype(id), AppWindowType>) void onActivated(Ui::MenuItem&)
+		template<auto id, class Source>
+		requires(!std::same_as<decltype(id), AppWindowType>) void onActivated(Enum::Tag<id>,
+		                                                                      Ui::MenuItem&,
+		                                                                      Source&)
 		{
-			fprintf(stderr, "Unimplemented action\n");
+			throw "Unimplemented action";
 		}
 
-		template<AppWindowType item>
-		void onActivated(Ui::MenuItem&)
+		template<class Source>
+		void onActivated(Enum::Tag<AppAction::Quit>, Ui::MenuItem&, Source&)
+		{
+			Ui::Context::get().exit();
+		}
+
+		template<AppWindowType item, class Source>
+		void onActivated(Enum::Tag<item>, Ui::MenuItem&, Source&)
 		{
 			if(m_windows.get<item>() == nullptr)
 			{
@@ -228,7 +244,8 @@ namespace Texpainter::App
 
 	private:
 		Model::Document m_document;
-		Enum::Tuple<AppWindowType, detail::AppWindowTypeTraits> m_windows;
+
+		Enum::Tuple<AppWindowType, AppWindowTypeTraits> m_windows;
 
 		size_t m_window_count;
 
@@ -281,12 +298,7 @@ namespace Texpainter::App
 		}
 	};
 
-	template<>
-	inline void WindowManager::onActivated<AppAction::Quit>(Ui::MenuItem&)
-	{
-		Ui::Context::get().exit();
-	}
-
+#if 0
 	template<>
 	inline void WindowManager::onActivated<ImageAction::New>(Ui::MenuItem& item)
 	{
@@ -338,6 +350,7 @@ namespace Texpainter::App
 			}
 		m_gen_palette->show();
 	}
+#endif
 }
 
 #endif

@@ -96,7 +96,4 @@ Texpainter::Ui::MenuItem& Texpainter::Ui::MenuItem::sensitive(bool val)
 
 void* Texpainter::Ui::MenuItem::toplevel() const { return m_impl->_toplevel(); }
 
-char const* Texpainter::Ui::MenuItem::label() const
-{
-	return m_impl->label();
-}
+char const* Texpainter::Ui::MenuItem::label() const { return m_impl->label(); }

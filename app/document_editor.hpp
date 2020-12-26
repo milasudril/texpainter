@@ -9,17 +9,20 @@
 #include "ui/box.hpp"
 #include "ui/menu_builder.hpp"
 
+#include "libenum/enum.hpp"
+
 namespace Texpainter::App
 {
-	template<class Widget>
+	template<class Widget, class EventHandler>
 	class DocumentEditor
 	{
 	public:
 		DocumentEditor(DocumentEditor&&) = delete;
 
 		template<class... Args>
-		explicit DocumentEditor(char const* title, Args&&... args)
-		    : m_window{title}
+		explicit DocumentEditor(char const* title, EventHandler& eh, Args&&... args)
+		    : m_eh{eh}
+		    , m_window{title}
 		    , m_root{m_window, Ui::Box::Orientation::Vertical}
 		    , m_menu{m_root}
 		    , m_widget{m_root.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand}),
@@ -37,18 +40,20 @@ namespace Texpainter::App
 		auto& menu() { return m_menu; }
 
 		template<auto id>
-		void onActivated(Ui::MenuItem&)
+		void onActivated(Ui::MenuItem& item)
 		{
-			throw "Unimplemented";
+			m_eh.get().onActivated(Enum::Tag<id>{}, item, *this);
 		}
 
 		template<auto id>
-		void handleException(char const* msg, Ui::MenuItem const& item)
+		void handleException(char const* msg, Ui::MenuItem& item)
 		{
-			fprintf(stderr, "Failed to %s: %s\n", item.label(), msg);
+			m_eh.get().handleException(Enum::Tag<id>{}, msg, item, *this);
 		}
 
 	private:
+		std::reference_wrapper<EventHandler> m_eh;
+
 		Ui::Window m_window;
 		Ui::Box m_root;
 		Ui::MenuBuilder<MainMenuItem, MainMenuItemTraits> m_menu;
