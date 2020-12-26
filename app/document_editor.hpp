@@ -15,6 +15,8 @@ namespace Texpainter::App
 	class DocumentEditor
 	{
 	public:
+		DocumentEditor(DocumentEditor&&) = delete;
+
 		template<class... Args>
 		explicit DocumentEditor(char const* title, Args&&... args)
 		    : m_window{title}
@@ -24,6 +26,8 @@ namespace Texpainter::App
 		               std::forward<Args>(args)...}
 		{
 			m_window.resize(Size2d{800, 500}).show();
+
+			//	m_menu.eventHandler(*this);
 		}
 
 		auto& window() { return m_window; }
@@ -31,6 +35,16 @@ namespace Texpainter::App
 		auto& widget() { return m_widget; }
 
 		auto& menu() { return m_menu; }
+
+		template<auto id>
+		void onActivated(Ui::MenuItem&)
+		{
+		}
+
+		template<auto id>
+		void handleException(char const*, Ui::MenuItem&)
+		{
+		}
 
 	private:
 		Ui::Window m_window;
