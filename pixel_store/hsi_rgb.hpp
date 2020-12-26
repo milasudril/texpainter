@@ -22,9 +22,9 @@ namespace Texpainter::PixelStore
 	namespace detail
 	{
 		constexpr std::array<float, 13> WrappedHues{0.0000000e+00f,
-		                                            5.0979245e-02f,
-		                                            8.8460408e-02f,
-		                                            1.2461386e-01f,
+		                                            2.0979245e-02f,
+		                                            6.8460408e-02f,
+		                                            1.0461386e-01f,
 		                                            1.6666667e-01f,
 		                                            2.4562909e-01f,
 		                                            3.3333334e-01f,
