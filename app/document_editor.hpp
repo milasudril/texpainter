@@ -52,9 +52,11 @@ namespace Texpainter::App
 
 	namespace detail
 	{
-		using FilterGraphEditorWindow = DocumentEditor<FilterGraphEditor>;
-		using ImageEditorWindow       = DocumentEditor<ImageEditor>;
-		using OutputWindow            = DocumentEditor<Ui::ImageView>;
+		using DocumentPreviewer = Ui::ImageView;
+
+		using FilterGraphEditWindow = DocumentEditor<FilterGraphEditor>;
+		using ImageEditWindow       = DocumentEditor<ImageEditor>;
+		using DocumentPreviewWindow = DocumentEditor<DocumentPreviewer>;
 
 		template<AppWindowType>
 		struct AppWindowTypeTraits;
@@ -62,21 +64,21 @@ namespace Texpainter::App
 		template<>
 		struct AppWindowTypeTraits<AppWindowType::FilterGraphEditor>
 		{
-			using type = std::unique_ptr<FilterGraphEditorWindow>;
+			using type = std::unique_ptr<FilterGraphEditWindow>;
 			static constexpr char const* name() { return "Texpainter: Filter graph"; }
 		};
 
 		template<>
 		struct AppWindowTypeTraits<AppWindowType::ImageEditor>
 		{
-			using type = std::unique_ptr<ImageEditorWindow>;
+			using type = std::unique_ptr<ImageEditWindow>;
 			static constexpr char const* name() { return "Texpainter: Image editor"; }
 		};
 
 		template<>
 		struct AppWindowTypeTraits<AppWindowType::Output>
 		{
-			using type = std::unique_ptr<OutputWindow>;
+			using type = std::unique_ptr<DocumentPreviewWindow>;
 			static constexpr char const* name() { return "Texpainter: Output"; }
 		};
 	}
