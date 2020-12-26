@@ -75,10 +75,10 @@ namespace Texpainter::App
 		};
 
 		template<>
-		struct AppWindowTypeTraits<AppWindowType::Output>
+		struct AppWindowTypeTraits<AppWindowType::DocumentPreviewer>
 		{
 			using type = std::unique_ptr<DocumentPreviewWindow>;
-			static constexpr char const* name() { return "Texpainter: Output"; }
+			static constexpr char const* name() { return "Texpainter: Document preview"; }
 		};
 	}
 
@@ -107,8 +107,8 @@ namespace Texpainter::App
 			    createWindow<AppWindowType::FilterGraphEditor>(m_document);
 			m_windows.get<AppWindowType::ImageEditor>() =
 			    createWindow<AppWindowType::ImageEditor>(m_document);
-			m_windows.get<AppWindowType::Output>() =
-			    createWindow<AppWindowType::Output>(m_document);
+			m_windows.get<AppWindowType::DocumentPreviewer>() =
+			    createWindow<AppWindowType::DocumentPreviewer>(m_document);
 		}
 
 		template<AppWindowType>
@@ -119,7 +119,7 @@ namespace Texpainter::App
 		template<AppWindowType window>
 		void onKeyDown(Ui::Window&, Ui::Scancode)
 		{
-			if constexpr(window != AppWindowType::Output)
+			if constexpr(window != AppWindowType::DocumentPreviewer)
 			{
 				m_windows.template get<window>()->widget().onKeyDown(
 				    Ui::Context::get().keyboardState());
@@ -234,7 +234,7 @@ namespace Texpainter::App
 			if(auto editor = m_windows.get<AppWindowType::ImageEditor>().get(); editor != nullptr)
 				[[likely]] { editor->widget().refresh(); }
 
-			if(auto output = m_windows.get<AppWindowType::Output>().get(); output != nullptr)
+			if(auto output = m_windows.get<AppWindowType::DocumentPreviewer>().get(); output != nullptr)
 				[[likely]] { output->widget().refresh(); }
 		}
 
@@ -280,7 +280,7 @@ namespace Texpainter::App
 				img_editor->window().show();
 			}
 
-			if(auto output = m_windows.get<AppWindowType::Output>().get(); output != nullptr)
+			if(auto output = m_windows.get<AppWindowType::DocumentPreviewer>().get(); output != nullptr)
 				[[likely]] { output->widget().refresh(); }
 		}
 
@@ -301,7 +301,7 @@ namespace Texpainter::App
 				img_editor->window().show();
 			}
 
-			if(auto output = m_windows.get<AppWindowType::Output>().get(); output != nullptr)
+			if(auto output = m_windows.get<AppWindowType::DocumentPreviewer>().get(); output != nullptr)
 				[[likely]] { output->widget().refresh(); }
 		}
 	};

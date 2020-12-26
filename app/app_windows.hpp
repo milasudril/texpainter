@@ -13,14 +13,14 @@ namespace Texpainter
 	{
 		ImageEditor,
 		FilterGraphEditor,
-		Output
+		DocumentPreviewer
 	};
 
 	constexpr auto begin(Enum::Empty<AppWindowType>) { return AppWindowType::ImageEditor; }
 
 	constexpr auto end(Enum::Empty<AppWindowType>)
 	{
-		return static_cast<AppWindowType>(static_cast<int>(AppWindowType::Output) + 1);
+		return static_cast<AppWindowType>(static_cast<int>(AppWindowType::DocumentPreviewer) + 1);
 	}
 
 	template<AppWindowType>
@@ -41,10 +41,10 @@ namespace Texpainter
 	};
 
 	template<>
-	struct AppWindowTypeMenuTraits<AppWindowType::Output>
+	struct AppWindowTypeMenuTraits<AppWindowType::DocumentPreviewer>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName() { return "Output"; }
+		static constexpr char const* displayName() { return "Document preview"; }
 	};
 }
 
