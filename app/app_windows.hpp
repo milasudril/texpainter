@@ -37,7 +37,7 @@ namespace Texpainter
 	struct AppWindowTypeMenuTraits<AppWindowType::FilterGraphEditor>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName() { return "Filter graph"; }
+		static constexpr char const* displayName() { return "Compositor"; }
 	};
 
 	template<>

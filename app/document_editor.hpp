@@ -64,7 +64,7 @@ namespace Texpainter::App
 		struct AppWindowTypeTraits<AppWindowType::FilterGraphEditor>
 		{
 			using type = std::unique_ptr<FilterGraphEditWindow>;
-			static constexpr char const* name() { return "Texpainter: Filter graph"; }
+			static constexpr char const* name() { return "Texpainter: Compositor"; }
 		};
 
 		template<>
@@ -234,7 +234,8 @@ namespace Texpainter::App
 			if(auto editor = m_windows.get<AppWindowType::ImageEditor>().get(); editor != nullptr)
 				[[likely]] { editor->widget().refresh(); }
 
-			if(auto output = m_windows.get<AppWindowType::DocumentPreviewer>().get(); output != nullptr)
+			if(auto output = m_windows.get<AppWindowType::DocumentPreviewer>().get();
+			   output != nullptr)
 				[[likely]] { output->widget().refresh(); }
 		}
 
@@ -280,7 +281,8 @@ namespace Texpainter::App
 				img_editor->window().show();
 			}
 
-			if(auto output = m_windows.get<AppWindowType::DocumentPreviewer>().get(); output != nullptr)
+			if(auto output = m_windows.get<AppWindowType::DocumentPreviewer>().get();
+			   output != nullptr)
 				[[likely]] { output->widget().refresh(); }
 		}
 
@@ -301,7 +303,8 @@ namespace Texpainter::App
 				img_editor->window().show();
 			}
 
-			if(auto output = m_windows.get<AppWindowType::DocumentPreviewer>().get(); output != nullptr)
+			if(auto output = m_windows.get<AppWindowType::DocumentPreviewer>().get();
+			   output != nullptr)
 				[[likely]] { output->widget().refresh(); }
 		}
 	};
