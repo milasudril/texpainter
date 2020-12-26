@@ -62,16 +62,14 @@ __Source code:__
 void main(auto const& args, auto const& params)
 {
 	auto const size = args.size().area();
-	std::array<float, Palette::size()> vals;
-	std::ranges::transform(params.values(), std::begin(vals), [](auto val) {
-		return static_cast<float>(val.value());
-	});
+	std::array<double, Palette::size()> vals;
+	std::ranges::transform(params.values(), std::begin(vals), [](auto val) { return val.value(); });
 
 	std::transform(input<0>(args),
 	               input<0>(args) + size,
 	               output<0>(args),
 	               [&palette = input<1>(args).get(),
-	                pdf      = Texpainter::DiscretePdf<float, Palette::size()>{vals}](auto val) {
+	                pdf      = Texpainter::DiscretePdf<double, Palette::size()>{vals}](auto val) {
 		               using IntegerType = Palette::index_type::element_type;
 		               auto index        = static_cast<IntegerType>(pdf.eventIndex(val));
 		               return palette[Palette::index_type{index}];

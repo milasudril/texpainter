@@ -50,6 +50,7 @@
 
 //HACK must have a static references to these for linking to work properly
 #include "utils/default_rng.hpp"
+#include "utils/discrete_pdf.hpp"
 #include "dft/engine.hpp"
 
 namespace
