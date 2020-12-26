@@ -27,7 +27,7 @@ namespace Texpainter::App
 		{
 			m_window.resize(Size2d{800, 500}).show();
 
-			//	m_menu.eventHandler(*this);
+			m_menu.eventHandler(*this);
 		}
 
 		auto& window() { return m_window; }
@@ -39,11 +39,13 @@ namespace Texpainter::App
 		template<auto id>
 		void onActivated(Ui::MenuItem&)
 		{
+			throw "Unimplemented";
 		}
 
 		template<auto id>
-		void handleException(char const*, Ui::MenuItem&)
+		void handleException(char const* msg, Ui::MenuItem const& item)
 		{
+			fprintf(stderr, "Failed to %s: %s\n", item.label(), msg);
 		}
 
 	private:

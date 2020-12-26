@@ -18,6 +18,8 @@ public:
 
 	void label(char const* label) { gtk_menu_item_set_label(m_handle, label); }
 
+	char const* label() const { return gtk_menu_item_get_label(m_handle); }
+
 	void _add(GtkWidget* handle) noexcept { gtk_menu_item_set_submenu(m_handle, handle); }
 
 	void _show() noexcept { gtk_widget_show_all(GTK_WIDGET(m_handle)); }
@@ -93,3 +95,8 @@ Texpainter::Ui::MenuItem& Texpainter::Ui::MenuItem::sensitive(bool val)
 }
 
 void* Texpainter::Ui::MenuItem::toplevel() const { return m_impl->_toplevel(); }
+
+char const* Texpainter::Ui::MenuItem::label() const
+{
+	return m_impl->label();
+}

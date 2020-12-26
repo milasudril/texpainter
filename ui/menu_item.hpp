@@ -42,6 +42,7 @@ namespace Texpainter::Ui
 		}
 
 		MenuItem& label(char const* label);
+		char const* label() const;
 
 		MenuItem& add(void* handle) override;
 		MenuItem& show() override;
