@@ -23,11 +23,11 @@
 namespace Texpainter::App
 {
 	template<class Widget>
-	class WidgetWithWindow
+	class DocumentEditor
 	{
 	public:
 		template<class... Args>
-		explicit WidgetWithWindow(char const* title, Args&&... args)
+		explicit DocumentEditor(char const* title, Args&&... args)
 		    : m_window{title}
 		    , m_root{m_window, Ui::Box::Orientation::Vertical}
 		    , m_menu{m_root}
@@ -52,9 +52,9 @@ namespace Texpainter::App
 
 	namespace detail
 	{
-		using FilterGraphEditorWindow = WidgetWithWindow<FilterGraphEditor>;
-		using ImageEditorWindow       = WidgetWithWindow<ImageEditor>;
-		using OutputWindow            = WidgetWithWindow<Ui::ImageView>;
+		using FilterGraphEditorWindow = DocumentEditor<FilterGraphEditor>;
+		using ImageEditorWindow       = DocumentEditor<ImageEditor>;
+		using OutputWindow            = DocumentEditor<Ui::ImageView>;
 
 		template<AppWindowType>
 		struct AppWindowTypeTraits;
