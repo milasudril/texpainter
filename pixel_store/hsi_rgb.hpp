@@ -21,6 +21,43 @@ namespace Texpainter::PixelStore
 
 	namespace detail
 	{
+		constexpr std::array<float, 13> WrappedHues{0.0000000e+00f,
+		                                            5.0979245e-02f,
+		                                            8.8460408e-02f,
+		                                            1.2461386e-01f,
+		                                            1.6666667e-01f,
+		                                            2.4562909e-01f,
+		                                            3.3333334e-01f,
+		                                            5.0000000e-01f,
+		                                            6.3490719e-01f,
+		                                            6.9079286e-01f,
+		                                            7.5191814e-01f,
+		                                            9.2916709e-01f,
+		                                            1.0f};
+
+		constexpr auto wrapHue(float value)
+		{
+			value  = std::fmod(value, 1.0f);
+			auto i = std::ranges::lower_bound(WrappedHues, value);
+			if(i == std::end(WrappedHues) || i == std::begin(WrappedHues)) { return 0.0f; }
+			auto i_prev    = i - 1;
+			auto const min = *i_prev;
+			auto const max = *i;
+			auto const t   = (value - min) / (max - min);
+			return std::lerp(i_prev - std::begin(WrappedHues), i - std::begin(WrappedHues), t)
+			       / (WrappedHues.size() - 1);
+		}
+
+		constexpr auto unwrapHue(float value)
+		{
+			value = std::fmod(value, 1.0f);
+			value *= WrappedHues.size() - 1;
+			auto const min = static_cast<int>(value);
+			auto const max = min + 1;
+			return std::lerp(WrappedHues[min], WrappedHues[max], value - min);
+		}
+
+#if 0
 		constexpr auto HueUnwrappedYellow   = 1.0f / 6.0f;
 		constexpr auto HueUnwrappedGreen    = 3.4527740e-01f;
 		constexpr auto HueUnwrappedBlue     = 6.1349493e-01f;
@@ -122,6 +159,7 @@ namespace Texpainter::PixelStore
 			return HueUnwrappedPink
 			       + (value - HueWrappedPink) * (1.0f - HueUnwrappedPink) / (1.0f - HueWrappedPink);
 		}
+#endif
 	}
 
 
