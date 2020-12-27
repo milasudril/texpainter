@@ -22,9 +22,6 @@ namespace Texpainter::Ui
 
 		constexpr explicit SliderValue(double val): m_value{val} {}
 
-		// SIGSEGV during compilation in gcc 10.1 [bug 96064]
-		// constexpr bool operator<=>(SliderValue const&) const = default;
-
 		constexpr double value() const { return m_value; }
 
 	private:
