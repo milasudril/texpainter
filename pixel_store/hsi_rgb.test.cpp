@@ -75,7 +75,7 @@ namespace Testcases
 
 		assert(std::abs(val_hsi.hue - val_hsi_2.hue) < 1e-5f);
 		assert(val_hsi.saturation == val_hsi_2.saturation);
-		assert(val_hsi.intensity == val_hsi_2.intensity);
+		assert(std::abs(val_hsi.intensity - val_hsi_2.intensity) < 1e-5);
 	}
 
 	void texpainterRgbHsiRgb()
@@ -93,6 +93,7 @@ int main()
 {
 	//	Testcases::texpainterHsiToRgb();
 	//	Testcases::texpainterRgbToHsi();
+
 	Testcases::texpainterHsiRgbHsi();
 	Testcases::texpainterRgbHsiRgb();
 	return 0;
