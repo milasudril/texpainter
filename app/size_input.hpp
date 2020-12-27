@@ -35,10 +35,44 @@ namespace Texpainter
 		    Ui::Slider::TickMark{Ui::logValue(std::numbers::phi, MinRatio, MaxRatio), "Φ:1"},
 		    Ui::Slider::TickMark{Ui::logValue(2.0, MinRatio, MaxRatio), "2:1"}};
 
+		static Size2d size_from_width(uint32_t width, double r)
+		{
+			auto const height = static_cast<uint32_t>(width / r + 0.5);
+			return Size2d{width, height};
+		}
+
+		static Size2d size_from_height(uint32_t height, double r)
+		{
+			auto const width = static_cast<uint32_t>(height * r + 0.5);
+			return Size2d{width, height};
+		}
+
+		static Size2d size_from_square_size(uint32_t size, double r)
+		{
+			// A = w*h
+			// w/h = r  <=> w = h*r
+			// A = s*s
+
+			// A = r*h*h
+			// s*s = r*h*h
+			// s = sqrt(r)*h
+			// h = s/sqrt(r)
+			// w = h*r = s*r/sqrt(r) = s*sqrt(r)
+			auto const w = static_cast<uint32_t>(size * sqrt(r) + 0.5);
+			auto const h = static_cast<uint32_t>(size / sqrt(r) + 0.5);
+			return Size2d{w, h};
+		}
+
+		using SizeFunc = Size2d (*)(uint32_t, double);
+
+		static constexpr SizeFunc s_size_mode[] = {
+		    size_from_width, size_from_height, size_from_square_size};
+
 	public:
 		enum class ControlId : int
 		{
-			Width,
+			SizeMode,
+			SizeValue,
 			AspectRatio
 		};
 
@@ -47,45 +81,48 @@ namespace Texpainter
 		explicit SizeInput(Ui::Container& container, Size2d default_size, Size2d max_size)
 		    : m_root{container, Ui::Box::Orientation::Vertical}
 		    , m_size{m_root, Ui::Box::Orientation::Horizontal, "Width: "}
-		    , m_asplect_ratio{m_root, Ui::Box::Orientation::Vertical, "W/H:", false}
+		    , m_asplect_ratio{m_root, Ui::Box::Orientation::Vertical, "Aspect ratio:", false}
 		    , m_comp_size{m_root, Ui::Box::Orientation::Horizontal, "Size: ", "0"}
 		    , m_size_str{std::to_string(default_size.width())}
 		    , m_max_size{max_size}
 		{
-			m_size.label().append("Height: ").append("Square size: ").selected(0);
+			m_size.label()
+			    .append("Height: ")
+			    .append("Square size: ")
+			    .selected(0)
+			    .eventHandler<ControlId::SizeMode>(*this);
 
 			m_size.inputField()
 			    .content(m_size_str.c_str())
 			    .alignment(0.0f)
 			    .width(5)
-			    .eventHandler<ControlId::Width>(*this);
-
+			    .eventHandler<ControlId::SizeValue>(*this);
 
 			auto const r = static_cast<double>(default_size.width()) / default_size.height();
-
 			m_asplect_ratio.inputField()
 			    .ticks(RatioTickMarks)
 			    .value(Ui::logValue(1 / r, MinRatio, MaxRatio))
 			    .eventHandler<ControlId::AspectRatio>(*this);
 
-			m_comp_size.inputField().content(toString(value()).c_str());
+			onChanged<0>(*this);
 		}
 
 		Size2d value() const
 		{
-			auto const width  = static_cast<uint32_t>(std::atoi(m_size.inputField().content()));
-			auto const height = static_cast<uint32_t>(
-			    width
-			        / Ui::logValue(m_asplect_ratio.inputField().value(), MinRatio, MaxRatio, false)
-			    + 0.5);
+			auto const size = static_cast<uint32_t>(std::atoi(m_size.inputField().content()));
+			auto const r =
+			    Ui::logValue(m_asplect_ratio.inputField().value(), MinRatio, MaxRatio, false);
+			auto const size_mode = m_size.label().selected();
 
-			return Size2d{width, height};
+			return s_size_mode[size_mode](size, r);
 		}
 
 		template<auto, class T>
 		void onChanged(T&)
 		{
-			m_comp_size.inputField().content(toString(value()).c_str());
+			auto const size = value();
+			m_comp_size.inputField().content(
+			    (toString(value()) + ", A = " + toString(size.area())).c_str());
 		}
 
 		template<ControlId, class... T>
