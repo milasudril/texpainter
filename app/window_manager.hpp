@@ -9,6 +9,7 @@
 #include "./image_creator.hpp"
 #include "./palette_creator.hpp"
 #include "./document_previewer.hpp"
+#include "./size_input.hpp"
 
 #include "model/document.hpp"
 #include "model/palette_generate.hpp"
@@ -65,29 +66,32 @@ namespace Texpainter::App
 		using AppWindowTypeTraits = detail::AppWindowTypeTraits<id, WindowManager>;
 
 		template<AppWindowType id, class... Args>
-		auto createWindow(Args&&... args)
+		auto createWindow(Model::Document& doc, Args&&... args)
 		{
 			using T  = typename AppWindowTypeTraits<id>::type::element_type;
 			auto ret = std::make_unique<T>(
-			    AppWindowTypeTraits<id>::name(), *this, std::forward<Args>(args)...);
+			    AppWindowTypeTraits<id>::name(), *this, doc, std::forward<Args>(args)...);
 			ret->window().template eventHandler<id>(*this);
 			ret->widget().template eventHandler<id>(*this);
 			return ret;
 		}
 
+		using DocumentCreatorDlg     = Ui::Dialog<Ui::LabeledInput<SizeInput>>;
 		using ImageCreatorDlg        = Ui::Dialog<ImageCreator>;
 		using EmptyPaletteCreatorDlg = Ui::Dialog<Ui::LabeledInput<Ui::TextEntry>>;
 		using PaletteGenerateDlg     = Ui::Dialog<PaletteCreator>;
 
 	public:
-		[[nodiscard]] WindowManager(): m_document{Size2d{512, 512}}, m_window_count{3}
+		[[nodiscard]] WindowManager()
+		    : m_document{std::make_unique<Model::Document>(Size2d{512, 512})}
+		    , m_window_count{3}
 		{
 			m_windows.get<AppWindowType::FilterGraphEditor>() =
-			    createWindow<AppWindowType::FilterGraphEditor>(m_document);
+			    createWindow<AppWindowType::FilterGraphEditor>(*m_document);
 			m_windows.get<AppWindowType::ImageEditor>() =
-			    createWindow<AppWindowType::ImageEditor>(m_document);
+			    createWindow<AppWindowType::ImageEditor>(*m_document);
 			m_windows.get<AppWindowType::DocumentPreviewer>() =
-			    createWindow<AppWindowType::DocumentPreviewer>(m_document);
+			    createWindow<AppWindowType::DocumentPreviewer>(*m_document);
 		}
 
 		template<AppWindowType>
@@ -111,7 +115,7 @@ namespace Texpainter::App
 			--m_window_count;
 			if constexpr(id == AppWindowType::FilterGraphEditor)
 			{
-				m_document.nodeLocations(
+				m_document->nodeLocations(
 				    m_windows.get<AppWindowType::FilterGraphEditor>()->widget().nodeLocations());
 			}
 			m_windows.get<id>().reset();
@@ -149,7 +153,7 @@ namespace Texpainter::App
 		{
 			if(m_windows.get<item>() == nullptr)
 			{
-				m_windows.get<item>() = createWindow<item>(m_document);
+				m_windows.get<item>() = createWindow<item>(*m_document);
 				++m_window_count;
 			}
 			m_windows.get<item>()->window().show();
@@ -166,6 +170,24 @@ namespace Texpainter::App
 				}
 			m_img_creator->show();
 		}
+
+		template<class Source>
+		void onActivated(Enum::Tag<DocumentAction::New>, Ui::MenuItem&, Source& src)
+		{
+			if(m_doc_creator == nullptr) [[likely]]
+				{
+					m_doc_creator =
+					    std::make_unique<DocumentCreatorDlg>(src.window(),
+					                                         "Create new document",
+					                                         Ui::Box::Orientation::Vertical,
+					                                         "Canvas size:",
+					                                         Size2d{512, 512},
+					                                         Size2d{65535, 65535});
+					m_doc_creator->eventHandler<DocumentAction::New>(*this);
+				}
+			m_doc_creator->show();
+		}
+
 
 		template<class Source>
 		void onActivated(Enum::Tag<ImageAction::Import>, Ui::MenuItem&, Source& src)
@@ -271,6 +293,29 @@ namespace Texpainter::App
 			m_gen_palette.reset();
 		}
 
+		template<auto>
+		void confirmPositive(DocumentCreatorDlg& src)
+		{
+			auto doc = std::make_unique<Model::Document>(src.widget().inputField().value());
+
+			auto filter_edit   = createWindow<AppWindowType::FilterGraphEditor>(*doc);
+			auto img_edit      = createWindow<AppWindowType::ImageEditor>(*doc);
+			auto doc_previewer = createWindow<AppWindowType::DocumentPreviewer>(*doc);
+
+			m_document                                        = std::move(doc);
+			m_windows.get<AppWindowType::FilterGraphEditor>() = std::move(filter_edit);
+			m_windows.get<AppWindowType::ImageEditor>()       = std::move(img_edit);
+			m_windows.get<AppWindowType::DocumentPreviewer>() = std::move(doc_previewer);
+
+			m_doc_creator.reset();
+		}
+
+		template<auto>
+		void dismiss(DocumentCreatorDlg&)
+		{
+			m_doc_creator.reset();
+		}
+
 		template<AppWindowType id, class Src>
 		void onUpdated(Src&)
 		{
@@ -298,7 +343,7 @@ namespace Texpainter::App
 		}
 
 	private:
-		Model::Document m_document;
+		std::unique_ptr<Model::Document> m_document;
 
 		Enum::Tuple<AppWindowType, AppWindowTypeTraits> m_windows;
 
@@ -307,16 +352,17 @@ namespace Texpainter::App
 		std::unique_ptr<ImageCreatorDlg> m_img_creator;
 		std::unique_ptr<EmptyPaletteCreatorDlg> m_empty_pal_creator;
 		std::unique_ptr<PaletteGenerateDlg> m_gen_palette;
+		std::unique_ptr<DocumentCreatorDlg> m_doc_creator;
 
 		void insert(Model::ItemName&& name, PixelStore::Image&& img)
 		{
-			if(m_document.insert(name, std::move(img)) == nullptr)
+			if(m_document->insert(name, std::move(img)) == nullptr)
 			{ throw std::string{"Item already exists"}; }
 
-			auto node = m_document.inputNodeItem(name);
+			auto node = m_document->inputNodeItem(name);
 			m_windows.get<AppWindowType::FilterGraphEditor>()->widget().insertNodeEditor(*node);
 
-			m_document.currentImage(std::move(name));
+			m_document->currentImage(std::move(name));
 
 			if(auto img_editor = m_windows.get<AppWindowType::ImageEditor>().get();
 			   img_editor != nullptr)
@@ -332,13 +378,13 @@ namespace Texpainter::App
 
 		void insert(Model::ItemName&& name, Model::Palette&& pal)
 		{
-			if(m_document.insert(name, std::move(pal)) == nullptr)
+			if(m_document->insert(name, std::move(pal)) == nullptr)
 			{ throw std::string{"Item already exists"}; }
 
-			auto node = m_document.inputNodeItem(name);
+			auto node = m_document->inputNodeItem(name);
 			m_windows.get<AppWindowType::FilterGraphEditor>()->widget().insertNodeEditor(*node);
 
-			m_document.currentPalette(std::move(name));
+			m_document->currentPalette(std::move(name));
 
 			if(auto img_editor = m_windows.get<AppWindowType::ImageEditor>().get();
 			   img_editor != nullptr)
