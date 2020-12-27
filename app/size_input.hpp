@@ -66,7 +66,7 @@ namespace Texpainter
 			m_asplect_ratio.inputField()
 			    .ticks(RatioTickMarks)
 			    .value(Ui::logValue(1 / r, MinRatio, MaxRatio))
-				.eventHandler<ControlId::AspectRatio>(*this);
+			    .eventHandler<ControlId::AspectRatio>(*this);
 
 			m_comp_size.inputField().content(toString(value()).c_str());
 		}
@@ -75,7 +75,8 @@ namespace Texpainter
 		{
 			auto const width  = static_cast<uint32_t>(std::atoi(m_size.inputField().content()));
 			auto const height = static_cast<uint32_t>(
-			    width / Ui::logValue(m_asplect_ratio.inputField().value(), MinRatio, MaxRatio)
+			    width
+			        / Ui::logValue(m_asplect_ratio.inputField().value(), MinRatio, MaxRatio, false)
 			    + 0.5);
 
 			return Size2d{width, height};
@@ -83,7 +84,9 @@ namespace Texpainter
 
 		template<auto, class T>
 		void onChanged(T&)
-		{ m_comp_size.inputField().content(toString(value()).c_str()); }
+		{
+			m_comp_size.inputField().content(toString(value()).c_str());
+		}
 
 		template<ControlId, class... T>
 		void handleException(char const* msg, T&...)

@@ -38,12 +38,15 @@ namespace Texpainter::Ui
 	}
 
 	inline constexpr double logValue(SliderValue val,
-	                                 double min_exponent = -10.0,
-	                                 double max_exponent = 0.0)
+	                                 double min_exponent    = -10.0,
+	                                 double max_exponent    = 0.0,
+	                                 bool flush_min_to_zero = true)
 	{
 		auto const x = val.value();
 
-		return x == 0.0 ? 0.0 : std::exp2(min_exponent * (1.0 - x) + x * max_exponent);
+		return x == 0.0 && flush_min_to_zero
+		           ? 0.0
+		           : std::exp2(min_exponent * (1.0 - x) + x * max_exponent);
 	}
 
 	inline constexpr SliderValue linValue(double x, double min = 0.0, double max = 1.0)

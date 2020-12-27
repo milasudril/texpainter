@@ -36,7 +36,7 @@ public:
 		});
 
 		if(!m_vertical)
-		{ gtk_widget_set_size_request(GTK_WIDGET(m_handle), 48*marks.size(), 32); }
+		{ gtk_widget_set_size_request(GTK_WIDGET(m_handle), 48 * marks.size(), 32); }
 	}
 
 private:
@@ -75,7 +75,10 @@ Texpainter::Ui::Slider& Texpainter::Ui::Slider::ticks(std::span<TickMark const> 
 	return *this;
 }
 
-Texpainter::Ui::Slider::Impl::Impl(Container& cnt, bool vertical): Slider{*this}, r_eh(nullptr), m_vertical{vertical}
+Texpainter::Ui::Slider::Impl::Impl(Container& cnt, bool vertical)
+    : Slider{*this}
+    , r_eh(nullptr)
+    , m_vertical{vertical}
 {
 	auto widget = gtk_scale_new_with_range(
 	    vertical ? GTK_ORIENTATION_VERTICAL : GTK_ORIENTATION_HORIZONTAL, 0, 1, 1e-3);
