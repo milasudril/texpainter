@@ -42,10 +42,13 @@ namespace Texpainter
 			AspectRatio
 		};
 
+		SizeInput(SizeInput&&) = delete;
+
 		explicit SizeInput(Ui::Container& container, Size2d default_size, Size2d max_size)
 		    : m_root{container, Ui::Box::Orientation::Vertical}
 		    , m_size{m_root, Ui::Box::Orientation::Horizontal, "Width: "}
-		    , m_asplect_ratio{m_root, Ui::Box::Orientation::Horizontal, "W/H: ", false}
+		    , m_asplect_ratio{m_root, Ui::Box::Orientation::Vertical, "W/H:", false}
+		    , m_comp_size{m_root, Ui::Box::Orientation::Horizontal, "Size: ", "0"}
 		    , m_size_str{std::to_string(default_size.width())}
 		    , m_max_size{max_size}
 		{
@@ -62,7 +65,10 @@ namespace Texpainter
 
 			m_asplect_ratio.inputField()
 			    .ticks(RatioTickMarks)
-			    .value(Ui::logValue(1 / r, MinRatio, MaxRatio));
+			    .value(Ui::logValue(1 / r, MinRatio, MaxRatio))
+				.eventHandler<ControlId::AspectRatio>(*this);
+
+			m_comp_size.inputField().content(toString(value()).c_str());
 		}
 
 		Size2d value() const
@@ -75,8 +81,9 @@ namespace Texpainter
 			return Size2d{width, height};
 		}
 
-		template<ControlId>
-		void onChanged(Ui::TextEntry& entry);
+		template<auto, class T>
+		void onChanged(T&)
+		{ m_comp_size.inputField().content(toString(value()).c_str()); }
 
 		template<ControlId, class... T>
 		void handleException(char const* msg, T&...)
@@ -88,25 +95,13 @@ namespace Texpainter
 		Ui::Box m_root;
 		Ui::LabeledInput<Ui::TextEntry, Ui::Combobox> m_size;
 		Ui::LabeledInput<Ui::Slider> m_asplect_ratio;
+		Ui::LabeledInput<Ui::Label> m_comp_size;
 
 		std::string m_size_str;
 		Size2d m_max_size;
 
 		Ui::ErrorMessageDialog m_err_disp;
 	};
-
-	template<>
-	inline void SizeInput::onChanged<SizeInput::ControlId::Width>(Ui::TextEntry& entry)
-	{
-		auto val = toInt(entry.content());
-		if(!val.has_value())
-		{
-			entry.content(m_size_str.c_str());
-			return;
-		}
-
-		entry.content(toArray(std::clamp(*val, 1u, m_max_size.width())).data());
-	}
 }
 
 #endif

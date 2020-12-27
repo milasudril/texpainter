@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include <limits>
+#include <string>
 
 namespace Texpainter
 {
@@ -58,6 +59,11 @@ namespace Texpainter
 	{
 		auto const a = size.area();
 		return a != 0 && a < std::numeric_limits<size_t>::max() / sizeof(T);
+	}
+
+	inline std::string toString(Size2d size)
+	{
+		return std::to_string(size.width()) + " × " + std::to_string(size.height());
 	}
 }
 
