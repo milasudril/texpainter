@@ -34,12 +34,16 @@ public:
 		std::ranges::for_each(marks, [scale = m_handle](auto item) {
 			gtk_scale_add_mark(scale, item.location.value(), GTK_POS_RIGHT, item.text);
 		});
+
+		if(!m_vertical)
+		{ gtk_widget_set_size_request(GTK_WIDGET(m_handle), 48*marks.size(), 32); }
 	}
 
 private:
 	void* r_eh;
 	EventHandlerFunc r_func;
 	GtkScale* m_handle;
+	bool m_vertical;
 	static gboolean changed_callback(GtkWidget* widget, gpointer data);
 };
 
@@ -71,7 +75,7 @@ Texpainter::Ui::Slider& Texpainter::Ui::Slider::ticks(std::span<TickMark const> 
 	return *this;
 }
 
-Texpainter::Ui::Slider::Impl::Impl(Container& cnt, bool vertical): Slider{*this}, r_eh(nullptr)
+Texpainter::Ui::Slider::Impl::Impl(Container& cnt, bool vertical): Slider{*this}, r_eh(nullptr), m_vertical{vertical}
 {
 	auto widget = gtk_scale_new_with_range(
 	    vertical ? GTK_ORIENTATION_VERTICAL : GTK_ORIENTATION_HORIZONTAL, 0, 1, 1e-3);
