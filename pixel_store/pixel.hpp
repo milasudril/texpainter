@@ -3,7 +3,6 @@
 #ifndef TEXPAINTER_PIXELSTORE_PIXEL_HPP
 #define TEXPAINTER_PIXELSTORE_PIXEL_HPP
 
-#include "utils/empty.hpp"
 #include "utils/vec_t.hpp"
 
 #include <type_traits>

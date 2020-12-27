@@ -76,22 +76,6 @@ namespace Texpainter::PixelStore
 		}
 	};
 
-	template<class PixelType, class OutputStream>
-	void write(BasicImage<PixelType> const& img, OutputStream stream)
-	{
-		write(img.size(), stream);
-		write(std::span{img.pixels().begin(), img.area()}, stream);
-	}
-
-	template<class PixelType, class InputStream>
-	BasicImage<PixelType> read(Empty<BasicImage<PixelType>>, InputStream stream)
-	{
-		auto size = read(Empty<Size2d>{}, stream);
-		BasicImage<PixelType> ret{size};
-		read(std::span{ret.pixels().begin(), ret.area()}, stream);
-		return ret;
-	}
-
 	template<class PixelType>
 	inline auto size(BasicImage<PixelType> const& img)
 	{

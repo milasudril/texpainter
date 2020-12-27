@@ -4,7 +4,6 @@
 #define TEXPAINTER_UTILS_DATABLOCK_HPP
 
 #include "./trivial.hpp"
-#include "./empty.hpp"
 #include "./call_free.hpp"
 #include "./malloc.hpp"
 
@@ -66,23 +65,6 @@ namespace Texpainter
 		uint32_t m_size;
 		pointer_wrapper<T> m_ptr;
 	};
-
-
-	template<class T, class OutputStream>
-	void write(DataBlock<T> const& block, OutputStream stream)
-	{
-		write(block.size(), stream);
-		write(std::span{std::ranges::data(block), std::ranges::size(block)}, stream);
-	}
-
-	template<class T, class InputStream>
-	DataBlock<T> read(Empty<DataBlock<T>>, InputStream stream)
-	{
-		auto const n = read(Empty<uint32_t>(), stream);
-		DataBlock<T> ret{n};
-		read(std::span{std::ranges::data(ret), std::ranges::size(ret)}, stream);
-		return ret;
-	}
 
 	template<class T>
 	void resize(DataBlock<T>& block, uint32_t size_new)

@@ -3,8 +3,6 @@
 #ifndef TEXPAINTER_UTILS_SIZE2D_HPP
 #define TEXPAINTER_UTILS_SIZE2D_HPP
 
-#include "./empty.hpp"
-
 #include <cstdint>
 #include <limits>
 #include <string>
@@ -38,21 +36,6 @@ namespace Texpainter
 	}
 
 	constexpr inline bool operator!=(Size2d a, Size2d b) { return !(a == b); }
-
-	template<class OutputStream>
-	void write(Size2d size, OutputStream stream)
-	{
-		write(size.width(), stream);
-		write(size.height(), stream);
-	}
-
-	template<class InputStream>
-	Size2d read(Empty<Size2d>, InputStream stream)
-	{
-		auto const w = read(Empty<uint32_t>{}, stream);
-		auto const h = read(Empty<uint32_t>{}, stream);
-		return Size2d{w, h};
-	}
 
 	template<class T>
 	bool isSupported(Size2d size)
