@@ -14,9 +14,11 @@ namespace Testcases
 {
 	void texpainterPixelStoreLoadStoreLoad()
 	{
-		auto image_a = Texpainter::PixelStore::load("test_pattern/test_pattern.exr");
+		auto image_a =
+		    load(Enum::Empty<Texpainter::PixelStore::Image>{}, "test_pattern/test_pattern.exr");
 		store(image_a, STR(MAIKE_TARGET_DIRECTORY) "/testimg.exr");
-		auto image_b = Texpainter::PixelStore::load(STR(MAIKE_TARGET_DIRECTORY) "/testimg.exr");
+		auto image_b = load(Enum::Empty<Texpainter::PixelStore::Image>{},
+		                    STR(MAIKE_TARGET_DIRECTORY) "/testimg.exr");
 		assert((std::ranges::equal(image_a.pixels(), image_b.pixels(), [](auto a, auto b) {
 			return a.red() == b.red() && a.green() == b.green() && a.blue() == b.blue()
 			       && a.alpha() == b.alpha();

@@ -8,7 +8,7 @@
 #include <OpenEXR/ImfArray.h>
 #include <OpenEXR/ImfTestFile.h>
 
-Texpainter::PixelStore::Image Texpainter::PixelStore::load(const char* filename)
+Texpainter::PixelStore::Image Texpainter::PixelStore::load(Enum::Empty<Image>, const char* filename)
 {
 	Imf::InputFile src{filename};
 

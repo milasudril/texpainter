@@ -202,7 +202,7 @@ namespace Texpainter::App
 			       "Supported image files"))
 			{
 				insert(Model::createItemNameFromFilename(filename.c_str()),
-				       PixelStore::load(filename.c_str()));
+				       load(Enum::Empty<PixelStore::Image>{}, filename.c_str()));
 			}
 		}
 
@@ -262,9 +262,8 @@ namespace Texpainter::App
 			       [](char const*) { return true; },
 			       "Supported image files"))
 			{
-				insert(
-				    Model::createItemNameFromFilename(filename.c_str()),
-				    PixelStore::load<PixelStore::ColorIndex::element_type{16}>(filename.c_str()));
+				insert(Model::createItemNameFromFilename(filename.c_str()),
+				       PixelStore::load(Enum::Empty<Model::Palette>{}, filename.c_str()));
 			}
 		}
 

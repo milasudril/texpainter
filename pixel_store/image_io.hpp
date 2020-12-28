@@ -8,9 +8,11 @@
 
 #include "./image.hpp"
 
+#include "libenum/empty.hpp"
+
 namespace Texpainter::PixelStore
 {
-	Image load(char const* filename);
+	Image load(Enum::Empty<Image>, char const* filename);
 
 	bool fileValid(char const* filename);
 

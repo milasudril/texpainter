@@ -117,7 +117,7 @@ namespace Texpainter::PixelStore
 	}
 
 	template<ColorIndex::element_type Size>
-	Palette<Size> load(char const* filename)
+	Palette<Size> load(Enum::Empty<Palette<Size>>, char const* filename)
 	{
 		auto const f = std::unique_ptr<FILE, int (*)(FILE*)>{fopen(filename, "rb"), fclose};
 		if(f == nullptr)
