@@ -88,13 +88,15 @@ namespace Texpainter::PixelStore
 
 		if(colorspace == "g22")
 		{
-			std::ranges::transform(colors,
-			                       std::begin(pal),
-			                       [k = ColorIndex::element_type{0}](auto const& value) mutable {
-				                       if(k == Size) { throw std::string{"Palette too large"}; }
-				                       ++k;
-				                       return Pixel{fromString(Enum::Empty<Pixel>{}, value)};
-			                       });
+			std::ranges::transform(
+			    colors,
+			    std::begin(pal),
+			    [k = ColorIndex::element_type{0}](auto const& value) mutable {
+				    if(k == Size) { throw std::string{"Palette too large"}; }
+				    ++k;
+				    return Pixel{
+				        fromString(Enum::Empty<BasicPixel<ColorProfiles::Gamma22>>{}, value)};
+			    });
 		}
 		else if(colorspace == "linear")
 		{
