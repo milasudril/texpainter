@@ -250,6 +250,24 @@ namespace Texpainter::App
 			}
 		}
 
+		template<class Source>
+		void onActivated(Enum::Tag<PaletteAction::Import>, Ui::MenuItem&, Source& src)
+		{
+			std::filesystem::path filename;
+			if(Ui::filenameSelect(
+			       src.window(),
+			       std::filesystem::current_path(),
+			       filename,
+			       Ui::FilenameSelectMode::Open,
+			       [](char const*) { return true; },
+			       "Supported image files"))
+			{
+				insert(
+				    Model::createItemNameFromFilename(filename.c_str()),
+				    PixelStore::load<PixelStore::ColorIndex::element_type{16}>(filename.c_str()));
+			}
+		}
+
 		template<auto>
 		void handleException(char const* msg, ImageCreatorDlg&)
 		{

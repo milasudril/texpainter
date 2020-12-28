@@ -6,6 +6,7 @@
 #include "./pixel.hpp"
 #include "./color_index.hpp"
 
+#define JSON_USE_IMPLICIT_CONVERSIONS 0
 #include <nlohmann/json.hpp>
 
 #include <array>
@@ -71,13 +72,45 @@ namespace Texpainter::PixelStore
 		nlohmann::json obj;
 		to_json(obj, pal);
 		auto const str = obj.dump(1, '\t');
-		auto const f   = fopen(filename, "wb");
+
+		auto const f = fopen(filename, "wb");
 		if(f == nullptr)
 		{ throw std::string{"Failed to open "} + filename + ": " + strerror(errno); }
 		fputs(str.c_str(), f);
 		fclose(f);
 	}
 
+	template<ColorIndex::element_type Size>
+	void from_json(nlohmann::json const& j, Palette<Size>& pal)
+	{
+		auto colorspace = j.at("colorspace").get<std::string>();
+		auto colors     = j.at("colors").get<std::array<std::string, static_cast<size_t>(Size)>>();
+
+		if(colorspace == "g22") { throw std::string{"Unsupported colorspace "} + colorspace; }
+		else if(colorspace == "linear")
+		{
+			std::ranges::transform(colors, std::begin(pal), [](auto const& value) {
+				return fromString(Enum::Empty<Pixel>{}, value);
+			});
+		}
+		else
+		{
+			throw std::string{"Unsupported colorspace "} + colorspace;
+		}
+	}
+
+	template<ColorIndex::element_type Size>
+	Palette<Size> load(char const* filename)
+	{
+		auto const f = std::unique_ptr<FILE, int (*)(FILE*)>{fopen(filename, "rb"), fclose};
+		if(f == nullptr)
+		{ throw std::string{"Failed to open "} + filename + ": " + strerror(errno); }
+
+		auto obj = nlohmann::json::parse(f.get());
+		Palette<Size> ret;
+		from_json(obj, ret);
+		return ret;
+	}
 }
 
 #endif
