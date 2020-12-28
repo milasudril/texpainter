@@ -247,15 +247,7 @@ namespace Texpainter::PixelStore
 
 	inline std::string toString(Pixel val)
 	{
-		auto ret = std::string{};
-		ret += Texpainter::toString(val.red());
-		ret += " ";
-		ret += Texpainter::toString(val.green());
-		ret += " ";
-		ret += Texpainter::toString(val.blue());
-		ret += " ";
-		ret += Texpainter::toString(val.alpha());
-		return ret;
+		return Texpainter::toString(val.value());
 	}
 
 	inline Pixel fromString(Enum::Empty<Pixel>, std::string const& str)

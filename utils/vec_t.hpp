@@ -65,6 +65,19 @@ namespace Texpainter
 		return ret;
 	}
 
+	inline std::string toString(vec4_t v)
+	{
+		auto ret = std::string{};
+		ret += Texpainter::toString(v[0]);
+		ret += " ";
+		ret += Texpainter::toString(v[1]);
+		ret += " ";
+		ret += Texpainter::toString(v[2]);
+		ret += " ";
+		ret += Texpainter::toString(v[3]);
+		return ret;
+	}
+
 	template<int dummy = 0>
 	constexpr auto chooseValIfInRange(vec4_t val,
 	                                  vec4_t if_too_small,
