@@ -192,18 +192,7 @@ namespace Texpainter::App
 		template<class Source>
 		void onActivated(Enum::Tag<ImageAction::Import>, Ui::MenuItem&, Source& src)
 		{
-			std::filesystem::path filename;
-			if(Ui::filenameSelect(
-			       src.window(),
-			       std::filesystem::current_path(),
-			       filename,
-			       Ui::FilenameSelectMode::Open,
-			       [](char const* filename) { return fileValid(Enum::Empty<PixelStore::Image>{}, filename); },
-			       "Supported image files"))
-			{
-				insert(Model::createItemNameFromFilename(filename.c_str()),
-				       load(Enum::Empty<PixelStore::Image>{}, filename.c_str()));
-			}
+			loadAndInsert<PixelStore::Image>("Image files", src.window());
 		}
 
 		template<class Source>
@@ -253,18 +242,7 @@ namespace Texpainter::App
 		template<class Source>
 		void onActivated(Enum::Tag<PaletteAction::Import>, Ui::MenuItem&, Source& src)
 		{
-			std::filesystem::path filename;
-			if(Ui::filenameSelect(
-			       src.window(),
-			       std::filesystem::current_path(),
-			       filename,
-			       Ui::FilenameSelectMode::Open,
-			       [](char const* filename) { return fileValid(Enum::Empty<Model::Palette>{}, filename); ; },
-			       "Palette files"))
-			{
-				insert(Model::createItemNameFromFilename(filename.c_str()),
-				       PixelStore::load(Enum::Empty<Model::Palette>{}, filename.c_str()));
-			}
+			loadAndInsert<Model::Palette>("Palette files", src.window());
 		}
 
 		template<auto>
@@ -387,6 +365,24 @@ namespace Texpainter::App
 		std::unique_ptr<EmptyPaletteCreatorDlg> m_empty_pal_creator;
 		std::unique_ptr<PaletteGenerateDlg> m_gen_palette;
 		std::unique_ptr<DocumentCreatorDlg> m_doc_creator;
+
+
+		template<class T>
+		void loadAndInsert(char const* filter_name, Ui::Container& dlg_owner)
+		{
+			std::filesystem::path filename;
+			if(Ui::filenameSelect(
+			       dlg_owner,
+			       std::filesystem::current_path(),
+			       filename,
+			       Ui::FilenameSelectMode::Open,
+			       [](char const* filename) { return fileValid(Enum::Empty<T>{}, filename); },
+			       filter_name))
+			{
+				insert(Model::createItemNameFromFilename(filename.c_str()),
+				       load(Enum::Empty<T>{}, filename.c_str()));
+			}
+		}
 
 		void insert(Model::ItemName&& name, PixelStore::Image&& img)
 		{
