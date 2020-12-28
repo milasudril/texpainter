@@ -84,14 +84,27 @@ namespace Texpainter::PixelStore
 	void from_json(nlohmann::json const& j, Palette<Size>& pal)
 	{
 		auto colorspace = j.at("colorspace").get<std::string>();
-		auto colors     = j.at("colors").get<std::array<std::string, static_cast<size_t>(Size)>>();
+		auto colors     = j.at("colors").get<nlohmann::json::array_t>();
 
-		if(colorspace == "g22") { throw std::string{"Unsupported colorspace "} + colorspace; }
+		if(colorspace == "g22")
+		{
+			std::ranges::transform(colors,
+			                       std::begin(pal),
+			                       [k = ColorIndex::element_type{0}](auto const& value) mutable {
+				                       if(k == Size) { throw std::string{"Palette too large"}; }
+				                       ++k;
+				                       return Pixel{fromString(Enum::Empty<Pixel>{}, value)};
+			                       });
+		}
 		else if(colorspace == "linear")
 		{
-			std::ranges::transform(colors, std::begin(pal), [](auto const& value) {
-				return fromString(Enum::Empty<Pixel>{}, value);
-			});
+			std::ranges::transform(colors,
+			                       std::begin(pal),
+			                       [k = ColorIndex::element_type{0}](auto const& value) mutable {
+				                       if(k == Size) { throw std::string{"Palette too large"}; }
+				                       ++k;
+				                       return fromString(Enum::Empty<Pixel>{}, value);
+			                       });
 		}
 		else
 		{

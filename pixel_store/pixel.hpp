@@ -245,14 +245,12 @@ namespace Texpainter::PixelStore
 		return std::min(a.red(), std::min(a.green(), a.blue()));
 	}
 
-	inline std::string toString(Pixel val)
-	{
-		return Texpainter::toString(val.value());
-	}
+	inline std::string toString(Pixel val) { return Texpainter::toString(val.value()); }
 
-	inline Pixel fromString(Enum::Empty<Pixel>, std::string const& str)
+	template<class ColorProfile>
+	inline auto fromString(Enum::Empty<BasicPixel<ColorProfile>>, std::string const& str)
 	{
-		return Pixel{Texpainter::fromString(Enum::Empty<vec4_t>{}, str)};
+		return BasicPixel<ColorProfile>{Texpainter::fromString(Enum::Empty<vec4_t>{}, str)};
 	}
 }
 #endif
