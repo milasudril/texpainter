@@ -233,6 +233,23 @@ namespace Texpainter::App
 			m_gen_palette->show();
 		}
 
+		template<class Source>
+		void onActivated(Enum::Tag<PaletteAction::Export>, Ui::MenuItem&, Source& src)
+		{
+			if(auto pal = m_document->palette(m_document->currentPalette()); pal != nullptr)
+			{
+				std::filesystem::path filename;
+				if(Ui::filenameSelect(
+				       src.window(),
+				       std::filesystem::current_path(),
+				       filename,
+				       Ui::FilenameSelectMode::Save,
+				       [](char const*) { return true; },
+				       "Palette files"))
+				{ store(pal->source.get(), filename.c_str()); }
+			}
+		}
+
 		template<auto>
 		void handleException(char const* msg, ImageCreatorDlg&)
 		{

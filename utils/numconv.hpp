@@ -33,7 +33,7 @@ namespace Texpainter
 	inline std::array<char, 16> toArray(float x)
 	{
 		std::array<char, 16> ret{};
-		sprintf(ret.data(), "%.7e", x);
+		sprintf(ret.data(), "%.8e", x);
 		return ret;
 	}
 

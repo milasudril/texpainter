@@ -242,5 +242,18 @@ namespace Texpainter::PixelStore
 	{
 		return std::min(a.red(), std::min(a.green(), a.blue()));
 	}
+
+	inline std::string toString(Pixel val)
+	{
+		auto ret = std::string{};
+		ret += Texpainter::toString(val.red());
+		ret += " ";
+		ret += Texpainter::toString(val.green());
+		ret += " ";
+		ret += Texpainter::toString(val.blue());
+		ret += " ";
+		ret += Texpainter::toString(val.alpha());
+		return ret;
+	}
 }
 #endif

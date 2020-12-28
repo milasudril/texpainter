@@ -4,6 +4,7 @@
 #define TEXPAINTER_UTILS_VECT_HPP
 
 #include "./compiler_flags.hpp"
+#include "./to_string.hpp"
 
 #include <cmath>
 #include <string>
@@ -58,12 +59,9 @@ namespace Texpainter
 
 	inline std::string toString(vec2_t v)
 	{
-		auto ret = std::string{"("};
-		ret += std::to_string(v[0]);
-		ret += ", ";
-		ret += std::to_string(v[1]);
-		ret += ")";
-
+		auto ret = toString(v[0]);
+		ret += " ";
+		ret += toString(v[1]);
 		return ret;
 	}
 

@@ -6,6 +6,8 @@
 #include "./pixel.hpp"
 #include "./color_index.hpp"
 
+#include <nlohmann/json.hpp>
+
 #include <array>
 #include <algorithm>
 
@@ -53,6 +55,29 @@ namespace Texpainter::PixelStore
 	private:
 		std::array<Pixel, Size> m_data;
 	};
+
+	template<ColorIndex::element_type Size>
+	void to_json(nlohmann::json& j, Palette<Size> const& pal)
+	{
+		std::array<std::string, static_cast<size_t>(Size)> colors;
+		std::ranges::transform(
+		    pal, std::begin(colors), [](auto const& val) { return toString(val); });
+		j = nlohmann::json{std::pair{"colorspace", "linear"}, std::pair{"colors", colors}};
+	}
+
+	template<ColorIndex::element_type Size>
+	void store(Palette<Size> const& pal, char const* filename)
+	{
+		nlohmann::json obj;
+		to_json(obj, pal);
+		auto const str = obj.dump(1, '\t');
+		auto const f   = fopen(filename, "wb");
+		if(f == nullptr)
+		{ throw std::string{"Failed to open "} + filename + ": " + strerror(errno); }
+		fputs(str.c_str(), f);
+		fclose(f);
+	}
+
 }
 
 #endif
