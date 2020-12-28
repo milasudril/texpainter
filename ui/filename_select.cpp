@@ -31,10 +31,7 @@ bool Texpainter::Ui::filenameSelect(Container const& cnt,
 	gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(dlg),
 	                                               mode == FilenameSelectMode::Save);
 	if(!filename_in.empty())
-	{
-		auto filename_tot = working_dir / filename_in;
-		gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dlg), filename_tot.c_str());
-	}
+	{ gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dlg), filename_in.c_str()); }
 	else
 	{
 		gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), working_dir.c_str());

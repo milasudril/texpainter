@@ -227,7 +227,7 @@ namespace Texpainter::App
 		{
 			if(auto pal = m_document->palette(m_document->currentPalette()); pal != nullptr)
 			{
-				std::filesystem::path filename;
+				std::filesystem::path filename{m_document->currentPalette().c_str()};
 				if(Ui::filenameSelect(
 				       src.window(),
 				       std::filesystem::current_path(),
