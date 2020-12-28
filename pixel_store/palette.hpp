@@ -128,6 +128,20 @@ namespace Texpainter::PixelStore
 		from_json(obj, ret);
 		return ret;
 	}
+
+	template<ColorIndex::element_type Size>
+	bool fileValid(Enum::Empty<Palette<Size>> e, char const* filename)
+	{
+		try
+		{
+			load(e, filename);
+			return true;
+		}
+		catch(...)
+		{
+			return false;
+		}
+	}
 }
 
 #endif

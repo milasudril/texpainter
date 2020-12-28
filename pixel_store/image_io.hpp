@@ -14,7 +14,7 @@ namespace Texpainter::PixelStore
 {
 	Image load(Enum::Empty<Image>, char const* filename);
 
-	bool fileValid(char const* filename);
+	bool fileValid(Enum::Empty<Image>, char const* filename);
 
 	void store(Span2d<Pixel const> pixels, char const* filename);
 

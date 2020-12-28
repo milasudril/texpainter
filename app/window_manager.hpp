@@ -198,7 +198,7 @@ namespace Texpainter::App
 			       std::filesystem::current_path(),
 			       filename,
 			       Ui::FilenameSelectMode::Open,
-			       [](char const* filename) { return PixelStore::fileValid(filename); },
+			       [](char const* filename) { return fileValid(Enum::Empty<PixelStore::Image>{}, filename); },
 			       "Supported image files"))
 			{
 				insert(Model::createItemNameFromFilename(filename.c_str()),
@@ -259,8 +259,8 @@ namespace Texpainter::App
 			       std::filesystem::current_path(),
 			       filename,
 			       Ui::FilenameSelectMode::Open,
-			       [](char const*) { return true; },
-			       "Supported image files"))
+			       [](char const* filename) { return fileValid(Enum::Empty<Model::Palette>{}, filename); ; },
+			       "Palette files"))
 			{
 				insert(Model::createItemNameFromFilename(filename.c_str()),
 				       PixelStore::load(Enum::Empty<Model::Palette>{}, filename.c_str()));

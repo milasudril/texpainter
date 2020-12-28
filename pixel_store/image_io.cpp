@@ -93,7 +93,7 @@ void Texpainter::PixelStore::store(Span2d<Pixel const> pixels, char const* filen
 	dest.writePixels(pixels.height());
 }
 
-bool Texpainter::PixelStore::fileValid(char const* filename)
+bool Texpainter::PixelStore::fileValid(Enum::Empty<Image>, char const* filename)
 {
 	return Imf::isOpenExrFile(filename);
 }
