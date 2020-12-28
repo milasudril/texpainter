@@ -86,32 +86,34 @@ namespace Texpainter::PixelStore
 		auto colorspace = j.at("colorspace").get<std::string>();
 		auto colors     = j.at("colors").get<nlohmann::json::array_t>();
 
-		if(colorspace == "g22")
-		{
-			std::ranges::transform(
-			    colors,
-			    std::begin(pal),
-			    [k = ColorIndex::element_type{0}](auto const& value) mutable {
-				    if(k == Size) { throw std::string{"Palette too large"}; }
-				    ++k;
-				    return Pixel{
-				        fromString(Enum::Empty<BasicPixel<ColorProfiles::Gamma22>>{}, value)};
-			    });
-		}
-		else if(colorspace == "linear")
-		{
-			std::ranges::transform(colors,
-			                       std::begin(pal),
-			                       [k = ColorIndex::element_type{0}](auto const& value) mutable {
-				                       if(k == Size) { throw std::string{"Palette too large"}; }
-				                       ++k;
-				                       return fromString(Enum::Empty<Pixel>{}, value);
-			                       });
-		}
-		else
-		{
-			throw std::string{"Unsupported colorspace "} + colorspace;
-		}
+		auto get_converter = [](std::string const& colorspace) {
+			if(colorspace == "g22")
+			{
+				return +[](std::string const& value) {
+					return Pixel{
+					    fromString(Enum::Empty<BasicPixel<ColorProfiles::Gamma22>>{}, value)};
+				};
+			}
+			if(colorspace == "linear")
+			{
+				return +[](std::string const& value) {
+					return fromString(Enum::Empty<Pixel>{}, value);
+				};
+			}
+			else
+			{
+				throw std::string{"Unsupported colorspace "} + colorspace;
+			}
+		};
+
+		std::ranges::transform(colors,
+		                       std::begin(pal),
+		                       [k         = ColorIndex::element_type{0},
+		                        converter = get_converter(colorspace)](auto const& value) mutable {
+			                       if(k == Size) { throw std::string{"Palette too large"}; }
+			                       ++k;
+			                       return converter(value);
+		                       });
 	}
 
 	template<ColorIndex::element_type Size>
