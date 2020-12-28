@@ -60,6 +60,22 @@ namespace Texpainter::App
 		};
 	}
 
+	template<class T>
+	void exportItem(char const* filter_name,
+	                Ui::Container& dlg_owner,
+	                std::filesystem::path&& default_name,
+	                T const& item)
+	{
+		if(Ui::filenameSelect(
+		       dlg_owner,
+		       std::filesystem::current_path(),
+		       default_name,
+		       Ui::FilenameSelectMode::Save,
+		       [](char const*) { return true; },
+		       filter_name))
+		{ store(item, default_name.c_str()); }
+	}
+
 	class WindowManager
 	{
 		template<auto id>
@@ -200,15 +216,10 @@ namespace Texpainter::App
 		{
 			if(auto img = m_document->image(m_document->currentImage()); img != nullptr)
 			{
-				std::filesystem::path filename{m_document->currentImage().c_str()};
-				if(Ui::filenameSelect(
-				       src.window(),
-				       std::filesystem::current_path(),
-				       filename,
-				       Ui::FilenameSelectMode::Save,
-				       [](char const*) { return true; },
-				       "Palette files"))
-				{ store(img->source.get(), filename.c_str()); }
+				exportItem("Image files",
+				           src.window(),
+				           std::filesystem::path{m_document->currentPalette().c_str()},
+				           img->source.get());
 			}
 		}
 
@@ -244,15 +255,10 @@ namespace Texpainter::App
 		{
 			if(auto pal = m_document->palette(m_document->currentPalette()); pal != nullptr)
 			{
-				std::filesystem::path filename{m_document->currentPalette().c_str()};
-				if(Ui::filenameSelect(
-				       src.window(),
-				       std::filesystem::current_path(),
-				       filename,
-				       Ui::FilenameSelectMode::Save,
-				       [](char const*) { return true; },
-				       "Palette files"))
-				{ store(pal->source.get(), filename.c_str()); }
+				exportItem("Palette files",
+				           src.window(),
+				           std::filesystem::path{m_document->currentPalette().c_str()},
+				           pal->source.get());
 			}
 		}
 
