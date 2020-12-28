@@ -196,6 +196,23 @@ namespace Texpainter::App
 		}
 
 		template<class Source>
+		void onActivated(Enum::Tag<ImageAction::Export>, Ui::MenuItem&, Source& src)
+		{
+			if(auto img = m_document->image(m_document->currentImage()); img != nullptr)
+			{
+				std::filesystem::path filename{m_document->currentImage().c_str()};
+				if(Ui::filenameSelect(
+				       src.window(),
+				       std::filesystem::current_path(),
+				       filename,
+				       Ui::FilenameSelectMode::Save,
+				       [](char const*) { return true; },
+				       "Palette files"))
+				{ store(img->source.get(), filename.c_str()); }
+			}
+		}
+
+		template<class Source>
 		void onActivated(Enum::Tag<PaletteAction::New>, Ui::MenuItem&, Source& src)
 		{
 			if(m_empty_pal_creator == nullptr) [[likely]]
