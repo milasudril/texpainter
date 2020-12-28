@@ -1,10 +1,15 @@
-//@	{"targets":[{"name":"vec_t.hpp", "type":"include"}]}
+//@	{
+//@	 "targets":[{"name":"vec_t.hpp", "type":"include"}]
+//@	,"dependencies_extra":[{"ref":"vec_t.o","rel":"implementation"}]
+//@	}
 
 #ifndef TEXPAINTER_UTILS_VECT_HPP
 #define TEXPAINTER_UTILS_VECT_HPP
 
 #include "./compiler_flags.hpp"
 #include "./to_string.hpp"
+
+#include "libenum/empty.hpp"
 
 #include <cmath>
 #include <string>
@@ -77,6 +82,8 @@ namespace Texpainter
 		ret += Texpainter::toString(v[3]);
 		return ret;
 	}
+
+	Texpainter::vec4_t fromString(Enum::Empty<vec4_t>, std::string const& str);
 
 	template<int dummy = 0>
 	constexpr auto chooseValIfInRange(vec4_t val,
