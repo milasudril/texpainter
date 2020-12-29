@@ -93,6 +93,7 @@ namespace Texpainter::App
 		}
 
 		using DocumentCreatorDlg     = Ui::Dialog<Ui::LabeledInput<SizeInput>>;
+		using CanvasSizeDlg          = Ui::Dialog<SizeInput>;
 		using ImageCreatorDlg        = Ui::Dialog<ImageCreator>;
 		using EmptyPaletteCreatorDlg = Ui::Dialog<Ui::LabeledInput<Ui::TextEntry>>;
 		using PaletteGenerateDlg     = Ui::Dialog<PaletteCreator>;
@@ -176,18 +177,6 @@ namespace Texpainter::App
 		}
 
 		template<class Source>
-		void onActivated(Enum::Tag<ImageAction::New>, Ui::MenuItem&, Source& src)
-		{
-			if(m_img_creator == nullptr) [[likely]]
-				{
-					m_img_creator = std::make_unique<ImageCreatorDlg>(
-					    src.window(), "Create new image", Size2d{512, 512}, Size2d{65535, 65535});
-					m_img_creator->eventHandler<ImageAction::New>(*this);
-				}
-			m_img_creator->show();
-		}
-
-		template<class Source>
 		void onActivated(Enum::Tag<DocumentAction::New>, Ui::MenuItem&, Source& src)
 		{
 			if(m_doc_creator == nullptr) [[likely]]
@@ -204,6 +193,29 @@ namespace Texpainter::App
 			m_doc_creator->show();
 		}
 
+		template<class Source>
+		void onActivated(Enum::Tag<DocumentAction::SetCanvasSize>, Ui::MenuItem&, Source& src)
+		{
+			if(m_canvas_modifier == nullptr) [[likely]]
+				{
+					m_canvas_modifier = std::make_unique<CanvasSizeDlg>(
+					    src.window(), "Set canvas size", Size2d{512, 512}, Size2d{65535, 65535});
+					m_canvas_modifier->eventHandler<DocumentAction::SetCanvasSize>(*this);
+				}
+			m_canvas_modifier->show();
+		}
+
+		template<class Source>
+		void onActivated(Enum::Tag<ImageAction::New>, Ui::MenuItem&, Source& src)
+		{
+			if(m_img_creator == nullptr) [[likely]]
+				{
+					m_img_creator = std::make_unique<ImageCreatorDlg>(
+					    src.window(), "Create new image", Size2d{512, 512}, Size2d{65535, 65535});
+					m_img_creator->eventHandler<ImageAction::New>(*this);
+				}
+			m_img_creator->show();
+		}
 
 		template<class Source>
 		void onActivated(Enum::Tag<ImageAction::Import>, Ui::MenuItem&, Source& src)
@@ -351,6 +363,23 @@ namespace Texpainter::App
 			m_doc_creator.reset();
 		}
 
+		template<auto>
+		void confirmPositive(CanvasSizeDlg& src)
+		{
+			m_document->canvasSize(src.widget().value());
+			m_canvas_modifier.reset();
+
+			if(auto output = m_windows.get<AppWindowType::DocumentPreviewer>().get();
+			   output != nullptr)
+				[[likely]] { output->widget().refresh(Model::Document::ForceUpdate{true}); }
+		}
+
+		template<auto>
+		void dismiss(CanvasSizeDlg&)
+		{
+			m_canvas_modifier.reset();
+		}
+
 		template<AppWindowType id, class Src>
 		void onUpdated(Src&)
 		{
@@ -384,10 +413,11 @@ namespace Texpainter::App
 
 		size_t m_window_count;
 
+		std::unique_ptr<DocumentCreatorDlg> m_doc_creator;
+		std::unique_ptr<CanvasSizeDlg> m_canvas_modifier;
 		std::unique_ptr<ImageCreatorDlg> m_img_creator;
 		std::unique_ptr<EmptyPaletteCreatorDlg> m_empty_pal_creator;
 		std::unique_ptr<PaletteGenerateDlg> m_gen_palette;
-		std::unique_ptr<DocumentCreatorDlg> m_doc_creator;
 
 
 		template<class T>

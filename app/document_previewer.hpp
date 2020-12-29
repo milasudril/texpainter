@@ -30,14 +30,19 @@ namespace Texpainter::App
 			refresh();
 		}
 
-		DocumentPreviewer& refreshImageView()
+		DocumentPreviewer& refreshImageView(
+		    Model::Document::ForceUpdate force_update = Model::Document::ForceUpdate{true})
 		{
-			auto result = render(m_doc.get());
+			auto result = render(m_doc.get(), force_update);
 			m_img_view.image(result.pixels());
 			return *this;
 		}
 
-		DocumentPreviewer& refresh() { return refreshImageView(); }
+		DocumentPreviewer& refresh(
+		    Model::Document::ForceUpdate force_update = Model::Document::ForceUpdate{true})
+		{
+			return refreshImageView(force_update);
+		}
 
 		void onKeyDown(Ui::KeyboardState const&) {}
 

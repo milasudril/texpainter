@@ -8,9 +8,11 @@
 
 namespace
 {
-	void forceUpdateIfDirty(auto const& item, Texpainter::Model::Document const& doc)
+	void forceUpdateIfDirty(auto const& item,
+	                        Texpainter::Model::Document const& doc,
+	                        Texpainter::Model::Document::ForceUpdate force_update)
 	{
-		if(item.second.source.dirty())
+		if(item.second.source.dirty() || force_update)
 		{
 			auto node_item = doc.inputNodeItem(item.first);
 			assert(node_item != nullptr);
@@ -19,16 +21,17 @@ namespace
 	}
 }
 
-Texpainter::PixelStore::Image Texpainter::Model::render(Document const& document)
+Texpainter::PixelStore::Image Texpainter::Model::render(Document const& document,
+                                                        Document::ForceUpdate force_update)
 {
-	std::ranges::for_each(document.images(), [&document](auto const& item) {
+	std::ranges::for_each(document.images(), [&document, force_update](auto const& item) {
 		item.second.processor.get().processor().source(item.second.source.get().pixels());
-		forceUpdateIfDirty(item, document);
+		forceUpdateIfDirty(item, document, force_update);
 	});
 
-	std::ranges::for_each(document.palettes(), [&document](auto const& item) {
+	std::ranges::for_each(document.palettes(), [&document, force_update](auto const& item) {
 		item.second.processor.get().processor().source(item.second.source.get());
-		forceUpdateIfDirty(item, document);
+		forceUpdateIfDirty(item, document, force_update);
 	});
 
 	PixelStore::Image ret{document.canvasSize()};
@@ -41,11 +44,20 @@ Texpainter::PixelStore::Image Texpainter::Model::render(Document const& document
 		std::ranges::fill(ret.pixels(), PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
 	}
 
-	std::ranges::for_each(document.images(),
-	                      [&document](auto const& item) { item.second.source.clearStatus(); });
+	if(!force_update) [[likely]]
+		{
+			// In case force_update is true, it could be possible that we are rendering with a larger
+			// canvas because we are doing a detailed render. In that case do not clear the status flag.
+			// Maybe we should compare the output canvas size with the document canvas size.
 
-	std::ranges::for_each(document.palettes(),
-	                      [&document](auto const& item) { item.second.source.clearStatus(); });
+			std::ranges::for_each(document.images(), [&document](auto const& item) {
+				item.second.source.clearStatus();
+			});
+
+			std::ranges::for_each(document.palettes(), [&document](auto const& item) {
+				item.second.source.clearStatus();
+			});
+		}
 	return ret;
 }
 

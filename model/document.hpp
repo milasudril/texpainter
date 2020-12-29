@@ -50,6 +50,16 @@ namespace Texpainter::Model
 
 
 	public:
+		class ForceUpdate
+		{
+		public:
+			constexpr explicit ForceUpdate(bool status): m_status{status} {}
+			constexpr operator bool() const { return m_status; }
+
+		private:
+			bool m_status;
+		};
+
 		using CompositorInputManager<PixelStore::Image>::get;
 		using CompositorInputManager<PixelStore::Image>::modify;
 		using CompositorInputManager<Palette>::get;
@@ -221,7 +231,8 @@ namespace Texpainter::Model
 		PixelStore::Palette<8> m_color_history;
 	};
 
-	PixelStore::Image render(Document const& document);
+	PixelStore::Image render(Document const& document,
+	                         Document::ForceUpdate foce_update = Document::ForceUpdate{false});
 
 	void paint(Document& doc, vec2_t location);
 }
