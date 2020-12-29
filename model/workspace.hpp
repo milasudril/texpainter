@@ -1,9 +1,15 @@
 //@	{
-//@	 "targets":[{"name":"node.hpp", "type":"include"}]
+//@	 "targets":[{"name":"workspace.hpp", "type":"include"}]
+//@	,"dependencies_extra":[{"ref":"workspace.o","rel":"implementation"}]
 //@	}
 
 #ifndef TEXPAINTER_MODEL_WORKSPACE_HPP
 #define TEXPAINTER_MODEL_WORKSPACE_HPP
+
+#include "./brush.hpp"
+#include "./item_name.hpp"
+
+#include "filtergraph/graph.hpp"
 
 namespace Texpainter::Model
 {
