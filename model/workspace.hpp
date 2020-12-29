@@ -12,12 +12,17 @@
 #include "filtergraph/graph.hpp"
 
 #include <nlohmann/json.hpp>
+#include <filesystem>
 
 namespace Texpainter::Model
 {
 	struct Workspace
 	{
-		Workspace():m_current_brush{BrushInfo{0.5f, BrushShape::Circle}}{}
+		Workspace()
+		    : m_current_brush{BrushInfo{0.5f, BrushShape::Circle}}
+		    , m_working_directory{std::filesystem::current_path()}
+		{
+		}
 
 		std::map<FilterGraph::NodeId, vec2_t> m_node_locations;
 		BrushInfo m_current_brush;
@@ -25,6 +30,7 @@ namespace Texpainter::Model
 		PixelStore::ColorIndex m_current_color;
 		ItemName m_current_palette;
 		PixelStore::Palette<8> m_color_history;
+		std::filesystem::path m_working_directory;
 	};
 
 	void to_json(nlohmann::json& obj, Workspace const& workspace);

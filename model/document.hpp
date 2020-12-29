@@ -66,10 +66,7 @@ namespace Texpainter::Model
 		using CompositorInputManager<Palette>::get;
 		using CompositorInputManager<Palette>::modify;
 
-		explicit Document(Size2d canvas_size)
-		    : Size2d{canvas_size}
-		{
-		}
+		explicit Document(Size2d canvas_size): Size2d{canvas_size} {}
 
 		Size2d canvasSize() const { return static_cast<Size2d>(*this); }
 
