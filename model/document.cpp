@@ -40,6 +40,12 @@ Texpainter::PixelStore::Image Texpainter::Model::render(Document const& document
 	{
 		std::ranges::fill(ret.pixels(), PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
 	}
+
+	std::ranges::for_each(document.images(),
+	                      [&document](auto const& item) { item.second.source.clearStatus(); });
+
+	std::ranges::for_each(document.palettes(),
+	                      [&document](auto const& item) { item.second.source.clearStatus(); });
 	return ret;
 }
 

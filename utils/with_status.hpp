@@ -29,11 +29,11 @@ namespace Texpainter
 
 		bool dirty() const { return m_dirty; }
 
-		void clearStatus() { m_dirty = false; }
+		void clearStatus() const { m_dirty = false; }
 
 	private:
 		T m_content;
-		bool m_dirty;
+		mutable bool m_dirty;
 	};
 }
 
