@@ -10,6 +10,8 @@
 
 #include <cmath>
 
+#define direct
+
 namespace Texpainter::PixelStore
 {
 	struct Hsi
@@ -22,22 +24,38 @@ namespace Texpainter::PixelStore
 
 	namespace detail
 	{
-		constexpr std::array<std::pair<float, float>, 9> hue_points{
+		constexpr std::array<std::pair<float, float>, 11> hue_points{
 		    {{0.0f, 0.0f},
-		     {0.125f, 3.6586624e-02f},
-		     {0.25f, 1.2826073e-01f},  // Yellow
-		     {0.375f, 2.4137302e-01f},
-		     {0.5f, 3.3333334e-01f},  // Green
-		     {0.625f, 0.416f},
-		     {0.75f, 0.625f},  // Blue
-		     {0.875f, 0.8125f},
+		     {1.25e-01f, 3.6586624e-02f},
+		     {2.5e-01f, 1.2826073e-01f},  // Yellow
+		     {3.75e-01f, 2.4137302e-01f},
+		     {5.0e-01f, 3.3333334e-01f},          // Green
+		     {5.83333333e-01f, 5.0e-01f},         //Turqoise
+		     {6.66666667e-01f, 6.0e-01f},         //Skyblue
+		     {0.75f, 6.5e-01f},                   // Blue
+		     {8.33333333e-01f, 7.125e-01f},       // Violett
+		     {9.16666746e-01f, 8.90000026e-01f},  //Pink
 		     {1.0f, 1.0f}}};
 
 		constexpr BidirectionalInterpolationTable hue_table{hue_points};
 
-		constexpr auto wrapHue(float value) { return std::fmod(hue_table.input(value), 1.0f); }
+		constexpr auto wrapHue(float value)
+		{
+#ifdef direct
+			return value;
+#else
+			return std::fmod(hue_table.input(value), 1.0f);
+#endif
+		}
 
-		constexpr auto unwrapHue(float value) { return std::fmod(hue_table.output(value), 1.0f); }
+		constexpr auto unwrapHue(float value)
+		{
+#ifdef direct
+			return value;
+#else
+			return std::fmod(hue_table.output(value), 1.0f);
+#endif
+		}
 	}
 
 
