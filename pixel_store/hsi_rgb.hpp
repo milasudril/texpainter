@@ -6,6 +6,7 @@
 #define TEXPAINTER_PIXELSTORE_HSIRGB_HPP
 
 #include "./pixel.hpp"
+#include "utils/bidirectional_interpolation_table.hpp"
 
 #include <cmath>
 
@@ -21,37 +22,22 @@ namespace Texpainter::PixelStore
 
 	namespace detail
 	{
-		constexpr std::array<float, 9> WrappedHues{0.0f,  //Red
-		                                           3.6586624e-02f,
-		                                           1.2826073e-01f,  // Yellow
-		                                           2.4137302e-01f,
-		                                           3.3333334e-01f,  // Green
-		                                           0.416f,
-		                                           0.625f,  // Blue
-		                                           0.8125f,
-		                                           1.0f};
+		constexpr std::array<std::pair<float, float>, 9> hue_points{
+		    {{0.0f, 0.0f},
+		     {0.125f, 3.6586624e-02f},
+		     {0.25f, 1.2826073e-01f},  // Yellow
+		     {0.375f, 2.4137302e-01f},
+		     {0.5f, 3.3333334e-01f},  // Green
+		     {0.625f, 0.416f},
+		     {0.75f, 0.625f},  // Blue
+		     {0.875f, 0.8125f},
+		     {1.0f, 1.0f}}};
 
-		constexpr auto wrapHue(float value)
-		{
-			value  = std::fmod(value, 1.0f);
-			auto i = std::ranges::lower_bound(WrappedHues, value);
-			if(i == std::end(WrappedHues) || i == std::begin(WrappedHues)) { return 0.0f; }
-			auto i_prev    = i - 1;
-			auto const min = *i_prev;
-			auto const max = *i;
-			auto const t   = (value - min) / (max - min);
-			return std::lerp(i_prev - std::begin(WrappedHues), i - std::begin(WrappedHues), t)
-			       / (WrappedHues.size() - 1);
-		}
+		constexpr BidirectionalInterpolationTable hue_table{hue_points};
 
-		constexpr auto unwrapHue(float value)
-		{
-			value = std::fmod(value, 1.0f);
-			value *= WrappedHues.size() - 1;
-			auto const min = static_cast<int>(value);
-			auto const max = min + 1;
-			return std::lerp(WrappedHues[min], WrappedHues[max], value - min);
-		}
+		constexpr auto wrapHue(float value) { return std::fmod(hue_table.input(value), 1.0f); }
+
+		constexpr auto unwrapHue(float value) { return std::fmod(hue_table.output(value), 1.0f); }
 	}
 
 
@@ -69,6 +55,7 @@ namespace Texpainter::PixelStore
 			if(h < 4.0f) { return Pixel{0.0f, x, c, 0.0f}; }
 			if(h < 5.0f) { return Pixel{x, 0.0f, c, 0.0f}; }
 			if(h < 6.0f) { return Pixel{c, 0.0f, x, 0.0f}; }
+
 			return Pixel{0.0f, 0.0f, 0.0f, 0.0f};
 		}(hsi);
 
