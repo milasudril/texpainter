@@ -63,12 +63,13 @@ namespace Texpainter::App
 	template<class T>
 	void exportItem(char const* filter_name,
 	                Ui::Container& dlg_owner,
+	                std::filesystem::path const& current_dir,
 	                std::filesystem::path&& default_name,
 	                T const& item)
 	{
 		if(Ui::filenameSelect(
 		       dlg_owner,
-		       std::filesystem::current_path(),
+		       current_dir,
 		       default_name,
 		       Ui::FilenameSelectMode::Save,
 		       [](char const*) { return true; },
@@ -230,6 +231,7 @@ namespace Texpainter::App
 			{
 				exportItem("Image files",
 				           src.window(),
+				           m_document->workingDirectory(),
 				           std::filesystem::path{m_document->currentPalette().c_str()},
 				           img->source.get());
 			}
@@ -269,6 +271,7 @@ namespace Texpainter::App
 			{
 				exportItem("Palette files",
 				           src.window(),
+				           m_document->workingDirectory(),
 				           std::filesystem::path{m_document->currentPalette().c_str()},
 				           pal->source.get());
 			}
@@ -426,7 +429,7 @@ namespace Texpainter::App
 			std::filesystem::path filename;
 			if(Ui::filenameSelect(
 			       dlg_owner,
-			       std::filesystem::current_path(),
+			       m_document->workingDirectory(),
 			       filename,
 			       Ui::FilenameSelectMode::Open,
 			       [](char const* filename) { return fileValid(Enum::Empty<T>{}, filename); },

@@ -217,6 +217,11 @@ namespace Texpainter::Model
 			return *this;
 		}
 
+		std::filesystem::path const& workingDirectory() const
+		{
+			return m_workspace.m_working_directory;
+		}
+
 	private:
 		std::map<ItemName, Compositor::NodeItem> m_input_nodes;
 
