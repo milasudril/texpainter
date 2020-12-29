@@ -10,7 +10,7 @@
 
 #include <cmath>
 
-#define direct
+// #define direct
 
 namespace Texpainter::PixelStore
 {
@@ -30,11 +30,11 @@ namespace Texpainter::PixelStore
 		     {2.5e-01f, 1.2826073e-01f},  // Yellow
 		     {3.75e-01f, 2.4137302e-01f},
 		     {5.0e-01f, 3.3333334e-01f},          // Green
-		     {5.83333333e-01f, 5.0e-01f},         //Turqoise
-		     {6.66666667e-01f, 6.0e-01f},         //Skyblue
+		     {5.83333333e-01f, 5.0e-01f},         // Turqoise
+		     {6.66666667e-01f, 6.0e-01f},         // Skyblue
 		     {0.75f, 6.5e-01f},                   // Blue
 		     {8.33333333e-01f, 7.125e-01f},       // Violett
-		     {9.16666746e-01f, 8.90000026e-01f},  //Pink
+		     {9.16666746e-01f, 8.90000026e-01f},  // Pink
 		     {1.0f, 1.0f}}};
 
 		constexpr BidirectionalInterpolationTable hue_table{hue_points};
