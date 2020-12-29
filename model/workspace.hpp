@@ -11,6 +11,8 @@
 
 #include "filtergraph/graph.hpp"
 
+#include <nlohmann/json.hpp>
+
 namespace Texpainter::Model
 {
 	struct Workspace
@@ -24,6 +26,8 @@ namespace Texpainter::Model
 		ItemName m_current_palette;
 		PixelStore::Palette<8> m_color_history;
 	};
+
+	void to_json(nlohmann::json& obj, Workspace const& workspace);
 }
 
 #endif
