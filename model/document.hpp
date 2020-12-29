@@ -14,6 +14,7 @@
 #include "./compositor_proxy.hpp"
 #include "./brush.hpp"
 #include "./paint.hpp"
+#include "./workspace.hpp"
 
 #include "pixel_store/image.hpp"
 #include "utils/with_status.hpp"
@@ -222,17 +223,7 @@ namespace Texpainter::Model
 	private:
 		std::map<ItemName, Compositor::NodeItem> m_input_nodes;
 
-		struct Workspace
-		{
-			Workspace():m_current_brush{BrushInfo{0.5f, BrushShape::Circle}}{}
-
-			std::map<FilterGraph::NodeId, vec2_t> m_node_locations;
-			BrushInfo m_current_brush;
-			ItemName m_current_image;
-			PixelStore::ColorIndex m_current_color;
-			ItemName m_current_palette;
-			PixelStore::Palette<8> m_color_history;
-		} m_workspace;
+		Workspace m_workspace;
 	};
 
 	PixelStore::Image render(Document const& document,
