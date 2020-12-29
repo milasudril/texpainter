@@ -67,7 +67,6 @@ namespace Texpainter::Model
 
 		explicit Document(Size2d canvas_size)
 		    : Size2d{canvas_size}
-		    , m_current_brush{BrushInfo{0.5f, BrushShape::Circle}}
 		{
 		}
 
@@ -169,66 +168,71 @@ namespace Texpainter::Model
 			__builtin_unreachable();
 		}
 
-		auto const& nodeLocations() const { return m_node_locations; }
+		auto const& nodeLocations() const { return m_workspace.m_node_locations; }
 
 		Document& nodeLocations(std::map<FilterGraph::NodeId, vec2_t>&& locs)
 		{
-			m_node_locations = std::move(locs);
+			m_workspace.m_node_locations = std::move(locs);
 			return *this;
 		}
 
-		BrushInfo currentBrush() const { return m_current_brush; }
+		BrushInfo currentBrush() const { return m_workspace.m_current_brush; }
 
 		Document& currentBrush(BrushInfo brush)
 		{
-			m_current_brush = brush;
+			m_workspace.m_current_brush = brush;
 			return *this;
 		}
 
-		ItemName const& currentImage() const { return m_current_image; }
+		ItemName const& currentImage() const { return m_workspace.m_current_image; }
 
 		Document& currentImage(ItemName&& name)
 		{
-			m_current_image = std::move(name);
+			m_workspace.m_current_image = std::move(name);
 			return *this;
 		}
 
-		PixelStore::ColorIndex currentColor() const { return m_current_color; }
+		PixelStore::ColorIndex currentColor() const { return m_workspace.m_current_color; }
 
 		Document& currentColor(PixelStore::ColorIndex i)
 		{
-			m_current_color = i;
+			m_workspace.m_current_color = i;
 			return *this;
 		}
 
-		ItemName const& currentPalette() const { return m_current_palette; }
+		ItemName const& currentPalette() const { return m_workspace.m_current_palette; }
 
 		Document& currentPalette(ItemName&& name)
 		{
-			m_current_palette = std::move(name);
+			m_workspace.m_current_palette = std::move(name);
 			return *this;
 		}
 
-		PixelStore::Palette<8> const& colorHistory() const { return m_color_history; }
+		PixelStore::Palette<8> const& colorHistory() const { return m_workspace.m_color_history; }
 
 		Document& saveColor(PixelStore::Pixel color)
 		{
-			std::rotate(std::rbegin(m_color_history),
-			            std::rbegin(m_color_history) + 1,
-			            std::rend(m_color_history));
-			m_color_history[PixelStore::ColorIndex{0}] = color;
+			std::rotate(std::rbegin(m_workspace.m_color_history),
+			            std::rbegin(m_workspace.m_color_history) + 1,
+			            std::rend(m_workspace.m_color_history));
+			m_workspace.m_color_history[PixelStore::ColorIndex{0}] = color;
 			return *this;
 		}
 
 	private:
 		std::map<ItemName, Compositor::NodeItem> m_input_nodes;
 
-		std::map<FilterGraph::NodeId, vec2_t> m_node_locations;
-		BrushInfo m_current_brush;
-		ItemName m_current_image;
-		PixelStore::ColorIndex m_current_color;
-		ItemName m_current_palette;
-		PixelStore::Palette<8> m_color_history;
+		struct Workspace
+		{
+			Workspace():m_current_brush{BrushInfo{0.5f, BrushShape::Circle}}{}
+
+			std::map<FilterGraph::NodeId, vec2_t> m_node_locations;
+			BrushInfo m_current_brush;
+			ItemName m_current_image;
+			PixelStore::ColorIndex m_current_color;
+			ItemName m_current_palette;
+			PixelStore::Palette<8> m_color_history;
+		} m_workspace;
 	};
 
 	PixelStore::Image render(Document const& document,
