@@ -5,6 +5,8 @@
 #ifndef TEXPAINTER_FILTERGRAPH_NODEID_HPP
 #define TEXPAINTER_FILTERGRAPH_NODEID_HPP
 
+#include <nlohmann/json.hpp>
+
 #include <compare>
 
 namespace Texpainter::FilterGraph
@@ -38,6 +40,11 @@ namespace Texpainter::FilterGraph
 	private:
 		uint64_t m_value;
 	};
+
+	inline void to_json(nlohmann::json& obj, NodeId id)
+	{
+		obj = nlohmann::json{id.value()};
+	}
 }
 
 #endif

@@ -11,6 +11,8 @@
 
 #include "libenum/empty.hpp"
 
+#include <nlohmann/json.hpp>
+
 #include <cmath>
 #include <string>
 
@@ -103,6 +105,24 @@ namespace Texpainter
 		           ? if_too_small
 		           : (val > vec4_t{1.0f, 1.0f, 1.0f, 1.0f}) ? if_too_large : val;
 	}
+
+}
+
+namespace nlohmann
+{
+	template <>
+	struct adl_serializer<Texpainter::vec2_t>
+	{
+		static void to_json(json& j, Texpainter::vec2_t value)
+		{
+			j = nlohmann::json{Texpainter::toString(value)};
+		}
+
+		static void from_json(const json&, Texpainter::vec2_t)
+		{
+			// TODO: same thing, but with the "from_json" method
+		}
+	};
 }
 
 #endif

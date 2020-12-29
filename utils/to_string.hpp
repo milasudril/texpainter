@@ -21,6 +21,8 @@ namespace Texpainter
 
 	inline std::string toString(float x) { return toArray(x).data(); }
 
+	inline std::string toString(double x) { return toArray(x).data(); }
+
 	std::string toString(double);
 }
 

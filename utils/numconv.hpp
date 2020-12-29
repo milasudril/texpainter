@@ -37,6 +37,13 @@ namespace Texpainter
 		return ret;
 	}
 
+	inline std::array<char, 32> toArray(double x)
+	{
+		std::array<char, 32> ret{};
+		sprintf(ret.data(), "%.16e", x);
+		return ret;
+	}
+
 	inline std::optional<float> toFloat(char const* str)
 	{
 		char* end;
