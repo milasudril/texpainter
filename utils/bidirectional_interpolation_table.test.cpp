@@ -40,10 +40,28 @@ namespace Testcases
 		assert(tab.output(tab.input(3.0)) == 3.0);
 		assert(tab.output(tab.input(4.0)) == 4.0);
 	}
+
+	void bidirectionalInterpolationTableGetValues2()
+	{
+		constexpr std::array<std::pair<float, float>, 9> vals{{{0.0f, 0.0f},
+		                                                       {0.125f, 3.6586624e-02f},
+		                                                       {0.25f, 1.2826073e-01f},
+		                                                       {0.375f, 2.4137302e-01f},
+		                                                       {0.5f, 3.3333334e-01f},
+		                                                       {0.625f, 0.416f},
+		                                                       {0.75f, 0.625f},
+		                                                       {0.875f, 0.8125f},
+		                                                       {1.0f, 1.0f}}};
+
+		constexpr Texpainter::BidirectionalInterpolationTable tab{vals};
+
+		assert(tab.input(3.3333334e-01f) == 0.5f);
+	}
 }
 
 int main()
 {
 	Testcases::bidirectionalInterpolationTableGetValues();
+	Testcases::bidirectionalInterpolationTableGetValues2();
 	return 0;
 }

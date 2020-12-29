@@ -6,7 +6,6 @@
 #include "./interpolation_table.hpp"
 
 #include <algorithm>
-#include <cmath>
 
 namespace Texpainter
 {

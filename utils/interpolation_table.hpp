@@ -14,8 +14,7 @@ namespace Texpainter
 	public:
 		constexpr explicit InterpolationTable(std::array<std::pair<InputType, OutputType>, N> vals)
 		{
-			std::ranges::sort(vals,
-			                  [](auto const& a, auto const& b) { return a.first < b.second; });
+			std::ranges::sort(vals, [](auto const& a, auto const& b) { return a.first < b.first; });
 			std::ranges::transform(
 			    vals, std::begin(m_x), [](auto const& val) { return val.first; });
 			std::ranges::transform(
@@ -30,6 +29,12 @@ namespace Texpainter
 				}
 
 			auto const i_max = std::ranges::lower_bound(m_x, x);
+
+			if(i_max == std::begin(m_x)) [[unlikely]]
+				{
+					return m_y[0];
+				}
+
 			if(i_max > std::end(m_x) - 1) [[unlikely]]
 				{
 					return m_y[N - 1];
