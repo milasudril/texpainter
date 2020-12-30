@@ -32,7 +32,7 @@ namespace Texpainter::Model
 
 		void operator()(FilterGraph::ImgProcArg<InterfaceDescriptor> const& args) const
 		{
-			auto ret       = Texpainter::Span2d{args.template output<0>(), args.size()};
+			auto ret = Texpainter::Span2d{args.template output<0>(), args.size()};
 
 			auto const src = r_pixels;
 			auto const origin_src =

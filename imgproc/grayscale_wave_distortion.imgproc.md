@@ -60,8 +60,7 @@ inline auto wavelength(size_t canvas_size, ParamValue val)
 void main(auto const& args, auto const& params)
 {
 	auto const waveform = waveformIndex(param<Str{"Waveform"}>(params));
-	auto const f =
-	    1.0 / wavelength(std::sqrt(area(args.size())), param<Str{"Wavelength"}>(params));
+	auto const f = 1.0 / wavelength(std::sqrt(area(args.size())), param<Str{"Wavelength"}>(params));
 	auto const phase     = param<Str{"Phase"}>(params).value();
 	auto const dc_offset = param<Str{"Add DC offset"}>(params).value();
 

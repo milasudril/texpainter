@@ -81,7 +81,10 @@ namespace Texpainter::PixelStore
 	}
 
 	template<class PixelType>
-	inline auto area(BasicImage<PixelType> const& img) { return area(img.size()); }
+	inline auto area(BasicImage<PixelType> const& img)
+	{
+		return area(img.size());
+	}
 
 	using Image = BasicImage<Pixel>;
 }

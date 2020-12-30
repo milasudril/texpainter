@@ -61,7 +61,10 @@ namespace Texpainter
 	};
 
 	template<class T>
-	constexpr inline auto area(Span2d<T> s) { return area(s.size()); }
+	constexpr inline auto area(Span2d<T> s)
+	{
+		return area(s.size());
+	}
 
 	template<class T, class Func>
 	void for_each(Span2d<T> span, Func&& f)
