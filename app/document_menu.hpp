@@ -12,19 +12,20 @@ namespace Texpainter
 	enum class DocumentAction : int
 	{
 		New,
+		SetCanvasSize,
 		Open,
 		Save,
 		SaveAs,
 		SaveCopy,
-		Export,
-		SetCanvasSize
+		RenderToImage,
+		Export
 	};
 
 	constexpr auto begin(Enum::Empty<DocumentAction>) { return DocumentAction::New; }
 
 	constexpr auto end(Enum::Empty<DocumentAction>)
 	{
-		return static_cast<DocumentAction>(static_cast<int>(DocumentAction::SetCanvasSize) + 1);
+		return static_cast<DocumentAction>(static_cast<int>(DocumentAction::Export) + 1);
 	}
 
 	template<DocumentAction>
@@ -78,6 +79,13 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Set canvas size"; }
+	};
+
+	template<>
+	struct DocumentActionTraits<DocumentAction::RenderToImage>
+	{
+		using type = Ui::MenuItem;
+		static constexpr char const* displayName() { return "Render to image"; }
 	};
 }
 
