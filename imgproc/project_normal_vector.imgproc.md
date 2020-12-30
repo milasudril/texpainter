@@ -39,7 +39,7 @@ void main(auto const& arg, auto const& params)
 	            0.0f};
 
 	std::transform(input<0>(arg),
-	               input<0>(arg) + arg.size().area(),
+	               input<0>(arg) + area(arg.size()),
 	               output<0>(arg),
 	               [proj](auto val) { return Texpainter::dot(val.value(), proj); });
 }

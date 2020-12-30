@@ -29,7 +29,7 @@ __Source code:__
 ```c++
 void main(auto const& args, auto const& params)
 {
-	auto const size  = args.size().area();
+	auto const size  = area(args.size());
 	auto const range = std::minmax_element(input<0>(args), input<0>(args) + size);
 	std::transform(
 	    input<0>(args),

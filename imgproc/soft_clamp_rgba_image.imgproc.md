@@ -39,7 +39,7 @@ void main(auto const& args, auto const& params)
 	auto const softness = static_cast<float>(param<Str{"Softness"}>(params).value());
 
 	std::transform(input<0>(args),
-	               input<0>(args) + args.size().area(),
+	               input<0>(args) + area(args.size()),
 	               output<0>(args),
 	               [min = RgbaValue{x_min, x_min, x_min, 0.0},
 	                max = RgbaValue{x_max, x_max, x_max, 1.0},

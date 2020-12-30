@@ -28,7 +28,7 @@ __Source code:__
 ```c++
 void main(auto const& args)
 {
-	auto const size = args.size().area();
+	auto const size = area(args.size());
 	std::transform(
 	    input<0>(args), input<0>(args) + size, input<1>(args), output<0>(args), std::multiplies{});
 }

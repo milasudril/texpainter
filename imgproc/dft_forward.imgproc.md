@@ -44,7 +44,7 @@ void main(auto const& args)
 	auto const out = output<0>(args);
 	auto& engine   = Dft::engineInstance();
 	engine.run<Dft::Direction::Forward>(size, input_buffer.pixels().data(), out);
-	auto const A = size.area();
+	auto const A = area(size);
 	std::for_each(out, out + A, [A](auto& val) { return val /= A; });
 }
 ```

@@ -28,7 +28,7 @@ namespace Texpainter::FilterGraph
 		void operator()(ImgProcArg<InterfaceDescriptor> const& args) const
 		{
 			assert(r_pixels.data() != nullptr);
-			std::copy_n(args.input<0>(), args.size().area(), r_pixels.data());
+			std::copy_n(args.input<0>(), area(args.size()), r_pixels.data());
 		}
 
 		ParamValue get(ParamName) const { return ParamValue{0.0}; }

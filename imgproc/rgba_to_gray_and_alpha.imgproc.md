@@ -51,7 +51,7 @@ void main(auto const& args, auto const& params)
 {
 	std::transform(
 	    input<0>(args),
-	    input<0>(args) + args.size().area(),
+	    input<0>(args) + area(args.size()),
 	    output<0>(args),
 	    [weights = computeWeights(params.values())](auto val) {
 		    auto weighted_val = val.value() * weights;
@@ -60,7 +60,7 @@ void main(auto const& args, auto const& params)
 	    });
 
 	std::transform(input<0>(args),
-	               input<0>(args) + args.size().area(),
+	               input<0>(args) + area(args.size()),
 	               output<1>(args),
 	               [](auto val) { return val.alpha(); });
 }

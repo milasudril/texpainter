@@ -27,7 +27,7 @@ void main(auto const& arg, auto const& params)
 {
 	auto size = arg.size();
 	auto height =
-	    sqrt(size.area()) * exp2(std::lerp(-4.0, 4.0, param<Str{"Max elevation"}>(params).value()));
+	    sqrt(area(size)) * exp2(std::lerp(-4.0, 4.0, param<Str{"Max elevation"}>(params).value()));
 	for(uint32_t row = 0; row < size.height(); ++row)
 	{
 		for(uint32_t col = 0; col < size.width(); ++col)

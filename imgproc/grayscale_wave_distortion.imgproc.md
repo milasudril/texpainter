@@ -61,12 +61,12 @@ void main(auto const& args, auto const& params)
 {
 	auto const waveform = waveformIndex(param<Str{"Waveform"}>(params));
 	auto const f =
-	    1.0 / wavelength(std::sqrt(args.size().area()), param<Str{"Wavelength"}>(params));
+	    1.0 / wavelength(std::sqrt(area(args.size())), param<Str{"Wavelength"}>(params));
 	auto const phase     = param<Str{"Phase"}>(params).value();
 	auto const dc_offset = param<Str{"Add DC offset"}>(params).value();
 
 	std::transform(input<0>(args),
-	               input<0>(args) + args.size().area(),
+	               input<0>(args) + area(args.size()),
 	               output<0>(args),
 	               [func = functions[waveform], f, phase, dc_offset](auto val) {
 		               auto z = func(f * (val - phase));

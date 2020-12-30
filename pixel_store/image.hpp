@@ -26,7 +26,7 @@ namespace Texpainter::PixelStore
 
 		explicit BasicImage(Size2d size)
 		    : m_size{size}
-		    , m_data{std::make_unique<PixelType[]>(size.area())}
+		    , m_data{std::make_unique<PixelType[]>(area(size))}
 		{
 		}
 
@@ -41,8 +41,6 @@ namespace Texpainter::PixelStore
 		auto width() const { return m_size.width(); }
 
 		auto height() const { return m_size.height(); }
-
-		auto area() const { return m_size.area(); }
 
 		Size2d size() const { return Size2d{width(), height()}; }
 
@@ -81,6 +79,9 @@ namespace Texpainter::PixelStore
 	{
 		return img.size();
 	}
+
+	template<class PixelType>
+	inline auto area(BasicImage<PixelType> const& img) { return area(img.size()); }
 
 	using Image = BasicImage<Pixel>;
 }

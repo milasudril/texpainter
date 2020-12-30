@@ -29,9 +29,9 @@ namespace Texpainter
 
 		constexpr auto begin() { return r_ptr; }
 
-		constexpr auto end() const { return r_ptr + area(); }
+		constexpr auto end() const { return r_ptr + area(m_size); }
 
-		constexpr auto end() { return r_ptr + area(); }
+		constexpr auto end() { return r_ptr + area(m_size); }
 
 		constexpr auto data() const { return begin(); }
 
@@ -40,8 +40,6 @@ namespace Texpainter
 		constexpr auto width() const { return m_size.width(); }
 
 		constexpr auto height() const { return m_size.height(); }
-
-		constexpr auto area() const { return m_size.area(); }
 
 		constexpr T& operator()(uint32_t x, uint32_t y)
 		{
@@ -61,6 +59,9 @@ namespace Texpainter
 		T* r_ptr;
 		Size2d m_size;
 	};
+
+	template<class T>
+	constexpr inline auto area(Span2d<T> s) { return area(s.size()); }
 
 	template<class T, class Func>
 	void for_each(Span2d<T> span, Func&& f)

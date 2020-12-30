@@ -29,7 +29,7 @@ __Source code:__
 ```c++
 void main(auto const& args)
 {
-	auto size = args.size().area();
+	auto size = area(args.size());
 	Texpainter::transform(
 	    [](auto r, auto g, auto b, auto a) {
 		    return RgbaValue{static_cast<float>(r),

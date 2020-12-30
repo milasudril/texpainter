@@ -99,13 +99,13 @@ namespace Testcases
 		assert(get_if<std::unique_ptr<Texpainter::FilterGraph::RealValue[]>>(&ret[3])->get()
 		       == args.output<3>());
 		assert(Testutils::MallocHook::blockSize(args.output<0>())
-		       == size.area() * sizeof(Texpainter::FilterGraph::ComplexValue));
+		       == area(size) * sizeof(Texpainter::FilterGraph::ComplexValue));
 		assert(Testutils::MallocHook::blockSize(args.output<1>())
-		       == size.area() * sizeof(Texpainter::FilterGraph::RealValue));
+		       == area(size) * sizeof(Texpainter::FilterGraph::RealValue));
 		assert(Testutils::MallocHook::blockSize(args.output<2>())
-		       == size.area() * sizeof(Texpainter::FilterGraph::RgbaValue));
+		       == area(size) * sizeof(Texpainter::FilterGraph::RgbaValue));
 		assert(Testutils::MallocHook::blockSize(args.output<3>())
-		       == size.area() * sizeof(Texpainter::FilterGraph::RealValue));
+		       == area(size) * sizeof(Texpainter::FilterGraph::RealValue));
 		static_assert(
 		    std::is_same_v<decltype(args.output<0>()), Texpainter::FilterGraph::ComplexValue*>);
 		static_assert(

@@ -17,7 +17,7 @@ __Source code:__
 ```c++
 void main(auto const& args, auto const& params)
 {
-	auto const size = args.size().area();
+	auto const size = area(args.size());
 	std::fill(output<0>(args),
 	          output<0>(args) + size,
 	          static_cast<float>(param<Str{"Value"}>(params).value()));

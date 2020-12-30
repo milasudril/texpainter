@@ -36,7 +36,7 @@ inline double mapParameter(ParamValue val) { return std::exp2(std::lerp(-1.0, 1.
 
 void main(auto const& args, auto const& params)
 {
-	auto const size = args.size().area();
+	auto const size = area(args.size());
 	std::transform(input<0>(args),
 	               input<0>(args) + size,
 	               input<1>(args),

@@ -14,7 +14,7 @@ namespace Testcases
 		Texpainter::PixelStore::Image img{3u, 2u};
 		assert(img.width() == 3);
 		assert(img.height() == 2);
-		assert(img.area() == 6);
+		assert(area(img) == 6);
 
 		auto ptr   = img.pixels().begin();
 		*(ptr + 0) = Texpainter::PixelStore::red();

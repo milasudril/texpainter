@@ -77,7 +77,7 @@ void Texpainter::Model::paint(Document& doc, vec2_t location)
 	     brush_radius = static_cast<double>(brush.radius()),
 	     brush_func   = BrushFunction{brush.shape()},
 	     color        = palette[doc.currentColor()]](PixelStore::Image& img) noexcept {
-		    auto r = 0.5 * std::exp2(brush_radius * 0.5 * std::log2(img.area()));
+		    auto r = 0.5 * std::exp2(brush_radius * 0.5 * std::log2(area(img)));
 		    paint(img.pixels(), location, r, brush_func, color);
 		    return true;
 	    },

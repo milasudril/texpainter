@@ -134,18 +134,18 @@ namespace Texpainter
 		void onChanged(T&)
 		{
 			auto size = value();
-			if(size.area() > m_max_size.area()) [[unlikely]]
+			if(area(size) > area(m_max_size)) [[unlikely]]
 				{
 					auto const size_mode = m_size.label().selected();
 					auto const r         = Ui::logValue(
                         m_asplect_ratio.inputField().value(), MinRatio, MaxRatio, false);
-					auto const length = s_size[size_mode](m_max_size.area(), r);
+					auto const length = s_size[size_mode](area(m_max_size), r);
 					m_size.inputField().content(std::to_string(length).c_str());
 					size = value();
 				}
 
 			m_comp_size.inputField().content(
-			    (toString(size) + ", A = " + toString(size.area())).c_str());
+			    (toString(size) + ", A = " + toString(area(size))).c_str());
 		}
 
 		template<ControlId, class... T>

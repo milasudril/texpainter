@@ -47,7 +47,7 @@ namespace Texpainter::FilterGraph
 	{
 		using type = std::unique_ptr<RgbaValue[]>;
 
-		static type createValue(Size2d size) { return std::make_unique<RgbaValue[]>(size.area()); }
+		static type createValue(Size2d size) { return std::make_unique<RgbaValue[]>(area(size)); }
 	};
 
 	template<>
@@ -55,7 +55,7 @@ namespace Texpainter::FilterGraph
 	{
 		using type = std::unique_ptr<RealValue[]>;
 
-		static type createValue(Size2d size) { return std::make_unique<RealValue[]>(size.area()); }
+		static type createValue(Size2d size) { return std::make_unique<RealValue[]>(area(size)); }
 	};
 
 	template<>
@@ -65,7 +65,7 @@ namespace Texpainter::FilterGraph
 
 		static type createValue(Size2d size)
 		{
-			return std::make_unique<ComplexValue[]>(size.area());
+			return std::make_unique<ComplexValue[]>(area(size));
 		}
 	};
 
@@ -76,7 +76,7 @@ namespace Texpainter::FilterGraph
 
 		static type createValue(Size2d size)
 		{
-			return std::make_unique<TopographyInfo[]>(size.area());
+			return std::make_unique<TopographyInfo[]>(area(size));
 		}
 	};
 

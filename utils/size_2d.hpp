@@ -20,11 +20,6 @@ namespace Texpainter
 
 		constexpr auto height() const { return m_height; }
 
-		constexpr auto area() const
-		{
-			return static_cast<size_t>(m_width) * static_cast<size_t>(m_height);
-		}
-
 	private:
 		uint32_t m_width;
 		uint32_t m_height;
@@ -37,10 +32,15 @@ namespace Texpainter
 
 	constexpr inline bool operator!=(Size2d a, Size2d b) { return !(a == b); }
 
+	constexpr auto inline area(Size2d size)
+	{
+		return static_cast<size_t>(size.width()) * static_cast<size_t>(size.height());
+	}
+
 	template<class T>
 	bool isSupported(Size2d size)
 	{
-		auto const a = size.area();
+		auto const a = area(size);
 		return a != 0 && a < std::numeric_limits<size_t>::max() / sizeof(T);
 	}
 
@@ -48,6 +48,7 @@ namespace Texpainter
 	{
 		return std::to_string(size.width()) + " × " + std::to_string(size.height());
 	}
+
 }
 
 #endif

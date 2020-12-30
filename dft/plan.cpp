@@ -14,7 +14,7 @@ namespace
 
 Texpainter::Dft::BasicPlan::BasicPlan(Size2d size, Direction dir)
 {
-	auto const n     = size.area();
+	auto const n     = area(size);
 	auto input_buff  = std::make_unique<std::complex<double>[]>(n);
 	auto output_buff = std::make_unique<std::complex<double>[]>(n);
 	std::fill(input_buff.get(), input_buff.get() + n, 0);

@@ -61,7 +61,7 @@ __Source code:__
 ```c++
 void main(auto const& args, auto const& params)
 {
-	auto const size = args.size().area();
+	auto const size = area(args.size());
 	std::array<double, Palette::size()> vals;
 	std::ranges::transform(params.values(), std::begin(vals), [](auto val) { return val.value(); });
 
