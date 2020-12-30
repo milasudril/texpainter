@@ -40,7 +40,7 @@ namespace Texpainter::Model
 			    src_ratio > sink_ratio
 			        ? static_cast<double>(ret.width()) / static_cast<double>(r_pixels.width())
 			        : static_cast<double>(ret.height()) / static_cast<double>(r_pixels.height());
-			auto const scale_factor = 1 / (1.0 * r);
+			auto const scale_factor = 1 / r;
 
 			auto const src = r_pixels;
 			auto const origin_src =
@@ -49,10 +49,11 @@ namespace Texpainter::Model
 			    vec2_t{0.0, 0.0}
 			    + 0.5 * vec2_t{static_cast<double>(ret.width()), static_cast<double>(ret.height())};
 
-			auto const aabb = 0.5
-			                  * axisAlignedBoundingBox(vec2_t{static_cast<double>(src.width()),
-			                                                  static_cast<double>(src.height())},
-			                                           Angle{0});
+			auto const aabb =
+			    0.5
+			    * axisAlignedBoundingBox(
+			        r * vec2_t{static_cast<double>(src.width()), static_cast<double>(src.height())},
+			        Angle{0});
 			auto const begin_coords = loc_src_ret_coord - aabb;
 			auto const end_coords   = loc_src_ret_coord + aabb;
 
