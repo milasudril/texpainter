@@ -194,7 +194,6 @@ namespace Texpainter::App
 			m_doc_creator->show();
 		}
 
-
 		template<class Source>
 		void onActivated(Enum::Tag<DocumentAction::Save>, Ui::MenuItem&, Source&)
 		{
@@ -202,6 +201,20 @@ namespace Texpainter::App
 			   compositor != nullptr)
 			{ m_document->nodeLocations(compositor->widget().nodeLocations()); }
 			store(*m_document, "/dev/stdout");
+		}
+
+		template<class Source>
+		void onActivated(Enum::Tag<DocumentAction::Export>, Ui::MenuItem&, Source& src)
+		{
+			std::filesystem::path name;
+			if(Ui::filenameSelect(
+			       src.window(),
+			       m_document->workingDirectory(),
+			       name,
+			       Ui::FilenameSelectMode::Save,
+			       [](char const*) { return true; },
+			       "Exr files"))
+			{ store(render(*m_document, Model::Document::ForceUpdate{true}, 4.0), name.c_str()); }
 		}
 
 		template<class Source>

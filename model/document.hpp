@@ -231,7 +231,8 @@ namespace Texpainter::Model
 	};
 
 	PixelStore::Image render(Document const& document,
-	                         Document::ForceUpdate foce_update = Document::ForceUpdate{false});
+	                         Document::ForceUpdate foce_update = Document::ForceUpdate{false},
+	                         uint32_t scale                    = 1);
 
 	void paint(Document& doc, vec2_t location);
 
