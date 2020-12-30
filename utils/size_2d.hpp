@@ -40,6 +40,11 @@ namespace Texpainter
 		return static_cast<size_t>(size.width()) * static_cast<size_t>(size.height());
 	}
 
+	constexpr auto inline aspectRatio(Size2d size)
+	{
+		return static_cast<double>(size.width())/static_cast<double>(size.height());
+	}
+
 	template<class T>
 	bool isSupported(Size2d size)
 	{
