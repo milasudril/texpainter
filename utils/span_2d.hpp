@@ -66,6 +66,12 @@ namespace Texpainter
 		return area(s.size());
 	}
 
+	template<class T>
+	constexpr inline auto aspectRatio(Span2d<T> s)
+	{
+		return aspectRatio(s.size());
+	}
+
 	template<class T, class Func>
 	void for_each(Span2d<T> span, Func&& f)
 	{

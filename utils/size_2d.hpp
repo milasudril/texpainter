@@ -42,7 +42,7 @@ namespace Texpainter
 
 	constexpr auto inline aspectRatio(Size2d size)
 	{
-		return static_cast<double>(size.width())/static_cast<double>(size.height());
+		return static_cast<double>(size.width()) / static_cast<double>(size.height());
 	}
 
 	template<class T>

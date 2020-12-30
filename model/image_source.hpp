@@ -34,6 +34,14 @@ namespace Texpainter::Model
 		{
 			auto ret = Texpainter::Span2d{args.template output<0>(), args.size()};
 
+			auto const src_ratio  = aspectRatio(r_pixels);
+			auto const sink_ratio = aspectRatio(ret);
+			auto const r =
+			    src_ratio > sink_ratio
+			        ? static_cast<double>(ret.width()) / static_cast<double>(r_pixels.width())
+			        : static_cast<double>(ret.height()) / static_cast<double>(r_pixels.height());
+			auto const scale_factor = 1 / (1.0 * r);
+
 			auto const src = r_pixels;
 			auto const origin_src =
 			    0.5 * vec2_t{static_cast<double>(src.width()), static_cast<double>(src.height())};
@@ -56,7 +64,7 @@ namespace Texpainter::Model
 				    ++col)
 				{
 					auto const loc_ret = vec2_t{static_cast<double>(col), static_cast<double>(row)};
-					auto const src_pos = (loc_ret - loc_src_ret_coord) + origin_src;
+					auto const src_pos = scale_factor * (loc_ret - loc_src_ret_coord) + origin_src;
 					if(src_pos[0] >= 0 && src_pos[0] < src.width() && src_pos[1] >= 0
 					   && src_pos[1] < src.height())
 					{
