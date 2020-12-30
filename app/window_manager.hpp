@@ -95,6 +95,7 @@ namespace Texpainter::App
 		}
 
 		using DocumentCreatorDlg     = Ui::Dialog<Ui::LabeledInput<SizeInput>>;
+		using ExportJobCreatorDlg    = Ui::Dialog<RenderJobCreator>;
 		using CanvasSizeDlg          = Ui::Dialog<SizeInput>;
 		using ImageCreatorDlg        = Ui::Dialog<ImageCreator>;
 		using EmptyPaletteCreatorDlg = Ui::Dialog<Ui::LabeledInput<Ui::TextEntry>>;
@@ -201,12 +202,25 @@ namespace Texpainter::App
 			if(auto compositor = m_windows.get<AppWindowType::FilterGraphEditor>().get();
 			   compositor != nullptr)
 			{ m_document->nodeLocations(compositor->widget().nodeLocations()); }
+
+			if(auto compositor = m_windows.get<AppWindowType::FilterGraphEditor>().get();
+			   compositor != nullptr)
+			{ m_document->nodeLocations(compositor->widget().nodeLocations()); }
 			store(*m_document, "/dev/stdout");
 		}
 
 		template<class Source>
 		void onActivated(Enum::Tag<DocumentAction::Export>, Ui::MenuItem&, Source& src)
 		{
+#if 0
+			if(m_export_job_creator == nullptr) [[likely]]
+				{
+					m_export_job_creator =
+					    std::make_unique<ExportJobCreatorDlg>(src.window(), "Render options");
+					m_export_job_creator->eventHandler<DocumentAction::Export>(*this);
+				}
+#else
+			m_export_job_creator->show();
 			std::filesystem::path name;
 			if(Ui::filenameSelect(
 			       src.window(),
@@ -216,6 +230,7 @@ namespace Texpainter::App
 			       [](char const*) { return true; },
 			       "Exr files"))
 			{ store(render(*m_document, Model::Document::ForceUpdate{true}, 4.0), name.c_str()); }
+#endif
 		}
 
 		template<class Source>
@@ -391,6 +406,19 @@ namespace Texpainter::App
 		}
 
 		template<auto>
+		void confirmPositive(ExportJobCreatorDlg&)
+		{
+			m_export_job_creator.reset();
+		}
+
+		template<auto>
+		void dismiss(ExportJobCreatorDlg&)
+		{
+			m_export_job_creator.reset();
+		}
+
+
+		template<auto>
 		void confirmPositive(CanvasSizeDlg& src)
 		{
 			m_document->canvasSize(src.widget().value());
@@ -441,6 +469,7 @@ namespace Texpainter::App
 		size_t m_window_count;
 
 		std::unique_ptr<DocumentCreatorDlg> m_doc_creator;
+		std::unique_ptr<ExportJobCreatorDlg> m_export_job_creator;
 		std::unique_ptr<CanvasSizeDlg> m_canvas_modifier;
 		std::unique_ptr<ImageCreatorDlg> m_img_creator;
 		std::unique_ptr<EmptyPaletteCreatorDlg> m_empty_pal_creator;
