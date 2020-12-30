@@ -10,6 +10,7 @@
 #include "./palette_creator.hpp"
 #include "./document_previewer.hpp"
 #include "./size_input.hpp"
+#include "./render_job_creator.hpp"
 
 #include "model/document.hpp"
 #include "model/palette_generate.hpp"

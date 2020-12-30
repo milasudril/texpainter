@@ -82,7 +82,6 @@ namespace Texpainter
 
 		static constexpr LengthFunc s_size[] = {width_from_area, height_from_area, width_from_area};
 
-	public:
 		enum class ControlId : int
 		{
 			SizeMode,
@@ -90,6 +89,7 @@ namespace Texpainter
 			AspectRatio
 		};
 
+	public:
 		SizeInput(SizeInput&&) = delete;
 
 		explicit SizeInput(Ui::Container& container, Size2d default_size, Size2d max_size)
