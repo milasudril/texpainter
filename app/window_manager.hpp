@@ -198,6 +198,9 @@ namespace Texpainter::App
 		template<class Source>
 		void onActivated(Enum::Tag<DocumentAction::Save>, Ui::MenuItem&, Source&)
 		{
+			if(auto compositor = m_windows.get<AppWindowType::FilterGraphEditor>().get();
+			   compositor != nullptr)
+			{ m_document->nodeLocations(compositor->widget().nodeLocations()); }
 			store(*m_document, "/dev/stdout");
 		}
 
