@@ -5,9 +5,12 @@
 #ifndef TEXPAINTER_FILTERGRAPH_NODEID_HPP
 #define TEXPAINTER_FILTERGRAPH_NODEID_HPP
 
+#include "utils/to_string.hpp"
+
 #include <nlohmann/json.hpp>
 
 #include <compare>
+#include <map>
 
 namespace Texpainter::FilterGraph
 {
@@ -42,6 +45,25 @@ namespace Texpainter::FilterGraph
 	};
 
 	inline void to_json(nlohmann::json& obj, NodeId id) { obj = nlohmann::json{id.value()}; }
+
+	inline auto toString(NodeId id) { return Texpainter::toString(id.value()); }
+}
+
+namespace nlohmann
+{
+	template<class T>
+	struct adl_serializer<std::map<Texpainter::FilterGraph::NodeId, T>>
+	{
+		static void to_json(json& j, std::map<Texpainter::FilterGraph::NodeId, T> const& vals)
+		{
+			for(auto const& elem: vals)
+			{
+				j[toString(elem.first)] = elem.second;
+			}
+		}
+
+		static void from_json(const json&, std::map<Texpainter::FilterGraph::NodeId, T>&) {}
+	};
 }
 
 #endif

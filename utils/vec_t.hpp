@@ -113,10 +113,7 @@ namespace nlohmann
 	template<>
 	struct adl_serializer<Texpainter::vec2_t>
 	{
-		static void to_json(json& j, Texpainter::vec2_t value)
-		{
-			j = nlohmann::json{Texpainter::toString(value)};
-		}
+		static void to_json(json& j, Texpainter::vec2_t value) { j = Texpainter::toString(value); }
 
 		static void from_json(const json&, Texpainter::vec2_t)
 		{
