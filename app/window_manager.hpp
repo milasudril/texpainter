@@ -212,7 +212,6 @@ namespace Texpainter::App
 		template<class Source>
 		void onActivated(Enum::Tag<DocumentAction::Export>, Ui::MenuItem&, Source& src)
 		{
-#if 1
 			if(m_export_job_creator == nullptr) [[likely]]
 				{
 					m_export_job_creator =
@@ -220,17 +219,6 @@ namespace Texpainter::App
 					m_export_job_creator->eventHandler<DocumentAction::Export>(*this);
 				}
 			m_export_job_creator->show();
-#else
-			std::filesystem::path name;
-			if(Ui::filenameSelect(
-			       src.window(),
-			       m_document->workingDirectory(),
-			       name,
-			       Ui::FilenameSelectMode::Save,
-			       [](char const*) { return true; },
-			       "Exr files"))
-			{ store(render(*m_document, Model::Document::ForceUpdate{true}, 4.0), name.c_str()); }
-#endif
 		}
 
 		template<class Source>

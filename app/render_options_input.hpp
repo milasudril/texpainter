@@ -27,12 +27,12 @@ namespace Texpainter::App
 		                      Ui::Box::Orientation::Horizontal,
 		                      "Supersampling:",
 		                      Ui::Box::Orientation::Vertical,
-		                      "Foo",
+		                      "1",
 		                      false}
 		{
 			{
 				auto& inner = m_supersampling.inputField();
-				inner.label().content("1").alignment(1.0f);
+				inner.label().alignment(1.0f).content("1");
 				inner.inputField().eventHandler<ControlId::Supersampling>(*this);
 			}
 		}
