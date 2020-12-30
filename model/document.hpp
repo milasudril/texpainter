@@ -222,6 +222,8 @@ namespace Texpainter::Model
 			return m_workspace.m_working_directory;
 		}
 
+		Workspace const& workspace() const { return m_workspace; }
+
 	private:
 		std::map<ItemName, Compositor::NodeItem> m_input_nodes;
 
@@ -232,6 +234,8 @@ namespace Texpainter::Model
 	                         Document::ForceUpdate foce_update = Document::ForceUpdate{false});
 
 	void paint(Document& doc, vec2_t location);
+
+	void store(Document const& doc, char const* filenamae);
 }
 
 #endif

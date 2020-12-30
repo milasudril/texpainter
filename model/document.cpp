@@ -83,3 +83,15 @@ void Texpainter::Model::paint(Document& doc, vec2_t location)
 	    },
 	    doc.currentImage());
 }
+
+void Texpainter::Model::store(Document const& doc, char const* filename)
+{
+	nlohmann::json obj;
+	to_json(obj, doc.workspace());
+	auto const str = obj.dump(1, '\t');
+
+	auto const f = fopen(filename, "wb");
+	if(f == nullptr) { throw std::string{"Failed to open "} + filename + ": " + strerror(errno); }
+	fputs(str.c_str(), f);
+	fclose(f);
+}

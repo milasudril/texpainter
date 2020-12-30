@@ -194,6 +194,13 @@ namespace Texpainter::App
 			m_doc_creator->show();
 		}
 
+
+		template<class Source>
+		void onActivated(Enum::Tag<DocumentAction::Save>, Ui::MenuItem&, Source&)
+		{
+			store(*m_document, "/dev/stdout");
+		}
+
 		template<class Source>
 		void onActivated(Enum::Tag<DocumentAction::SetCanvasSize>, Ui::MenuItem&, Source& src)
 		{
