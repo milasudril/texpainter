@@ -3,6 +3,9 @@
 #ifndef TEXPAINTER_UTILS_SIZE2D_HPP
 #define TEXPAINTER_UTILS_SIZE2D_HPP
 
+#define JSON_USE_IMPLICIT_CONVERSIONS 0
+#include <nlohmann/json.hpp>
+
 #include <cstdint>
 #include <limits>
 #include <string>
@@ -48,6 +51,12 @@ namespace Texpainter
 	{
 		return std::to_string(size.width()) + " × " + std::to_string(size.height());
 	}
+
+	inline void to_json(nlohmann::json& j, Size2d size)
+	{
+		j = nlohmann::json{std::pair{"width", size.width()}, std::pair{"height", size.height()}};
+	}
+
 
 }
 
