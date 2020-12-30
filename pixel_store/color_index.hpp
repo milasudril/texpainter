@@ -3,6 +3,9 @@
 #ifndef TEXPAINTER_PIXELSTORE_COLORINDEX_HPP
 #define TEXPAINTER_PIXELSTORE_COLORINDEX_HPP
 
+#define JSON_USE_IMPLICIT_CONVERSIONS 0
+#include <nlohmann/json.hpp>
+
 #include <cstdint>
 #include <compare>
 #include <concepts>
@@ -40,7 +43,7 @@ namespace Texpainter::PixelStore
 		element_type m_value;
 	};
 
-	inline void to_json(nlohmann::json& obj, ColorIndex id) { obj = nlohmann::json{id.value()}; }
+	inline void to_json(nlohmann::json& obj, ColorIndex id) { obj = id.value(); }
 }
 
 #endif

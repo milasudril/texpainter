@@ -5,6 +5,7 @@
 #ifndef TEXPAINTER_MODEL_ITEMNAME_HPP
 #define TEXPAINTER_MODEL_ITEMNAME_HPP
 
+#define JSON_USE_IMPLICIT_CONVERSIONS 0
 #include <nlohmann/json.hpp>
 
 #include <string>
@@ -75,10 +76,7 @@ namespace Texpainter::Model
 	std::string const& toFilename(ItemName const&& item) = delete;
 	inline std::string const& toFilename(ItemName const& name) { return toString(name); }
 
-	inline void to_json(nlohmann::json& obj, ItemName const& name)
-	{
-		obj = nlohmann::json{toString(name)};
-	}
+	inline void to_json(nlohmann::json& obj, ItemName const& name) { obj = toString(name); }
 }
 
 #endif
