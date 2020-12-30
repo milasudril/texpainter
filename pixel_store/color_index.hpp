@@ -39,6 +39,8 @@ namespace Texpainter::PixelStore
 	private:
 		element_type m_value;
 	};
+
+	inline void to_json(nlohmann::json& obj, ColorIndex id) { obj = nlohmann::json{id.value()}; }
 }
 
 #endif
