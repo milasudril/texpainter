@@ -3,58 +3,78 @@
 #ifndef TEXPAINTER_APP_RENDERJOBCREATOR_HPP
 #define TEXPAINTER_APP_RENDERJOBCREATOR_HPP
 
-#include "ui/box.hpp"
-#include "ui/slider.hpp"
-#include "ui/labeled_input.hpp"
-#include "utils/to_string.hpp"
+#include "./render_options_input.hpp"
+
+#include "ui/button.hpp"
+#include "ui/text_entry.hpp"
+#include "ui/filename_select.hpp"
 
 namespace Texpainter::App
 {
 	class RenderJobCreator
 	{
-	private:
 		enum class ControlId : int
 		{
-			Supersampling
+			Filename
 		};
 
 	public:
+		struct Options
+		{
+			std::filesystem::path filename;
+			uint32_t supersampling;
+		};
+
 		RenderJobCreator(RenderJobCreator&&) = delete;
 
 		explicit RenderJobCreator(Ui::Container& container)
 		    : m_root{container, Ui::Box::Orientation::Vertical}
-		    , m_supersampling{m_root,
-		                      Ui::Box::Orientation::Horizontal,
-		                      "Supersampling:",
-		                      Ui::Box::Orientation::Vertical,
-		                      "Foo",
-		                      false}
+		    , m_filename{m_root,
+		                 Ui::Box::Orientation::Horizontal,
+		                 "Filename: ",
+		                 Ui::Box::Orientation::Horizontal,
+		                 "Browse..."}
+		    , m_render_opts{m_root, Ui::Box::Orientation::Vertical, "Render options:"}
 		{
 			{
-				auto& inner = m_supersampling.inputField();
-				inner.label().content("1").alignment(1.0f);
-				inner.inputField().eventHandler<ControlId::Supersampling>(*this);
+				auto& inner = m_filename.inputField();
+				inner.label().eventHandler<ControlId::Filename>(*this);
 			}
 		}
 
+		Options value() const
+		{
+			return Options{m_filename.inputField().inputField().content(),
+			               m_render_opts.inputField().value()};
+		}
+
 		template<auto>
-		void onChanged(Ui::Slider&)
+		void onClicked(Ui::Button& src)
 		{
-			m_supersampling.inputField().label().content(
-			    toString(value())
-			        .c_str());
+			std::filesystem::path name;
+			if(Ui::filenameSelect(
+			       m_root,
+			       std::filesystem::path{"."},
+			       name,
+			       Ui::FilenameSelectMode::Save,
+			       [](char const*) { return true; },
+			       "Exr files"))
+			{
+				auto& inner = m_filename.inputField();
+				inner.inputField().content(name.c_str());
+			}
+			src.state(false);
 		}
 
-		uint32_t value() const
+		template<auto, class T>
+		void handleException(char const*, T&)
 		{
-			auto val = m_supersampling.inputField().inputField().value().value();
-			return static_cast<uint32_t>(std::nextafter(8.0f, 0.0f) * val) + 1;
 		}
-
 
 	private:
 		Ui::Box m_root;
-		Ui::LabeledInput<Ui::ReversedLabeledInput<Ui::Slider>> m_supersampling;
+		Ui::LabeledInput<Ui::ReversedLabeledInput<Ui::TextEntry, Ui::Button>> m_filename;
+		Ui::LabeledInput<RenderOptionsInput> m_render_opts;
 	};
 }
 

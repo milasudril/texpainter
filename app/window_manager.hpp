@@ -212,15 +212,15 @@ namespace Texpainter::App
 		template<class Source>
 		void onActivated(Enum::Tag<DocumentAction::Export>, Ui::MenuItem&, Source& src)
 		{
-#if 0
+#if 1
 			if(m_export_job_creator == nullptr) [[likely]]
 				{
 					m_export_job_creator =
-					    std::make_unique<ExportJobCreatorDlg>(src.window(), "Render options");
+					    std::make_unique<ExportJobCreatorDlg>(src.window(), "Export image");
 					m_export_job_creator->eventHandler<DocumentAction::Export>(*this);
 				}
-#else
 			m_export_job_creator->show();
+#else
 			std::filesystem::path name;
 			if(Ui::filenameSelect(
 			       src.window(),
@@ -406,8 +406,12 @@ namespace Texpainter::App
 		}
 
 		template<auto>
-		void confirmPositive(ExportJobCreatorDlg&)
+		void confirmPositive(ExportJobCreatorDlg& src)
 		{
+			auto opts = src.widget().value();
+			store(render(*m_document, Model::Document::ForceUpdate{true}, opts.supersampling),
+			      opts.filename.c_str());
+
 			m_export_job_creator.reset();
 		}
 
