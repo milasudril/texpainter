@@ -4,7 +4,7 @@
 #define TEXPAINTER_APP_MAINMENU_HPP
 
 #include "./app_menu.hpp"
-#include "./app_windows.hpp"
+#include "./window_action.hpp"
 #include "./document_menu.hpp"
 #include "./image_menu.hpp"
 #include "./palette_menu.hpp"

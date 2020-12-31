@@ -1,4 +1,4 @@
-//@	{"targets":[{"name":"app_windows.hpp","type":"include"}]}
+//@	{"targets":[{"name":"window_action.hpp","type":"include"}]}
 
 #ifndef TEXPAINTER_APP_APPWINDOWS_HPP
 #define TEXPAINTER_APP_APPWINDOWS_HPP
