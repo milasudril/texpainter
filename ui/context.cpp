@@ -15,6 +15,13 @@ Texpainter::Ui::Context::Context(): m_stop{false}, m_event_index{0}
 	gtk_init(nullptr, nullptr);
 }
 
+Texpainter::Size2d Texpainter::Ui::Context::primaryWorkspaceSize() const
+{
+	GdkRectangle workarea{};
+	gdk_monitor_get_workarea(gdk_display_get_primary_monitor(gdk_display_get_default()), &workarea);
+	return Size2d{static_cast<uint32_t>(workarea.width), static_cast<uint32_t>(workarea.height)};
+}
+
 void Texpainter::Ui::Context::run()
 {
 	auto snooper = gtk_key_snooper_install(

@@ -114,6 +114,21 @@ namespace Texpainter::App
 			    createWindow<AppWindowType::FilterGraphEditor>(*m_document);
 			m_windows.get<AppWindowType::DocumentPreviewer>() =
 			    createWindow<AppWindowType::DocumentPreviewer>(*m_document);
+
+			auto const screen_size = Ui::Context::get().primaryWorkspaceSize();
+			vec2_t const size_vec{static_cast<double>(screen_size.width()),
+			                      static_cast<double>(screen_size.height())};
+			vec2_t const size_vec_quarter = 0.5 * size_vec;
+			vec2_t const size_vec_half    = vec2_t{1.0, 0.5} * size_vec;
+
+			auto const size_quarter = Size2d{static_cast<uint32_t>(size_vec_quarter[0]),
+			                                 static_cast<uint32_t>(size_vec_quarter[1])};
+			auto const size_half    = Size2d{static_cast<uint32_t>(size_vec_half[0]),
+                                          static_cast<uint32_t>(size_vec_half[1])};
+
+			m_windows.get<AppWindowType::ImageEditor>()->window().resize(size_quarter);
+			m_windows.get<AppWindowType::DocumentPreviewer>()->window().resize(size_quarter);
+			m_windows.get<AppWindowType::FilterGraphEditor>()->window().resize(size_half);
 		}
 
 		template<AppWindowType>
