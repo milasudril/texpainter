@@ -136,6 +136,8 @@ namespace Texpainter::App
 			    .move(Ui::ScreenCoordinates{0.0, 0.0} + vec2_t{0.5, 0.0} * size_vec);
 			m_windows.get<AppWindowType::FilterGraphEditor>()->window().resize(size_half).move(
 			    Ui::ScreenCoordinates{0.0, 0.0} + vec2_t{0.0, 0.625} * size_vec);
+
+			m_windows.get<AppWindowType::ImageEditor>()->window().show();
 		}
 
 		template<AppWindowType>
