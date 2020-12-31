@@ -150,11 +150,11 @@ namespace Texpainter::App
 				    .move(Ui::ScreenCoordinates{0.0, 0.0} + vec2_t{0.5, 0.0} * size_vec);
 			}
 
-			if(auto compositor = m_windows.get<AppWindowType::FilterGraphEditor>().get;
-			   compositior != nullptr)
+			if(auto compositor = m_windows.get<AppWindowType::FilterGraphEditor>().get();
+			   compositor != nullptr)
 			{
-				compositior->window().resize(size_half).move(Ui::ScreenCoordinates{0.0, 0.0}
-				                                             + vec2_t{0.0, 0.625} * size_vec);
+				compositor->window().resize(size_half).move(Ui::ScreenCoordinates{0.0, 0.0}
+				                                            + vec2_t{0.0, 0.625} * size_vec);
 			}
 		}
 
@@ -465,6 +465,8 @@ namespace Texpainter::App
 			m_windows.get<AppWindowType::DocumentPreviewer>() = std::move(doc_previewer);
 
 			m_doc_creator.reset();
+			resetWindowPositions();
+			m_windows.get<AppWindowType::ImageEditor>()->window().show();
 		}
 
 		template<auto>
