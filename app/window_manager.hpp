@@ -240,7 +240,7 @@ namespace Texpainter::App
 					                                         "Create new document",
 					                                         Ui::Box::Orientation::Vertical,
 					                                         "Canvas size:",
-					                                         Size2d{512, 512},
+					                                         m_document->canvasSize(),
 					                                         Size2d{65535, 65535});
 					m_doc_creator->eventHandler<DocumentAction::New>(*this);
 				}
@@ -289,8 +289,10 @@ namespace Texpainter::App
 		{
 			if(m_canvas_modifier == nullptr) [[likely]]
 				{
-					m_canvas_modifier = std::make_unique<CanvasSizeDlg>(
-					    src.window(), "Set canvas size", Size2d{512, 512}, Size2d{65535, 65535});
+					m_canvas_modifier = std::make_unique<CanvasSizeDlg>(src.window(),
+					                                                    "Set canvas size",
+					                                                    m_document->canvasSize(),
+					                                                    Size2d{65535, 65535});
 					m_canvas_modifier->eventHandler<DocumentAction::SetCanvasSize>(*this);
 				}
 			m_canvas_modifier->show();
@@ -301,8 +303,10 @@ namespace Texpainter::App
 		{
 			if(m_img_creator == nullptr) [[likely]]
 				{
-					m_img_creator = std::make_unique<ImageCreatorDlg>(
-					    src.window(), "Create new image", Size2d{512, 512}, Size2d{65535, 65535});
+					m_img_creator = std::make_unique<ImageCreatorDlg>(src.window(),
+					                                                  "Create new image",
+					                                                  m_document->canvasSize(),
+					                                                  Size2d{65535, 65535});
 					m_img_creator->eventHandler<ImageAction::New>(*this);
 				}
 			m_img_creator->show();
