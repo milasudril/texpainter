@@ -287,7 +287,7 @@ namespace Texpainter::App
 					    std::make_unique<EmptyPaletteCreatorDlg>(src.window(),
 					                                             "Create empty palette",
 					                                             Ui::Box::Orientation::Horizontal,
-					                                             "Name");
+					                                             "Name: ");
 					m_empty_pal_creator->eventHandler<PaletteAction::New>(*this);
 				}
 			m_empty_pal_creator->show();
