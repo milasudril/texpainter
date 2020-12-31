@@ -34,6 +34,19 @@ namespace Texpainter::Ui
 		constexpr Scancode ShiftRight{54};
 		constexpr Scancode AltLeft{56};
 		constexpr Scancode A{30};
+
+		constexpr Scancode F1{59};
+		constexpr Scancode F2{60};
+		constexpr Scancode F3{61};
+		constexpr Scancode F4{62};
+		constexpr Scancode F5{63};
+		constexpr Scancode F6{64};
+		constexpr Scancode F7{65};
+		constexpr Scancode F8{66};
+		constexpr Scancode F9{67};
+		constexpr Scancode F10{68};
+		constexpr Scancode F11{87};
+		constexpr Scancode F12{88};
 	}
 }
 

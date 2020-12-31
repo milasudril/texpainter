@@ -108,10 +108,10 @@ namespace Texpainter::App
 		    : m_document{std::make_unique<Model::Document>(Size2d{512, 512})}
 		    , m_window_count{3}
 		{
-			m_windows.get<AppWindowType::FilterGraphEditor>() =
-			    createWindow<AppWindowType::FilterGraphEditor>(*m_document);
 			m_windows.get<AppWindowType::ImageEditor>() =
 			    createWindow<AppWindowType::ImageEditor>(*m_document);
+			m_windows.get<AppWindowType::FilterGraphEditor>() =
+			    createWindow<AppWindowType::FilterGraphEditor>(*m_document);
 			m_windows.get<AppWindowType::DocumentPreviewer>() =
 			    createWindow<AppWindowType::DocumentPreviewer>(*m_document);
 		}
@@ -122,8 +122,27 @@ namespace Texpainter::App
 		}
 
 		template<AppWindowType window>
-		void onKeyDown(Ui::Window&, Ui::Scancode)
+		void onKeyDown(Ui::Window&, Ui::Scancode scancode)
 		{
+			auto& key_state = Ui::Context::get().keyboardState();
+			if((key_state.isPressed(Ui::Scancodes::ShiftLeft)
+			    || key_state.isPressed(Ui::Scancodes::ShiftRight))
+			   && key_state.numberOfPressedKeys() == 2)
+			{
+				switch(scancode.value())
+				{
+					case Ui::Scancodes::F1.value():
+						createAndShowWindow<AppWindowType::ImageEditor>();
+						return;
+					case Ui::Scancodes::F2.value():
+						createAndShowWindow<AppWindowType::FilterGraphEditor>();
+						return;
+					case Ui::Scancodes::F3.value():
+						createAndShowWindow<AppWindowType::DocumentPreviewer>();
+						return;
+				}
+			}
+
 			if constexpr(window != AppWindowType::DocumentPreviewer)
 			{
 				m_windows.template get<window>()->widget().onKeyDown(
@@ -170,8 +189,8 @@ namespace Texpainter::App
 			Ui::Context::get().exit();
 		}
 
-		template<AppWindowType item, class Source>
-		void onActivated(Enum::Tag<item>, Ui::MenuItem&, Source&)
+		template<AppWindowType item>
+		void createAndShowWindow()
 		{
 			if(m_windows.get<item>() == nullptr)
 			{
@@ -179,6 +198,12 @@ namespace Texpainter::App
 				++m_window_count;
 			}
 			m_windows.get<item>()->window().show();
+		}
+
+		template<AppWindowType item, class Source>
+		void onActivated(Enum::Tag<item>, Ui::MenuItem&, Source&)
+		{
+			createAndShowWindow<item>();
 		}
 
 		template<class Source>
