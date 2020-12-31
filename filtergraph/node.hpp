@@ -60,6 +60,7 @@ namespace Texpainter::FilterGraph
 
 		explicit Node(std::unique_ptr<AbstractImageProcessor> proc)
 		    : m_dirty{1}
+		    , m_rendered_size{0, 0}
 		    , m_usecount{static_cast<size_t>(-1)}
 		    , m_proc{std::move(proc)}
 		{
@@ -67,7 +68,7 @@ namespace Texpainter::FilterGraph
 
 		Node(Node&&) = delete;
 
-		Node(): m_dirty{0}, m_proc{nullptr} {}
+		Node(): m_dirty{0}, m_rendered_size{0, 0}, m_proc{nullptr} {}
 
 		auto clonedProcessor() const { return m_proc->clone(); }
 
@@ -87,7 +88,7 @@ namespace Texpainter::FilterGraph
 		{
 			assert(FilterGraph::isConnected(*this));
 
-			if(!dirty()) { return m_result_cache; }
+			if(!dirty(size)) { return m_result_cache; }
 
 			std::array<InputPortValue, NodeArgument::MaxNumInputs> args{};
 			auto const n_ports   = inputPorts().size();
@@ -97,7 +98,8 @@ namespace Texpainter::FilterGraph
 			               std::begin(args),
 			               [size](auto const& val) { return makeInputPortValue(val(size)); });
 
-			m_result_cache = (*m_proc)(NodeArgument{size, args});
+			m_result_cache  = (*m_proc)(NodeArgument{size, args});
+			m_rendered_size = size;
 			++m_usecount;
 			m_dirty = 0;
 			return m_result_cache;
@@ -178,6 +180,7 @@ namespace Texpainter::FilterGraph
 
 	private:
 		mutable size_t m_dirty;
+		mutable Size2d m_rendered_size;
 		mutable size_t m_usecount;
 		std::array<Source, NodeArgument::MaxNumInputs> m_inputs;
 		std::unique_ptr<AbstractImageProcessor> m_proc;
@@ -204,11 +207,12 @@ namespace Texpainter::FilterGraph
 			m_result_cache = result_type{};
 		}
 
-		bool dirty() const
+		bool dirty(Size2d size) const
 		{
-			return m_dirty || std::ranges::any_of(inputs(), [](auto const& item) {
-				       return item.processor().dirty() || item.hasOldResult();
-			       });
+			return m_dirty || size != m_rendered_size
+			       || std::ranges::any_of(inputs(), [size](auto const& item) {
+				          return item.processor().dirty(size) || item.hasOldResult();
+			          });
 		}
 	};
 

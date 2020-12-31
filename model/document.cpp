@@ -46,20 +46,13 @@ Texpainter::PixelStore::Image Texpainter::Model::render(Document const& document
 		std::ranges::fill(ret.pixels(), PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
 	}
 
-	if(!force_update) [[likely]]
-		{
-			// In case force_update is true, it could be possible that we are rendering with a larger
-			// canvas because we are doing a detailed render. In that case do not clear the status flag.
-			// Maybe we should compare the output canvas size with the document canvas size.
+	std::ranges::for_each(document.images(), [&document](auto const& item) {
+		item.second.source.clearStatus();
+	});
 
-			std::ranges::for_each(document.images(), [&document](auto const& item) {
-				item.second.source.clearStatus();
-			});
-
-			std::ranges::for_each(document.palettes(), [&document](auto const& item) {
-				item.second.source.clearStatus();
-			});
-		}
+	std::ranges::for_each(document.palettes(), [&document](auto const& item) {
+		item.second.source.clearStatus();
+	});
 
 	if(scale == 1) [[likely]]
 		{
