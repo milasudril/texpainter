@@ -9,39 +9,39 @@
 
 namespace Texpainter
 {
-	enum class AppWindowType : int
+	enum class WindowAction : int
 	{
 		ImageEditor,
 		FilterGraphEditor,
 		DocumentPreviewer
 	};
 
-	constexpr auto begin(Enum::Empty<AppWindowType>) { return AppWindowType::ImageEditor; }
+	constexpr auto begin(Enum::Empty<WindowAction>) { return WindowAction::ImageEditor; }
 
-	constexpr auto end(Enum::Empty<AppWindowType>)
+	constexpr auto end(Enum::Empty<WindowAction>)
 	{
-		return static_cast<AppWindowType>(static_cast<int>(AppWindowType::DocumentPreviewer) + 1);
+		return static_cast<WindowAction>(static_cast<int>(WindowAction::DocumentPreviewer) + 1);
 	}
 
-	template<AppWindowType>
-	struct AppWindowTypeMenuTraits;
+	template<WindowAction>
+	struct WindowActionMenuTraits;
 
 	template<>
-	struct AppWindowTypeMenuTraits<AppWindowType::ImageEditor>
+	struct WindowActionMenuTraits<WindowAction::ImageEditor>
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Image editor"; }
 	};
 
 	template<>
-	struct AppWindowTypeMenuTraits<AppWindowType::FilterGraphEditor>
+	struct WindowActionMenuTraits<WindowAction::FilterGraphEditor>
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Compositor"; }
 	};
 
 	template<>
-	struct AppWindowTypeMenuTraits<AppWindowType::DocumentPreviewer>
+	struct WindowActionMenuTraits<WindowAction::DocumentPreviewer>
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Document preview"; }

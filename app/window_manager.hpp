@@ -37,25 +37,25 @@ namespace Texpainter::App
 		template<class EventHandler>
 		using DocumentPreviewWindow = DocumentEditor<DocumentPreviewer, EventHandler>;
 
-		template<AppWindowType, class EventHandler>
-		struct AppWindowTypeTraits;
+		template<WindowAction, class EventHandler>
+		struct WindowActionTraits;
 
 		template<class EventHandler>
-		struct AppWindowTypeTraits<AppWindowType::FilterGraphEditor, EventHandler>
+		struct WindowActionTraits<WindowAction::FilterGraphEditor, EventHandler>
 		{
 			using type = std::unique_ptr<FilterGraphEditWindow<EventHandler>>;
 			static constexpr char const* name() { return "Texpainter: Compositor"; }
 		};
 
 		template<class EventHandler>
-		struct AppWindowTypeTraits<AppWindowType::ImageEditor, EventHandler>
+		struct WindowActionTraits<WindowAction::ImageEditor, EventHandler>
 		{
 			using type = std::unique_ptr<ImageEditWindow<EventHandler>>;
 			static constexpr char const* name() { return "Texpainter: Image editor"; }
 		};
 
 		template<class EventHandler>
-		struct AppWindowTypeTraits<AppWindowType::DocumentPreviewer, EventHandler>
+		struct WindowActionTraits<WindowAction::DocumentPreviewer, EventHandler>
 		{
 			using type = std::unique_ptr<DocumentPreviewWindow<EventHandler>>;
 			static constexpr char const* name() { return "Texpainter: Document preview"; }
@@ -82,14 +82,14 @@ namespace Texpainter::App
 	class WindowManager
 	{
 		template<auto id>
-		using AppWindowTypeTraits = detail::AppWindowTypeTraits<id, WindowManager>;
+		using WindowActionTraits = detail::WindowActionTraits<id, WindowManager>;
 
-		template<AppWindowType id, class... Args>
+		template<WindowAction id, class... Args>
 		auto createWindow(Model::Document& doc, Args&&... args)
 		{
-			using T  = typename AppWindowTypeTraits<id>::type::element_type;
+			using T  = typename WindowActionTraits<id>::type::element_type;
 			auto ret = std::make_unique<T>(
-			    AppWindowTypeTraits<id>::name(), *this, doc, std::forward<Args>(args)...);
+			    WindowActionTraits<id>::name(), *this, doc, std::forward<Args>(args)...);
 			ret->window().template eventHandler<id>(*this);
 			ret->widget().template eventHandler<id>(*this);
 			return ret;
@@ -108,19 +108,19 @@ namespace Texpainter::App
 		    : m_document{std::make_unique<Model::Document>(Size2d{512, 512})}
 		    , m_window_count{3}
 		{
-			m_windows.get<AppWindowType::ImageEditor>() =
-			    createWindow<AppWindowType::ImageEditor>(*m_document);
-			m_windows.get<AppWindowType::FilterGraphEditor>() =
-			    createWindow<AppWindowType::FilterGraphEditor>(*m_document);
-			m_windows.get<AppWindowType::DocumentPreviewer>() =
-			    createWindow<AppWindowType::DocumentPreviewer>(*m_document);
+			m_windows.get<WindowAction::ImageEditor>() =
+			    createWindow<WindowAction::ImageEditor>(*m_document);
+			m_windows.get<WindowAction::FilterGraphEditor>() =
+			    createWindow<WindowAction::FilterGraphEditor>(*m_document);
+			m_windows.get<WindowAction::DocumentPreviewer>() =
+			    createWindow<WindowAction::DocumentPreviewer>(*m_document);
 
 			resetWindowPositions();
 
-			m_windows.get<AppWindowType::ImageEditor>()->window().show();
+			m_windows.get<WindowAction::ImageEditor>()->window().show();
 		}
 
-		template<AppWindowType>
+		template<WindowAction>
 		void onKeyUp(Ui::Window&, Ui::Scancode)
 		{
 		}
@@ -138,11 +138,11 @@ namespace Texpainter::App
 			auto const size_half    = Size2d{static_cast<uint32_t>(size_vec_lower[0]),
                                           static_cast<uint32_t>(size_vec_lower[1])};
 
-			if(auto img_editor = m_windows.get<AppWindowType::ImageEditor>().get();
+			if(auto img_editor = m_windows.get<WindowAction::ImageEditor>().get();
 			   img_editor != nullptr)
 			{ img_editor->window().resize(size_quarter).move(Ui::ScreenCoordinates{0.0, 0.0}); }
 
-			if(auto doc_previewer = m_windows.get<AppWindowType::DocumentPreviewer>().get();
+			if(auto doc_previewer = m_windows.get<WindowAction::DocumentPreviewer>().get();
 			   doc_previewer != nullptr)
 			{
 				doc_previewer->window()
@@ -150,7 +150,7 @@ namespace Texpainter::App
 				    .move(Ui::ScreenCoordinates{0.0, 0.0} + vec2_t{0.5, 0.0} * size_vec);
 			}
 
-			if(auto compositor = m_windows.get<AppWindowType::FilterGraphEditor>().get();
+			if(auto compositor = m_windows.get<WindowAction::FilterGraphEditor>().get();
 			   compositor != nullptr)
 			{
 				compositor->window().resize(size_half).move(Ui::ScreenCoordinates{0.0, 0.0}
@@ -158,7 +158,7 @@ namespace Texpainter::App
 			}
 		}
 
-		template<AppWindowType window>
+		template<WindowAction window>
 		void onKeyDown(Ui::Window&, Ui::Scancode scancode)
 		{
 			auto& key_state = Ui::Context::get().keyboardState();
@@ -169,32 +169,32 @@ namespace Texpainter::App
 				switch(scancode.value())
 				{
 					case Ui::Scancodes::F1.value():
-						createAndShowWindow<AppWindowType::ImageEditor>();
+						createAndShowWindow<WindowAction::ImageEditor>();
 						return;
 					case Ui::Scancodes::F2.value():
-						createAndShowWindow<AppWindowType::FilterGraphEditor>();
+						createAndShowWindow<WindowAction::FilterGraphEditor>();
 						return;
 					case Ui::Scancodes::F3.value():
-						createAndShowWindow<AppWindowType::DocumentPreviewer>();
+						createAndShowWindow<WindowAction::DocumentPreviewer>();
 						return;
 				}
 			}
 
-			if constexpr(window != AppWindowType::DocumentPreviewer)
+			if constexpr(window != WindowAction::DocumentPreviewer)
 			{
 				m_windows.template get<window>()->widget().onKeyDown(
 				    Ui::Context::get().keyboardState());
 			}
 		}
 
-		template<AppWindowType id>
+		template<WindowAction id>
 		void onClose(Ui::Window&)
 		{
 			--m_window_count;
-			if constexpr(id == AppWindowType::FilterGraphEditor)
+			if constexpr(id == WindowAction::FilterGraphEditor)
 			{
 				m_document->nodeLocations(
-				    m_windows.get<AppWindowType::FilterGraphEditor>()->widget().nodeLocations());
+				    m_windows.get<WindowAction::FilterGraphEditor>()->widget().nodeLocations());
 			}
 			m_windows.get<id>().reset();
 			if(m_window_count == 0) { Ui::Context::get().exit(); }
@@ -213,7 +213,7 @@ namespace Texpainter::App
 		}
 
 		template<auto id, class Source>
-		requires(!std::same_as<decltype(id), AppWindowType>) void onActivated(Enum::Tag<id>,
+		requires(!std::same_as<decltype(id), WindowAction>) void onActivated(Enum::Tag<id>,
 		                                                                      Ui::MenuItem&,
 		                                                                      Source&)
 		{
@@ -226,7 +226,7 @@ namespace Texpainter::App
 			Ui::Context::get().exit();
 		}
 
-		template<AppWindowType item>
+		template<WindowAction item>
 		void createAndShowWindow()
 		{
 			if(m_windows.get<item>() == nullptr)
@@ -237,7 +237,7 @@ namespace Texpainter::App
 			m_windows.get<item>()->window().show();
 		}
 
-		template<AppWindowType item, class Source>
+		template<WindowAction item, class Source>
 		void onActivated(Enum::Tag<item>, Ui::MenuItem&, Source&)
 		{
 			createAndShowWindow<item>();
@@ -263,11 +263,11 @@ namespace Texpainter::App
 		template<class Source>
 		void onActivated(Enum::Tag<DocumentAction::Save>, Ui::MenuItem&, Source&)
 		{
-			if(auto compositor = m_windows.get<AppWindowType::FilterGraphEditor>().get();
+			if(auto compositor = m_windows.get<WindowAction::FilterGraphEditor>().get();
 			   compositor != nullptr)
 			{ m_document->nodeLocations(compositor->widget().nodeLocations()); }
 
-			if(auto compositor = m_windows.get<AppWindowType::FilterGraphEditor>().get();
+			if(auto compositor = m_windows.get<WindowAction::FilterGraphEditor>().get();
 			   compositor != nullptr)
 			{ m_document->nodeLocations(compositor->widget().nodeLocations()); }
 			store(*m_document, "/dev/stdout");
@@ -455,18 +455,18 @@ namespace Texpainter::App
 		{
 			auto doc = std::make_unique<Model::Document>(src.widget().inputField().value());
 
-			auto filter_edit   = createWindow<AppWindowType::FilterGraphEditor>(*doc);
-			auto img_edit      = createWindow<AppWindowType::ImageEditor>(*doc);
-			auto doc_previewer = createWindow<AppWindowType::DocumentPreviewer>(*doc);
+			auto filter_edit   = createWindow<WindowAction::FilterGraphEditor>(*doc);
+			auto img_edit      = createWindow<WindowAction::ImageEditor>(*doc);
+			auto doc_previewer = createWindow<WindowAction::DocumentPreviewer>(*doc);
 
 			m_document                                        = std::move(doc);
-			m_windows.get<AppWindowType::FilterGraphEditor>() = std::move(filter_edit);
-			m_windows.get<AppWindowType::ImageEditor>()       = std::move(img_edit);
-			m_windows.get<AppWindowType::DocumentPreviewer>() = std::move(doc_previewer);
+			m_windows.get<WindowAction::FilterGraphEditor>() = std::move(filter_edit);
+			m_windows.get<WindowAction::ImageEditor>()       = std::move(img_edit);
+			m_windows.get<WindowAction::DocumentPreviewer>() = std::move(doc_previewer);
 
 			m_doc_creator.reset();
 			resetWindowPositions();
-			m_windows.get<AppWindowType::ImageEditor>()->window().show();
+			m_windows.get<WindowAction::ImageEditor>()->window().show();
 		}
 
 		template<auto>
@@ -514,7 +514,7 @@ namespace Texpainter::App
 			m_document->canvasSize(src.widget().value());
 			m_canvas_modifier.reset();
 
-			if(auto output = m_windows.get<AppWindowType::DocumentPreviewer>().get();
+			if(auto output = m_windows.get<WindowAction::DocumentPreviewer>().get();
 			   output != nullptr)
 				[[likely]] { output->widget().refresh(Model::Document::ForceUpdate{true}); }
 		}
@@ -525,13 +525,13 @@ namespace Texpainter::App
 			m_canvas_modifier.reset();
 		}
 
-		template<AppWindowType id, class Src>
+		template<WindowAction id, class Src>
 		void onUpdated(Src&)
 		{
-			if(auto editor = m_windows.get<AppWindowType::ImageEditor>().get(); editor != nullptr)
+			if(auto editor = m_windows.get<WindowAction::ImageEditor>().get(); editor != nullptr)
 				[[likely]] { editor->widget().refresh(); }
 
-			if(auto output = m_windows.get<AppWindowType::DocumentPreviewer>().get();
+			if(auto output = m_windows.get<WindowAction::DocumentPreviewer>().get();
 			   output != nullptr)
 				[[likely]] { output->widget().refresh(); }
 		}
@@ -554,7 +554,7 @@ namespace Texpainter::App
 	private:
 		std::unique_ptr<Model::Document> m_document;
 
-		Enum::Tuple<AppWindowType, AppWindowTypeTraits> m_windows;
+		Enum::Tuple<WindowAction, WindowActionTraits> m_windows;
 
 		size_t m_window_count;
 
@@ -590,18 +590,18 @@ namespace Texpainter::App
 			{ throw std::string{"Item already exists"}; }
 
 			auto node = m_document->inputNodeItem(name);
-			m_windows.get<AppWindowType::FilterGraphEditor>()->widget().insertNodeEditor(*node);
+			m_windows.get<WindowAction::FilterGraphEditor>()->widget().insertNodeEditor(*node);
 
 			m_document->currentImage(std::move(name));
 
-			if(auto img_editor = m_windows.get<AppWindowType::ImageEditor>().get();
+			if(auto img_editor = m_windows.get<WindowAction::ImageEditor>().get();
 			   img_editor != nullptr)
 			{
 				img_editor->widget().refresh();
 				img_editor->window().show();
 			}
 
-			if(auto output = m_windows.get<AppWindowType::DocumentPreviewer>().get();
+			if(auto output = m_windows.get<WindowAction::DocumentPreviewer>().get();
 			   output != nullptr)
 				[[likely]] { output->widget().refresh(); }
 		}
@@ -612,18 +612,18 @@ namespace Texpainter::App
 			{ throw std::string{"Item already exists"}; }
 
 			auto node = m_document->inputNodeItem(name);
-			m_windows.get<AppWindowType::FilterGraphEditor>()->widget().insertNodeEditor(*node);
+			m_windows.get<WindowAction::FilterGraphEditor>()->widget().insertNodeEditor(*node);
 
 			m_document->currentPalette(std::move(name));
 
-			if(auto img_editor = m_windows.get<AppWindowType::ImageEditor>().get();
+			if(auto img_editor = m_windows.get<WindowAction::ImageEditor>().get();
 			   img_editor != nullptr)
 			{
 				img_editor->widget().refresh();
 				img_editor->window().show();
 			}
 
-			if(auto output = m_windows.get<AppWindowType::DocumentPreviewer>().get();
+			if(auto output = m_windows.get<WindowAction::DocumentPreviewer>().get();
 			   output != nullptr)
 				[[likely]] { output->widget().refresh(); }
 		}

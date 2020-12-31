@@ -46,7 +46,7 @@ namespace Texpainter
 	{
 		static constexpr char const* displayName() { return "Windows"; }
 
-		using type = Ui::SubmenuBuilder<AppWindowType, AppWindowTypeMenuTraits>;
+		using type = Ui::SubmenuBuilder<WindowAction, WindowActionMenuTraits>;
 	};
 
 	template<>
