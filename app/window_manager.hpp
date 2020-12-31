@@ -11,6 +11,7 @@
 #include "./document_previewer.hpp"
 #include "./size_input.hpp"
 #include "./render_job_creator.hpp"
+#include "./render_to_img_job_creator.hpp"
 
 #include "model/document.hpp"
 #include "model/palette_generate.hpp"
@@ -94,12 +95,13 @@ namespace Texpainter::App
 			return ret;
 		}
 
-		using DocumentCreatorDlg     = Ui::Dialog<Ui::LabeledInput<SizeInput>>;
-		using ExportJobCreatorDlg    = Ui::Dialog<RenderJobCreator>;
-		using CanvasSizeDlg          = Ui::Dialog<SizeInput>;
-		using ImageCreatorDlg        = Ui::Dialog<ImageCreator>;
-		using EmptyPaletteCreatorDlg = Ui::Dialog<Ui::LabeledInput<Ui::TextEntry>>;
-		using PaletteGenerateDlg     = Ui::Dialog<PaletteCreator>;
+		using DocumentCreatorDlg       = Ui::Dialog<Ui::LabeledInput<SizeInput>>;
+		using ExportJobCreatorDlg      = Ui::Dialog<RenderJobCreator>;
+		using RenderToImgJobCreatorDlg = Ui::Dialog<RenderToImgJobCreator>;
+		using CanvasSizeDlg            = Ui::Dialog<SizeInput>;
+		using ImageCreatorDlg          = Ui::Dialog<ImageCreator>;
+		using EmptyPaletteCreatorDlg   = Ui::Dialog<Ui::LabeledInput<Ui::TextEntry>>;
+		using PaletteGenerateDlg       = Ui::Dialog<PaletteCreator>;
 
 	public:
 		[[nodiscard]] WindowManager()
@@ -207,6 +209,18 @@ namespace Texpainter::App
 			   compositor != nullptr)
 			{ m_document->nodeLocations(compositor->widget().nodeLocations()); }
 			store(*m_document, "/dev/stdout");
+		}
+
+		template<class Source>
+		void onActivated(Enum::Tag<DocumentAction::RenderToImage>, Ui::MenuItem&, Source& src)
+		{
+			if(m_render_to_img_job_creator == nullptr) [[likely]]
+				{
+					m_render_to_img_job_creator =
+					    std::make_unique<RenderToImgJobCreatorDlg>(src.window(), "Render to image");
+					m_render_to_img_job_creator->eventHandler<DocumentAction::RenderToImage>(*this);
+				}
+			m_render_to_img_job_creator->show();
 		}
 
 		template<class Source>
@@ -394,6 +408,22 @@ namespace Texpainter::App
 		}
 
 		template<auto>
+		void confirmPositive(RenderToImgJobCreatorDlg& src)
+		{
+			auto opts = src.widget().value();
+			insert(std::move(opts.name),
+			       render(*m_document, Model::Document::ForceUpdate{true}, opts.supersampling));
+
+			m_render_to_img_job_creator.reset();
+		}
+
+		template<auto>
+		void dismiss(RenderToImgJobCreatorDlg&)
+		{
+			m_render_to_img_job_creator.reset();
+		}
+
+		template<auto>
 		void confirmPositive(ExportJobCreatorDlg& src)
 		{
 			auto opts = src.widget().value();
@@ -461,6 +491,7 @@ namespace Texpainter::App
 		size_t m_window_count;
 
 		std::unique_ptr<DocumentCreatorDlg> m_doc_creator;
+		std::unique_ptr<RenderToImgJobCreatorDlg> m_render_to_img_job_creator;
 		std::unique_ptr<ExportJobCreatorDlg> m_export_job_creator;
 		std::unique_ptr<CanvasSizeDlg> m_canvas_modifier;
 		std::unique_ptr<ImageCreatorDlg> m_img_creator;
