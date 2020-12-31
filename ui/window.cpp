@@ -56,7 +56,26 @@ public:
 		gtk_window_set_default_size(m_handle, size.width(), size.height());
 	}
 
-	void resize(Size2d size) { gtk_window_resize(m_handle, size.width(), size.height()); }
+	void resize(Size2d size)
+	{
+		if(auto gdk_window = gtk_widget_get_window(GTK_WIDGET(m_handle)); gdk_window != nullptr)
+			[[likely]]
+			{
+				while(gtk_events_pending())
+				{
+					gtk_main_iteration();
+				}
+
+				GdkRectangle rect{};
+				gdk_window_get_frame_extents(gdk_window, &rect);
+				GtkAllocation alloc{};
+				gtk_widget_get_allocation(GTK_WIDGET(m_handle), &alloc);
+
+				size = Size2d{size.width() - (rect.width - alloc.width),
+				              size.height() - (rect.height - alloc.height)};
+			}
+		gtk_window_resize(m_handle, size.width(), size.height());
+	}
 
 	void move(ScreenCoordinates coords) { gtk_window_move(m_handle, coords.x(), coords.y()); }
 
