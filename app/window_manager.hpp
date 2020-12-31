@@ -115,6 +115,18 @@ namespace Texpainter::App
 			m_windows.get<AppWindowType::DocumentPreviewer>() =
 			    createWindow<AppWindowType::DocumentPreviewer>(*m_document);
 
+			resetWindowPositions();
+
+			m_windows.get<AppWindowType::ImageEditor>()->window().show();
+		}
+
+		template<AppWindowType>
+		void onKeyUp(Ui::Window&, Ui::Scancode)
+		{
+		}
+
+		void resetWindowPositions()
+		{
 			auto const screen_size = Ui::Context::get().primaryWorkspaceSize();
 			vec2_t const size_vec{static_cast<double>(screen_size.width()),
 			                      static_cast<double>(screen_size.height())};
@@ -126,23 +138,24 @@ namespace Texpainter::App
 			auto const size_half    = Size2d{static_cast<uint32_t>(size_vec_lower[0]),
                                           static_cast<uint32_t>(size_vec_lower[1])};
 
-			m_windows.get<AppWindowType::ImageEditor>()
-			    ->window()
-			    .resize(size_quarter)
-			    .move(Ui::ScreenCoordinates{0.0, 0.0});
-			m_windows.get<AppWindowType::DocumentPreviewer>()
-			    ->window()
-			    .resize(size_quarter)
-			    .move(Ui::ScreenCoordinates{0.0, 0.0} + vec2_t{0.5, 0.0} * size_vec);
-			m_windows.get<AppWindowType::FilterGraphEditor>()->window().resize(size_half).move(
-			    Ui::ScreenCoordinates{0.0, 0.0} + vec2_t{0.0, 0.625} * size_vec);
+			if(auto img_editor = m_windows.get<AppWindowType::ImageEditor>().get();
+			   img_editor != nullptr)
+			{ img_editor->window().resize(size_quarter).move(Ui::ScreenCoordinates{0.0, 0.0}); }
 
-			m_windows.get<AppWindowType::ImageEditor>()->window().show();
-		}
+			if(auto doc_previewer = m_windows.get<AppWindowType::DocumentPreviewer>().get();
+			   doc_previewer != nullptr)
+			{
+				doc_previewer->window()
+				    .resize(size_quarter)
+				    .move(Ui::ScreenCoordinates{0.0, 0.0} + vec2_t{0.5, 0.0} * size_vec);
+			}
 
-		template<AppWindowType>
-		void onKeyUp(Ui::Window&, Ui::Scancode)
-		{
+			if(auto compositor = m_windows.get<AppWindowType::FilterGraphEditor>().get;
+			   compositior != nullptr)
+			{
+				compositior->window().resize(size_half).move(Ui::ScreenCoordinates{0.0, 0.0}
+				                                             + vec2_t{0.0, 0.625} * size_vec);
+			}
 		}
 
 		template<AppWindowType window>
