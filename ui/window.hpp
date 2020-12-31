@@ -9,6 +9,7 @@
 #include "./container.hpp"
 #include "./scancode.hpp"
 #include "./dispatch_event.hpp"
+#include "./screen_coordinates.hpp"
 
 #include "utils/size_2d.hpp"
 
@@ -81,6 +82,8 @@ namespace Texpainter::Ui
 		Window& defaultSize(Size2d size);
 
 		Window& resize(Size2d size);
+
+		Window& move(ScreenCoordinates coords);
 
 		static void terminateApp();
 

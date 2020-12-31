@@ -126,9 +126,16 @@ namespace Texpainter::App
 			auto const size_half    = Size2d{static_cast<uint32_t>(size_vec_half[0]),
                                           static_cast<uint32_t>(size_vec_half[1])};
 
-			m_windows.get<AppWindowType::ImageEditor>()->window().resize(size_quarter);
-			m_windows.get<AppWindowType::DocumentPreviewer>()->window().resize(size_quarter);
-			m_windows.get<AppWindowType::FilterGraphEditor>()->window().resize(size_half);
+			m_windows.get<AppWindowType::ImageEditor>()
+			    ->window()
+			    .resize(size_quarter)
+			    .move(Ui::ScreenCoordinates{0.0, 0.0});
+			m_windows.get<AppWindowType::DocumentPreviewer>()
+			    ->window()
+			    .resize(size_quarter)
+			    .move(Ui::ScreenCoordinates{0.0, 0.0} + vec2_t{0.5, 0.0} * size_vec);
+			m_windows.get<AppWindowType::FilterGraphEditor>()->window().resize(size_half).move(
+			    Ui::ScreenCoordinates{0.0, 0.0} + vec2_t{0.0, 0.5} * size_vec);
 		}
 
 		template<AppWindowType>

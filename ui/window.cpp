@@ -58,6 +58,8 @@ public:
 
 	void resize(Size2d size) { gtk_window_resize(m_handle, size.width(), size.height()); }
 
+	void move(ScreenCoordinates coords) { gtk_window_move(m_handle, coords.x(), coords.y()); }
+
 private:
 	static gboolean delete_event(GtkWidget* widget, GdkEvent* event, void* user_data);
 	static gboolean key_press(GtkWidget* widget, GdkEvent* event, void* user_data);
@@ -233,3 +235,9 @@ Texpainter::Ui::Window& Texpainter::Ui::Window::resize(Size2d size)
 }
 
 void Texpainter::Ui::Window::terminateApp() { gtk_main_quit(); }
+
+Texpainter::Ui::Window& Texpainter::Ui::Window::move(ScreenCoordinates coords)
+{
+	m_impl->move(coords);
+	return *this;
+}
