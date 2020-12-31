@@ -118,13 +118,13 @@ namespace Texpainter::App
 			auto const screen_size = Ui::Context::get().primaryWorkspaceSize();
 			vec2_t const size_vec{static_cast<double>(screen_size.width()),
 			                      static_cast<double>(screen_size.height())};
-			vec2_t const size_vec_quarter = 0.5 * size_vec;
-			vec2_t const size_vec_half    = vec2_t{1.0, 0.5} * size_vec;
+			vec2_t const size_vec_upper = vec2_t{0.5, 0.625} * size_vec;
+			vec2_t const size_vec_lower = vec2_t{1.0, 1.0 - 0.625} * size_vec;
 
-			auto const size_quarter = Size2d{static_cast<uint32_t>(size_vec_quarter[0]),
-			                                 static_cast<uint32_t>(size_vec_quarter[1])};
-			auto const size_half    = Size2d{static_cast<uint32_t>(size_vec_half[0]),
-                                          static_cast<uint32_t>(size_vec_half[1])};
+			auto const size_quarter = Size2d{static_cast<uint32_t>(size_vec_upper[0]),
+			                                 static_cast<uint32_t>(size_vec_upper[1])};
+			auto const size_half    = Size2d{static_cast<uint32_t>(size_vec_lower[0]),
+                                          static_cast<uint32_t>(size_vec_lower[1])};
 
 			m_windows.get<AppWindowType::ImageEditor>()
 			    ->window()
@@ -135,7 +135,7 @@ namespace Texpainter::App
 			    .resize(size_quarter)
 			    .move(Ui::ScreenCoordinates{0.0, 0.0} + vec2_t{0.5, 0.0} * size_vec);
 			m_windows.get<AppWindowType::FilterGraphEditor>()->window().resize(size_half).move(
-			    Ui::ScreenCoordinates{0.0, 0.0} + vec2_t{0.0, 0.5} * size_vec);
+			    Ui::ScreenCoordinates{0.0, 0.0} + vec2_t{0.0, 0.625} * size_vec);
 		}
 
 		template<AppWindowType>
