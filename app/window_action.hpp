@@ -12,7 +12,7 @@ namespace Texpainter
 	enum class WindowAction : int
 	{
 		ImageEditor,
-		FilterGraphEditor,
+		Compositor,
 		DocumentPreviewer
 	};
 
@@ -30,21 +30,21 @@ namespace Texpainter
 	struct WindowActionMenuTraits<WindowAction::ImageEditor>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName() { return "Image editor"; }
+		static constexpr char const* displayName() { return "Show image editor"; }
 	};
 
 	template<>
-	struct WindowActionMenuTraits<WindowAction::FilterGraphEditor>
+	struct WindowActionMenuTraits<WindowAction::Compositor>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName() { return "Compositor"; }
+		static constexpr char const* displayName() { return "Show compositor"; }
 	};
 
 	template<>
 	struct WindowActionMenuTraits<WindowAction::DocumentPreviewer>
 	{
 		using type = Ui::MenuItem;
-		static constexpr char const* displayName() { return "Document preview"; }
+		static constexpr char const* displayName() { return "Show document preview"; }
 	};
 }
 

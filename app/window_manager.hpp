@@ -74,6 +74,29 @@ namespace Texpainter::App
 			using type = std::unique_ptr<DocumentPreviewWindow<EventHandler>>;
 			static constexpr char const* name() { return "Texpainter: Document preview"; }
 		};
+
+		template<WindowAction, class EventHandler>
+		struct WindowTypeFromWindowAction
+		{
+		};
+
+		template<class EventHandler>
+		struct WindowTypeFromWindowAction<WindowAction::Compositor, EventHandler>
+		{
+			static constexpr auto id = WindowType::Compositor;
+		};
+
+		template<class EventHandler>
+		struct WindowTypeFromWindowAction<WindowAction::ImageEditor, EventHandler>
+		{
+			static constexpr auto id = WindowType::ImageEditor;
+		};
+
+		template<class EventHandler>
+		struct WindowTypeFromWindowAction<WindowAction::DocumentPreviewer, EventHandler>
+		{
+			static constexpr auto id = WindowType::DocumentPreviewer;
+		};
 	}
 
 	template<class T>
@@ -96,6 +119,9 @@ namespace Texpainter::App
 	class WindowManager
 	{
 		using WindowType = detail::WindowType;
+
+		template<WindowAction id>
+		using WindowTypeFromWindowAction = detail::WindowTypeFromWindowAction<id, WindowManager>;
 
 		template<WindowType id>
 		using WindowTypeTraits = detail::WindowTypeTraits<id, WindowManager>;
@@ -255,9 +281,16 @@ namespace Texpainter::App
 		}
 
 		template<WindowAction item, class Source>
+		requires(std::same_as<std::decay_t<decltype(WindowTypeFromWindowAction<item>::id)>,
+		                      WindowType>) void onActivated(Enum::Tag<item>, Ui::MenuItem&, Source&)
+		{
+			createAndShowWindow<WindowTypeFromWindowAction<item>::id>();
+		}
+
+		template<WindowAction item, class Source>
 		void onActivated(Enum::Tag<item>, Ui::MenuItem&, Source&)
 		{
-			//	createAndShowWindow<item>();
+			puts("Pass");
 		}
 
 		template<class Source>
