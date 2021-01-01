@@ -11,16 +11,16 @@ namespace Texpainter
 {
 	enum class WorkspaceAction : int
 	{
-		ImageEditor,
-		Compositor,
-		DocumentPreviewer
+		ShowImageEditor,
+		ShowCompositor,
+		ShowDocumentPreviewer
 	};
 
-	constexpr auto begin(Enum::Empty<WorkspaceAction>) { return WorkspaceAction::ImageEditor; }
+	constexpr auto begin(Enum::Empty<WorkspaceAction>) { return WorkspaceAction::ShowImageEditor; }
 
 	constexpr auto end(Enum::Empty<WorkspaceAction>)
 	{
-		return static_cast<WorkspaceAction>(static_cast<int>(WorkspaceAction::DocumentPreviewer)
+		return static_cast<WorkspaceAction>(static_cast<int>(WorkspaceAction::ShowDocumentPreviewer)
 		                                    + 1);
 	}
 
@@ -28,21 +28,21 @@ namespace Texpainter
 	struct WorkspaceActionMenuTraits;
 
 	template<>
-	struct WorkspaceActionMenuTraits<WorkspaceAction::ImageEditor>
+	struct WorkspaceActionMenuTraits<WorkspaceAction::ShowImageEditor>
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Show image editor"; }
 	};
 
 	template<>
-	struct WorkspaceActionMenuTraits<WorkspaceAction::Compositor>
+	struct WorkspaceActionMenuTraits<WorkspaceAction::ShowCompositor>
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Show compositor"; }
 	};
 
 	template<>
-	struct WorkspaceActionMenuTraits<WorkspaceAction::DocumentPreviewer>
+	struct WorkspaceActionMenuTraits<WorkspaceAction::ShowDocumentPreviewer>
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Show document preview"; }

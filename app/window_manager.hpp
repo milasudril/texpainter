@@ -81,19 +81,19 @@ namespace Texpainter::App
 		};
 
 		template<class EventHandler>
-		struct WindowTypeFromWorkspaceAction<WorkspaceAction::Compositor, EventHandler>
+		struct WindowTypeFromWorkspaceAction<WorkspaceAction::ShowCompositor, EventHandler>
 		{
 			static constexpr auto id = WindowType::Compositor;
 		};
 
 		template<class EventHandler>
-		struct WindowTypeFromWorkspaceAction<WorkspaceAction::ImageEditor, EventHandler>
+		struct WindowTypeFromWorkspaceAction<WorkspaceAction::ShowImageEditor, EventHandler>
 		{
 			static constexpr auto id = WindowType::ImageEditor;
 		};
 
 		template<class EventHandler>
-		struct WindowTypeFromWorkspaceAction<WorkspaceAction::DocumentPreviewer, EventHandler>
+		struct WindowTypeFromWorkspaceAction<WorkspaceAction::ShowDocumentPreviewer, EventHandler>
 		{
 			static constexpr auto id = WindowType::DocumentPreviewer;
 		};
