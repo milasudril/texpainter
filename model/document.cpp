@@ -1,8 +1,16 @@
 //@	{
-//@	 "targets":[{"name":"document.o", "type":"object"}]
+//@	 "targets":[{"name":"document.o", "type":"object", "include_targets":[
+//@		"../imgproc/split_rgba_image.imgproc.hpp",
+//@		"../imgproc/make_rgba_image.imgproc.hpp",
+//@		"../imgproc/dft_forward.imgproc.hpp",
+//@		"../imgproc/dft_backward.imgproc.hpp"]}]
 //@	}
 
 #include "./document.hpp"
+#include "filtergraph/image_processor_wrapper.hpp"
+
+//HACK must have a static references to these for linking to work properly
+#include "dft/engine.hpp"
 
 #include <algorithm>
 
@@ -58,6 +66,90 @@ Texpainter::PixelStore::Image Texpainter::Model::render(Document const& document
 		}
 
 	PixelStore::Image downsampled{document.canvasSize()};
+#if 1
+	using InputArray = std::array<FilterGraph::InputPortValue, FilterGraph::NodeArgument::MaxNumInputs>;
+	using OutputArray = std::array<FilterGraph::PortValue, FilterGraph::AbstractImageProcessor::MaxNumOutputs>;
+
+	auto rgba = [](auto input) {
+		FilterGraph::ImageProcessorWrapper to_grayscale{::SplitRgbaImage::ImageProcessor{}};
+		return to_grayscale(FilterGraph::NodeArgument{
+		    input.size(),
+		   InputArray{
+		        input.data()}});
+	}(ret.pixels());
+
+	auto dft = [](auto size, auto const& val) {
+		FilterGraph::ImageProcessorWrapper dft_forward{::DftForward::ImageProcessor{}};
+		return OutputArray{
+			std::move(dft_forward(FilterGraph::NodeArgument{size, InputArray{makeInputPortValue(val[0])}})[0]),
+			std::move(dft_forward(FilterGraph::NodeArgument{size, InputArray{makeInputPortValue(val[1])}})[0]),
+			std::move(dft_forward(FilterGraph::NodeArgument{size, InputArray{makeInputPortValue(val[2])}})[0]),
+			std::move(dft_forward(FilterGraph::NodeArgument{size, InputArray{makeInputPortValue(val[3])}})[0])
+		};
+	}(ret.size(), rgba);
+
+	auto mask = [](uint32_t scale, auto const& spectrum) {
+		auto const w_out = spectrum.width()/static_cast<double>(scale);
+		auto const h_out = spectrum.height()/static_cast<double>(scale);
+		auto const x_min = (spectrum.width() - w_out)/2.0;
+		auto const y_min = (spectrum.height() - h_out)/2.0;
+		auto const x_max = x_min + w_out;
+		auto const y_max = y_min + h_out;
+		auto retbuff = std::make_unique<std::complex<double>[]>(area(spectrum.size()));
+		Span2d ret{retbuff.get(), spectrum.size()};
+		for(uint32_t k = static_cast<uint32_t>(y_min); k < static_cast<uint32_t>(y_max + 0.5); ++k)
+		{
+			for(uint32_t l = static_cast<uint32_t>(x_min); l < static_cast<uint32_t>(x_max + 0.5); ++l)
+			{
+				ret(l, k) = spectrum(l, k);
+			}
+		}
+		return retbuff;
+	};
+
+	auto masked_dft = [&mask](uint32_t scale, auto size, auto const& output_array) {
+		using InputT = std::unique_ptr<std::complex<double>[]>;
+		return OutputArray{
+			mask(scale, Span2d{Enum::get_if<InputT>(&output_array[0])->get(), size}),
+			mask(scale, Span2d{Enum::get_if<InputT>(&output_array[1])->get(), size}),
+			mask(scale, Span2d{Enum::get_if<InputT>(&output_array[2])->get(), size}),
+			mask(scale, Span2d{Enum::get_if<InputT>(&output_array[3])->get(), size})
+		};
+	}(scale, ret.size(), dft);
+
+	auto idft = [](auto size, auto const& val){
+		FilterGraph::ImageProcessorWrapper dft_backward{::DftBackward::ImageProcessor{}};
+		return OutputArray{
+			std::move(dft_backward(FilterGraph::NodeArgument{size, InputArray{makeInputPortValue(val[0])}})[0]),
+			std::move(dft_backward(FilterGraph::NodeArgument{size, InputArray{makeInputPortValue(val[1])}})[0]),
+			std::move(dft_backward(FilterGraph::NodeArgument{size, InputArray{makeInputPortValue(val[2])}})[0]),
+			std::move(dft_backward(FilterGraph::NodeArgument{size, InputArray{makeInputPortValue(val[3])}})[0])};
+	}(ret.size(), masked_dft);
+
+	auto rgba_filtered = [](auto size, auto const& val) {
+		FilterGraph::ImageProcessorWrapper to_rgba{::MakeRgbaImage::ImageProcessor{}};
+		using InputT = std::unique_ptr<PixelStore::Pixel[]>;
+
+		auto result = to_rgba(FilterGraph::NodeArgument{size, InputArray{makeInputPortValue(val[0]),
+			makeInputPortValue(val[1]),
+					   makeInputPortValue(val[2]),
+					   makeInputPortValue(val[3])
+		}});
+
+		return std::move(*Enum::get_if<InputT>(result.data()));
+	}(ret.size(), idft);
+
+	auto rgba_filtered_span = Span2d{rgba_filtered.get(), ret.size()};
+	for(uint32_t row = 0; row < document.canvasSize().height(); ++row)
+	{
+		for(uint32_t col = 0; col < document.canvasSize().width(); ++col)
+		{
+			downsampled(col, row) = rgba_filtered_span(scale * col, scale * row);
+		}
+	}
+
+#else
+
 	for(uint32_t row = 0; row < document.canvasSize().height(); ++row)
 	{
 		for(uint32_t col = 0; col < document.canvasSize().width(); ++col)
@@ -73,6 +165,9 @@ Texpainter::PixelStore::Image Texpainter::Model::render(Document const& document
 			downsampled(col, row) = result / static_cast<float>(scale * scale);
 		}
 	}
+#endif
+	//	PixelStore::BasicImage<
+
 	return downsampled;
 }
 
