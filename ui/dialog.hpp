@@ -291,7 +291,7 @@ namespace Texpainter::Ui
 				m_buttons[ButtonIndex::user2()].label(DialogTraits::user2());
 			}
 
-			m_window.modal(true).show();
+			m_window.modal(true).show().shrinkToContent();
 		}
 
 		static constexpr bool has_dismiss() noexcept { return DialogTraits::dismiss() != nullptr; }

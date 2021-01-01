@@ -87,6 +87,8 @@ namespace Texpainter::Ui
 
 		static void terminateApp();
 
+		Window& shrinkToContent();
+
 	protected:
 		struct EventHandlerVtable
 		{
