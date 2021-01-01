@@ -4,7 +4,7 @@
 #define TEXPAINTER_APP_MAINMENU_HPP
 
 #include "./app_menu.hpp"
-#include "./window_action.hpp"
+#include "./workspace_action.hpp"
 #include "./document_menu.hpp"
 #include "./image_menu.hpp"
 #include "./palette_menu.hpp"
@@ -17,7 +17,7 @@ namespace Texpainter
 	enum class MainMenuItem : int
 	{
 		Application,
-		Windows,
+		Workspace,
 		Document,
 		Image,
 		Palette
@@ -42,11 +42,11 @@ namespace Texpainter
 	};
 
 	template<>
-	struct MainMenuItemTraits<MainMenuItem::Windows>
+	struct MainMenuItemTraits<MainMenuItem::Workspace>
 	{
-		static constexpr char const* displayName() { return "Windows"; }
+		static constexpr char const* displayName() { return "Workspace"; }
 
-		using type = Ui::SubmenuBuilder<WindowAction, WindowActionMenuTraits>;
+		using type = Ui::SubmenuBuilder<WorkspaceAction, WorkspaceActionMenuTraits>;
 	};
 
 	template<>
