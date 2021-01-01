@@ -58,22 +58,28 @@ public:
 
 	void resize(Size2d size)
 	{
-		if(auto gdk_window = gtk_widget_get_window(GTK_WIDGET(m_handle)); gdk_window != nullptr)
-			[[likely]]
+		if(gtk_window_get_decorated(m_handle) == TRUE)
+		{
+			if(auto gdk_window = gtk_widget_get_window(GTK_WIDGET(m_handle)); gdk_window != nullptr)
 			{
-				while(gtk_events_pending())
+				GdkRectangle rect{};
+				GtkAllocation alloc{};
+				auto size_new = size;
+				while(size_new == size)
 				{
 					gtk_main_iteration();
+					gdk_window_get_frame_extents(gdk_window, &rect);
+					gtk_widget_get_allocation(GTK_WIDGET(m_handle), &alloc);
+					size = Size2d{size.width() - (rect.width - alloc.width),
+					              size.height() - (rect.height - alloc.height)};
 				}
-
-				GdkRectangle rect{};
-				gdk_window_get_frame_extents(gdk_window, &rect);
-				GtkAllocation alloc{};
-				gtk_widget_get_allocation(GTK_WIDGET(m_handle), &alloc);
-
-				size = Size2d{size.width() - (rect.width - alloc.width),
-				              size.height() - (rect.height - alloc.height)};
+				size_new = size;
 			}
+			else
+			{
+				return;
+			}
+		}
 		gtk_window_resize(m_handle, size.width(), size.height());
 	}
 

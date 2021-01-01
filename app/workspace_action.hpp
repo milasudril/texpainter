@@ -21,8 +21,7 @@ namespace Texpainter
 
 	constexpr auto end(Enum::Empty<WorkspaceAction>)
 	{
-		return static_cast<WorkspaceAction>(static_cast<int>(WorkspaceAction::ResetLayout)
-		                                    + 1);
+		return static_cast<WorkspaceAction>(static_cast<int>(WorkspaceAction::ResetLayout) + 1);
 	}
 
 	template<WorkspaceAction>
