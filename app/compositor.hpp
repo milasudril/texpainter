@@ -1,10 +1,10 @@
 //@	{
-//@	 "targets":[{"name":"filter_graph_editor.hpp","type":"include"}]
-//@	,"dependencies_extra":[{"ref":"filter_graph_editor.o","rel":"implementation"}]
+//@	 "targets":[{"name":"compositor.hpp","type":"include"}]
+//@	,"dependencies_extra":[{"ref":"compositor.o","rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_APP_FILTERGRAPHEDITOR_HPP
-#define TEXPAINTER_APP_FILTERGRAPHEDITOR_HPP
+#ifndef TEXPAINTER_APP_COMPOSITOR_HPP
+#define TEXPAINTER_APP_COMPOSITOR_HPP
 
 #include "./node_editor.hpp"
 #include "./image_processor_selector.hpp"
@@ -208,10 +208,10 @@ namespace Texpainter::App
 	};
 
 
-	class FilterGraphEditor
+	class Compositor
 	{
 		using Canvas           = Ui::WidgetCanvas<FilterGraph::NodeId>;
-		using NodeWidget       = NodeEditor<FilterGraphEditor>;
+		using NodeWidget       = NodeEditor<Compositor>;
 		using NodeNameInputDlg = Ui::Dialog<
 		    InheritFrom<std::pair<FilterGraph::NodeId, Model::CompositorProxy<Model::Document>>,
 		                Ui::LabeledInput<Ui::TextEntry>>>;
@@ -226,20 +226,20 @@ namespace Texpainter::App
 			FilterMenu
 		};
 
-		FilterGraphEditor(FilterGraphEditor&&) = delete;
+		Compositor(Compositor&&) = delete;
 
-		FilterGraphEditor& operator=(FilterGraphEditor&&) = delete;
+		Compositor& operator=(Compositor&&) = delete;
 
-		FilterGraphEditor(Ui::Container& owner, Model::Document& doc);
+		Compositor(Ui::Container& owner, Model::Document& doc);
 
-		FilterGraphEditor& insert(std::unique_ptr<FilterGraph::AbstractImageProcessor> node,
-		                          Ui::WidgetCoordinates loc = Ui::WidgetCoordinates{50.0, 50.0});
+		Compositor& insert(std::unique_ptr<FilterGraph::AbstractImageProcessor> node,
+		                   Ui::WidgetCoordinates loc = Ui::WidgetCoordinates{50.0, 50.0});
 
 		template<auto id, class EventHandler>
-		FilterGraphEditor& eventHandler(EventHandler& eh)
+		Compositor& eventHandler(EventHandler& eh)
 		{
 			r_eh       = &eh;
-			r_callback = [](void* eh, FilterGraphEditor& src) {
+			r_callback = [](void* eh, Compositor& src) {
 				auto self = reinterpret_cast<EventHandler*>(eh);
 				self->template onUpdated<id>(src);
 			};
@@ -408,7 +408,7 @@ namespace Texpainter::App
 	private:
 		std::reference_wrapper<Model::Document> m_doc;
 		void* r_eh;
-		void (*r_callback)(void*, FilterGraphEditor&);
+		void (*r_callback)(void*, Compositor&);
 
 		PortMap m_ports;
 		FilterGraph::NodeId m_sel_node;
@@ -438,7 +438,7 @@ namespace Texpainter::App
 	};
 
 	template<>
-	inline void FilterGraphEditor::onMouseDown<FilterGraphEditor::ControlId::NodeWidgets>(
+	inline void Compositor::onMouseDown<Compositor::ControlId::NodeWidgets>(
 	    Canvas&,
 	    Ui::WidgetCoordinates loc,
 	    Ui::ScreenCoordinates,
@@ -457,7 +457,7 @@ namespace Texpainter::App
 	}
 
 	template<>
-	inline void FilterGraphEditor::onMouseMove<FilterGraphEditor::ControlId::NodeWidgets>(
+	inline void Compositor::onMouseMove<Compositor::ControlId::NodeWidgets>(
 	    Canvas& src, Ui::WidgetCoordinates loc_window, Ui::ToplevelCoordinates loc)
 	{
 		m_ports.moveDummyConnectors(loc + src.viewportOffset());
@@ -466,22 +466,20 @@ namespace Texpainter::App
 	}
 
 	template<>
-	inline void FilterGraphEditor::onCopyCompleted<FilterGraphEditor::ControlId::CopyNode>(
+	inline void Compositor::onCopyCompleted<Compositor::ControlId::CopyNode>(
 	    FilterGraph::NodeId, FilterGraph::Graph::NodeItem item)
 	{
 		insertNodeEditor(item);
 	}
 
 	template<>
-	inline void FilterGraphEditor::onActivated<FilterGraphEditor::ControlId::CopyNode>(
-	    Ui::MenuItem&)
+	inline void Compositor::onActivated<Compositor::ControlId::CopyNode>(Ui::MenuItem&)
 	{
-		m_doc.get().compositor().copy<FilterGraphEditor::ControlId::CopyNode>(*this, m_sel_node);
+		m_doc.get().compositor().copy<Compositor::ControlId::CopyNode>(*this, m_sel_node);
 	}
 
 	template<>
-	inline void FilterGraphEditor::onActivated<FilterGraphEditor::ControlId::DeleteNode>(
-	    Ui::MenuItem&)
+	inline void Compositor::onActivated<Compositor::ControlId::DeleteNode>(Ui::MenuItem&)
 	{
 		auto node = std::as_const(m_doc.get()).compositor().node(m_sel_node);
 		m_ports.removePorts(*node);
@@ -492,13 +490,13 @@ namespace Texpainter::App
 	}
 
 	template<>
-	inline void FilterGraphEditor::onRealized<FilterGraphEditor::ControlId::NodeWidgets>(Canvas&)
+	inline void Compositor::onRealized<Compositor::ControlId::NodeWidgets>(Canvas&)
 	{
 		updateLocations();
 	}
 
 	template<>
-	inline void FilterGraphEditor::onMouseDown<FilterGraphEditor::ControlId::NodeWidgets>(
+	inline void Compositor::onMouseDown<Compositor::ControlId::NodeWidgets>(
 	    Canvas&, Ui::WidgetCoordinates loc, Ui::ScreenCoordinates, int button)
 	{
 		switch(button)
@@ -525,15 +523,14 @@ namespace Texpainter::App
 	}
 
 	template<>
-	inline void FilterGraphEditor::onViewportMoved<FilterGraphEditor::ControlId::NodeWidgets>(
-	    Canvas& src)
+	inline void Compositor::onViewportMoved<Compositor::ControlId::NodeWidgets>(Canvas& src)
 	{
 		auto offset = src.viewportOffset();
 		m_linesegs->renderOffset(offset);
 	}
 
 	template<>
-	inline void FilterGraphEditor::requestItemName<FilterGraphEditor::ControlId::CopyNode>(
+	inline void Compositor::requestItemName<Compositor::ControlId::CopyNode>(
 	    FilterGraph::NodeId node_id, Model::CompositorProxy<Model::Document> compositor)
 	{
 		m_copy_name = std::make_unique<NodeNameInputDlg>(std::make_pair(node_id, compositor),
@@ -545,11 +542,10 @@ namespace Texpainter::App
 	}
 
 	template<>
-	inline void FilterGraphEditor::confirmPositive<FilterGraphEditor::ControlId::CopyNode>(
-	    NodeNameInputDlg& src)
+	inline void Compositor::confirmPositive<Compositor::ControlId::CopyNode>(NodeNameInputDlg& src)
 	{
 		auto& widget = src.widget();
-		widget.second.insertNodeWithName<FilterGraphEditor::ControlId::CopyNode>(
+		widget.second.insertNodeWithName<Compositor::ControlId::CopyNode>(
 		    *this, widget.first, Model::ItemName{widget.inputField().content()});
 		m_copy_name.reset();
 	}

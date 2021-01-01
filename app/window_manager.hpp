@@ -5,7 +5,7 @@
 
 #include "./document_editor.hpp"
 #include "./image_editor.hpp"
-#include "./filter_graph_editor.hpp"
+#include "./compositor.hpp"
 #include "./image_creator.hpp"
 #include "./palette_creator.hpp"
 #include "./document_previewer.hpp"
@@ -29,7 +29,7 @@ namespace Texpainter::App
 	namespace detail
 	{
 		template<class EventHandler>
-		using FilterGraphEditWindow = DocumentEditor<FilterGraphEditor, EventHandler>;
+		using CompositorWindow = DocumentEditor<Compositor, EventHandler>;
 
 		template<class EventHandler>
 		using ImageEditWindow = DocumentEditor<ImageEditor, EventHandler>;
@@ -57,7 +57,7 @@ namespace Texpainter::App
 		template<class EventHandler>
 		struct WindowTypeTraits<WindowType::Compositor, EventHandler>
 		{
-			using type = std::unique_ptr<FilterGraphEditWindow<EventHandler>>;
+			using type = std::unique_ptr<CompositorWindow<EventHandler>>;
 			static constexpr char const* name() { return "Texpainter: Compositor"; }
 		};
 
