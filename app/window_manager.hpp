@@ -37,6 +37,34 @@ namespace Texpainter::App
 		template<class EventHandler>
 		using DocumentPreviewWindow = DocumentEditor<DocumentPreviewer, EventHandler>;
 
+		enum class WindowType:int{ImageEditor, Compositor, DocumentPreviewer};
+
+		template<WindowType, class EventHandler>
+		struct WindowTypeTraits;
+
+		template<class EventHandler>
+		struct WindowTypeTraits<WindowType::Compositor, EventHandler>
+		{
+			using type = std::unique_ptr<FilterGraphEditWindow<EventHandler>>;
+			static constexpr char const* name() { return "Texpainter: Compositor"; }
+		};
+
+		template<class EventHandler>
+		struct WindowTypeTraits<WindowType::ImageEditor, EventHandler>
+		{
+			using type = std::unique_ptr<ImageEditWindow<EventHandler>>;
+			static constexpr char const* name() { return "Texpainter: Image editor"; }
+		};
+
+		template<class EventHandler>
+		struct WindowTypeTraits<WindowType::DocumentPreviewer, EventHandler>
+		{
+			using type = std::unique_ptr<DocumentPreviewWindow<EventHandler>>;
+			static constexpr char const* name() { return "Texpainter: Document preview"; }
+		};
+
+
+
 		template<WindowAction, class EventHandler>
 		struct WindowActionTraits;
 
