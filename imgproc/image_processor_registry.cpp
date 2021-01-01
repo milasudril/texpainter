@@ -40,7 +40,8 @@
 //@		"./gingham.imgproc.hpp",
 //@		"./soft_clamp_rgba_image.imgproc.hpp",
 //@		"./grayscale_wave_distortion.imgproc.hpp",
-//@		"./grayscale_power_distortion.imgproc.hpp"
+//@		"./grayscale_power_distortion.imgproc.hpp",
+//@		"./image_spectrum_to_amplitude_and_phase.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -114,7 +115,8 @@ namespace
 	    get_info<::Gingham::ImageProcessor>(),
 	    get_info<::SoftClampRgbaImage::ImageProcessor>(),
 	    get_info<::GrayscaleWaveDistortion::ImageProcessor>(),
-	    get_info<::GrayscalePowerDistortion::ImageProcessor>()};
+	    get_info<::GrayscalePowerDistortion::ImageProcessor>(),
+	    get_info<::ImageSpectrumToAmplitudeAndPhase::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
