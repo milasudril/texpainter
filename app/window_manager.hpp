@@ -291,7 +291,7 @@ namespace Texpainter::App
 		template<WorkspaceAction item, class Source>
 		void onActivated(Enum::Tag<item>, Ui::MenuItem&, Source&)
 		{
-			puts("Pass");
+			resetWindowPositions();
 		}
 
 		template<class Source>

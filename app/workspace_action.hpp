@@ -13,14 +13,15 @@ namespace Texpainter
 	{
 		ShowImageEditor,
 		ShowCompositor,
-		ShowDocumentPreviewer
+		ShowDocumentPreviewer,
+		ResetLayout
 	};
 
 	constexpr auto begin(Enum::Empty<WorkspaceAction>) { return WorkspaceAction::ShowImageEditor; }
 
 	constexpr auto end(Enum::Empty<WorkspaceAction>)
 	{
-		return static_cast<WorkspaceAction>(static_cast<int>(WorkspaceAction::ShowDocumentPreviewer)
+		return static_cast<WorkspaceAction>(static_cast<int>(WorkspaceAction::ResetLayout)
 		                                    + 1);
 	}
 
@@ -46,6 +47,13 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Show document preview"; }
+	};
+
+	template<>
+	struct WorkspaceActionMenuTraits<WorkspaceAction::ResetLayout>
+	{
+		using type = Ui::MenuItem;
+		static constexpr char const* displayName() { return "Reset layout"; }
 	};
 }
 
