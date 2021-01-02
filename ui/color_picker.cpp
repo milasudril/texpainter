@@ -265,6 +265,11 @@ public:
 	}
 
 	template<ControlId>
+	void onScroll(Texpainter::Ui::ImageView&, vec2_t)
+	{
+	}
+
+	template<ControlId>
 	void onChanged(Texpainter::Ui::TextEntry&);
 
 	template<ControlId, class... T>

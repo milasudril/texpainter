@@ -42,6 +42,7 @@ public:
 		g_signal_connect(G_OBJECT(widget), "button-press-event", G_CALLBACK(on_mouse_down), this);
 		g_signal_connect(G_OBJECT(widget), "button-release-event", G_CALLBACK(on_mouse_up), this);
 		g_signal_connect(G_OBJECT(widget), "motion-notify-event", G_CALLBACK(on_mouse_move), this);
+		g_signal_connect(G_OBJECT(widget), "scroll-event", G_CALLBACK(on_scroll), this);
 
 		m_background      = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 32, 32);
 		auto const stride = cairo_image_surface_get_stride(m_background);
@@ -206,7 +207,7 @@ private:
 		auto const w = static_cast<uint32_t>(gtk_widget_get_allocated_width(widget));
 		auto const h = static_cast<uint32_t>(gtk_widget_get_allocated_height(widget));
 		reinterpret_cast<Impl*>(self)->render(Size2d{w, h}, cr);
-		return FALSE;
+		return TRUE;
 	}
 
 	static gboolean on_mouse_down(GtkWidget*, GdkEvent* e, gpointer self)
@@ -251,9 +252,30 @@ private:
 			                         obj,
 			                         vec2_t{event_button->x, event_button->y},
 			                         vec2_t{event_button->x_root, event_button->y_root});
-			return FALSE;
+			return TRUE;
 		}
-		return TRUE;
+		return FALSE;
+	}
+
+	static gboolean on_scroll(GtkWidget*, GdkEvent* e, gpointer self)
+	{
+		auto& obj = *reinterpret_cast<Impl*>(self);
+		if(obj.r_eh != nullptr)
+		{
+			auto event_scroll = reinterpret_cast<GdkEventScroll const*>(e);
+			vec2_t dir{};
+			switch(event_scroll->direction)
+			{
+				case GDK_SCROLL_UP: dir = vec2_t{0, 1}; break;
+				case GDK_SCROLL_DOWN: dir = vec2_t{0, -1}; break;
+				case GDK_SCROLL_LEFT: dir = vec2_t{-1, 0}; break;
+				case GDK_SCROLL_RIGHT: dir = vec2_t{1, 0}; break;
+				case GDK_SCROLL_SMOOTH: gdk_event_get_scroll_deltas(e, &dir[0], &dir[1]); break;
+			}
+			obj.m_vt.m_on_scroll(obj.r_eh, obj, dir);
+			return TRUE;
+		}
+		return FALSE;
 	}
 };
 

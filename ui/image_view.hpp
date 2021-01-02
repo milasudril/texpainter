@@ -62,6 +62,10 @@ namespace Texpainter::Ui
 			     [](void* event_handler, ImageView& self, vec2_t loc_window, vec2_t loc_screen) {
 				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
 				     obj.template onMouseMove<id>(self, loc_window, loc_screen);
+			     },
+			     [](void* event_handler, ImageView& self, vec2_t delta) {
+				     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				     obj.template onScroll<id>(self, delta);
 			     }});
 		}
 
@@ -97,6 +101,7 @@ namespace Texpainter::Ui
 			                        ImageView& self,
 			                        vec2_t loc_window,
 			                        vec2_t loc_screen);
+			void (*m_on_scroll)(void* event_handler, ImageView& self, vec2_t delta);
 		};
 		ImageView& eventHandler(void* event_handler, EventHandlerVtable const& vtable);
 	};

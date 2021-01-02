@@ -258,6 +258,17 @@ namespace Texpainter::App
 			return *this;
 		}
 
+		template<auto>
+		void onScroll(Ui::ImageView&, vec2_t delta)
+		{
+			auto brush = m_doc.get().currentBrush();
+			auto radius_new =
+			    std::clamp(brush.radius() + static_cast<float>(delta[1]) / 32.0f, 0.0f, 1.0f);
+			brush.radius(radius_new);
+			m_brush_sel.inputField().brush(brush);
+			m_doc.get().currentBrush(brush);
+		}
+
 
 	private:
 		std::reference_wrapper<Model::Document> m_doc;
