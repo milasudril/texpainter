@@ -250,6 +250,8 @@ namespace Texpainter::Model
 
 	void floodfill(Document& doc, vec2_t location);
 
+	void floodfill(Document& doc, vec2_t location, PixelStore::Pixel color);
+
 	void store(Document const& doc, char const* filenamae);
 
 	template<>

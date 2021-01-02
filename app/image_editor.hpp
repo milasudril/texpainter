@@ -411,9 +411,7 @@ namespace Texpainter::App
 		{
 			auto& keyb_state = Ui::Context::get().keyboardState();
 			if(isShiftPressed(keyb_state))
-			{
-				//	floodfill(m_doc, loc_window);
-			}
+			{ floodfill(m_doc, loc_window, PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f}); }
 			else
 			{
 				m_draw_mode     = DrawMode::Erase;

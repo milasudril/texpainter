@@ -134,6 +134,16 @@ void Texpainter::Model::floodfill(Document& doc, vec2_t location)
 	    doc.currentImage());
 }
 
+void Texpainter::Model::floodfill(Document& doc, vec2_t location, PixelStore::Pixel color)
+{
+	doc.modify(
+	    [location, color](PixelStore::Image& img) noexcept {
+		    floodfill(img.pixels(), location, color);
+		    return true;
+	    },
+	    doc.currentImage());
+}
+
 void Texpainter::Model::store(Document const& doc, char const* filename)
 {
 	nlohmann::json obj{std::pair{"workspace", doc.workspace()},
