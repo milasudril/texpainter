@@ -228,6 +228,12 @@ namespace Texpainter::Model
 
 		Workspace const& workspace() const { return m_workspace; }
 
+		template<class T>
+		ItemName const& current() const;
+
+		template<class T>
+		Document& current(ItemName&&);
+
 	private:
 		std::map<ItemName, Compositor::NodeItem> m_input_nodes;
 
@@ -241,6 +247,32 @@ namespace Texpainter::Model
 	void paint(Document& doc, vec2_t location);
 
 	void store(Document const& doc, char const* filenamae);
+
+	template<>
+	inline ItemName const& Document::current<PixelStore::Image>() const
+	{
+		return currentImage();
+	}
+
+	template<>
+	inline Document& Document::current<PixelStore::Image>(ItemName&& name)
+	{
+		currentImage(std::move(name));
+		return *this;
+	}
+
+	template<>
+	inline ItemName const& Document::current<Palette>() const
+	{
+		return currentPalette();
+	}
+
+	template<>
+	inline Document& Document::current<Palette>(ItemName&& name)
+	{
+		currentPalette(std::move(name));
+		return *this;
+	}
 }
 
 #endif

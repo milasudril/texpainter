@@ -14,6 +14,8 @@ namespace Texpainter::App
 	class PaletteSelector
 	{
 	public:
+		using type = Model::Palette;
+
 		explicit PaletteSelector(Ui::Container& owner)
 		    : m_root{owner, Ui::Box::Orientation::Horizontal}
 		    , m_name{m_root}

@@ -3,6 +3,9 @@
 #ifndef TEXPAINTER_APP_IMAGESELECTOR_HPP
 #define TEXPAINTER_APP_IMAGESELECTOR_HPP
 
+#include "model/item_name.hpp"
+#include "pixel_store/image.hpp"
+
 #include "ui/combobox.hpp"
 
 #include <ranges>
@@ -13,6 +16,8 @@ namespace Texpainter::App
 	class ImageSelector
 	{
 	public:
+		using type = PixelStore::Image;
+
 		explicit ImageSelector(Ui::Container& owner): m_selector{owner} {}
 
 		ImageSelector& clear()
@@ -34,12 +39,21 @@ namespace Texpainter::App
 			return *this;
 		}
 
+		template<class... DontCare>
+		ImageSelector& selected(Model::ItemName const& val, DontCare&&...)
+		{
+			m_selector.selected(val.c_str());
+			return *this;
+		}
+
 		template<auto id, class EventHandler>
 		ImageSelector& eventHandler(EventHandler& eh)
 		{
 			m_selector.eventHandler<id>(eh);
 			return *this;
 		}
+
+		void update() {}
 
 	private:
 		Ui::Combobox m_selector;

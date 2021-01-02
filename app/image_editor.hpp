@@ -15,6 +15,7 @@
 #include "ui/color_picker.hpp"
 #include "ui/dialog.hpp"
 #include "ui/keyboard_state.hpp"
+#include "ui/context.hpp"
 
 #include "utils/default_rng.hpp"
 #include "utils/inherit_from.hpp"
@@ -321,26 +322,58 @@ namespace Texpainter::App
 			}
 		}
 
-		void imgviewButtonBack()
+		template<class Selector>
+		void goBack(Selector& sel)
 		{
-			auto const& pal = m_doc.get().currentPalette();
-			if(auto item = m_doc.get().getBefore(std::type_identity<Model::Palette>{}, pal);
+			using Type            = typename Selector::type;
+			auto const& item_name = m_doc.get().current<Type>();
+			if(auto item = m_doc.get().getBefore(std::type_identity<Type>{}, item_name);
 			   item.first != nullptr)
 			{
-				m_pal_sel.inputField().selected(*item.first, m_doc.get().palettes()).update();
-				m_doc.get().currentPalette(Model::ItemName{*item.first});
+				sel.selected(*item.first, m_doc.get().get(std::type_identity<Type>{})).update();
+				m_doc.get().current<Type>(Model::ItemName{*item.first});
 			}
+		}
+
+		template<class Selector>
+		void goForward(Selector& sel)
+		{
+			using Type            = typename Selector::type;
+			auto const& item_name = m_doc.get().current<Type>();
+			if(auto item = m_doc.get().getAfter(std::type_identity<Type>{}, item_name);
+			   item.first != nullptr)
+			{
+				sel.selected(*item.first, m_doc.get().get(std::type_identity<Type>{})).update();
+				m_doc.get().current<Type>(Model::ItemName{*item.first});
+			}
+		}
+
+		void imgviewButtonBack()
+		{
+			auto& keyb_state = Ui::Context::get().keyboardState();
+			if((keyb_state.isPressed(Ui::Scancodes::ShiftLeft)
+			    || keyb_state.isPressed(Ui::Scancodes::ShiftRight))
+			   && keyb_state.numberOfPressedKeys() == 1)
+			{ goBack(m_image_sel.inputField()); }
+			else
+			{
+				goBack(m_pal_sel.inputField());
+			}
+			on_updated(r_eh, *this);
 		}
 
 		void imgviewButtonFwd()
 		{
-			auto const& pal = m_doc.get().currentPalette();
-			if(auto item = m_doc.get().getAfter(std::type_identity<Model::Palette>{}, pal);
-			   item.first != nullptr)
+			auto& keyb_state = Ui::Context::get().keyboardState();
+			if((keyb_state.isPressed(Ui::Scancodes::ShiftLeft)
+			    || keyb_state.isPressed(Ui::Scancodes::ShiftRight))
+			   && keyb_state.numberOfPressedKeys() == 1)
+			{ goForward(m_image_sel.inputField()); }
+			else
 			{
-				m_pal_sel.inputField().selected(*item.first, m_doc.get().palettes()).update();
-				m_doc.get().currentPalette(Model::ItemName{*item.first});
+				goForward(m_pal_sel.inputField());
 			}
+			on_updated(r_eh, *this);
 		}
 	};
 
