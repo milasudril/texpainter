@@ -224,11 +224,13 @@ namespace Texpainter::App
 		template<auto>
 		void onMouseDown(Ui::ImageView&, vec2_t loc_window, vec2_t, int button)
 		{
-			if(button == 1)
+			switch(button)
 			{
-				m_draw_mode = true;
-				paint(m_doc, loc_window);
-				on_updated(r_eh, *this);
+				case 1:
+					m_draw_mode = true;
+					paint(m_doc, loc_window);
+					on_updated(r_eh, *this);
+					break;
 			}
 		}
 
