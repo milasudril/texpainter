@@ -62,8 +62,12 @@ namespace Texpainter::Model
 		};
 
 		using CompositorInputManager<PixelStore::Image>::get;
+		using CompositorInputManager<PixelStore::Image>::getBefore;
+		using CompositorInputManager<PixelStore::Image>::getAfter;
 		using CompositorInputManager<PixelStore::Image>::modify;
 		using CompositorInputManager<Palette>::get;
+		using CompositorInputManager<Palette>::getBefore;
+		using CompositorInputManager<Palette>::getAfter;
 		using CompositorInputManager<Palette>::modify;
 
 		explicit Document(Size2d canvas_size): Size2d{canvas_size} {}

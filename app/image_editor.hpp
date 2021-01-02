@@ -231,6 +231,10 @@ namespace Texpainter::App
 					paint(m_doc, loc_window);
 					on_updated(r_eh, *this);
 					break;
+
+				case 8: imgviewButtonBack(); break;
+
+				case 9: imgviewButtonFwd(); break;
 			}
 		}
 
@@ -314,6 +318,28 @@ namespace Texpainter::App
 				m_color_picker->eventHandler<ImageEditor::ControlId::ColorPicker>(*this)
 				    .widget()
 				    .value(current_pal->source.get()[index]);
+			}
+		}
+
+		void imgviewButtonBack()
+		{
+			auto const& pal = m_doc.get().currentPalette();
+			if(auto item = m_doc.get().getBefore(std::type_identity<Model::Palette>{}, pal);
+			   item.first != nullptr)
+			{
+				m_pal_sel.inputField().selected(*item.first, m_doc.get().palettes()).update();
+				m_doc.get().currentPalette(Model::ItemName{*item.first});
+			}
+		}
+
+		void imgviewButtonFwd()
+		{
+			auto const& pal = m_doc.get().currentPalette();
+			if(auto item = m_doc.get().getAfter(std::type_identity<Model::Palette>{}, pal);
+			   item.first != nullptr)
+			{
+				m_pal_sel.inputField().selected(*item.first, m_doc.get().palettes()).update();
+				m_doc.get().currentPalette(Model::ItemName{*item.first});
 			}
 		}
 	};

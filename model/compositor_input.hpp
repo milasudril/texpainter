@@ -32,6 +32,8 @@ namespace Texpainter::Model
 	template<class T>
 	class CompositorInputManager
 	{
+		using mapped_type = CompositorInput<WithStatus<T>>;
+
 	public:
 		auto const& get(std::type_identity<T>) const { return m_inputs; }
 
@@ -39,6 +41,27 @@ namespace Texpainter::Model
 		{
 			auto i = m_inputs.find(item);
 			return i != std::end(m_inputs) ? &i->second : nullptr;
+		}
+
+		auto getBefore(std::type_identity<T>, ItemName const& item) const
+		{
+			using ReturnType = std::pair<ItemName const*, mapped_type const*>;
+			auto i           = m_inputs.find(item);
+			if(i == std::end(m_inputs)) { return ReturnType{nullptr, nullptr}; }
+			if(i == std::begin(m_inputs)) { return ReturnType{&i->first, &i->second}; }
+			--i;
+			return ReturnType{&i->first, &i->second};
+		}
+
+		auto getAfter(std::type_identity<T>, ItemName const& item) const
+		{
+			using ReturnType = std::pair<ItemName const*, mapped_type const*>;
+			auto i           = m_inputs.find(item);
+			if(i == std::end(m_inputs)) { return ReturnType{nullptr, nullptr}; }
+			auto i_old = i;
+			++i;
+			if(i == std::end(m_inputs)) { return ReturnType{&i_old->first, &i_old->second}; }
+			return ReturnType{&i->first, &i->second};
 		}
 
 		auto insert(ItemName const& name,
@@ -49,7 +72,7 @@ namespace Texpainter::Model
 			auto i = nodes.find(name);
 			if(i != std::end(nodes)) [[unlikely]]
 				{
-					return static_cast<CompositorInput<WithStatus<T>>*>(nullptr);
+					return static_cast<mapped_type*>(nullptr);
 				}
 
 			using ImgProc = typename detail::ImageProcessor<WithStatus<T>>::type;
@@ -94,7 +117,7 @@ namespace Texpainter::Model
 		}
 
 	private:
-		std::map<ItemName, CompositorInput<WithStatus<T>>> m_inputs;
+		std::map<ItemName, mapped_type> m_inputs;
 	};
 }
 #endif
