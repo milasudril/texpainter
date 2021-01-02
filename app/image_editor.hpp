@@ -23,6 +23,27 @@
 
 namespace Texpainter::App
 {
+	namespace detail
+	{
+		inline std::optional<PixelStore::ColorIndex> toColorIndex(Ui::Scancode scancode)
+		{
+			if(scancode.value() >= 3 && scancode.value() < 7)
+			{ return PixelStore::ColorIndex{static_cast<uint8_t>(scancode.value() - 3)}; }
+
+			if(scancode.value() >= 16 && scancode.value() < 20)
+			{ return PixelStore::ColorIndex{static_cast<uint8_t>(4 + scancode.value() - 16)}; }
+
+			if(scancode.value() >= 30 && scancode.value() < 34)
+			{ return PixelStore::ColorIndex{static_cast<uint8_t>(8 + scancode.value() - 30)}; }
+
+			if(scancode.value() == 86) { return PixelStore::ColorIndex{12}; }
+
+			if(scancode.value() >= 44 && scancode.value() < 47)
+			{ return PixelStore::ColorIndex{static_cast<uint8_t>(13 + scancode.value() - 44)}; }
+			return std::optional<PixelStore::ColorIndex>{};
+		}
+	}
+
 	class ImageEditor
 	{
 		enum class ControlId : int
@@ -131,7 +152,29 @@ namespace Texpainter::App
 			return refreshImageSelector().refreshBrushSelector().refreshPaletteSelector();
 		}
 
-		void onKeyDown(Ui::KeyboardState const&) {}
+		void onKeyDown(Ui::Scancode scancode, Ui::KeyboardState const& state)
+		{
+			if(auto color_index = detail::toColorIndex(scancode); color_index.has_value())
+			{
+				if(state.isPressed(Ui::Scancodes::ShiftLeft)
+				   || state.isPressed(Ui::Scancodes::ShiftRight))
+				{ openColorPicker(*color_index); }
+				else
+				{
+					selectColor(*color_index);
+				}
+			}
+		}
+
+		void selectColor(PixelStore::ColorIndex index)
+		{
+			auto const current_color = m_doc.get().currentColor();
+			m_doc.get().currentColor(index);
+			m_pal_sel.inputField()
+			    .highlightMode(current_color, Ui::PaletteView::HighlightMode::None)
+			    .highlightMode(index, Ui::PaletteView::HighlightMode::Read)
+			    .update();
+		}
 
 		template<auto>
 		void onChanged(Ui::Combobox& src);
@@ -240,6 +283,28 @@ namespace Texpainter::App
 		Ui::ImageView m_img_view;
 
 		std::unique_ptr<ColorPickerDlg> m_color_picker;
+
+		void openColorPicker(PixelStore::ColorIndex index)
+		{
+			if(auto current_pal = m_doc.get().palette(m_doc.get().currentPalette());
+			   current_pal != nullptr)
+			{
+				auto& src = m_pal_sel.inputField();
+				src.highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Write)
+				    .update();
+				m_color_picker = std::make_unique<ColorPickerDlg>(
+				    index,
+				    m_selectors,
+				    (std::string{"Select color number "} + std::to_string(index.value() + 1))
+				        .c_str(),
+				    PolymorphicRng{DefaultRng::engine()},
+				    "Recently used: ",
+				    m_doc.get().colorHistory());
+				m_color_picker->eventHandler<ImageEditor::ControlId::ColorPicker>(*this)
+				    .widget()
+				    .value(current_pal->source.get()[index]);
+			}
+		}
 	};
 
 	template<>
@@ -258,39 +323,19 @@ namespace Texpainter::App
 
 	template<>
 	inline void ImageEditor::onMouseDown<ImageEditor::ControlId::PaletteSelector>(
-	    Ui::PaletteView& src, PixelStore::ColorIndex index, int button)
+	    Ui::PaletteView&, PixelStore::ColorIndex index, int button)
 	{
 		switch(button)
 		{
 			case 1:
 			{
-				auto const current_color = m_doc.get().currentColor();
-				m_doc.get().currentColor(index);
-				src.highlightMode(current_color, Ui::PaletteView::HighlightMode::None)
-				    .highlightMode(index, Ui::PaletteView::HighlightMode::Read)
-				    .update();
+				selectColor(index);
 				break;
 			}
 
 			case 3:
 			{
-				if(auto current_pal = m_doc.get().palette(m_doc.get().currentPalette());
-				   current_pal != nullptr)
-				{
-					src.highlightMode(index, Texpainter::Ui::PaletteView::HighlightMode::Write)
-					    .update();
-					m_color_picker = std::make_unique<ColorPickerDlg>(
-					    index,
-					    m_selectors,
-					    (std::string{"Select color number "} + std::to_string(index.value() + 1))
-					        .c_str(),
-					    PolymorphicRng{DefaultRng::engine()},
-					    "Recently used: ",
-					    m_doc.get().colorHistory());
-					m_color_picker->eventHandler<ImageEditor::ControlId::ColorPicker>(*this)
-					    .widget()
-					    .value(current_pal->source.get()[index]);
-				}
+				openColorPicker(index);
 				break;
 			}
 		}

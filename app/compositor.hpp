@@ -253,11 +253,11 @@ namespace Texpainter::App
 		                 int button,
 		                 FilterGraph::NodeId);
 
-		void onKeyDown(Ui::KeyboardState const& state)
+		void onKeyDown(Ui::Scancode scancode, Ui::KeyboardState const& state)
 		{
 			if((state.isPressed(Ui::Scancodes::ShiftLeft)
 			    || state.isPressed(Ui::Scancodes::ShiftRight))
-			   && state.lastKey() == Ui::Scancodes::A && state.numberOfPressedKeys() == 2)
+			   && scancode == Ui::Scancodes::A && state.numberOfPressedKeys() == 2)
 			{
 				m_filtermenu =
 				    std::make_unique<ImageProcessorSelectorDlg>(r_owner, "Select image processor");

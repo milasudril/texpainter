@@ -65,6 +65,12 @@ namespace Texpainter::App
 			return *this;
 		}
 
+		PaletteSelector& update()
+		{
+			m_palette.update();
+			return *this;
+		}
+
 	private:
 		Ui::Box m_root;
 		Ui::Combobox m_name;

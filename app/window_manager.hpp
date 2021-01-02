@@ -199,7 +199,7 @@ namespace Texpainter::App
 			if constexpr(window != WindowType::DocumentPreviewer)
 			{
 				m_windows.template get<window>()->widget().onKeyDown(
-				    Ui::Context::get().keyboardState());
+				    scancode, Ui::Context::get().keyboardState());
 			}
 		}
 
