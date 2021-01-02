@@ -34,6 +34,11 @@ namespace Texpainter::Ui
 	private:
 		SortedSequence<Ui::Scancode, bool> m_key_state;
 	};
+
+	inline bool isShiftPressed(KeyboardState const& kb)
+	{
+		return kb.isPressed(Scancodes::ShiftLeft) || kb.isPressed(Scancodes::ShiftLeft);
+	}
 }
 
 #endif

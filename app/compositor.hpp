@@ -255,9 +255,8 @@ namespace Texpainter::App
 
 		void onKeyDown(Ui::Scancode scancode, Ui::KeyboardState const& state)
 		{
-			if((state.isPressed(Ui::Scancodes::ShiftLeft)
-			    || state.isPressed(Ui::Scancodes::ShiftRight))
-			   && scancode == Ui::Scancodes::A && state.numberOfPressedKeys() == 2)
+			if(isShiftPressed(state) && scancode == Ui::Scancodes::A
+			   && state.numberOfPressedKeys() == 2)
 			{
 				m_filtermenu =
 				    std::make_unique<ImageProcessorSelectorDlg>(r_owner, "Select image processor");

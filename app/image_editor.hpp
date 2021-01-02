@@ -166,9 +166,7 @@ namespace Texpainter::App
 		{
 			if(auto color_index = detail::toColorIndex(scancode); color_index.has_value())
 			{
-				if(state.isPressed(Ui::Scancodes::ShiftLeft)
-				   || state.isPressed(Ui::Scancodes::ShiftRight))
-				{ openColorPicker(*color_index); }
+				if(isShiftPressed(state)) { openColorPicker(*color_index); }
 				else
 				{
 					selectColor(*color_index);
@@ -369,9 +367,7 @@ namespace Texpainter::App
 		void imgviewButtonBack()
 		{
 			auto& keyb_state = Ui::Context::get().keyboardState();
-			if(keyb_state.isPressed(Ui::Scancodes::ShiftLeft)
-			   || keyb_state.isPressed(Ui::Scancodes::ShiftRight))
-			{ goBack(m_image_sel.inputField()); }
+			if(isShiftPressed(keyb_state)) { goBack(m_image_sel.inputField()); }
 			else
 			{
 				goBack(m_pal_sel.inputField());
@@ -382,9 +378,7 @@ namespace Texpainter::App
 		void imgviewButtonFwd()
 		{
 			auto& keyb_state = Ui::Context::get().keyboardState();
-			if(keyb_state.isPressed(Ui::Scancodes::ShiftLeft)
-			   || keyb_state.isPressed(Ui::Scancodes::ShiftRight))
-			{ goForward(m_image_sel.inputField()); }
+			if(isShiftPressed(keyb_state)) { goForward(m_image_sel.inputField()); }
 			else
 			{
 				goForward(m_pal_sel.inputField());
@@ -395,9 +389,7 @@ namespace Texpainter::App
 		void doPaint(vec2_t loc_window)
 		{
 			auto& keyb_state = Ui::Context::get().keyboardState();
-			if(keyb_state.isPressed(Ui::Scancodes::ShiftLeft)
-			   || keyb_state.isPressed(Ui::Scancodes::ShiftRight))
-			{ floodfill(m_doc, loc_window); }
+			if(isShiftPressed(keyb_state)) { floodfill(m_doc, loc_window); }
 			else
 			{
 				m_draw_mode = true;

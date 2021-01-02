@@ -178,9 +178,7 @@ namespace Texpainter::App
 		void onKeyDown(Ui::Window&, Ui::Scancode scancode)
 		{
 			auto& key_state = Ui::Context::get().keyboardState();
-			if((key_state.isPressed(Ui::Scancodes::ShiftLeft)
-			    || key_state.isPressed(Ui::Scancodes::ShiftRight))
-			   && key_state.numberOfPressedKeys() == 2)
+			if(isShiftPressed(key_state) && key_state.numberOfPressedKeys() == 2)
 			{
 				switch(scancode.value())
 				{
