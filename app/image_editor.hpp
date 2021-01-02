@@ -37,9 +37,20 @@ namespace Texpainter::App
 			if(scancode.value() >= 30 && scancode.value() < 36)
 			{ return PixelStore::ColorIndex{static_cast<uint8_t>(10 + scancode.value() - 30)}; }
 
-			if(scancode.value() == 47) { return PixelStore::ColorIndex{15}; }
+			if(scancode.value() == 43) { return PixelStore::ColorIndex{15}; }
 
 			return std::optional<PixelStore::ColorIndex>{};
+		}
+
+		inline std::optional<Model::BrushShape> toBrushShape(Ui::Scancode scancode)
+		{
+			switch(scancode.value())
+			{
+				case Ui::Scancodes::F1.value(): return Model::BrushShape::Diamond;
+				case Ui::Scancodes::F2.value(): return Model::BrushShape::Circle;
+				case Ui::Scancodes::F3.value(): return Model::BrushShape::Square;
+				default: return std::optional<Model::BrushShape>{};
+			}
 		}
 	}
 
@@ -162,7 +173,11 @@ namespace Texpainter::App
 				{
 					selectColor(*color_index);
 				}
+				return;
 			}
+
+			if(auto brush_shape = detail::toBrushShape(scancode); brush_shape.has_value())
+			{ selectBrush(*brush_shape); }
 		}
 
 		void selectColor(PixelStore::ColorIndex index)
@@ -173,6 +188,13 @@ namespace Texpainter::App
 			    .highlightMode(current_color, Ui::PaletteView::HighlightMode::None)
 			    .highlightMode(index, Ui::PaletteView::HighlightMode::Read)
 			    .update();
+		}
+
+		void selectBrush(Model::BrushShape shape)
+		{
+			auto brush = m_doc.get().currentBrush();
+			m_doc.get().currentBrush(brush.shape(shape));
+			refreshBrushSelector();
 		}
 
 		template<auto>
