@@ -609,8 +609,12 @@ namespace Texpainter::App
 			if(m_document->insert(name, std::move(img)) == nullptr)
 			{ throw std::string{"Item already exists"}; }
 
-			auto node = m_document->inputNodeItem(name);
-			m_windows.get<WindowType::Compositor>()->widget().insertNodeEditor(*node);
+			if(auto compositor = m_windows.get<WindowType::Compositor>().get();
+			   compositor != nullptr)
+			{
+				auto node = std::as_const(*m_document).inputNodeItem(name);
+				compositor->widget().insertNodeEditor(*node);
+			}
 
 			m_document->currentImage(std::move(name));
 
@@ -623,7 +627,7 @@ namespace Texpainter::App
 
 			if(auto output = m_windows.get<WindowType::DocumentPreviewer>().get();
 			   output != nullptr)
-				[[likely]] { output->widget().refresh(); }
+			{ output->widget().refresh(); }
 		}
 
 		void insert(Model::ItemName&& name, Model::Palette&& pal)
@@ -631,8 +635,12 @@ namespace Texpainter::App
 			if(m_document->insert(name, std::move(pal)) == nullptr)
 			{ throw std::string{"Item already exists"}; }
 
-			auto node = m_document->inputNodeItem(name);
-			m_windows.get<WindowType::Compositor>()->widget().insertNodeEditor(*node);
+			if(auto compositor = m_windows.get<WindowType::Compositor>().get();
+			   compositor != nullptr)
+			{
+				auto node = std::as_const(*m_document).inputNodeItem(name);
+				compositor->widget().insertNodeEditor(*node);
+			}
 
 			m_document->currentPalette(std::move(name));
 
@@ -645,7 +653,7 @@ namespace Texpainter::App
 
 			if(auto output = m_windows.get<WindowType::DocumentPreviewer>().get();
 			   output != nullptr)
-				[[likely]] { output->widget().refresh(); }
+			{ output->widget().refresh(); }
 		}
 	};
 }
