@@ -16,4 +16,6 @@ namespace Texpainter::Model
 	           double radius,
 	           BrushFunction brush,
 	           PixelStore::Pixel color);
+
+	void floodfill(Span2d<PixelStore::Pixel> pixels, vec2_t origin, PixelStore::Pixel color);
 }

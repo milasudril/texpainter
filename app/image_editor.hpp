@@ -249,11 +249,7 @@ namespace Texpainter::App
 		{
 			switch(button)
 			{
-				case 1:
-					m_draw_mode = true;
-					paint(m_doc, loc_window);
-					on_updated(r_eh, *this);
-					break;
+				case 1: doPaint(loc_window); break;
 
 				case 8: imgviewButtonBack(); break;
 
@@ -373,9 +369,8 @@ namespace Texpainter::App
 		void imgviewButtonBack()
 		{
 			auto& keyb_state = Ui::Context::get().keyboardState();
-			if((keyb_state.isPressed(Ui::Scancodes::ShiftLeft)
-			    || keyb_state.isPressed(Ui::Scancodes::ShiftRight))
-			   && keyb_state.numberOfPressedKeys() == 1)
+			if(keyb_state.isPressed(Ui::Scancodes::ShiftLeft)
+			   || keyb_state.isPressed(Ui::Scancodes::ShiftRight))
 			{ goBack(m_image_sel.inputField()); }
 			else
 			{
@@ -387,13 +382,26 @@ namespace Texpainter::App
 		void imgviewButtonFwd()
 		{
 			auto& keyb_state = Ui::Context::get().keyboardState();
-			if((keyb_state.isPressed(Ui::Scancodes::ShiftLeft)
-			    || keyb_state.isPressed(Ui::Scancodes::ShiftRight))
-			   && keyb_state.numberOfPressedKeys() == 1)
+			if(keyb_state.isPressed(Ui::Scancodes::ShiftLeft)
+			   || keyb_state.isPressed(Ui::Scancodes::ShiftRight))
 			{ goForward(m_image_sel.inputField()); }
 			else
 			{
 				goForward(m_pal_sel.inputField());
+			}
+			on_updated(r_eh, *this);
+		}
+
+		void doPaint(vec2_t loc_window)
+		{
+			auto& keyb_state = Ui::Context::get().keyboardState();
+			if(keyb_state.isPressed(Ui::Scancodes::ShiftLeft)
+			   || keyb_state.isPressed(Ui::Scancodes::ShiftRight))
+			{ floodfill(m_doc, loc_window); }
+			else
+			{
+				m_draw_mode = true;
+				paint(m_doc, loc_window);
 			}
 			on_updated(r_eh, *this);
 		}

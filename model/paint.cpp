@@ -2,6 +2,8 @@
 
 #include "./paint.hpp"
 
+#include <stack>
+
 void Texpainter::Model::paint(Span2d<PixelStore::Pixel> pixels,
                               vec2_t origin,
                               double radius,
@@ -24,5 +26,47 @@ void Texpainter::Model::paint(Span2d<PixelStore::Pixel> pixels,
 			auto d             = loc_ret - origin;
 			if(brush(d, radius)) { pixels((col + w) % w, (row + h) % h) = color; }
 		}
+	}
+}
+
+void Texpainter::Model::floodfill(Span2d<PixelStore::Pixel> pixels,
+                                  vec2_t origin,
+                                  PixelStore::Pixel color)
+{
+	auto const w   = pixels.width();
+	auto const h   = pixels.height();
+	auto const tol = 1e-7;
+	auto init      = std::pair{static_cast<uint32_t>(origin[0]), static_cast<uint32_t>(origin[1])};
+
+	auto start_color = pixels((init.first + w) % w, (init.second + h) % h);
+	if(distanceSquared(color, start_color) < tol) { return; }
+
+	std::stack<std::pair<uint32_t, uint32_t>> locations;
+	locations.push(init);
+	while(!locations.empty())
+	{
+		auto loc = locations.top();
+		locations.pop();
+
+		if(distanceSquared(pixels((loc.first + w) % w, (loc.second + h) % h), color) < 1e-7)
+		{ continue; }
+
+		pixels((loc.first + w) % w, (loc.second + h) % h) = color;
+
+		if(distanceSquared(pixels((loc.first + w + 1) % w, (loc.second + h) % h), start_color)
+		   < tol)
+		{ locations.push(std::pair{(loc.first + w + 1) % w, (loc.second + h) % h}); }
+
+		if(distanceSquared(pixels((loc.first + w - 1) % w, (loc.second + h) % h), start_color)
+		   < tol)
+		{ locations.push(std::pair{(loc.first + w - 1) % w, (loc.second + h) % h}); }
+
+		if(distanceSquared(pixels((loc.first + w) % w, (loc.second + h + 1) % h), start_color)
+		   < tol)
+		{ locations.push(std::pair{(loc.first + w) % w, (loc.second + h + 1) % h}); }
+
+		if(distanceSquared(pixels((loc.first + w) % w, (loc.second + h - 1) % h), start_color)
+		   < tol)
+		{ locations.push(std::pair{(loc.first + w) % w, (loc.second + h - 1) % h}); }
 	}
 }

@@ -99,6 +99,24 @@ void Texpainter::Model::paint(Document& doc, vec2_t location)
 	    doc.currentImage());
 }
 
+void Texpainter::Model::floodfill(Document& doc, vec2_t location)
+{
+	auto palette_ref = doc.palette(doc.currentPalette());
+	if(palette_ref == nullptr) [[unlikely]]
+		{
+			return;
+		}
+
+	auto const& palette = palette_ref->source.get();
+
+	doc.modify(
+	    [location, color = palette[doc.currentColor()]](PixelStore::Image& img) noexcept {
+		    floodfill(img.pixels(), location, color);
+		    return true;
+	    },
+	    doc.currentImage());
+}
+
 void Texpainter::Model::store(Document const& doc, char const* filename)
 {
 	nlohmann::json obj{std::pair{"workspace", doc.workspace()},

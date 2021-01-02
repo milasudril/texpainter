@@ -246,6 +246,8 @@ namespace Texpainter::Model
 
 	void paint(Document& doc, vec2_t location);
 
+	void floodfill(Document& doc, vec2_t location);
+
 	void store(Document const& doc, char const* filenamae);
 
 	template<>
