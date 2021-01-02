@@ -65,6 +65,13 @@ namespace Texpainter::App
 			DrawingArea
 		};
 
+		enum class DrawMode : int
+		{
+			Off,
+			Paint,
+			Erase
+		};
+
 		class ColorPickerData
 		{
 		public:
@@ -249,6 +256,8 @@ namespace Texpainter::App
 			{
 				case 1: doPaint(loc_window); break;
 
+				case 3: erase(loc_window); break;
+
 				case 8: imgviewButtonBack(); break;
 
 				case 9: imgviewButtonFwd(); break;
@@ -258,17 +267,29 @@ namespace Texpainter::App
 		template<auto>
 		void onMouseUp(Ui::ImageView&, vec2_t, vec2_t, int)
 		{
-			m_draw_mode = false;
+			m_draw_mode = DrawMode::Off;
 		}
 
 		template<auto>
 		void onMouseMove(Ui::ImageView&, vec2_t loc_window, vec2_t)
 		{
-			if(m_draw_mode) [[likely]]
-				{
+			switch(m_draw_mode)
+			{
+				case DrawMode::Off: return;
+				case DrawMode::Paint:
 					paint(m_doc, loc_window);
 					on_updated(r_eh, *this);
+					break;
+
+				case DrawMode::Erase:
+				{
+					auto brush      = m_doc.get().currentBrush();
+					auto radius_new = std::clamp(brush.radius() + 1.0f / 32.0f, 0.0f, 1.0f);
+					paint(m_doc, loc_window, radius_new, PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
+					on_updated(r_eh, *this);
+					break;
 				}
+			}
 		}
 
 		template<auto id, class EventHandler>
@@ -295,7 +316,7 @@ namespace Texpainter::App
 
 	private:
 		std::reference_wrapper<Model::Document> m_doc;
-		bool m_draw_mode;
+		DrawMode m_draw_mode;
 		void* r_eh;
 		void (*on_updated)(void*, ImageEditor&);
 
@@ -386,13 +407,30 @@ namespace Texpainter::App
 			on_updated(r_eh, *this);
 		}
 
+		void erase(vec2_t loc_window)
+		{
+			auto& keyb_state = Ui::Context::get().keyboardState();
+			if(isShiftPressed(keyb_state))
+			{
+				//	floodfill(m_doc, loc_window);
+			}
+			else
+			{
+				m_draw_mode     = DrawMode::Erase;
+				auto brush      = m_doc.get().currentBrush();
+				auto radius_new = std::clamp(brush.radius() + 1.0f / 32.0f, 0.0f, 1.0f);
+				paint(m_doc, loc_window, radius_new, PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
+			}
+			on_updated(r_eh, *this);
+		}
+
 		void doPaint(vec2_t loc_window)
 		{
 			auto& keyb_state = Ui::Context::get().keyboardState();
 			if(isShiftPressed(keyb_state)) { floodfill(m_doc, loc_window); }
 			else
 			{
-				m_draw_mode = true;
+				m_draw_mode = DrawMode::Paint;
 				paint(m_doc, loc_window);
 			}
 			on_updated(r_eh, *this);

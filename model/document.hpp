@@ -246,6 +246,8 @@ namespace Texpainter::Model
 
 	void paint(Document& doc, vec2_t location);
 
+	void paint(Document& doc, vec2_t location, float brush_radius, PixelStore::Pixel color);
+
 	void floodfill(Document& doc, vec2_t location);
 
 	void store(Document const& doc, char const* filenamae);

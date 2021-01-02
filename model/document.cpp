@@ -99,6 +99,23 @@ void Texpainter::Model::paint(Document& doc, vec2_t location)
 	    doc.currentImage());
 }
 
+void Texpainter::Model::paint(Document& doc,
+                              vec2_t location,
+                              float brush_radius,
+                              PixelStore::Pixel color)
+{
+	doc.modify(
+	    [location,
+	     brush_radius = static_cast<double>(brush_radius),
+	     brush_func   = BrushFunction{doc.currentBrush().shape()},
+	     color](PixelStore::Image& img) noexcept {
+		    auto r = 0.5 * std::exp2(brush_radius * 0.5 * std::log2(area(img)));
+		    paint(img.pixels(), location, r, brush_func, color);
+		    return true;
+	    },
+	    doc.currentImage());
+}
+
 void Texpainter::Model::floodfill(Document& doc, vec2_t location)
 {
 	auto palette_ref = doc.palette(doc.currentPalette());
