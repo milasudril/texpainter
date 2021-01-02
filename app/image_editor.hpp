@@ -27,19 +27,17 @@ namespace Texpainter::App
 	{
 		inline std::optional<PixelStore::ColorIndex> toColorIndex(Ui::Scancode scancode)
 		{
-			if(scancode.value() >= 3 && scancode.value() < 7)
+			if(scancode.value() >= 3 && scancode.value() < 8)
 			{ return PixelStore::ColorIndex{static_cast<uint8_t>(scancode.value() - 3)}; }
 
-			if(scancode.value() >= 16 && scancode.value() < 20)
-			{ return PixelStore::ColorIndex{static_cast<uint8_t>(4 + scancode.value() - 16)}; }
+			if(scancode.value() >= 16 && scancode.value() < 21)
+			{ return PixelStore::ColorIndex{static_cast<uint8_t>(5 + scancode.value() - 16)}; }
 
-			if(scancode.value() >= 30 && scancode.value() < 34)
-			{ return PixelStore::ColorIndex{static_cast<uint8_t>(8 + scancode.value() - 30)}; }
+			if(scancode.value() >= 30 && scancode.value() < 36)
+			{ return PixelStore::ColorIndex{static_cast<uint8_t>(10 + scancode.value() - 30)}; }
 
-			if(scancode.value() == 86) { return PixelStore::ColorIndex{12}; }
+			if(scancode.value() == 47) { return PixelStore::ColorIndex{15}; }
 
-			if(scancode.value() >= 44 && scancode.value() < 47)
-			{ return PixelStore::ColorIndex{static_cast<uint8_t>(13 + scancode.value() - 44)}; }
 			return std::optional<PixelStore::ColorIndex>{};
 		}
 	}
