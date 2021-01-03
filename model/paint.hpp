@@ -18,4 +18,6 @@ namespace Texpainter::Model
 	           PixelStore::Pixel color);
 
 	void floodfill(Span2d<PixelStore::Pixel> pixels, vec2_t origin, PixelStore::Pixel color);
+
+	void drawOutline(Span2d<PixelStore::Pixel> pixels);
 }

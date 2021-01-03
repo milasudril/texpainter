@@ -70,3 +70,48 @@ void Texpainter::Model::floodfill(Span2d<PixelStore::Pixel> pixels,
 		{ locations.push(std::pair{(loc.first + w) % w, (loc.second + h - 1) % h}); }
 	}
 }
+
+void Texpainter::Model::drawOutline(Span2d<PixelStore::Pixel> pixels)
+{
+	auto const w = pixels.width();
+	auto const h = pixels.height();
+
+	constexpr auto dark  = PixelStore::Pixel{0.0f, 0.0f, 0.0f, 1.0f};
+	constexpr auto light = PixelStore::Pixel{1.0f, 1.0f, 1.0f, 1.0f};
+
+	for(uint32_t k = 0; k < w; ++k)
+	{
+		auto src     = pixels(k, 0);
+		pixels(k, 0) = intensity(src) < 0.5f ? dark : light;
+	}
+
+	for(uint32_t k = 0; k < w; ++k)
+	{
+		auto src         = pixels(k, h - 1);
+		pixels(k, h - 1) = intensity(src) < 0.5f ? dark : light;
+	}
+
+	for(uint32_t k = 0; k < h; ++k)
+	{
+		auto src     = pixels(0, k);
+		pixels(0, k) = intensity(src) < 0.5f ? dark : light;
+	}
+
+	for(uint32_t k = 0; k < h; ++k)
+	{
+		auto src         = pixels(w - 1, k);
+		pixels(w - 1, k) = intensity(src) < 0.5f ? dark : light;
+	}
+
+	if(w >= 8 && h >= 8)
+	{
+		for(int k = -1; k <= 1; ++k)
+		{
+			for(int l = -1; l <= 1; ++l)
+			{
+				auto src                     = pixels(w / 2 + l, h / 2 + k);
+				pixels(w / 2 + l, h / 2 + k) = intensity(src) < 0.5f ? dark : light;
+			}
+		}
+	}
+}

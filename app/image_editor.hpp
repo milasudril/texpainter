@@ -8,6 +8,7 @@
 #include "./palette_selector.hpp"
 
 #include "model/document.hpp"
+#include "model/paint.hpp"
 
 #include "ui/image_view.hpp"
 #include "ui/labeled_input.hpp"
@@ -136,7 +137,9 @@ namespace Texpainter::App
 			auto& current_img = m_doc.get().currentImage();
 			if(auto i = imgs.find(current_img); i != std::end(imgs)) [[likely]]
 				{
-					m_img_view.image(i->second.source.get().pixels());
+					auto imgdisp = i->second.source.get();
+					Model::drawOutline(imgdisp.pixels());
+					m_img_view.image(imgdisp.pixels());
 				}
 			else
 			{
