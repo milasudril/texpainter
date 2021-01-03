@@ -87,6 +87,24 @@ public:
 
 	void shrinkToContent() { gtk_window_resize(m_handle, 1, 1); }
 
+	Size2d size() const
+	{
+		auto gdk_window = gtk_widget_get_window(GTK_WIDGET(m_handle));
+		assert(gdk_window != nullptr);
+		GdkRectangle rect{};
+		gdk_window_get_frame_extents(gdk_window, &rect);
+		return Size2d{static_cast<uint32_t>(rect.width), static_cast<uint32_t>(rect.height)};
+	}
+
+	ScreenCoordinates location() const
+	{
+		auto gdk_window = gtk_widget_get_window(GTK_WIDGET(m_handle));
+		assert(gdk_window != nullptr);
+		GdkRectangle rect{};
+		gdk_window_get_frame_extents(gdk_window, &rect);
+		return ScreenCoordinates{static_cast<double>(rect.x), static_cast<double>(rect.y)};
+	}
+
 private:
 	static gboolean delete_event(GtkWidget* widget, GdkEvent* event, void* user_data);
 	static gboolean key_press(GtkWidget* widget, GdkEvent* event, void* user_data);
@@ -273,4 +291,12 @@ Texpainter::Ui::Window& Texpainter::Ui::Window::shrinkToContent()
 {
 	m_impl->shrinkToContent();
 	return *this;
+}
+
+
+Texpainter::Size2d Texpainter::Ui::Window::size() const { return m_impl->size(); }
+
+Texpainter::Ui::ScreenCoordinates Texpainter::Ui::Window::location() const
+{
+	return m_impl->location();
 }

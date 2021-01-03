@@ -234,6 +234,12 @@ namespace Texpainter::Model
 		template<class T>
 		Document& current(ItemName&&);
 
+		Document& windows(Windows&& windows)
+		{
+			m_workspace.m_windows = std::move(windows);
+			return *this;
+		}
+
 	private:
 		std::map<ItemName, Compositor::NodeItem> m_input_nodes;
 

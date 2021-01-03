@@ -12,10 +12,29 @@
 #include "filtergraph/graph.hpp"
 
 #include <nlohmann/json.hpp>
+
 #include <filesystem>
+#include <optional>
 
 namespace Texpainter::Model
 {
+	struct WindowRectangle
+	{
+		Size2d size;
+		vec2_t location;
+	};
+
+	void to_json(nlohmann::json& obj, WindowRectangle const& workspace);
+
+	struct Windows
+	{
+		std::optional<WindowRectangle> image_editor;
+		std::optional<WindowRectangle> compositor;
+		std::optional<WindowRectangle> document_previewer;
+	};
+
+	void to_json(nlohmann::json& obj, Windows const& workspace);
+
 	struct Workspace
 	{
 		Workspace()
@@ -30,6 +49,8 @@ namespace Texpainter::Model
 		PixelStore::ColorIndex m_current_color;
 		ItemName m_current_palette;
 		PixelStore::Palette<8> m_color_history;
+		Windows m_windows;
+
 		std::filesystem::path m_working_directory;
 	};
 

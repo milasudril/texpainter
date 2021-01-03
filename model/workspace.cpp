@@ -4,11 +4,27 @@
 
 #include "./workspace.hpp"
 
+void Texpainter::Model::to_json(nlohmann::json& obj, WindowRectangle const& rect)
+{
+	obj = nlohmann::json{std::pair{"size", rect.size}, std::pair{"location", rect.location}};
+}
+
+void Texpainter::Model::to_json(nlohmann::json& obj, Windows const& windows)
+{
+	if(windows.image_editor.has_value()) { obj["image_editor"] = *windows.image_editor; }
+
+	if(windows.compositor.has_value()) { obj["compositor"] = *windows.compositor; }
+
+	if(windows.document_previewer.has_value())
+	{ obj["document_previewer"] = *windows.document_previewer; }
+}
+
 void Texpainter::Model::to_json(nlohmann::json& obj, Workspace const& workspace)
 {
 	obj = nlohmann::json{std::pair{"node_locations", workspace.m_node_locations},
 	                     std::pair{"current_image", workspace.m_current_image},
 	                     std::pair{"current_color", workspace.m_current_color},
 	                     std::pair{"current_palette", workspace.m_current_palette},
-	                     std::pair{"color_history", workspace.m_color_history}};
+	                     std::pair{"color_history", workspace.m_color_history},
+	                     std::pair{"windows", workspace.m_windows}};
 }

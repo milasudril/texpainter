@@ -34,3 +34,28 @@ void Texpainter::App::WindowManager::resetWindowPositions()
 		                                            + vec2_t{0.0, 0.625} * size_vec);
 	}
 }
+
+Texpainter::Model::Windows Texpainter::App::WindowManager::windowInfo() const
+{
+	Model::Windows ret;
+
+	if(auto editor = m_windows.get<WindowType::ImageEditor>().get(); editor != nullptr)
+	{
+		ret.image_editor =
+		    Model::WindowRectangle{editor->window().size(), editor->window().location().value()};
+	}
+
+	if(auto compositor = m_windows.get<WindowType::Compositor>().get(); compositor != nullptr)
+	{
+		ret.compositor = Model::WindowRectangle{compositor->window().size(),
+		                                        compositor->window().location().value()};
+	}
+
+	if(auto previewer = m_windows.get<WindowType::DocumentPreviewer>().get(); previewer != nullptr)
+	{
+		ret.document_previewer = Model::WindowRectangle{previewer->window().size(),
+		                                                previewer->window().location().value()};
+	}
+
+	return ret;
+}

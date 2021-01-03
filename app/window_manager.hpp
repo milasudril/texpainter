@@ -288,6 +288,8 @@ namespace Texpainter::App
 			   compositor != nullptr)
 			{ m_document->nodeLocations(compositor->widget().nodeLocations()); }
 
+			m_document->windows(windowInfo());
+
 			store(*m_document, "/dev/stdout");
 		}
 
@@ -534,7 +536,7 @@ namespace Texpainter::App
 
 			if(auto output = m_windows.get<WindowType::DocumentPreviewer>().get();
 			   output != nullptr)
-				[[likely]] { output->widget().refresh(Model::Document::ForceUpdate{true}); }
+			{ output->widget().refresh(Model::Document::ForceUpdate{true}); }
 		}
 
 		template<auto>
@@ -547,11 +549,11 @@ namespace Texpainter::App
 		void onUpdated(Src&)
 		{
 			if(auto editor = m_windows.get<WindowType::ImageEditor>().get(); editor != nullptr)
-				[[likely]] { editor->widget().refresh(); }
+			{ editor->widget().refresh(); }
 
 			if(auto output = m_windows.get<WindowType::DocumentPreviewer>().get();
 			   output != nullptr)
-				[[likely]] { output->widget().refresh(); }
+			{ output->widget().refresh(); }
 		}
 
 		template<auto, class T>
@@ -569,10 +571,13 @@ namespace Texpainter::App
 		{
 		}
 
+		Model::Windows windowInfo() const;
+
 	private:
 		std::unique_ptr<Model::Document> m_document;
 
 		Enum::Tuple<WindowType, WindowTypeTraits> m_windows;
+
 
 		size_t m_window_count;
 

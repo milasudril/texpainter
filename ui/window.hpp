@@ -85,6 +85,10 @@ namespace Texpainter::Ui
 
 		Window& move(ScreenCoordinates coords);
 
+		Size2d size() const;
+
+		ScreenCoordinates location() const;
+
 		static void terminateApp();
 
 		Window& shrinkToContent();
