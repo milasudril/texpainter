@@ -37,10 +37,10 @@ void main(auto const& arg, auto const& params)
 			auto const dy = input<0>(arg, col, (row + 1 + size.height()) % size.height())
 			                - input<0>(arg, col, (row - 1 + size.height()) % size.height());
 
-			output<0>(arg, col, row) =
-			    TopographyInfo{static_cast<float>(height * 0.5 * dx),
-			                   static_cast<float>(height * 0.5 * dy),
-			                   static_cast<float>(height * input<0>(arg, col, row))};
+			output<0>(arg, col, row) = TopographyInfo{
+			    static_cast<float>(height * 0.5 * dx),
+			    static_cast<float>(height * 0.5 * dy),
+			    static_cast<float>(height * input<0>(arg, col, row) / arg.resolution())};
 		}
 	}
 }
