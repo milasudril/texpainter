@@ -26,9 +26,10 @@ namespace Testcases
 		Texpainter::FilterGraph::RgbaValue const c{};
 
 		Texpainter::Size2d size{23, 56};
-		Texpainter::FilterGraph::NodeArgument test{size, {&a, &b, &c}};
+		Texpainter::FilterGraph::NodeArgument test{size, 2.0, {&a, &b, &c}};
 
 		assert(test.size() == size);
+		assert(test.resolution() == 2.0);
 
 		auto const& inputs = test.inputs();
 		assert(*Enum::get_if<Texpainter::FilterGraph::RealValue const*>(&inputs[0]) == &a);

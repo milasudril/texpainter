@@ -23,8 +23,12 @@ namespace Texpainter::FilterGraph
 
 		ImgProcArg(): m_canvas_size{0, 0} {}
 
-		explicit ImgProcArg(Size2d canvas_size, InputArgs const& inputs, OutputArgs const& outputs)
+		explicit ImgProcArg(Size2d canvas_size,
+		                    double resolution,
+		                    InputArgs const& inputs,
+		                    OutputArgs const& outputs)
 		    : m_canvas_size{canvas_size}
+		    , m_resolution{resolution}
 		    , m_inputs{inputs}
 		    , m_outputs{outputs}
 		{
@@ -56,8 +60,11 @@ namespace Texpainter::FilterGraph
 			return std::get<index>(m_outputs);
 		}
 
+		double resolution() const { return m_resolution; }
+
 	private:
 		Size2d m_canvas_size;
+		double m_resolution;
 		InputArgs m_inputs;
 		OutputArgs m_outputs;
 	};

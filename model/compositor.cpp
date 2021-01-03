@@ -32,7 +32,8 @@ Texpainter::FilterGraph::ValidationResult Texpainter::Model::validate(Compositor
 	return result;
 }
 
-void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas) const
+void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
+                                            double resolution) const
 {
 	assert(valid());
 	if(m_node_array.size() == 0) [[unlikely]]
@@ -74,16 +75,17 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas) co
 
 	Sched::SignalingCounter<size_t> task_counter;
 
-	auto schedule_task = [&workers = m_workers, size = canvas.size(), &task_counter](auto& item) {
-		workers.addTask([&item, size, &task_counter]() {
-			item.counter->waitAndReset(item.node.get().inputPorts().size());
-			item.node(size);
-			std::ranges::for_each(item.signal_counters, [](auto& counter) {
-				std::ranges::for_each(counter, [](auto value) { ++(*value); });
-			});
-			++task_counter;
-		});
-	};
+	auto schedule_task =
+	    [&workers = m_workers, size = canvas.size(), resolution, &task_counter](auto& item) {
+		    workers.addTask([&item, size, resolution, &task_counter]() {
+			    item.counter->waitAndReset(item.node.get().inputPorts().size());
+			    item.node(size, resolution);
+			    std::ranges::for_each(item.signal_counters, [](auto& counter) {
+				    std::ranges::for_each(counter, [](auto value) { ++(*value); });
+			    });
+			    ++task_counter;
+		    });
+	    };
 
 	std::ranges::for_each(m_node_array, schedule_task);
 	task_counter.waitAndReset(m_node_array.size());

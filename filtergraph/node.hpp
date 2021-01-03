@@ -32,10 +32,10 @@ namespace Texpainter::FilterGraph
 			{
 			}
 
-			auto const& operator()(Size2d size) const
+			auto const& operator()(Size2d size, double resolution) const
 			{
 				assert(valid());
-				auto const& ret = (*r_processor)(size);
+				auto const& ret = (*r_processor)(size, resolution);
 				m_last_usecount = r_processor->m_usecount;
 				return ret[m_index.value()];
 			}
@@ -61,6 +61,7 @@ namespace Texpainter::FilterGraph
 		explicit Node(std::unique_ptr<AbstractImageProcessor> proc)
 		    : m_dirty{1}
 		    , m_rendered_size{0, 0}
+		    , m_rendered_resolution{0.0}
 		    , m_usecount{static_cast<size_t>(-1)}
 		    , m_proc{std::move(proc)}
 		{
@@ -84,11 +85,11 @@ namespace Texpainter::FilterGraph
 
 		void forceUpdate() const { m_dirty = true; }
 
-		result_type const& operator()(Size2d size) const
+		result_type const& operator()(Size2d size, double resolution) const
 		{
 			assert(FilterGraph::isConnected(*this));
 
-			if(!dirty(size)) { return m_result_cache; }
+			if(!dirty(size, resolution)) { return m_result_cache; }
 
 			std::array<InputPortValue, NodeArgument::MaxNumInputs> args{};
 			auto const n_ports   = inputPorts().size();
@@ -96,10 +97,13 @@ namespace Texpainter::FilterGraph
 			std::transform(std::begin(m_inputs),
 			               input_end,
 			               std::begin(args),
-			               [size](auto const& val) { return makeInputPortValue(val(size)); });
+			               [size, resolution](auto const& val) {
+				               return makeInputPortValue(val(size, resolution));
+			               });
 
-			m_result_cache  = (*m_proc)(NodeArgument{size, args});
-			m_rendered_size = size;
+			m_result_cache        = (*m_proc)(NodeArgument{size, resolution, args});
+			m_rendered_size       = size;
+			m_rendered_resolution = resolution;
 			++m_usecount;
 			m_dirty = 0;
 			return m_result_cache;
@@ -181,6 +185,7 @@ namespace Texpainter::FilterGraph
 	private:
 		mutable size_t m_dirty;
 		mutable Size2d m_rendered_size;
+		mutable double m_rendered_resolution;
 		mutable size_t m_usecount;
 		std::array<Source, NodeArgument::MaxNumInputs> m_inputs;
 		std::unique_ptr<AbstractImageProcessor> m_proc;
@@ -207,11 +212,11 @@ namespace Texpainter::FilterGraph
 			m_result_cache = result_type{};
 		}
 
-		bool dirty(Size2d size) const
+		bool dirty(Size2d size, double resolution) const
 		{
-			return m_dirty || size != m_rendered_size
-			       || std::ranges::any_of(inputs(), [size](auto const& item) {
-				          return item.processor().dirty(size) || item.hasOldResult();
+			return m_dirty || size != m_rendered_size || resolution != m_rendered_resolution
+			       || std::ranges::any_of(inputs(), [size, resolution](auto const& item) {
+				          return item.processor().dirty(size, resolution) || item.hasOldResult();
 			          });
 		}
 	};

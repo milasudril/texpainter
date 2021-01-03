@@ -128,7 +128,7 @@ namespace Testcases
 		    .connect(Texpainter::FilterGraph::InputPortIndex{1},
 		             input,
 		             Texpainter::FilterGraph::OutputPortIndex{2});
-		obj(Texpainter::Size2d{1, 1});
+		obj(Texpainter::Size2d{1, 1}, 1.0);
 	}
 
 	void texpainterFilterGraphNodeInputPortIndexs()

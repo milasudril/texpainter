@@ -39,7 +39,7 @@ Texpainter::PixelStore::Image Texpainter::Model::render(Document const& document
 	                      scale * document.canvasSize().height()};
 	if(document.compositor().valid()) [[likely]]
 		{
-			document.compositor().process(ret.pixels());
+			document.compositor().process(ret.pixels(), static_cast<double>(scale));
 		}
 	else
 	{
