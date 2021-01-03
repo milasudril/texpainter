@@ -54,7 +54,7 @@ inline int waveformIndex(ParamValue val)
 
 inline auto wavelength(size_t canvas_size, ParamValue val)
 {
-	return 0.5 * std::exp2(std::lerp(-std::log2(canvas_size), 0.0, val.value()));
+	return std::max(1.0 / canvas_size, 0.5 * std::exp2(std::lerp(-16, 0.0, val.value())));
 }
 
 void main(auto const& args, auto const& params)
