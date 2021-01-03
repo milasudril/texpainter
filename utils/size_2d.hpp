@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <limits>
 #include <string>
+#include <cmath>
 
 namespace Texpainter
 {
@@ -35,14 +36,19 @@ namespace Texpainter
 
 	constexpr inline bool operator!=(Size2d a, Size2d b) { return !(a == b); }
 
-	constexpr auto inline area(Size2d size)
+	constexpr inline auto area(Size2d size)
 	{
 		return static_cast<size_t>(size.width()) * static_cast<size_t>(size.height());
 	}
 
-	constexpr auto inline aspectRatio(Size2d size)
+	constexpr inline auto aspectRatio(Size2d size)
 	{
 		return static_cast<double>(size.width()) / static_cast<double>(size.height());
+	}
+
+	constexpr inline auto toDiameter(Size2d size, double exponent)
+	{
+		return std::max(2.0, std::sqrt(area(size)) * std::exp2(std::lerp(-16.0, 0.0, exponent)));
 	}
 
 	template<class T>
