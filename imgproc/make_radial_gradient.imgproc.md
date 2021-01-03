@@ -8,7 +8,9 @@ __Output:__ (Grayscale image) Output image
 
 ## Parameters
 
-__Size:__ (= 0.5) The size of the mask, along the nominal x axis.
+__Size:__ (= 0.875) The size of the mask, along the nominal x axis.
+
+__Scale with resolution:__ (= 1.0) If > 0.5, scale the size with rendering resolution. Use for spectral filtering.
 
 __Aspect ratio:__ (= 1.0) The aspect ratio of mask. 1.0 means that the mask is circular.
 
@@ -47,24 +49,21 @@ using NormSquared = RealValue (*)(vec2_t loc);
 constexpr NormSquared norms2[] = {
     polygon<4>, polygon<6>, polygon<8>, polygon<10>, polygon<12>, circle};
 
-inline auto size(size_t canvas_size, ParamValue val)
-{
-	return 0.5 * std::exp2(std::lerp(-std::log2(canvas_size), 0.0, val.value()));
-}
-
 void main(auto const& args, auto const& params)
 {
 	auto const w = args.canvasSize().width();
 	auto const h = args.canvasSize().height();
-	auto const A = area(args.canvasSize());
 
-	auto const r_x = size(static_cast<size_t>(sqrt(A)), param<Str{"Size"}>(params));
+	auto const r_x =
+	    0.5 * toDiameter(args.canvasSize(), param<Str{"Size"}>(params).value())
+	    / (param<Str{"Scale with resolution"}>(params).value() > 0.5 ? args.resolution() : 1.0);
+
 	auto const r_y = r_x * param<Str{"Aspect ratio"}>(params).value();
 	auto const θ   = Angle{0.5 * param<Str{"Orientation"}>(params).value(), Angle::Turns{}};
 	auto const n   = static_cast<int>(std::lerp(
         0, std::nextafter(std::size(norms2), 0), param<Str{"Number of vertices"}>(params).value()));
 
-	auto const r_0       = sqrt(A) * vec2_t{r_x, r_y};
+	auto const r_0       = vec2_t{r_x, r_y};
 	auto const rot_vec_x = vec2_t{cos(θ), -sin(θ)};
 	auto const rot_vec_y = vec2_t{sin(θ), cos(θ)};
 	auto const norm2     = norms2[n];
