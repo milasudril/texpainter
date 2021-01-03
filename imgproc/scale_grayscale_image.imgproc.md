@@ -49,10 +49,10 @@ void main(auto const& args, auto const& params)
 	auto const s   = vec2_t{r_x, r_y};
 
 	if(param<Str{"Fill mode"}>(params).value() < 0.5)
-	{ renderCentered(Span2d{input<0>(args), args.size()}, output<0>(args), s); }
+	{ renderCentered(Span2d{input<0>(args), args.canvasSize()}, output<0>(args), s); }
 	else
 	{
-		renderTiled(Span2d{input<0>(args), args.size()}, output<0>(args), s);
+		renderTiled(Span2d{input<0>(args), args.canvasSize()}, output<0>(args), s);
 	}
 }
 ```

@@ -54,9 +54,9 @@ inline auto size(size_t canvas_size, ParamValue val)
 
 void main(auto const& args, auto const& params)
 {
-	auto const w = args.size().width();
-	auto const h = args.size().height();
-	auto const A = area(args.size());
+	auto const w = args.canvasSize().width();
+	auto const h = args.canvasSize().height();
+	auto const A = area(args.canvasSize());
 
 	auto const r_x = size(static_cast<size_t>(sqrt(A)), param<Str{"Size"}>(params));
 	auto const r_y = r_x * param<Str{"Aspect ratio"}>(params).value();

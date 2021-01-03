@@ -27,7 +27,7 @@ namespace Dft    = Texpainter::Dft;
 
 void main(auto const& args)
 {
-	auto const size = args.size();
+	auto const size = args.canvasSize();
 	TempBuffer output_buffer{size};
 	auto& engine = Dft::engineInstance();
 	engine.run<Dft::Direction::Backward>(size, input<0>(args), output_buffer.pixels().data());

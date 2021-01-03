@@ -89,7 +89,7 @@ namespace Testcases
 		Testutils::MallocHook::disarm();
 		auto args = obj.processor().args_result;
 
-		assert(args.size() == size);
+		assert(args.canvasSize() == size);
 		assert(get_if<std::unique_ptr<Texpainter::FilterGraph::ComplexValue[]>>(&ret[0])->get()
 		       == args.output<0>());
 		assert(get_if<std::unique_ptr<Texpainter::FilterGraph::RealValue[]>>(&ret[1])->get()

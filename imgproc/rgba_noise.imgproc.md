@@ -21,7 +21,7 @@ __Source code:__
 ```c++
 void main(auto const& args)
 {
-	auto const size = area(args.size());
+	auto const size = area(args.canvasSize());
 	std::generate(output<0>(args),
 	              output<0>(args) + size,
 	              [U   = std::uniform_real_distribution{0.0f, 1.0f},

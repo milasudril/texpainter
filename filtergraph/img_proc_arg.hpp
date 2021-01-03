@@ -21,21 +21,21 @@ namespace Texpainter::FilterGraph
 		using InputArgs  = InArgTuple<portTypes(Descriptor::InputPorts)>;
 		using OutputArgs = OutArgTuple<portTypes(Descriptor::OutputPorts)>;
 
-		ImgProcArg(): m_size{0, 0} {}
+		ImgProcArg(): m_canvas_size{0, 0} {}
 
-		explicit ImgProcArg(Size2d size, InputArgs const& inputs, OutputArgs const& outputs)
-		    : m_size{size}
+		explicit ImgProcArg(Size2d canvas_size, InputArgs const& inputs, OutputArgs const& outputs)
+		    : m_canvas_size{canvas_size}
 		    , m_inputs{inputs}
 		    , m_outputs{outputs}
 		{
 		}
 
-		Size2d size() const { return m_size; }
+		Size2d canvasSize() const { return m_canvas_size; }
 
 		template<size_t index>
 		auto input(uint32_t col, uint32_t row) const
 		{
-			return std::get<index>(m_inputs)[row * m_size.width() + col];
+			return std::get<index>(m_inputs)[row * m_canvas_size.width() + col];
 		}
 
 		template<size_t index>
@@ -47,7 +47,7 @@ namespace Texpainter::FilterGraph
 		template<size_t index>
 		auto& output(uint32_t col, uint32_t row) const
 		{
-			return std::get<index>(m_outputs)[row * m_size.width() + col];
+			return std::get<index>(m_outputs)[row * m_canvas_size.width() + col];
 		}
 
 		template<size_t index>
@@ -57,7 +57,7 @@ namespace Texpainter::FilterGraph
 		}
 
 	private:
-		Size2d m_size;
+		Size2d m_canvas_size;
 		InputArgs m_inputs;
 		OutputArgs m_outputs;
 	};

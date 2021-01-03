@@ -26,7 +26,7 @@ __Source code:__
 ```c++
 void main(auto const& args)
 {
-	auto const size = area(args.size());
+	auto const size = area(args.canvasSize());
 	std::transform(input<0>(args), input<0>(args) + size, output<0>(args), [](auto val) {
 		return std::exp2(-0.5 * val);
 	});

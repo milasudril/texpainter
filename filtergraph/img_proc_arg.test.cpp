@@ -47,7 +47,7 @@ namespace Testcases
 		    InArgs{std::begin(input1), std::begin(input2), std::begin(input3)},
 		    OutArgs{std::begin(output1), std::begin(output2), std::begin(output3)}};
 
-		assert(obj.size() == size);
+		assert(obj.canvasSize() == size);
 
 		assert(obj.input<1>(0, 0) == input2[0]);
 		assert(obj.input<1>(2, 0) == input2[2]);

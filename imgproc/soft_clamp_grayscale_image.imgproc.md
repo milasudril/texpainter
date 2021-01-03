@@ -38,7 +38,7 @@ void main(auto const& args, auto const& params)
 	auto const softness = static_cast<float>(param<Str{"Softness"}>(params).value());
 	std::transform(
 	    input<0>(args),
-	    input<0>(args) + area(args.size()),
+	    input<0>(args) + area(args.canvasSize()),
 	    output<0>(args),
 	    [x_min, x_max, softness](auto val) { return computeValue(val, x_min, x_max, softness); });
 }

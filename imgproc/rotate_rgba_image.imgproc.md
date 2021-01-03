@@ -46,10 +46,10 @@ void main(auto const& args, auto const& params)
 {
 	auto const ϴ = angle(param<Str{"Angle"}>(params));
 	if(param<Str{"Fill mode"}>(params).value() < 0.5)
-	{ renderCentered(Span2d{input<0>(args), args.size()}, output<0>(args), ϴ); }
+	{ renderCentered(Span2d{input<0>(args), args.canvasSize()}, output<0>(args), ϴ); }
 	else
 	{
-		renderTiled(Span2d{input<0>(args), args.size()}, output<0>(args), ϴ);
+		renderTiled(Span2d{input<0>(args), args.canvasSize()}, output<0>(args), ϴ);
 	}
 }
 ```

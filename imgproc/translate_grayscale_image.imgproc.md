@@ -28,8 +28,8 @@ inline int32_t mapParameter(ParamValue value, uint32_t scale)
 
 void main(auto const& args, auto const& params)
 {
-	auto const w = args.size().width();
-	auto const h = args.size().height();
+	auto const w = args.canvasSize().width();
+	auto const h = args.canvasSize().height();
 
 	auto const Δx = mapParameter(param<Str{"Δx"}>(params), w);
 	auto const Δy = mapParameter(param<Str{"Δy"}>(params), h);

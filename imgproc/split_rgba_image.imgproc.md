@@ -23,7 +23,7 @@ __Source code:__
 ```c++
 void main(auto const& args)
 {
-	auto size = args.size();
+	auto size = args.canvasSize();
 
 	for(uint32_t row = 0; row < size.height(); ++row)
 	{

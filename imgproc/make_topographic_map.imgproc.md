@@ -25,7 +25,7 @@ __Source code:__
 ```c++
 void main(auto const& arg, auto const& params)
 {
-	auto size = arg.size();
+	auto size = arg.canvasSize();
 	auto height =
 	    sqrt(area(size)) * exp2(std::lerp(-4.0, 4.0, param<Str{"Max elevation"}>(params).value()));
 	for(uint32_t row = 0; row < size.height(); ++row)

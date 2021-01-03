@@ -28,7 +28,7 @@ namespace Dft    = Texpainter::Dft;
 void main(auto const& args)
 {
 	auto sign_row   = 1;
-	auto const size = args.size();
+	auto const size = args.canvasSize();
 	TempBuffer input_buffer{size};
 	for(uint32_t row = 0; row < size.height(); ++row)
 	{

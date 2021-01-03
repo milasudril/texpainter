@@ -34,7 +34,7 @@ void main(auto const& args, auto const& params)
 	auto const a = power(param<Str{"Exponent"}>(params));
 
 	std::transform(input<0>(args),
-	               input<0>(args) + area(args.size()),
+	               input<0>(args) + area(args.canvasSize()),
 	               output<0>(args),
 	               [a](auto val) { return std::pow(val, a); });
 }

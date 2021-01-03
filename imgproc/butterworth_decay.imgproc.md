@@ -35,7 +35,7 @@ inline auto order(ParamValue val)
 
 void main(auto const& args, auto const& params)
 {
-	auto const size = area(args.size());
+	auto const size = area(args.canvasSize());
 	std::transform(input<0>(args),
 	               input<0>(args) + size,
 	               output<0>(args),

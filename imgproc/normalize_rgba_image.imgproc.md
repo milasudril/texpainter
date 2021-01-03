@@ -29,7 +29,7 @@ __Source code:__
 ```c++
 void main(auto const& args, auto const& params)
 {
-	auto const size       = area(args.size());
+	auto const size       = area(args.canvasSize());
 	auto const input_view = std::span{input<0>(args), input<0>(args) + size};
 	auto const range      = std::pair{
         std::ranges::min_element(input_view, [](auto a, auto b) { return min(a) < min(b); }),

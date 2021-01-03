@@ -36,8 +36,8 @@ constexpr RealValue pattern[2][2] = {0.0, 0.5, 0.5, 1.0};
 
 void main(auto const& args, auto const& params)
 {
-	auto const w = args.size().width();
-	auto const h = args.size().height();
+	auto const w = args.canvasSize().width();
+	auto const h = args.canvasSize().height();
 
 	auto dx = 2.0 * static_cast<int>(w * sizeFromParam(w, param<Str{"Div x"}>(params)))
 	          / static_cast<double>(w);

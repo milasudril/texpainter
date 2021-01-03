@@ -32,7 +32,7 @@ namespace Texpainter::Model
 
 		void operator()(FilterGraph::ImgProcArg<InterfaceDescriptor> const& args) const
 		{
-			auto ret = Texpainter::Span2d{args.template output<0>(), args.size()};
+			auto ret = Texpainter::Span2d{args.template output<0>(), args.canvasSize()};
 
 			auto const src_ratio  = aspectRatio(r_pixels);
 			auto const sink_ratio = aspectRatio(ret);

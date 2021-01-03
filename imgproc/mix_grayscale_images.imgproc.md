@@ -27,7 +27,7 @@ __Source code:__
 ```c++
 void main(auto const& args)
 {
-	auto const size = area(args.size());
+	auto const size = area(args.canvasSize());
 	auto blend      = [](auto a, auto b, auto factor) { return a * (1.0f - factor) + b * factor; };
 
 	Texpainter::transform(blend,
