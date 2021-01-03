@@ -12,7 +12,9 @@ __Intensity:__ (Grayscale image) The generated intensity function
 
 ## Parameters
 
-__Div x:__ (= 0.5) The number of cells per pattern period
+__Div x:__ (= 0.75) The number of cells per pattern period
+
+__Scale with resolution:__ (= 0.0) If > 0.5, scale the size with rendering resolution. Use for spectral filtering.
 
 __Aspect ratio:__ (= 1.0) The aspect ratio of cells. 1.0 means that they are squares
 
@@ -27,21 +29,20 @@ __Includes:__
 __Source code:__ 
 
 ```c++
-inline auto sizeFromParam(size_t size, ParamValue val)
-{
-	return 0.5 * std::exp2(std::lerp(-std::log2(size), 0.0, val.value()));
-}
-
 constexpr RealValue pattern[2][2] = {0.0, 0.5, 0.5, 1.0};
 
 void main(auto const& args, auto const& params)
 {
-	auto const w = args.canvasSize().width();
-	auto const h = args.canvasSize().height();
+	auto const size = args.canvasSize();
+	auto const A    = area(size);
+	auto const w    = args.canvasSize().width();
+	auto const h    = args.canvasSize().height();
 
-	auto dx = 2.0 * static_cast<int>(w * sizeFromParam(w, param<Str{"Div x"}>(params)))
-	          / static_cast<double>(w);
-	auto dy = dx * param<Str{"Aspect ratio"}>(params).value();
+	auto const dx =
+	    2.0 * static_cast<int>(0.5 * toDiameter(size, param<Str{"Div x"}>(params).value()))
+	    / (sqrt(A)
+	       * (param<Str{"Scale with resolution"}>(params).value() < 0.5 ? args.resolution() : 1.0));
+	auto const dy = dx * param<Str{"Aspect ratio"}>(params).value();
 
 	for(uint32_t row = 0; row < h; ++row)
 	{
