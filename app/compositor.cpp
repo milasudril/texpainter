@@ -104,6 +104,7 @@ Texpainter::App::Compositor::Compositor(Ui::Container& owner, Model::Document& d
     : m_doc{doc}
     , r_callback{[](void*, Compositor&) {}}
     , m_canvas{owner}
+    , m_filtermenuloc{0.0, 0.0}
     , m_node_copy{m_node_menu, "Copy"}
     , m_node_delete{m_node_menu, "Delete"}
     , r_owner{owner}
