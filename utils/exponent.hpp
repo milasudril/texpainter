@@ -3,6 +3,8 @@
 #ifndef TEXPAINTER_UTILS_EXPONENT_HPP
 #define TEXPAINTER_UTILS_EXPONENT_HPP
 
+#include <cmath>
+
 namespace Texpainter
 {
 	template<std::floating_point Representation>
@@ -13,7 +15,7 @@ namespace Texpainter
 
 		constexpr Exponent() = default;
 
-		constexpr explilcit Exponent(representation val): m_val{val} {}
+		constexpr explicit Exponent(representation val): m_val{val} {}
 
 		constexpr representation value() const { return m_val; }
 
@@ -71,6 +73,7 @@ namespace Texpainter
 		return c * a;
 	}
 
+	template<std::floating_point Representation>
 	constexpr auto operator/(Exponent<Representation> a, Representation c) { return a /= c; }
 
 	template<std::floating_point Representation>
@@ -82,7 +85,7 @@ namespace Texpainter
 	template<std::floating_point Representation>
 	constexpr auto fromExponent(Exponent<Representation> val)
 	{
-		return std::exp2(val);
+		return std::exp2(val.value());
 	}
 }
 #endif
