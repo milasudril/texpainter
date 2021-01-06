@@ -40,7 +40,7 @@ namespace Texpainter::FilterGraph
 
 	constexpr double sizeFromWidth(Size2d size, ParamValue val)
 	{
-		return ScalingFactors::sizeFromHeight(size, val.value());
+		return ScalingFactors::sizeFromWidth(size, val.value());
 	}
 
 	constexpr double sizeFromHeight(Size2d size, ParamValue val)

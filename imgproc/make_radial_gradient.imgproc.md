@@ -58,7 +58,7 @@ void main(auto const& args, auto const& params)
 	    0.5 * sizeFromArea(args.canvasSize(), param<Str{"Size"}>(params))
 	    / (param<Str{"Scale with resolution"}>(params).value() > 0.5 ? args.resolution() : 1.0);
 
-	auto const r_y = r_x * param<Str{"Aspect ratio"}>(params).value();
+	auto const r_y = r_x * sizeScaleFactor(param<Str{"Aspect ratio"}>(params));
 	auto const θ   = Angle{0.5 * param<Str{"Orientation"}>(params).value(), Angle::Turns{}};
 	auto const n   = static_cast<int>(std::lerp(
         0, std::nextafter(std::size(norms2), 0), param<Str{"Number of vertices"}>(params).value()));

@@ -31,22 +31,26 @@ __Source code:__
 ```c++
 void main(auto const& args, auto const& params)
 {
-	auto const size = args.canvasSize();
-	auto const w    = args.canvasSize().width();
-	auto const h    = args.canvasSize().height();
+	auto const w = args.canvasSize().width();
+	auto const h = args.canvasSize().height();
+	auto const res_scale =
+	    param<Str{"Scale with resolution"}>(params).value() < 0.5 ? args.resolution() : 1.0;
 
-	auto const dx =
-	    2.0 * static_cast<int>(0.5 * sizeFromWidth(size, param<Str{"Div/x"}>(params)))
-	    / (size.width()
-	       * (param<Str{"Scale with resolution"}>(params).value() < 0.5 ? args.resolution() : 1.0));
-	auto const dy = dx * param<Str{"Aspect ratio"}>(params).value();
+	auto const scaled_size = Size2d{w / static_cast<uint32_t>(res_scale), 1u};
+	auto const n =
+	    2 * static_cast<int>(0.5 * sizeFromWidth(scaled_size, param<Str{"Div/x"}>(params)));
+
+	auto const fx = (n * 1.0) / w;
+	auto const fy =
+	    2.0 * static_cast<int>(0.5 * fx * sizeScaleFactor(param<Str{"Aspect ratio"}>(params)) * h)
+	    / h;
 
 	for(uint32_t row = 0; row < h; ++row)
 	{
-		auto const i = static_cast<uint32_t>(row * dy);
+		auto const i = static_cast<uint32_t>(row * fy);
 		for(uint32_t col = 0; col < w; ++col)
 		{
-			auto const j              = static_cast<uint32_t>(col * dx);
+			auto const j              = static_cast<uint32_t>(col * fx);
 			output<0>(args, col, row) = (i % 2 == j % 2) ? 0.0 : 1.0;
 		}
 	}
