@@ -145,6 +145,12 @@ namespace
 
 		return ret;
 	}
+
+	struct Overlay
+	{
+		CairoSurface surface;
+		Texpainter::vec2_t location;
+	};
 }
 
 class Texpainter::Ui::ImageView::Impl: private ImageView
@@ -185,14 +191,24 @@ public:
 		cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
 		cairo_fill(cr);
 
-		if(auto img = m_img_surface.get(); img != nullptr) [[likely]]
-			{
-				cairo_set_source_surface(cr, img, 0.0, 0.0);
-				cairo_pattern_set_extend(cairo_get_source(cr), CAIRO_EXTEND_REPEAT);
-				cairo_rectangle(cr, 0.0, 0.0, dim.width(), dim.height());
-				cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
-				cairo_fill(cr);
-			}
+		if(auto img = m_img_surface.get(); img != nullptr)
+		{
+			cairo_set_source_surface(cr, img, 0.0, 0.0);
+			cairo_pattern_set_extend(cairo_get_source(cr), CAIRO_EXTEND_REPEAT);
+			cairo_rectangle(cr, 0.0, 0.0, dim.width(), dim.height());
+			cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
+			cairo_fill(cr);
+		}
+
+		if(auto img = m_overlay.surface.get(); img != nullptr)
+		{
+			cairo_set_source_surface(cr, img, m_overlay.location[0], m_overlay.location[1]);
+			cairo_pattern_set_extend(cairo_get_source(cr), CAIRO_EXTEND_NONE);
+			cairo_rectangle(
+			    cr, m_overlay.location[0], m_overlay.location[1], dim.width(), dim.height());
+			cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
+			cairo_fill(cr);
+		}
 	}
 
 	void image(Span2d<PixelStore::Pixel const> img)
@@ -204,6 +220,8 @@ public:
 	void clear()
 	{
 		m_img_surface = CairoSurface{};
+		m_overlay     = Overlay{};
+
 		gtk_widget_queue_draw(GTK_WIDGET(m_handle));
 	}
 
@@ -224,12 +242,27 @@ public:
 
 	void alwaysEmitMouseEvents(bool status) { m_emit_mouse_events = status; }
 
+	void overlay(Span2d<PixelStore::Pixel const> img, vec2_t location)
+	{
+		m_overlay = Overlay{CairoSurface{img}, location};
+	}
+
+	void overlayLocation(vec2_t location)
+	{
+		m_overlay.location = location
+		                     - 0.5
+		                           * vec2_t{static_cast<double>(m_overlay.surface.size().width()),
+		                                    static_cast<double>(m_overlay.surface.size().height())};
+		gtk_widget_queue_draw(GTK_WIDGET(m_handle));
+	}
+
 private:
 	void* r_eh;
 	EventHandlerVtable m_vt;
 	bool m_emit_mouse_events;
 	CairoSurface m_background;
 	CairoSurface m_img_surface;
+	Overlay m_overlay;
 
 	GtkDrawingArea* m_handle;
 	static gboolean draw_callback(GtkWidget* widget, cairo_t* cr, gpointer self)
@@ -355,16 +388,15 @@ Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::clear()
 	return *this;
 }
 
-#if 0
-Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::overlay(Span2d<PixelStore::Pixel const> img, vec2_t initial_position = vec2_t{0.0, 0.0})
+Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::overlay(Span2d<PixelStore::Pixel const> img,
+                                                              vec2_t initial_location)
 {
-	m_impl->overlay(img, initial_position);
+	m_impl->overlay(img, initial_location);
 	return *this;
 }
 
-Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::overlayPosition(vec2_t pos)
+Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::overlayLocation(vec2_t pos)
 {
-	m_impl->overlayPosition(pos);
+	m_impl->overlayLocation(pos);
 	return *this;
 }
-#endif

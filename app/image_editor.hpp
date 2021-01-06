@@ -135,12 +135,12 @@ namespace Texpainter::App
 		{
 			auto& imgs        = m_doc.get().images();
 			auto& current_img = m_doc.get().currentImage();
-			if(auto i = imgs.find(current_img); i != std::end(imgs)) [[likely]]
-				{
-					auto imgdisp = i->second.source.get();
-					Model::drawOutline(imgdisp.pixels());
-					m_img_view.image(imgdisp.pixels());
-				}
+			if(auto i = imgs.find(current_img); i != std::end(imgs))
+			{
+				auto imgdisp = i->second.source.get();
+				Model::drawOutline(imgdisp.pixels());
+				m_img_view.image(imgdisp.pixels());
+			}
 			else
 			{
 				m_img_view.image(Span2d<PixelStore::Pixel>{});
@@ -158,12 +158,14 @@ namespace Texpainter::App
 			        pals, [](auto const& item) { return item.first.c_str(); }))
 			    .selected(current_pal, pals)
 			    .highlightMode(m_doc.get().currentColor(), Ui::PaletteView::HighlightMode::Read);
+			updateBrush();
 			return *this;
 		}
 
 		ImageEditor& refreshBrushSelector()
 		{
 			m_brush_sel.inputField().brush(m_doc.get().currentBrush());
+			updateBrush();
 			return *this;
 		}
 
@@ -196,6 +198,7 @@ namespace Texpainter::App
 			    .highlightMode(current_color, Ui::PaletteView::HighlightMode::None)
 			    .highlightMode(index, Ui::PaletteView::HighlightMode::Read)
 			    .update();
+			updateBrush();
 		}
 
 		void selectBrush(Model::BrushShape shape)
@@ -253,13 +256,19 @@ namespace Texpainter::App
 		}
 
 		template<auto>
-		void onMouseDown(Ui::ImageView&, vec2_t loc_window, vec2_t, int button)
+		void onMouseDown(Ui::ImageView& src, vec2_t loc_window, vec2_t, int button)
 		{
 			switch(button)
 			{
-				case 1: doPaint(loc_window); break;
+				case 1:
+					doPaint(loc_window);
+					src.overlayLocation(loc_window);
+					break;
 
-				case 3: erase(loc_window); break;
+				case 3:
+					erase(loc_window);
+					src.overlayLocation(loc_window);
+					break;
 
 				case 8: imgviewButtonBack(); break;
 
@@ -274,11 +283,11 @@ namespace Texpainter::App
 		}
 
 		template<auto>
-		void onMouseMove(Ui::ImageView&, vec2_t loc_window, vec2_t)
+		void onMouseMove(Ui::ImageView& src, vec2_t loc_window, vec2_t)
 		{
 			switch(m_draw_mode)
 			{
-				case DrawMode::Off: return;
+				case DrawMode::Off: break;
 				case DrawMode::Paint:
 					paint(m_doc, loc_window);
 					on_updated(r_eh, *this);
@@ -293,6 +302,7 @@ namespace Texpainter::App
 					break;
 				}
 			}
+			src.overlayLocation(loc_window);
 		}
 
 		template<auto id, class EventHandler>
@@ -359,6 +369,32 @@ namespace Texpainter::App
 				m_color_picker->eventHandler<ImageEditor::ControlId::ColorPicker>(*this)
 				    .widget()
 				    .value(current_pal->source.get()[index]);
+			}
+		}
+
+		void updateBrush()
+		{
+			auto& imgs        = m_doc.get().images();
+			auto& current_img = m_doc.get().currentImage();
+			if(auto i = imgs.find(current_img); i != std::end(imgs))
+			{
+				auto imgdisp = i->second.source.get();
+				Model::drawOutline(imgdisp.pixels());
+				m_img_view.image(imgdisp.pixels());
+				auto const brush  = m_doc.get().currentBrush();
+				auto brush_radius = ScalingFactors::sizeFromArea(imgdisp.size(), brush.radius());
+				PixelStore::Image rendered_brush{Size2d{static_cast<uint32_t>(brush_radius + 0.5),
+				                                        static_cast<uint32_t>(brush_radius + 0.5)}};
+				Model::paint(rendered_brush.pixels(),
+				             0.5 * vec2_t{brush_radius, brush_radius},
+				             0.5 * brush_radius,
+				             Model::BrushFunction{brush.shape()},
+				             PixelStore::Pixel{0.0, 0.0, 0.0, 1.0});
+				m_img_view.overlay(rendered_brush);
+			}
+			else
+			{
+				m_img_view.overlay(Span2d<PixelStore::Pixel const>{});
 			}
 		}
 
@@ -484,6 +520,7 @@ namespace Texpainter::App
 	{
 		auto brush = m_doc.get().currentBrush();
 		m_doc.get().currentBrush(brush.radius(static_cast<float>(src.value().value())));
+		updateBrush();
 	}
 }
 
