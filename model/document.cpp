@@ -80,10 +80,7 @@ void Texpainter::Model::paint(Document& doc, vec2_t location)
 {
 	auto brush       = doc.currentBrush();
 	auto palette_ref = doc.palette(doc.currentPalette());
-	if(palette_ref == nullptr) [[unlikely]]
-		{
-			return;
-		}
+	if(palette_ref == nullptr) { return; }
 
 	auto const& palette = palette_ref->source.get();
 

@@ -104,7 +104,7 @@ namespace
 			cairo_surface_mark_dirty(surface);
 		}
 
-		cairo_surface_t* get() { return m_img_surface.get(); }
+		cairo_surface_t* get() const { return m_img_surface.get(); }
 
 		Texpainter::Size2d size() const { return m_size_current; }
 
@@ -183,7 +183,7 @@ public:
 		m_impl = nullptr;
 	}
 
-	void render(Size2d dim, cairo_t* cr)
+	void render(Size2d dim, cairo_t* cr) const
 	{
 		cairo_set_source_surface(cr, m_background.get(), 0.0, 0.0);
 		cairo_pattern_set_extend(cairo_get_source(cr), CAIRO_EXTEND_REPEAT);
@@ -204,8 +204,12 @@ public:
 		{
 			cairo_set_source_surface(cr, img, m_overlay.location[0], m_overlay.location[1]);
 			cairo_pattern_set_extend(cairo_get_source(cr), CAIRO_EXTEND_NONE);
-			cairo_rectangle(
-			    cr, m_overlay.location[0], m_overlay.location[1], dim.width(), dim.height());
+			auto const surf_rect = m_overlay.surface.size();
+			cairo_rectangle(cr,
+			                m_overlay.location[0],
+			                m_overlay.location[1],
+			                surf_rect.width(),
+			                surf_rect.height());
 			cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
 			cairo_fill(cr);
 		}

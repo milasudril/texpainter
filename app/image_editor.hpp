@@ -330,6 +330,7 @@ namespace Texpainter::App
 	private:
 		std::reference_wrapper<Model::Document> m_doc;
 		DrawMode m_draw_mode;
+
 		void* r_eh;
 		void (*on_updated)(void*, ImageEditor&);
 
@@ -374,28 +375,26 @@ namespace Texpainter::App
 
 		void updateBrush()
 		{
-			auto& imgs        = m_doc.get().images();
-			auto& current_img = m_doc.get().currentImage();
-			if(auto i = imgs.find(current_img); i != std::end(imgs))
-			{
-				auto imgdisp = i->second.source.get();
-				Model::drawOutline(imgdisp.pixels());
-				m_img_view.image(imgdisp.pixels());
-				auto const brush  = m_doc.get().currentBrush();
-				auto brush_radius = ScalingFactors::sizeFromArea(imgdisp.size(), brush.radius());
-				PixelStore::Image rendered_brush{Size2d{static_cast<uint32_t>(brush_radius + 0.5),
-				                                        static_cast<uint32_t>(brush_radius + 0.5)}};
-				Model::paint(rendered_brush.pixels(),
-				             0.5 * vec2_t{brush_radius, brush_radius},
-				             0.5 * brush_radius,
-				             Model::BrushFunction{brush.shape()},
-				             PixelStore::Pixel{0.0, 0.0, 0.0, 1.0});
-				m_img_view.overlay(rendered_brush);
-			}
-			else
+			auto const palette_ref = m_doc.get().palette(m_doc.get().currentPalette());
+			auto const img_ref     = m_doc.get().image(m_doc.get().currentImage());
+			if(palette_ref == nullptr || img_ref == nullptr)
 			{
 				m_img_view.overlay(Span2d<PixelStore::Pixel const>{});
+				return;
 			}
+
+			auto const color    = palette_ref->source.get()[m_doc.get().currentColor()];
+			auto const brush    = m_doc.get().currentBrush();
+			auto const& imgdisp = img_ref->source.get();
+			auto brush_radius   = ScalingFactors::sizeFromArea(imgdisp.size(), brush.radius());
+			PixelStore::Image rendered_brush{Size2d{static_cast<uint32_t>(brush_radius + 0.5),
+			                                        static_cast<uint32_t>(brush_radius + 0.5)}};
+			Model::paint(rendered_brush.pixels(),
+			             0.5 * vec2_t{brush_radius, brush_radius},
+			             0.5 * brush_radius,
+			             Model::BrushFunction{brush.shape()},
+			             color);
+			m_img_view.overlay(rendered_brush);
 		}
 
 		template<class Selector>
