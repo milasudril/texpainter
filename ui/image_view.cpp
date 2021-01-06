@@ -22,43 +22,49 @@ namespace
 	}
 	constexpr auto gamma_22 = gen_gamma_22_lut();
 
+	struct CairoSurfaceDeleter
+	{
+		void operator()(cairo_surface_t* surface)
+		{
+			if(surface != nullptr){cairo_surface_destroy(surface);}
+		}
+	};
 
 	class CairoSurface
 	{
+		using Handle = std::unique_ptr<cairo_surface_t, CairoSurfaceDeleter>;
+
 	public:
-		CairoSurface(): m_img_surface{nullptr}, m_size_current{0, 0}{}
+		CairoSurface(): m_size_current{0, 0} {}
 
-		CairoSurface& operator=(Texpainter::Span2d<Texpainter::PixelStore::Pixel const> img)
+		explicit CairoSurface(Texpainter::Size2d size):m_size_current{size}
 		{
-			using Texpainter::vec4_t;
-			using Texpainter::vec4i_t;
-			using Texpainter::chooseValIfInRange;
 			using Texpainter::Size2d;
-
-			if(img.size() != m_size_current) [[unlikely]]
+			if(m_size_current == Size2d{0, 0})
 			{
-				if(img.size() == Size2d{0, 0})
-				{
-					cairo_surface_destroy(m_img_surface);
-					m_img_surface = nullptr;
-					return *this;
-				}
-				auto surface =
-				    cairo_image_surface_create(CAIRO_FORMAT_ARGB32, img.width(), img.height());
-				if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
-				{
-					return *this;
-				}
-				m_img_surface = surface;
-				m_size_current = img.size();
+				return;
 			}
 
-			if(m_size_current == Size2d{0, 0})
-			{ return *this; }
+			m_img_surface = Handle{cairo_image_surface_create(
+			    CAIRO_FORMAT_ARGB32, m_size_current.width(), m_size_current.height())};
 
-			auto const stride = cairo_image_surface_get_stride(m_img_surface);
-			cairo_surface_flush(m_img_surface);
-			auto const data = cairo_image_surface_get_data(m_img_surface);
+			auto surface = m_img_surface.get();
+			if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
+			{
+				m_size_current = Size2d{0, 0};
+				m_img_surface.reset();
+				return;
+			}
+		}
+		explicit CairoSurface(Texpainter::Span2d<Texpainter::PixelStore::Pixel const> img):CairoSurface{img.size()}
+		{
+			using Texpainter::chooseValIfInRange;
+			using Texpainter::vec4_t;
+			using Texpainter::vec4i_t;
+			auto surface = m_img_surface.get();
+			auto const stride = cairo_image_surface_get_stride(surface);
+			cairo_surface_flush(surface);
+			auto const data = cairo_image_surface_get_data(surface);
 			assert(data != nullptr);
 			auto const w  = img.width();
 			auto const h  = img.height();
@@ -69,18 +75,20 @@ namespace
 				for(uint32_t col = 0; col < w; ++col)
 				{
 					constexpr auto last_lut_entry = static_cast<int>(gamma_22.size() - 1);
-					auto val                      = chooseValIfInRange(
-						read_ptr->value(),
-						row % 3 == 0 ? vec4_t{0.0f, 0.0f, 0.0f, 0.0f} : vec4_t{1.0f, 1.0f, 1.0f, 1.0f},
-						row % 3 != 0 ? vec4_t{0.0f, 0.0f, 0.0f, 0.0f} : vec4_t{1.0f, 1.0f, 1.0f, 1.0f},
-						col % 3 != 0 ? vec4_t{0.0f, 0.0f, 0.0f, 0.0f} : vec4_t{1.0f, 1.0f, 1.0f, 1.0f});
+					auto val                      = chooseValIfInRange(read_ptr->value(),
+                                                  row % 3 == 0 ? vec4_t{0.0f, 0.0f, 0.0f, 0.0f}
+                                                               : vec4_t{1.0f, 1.0f, 1.0f, 1.0f},
+                                                  row % 3 != 0 ? vec4_t{0.0f, 0.0f, 0.0f, 0.0f}
+                                                               : vec4_t{1.0f, 1.0f, 1.0f, 1.0f},
+                                                  col % 3 != 0 ? vec4_t{0.0f, 0.0f, 0.0f, 0.0f}
+                                                               : vec4_t{1.0f, 1.0f, 1.0f, 1.0f});
 
 					auto pixel_out = static_cast<float>(last_lut_entry) * val;
 
 					auto as_ints = vec4i_t{static_cast<int>(pixel_out[0]),
-										static_cast<int>(pixel_out[1]),
-										static_cast<int>(pixel_out[2]),
-										static_cast<int>(pixel_out[3])};
+					                       static_cast<int>(pixel_out[1]),
+					                       static_cast<int>(pixel_out[2]),
+					                       static_cast<int>(pixel_out[3])};
 
 					write_ptr[0] = gamma_22[as_ints[2]];
 					write_ptr[1] = gamma_22[as_ints[1]];
@@ -91,14 +99,13 @@ namespace
 					++read_ptr;
 				}
 			}
-			cairo_surface_mark_dirty(m_img_surface);
-			return *this;
+			cairo_surface_mark_dirty(surface);
 		}
 
-		cairo_surface_t* get() { return m_img_surface; }
+		cairo_surface_t* get() { return m_img_surface.get(); }
 
 	private:
-		cairo_surface_t* m_img_surface;
+		Handle m_img_surface;
 		Texpainter::Size2d m_size_current;
 	};
 }

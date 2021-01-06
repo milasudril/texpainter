@@ -71,7 +71,8 @@ namespace Texpainter::Ui
 
 		ImageView& image(Span2d<PixelStore::Pixel const> img);
 
-		ImageView& overlay(Span2d<PixelStore::Pixel const> img, vec2_t initial_position = vec2_t{0.0, 0.0});
+		ImageView& overlay(Span2d<PixelStore::Pixel const> img,
+		                   vec2_t initial_position = vec2_t{0.0, 0.0});
 
 		ImageView& overlayPosition(vec2_t pos);
 
