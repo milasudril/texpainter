@@ -20,13 +20,13 @@ __Aspect ratio:__ (= 1.0) The aspect ratio of cells. 1.0 means that they are squ
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <cmath>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 constexpr RealValue pattern[2][2] = {0.0, 0.5, 0.5, 1.0};

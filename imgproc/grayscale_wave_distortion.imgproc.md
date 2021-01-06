@@ -16,7 +16,7 @@ __Ouptut:__ (Grayscale image) The output image
 
 __Waveform:__ (= 0.0) Sine, Sawtooth, Square, Triangle
 
-__Wavelength:__ (= 0.5) Wavelength
+__Wavelength:__ (= 0.75) Wavelength
 
 __Phase:__ (= 0.0) Phase
 
@@ -52,16 +52,15 @@ inline int waveformIndex(ParamValue val)
 	return static_cast<int>(std::lerp(0, std::nextafter(std::size(functions), 0), val.value()));
 }
 
-inline auto wavelength(size_t canvas_size, ParamValue val)
+inline auto wavelength(Size2d canvas_size, ParamValue val)
 {
-	return std::max(1.0 / canvas_size, 0.5 * std::exp2(std::lerp(-16, 0.0, val.value())));
+	return std::max(2.0 / std::sqrt(area(canvas_size)), sizeScaleFactor(val));
 }
 
 void main(auto const& args, auto const& params)
 {
-	auto const waveform = waveformIndex(param<Str{"Waveform"}>(params));
-	auto const f =
-	    1.0 / wavelength(std::sqrt(area(args.canvasSize())), param<Str{"Wavelength"}>(params));
+	auto const waveform  = waveformIndex(param<Str{"Waveform"}>(params));
+	auto const f         = 1.0 / wavelength(args.canvasSize(), param<Str{"Wavelength"}>(params));
 	auto const phase     = param<Str{"Phase"}>(params).value();
 	auto const dc_offset = param<Str{"Add DC offset"}>(params).value();
 
