@@ -512,6 +512,7 @@ namespace Texpainter::App
 	{
 		auto brush = m_doc.get().currentBrush();
 		m_doc.get().currentBrush(brush.shape(static_cast<Model::BrushShape>(src.selected())));
+		updateBrush();
 	}
 
 	template<>
