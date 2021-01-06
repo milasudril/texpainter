@@ -112,6 +112,39 @@ namespace
 		Handle m_img_surface;
 		Texpainter::Size2d m_size_current;
 	};
+
+	CairoSurface createBackground()
+	{
+		CairoSurface ret{Texpainter::Size2d{32, 32}};
+
+		auto surface      = ret.get();
+		auto const stride = cairo_image_surface_get_stride(surface);
+		cairo_surface_flush(surface);
+		auto const data = cairo_image_surface_get_data(surface);
+		for(uint32_t row = 0; row < 32; ++row)
+		{
+			auto write_ptr = data + row * stride;
+			for(uint32_t col = 0; col < 32; ++col)
+			{
+				constexpr auto last_lut_entry = static_cast<int>(gamma_22.size() - 1);
+				constexpr auto intensity_a = gamma_22[static_cast<int>(9.0 * last_lut_entry / 16)];
+				constexpr auto intensity_b = gamma_22[static_cast<int>(7.0 * last_lut_entry / 16)];
+
+				auto const i =
+				    (col < 16 && row < 16) || (col >= 16 && row >= 16) ? intensity_a : intensity_b;
+
+				write_ptr[0] = i;
+				write_ptr[1] = i;
+				write_ptr[2] = i;
+				write_ptr[3] = 255;
+
+				write_ptr += 4;
+			}
+		}
+		cairo_surface_mark_dirty(surface);
+
+		return ret;
+	}
 }
 
 class Texpainter::Ui::ImageView::Impl: private ImageView
@@ -134,31 +167,7 @@ public:
 		g_signal_connect(G_OBJECT(widget), "motion-notify-event", G_CALLBACK(on_mouse_move), this);
 		g_signal_connect(G_OBJECT(widget), "scroll-event", G_CALLBACK(on_scroll), this);
 
-		m_background      = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 32, 32);
-		auto const stride = cairo_image_surface_get_stride(m_background);
-		cairo_surface_flush(m_background);
-		auto const data = cairo_image_surface_get_data(m_background);
-		for(uint32_t row = 0; row < 32; ++row)
-		{
-			auto write_ptr = data + row * stride;
-			for(uint32_t col = 0; col < 32; ++col)
-			{
-				constexpr auto last_lut_entry = static_cast<int>(gamma_22.size() - 1);
-				constexpr auto intensity_a = gamma_22[static_cast<int>(9.0 * last_lut_entry / 16)];
-				constexpr auto intensity_b = gamma_22[static_cast<int>(7.0 * last_lut_entry / 16)];
-
-				auto const i =
-				    (col < 16 && row < 16) || (col >= 16 && row >= 16) ? intensity_a : intensity_b;
-
-				write_ptr[0] = i;
-				write_ptr[1] = i;
-				write_ptr[2] = i;
-				write_ptr[3] = 255;
-
-				write_ptr += 4;
-			}
-		}
-		cairo_surface_mark_dirty(m_background);
+		m_background = createBackground();
 	}
 
 	~Impl()
@@ -166,12 +175,11 @@ public:
 		gtk_widget_destroy(GTK_WIDGET(m_handle));
 		g_object_unref(m_handle);
 		m_impl = nullptr;
-		cairo_surface_destroy(m_background);
 	}
 
 	void render(Size2d dim, cairo_t* cr)
 	{
-		cairo_set_source_surface(cr, m_background, 0.0, 0.0);
+		cairo_set_source_surface(cr, m_background.get(), 0.0, 0.0);
 		cairo_pattern_set_extend(cairo_get_source(cr), CAIRO_EXTEND_REPEAT);
 		cairo_rectangle(cr, 0.0, 0.0, dim.width(), dim.height());
 		cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
@@ -220,8 +228,7 @@ private:
 	void* r_eh;
 	EventHandlerVtable m_vt;
 	bool m_emit_mouse_events;
-	cairo_surface_t* m_background;
-
+	CairoSurface m_background;
 	CairoSurface m_img_surface;
 
 	GtkDrawingArea* m_handle;
