@@ -46,11 +46,6 @@ namespace Texpainter
 		return static_cast<double>(size.width()) / static_cast<double>(size.height());
 	}
 
-	constexpr inline auto toDiameter(Size2d size, double exponent)
-	{
-		return std::max(2.0, std::sqrt(area(size)) * std::exp2(std::lerp(-16.0, 0.0, exponent)));
-	}
-
 	template<class T>
 	bool isSupported(Size2d size)
 	{
@@ -67,8 +62,6 @@ namespace Texpainter
 	{
 		j = nlohmann::json{std::pair{"width", size.width()}, std::pair{"height", size.height()}};
 	}
-
-
 }
 
 #endif

@@ -20,14 +20,14 @@ __Number of vertices:__ (= 1.0) The number of vertices. 0.0 maps to four vertice
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <cmath>
 #include <numbers>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 template<int n>
@@ -55,7 +55,7 @@ void main(auto const& args, auto const& params)
 	auto const h = args.canvasSize().height();
 
 	auto const r_x =
-	    0.5 * toDiameter(args.canvasSize(), param<Str{"Size"}>(params).value())
+	    0.5 * sizeFromArea(args.canvasSize(), param<Str{"Size"}>(params))
 	    / (param<Str{"Scale with resolution"}>(params).value() > 0.5 ? args.resolution() : 1.0);
 
 	auto const r_y = r_x * param<Str{"Aspect ratio"}>(params).value();

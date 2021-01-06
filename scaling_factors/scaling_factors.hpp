@@ -14,7 +14,7 @@ namespace Texpainter::ScalingFactors
 {
 	constexpr auto MinumSize = Exponent{-15.0};
 
-	constexpr double sizeScaleFactor(double val) { return fromExponent(val * MinumSize); }
+	constexpr double sizeScaleFactor(double val) { return fromExponent((1.0 - val) * MinumSize); }
 
 	constexpr double sizeFromArea(Size2d size, double val)
 	{
