@@ -26,7 +26,7 @@ namespace
 	{
 		void operator()(cairo_surface_t* surface)
 		{
-			if(surface != nullptr){cairo_surface_destroy(surface);}
+			if(surface != nullptr) { cairo_surface_destroy(surface); }
 		}
 	};
 
@@ -37,13 +37,10 @@ namespace
 	public:
 		CairoSurface(): m_size_current{0, 0} {}
 
-		explicit CairoSurface(Texpainter::Size2d size):m_size_current{size}
+		explicit CairoSurface(Texpainter::Size2d size): m_size_current{size}
 		{
 			using Texpainter::Size2d;
-			if(m_size_current == Size2d{0, 0})
-			{
-				return;
-			}
+			if(m_size_current == Size2d{0, 0}) { return; }
 
 			m_img_surface = Handle{cairo_image_surface_create(
 			    CAIRO_FORMAT_ARGB32, m_size_current.width(), m_size_current.height())};
@@ -56,12 +53,17 @@ namespace
 				return;
 			}
 		}
-		explicit CairoSurface(Texpainter::Span2d<Texpainter::PixelStore::Pixel const> img):CairoSurface{img.size()}
+
+		explicit CairoSurface(Texpainter::Span2d<Texpainter::PixelStore::Pixel const> img)
+		    : CairoSurface{img.size()}
 		{
 			using Texpainter::chooseValIfInRange;
 			using Texpainter::vec4_t;
 			using Texpainter::vec4i_t;
+
 			auto surface = m_img_surface.get();
+			if(surface == nullptr) { return; }
+
 			auto const stride = cairo_image_surface_get_stride(surface);
 			cairo_surface_flush(surface);
 			auto const data = cairo_image_surface_get_data(surface);
@@ -104,6 +106,8 @@ namespace
 
 		cairo_surface_t* get() { return m_img_surface.get(); }
 
+		Texpainter::Size2d size() const { return m_size_current; }
+
 	private:
 		Handle m_img_surface;
 		Texpainter::Size2d m_size_current;
@@ -113,13 +117,12 @@ namespace
 class Texpainter::Ui::ImageView::Impl: private ImageView
 {
 public:
-	explicit Impl(Container& cnt): ImageView{*this}, m_size_current{0, 0}
+	explicit Impl(Container& cnt): ImageView{*this}
 	{
 		auto widget = gtk_drawing_area_new();
 		g_object_ref_sink(widget);
 		cnt.add(widget);
 		m_handle            = GTK_DRAWING_AREA(widget);
-		m_img_surface       = nullptr;
 		r_eh                = nullptr;
 		m_emit_mouse_events = false;
 		gtk_widget_add_events(widget,
@@ -160,7 +163,6 @@ public:
 
 	~Impl()
 	{
-		if(m_img_surface != nullptr) { cairo_surface_destroy(m_img_surface); }
 		gtk_widget_destroy(GTK_WIDGET(m_handle));
 		g_object_unref(m_handle);
 		m_impl = nullptr;
@@ -175,9 +177,9 @@ public:
 		cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
 		cairo_fill(cr);
 
-		if(m_img_surface != nullptr) [[likely]]
+		if(auto img = m_img_surface.get(); img != nullptr) [[likely]]
 			{
-				cairo_set_source_surface(cr, m_img_surface, 0.0, 0.0);
+				cairo_set_source_surface(cr, img, 0.0, 0.0);
 				cairo_pattern_set_extend(cairo_get_source(cr), CAIRO_EXTEND_REPEAT);
 				cairo_rectangle(cr, 0.0, 0.0, dim.width(), dim.height());
 				cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
@@ -187,37 +189,14 @@ public:
 
 	void image(Span2d<PixelStore::Pixel const> img)
 	{
-		if(img.size() == Size2d{0, 0}) [[unlikely]]
-			{
-				if(m_img_surface != nullptr) { cairo_surface_destroy(m_img_surface); }
-				m_img_surface = nullptr;
-				gtk_widget_queue_draw(GTK_WIDGET(m_handle));
-				return;
-			}
-
-		if(img.size() != m_size_current || m_img_surface == nullptr) [[unlikely]]
-			{
-				auto surface =
-				    cairo_image_surface_create(CAIRO_FORMAT_ARGB32, img.width(), img.height());
-				if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) { return; }
-
-				if(surface == nullptr) { abort(); }
-
-				cairo_surface_destroy(m_img_surface);
-				m_img_surface  = surface;
-				m_size_current = img.size();
-			}
-		update(img);
+		m_img_surface = CairoSurface{img};
+		gtk_widget_queue_draw(GTK_WIDGET(m_handle));
 	}
 
 	void clear()
 	{
-		if(m_img_surface != nullptr)
-		{
-			cairo_surface_destroy(m_img_surface);
-			m_img_surface  = nullptr;
-			m_size_current = Size2d{0, 0};
-		}
+		m_img_surface = CairoSurface{};
+		gtk_widget_queue_draw(GTK_WIDGET(m_handle));
 	}
 
 	void eventHandler(void* event_handler, EventHandlerVtable const& vtable)
@@ -231,7 +210,7 @@ public:
 		gtk_widget_set_size_request(GTK_WIDGET(m_handle), size.width(), size.height());
 	}
 
-	Size2d imageSize() const noexcept { return m_size_current; }
+	Size2d imageSize() const noexcept { return m_img_surface.size(); }
 
 	void focus() { gtk_widget_grab_focus(GTK_WIDGET(m_handle)); }
 
@@ -243,50 +222,7 @@ private:
 	bool m_emit_mouse_events;
 	cairo_surface_t* m_background;
 
-	cairo_surface_t* m_img_surface;
-	Size2d m_size_current;
-
-	void update(Span2d<PixelStore::Pixel const> img)
-	{
-		auto const stride = cairo_image_surface_get_stride(m_img_surface);
-		cairo_surface_flush(m_img_surface);
-		auto const data = cairo_image_surface_get_data(m_img_surface);
-		assert(data != nullptr);
-		auto const w  = img.width();
-		auto const h  = img.height();
-		auto read_ptr = std::data(img);
-		for(uint32_t row = 0; row < h; ++row)
-		{
-			auto write_ptr = data + row * stride;
-			for(uint32_t col = 0; col < w; ++col)
-			{
-				constexpr auto last_lut_entry = static_cast<int>(gamma_22.size() - 1);
-				auto val                      = chooseValIfInRange(
-                    read_ptr->value(),
-                    row % 3 == 0 ? vec4_t{0.0f, 0.0f, 0.0f, 0.0f} : vec4_t{1.0f, 1.0f, 1.0f, 1.0f},
-                    row % 3 != 0 ? vec4_t{0.0f, 0.0f, 0.0f, 0.0f} : vec4_t{1.0f, 1.0f, 1.0f, 1.0f},
-                    col % 3 != 0 ? vec4_t{0.0f, 0.0f, 0.0f, 0.0f} : vec4_t{1.0f, 1.0f, 1.0f, 1.0f});
-
-				auto pixel_out = static_cast<float>(last_lut_entry) * val;
-
-				auto as_ints = vec4i_t{static_cast<int>(pixel_out[0]),
-				                       static_cast<int>(pixel_out[1]),
-				                       static_cast<int>(pixel_out[2]),
-				                       static_cast<int>(pixel_out[3])};
-
-				write_ptr[0] = gamma_22[as_ints[2]];
-				write_ptr[1] = gamma_22[as_ints[1]];
-				write_ptr[2] = gamma_22[as_ints[0]];
-				write_ptr[3] = 255.0f * read_ptr->alpha();
-
-				write_ptr += 4;
-				++read_ptr;
-			}
-		}
-		cairo_surface_mark_dirty(m_img_surface);
-		gtk_widget_queue_draw(GTK_WIDGET(m_handle));
-	}
-
+	CairoSurface m_img_surface;
 
 	GtkDrawingArea* m_handle;
 	static gboolean draw_callback(GtkWidget* widget, cairo_t* cr, gpointer self)
