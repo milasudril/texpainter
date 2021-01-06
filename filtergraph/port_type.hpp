@@ -8,7 +8,7 @@
 #include "pixel_store/pixel.hpp"
 #include "pixel_store/palette.hpp"
 #include "utils/size_2d.hpp"
-#include "model/topography_info.hpp"
+#include "pixel_types/topography_info.hpp"
 
 #include "libenum/enum.hpp"
 

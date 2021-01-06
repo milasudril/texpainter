@@ -31,7 +31,7 @@ namespace Texpainter::FilterGraph
 
 	constexpr double sizeScaleFactor(ParamValue val)
 	{
-		return fromExponent(val.value()*MinumSize);
+		return fromExponent(val.value() * MinumSize);
 	}
 
 	class ParamName

@@ -74,7 +74,10 @@ namespace Texpainter
 	}
 
 	template<std::floating_point Representation>
-	constexpr auto operator/(Exponent<Representation> a, Representation c) { return a /= c; }
+	constexpr auto operator/(Exponent<Representation> a, Representation c)
+	{
+		return a /= c;
+	}
 
 	template<std::floating_point Representation>
 	constexpr auto toExponent(Representation val)

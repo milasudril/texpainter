@@ -2,8 +2,8 @@
 //@	"targets":[{"name":"topography_info.hpp","type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_MODEL_TOPOGRAPHYINFO_HPP
-#define TEXPAINTER_MODEL_TOPOGRAPHYINFO_HPP
+#ifndef TEXPAINTER_PIXELTYPES_TOPOGRAPHYINFO_HPP
+#define TEXPAINTER_PIXELTYPES_TOPOGRAPHYINFO_HPP
 
 #include "utils/vec_t.hpp"
 
