@@ -6,6 +6,7 @@
 #define TEXPAINTER_FILTERGRAPH_IMGPROCPARAM_HPP
 
 #include "utils/exponent.hpp"
+#include "scaling_factors/scaling_factors.hpp"
 
 #include <compare>
 #include <cstring>
@@ -27,11 +28,24 @@ namespace Texpainter::FilterGraph
 		double m_value;
 	};
 
-	constexpr auto MinumSize = Exponent{-16.0};
-
 	constexpr double sizeScaleFactor(ParamValue val)
 	{
-		return fromExponent(val.value() * MinumSize);
+		return ScalingFactors::sizeScaleFactor(val.value());
+	}
+
+	constexpr double sizeFromArea(Size2d size, ParamValue val)
+	{
+		return ScalingFactors::sizeFromArea(size, val.value());
+	}
+
+	constexpr double sizeFromWidth(Size2d size, ParamValue val)
+	{
+		return ScalingFactors::sizeFromHeight(size, val.value());
+	}
+
+	constexpr double sizeFromHeight(Size2d size, ParamValue val)
+	{
+		return ScalingFactors::sizeFromHeight(size, val.value());
 	}
 
 	class ParamName

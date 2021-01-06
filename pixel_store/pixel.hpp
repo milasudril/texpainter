@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"pixel.hpp", "type":"include"}]}
 
-#ifndef TEXPAINTER_PIXELTYPES_PIXEL_HPP
-#define TEXPAINTER_PIXELTYPES_PIXEL_HPP
+#ifndef TEXPAINTER_PIXELSTORE_PIXEL_HPP
+#define TEXPAINTER_PIXELSTORE_PIXEL_HPP
 
 #include "utils/vec_t.hpp"
 
