@@ -21,6 +21,86 @@ namespace
 		return ret;
 	}
 	constexpr auto gamma_22 = gen_gamma_22_lut();
+
+
+	class CairoSurface
+	{
+	public:
+		CairoSurface(): m_img_surface{nullptr}, m_size_current{0, 0}{}
+
+		CairoSurface& operator=(Texpainter::Span2d<Texpainter::PixelStore::Pixel const> img)
+		{
+			using Texpainter::vec4_t;
+			using Texpainter::vec4i_t;
+			using Texpainter::chooseValIfInRange;
+			using Texpainter::Size2d;
+
+			if(img.size() != m_size_current) [[unlikely]]
+			{
+				if(img.size() == Size2d{0, 0})
+				{
+					cairo_surface_destroy(m_img_surface);
+					m_img_surface = nullptr;
+					return *this;
+				}
+				auto surface =
+				    cairo_image_surface_create(CAIRO_FORMAT_ARGB32, img.width(), img.height());
+				if(cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS)
+				{
+					return *this;
+				}
+				m_img_surface = surface;
+				m_size_current = img.size();
+			}
+
+			if(m_size_current == Size2d{0, 0})
+			{ return *this; }
+
+			auto const stride = cairo_image_surface_get_stride(m_img_surface);
+			cairo_surface_flush(m_img_surface);
+			auto const data = cairo_image_surface_get_data(m_img_surface);
+			assert(data != nullptr);
+			auto const w  = img.width();
+			auto const h  = img.height();
+			auto read_ptr = std::data(img);
+			for(uint32_t row = 0; row < h; ++row)
+			{
+				auto write_ptr = data + row * stride;
+				for(uint32_t col = 0; col < w; ++col)
+				{
+					constexpr auto last_lut_entry = static_cast<int>(gamma_22.size() - 1);
+					auto val                      = chooseValIfInRange(
+						read_ptr->value(),
+						row % 3 == 0 ? vec4_t{0.0f, 0.0f, 0.0f, 0.0f} : vec4_t{1.0f, 1.0f, 1.0f, 1.0f},
+						row % 3 != 0 ? vec4_t{0.0f, 0.0f, 0.0f, 0.0f} : vec4_t{1.0f, 1.0f, 1.0f, 1.0f},
+						col % 3 != 0 ? vec4_t{0.0f, 0.0f, 0.0f, 0.0f} : vec4_t{1.0f, 1.0f, 1.0f, 1.0f});
+
+					auto pixel_out = static_cast<float>(last_lut_entry) * val;
+
+					auto as_ints = vec4i_t{static_cast<int>(pixel_out[0]),
+										static_cast<int>(pixel_out[1]),
+										static_cast<int>(pixel_out[2]),
+										static_cast<int>(pixel_out[3])};
+
+					write_ptr[0] = gamma_22[as_ints[2]];
+					write_ptr[1] = gamma_22[as_ints[1]];
+					write_ptr[2] = gamma_22[as_ints[0]];
+					write_ptr[3] = 255.0f * read_ptr->alpha();
+
+					write_ptr += 4;
+					++read_ptr;
+				}
+			}
+			cairo_surface_mark_dirty(m_img_surface);
+			return *this;
+		}
+
+		cairo_surface_t* get() { return m_img_surface; }
+
+	private:
+		cairo_surface_t* m_img_surface;
+		Texpainter::Size2d m_size_current;
+	};
 }
 
 class Texpainter::Ui::ImageView::Impl: private ImageView
@@ -324,3 +404,17 @@ Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::clear()
 	m_impl->clear();
 	return *this;
 }
+
+#if 0
+Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::overlay(Span2d<PixelStore::Pixel const> img, vec2_t initial_position = vec2_t{0.0, 0.0})
+{
+	m_impl->overlay(img, initial_position);
+	return *this;
+}
+
+Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::overlayPosition(vec2_t pos)
+{
+	m_impl->overlayPosition(pos);
+	return *this;
+}
+#endif
