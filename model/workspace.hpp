@@ -20,11 +20,29 @@ namespace Texpainter::Model
 {
 	struct WindowRectangle
 	{
-		Size2d size;
-		vec2_t location;
+		Size2d size{0, 0};
+		vec2_t location{0.0, 0.0};
 	};
 
 	void to_json(nlohmann::json& obj, WindowRectangle const& workspace);
+
+	enum class WindowState : int
+	{
+		Normal,
+		Minimized,
+		Maximized
+	};
+
+	void to_json(nlohmann::json& obj, WindowState state);
+
+	struct Window
+	{
+		bool visible{false};
+		WindowState state{WindowState::Normal};
+		WindowRectangle rect{};
+	};
+
+	void to_json(nlohmann::json& obj, Window const& window);
 
 	struct Windows
 	{

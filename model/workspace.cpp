@@ -9,6 +9,23 @@ void Texpainter::Model::to_json(nlohmann::json& obj, WindowRectangle const& rect
 	obj = nlohmann::json{std::pair{"size", rect.size}, std::pair{"location", rect.location}};
 }
 
+void Texpainter::Model::to_json(nlohmann::json& obj, WindowState state)
+{
+	switch(state)
+	{
+		case WindowState::Normal: obj = "normal"; break;
+		case WindowState::Minimized: obj = "minimized"; break;
+		case WindowState::Maximized: obj = "maximized"; break;
+	}
+}
+
+void Texpainter::Model::to_json(nlohmann::json& obj, Window const& window)
+{
+	obj = nlohmann::json{std::pair{"visible", window.visible},
+	                     std::pair{"state", window.state},
+	                     std::pair{"rect", window.rect}};
+}
+
 void Texpainter::Model::to_json(nlohmann::json& obj, Windows const& windows)
 {
 	if(windows.image_editor.has_value()) { obj["image_editor"] = *windows.image_editor; }
