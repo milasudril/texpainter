@@ -28,12 +28,9 @@ void Texpainter::Model::to_json(nlohmann::json& obj, Window const& window)
 
 void Texpainter::Model::to_json(nlohmann::json& obj, Windows const& windows)
 {
-	if(windows.image_editor.has_value()) { obj["image_editor"] = *windows.image_editor; }
-
-	if(windows.compositor.has_value()) { obj["compositor"] = *windows.compositor; }
-
-	if(windows.document_previewer.has_value())
-	{ obj["document_previewer"] = *windows.document_previewer; }
+	obj["image_editor"]       = windows.image_editor;
+	obj["compositor"]         = windows.compositor;
+	obj["document_previewer"] = windows.document_previewer;
 }
 
 void Texpainter::Model::to_json(nlohmann::json& obj, Workspace const& workspace)

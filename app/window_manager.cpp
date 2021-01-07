@@ -41,20 +41,23 @@ Texpainter::Model::Windows Texpainter::App::WindowManager::windowInfo() const
 
 	if(auto editor = m_windows.get<WindowType::ImageEditor>().get(); editor != nullptr)
 	{
-		ret.image_editor =
+		ret.image_editor.rect =
 		    Model::WindowRectangle{editor->window().size(), editor->window().location().value()};
+		ret.image_editor.visible = true;
 	}
 
 	if(auto compositor = m_windows.get<WindowType::Compositor>().get(); compositor != nullptr)
 	{
-		ret.compositor = Model::WindowRectangle{compositor->window().size(),
-		                                        compositor->window().location().value()};
+		ret.compositor.rect    = Model::WindowRectangle{compositor->window().size(),
+                                                     compositor->window().location().value()};
+		ret.compositor.visible = true;
 	}
 
 	if(auto previewer = m_windows.get<WindowType::DocumentPreviewer>().get(); previewer != nullptr)
 	{
-		ret.document_previewer = Model::WindowRectangle{previewer->window().size(),
-		                                                previewer->window().location().value()};
+		ret.document_previewer.rect = Model::WindowRectangle{
+		    previewer->window().size(), previewer->window().location().value()};
+		ret.compositor.visible = true;
 	}
 
 	return ret;

@@ -46,9 +46,9 @@ namespace Texpainter::Model
 
 	struct Windows
 	{
-		std::optional<WindowRectangle> image_editor;
-		std::optional<WindowRectangle> compositor;
-		std::optional<WindowRectangle> document_previewer;
+		Window image_editor;
+		Window compositor;
+		Window document_previewer;
 	};
 
 	void to_json(nlohmann::json& obj, Windows const& workspace);
