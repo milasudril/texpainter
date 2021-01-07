@@ -249,6 +249,9 @@ public:
 	void overlay(Span2d<PixelStore::Pixel const> img, vec2_t location)
 	{
 		m_overlay = Overlay{CairoSurface{img}, location};
+		m_overlay.location -= 0.5
+		                      * vec2_t{static_cast<double>(m_overlay.surface.size().width()),
+		                               static_cast<double>(m_overlay.surface.size().height())};
 	}
 
 	void overlayLocation(vec2_t location)

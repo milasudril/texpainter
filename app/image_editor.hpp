@@ -96,6 +96,7 @@ namespace Texpainter::App
 		explicit ImageEditor(Ui::Container& owner, Model::Document& doc)
 		    : m_doc{doc}
 		    , m_draw_mode{false}
+		    , m_loc{0.0, 0.0}
 		    , m_root{owner, Ui::Box::Orientation::Vertical}
 		    , m_selectors{m_root, Ui::Box::Orientation::Horizontal}
 		    , m_image_sel{m_selectors, Ui::Box::Orientation::Horizontal, "Image: "}
@@ -285,6 +286,7 @@ namespace Texpainter::App
 		template<auto>
 		void onMouseMove(Ui::ImageView& src, vec2_t loc_window, vec2_t)
 		{
+			m_loc = loc_window;
 			switch(m_draw_mode)
 			{
 				case DrawMode::Off: break;
@@ -324,12 +326,15 @@ namespace Texpainter::App
 			brush.radius(radius_new);
 			m_brush_sel.inputField().brush(brush);
 			m_doc.get().currentBrush(brush);
+			updateBrush();
+			m_img_view.overlayLocation(m_loc);
 		}
 
 
 	private:
 		std::reference_wrapper<Model::Document> m_doc;
 		DrawMode m_draw_mode;
+		vec2_t m_loc;
 
 		void* r_eh;
 		void (*on_updated)(void*, ImageEditor&);
