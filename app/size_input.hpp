@@ -117,7 +117,7 @@ namespace Texpainter
 			auto const r = static_cast<double>(default_size.width()) / default_size.height();
 			m_asplect_ratio.inputField()
 			    .ticks(RatioTickMarks)
-			    .value(Ui::logValue(1 / r, MinRatio, MaxRatio))
+			    .value(Ui::logValue(r, MinRatio, MaxRatio))
 			    .eventHandler<ControlId::AspectRatio>(*this);
 
 			onChanged<0>(*this);
