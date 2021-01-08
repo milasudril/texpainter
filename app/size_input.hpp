@@ -23,6 +23,8 @@ namespace Texpainter
 
 		static constexpr Ui::Slider::TickMark RatioTickMarks[] = {
 		    Ui::Slider::TickMark{Ui::logValue(0.5, MinRatio, MaxRatio), "1:2"},
+		    Ui::Slider::TickMark{Ui::logValue(std::numbers::sqrt3 / 3.0, MinRatio, MaxRatio),
+		                         "1:√3"},
 		    Ui::Slider::TickMark{Ui::logValue(1.0 / std::numbers::phi, MinRatio, MaxRatio), "1:Φ"},
 		    Ui::Slider::TickMark{Ui::logValue(1.0 / std::numbers::sqrt2, MinRatio, MaxRatio),
 		                         "1:√2"},
@@ -33,6 +35,7 @@ namespace Texpainter
 		                         "2:√3"},
 		    Ui::Slider::TickMark{Ui::logValue(std::numbers::sqrt2, MinRatio, MaxRatio), "√2:1"},
 		    Ui::Slider::TickMark{Ui::logValue(std::numbers::phi, MinRatio, MaxRatio), "Φ:1"},
+		    Ui::Slider::TickMark{Ui::logValue(std::numbers::sqrt3, MinRatio, MaxRatio), "√3"},
 		    Ui::Slider::TickMark{Ui::logValue(2.0, MinRatio, MaxRatio), "2:1"}};
 
 		static constexpr Size2d size_from_width(uint32_t width, double r)

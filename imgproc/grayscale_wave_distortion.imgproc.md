@@ -16,7 +16,7 @@ __Ouptut:__ (Grayscale image) The output image
 
 __Waveform:__ (= 0.0) Sine, Sawtooth, Square, Triangle
 
-__Wavelength:__ (= 0.75) Wavelength
+__Wavelength:__ (= 0.8666666666666667) Wavelength
 
 __Phase:__ (= 0.0) Phase
 
@@ -54,7 +54,8 @@ inline int waveformIndex(ParamValue val)
 
 inline auto wavelength(Size2d canvas_size, ParamValue val)
 {
-	return std::max(2.0 / std::sqrt(area(canvas_size)), sizeScaleFactor(val));
+	return std::max(2.0 / std::min(canvas_size.width(), canvas_size.height()),
+	                sizeScaleFactor(val));
 }
 
 void main(auto const& args, auto const& params)

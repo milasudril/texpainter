@@ -12,7 +12,7 @@ __Intensity:__ (Grayscale image) The generated intensity function
 
 ## Parameters
 
-__Div/x:__ (= 0.75) The number of cells per pattern period
+__Div/x:__ (= 0.8666666666666667) The number of cells per pattern period
 
 __Scale with resolution:__ (= 0.0) If > 0.5, scale the size with rendering resolution. Use for spectral filtering.
 

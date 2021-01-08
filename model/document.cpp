@@ -89,7 +89,7 @@ void Texpainter::Model::paint(Document& doc, vec2_t location)
 	     brush_radius = static_cast<double>(brush.radius()),
 	     brush_func   = BrushFunction{brush.shape()},
 	     color        = palette[doc.currentColor()]](PixelStore::Image& img) noexcept {
-		    auto r = 0.5 * ScalingFactors::sizeFromArea(img.size(), brush_radius);
+		    auto r = 0.5 * ScalingFactors::sizeFromGeomMean(img.size(), brush_radius);
 		    paint(img.pixels(), location, r, brush_func, color);
 		    return true;
 	    },
@@ -106,7 +106,7 @@ void Texpainter::Model::paint(Document& doc,
 	     brush_radius = static_cast<double>(brush_radius),
 	     brush_func   = BrushFunction{doc.currentBrush().shape()},
 	     color](PixelStore::Image& img) noexcept {
-		    auto r = 0.5 * ScalingFactors::sizeFromArea(img.size(), brush_radius);
+		    auto r = 0.5 * ScalingFactors::sizeFromGeomMean(img.size(), brush_radius);
 		    paint(img.pixels(), location, r, brush_func, color);
 		    return true;
 	    },

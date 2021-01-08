@@ -391,7 +391,7 @@ namespace Texpainter::App
 			auto const color    = palette_ref->source.get()[m_doc.get().currentColor()];
 			auto const brush    = m_doc.get().currentBrush();
 			auto const& imgdisp = img_ref->source.get();
-			auto brush_radius   = ScalingFactors::sizeFromArea(imgdisp.size(), brush.radius());
+			auto brush_radius   = ScalingFactors::sizeFromGeomMean(imgdisp.size(), brush.radius());
 			PixelStore::Image rendered_brush{Size2d{static_cast<uint32_t>(brush_radius + 0.5),
 			                                        static_cast<uint32_t>(brush_radius + 0.5)}};
 			Model::paint(rendered_brush.pixels(),

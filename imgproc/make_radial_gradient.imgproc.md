@@ -8,7 +8,7 @@ __Output:__ (Grayscale image) Output image
 
 ## Parameters
 
-__Size:__ (= 0.875) The size of the mask, along the nominal x axis.
+__Size:__ (= 0.9333333333333333) The size of the mask, along the nominal x axis.
 
 __Scale with resolution:__ (= 1.0) If > 0.5, scale the size with rendering resolution. Use for spectral filtering.
 
@@ -36,7 +36,8 @@ inline RealValue polygon(vec2_t loc)
 	RealValue ret = 0;
 	for(int k = 0; k < n; ++k)
 	{
-		vec2_t vert{std::cos(2 * std::numbers::pi * k / n), std::sin(2 * std::numbers::pi * k / n)};
+		vec2_t vert{std::cos(2 * std::numbers::pi * (k + 0.5) / n),
+		            std::sin(2 * std::numbers::pi * (k + 0.5) / n)};
 		ret = std::max(ret, std::abs(Texpainter::dot(loc, vert)));
 	}
 	return ret * ret;
@@ -55,7 +56,7 @@ void main(auto const& args, auto const& params)
 	auto const h = args.canvasSize().height();
 
 	auto const r_x =
-	    0.5 * sizeFromArea(args.canvasSize(), param<Str{"Size"}>(params))
+	    0.5 * sizeFromMin(args.canvasSize(), param<Str{"Size"}>(params))
 	    / (param<Str{"Scale with resolution"}>(params).value() > 0.5 ? args.resolution() : 1.0);
 
 	auto const r_y = r_x * sizeScaleFactor(param<Str{"Aspect ratio"}>(params));

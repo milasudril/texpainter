@@ -33,9 +33,19 @@ namespace Texpainter::FilterGraph
 		return ScalingFactors::sizeScaleFactor(val.value());
 	}
 
-	constexpr double sizeFromArea(Size2d size, ParamValue val)
+	constexpr double sizeFromGeomMean(Size2d size, ParamValue val)
 	{
-		return ScalingFactors::sizeFromArea(size, val.value());
+		return ScalingFactors::sizeFromGeomMean(size, val.value());
+	}
+
+	constexpr double sizeFromMin(Size2d size, ParamValue val)
+	{
+		return ScalingFactors::sizeFromMin(size, val.value());
+	}
+
+	constexpr double sizeFromMax(Size2d size, ParamValue val)
+	{
+		return ScalingFactors::sizeFromMax(size, val.value());
 	}
 
 	constexpr double sizeFromWidth(Size2d size, ParamValue val)
