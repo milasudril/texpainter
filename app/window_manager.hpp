@@ -210,6 +210,7 @@ namespace Texpainter::App
 				m_document->nodeLocations(
 				    m_windows.get<WindowType::Compositor>()->widget().nodeLocations());
 			}
+			m_document->windows(windowInfo());
 			m_windows.get<id>().reset();
 			if(m_window_count == 0) { Ui::Context::get().exit(); }
 		}
