@@ -137,6 +137,8 @@ namespace Texpainter::App
 		using EmptyPaletteCreatorDlg   = Ui::Dialog<Ui::LabeledInput<Ui::TextEntry>>;
 		using PaletteGenerateDlg       = Ui::Dialog<PaletteCreator>;
 
+		using Windows = Enum::Tuple<WindowType, WindowTypeTraits>;
+
 	public:
 		[[nodiscard]] WindowManager()
 		    : m_document{std::make_unique<Model::Document>(Size2d{512, 512})}
@@ -460,14 +462,12 @@ namespace Texpainter::App
 		{
 			auto doc = std::make_unique<Model::Document>(src.widget().inputField().value());
 
-			auto filter_edit   = createWindow<WindowType::Compositor>(*doc);
-			auto img_edit      = createWindow<WindowType::ImageEditor>(*doc);
-			auto doc_previewer = createWindow<WindowType::DocumentPreviewer>(*doc);
+			Windows tmp;
+			Enum::forEachEnumItem<WindowType>(
+			    [&tmp, &doc, this](auto i) { tmp.get<i.value>() = createWindow<i.value>(*doc); });
 
-			m_document                                     = std::move(doc);
-			m_windows.get<WindowType::Compositor>()        = std::move(filter_edit);
-			m_windows.get<WindowType::ImageEditor>()       = std::move(img_edit);
-			m_windows.get<WindowType::DocumentPreviewer>() = std::move(doc_previewer);
+			m_document = std::move(doc);
+			m_windows  = std::move(tmp);
 
 			m_doc_creator.reset();
 			resetWindowPositions();
@@ -561,9 +561,7 @@ namespace Texpainter::App
 	private:
 		std::unique_ptr<Model::Document> m_document;
 
-		Enum::Tuple<WindowType, WindowTypeTraits> m_windows;
-
-
+		Windows m_windows;
 		size_t m_window_count;
 
 		std::unique_ptr<DocumentCreatorDlg> m_doc_creator;
