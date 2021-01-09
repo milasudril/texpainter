@@ -11,12 +11,8 @@ void Texpainter::Model::to_json(nlohmann::json& obj, WindowRectangle const& rect
 
 void Texpainter::Model::to_json(nlohmann::json& obj, WindowState state)
 {
-	switch(state)
-	{
-		case WindowState::Normal: obj = "normal"; break;
-		case WindowState::Minimized: obj = "minimized"; break;
-		case WindowState::Maximized: obj = "maximized"; break;
-	}
+	obj["minimized"] = state.minimized();
+	obj["maximized"] = state.maximized();
 }
 
 void Texpainter::Model::to_json(nlohmann::json& obj, Window const& window)

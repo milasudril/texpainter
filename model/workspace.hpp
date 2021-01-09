@@ -27,19 +27,52 @@ namespace Texpainter::Model
 
 	void to_json(nlohmann::json& obj, WindowRectangle const& workspace);
 
-	enum class WindowState : int
+	class WindowState
 	{
-		Normal,
-		Minimized,
-		Maximized
+	public:
+		constexpr WindowState(): m_bits{0} {}
+
+		constexpr WindowState& clear()
+		{
+			m_bits = 0;
+			return *this;
+		}
+
+		constexpr bool minimized() const { return m_bits & Minimized; }
+
+		constexpr WindowState& minimized(bool status)
+		{
+			m_bits = status ? m_bits | Minimized : m_bits & (~Minimized);
+			return *this;
+		}
+
+		constexpr bool maximized() const { return m_bits & Maximized; }
+
+		constexpr WindowState& maximized(bool status)
+		{
+			m_bits = status ? m_bits | Maximized : m_bits & (~Maximized);
+			return *this;
+		}
+
+		constexpr unsigned int value() const { return m_bits; }
+
+	private:
+		static constexpr unsigned int Minimized = 1;
+		static constexpr unsigned int Maximized = 2;
+
+		unsigned int m_bits;
 	};
+
+	constexpr bool operator==(WindowState a, WindowState b) { return a.value() == b.value(); }
+
+	constexpr bool operator!=(WindowState a, WindowState b) { return !(a.value() == b.value()); }
 
 	void to_json(nlohmann::json& obj, WindowState state);
 
 	struct Window
 	{
 		bool visible{false};
-		WindowState state{WindowState::Normal};
+		WindowState state;
 		WindowRectangle rect{};
 	};
 
