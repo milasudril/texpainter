@@ -20,14 +20,14 @@ __Number of vertices:__ (= 1.0) The number of vertices. 0.0 maps to four vertice
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <cmath>
 #include <numbers>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 template<int n>
@@ -36,8 +36,8 @@ inline RealValue polygon(vec2_t loc)
 	RealValue ret = 0;
 	for(int k = 0; k < n; ++k)
 	{
-		vec2_t vert{std::cos(2 * std::numbers::pi * (k + 0.5) / n),
-		            std::sin(2 * std::numbers::pi * (k + 0.5) / n)};
+		vec2_t vert{std::cos(2 * std::numbers::pi * k / n),
+		            std::sin(2 * std::numbers::pi * k / n)};
 		ret = std::max(ret, std::abs(Texpainter::dot(loc, vert)));
 	}
 	return ret * ret;
@@ -86,3 +86,7 @@ void main(auto const& args, auto const& params)
 __Id:__ fc8f077d53cf4e48b05b8a66a34c7bd4
 
 __Category:__ Generators
+
+## TODO:s
+
+* Add mode which fits the long diameter in addition to the short diameter
