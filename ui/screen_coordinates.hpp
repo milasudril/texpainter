@@ -11,6 +11,9 @@ namespace Texpainter::Ui
 	{
 	public:
 		constexpr ScreenCoordinates() = default;
+
+		constexpr explicit ScreenCoordinates(vec2_t v): m_value{v} {}
+
 		constexpr explicit ScreenCoordinates(double x, double y): m_value{x, y} {}
 
 		constexpr double x() const { return m_value[0]; }

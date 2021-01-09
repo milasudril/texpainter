@@ -233,9 +233,25 @@ namespace Texpainter::App
 			if(m_windows.get<item>() == nullptr)
 			{
 				m_windows.get<item>() = createWindow<item>(*m_document);
+				auto& window          = m_windows.get<item>()->window();
+				window.show();
+				auto const& windows_stored = m_document->workspace().m_windows;
+				if(windows_stored.get<item>().rect.size != Size2d{0, 0})
+				{
+					window.resize(windows_stored.get<item>().rect.size)
+					    .move(Ui::ScreenCoordinates{windows_stored.get<item>().rect.location});
+				}
+				else
+				{
+					window.resize(Size2d{800, 600 - 28});
+				}
+
 				++m_window_count;
 			}
-			m_windows.get<item>()->window().show();
+			else
+			{
+				m_windows.get<item>()->window().show();
+			}
 		}
 
 		template<WorkspaceAction item, class Source>
