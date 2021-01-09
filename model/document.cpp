@@ -145,7 +145,8 @@ void Texpainter::Model::store(Document const& doc, char const* filename)
 {
 	nlohmann::json obj{std::pair{"workspace", doc.workspace()},
 	                   std::pair{"canvas_size", doc.canvasSize()}};
-	auto const str = obj.dump(1, '\t');
+	obj["compositor"] = doc.compositor();
+	auto const str    = obj.dump(1, '\t');
 
 	auto const f = fopen(filename, "wb");
 	if(f == nullptr) { throw std::string{"Failed to open "} + filename + ": " + strerror(errno); }

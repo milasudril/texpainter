@@ -15,6 +15,9 @@
 #include "sched/signaling_counter.hpp"
 #include "sched/thread_pool.hpp"
 
+#define JSON_USE_IMPLICIT_CONVERSIONS 0
+#include <nlohmann/json.hpp>
+
 #include <algorithm>
 
 namespace Texpainter::Model
@@ -135,6 +138,10 @@ namespace Texpainter::Model
 	};
 
 	Texpainter::FilterGraph::ValidationResult validate(Compositor const& g);
+
+	std::map<FilterGraph::Node const*, FilterGraph::NodeId> mapNodesToNodeIds(Compositor const& g);
+
+	void to_json(nlohmann::json& obj, Compositor const& src);
 }
 
 #endif

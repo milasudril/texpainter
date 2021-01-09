@@ -5,23 +5,40 @@
 #ifndef TEXPAINTER_FILTERGRAPH_IMAGEPROCESSORID_HPP
 #define TEXPAINTER_FILTERGRAPH_IMAGEPROCESSORID_HPP
 
+#define JSON_USE_IMPLICIT_CONVERSIONS 0
+#include <nlohmann/json.hpp>
+
 #include <array>
 #include <cstdint>
 #include <algorithm>
+#include <string>
 
 namespace Texpainter::FilterGraph
 {
 	namespace detail
 	{
-		consteval uint8_t from_hex_digit(char x)
+		constexpr uint8_t from_hex_digit(char x)
 		{
 			if(x < 0) { throw "String should be a 128 bit number written in hexadecimal notation"; }
-			x &= ~0x70;
+			x = x >= 'A' + 32 ? x - 32 : x;
 
 			if((x > '9' && x < 'A') || x > 'F')
 			{ throw "String should be a 128 bit number written in hexadecimal notation"; }
 
-			return static_cast<std::uint8_t>((x >= '0' && x <= '9') ? x - '0' : x - 'A');
+			return static_cast<std::uint8_t>((x >= '0' && x <= '9') ? x - '0' : 10 + (x - 'A'));
+		}
+
+		constexpr char to_hex_digit(std::byte val)
+		{
+			auto i = static_cast<uint8_t>(val);
+			if(i < 10) { return static_cast<char>(i + '0'); }
+			return static_cast<char>((i - 10) + 'a');
+		}
+
+		constexpr std::pair<char, char> to_hex_digits(std::byte val)
+		{
+			return std::make_pair(to_hex_digit(val >> 4),
+			                      to_hex_digit(val & static_cast<std::byte>(0x0f)));
 		}
 	}
 
@@ -37,28 +54,25 @@ namespace Texpainter::FilterGraph
 		}
 
 		template<size_t N>
-		consteval explicit ImageProcessorId(char const (&id)[N])
+		constexpr explicit ImageProcessorId(char const (&id)[N])
 		{
-			static_assert(
-			    N == 33,
-			    "String should be a 128 bit number written in hexadecimal notation");  // Remember nul terminator
+			static_assert(N == 33,  // Remember nul terminator
+			              "String should be a 128 bit number written in hexadecimal notation");
 			auto ptr = std::begin(m_data);
-			uint8_t msb;
-			uint8_t lsb;
-			for(size_t k = 0; k < 32; ++k)
+			uint8_t msb{};
+			for(int k = 0; k < 32; ++k)
 			{
 				if(k % 2 == 0) { msb = detail::from_hex_digit(id[k]); }
-				if(k % 2 != 0)
+				else
 				{
-					lsb  = detail::from_hex_digit(id[k]);
-					*ptr = static_cast<std::byte>((msb << 4) | lsb);
+					auto const lsb = detail::from_hex_digit(id[k]);
+					*ptr           = static_cast<std::byte>((msb << 4) | lsb);
 					++ptr;
 				}
 			}
 		}
 
-		constexpr auto data() const { return m_data; }
-
+		constexpr auto const& data() const { return m_data; }
 
 	private:
 		std::array<std::byte, 16> m_data;
@@ -72,6 +86,20 @@ namespace Texpainter::FilterGraph
 	}
 
 	constexpr bool operator!=(ImageProcessorId a, ImageProcessorId b) { return !(a == b); }
+
+	inline std::string toString(ImageProcessorId const& id)
+	{
+		std::string ret{};
+		ret.reserve(32);
+		std::ranges::for_each(id.data(), [&ret](auto val) {
+			auto hexdigits = detail::to_hex_digits(val);
+			ret.push_back(hexdigits.first);
+			ret.push_back(hexdigits.second);
+		});
+		return ret;
+	}
+
+	inline void to_json(nlohmann::json& obj, ImageProcessorId const& id) { obj = toString(id); }
 }
 
 #endif

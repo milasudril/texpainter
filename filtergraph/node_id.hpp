@@ -45,7 +45,7 @@ namespace Texpainter::FilterGraph
 		uint64_t m_value;
 	};
 
-	inline void to_json(nlohmann::json& obj, NodeId id) { obj = nlohmann::json{id.value()}; }
+	inline void to_json(nlohmann::json& obj, NodeId id) { obj = id.value(); }
 
 	inline auto toString(NodeId id) { return Texpainter::toString(id.value()); }
 }

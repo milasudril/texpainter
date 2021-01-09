@@ -7,6 +7,9 @@
 
 #include "./abstract_image_processor.hpp"
 
+#define JSON_USE_IMPLICIT_CONVERSIONS 0
+#include <nlohmann/json.hpp>
+
 #include <map>
 #include <set>
 #include <cassert>
@@ -150,8 +153,6 @@ namespace Texpainter::FilterGraph
 
 		auto paramNames() const { return m_proc->paramNames(); }
 
-		auto paramValues() const { return m_proc->paramValues(); }
-
 		Node& set(ParamName param_name, ParamValue val)
 		{
 			m_proc->set(param_name, val);
@@ -162,6 +163,8 @@ namespace Texpainter::FilterGraph
 		ParamValue get(ParamName param_name) const { return m_proc->get(param_name); }
 
 		char const* name() const { return m_proc->name(); }
+
+		auto id() const { return m_proc->id(); }
 
 		~Node()
 		{
@@ -236,6 +239,23 @@ namespace Texpainter::FilterGraph
 	inline auto reference(Node::Source const& src)
 	{
 		return src.valid() ? &src.processor() : nullptr;
+	}
+
+	inline std::map<std::string, double> params(Node const& node)
+	{
+		std::map<std::string, double> ret;
+		auto param_names = node.paramNames();
+		std::ranges::transform(
+		    param_names, std::inserter(ret, std::begin(ret)), [&node](auto const& name) {
+			    return std::pair{std::string{name.c_str()}, node.get(name).value()};
+		    });
+		return ret;
+	}
+
+	inline void to_json(nlohmann::json& obj, Node const& node)
+	{
+		if(node.hasProcessor())
+		{ obj = {std::pair{"id", node.id()}, std::pair{"params", params(node)}}; }
 	}
 }
 

@@ -6,6 +6,8 @@
 
 #include "utils/graphutils.hpp"
 
+#include <limits>
+
 Texpainter::FilterGraph::ValidationResult Texpainter::Model::validate(Compositor const& g)
 {
 	using FilterGraph::ValidationResult;
@@ -89,4 +91,40 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
 
 	std::ranges::for_each(m_node_array, schedule_task);
 	task_counter.waitAndReset(m_node_array.size());
+}
+
+std::map<Texpainter::FilterGraph::Node const*, Texpainter::FilterGraph::NodeId> Texpainter::Model::
+    mapNodesToNodeIds(Compositor const& g)
+{
+	std::map<Texpainter::FilterGraph::Node const*, FilterGraph::NodeId> ret;
+	auto nodes = g.nodesWithId();
+	std::ranges::transform(nodes, std::inserter(ret, std::begin(ret)), [](auto const& item) {
+		return std::pair{&item.second, item.first};
+	});
+	return ret;
+}
+
+
+void Texpainter::Model::to_json(nlohmann::json& obj, Compositor const& src)
+{
+	obj["nodes"] = {};
+	auto nodes   = src.nodesWithId();
+	std::ranges::for_each(nodes, [&nodes = obj["nodes"]](auto const& item) {
+		nodes[toString(item.first)] = item.second;
+	});
+
+	obj["connections"] = {};
+	std::ranges::for_each(
+	    nodes, [node_to_id = mapNodesToNodeIds(src), &conn = obj["connections"]](auto const& item) {
+		    auto inputs = item.second.inputs();
+		    std::vector<FilterGraph::NodeId> ids;
+		    ids.reserve(4);
+		    std::ranges::transform(inputs, std::back_inserter(ids), [&node_to_id](auto const& src) {
+			    if(src.valid()) { return node_to_id.find(&src.processor())->second; }
+			    return FilterGraph::NodeId{std::numeric_limits<uint64_t>::max()};
+		    });
+		    conn[toString(item.first)] = ids;
+	    });
+
+	//	std::for_each(std::begin(nodes), std::end(nodes)
 }
