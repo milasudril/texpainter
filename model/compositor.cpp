@@ -121,7 +121,7 @@ void Texpainter::Model::to_json(nlohmann::json& obj, Compositor const& src)
 		    ids.reserve(4);
 		    std::ranges::transform(inputs, std::back_inserter(ids), [&node_to_id](auto const& src) {
 			    if(src.valid()) { return node_to_id.find(&src.processor())->second; }
-			    return FilterGraph::NodeId{std::numeric_limits<uint64_t>::max()};
+			    return FilterGraph::InvalidNodeId;
 		    });
 		    conn[toString(item.first)] = ids;
 	    });
