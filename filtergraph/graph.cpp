@@ -20,7 +20,7 @@ namespace
 	{
 		std::map<Texpainter::FilterGraph::NodeId, Texpainter::FilterGraph::Node> ret;
 		std::ranges::for_each(g.nodesWithId(), [&ret](auto const& item) {
-			ret.insert(std::make_pair(item.first, item.second.clonedProcessor()));
+			ret.try_emplace(item.first, item.second.clonedProcessor(), item.first);
 		});
 		return ret;
 	}

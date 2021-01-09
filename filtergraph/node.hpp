@@ -6,6 +6,7 @@
 #define TEXPAINTER_FILTERGRAPH_NODE_HPP
 
 #include "./abstract_image_processor.hpp"
+#include "./node_id.hpp"
 
 #define JSON_USE_IMPLICIT_CONVERSIONS 0
 #include <nlohmann/json.hpp>
@@ -61,18 +62,19 @@ namespace Texpainter::FilterGraph
 
 		static constexpr size_t MaxNumOutputs = AbstractImageProcessor::MaxNumOutputs;
 
-		explicit Node(std::unique_ptr<AbstractImageProcessor> proc)
+		explicit Node(std::unique_ptr<AbstractImageProcessor> proc, NodeId id)
 		    : m_dirty{1}
 		    , m_rendered_size{0, 0}
 		    , m_rendered_resolution{0.0}
 		    , m_usecount{static_cast<size_t>(-1)}
 		    , m_proc{std::move(proc)}
+		    , m_id{id}
 		{
 		}
 
 		Node(Node&&) = delete;
 
-		Node(): m_dirty{0}, m_rendered_size{0, 0}, m_proc{nullptr} {}
+		Node(): m_dirty{0}, m_rendered_size{0, 0}, m_proc{nullptr}, m_id{InvalidNodeId} {}
 
 		auto clonedProcessor() const { return m_proc->clone(); }
 
@@ -166,6 +168,8 @@ namespace Texpainter::FilterGraph
 
 		auto id() const { return m_proc->id(); }
 
+		auto nodeId() const { return m_id; }
+
 		~Node()
 		{
 			std::ranges::for_each(r_consumers, [](auto const& item) {
@@ -193,6 +197,7 @@ namespace Texpainter::FilterGraph
 		std::array<Source, NodeArgument::MaxNumInputs> m_inputs;
 		std::unique_ptr<AbstractImageProcessor> m_proc;
 		mutable result_type m_result_cache;
+		NodeId m_id;
 
 		struct InputPortIndexCompare
 		{

@@ -102,7 +102,8 @@ namespace Testcases
 
 	void texpainterFilterGraphNodeClonedProcessor()
 	{
-		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>()};
+		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>(),
+		                                  Texpainter::FilterGraph::NodeId{}};
 		assert(obj.hasProcessor());
 		auto other = obj.clonedProcessor();
 		assert(other.get() != &obj.processor());
@@ -110,12 +111,14 @@ namespace Testcases
 
 	void texpainterFilterGraphNodeCall()
 	{
-		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>()};
+		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>(),
+		                                  Texpainter::FilterGraph::NodeId{}};
 		assert(obj.hasProcessor());
 
 		ImageProcessorStub input_stub;
 		input_stub.no_inputs = true;
-		Texpainter::FilterGraph::Node input{std::make_unique<ImageProcessorStub>(input_stub)};
+		Texpainter::FilterGraph::Node input{std::make_unique<ImageProcessorStub>(input_stub),
+		                                    Texpainter::FilterGraph::NodeId{}};
 
 		obj.connect(Texpainter::FilterGraph::InputPortIndex{0},
 		            input,
@@ -128,7 +131,8 @@ namespace Testcases
 
 	void texpainterFilterGraphNodeInputPortIndexs()
 	{
-		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>()};
+		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>(),
+		                                  Texpainter::FilterGraph::NodeId{}};
 		assert(obj.hasProcessor());
 		auto ports = obj.inputPorts();
 		assert(std::ranges::equal(ports, ImageProcessorStub::s_input_ports));
@@ -136,7 +140,8 @@ namespace Testcases
 
 	void texpainterFilterGraphNodeOutputPortIndexs()
 	{
-		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>()};
+		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>(),
+		                                  Texpainter::FilterGraph::NodeId{}};
 		assert(obj.hasProcessor());
 		auto ports = obj.outputPorts();
 		assert(std::ranges::equal(ports, ImageProcessorStub::s_output_ports));
@@ -144,12 +149,14 @@ namespace Testcases
 
 	void texpainterFilterGraphNodeDisconnect()
 	{
-		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>()};
+		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>(),
+		                                  Texpainter::FilterGraph::NodeId{}};
 		assert(obj.hasProcessor());
 
 		ImageProcessorStub input_stub;
 		input_stub.no_inputs = true;
-		Texpainter::FilterGraph::Node input{std::make_unique<ImageProcessorStub>(input_stub)};
+		Texpainter::FilterGraph::Node input{std::make_unique<ImageProcessorStub>(input_stub),
+		                                    Texpainter::FilterGraph::NodeId{}};
 
 		obj.connect(Texpainter::FilterGraph::InputPortIndex{0},
 		            input,
@@ -167,14 +174,16 @@ namespace Testcases
 
 	void texpainterFilterGraphNodeInputs()
 	{
-		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>()};
+		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>(),
+		                                  Texpainter::FilterGraph::NodeId{}};
 		assert(obj.hasProcessor());
 
 		assert((std::ranges::none_of(obj.inputs(), [](auto item) { return item.valid(); })));
 
 		ImageProcessorStub input_stub;
 		input_stub.no_inputs = true;
-		Texpainter::FilterGraph::Node input{std::make_unique<ImageProcessorStub>(input_stub)};
+		Texpainter::FilterGraph::Node input{std::make_unique<ImageProcessorStub>(input_stub),
+		                                    Texpainter::FilterGraph::NodeId{}};
 
 		obj.connect(Texpainter::FilterGraph::InputPortIndex{0},
 		            input,
@@ -200,14 +209,16 @@ namespace Testcases
 
 	void texpainterFilterGraphNodeParamNames()
 	{
-		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>()};
+		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>(),
+		                                  Texpainter::FilterGraph::NodeId{}};
 		assert(obj.hasProcessor());
 		assert(std::ranges::equal(obj.paramNames(), ImageProcessorStub::s_param_names));
 	}
 
 	void texpainterFilterGraphNodeParamValues()
 	{
-		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>()};
+		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>(),
+		                                  Texpainter::FilterGraph::NodeId{}};
 		assert(obj.hasProcessor());
 		assert(std::ranges::equal(obj.paramNames(), ImageProcessorStub::s_param_names));
 	}
@@ -219,7 +230,7 @@ namespace Testcases
 		Texpainter::FilterGraph::ParamValue called_with_paramvalue{0.0};
 		proc->called_with_paramname  = &called_with_paramname;
 		proc->called_with_paramvalue = &called_with_paramvalue;
-		Texpainter::FilterGraph::Node obj{std: move(proc)};
+		Texpainter::FilterGraph::Node obj{std::move(proc), Texpainter::FilterGraph::NodeId{}};
 		assert(obj.hasProcessor());
 		obj.set("Param 1", Texpainter::FilterGraph::ParamValue{1.0});
 		assert(called_with_paramname == "Param 1");
@@ -231,7 +242,7 @@ namespace Testcases
 		auto proc = std::make_unique<ImageProcessorStub>();
 		Texpainter::FilterGraph::ParamName called_with_paramname{nullptr};
 		proc->called_with_paramname = &called_with_paramname;
-		Texpainter::FilterGraph::Node obj{std: move(proc)};
+		Texpainter::FilterGraph::Node obj{std::move(proc), Texpainter::FilterGraph::NodeId{}};
 		assert(obj.hasProcessor());
 		obj.get("Param 1");
 		assert(called_with_paramname == "Param 1");
@@ -239,7 +250,8 @@ namespace Testcases
 
 	void texpainterFilterGraphNodeName()
 	{
-		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>()};
+		Texpainter::FilterGraph::Node obj{std::make_unique<ImageProcessorStub>(),
+		                                  Texpainter::FilterGraph::NodeId{}};
 		assert(obj.hasProcessor());
 		assert(strcmp(obj.name(), "ImageProcessorStub") == 0);
 	}

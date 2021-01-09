@@ -146,8 +146,8 @@ void Texpainter::Model::store(Document const& doc, char const* filename)
 	nlohmann::json obj{std::pair{"workspace", doc.workspace()},
 	                   std::pair{"canvas_size", doc.canvasSize()}};
 	obj["compositor"] = doc.compositor();
-	obj["images"] = mapIdsToItemNames(doc.images());
-	obj["palettes"] = mapIdsToItemNames(doc.palettes());
+	obj["images"]     = mapIdsToItemNames(doc.images());
+	obj["palettes"]   = mapIdsToItemNames(doc.palettes());
 	auto const str    = obj.dump(1, '\t');
 
 	auto const f = fopen(filename, "wb");

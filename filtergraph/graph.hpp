@@ -79,7 +79,7 @@ namespace Texpainter::FilterGraph
 
 		NodeItem insert(std::unique_ptr<AbstractImageProcessor> proc)
 		{
-			auto i = m_nodes.insert(std::make_pair(m_current_id, std::move(proc)));
+			auto i = m_nodes.try_emplace(m_current_id, std::move(proc), m_current_id);
 			++m_current_id;
 			return std::make_pair(i.first->first, std::ref(i.first->second));
 		}
