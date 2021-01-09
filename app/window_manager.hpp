@@ -142,12 +142,9 @@ namespace Texpainter::App
 		    : m_document{std::make_unique<Model::Document>(Size2d{512, 512})}
 		    , m_window_count{m_windows.size()}
 		{
-			m_windows.get<WindowType::ImageEditor>() =
-			    createWindow<WindowType::ImageEditor>(*m_document);
-			m_windows.get<WindowType::Compositor>() =
-			    createWindow<WindowType::Compositor>(*m_document);
-			m_windows.get<WindowType::DocumentPreviewer>() =
-			    createWindow<WindowType::DocumentPreviewer>(*m_document);
+			Enum::forEachEnumItem<WindowType>([this](auto item) {
+				m_windows.get<item.value>() = createWindow<item.value>(*m_document);
+			});
 
 			resetWindowPositions();
 
