@@ -140,7 +140,7 @@ namespace Texpainter::App
 	public:
 		[[nodiscard]] WindowManager()
 		    : m_document{std::make_unique<Model::Document>(Size2d{512, 512})}
-		    , m_window_count{3}
+		    , m_window_count{m_windows.size()}
 		{
 			m_windows.get<WindowType::ImageEditor>() =
 			    createWindow<WindowType::ImageEditor>(*m_document);
