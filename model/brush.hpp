@@ -8,6 +8,10 @@
 #include "./brushes.hpp"
 
 #include "libenum/enum.hpp"
+
+#define JSON_USE_IMPLICIT_CONVERSIONS 0
+#include <nlohmann/json.hpp>
+
 #include <array>
 
 namespace Texpainter::Model
@@ -37,6 +41,12 @@ namespace Texpainter::Model
 		float m_radius;
 		BrushShape m_type;
 	};
+
+	inline void to_json(nlohmann::json& obj, BrushInfo brush)
+	{
+		obj["radius"] = brush.radius();
+		obj["shape"]  = brush.shape();
+	}
 
 	namespace detail
 	{

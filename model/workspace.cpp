@@ -36,5 +36,6 @@ void Texpainter::Model::to_json(nlohmann::json& obj, Workspace const& workspace)
 	                     std::pair{"current_color", workspace.m_current_color},
 	                     std::pair{"current_palette", workspace.m_current_palette},
 	                     std::pair{"color_history", workspace.m_color_history},
-	                     std::pair{"windows", workspace.m_windows}};
+	                     std::pair{"windows", workspace.m_windows},
+	                     std::pair{"current_brush", workspace.m_current_brush}};
 }

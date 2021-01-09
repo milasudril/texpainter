@@ -6,7 +6,11 @@
 #define TEXPAINTER_MODEL_BRUSHES_HPP
 
 #include "utils/vec_t.hpp"
-#include "libenum/empty.hpp"
+
+#include "libenum/enum.hpp"
+
+#define JSON_USE_IMPLICIT_CONVERSIONS 0
+#include <nlohmann/json.hpp>
 
 #include <cstdint>
 
@@ -71,5 +75,13 @@ namespace Texpainter::Model
 
 		static constexpr char const* name() { return "square"; }
 	};
+
+	inline void to_json(nlohmann::json& obj, BrushShape shape)
+	{
+		Enum::forEachEnumItem<BrushShape>([shape, &obj](auto i) {
+			if(i.value == shape) { obj = BrushTraits<i.value>::name(); }
+		});
+	}
+
 }
 #endif
