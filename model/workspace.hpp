@@ -8,6 +8,7 @@
 
 #include "./brush.hpp"
 #include "./item_name.hpp"
+#include "./window_type.hpp"
 
 #include "filtergraph/graph.hpp"
 
@@ -44,12 +45,32 @@ namespace Texpainter::Model
 
 	void to_json(nlohmann::json& obj, Window const& window);
 
-	struct Windows
+
+	template<WindowType>
+	struct WindowTypeInfo;
+
+	template<>
+	struct WindowTypeInfo<WindowType::Compositor>
 	{
-		Window image_editor;
-		Window compositor;
-		Window document_previewer;
+		using type = Window;
+		static constexpr char const* name() { return "compositor"; }
 	};
+
+	template<>
+	struct WindowTypeInfo<WindowType::ImageEditor>
+	{
+		using type = Window;
+		static constexpr char const* name() { return "image_editor"; }
+	};
+
+	template<>
+	struct WindowTypeInfo<WindowType::DocumentPreviewer>
+	{
+		using type = Window;
+		static constexpr char const* name() { return "document_previewer"; }
+	};
+
+	using Windows = Enum::Tuple<WindowType, WindowTypeInfo>;
 
 	void to_json(nlohmann::json& obj, Windows const& workspace);
 

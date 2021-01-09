@@ -28,9 +28,9 @@ void Texpainter::Model::to_json(nlohmann::json& obj, Window const& window)
 
 void Texpainter::Model::to_json(nlohmann::json& obj, Windows const& windows)
 {
-	obj["image_editor"]       = windows.image_editor;
-	obj["compositor"]         = windows.compositor;
-	obj["document_previewer"] = windows.document_previewer;
+	Enum::forEachEnumItem<WindowType>([&obj, &windows](auto item) {
+		obj[WindowTypeInfo<item.value>::name()] = windows.get<item.value>();
+	});
 }
 
 void Texpainter::Model::to_json(nlohmann::json& obj, Workspace const& workspace)
