@@ -17,6 +17,7 @@
 #include "./render_to_img_job_creator.hpp"
 
 #include "model/document.hpp"
+#include "model/window_type.hpp"
 #include "model/palette_generate.hpp"
 #include "pixel_store/image_io.hpp"
 #include "ui/window.hpp"
@@ -40,39 +41,25 @@ namespace Texpainter::App
 		template<class EventHandler>
 		using DocumentPreviewWindow = DocumentEditor<DocumentPreviewer, EventHandler>;
 
-		enum class WindowType : int
-		{
-			ImageEditor,
-			Compositor,
-			DocumentPreviewer
-		};
-
-		constexpr auto begin(Enum::Empty<WindowType>) { return WindowType::ImageEditor; }
-
-		constexpr auto end(Enum::Empty<WindowType>)
-		{
-			return WindowType{static_cast<int>(WindowType::DocumentPreviewer) + 1};
-		}
-
-		template<WindowType, class EventHandler>
+		template<Model::WindowType, class EventHandler>
 		struct WindowTypeTraits;
 
 		template<class EventHandler>
-		struct WindowTypeTraits<WindowType::Compositor, EventHandler>
+		struct WindowTypeTraits<Model::WindowType::Compositor, EventHandler>
 		{
 			using type = std::unique_ptr<CompositorWindow<EventHandler>>;
 			static constexpr char const* name() { return "Texpainter: Compositor"; }
 		};
 
 		template<class EventHandler>
-		struct WindowTypeTraits<WindowType::ImageEditor, EventHandler>
+		struct WindowTypeTraits<Model::WindowType::ImageEditor, EventHandler>
 		{
 			using type = std::unique_ptr<ImageEditWindow<EventHandler>>;
 			static constexpr char const* name() { return "Texpainter: Image editor"; }
 		};
 
 		template<class EventHandler>
-		struct WindowTypeTraits<WindowType::DocumentPreviewer, EventHandler>
+		struct WindowTypeTraits<Model::WindowType::DocumentPreviewer, EventHandler>
 		{
 			using type = std::unique_ptr<DocumentPreviewWindow<EventHandler>>;
 			static constexpr char const* name() { return "Texpainter: Document preview"; }
@@ -86,19 +73,19 @@ namespace Texpainter::App
 		template<class EventHandler>
 		struct WindowTypeFromWorkspaceAction<WorkspaceAction::ShowCompositor, EventHandler>
 		{
-			static constexpr auto id = WindowType::Compositor;
+			static constexpr auto id = Model::WindowType::Compositor;
 		};
 
 		template<class EventHandler>
 		struct WindowTypeFromWorkspaceAction<WorkspaceAction::ShowImageEditor, EventHandler>
 		{
-			static constexpr auto id = WindowType::ImageEditor;
+			static constexpr auto id = Model::WindowType::ImageEditor;
 		};
 
 		template<class EventHandler>
 		struct WindowTypeFromWorkspaceAction<WorkspaceAction::ShowDocumentPreviewer, EventHandler>
 		{
-			static constexpr auto id = WindowType::DocumentPreviewer;
+			static constexpr auto id = Model::WindowType::DocumentPreviewer;
 		};
 	}
 
@@ -121,7 +108,7 @@ namespace Texpainter::App
 
 	class WindowManager
 	{
-		using WindowType = detail::WindowType;
+		using WindowType = Model::WindowType;
 
 		template<WorkspaceAction id>
 		using WindowTypeFromWorkspaceAction =

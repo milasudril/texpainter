@@ -20,14 +20,14 @@ __Number of vertices:__ (= 1.0) The number of vertices. 0.0 maps to four vertice
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <cmath>
 #include <numbers>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 template<int n>
@@ -36,8 +36,7 @@ inline RealValue polygon(vec2_t loc)
 	RealValue ret = 0;
 	for(int k = 0; k < n; ++k)
 	{
-		vec2_t vert{std::cos(2 * std::numbers::pi * k / n),
-		            std::sin(2 * std::numbers::pi * k / n)};
+		vec2_t vert{std::cos(2 * std::numbers::pi * k / n), std::sin(2 * std::numbers::pi * k / n)};
 		ret = std::max(ret, std::abs(Texpainter::dot(loc, vert)));
 	}
 	return ret * ret;
