@@ -50,8 +50,6 @@ namespace
 			return Texpainter::FilterGraph::ParamValue{0};
 		}
 
-		auto const& paramValues() const { return m_params; }
-
 		void operator()(Texpainter::FilterGraph::ImgProcArg<InterfaceDescriptor> const& args) const
 		{
 			args_result = args;
@@ -151,13 +149,6 @@ namespace Testcases
 		assert(std::ranges::equal(params, ImgProcStub::InterfaceDescriptor::ParamNames));
 	}
 
-	void texpainterFilterGraphImageProcessorWrapperParamValues()
-	{
-		Texpainter::FilterGraph::ImageProcessorWrapper obj{ImgProcStub{}};
-		auto vals = obj.paramValues();
-		assert(std::ranges::equal(vals, obj.processor().m_params));
-	}
-
 	void texpainterFilterGraphImageProcessorWrapperGetParamValue()
 	{
 		Texpainter::FilterGraph::ImageProcessorWrapper obj{ImgProcStub{}};
@@ -190,7 +181,6 @@ int main()
 	Testcases::texpaitnerFilterGraphImageProcessorWrapperInputPorts();
 	Testcases::texpaitnerFilterGraphImageProcessorWrapperOutputPorts();
 	Testcases::texpaitnerFilterGraphImageProcessorWrapperParamNames();
-	Testcases::texpainterFilterGraphImageProcessorWrapperParamValues();
 	Testcases::texpainterFilterGraphImageProcessorWrapperGetParamValue();
 	Testcases::texpainterFilterGraphImageProcessorWrapperSetParamValue();
 	Testcases::texpainterFilterGraphImageProcessorWrapperName();

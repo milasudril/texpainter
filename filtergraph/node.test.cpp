@@ -57,11 +57,6 @@ namespace
 			return s_param_names;
 		}
 
-		std::span<Texpainter::FilterGraph::ParamValue const> paramValues() const override
-		{
-			return s_param_values;
-		}
-
 		Texpainter::FilterGraph::ParamValue get(
 		    Texpainter::FilterGraph::ParamName param_name) const override
 		{

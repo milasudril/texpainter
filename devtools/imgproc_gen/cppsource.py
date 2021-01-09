@@ -129,9 +129,7 @@ def makeParamAccessors(param_names):
 	if len(param_names) == 0:
 		return '''void set(ParamName, ParamValue) {}
 
-		ParamValue get(ParamName) const { return ParamValue{0.0}; }
-
-		std::span<ParamValue const> paramValues() const { return std::span<ParamValue const>{}; }'''
+		ParamValue get(ParamName) const { return ParamValue{0.0}; }'''
 	else:
 		return '''void set(ParamName name, ParamValue value)
 		{
@@ -145,9 +143,7 @@ def makeParamAccessors(param_names):
 		{
 			auto ptr = params.find(name);
 			return ptr != nullptr ? *ptr : ParamValue{0.0};
-		}
-
-		std::span<ParamValue const> paramValues() const { return params.values(); }'''
+		}'''
 
 
 template = string.Template("""//@	{

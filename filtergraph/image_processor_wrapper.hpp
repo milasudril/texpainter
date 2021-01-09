@@ -74,8 +74,6 @@ namespace Texpainter::FilterGraph
 			return Proc::InterfaceDescriptor::ParamNames;
 		}
 
-		std::span<ParamValue const> paramValues() const override { return m_proc.paramValues(); }
-
 		ParamValue get(ParamName param_name) const override { return m_proc.get(param_name); }
 
 		AbstractImageProcessor& set(ParamName param_name, ParamValue value) override

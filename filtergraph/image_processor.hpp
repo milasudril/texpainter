@@ -24,11 +24,6 @@ namespace Texpainter::FilterGraph
 		->ImgProcInterfaceDescriptor;
 
 		{
-			std::as_const(a).paramValues()
-		}
-		->std::convertible_to<std::span<ParamValue const>>;
-
-		{
 			std::as_const(a).get(std::declval<ParamName>())
 		}
 		->std::same_as<ParamValue>;
