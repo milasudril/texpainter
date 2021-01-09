@@ -119,5 +119,12 @@ namespace Texpainter::Model
 	private:
 		std::map<ItemName, mapped_type> m_inputs;
 	};
+
+	template<class T>
+	std::map<FilterGraph::NodeId, ItemName> mapIdsToItemNames(std::map<ItemName, CompositorInput<WithStatus<T>>> const&)
+	{
+		std::map<FilterGraph::NodeId, ItemName> ret;
+		return ret;
+	}
 }
 #endif
