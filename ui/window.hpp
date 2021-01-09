@@ -93,6 +93,14 @@ namespace Texpainter::Ui
 
 		Window& shrinkToContent();
 
+		bool minimized() const;
+
+		Window& minimized(bool status);
+
+		bool maximized() const;
+
+		Window& maximized(bool status);
+
 	protected:
 		struct EventHandlerVtable
 		{

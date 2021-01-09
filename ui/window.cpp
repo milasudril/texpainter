@@ -105,10 +105,41 @@ public:
 		return ScreenCoordinates{static_cast<double>(rect.x), static_cast<double>(rect.y)};
 	}
 
+	bool minimized() const { return m_minimized; }
+
+	void minimized(bool status)
+	{
+		if(status) { gtk_window_iconify(m_handle); }
+		else
+		{
+			gtk_window_deiconify(m_handle);
+		}
+	}
+
+	bool maximized() const { return m_maximized; }
+
+	void maximized(bool status)
+	{
+		if(status) { gtk_window_maximize(m_handle); }
+		else
+		{
+			gtk_window_unmaximize(m_handle);
+		}
+	}
+
+
 private:
 	static gboolean delete_event(GtkWidget* widget, GdkEvent* event, void* user_data);
 	static gboolean key_press(GtkWidget* widget, GdkEvent* event, void* user_data);
 	static gboolean key_release(GtkWidget* widget, GdkEvent* event, void* user_data);
+	static gboolean state_event(GtkWidget*, GdkEvent* e, gpointer user_data)
+	{
+		auto event        = reinterpret_cast<GdkEventWindowState const*>(e);
+		auto self         = reinterpret_cast<Impl*>(user_data);
+		self->m_minimized = (event->new_window_state == GDK_WINDOW_STATE_ICONIFIED);
+		self->m_maximized = (event->new_window_state == GDK_WINDOW_STATE_MAXIMIZED);
+		return TRUE;
+	}
 
 	void* r_eh;
 	EventHandlerVtable m_vt;
@@ -116,6 +147,9 @@ private:
 	GtkWidget* r_focus_old;
 	std::string m_title;
 	GdkPixbuf* m_icon;
+
+	bool m_minimized;
+	bool m_maximized;
 };
 
 Texpainter::Ui::Window::Window(char const* title, Container* owner)
@@ -176,11 +210,15 @@ Texpainter::Ui::Window::Impl::Impl(char const* ti, Container* owner)
     : Window{*this}
     , r_eh{nullptr}
     , r_focus_old{nullptr}
+    , m_minimized{false}
+    , m_maximized{false}
 {
 	auto widget = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	g_signal_connect(widget, "delete-event", G_CALLBACK(delete_event), this);
 	g_signal_connect(widget, "key-press-event", G_CALLBACK(key_press), this);
 	g_signal_connect(widget, "key-release-event", G_CALLBACK(key_release), this);
+	g_signal_connect(widget, "window-state-event", G_CALLBACK(state_event), this);
+
 	m_handle = GTK_WINDOW(widget);
 	title(ti);
 	if(owner != nullptr) { gtk_window_set_transient_for(m_handle, GTK_WINDOW(owner->toplevel())); }
@@ -299,4 +337,21 @@ Texpainter::Size2d Texpainter::Ui::Window::size() const { return m_impl->size();
 Texpainter::Ui::ScreenCoordinates Texpainter::Ui::Window::location() const
 {
 	return m_impl->location();
+}
+
+bool Texpainter::Ui::Window::minimized() const { return m_impl->minimized(); }
+
+Texpainter::Ui::Window& Texpainter::Ui::Window::minimized(bool status)
+{
+	m_impl->minimized(status);
+	return *this;
+}
+
+bool Texpainter::Ui::Window::maximized() const { return m_impl->maximized(); }
+
+
+Texpainter::Ui::Window& Texpainter::Ui::Window::maximized(bool status)
+{
+	m_impl->maximized(status);
+	return *this;
 }

@@ -239,7 +239,9 @@ namespace Texpainter::App
 				if(windows_stored.get<item>().rect.size != Size2d{0, 0})
 				{
 					window.resize(windows_stored.get<item>().rect.size)
-					    .move(Ui::ScreenCoordinates{windows_stored.get<item>().rect.location});
+					    .move(Ui::ScreenCoordinates{windows_stored.get<item>().rect.location})
+					    .maximized(windows_stored.get<item>().state.maximized())
+					    .minimized(windows_stored.get<item>().state.minimized());
 				}
 				else
 				{

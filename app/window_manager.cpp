@@ -45,6 +45,7 @@ Texpainter::Model::Windows Texpainter::App::WindowManager::windowInfo() const
 			auto& window = panel->window();
 			val.rect     = Model::WindowRectangle{window.size(), window.location().value()};
 			val.visible  = true;
+			val.state.maximized(window.maximized()).minimized(window.minimized());
 		}
 	});
 	return ret;
