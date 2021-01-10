@@ -166,7 +166,7 @@ namespace Texpainter::FilterGraph
 
 		char const* name() const { return m_proc->name(); }
 
-		auto id() const { return m_proc->id(); }
+		auto processorId() const { return m_proc->id(); }
 
 		auto nodeId() const { return m_id; }
 
@@ -260,7 +260,10 @@ namespace Texpainter::FilterGraph
 	inline void to_json(nlohmann::json& obj, Node const& node)
 	{
 		if(node.hasProcessor())
-		{ obj = {std::pair{"id", node.id()}, std::pair{"params", params(node)}}; }
+		{
+			obj = {std::pair{"processor_id", node.processorId()},
+			       std::pair{"params", params(node)}};
+		}
 	}
 }
 
