@@ -39,6 +39,7 @@ def makeIncludeGuard(filename):
 
 
 for filename in sys.argv[1:]:
+	print(filename)
 	with open(filename) as f:
 		guard = makeIncludeGuard(filename)
 		first_ifndef = True
