@@ -27,6 +27,7 @@ namespace Texpainter::Model
 		std::reference_wrapper<
 		    FilterGraph::ImageProcessorWrapper<typename detail::ImageProcessor<T>::type>>
 		    processor;
+		FilterGraph::NodeId node_id;
 	};
 
 	template<class T>
@@ -35,6 +36,8 @@ namespace Texpainter::Model
 		using mapped_type = CompositorInput<WithStatus<T>>;
 
 	public:
+		using Map = std::map<ItemName, mapped_type>;
+
 		auto const& get(std::type_identity<T>) const { return m_inputs; }
 
 		auto const get(std::type_identity<T>, ItemName const& item) const
@@ -81,8 +84,8 @@ namespace Texpainter::Model
 			auto& node = dynamic_cast<FilterGraph::ImageProcessorWrapper<ImgProc>&>(
 			    item.second.get().processor());
 			return &m_inputs
-			            .insert(
-			                std::pair{name, CompositorInput{WithStatus{std::move(source)}, node}})
+			            .insert(std::pair{
+			                name, CompositorInput{WithStatus{std::move(source)}, node, item.first}})
 			            .first->second;
 		}
 
@@ -117,7 +120,18 @@ namespace Texpainter::Model
 		}
 
 	private:
-		std::map<ItemName, mapped_type> m_inputs;
+		Map m_inputs;
 	};
+
+	template<class T>
+	std::map<FilterGraph::NodeId, ItemName> mapNodeIdsToItemName(
+	    std::map<ItemName, CompositorInput<WithStatus<T>>> const& items)
+	{
+		std::map<FilterGraph::NodeId, ItemName> ret;
+		std::ranges::transform(items, std::inserter(ret, std::end(ret)), [](auto const& item) {
+			return std::pair{item.second.node_id, item.first};
+		});
+		return ret;
+	}
 }
 #endif

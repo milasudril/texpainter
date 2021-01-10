@@ -285,10 +285,6 @@ namespace Texpainter::Model
 		currentPalette(std::move(name));
 		return *this;
 	}
-
-	std::map<FilterGraph::NodeId, ItemName> mapIdsToImages(Document const& doc);
-
-	std::map<FilterGraph::NodeId, ItemName> mapIdsToPalettes(Document const& doc);
 }
 
 #endif

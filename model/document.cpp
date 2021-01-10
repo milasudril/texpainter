@@ -141,33 +141,13 @@ void Texpainter::Model::floodfill(Document& doc, vec2_t location, PixelStore::Pi
 	    doc.currentImage());
 }
 
-std::map<Texpainter::FilterGraph::NodeId, Texpainter::Model::ItemName> Texpainter::Model::
-    mapIdsToImages(Document const& doc)
-{
-	std::map<FilterGraph::NodeId, Texpainter::Model::ItemName> ret;
-	std::ranges::transform(doc.images(), std::inserter(ret, std::end(ret)), [&doc](auto const& item){
-		return std::pair{doc.inputNodeItem(item.first)->first, item.first};
-	});
-	return ret;
-}
-
-std::map<Texpainter::FilterGraph::NodeId, Texpainter::Model::ItemName> Texpainter::Model::
-    mapIdsToPalettes(Document const& doc)
-{
-	std::map<FilterGraph::NodeId, ItemName> ret;
-	std::ranges::transform(doc.palettes(), std::inserter(ret, std::end(ret)), [&doc](auto const& item){
-		return std::pair{doc.inputNodeItem(item.first)->first, item.first};
-	});
-	return ret;
-}
-
 void Texpainter::Model::store(Document const& doc, char const* filename)
 {
 	nlohmann::json obj{std::pair{"workspace", doc.workspace()},
 	                   std::pair{"canvas_size", doc.canvasSize()}};
 	obj["compositor"] = doc.compositor();
-	obj["images"]     = mapIdsToImages(doc);
-	obj["palettes"]   = mapIdsToPalettes(doc);
+	obj["images"]     = mapNodeIdsToItemName(doc.images());
+	obj["palettes"]   = mapNodeIdsToItemName(doc.palettes());
 	auto const str    = obj.dump(1, '\t');
 
 	auto const f = fopen(filename, "wb");
