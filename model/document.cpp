@@ -1,8 +1,13 @@
 //@	{
-//@	 "targets":[{"name":"document.o", "type":"object"}]
+//@	 "targets":[{"name":"document.o", "type":"object", "pkgconfig_libs":["wad64"]}]
 //@	}
 
 #include "./document.hpp"
+
+#include <wad64/archive.hpp>
+#include <wad64/readonly_archive.hpp>
+#include <wad64/fd_owner.hpp>
+#include <wad64/output_file.hpp>
 
 #include <algorithm>
 
@@ -141,7 +146,7 @@ void Texpainter::Model::floodfill(Document& doc, vec2_t location, PixelStore::Pi
 	    doc.currentImage());
 }
 
-void Texpainter::Model::store(Document const& doc, char const* filename)
+void Texpainter::Model::store(Document const& doc, char const*)
 {
 	nlohmann::json obj{std::pair{"workspace", doc.workspace()},
 	                   std::pair{"canvas_size", doc.canvasSize()}};
@@ -150,8 +155,15 @@ void Texpainter::Model::store(Document const& doc, char const* filename)
 	obj["palettes"]   = mapNodeIdsToItemName(doc.palettes());
 	auto const str    = obj.dump(1, '\t');
 
-	auto const f = fopen(filename, "wb");
-	if(f == nullptr) { throw std::string{"Failed to open "} + filename + ": " + strerror(errno); }
-	fputs(str.c_str(), f);
-	fclose(f);
+	Wad64::FdOwner output_file{
+	    "test.tex.wad64",
+	    Wad64::IoMode::AllowRead().allowWrite(),
+	    Wad64::FileCreationMode::AllowOverwriteWithTruncation().allowCreation()};
+
+	Wad64::Archive archive{std::ref(output_file)};
+	Wad64::OutputFile output{
+	    archive,
+	    "texpainter_doc.json",
+	    Wad64::FileCreationMode::AllowOverwriteWithTruncation().allowCreation()};
+	output.write(std::as_bytes(std::span{str}));
 }
