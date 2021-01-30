@@ -7,6 +7,3 @@
 [submodule "test_pattern"]
 	path = test_pattern
 	url = https://github.com/milasudril/test_pattern
-[submodule "wad64"]
-	path = wad64
-	url = git@github.com:milasudril/wad64.git
