@@ -4,6 +4,8 @@
 
 #include "./document.hpp"
 
+#include "pixel_store/image_io.hpp"
+
 #include <wad64/archive.hpp>
 #include <wad64/readonly_archive.hpp>
 #include <wad64/fd_owner.hpp>
@@ -172,6 +174,12 @@ void Texpainter::Model::store(Document const& doc, char const*)
 	}
 
 	std::ranges::for_each(doc.palettes(), [&archive](auto const& item) {
+		store(item.second.source.get(),
+		      Wad64::OutputFile{
+		          archive, std::string{"data/"} + item.first.c_str(), store_creation_mode});
+	});
+
+	std::ranges::for_each(doc.images(), [&archive](auto const& item) {
 		store(item.second.source.get(),
 		      Wad64::OutputFile{
 		          archive, std::string{"data/"} + item.first.c_str(), store_creation_mode});
