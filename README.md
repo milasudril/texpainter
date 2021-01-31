@@ -16,12 +16,13 @@ Texpainter is a utility program intended for creating tilable textures. It consi
 
     If you do not have it, also install g++ version 10 or later, since the code uses some new features from C++20.
 
- 2. Install maike, currently avaiable in the ppa https://launchpad.net/~milasudril/+archive/ubuntu/maike
-    That is,
+ 2. Install maike, and wad64, currently avaiable in the ppa:s https://launchpad.net/~milasudril/+archive/ubuntu/maike
+    and https://launchpad.net/~milasudril/+archive/ubuntu/wad64 That is,
 
         sudo add-apt-repository ppa:milasudril/maike
+        sudo add-apt-repository ppa:milasudril/wad64
         sudo apt-get update
-        sudo apt-get install maike
+        sudo apt-get install maike wad64
 
     Should do the trick
 
