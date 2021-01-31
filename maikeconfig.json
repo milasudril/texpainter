@@ -44,7 +44,7 @@
 					"Werror",
 					"Wextra",
 					"mavx2",
-					"O3"
+					"g"
 				],
 				"cflags_format": "-^",
 				"dllcompile": {

@@ -14,49 +14,43 @@ namespace Texpainter::PixelStore
 	namespace detail
 	{
 		template<class T>
-		void write(void* handle, char const* buffer, int n)
+		void write(T& handle, char const* buffer, int n)
 		{
-			(void)write(*static_cast<T*>(handle),
+			(void)write(handle,
 			            std::as_bytes(std::span{buffer, static_cast<size_t>(n)}));
 		}
 
 		template<class T>
-		Imath::Int64 tellp(void* handle)
+		Imath::Int64 tellp(T& handle)
 		{
-			return tell(*static_cast<T*>(handle));
+			return tell(handle);
 		}
 
 		template<class T>
-		void seekp(void* handle, Imath::Int64 pos)
+		void seekp(T& handle, Imath::Int64 pos)
 		{
-			(void)seek(*static_cast<T*>(handle), pos);
+			(void)seek(handle, pos);
 		}
 	}
 
+	template<class FileWriter>
 	class IlmOutputAdapter: public Imf::OStream
 	{
 	public:
-		template<class T>
-		explicit IlmOutputAdapter(std::reference_wrapper<T> ref)
+		explicit IlmOutputAdapter(FileWriter&& writer)
 		    : Imf::OStream{"Dummy"}
-		    , m_handle{&ref.get()}
-		    , m_write{detail::write<T>}
-		    , m_tellp{detail::tellp<T>}
-		    , m_seekp{detail::seekp<T>}
+		    , m_writer{std::move(writer)}
 		{
 		}
 
-		void write(char const* buffer, int n) override { m_write(m_handle, buffer, n); }
+		void write(char const* buffer, int n) override { detail::write(m_writer, buffer, n); }
 
-		Imath::Int64 tellp() override { return m_tellp(m_handle); }
+		Imath::Int64 tellp() override { return detail::tellp(m_writer); }
 
-		void seekp(Imath::Int64 pos) override { m_seekp(m_handle, pos); }
+		void seekp(Imath::Int64 pos) override { detail::seekp(m_writer, pos); }
 
 	private:
-		void* m_handle;
-		void (*m_write)(void*, char const*, int);
-		Imath::Int64 (*m_tellp)(void*);
-		void (*m_seekp)(void*, Imath::Int64);
+		FileWriter m_writer;
 	};
 }
 

@@ -36,18 +36,20 @@ namespace Texpainter::PixelStore
 
 	inline void store(Image const& img, char const* filename) { store(img.pixels(), filename); }
 
-	void store(Span2d<Pixel const> pixels, IlmOutputAdapter&& ilm_output);
-
 	template<class FileWriter>
-	void store(Image const& img, FileWriter writer)
+	void store(Span2d<Pixel const> pixels, FileWriter&& writer)
 	{
-		IlmOutputAdapter output{std::ref(writer)};
-		store(img.pixels(), &output, [](void* output, Imf::Header const& header) {
-			return Imf::OutputFile{*static_cast<IlmOutputAdapter*>(output), header};
+		IlmOutputAdapter output{std::forward<FileWriter>(writer)};
+		store(pixels, &output, [](void* output, Imf::Header const& header) {
+			return Imf::OutputFile{*static_cast<IlmOutputAdapter<FileWriter>*>(output), header};
 		});
 	}
 
-	void store(Span2d<Pixel const> pixels, IlmOutputAdapter&& ilm_output);
+	template<class FileWriter>
+	void store(Image const& img, FileWriter&& writer)
+	{
+		store(img.pixels(), std::forward<FileWriter>(writer));
+	}
 }
 
 #endif
