@@ -299,6 +299,18 @@ namespace Texpainter::App
 		}
 
 		template<class Source>
+		void onActivated(Enum::Tag<DocumentAction::Open>, Ui::MenuItem&, Source&)
+		{
+			if(auto compositor = m_windows.get<WindowType::Compositor>().get();
+			   compositor != nullptr)
+			{ m_document->nodeLocations(compositor->widget().nodeLocations()); }
+
+			m_document->windows(windowInfo());
+
+			(void)load(Enum::Empty<Model::Document>{}, "/dev/stdout");
+		}
+
+		template<class Source>
 		void onActivated(Enum::Tag<DocumentAction::RenderToImage>, Ui::MenuItem&, Source& src)
 		{
 			if(m_render_to_img_job_creator == nullptr) [[likely]]

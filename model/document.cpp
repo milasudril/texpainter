@@ -10,6 +10,7 @@
 #include <wad64/readonly_archive.hpp>
 #include <wad64/fd_owner.hpp>
 #include <wad64/output_file.hpp>
+#include <wad64/input_file.hpp>
 
 #include <algorithm>
 
@@ -150,8 +151,29 @@ void Texpainter::Model::floodfill(Document& doc, vec2_t location, PixelStore::Pi
 
 namespace
 {
+	constexpr auto load_creation_mode = Wad64::FileCreationMode::DontCare();
+
 	constexpr auto store_creation_mode =
 	    Wad64::FileCreationMode::AllowOverwriteWithTruncation().allowCreation();
+}
+
+std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty<Document>,
+																	 char const*)
+{
+	Wad64::FdOwner input_file{"test.tex.wad64", Wad64::IoMode::AllowRead(), load_creation_mode};
+	Wad64::ReadonlyArchive archive{std::ref(input_file)};
+	{
+		Wad64::InputFile src{archive, "document.json"};
+		auto buffer = std::make_unique<char[]>(static_cast<size_t>(src.size()));
+		auto range = std::span{buffer.get(), buffer.get() + src.size()};
+		(void)read(src, std::as_writable_bytes(range));
+		auto obj = nlohmann::json::parse(std::begin(range), std::end(range));
+
+		auto workspace = obj.at("workspace").get<Workspace>();
+	}
+
+
+	return nullptr;
 }
 
 void Texpainter::Model::store(Document const& doc, char const*)

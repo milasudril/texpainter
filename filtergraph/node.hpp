@@ -265,6 +265,8 @@ namespace Texpainter::FilterGraph
 			       std::pair{"params", params(node)}};
 		}
 	}
+
+	void from_json(nlohmann::json const& obj, Node& node) = delete;
 }
 
 #endif

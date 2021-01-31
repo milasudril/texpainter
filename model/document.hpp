@@ -258,6 +258,8 @@ namespace Texpainter::Model
 
 	void floodfill(Document& doc, vec2_t location, PixelStore::Pixel color);
 
+	std::unique_ptr<Document> load(Enum::Empty<Document>, char const* filename);
+
 	void store(Document const& doc, char const* filename);
 
 	template<>

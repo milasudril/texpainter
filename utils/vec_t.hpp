@@ -87,6 +87,8 @@ namespace Texpainter
 
 	Texpainter::vec4_t fromString(Enum::Empty<vec4_t>, std::string const& str);
 
+	Texpainter::vec2_t fromString(Enum::Empty<vec2_t>, std::string const& str);
+
 	template<int dummy = 0>
 	constexpr auto chooseValIfInRange(vec4_t val,
 	                                  vec4_t if_too_small,
@@ -115,9 +117,9 @@ namespace nlohmann
 	{
 		static void to_json(json& j, Texpainter::vec2_t value) { j = Texpainter::toString(value); }
 
-		static void from_json(const json&, Texpainter::vec2_t)
+		static void from_json(const json& j, Texpainter::vec2_t& value)
 		{
-			// TODO: same thing, but with the "from_json" method
+			value = Texpainter::fromString(Enum::Empty<Texpainter::vec2_t>{}, j.get<std::string>());
 		}
 	};
 }

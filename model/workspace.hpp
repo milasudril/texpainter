@@ -28,6 +28,8 @@ namespace Texpainter::Model
 
 	void to_json(nlohmann::json& obj, WindowRectangle const& workspace);
 
+	void from_json(nlohmann::json const& obj, WindowRectangle& rect);
+
 	class WindowState
 	{
 	public:
@@ -70,6 +72,8 @@ namespace Texpainter::Model
 
 	void to_json(nlohmann::json& obj, WindowState state);
 
+	void from_json(nlohmann::json const& obj, WindowState& state);
+
 	struct Window
 	{
 		bool visible{false};
@@ -77,8 +81,9 @@ namespace Texpainter::Model
 		WindowRectangle rect{};
 	};
 
-	void to_json(nlohmann::json& obj, Window const& window);
+	void from_json(nlohmann::json const& obj, Window& windows);
 
+	void to_json(nlohmann::json& obj, Window const& window);
 
 	template<WindowType>
 	struct WindowTypeInfo;
@@ -106,6 +111,8 @@ namespace Texpainter::Model
 
 	using Windows = Enum::Tuple<WindowType, WindowTypeInfo>;
 
+	void from_json(nlohmann::json const& obj, Windows& windows);
+
 	void to_json(nlohmann::json& obj, Windows const& workspace);
 
 	struct Workspace
@@ -126,6 +133,8 @@ namespace Texpainter::Model
 
 		std::filesystem::path m_working_directory;
 	};
+
+	void from_json(nlohmann::json const& obj, Workspace& workspace);
 
 	void to_json(nlohmann::json& obj, Workspace const& workspace);
 }

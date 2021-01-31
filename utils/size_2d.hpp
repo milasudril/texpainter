@@ -57,11 +57,23 @@ namespace Texpainter
 	{
 		return std::to_string(size.width()) + " × " + std::to_string(size.height());
 	}
+}
 
-	inline void to_json(nlohmann::json& j, Size2d size)
-	{
-		j = nlohmann::json{std::pair{"width", size.width()}, std::pair{"height", size.height()}};
-	}
+namespace nlohmann
+{
+    template <>
+    struct adl_serializer<Texpainter::Size2d>
+    {
+        static Texpainter::Size2d from_json(const json& j)
+		{
+            return Texpainter::Size2d{j.at("width").get<uint32_t>(), j.at("height").get<uint32_t>()};
+        }
+
+        static void to_json(json& j, Texpainter::Size2d size)
+		{
+            j = nlohmann::json{std::pair{"width", size.width()}, std::pair{"height", size.height()}};
+        }
+    };
 }
 
 #endif

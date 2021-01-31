@@ -93,6 +93,12 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
 	task_counter.waitAndReset(m_node_array.size());
 }
 
+void Texpainter::Model::from_json(nlohmann::json const&, Compositor&)
+{
+//	auto nodes = j.at("nodes").get<std::map<FilterGraph::NodeId, FilterGraph::Node>>();
+//	printf("%zu\n", std::size(nodes));
+}
+
 void Texpainter::Model::to_json(nlohmann::json& obj, Compositor const& src)
 {
 	obj["nodes"] = {};

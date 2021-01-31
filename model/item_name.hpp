@@ -77,6 +77,11 @@ namespace Texpainter::Model
 	inline std::string const& toFilename(ItemName const& name) { return toString(name); }
 
 	inline void to_json(nlohmann::json& obj, ItemName const& name) { obj = toString(name); }
+
+	inline void from_json(nlohmann::json const& obj, ItemName& name)
+	{
+		name = ItemName{obj.get<std::string>().c_str()};
+	}
 }
 
 #endif

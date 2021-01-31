@@ -42,12 +42,6 @@ namespace Texpainter::Model
 		BrushShape m_type;
 	};
 
-	inline void to_json(nlohmann::json& obj, BrushInfo brush)
-	{
-		obj["radius"] = brush.radius();
-		obj["shape"]  = brush.shape();
-	}
-
 	namespace detail
 	{
 		using BrushFunc = bool (*)(vec2_t location, double radius);
@@ -78,5 +72,24 @@ namespace Texpainter::Model
 	private:
 		detail::BrushFunc r_func;
 	};
+}
+
+
+namespace nlohmann
+{
+    template <>
+    struct adl_serializer<Texpainter::Model::BrushInfo>
+    {
+        static Texpainter::Model::BrushInfo from_json(const json& j)
+		{
+            return Texpainter::Model::BrushInfo{j.at("radius").get<float>(), j.at("shape").get<Texpainter::Model::BrushShape>()};
+        }
+
+        static void to_json(json& j, Texpainter::Model::BrushInfo brush)
+		{
+			j["radius"] = brush.radius();
+			j["shape"]  = brush.shape();
+		}
+    };
 }
 #endif
