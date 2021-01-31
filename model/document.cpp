@@ -146,24 +146,34 @@ void Texpainter::Model::floodfill(Document& doc, vec2_t location, PixelStore::Pi
 	    doc.currentImage());
 }
 
+namespace
+{
+	constexpr auto store_creation_mode =
+	    Wad64::FileCreationMode::AllowOverwriteWithTruncation().allowCreation();
+}
+
 void Texpainter::Model::store(Document const& doc, char const*)
 {
-	nlohmann::json obj{std::pair{"workspace", doc.workspace()},
-	                   std::pair{"canvas_size", doc.canvasSize()}};
-	obj["compositor"] = doc.compositor();
-	obj["images"]     = mapNodeIdsToItemName(doc.images());
-	obj["palettes"]   = mapNodeIdsToItemName(doc.palettes());
-	auto const str    = obj.dump(1, '\t');
 
 	Wad64::FdOwner output_file{
-	    "test.tex.wad64",
-	    Wad64::IoMode::AllowRead().allowWrite(),
-	    Wad64::FileCreationMode::AllowOverwriteWithTruncation().allowCreation()};
-
+	    "test.tex.wad64", Wad64::IoMode::AllowRead().allowWrite(), store_creation_mode};
 	Wad64::Archive archive{std::ref(output_file)};
-	Wad64::OutputFile output{
-	    archive,
-	    "texpainter_doc.json",
-	    Wad64::FileCreationMode::AllowOverwriteWithTruncation().allowCreation()};
-	output.write(std::as_bytes(std::span{str}));
+
+	{
+		nlohmann::json obj{std::pair{"workspace", doc.workspace()},
+		                   std::pair{"canvas_size", doc.canvasSize()}};
+		obj["compositor"] = doc.compositor();
+		obj["images"]     = mapNodeIdsToItemName(doc.images());
+		obj["palettes"]   = mapNodeIdsToItemName(doc.palettes());
+		auto const str    = obj.dump(1, '\t');
+
+		Wad64::OutputFile output{archive, "document.json", store_creation_mode};
+		output.write(std::as_bytes(std::span{str}));
+	}
+
+	std::ranges::for_each(doc.palettes(), [&archive](auto const& item) {
+		store(item.second.source.get(),
+		      Wad64::OutputFile{
+		          archive, std::string{"data/"} + item.first.c_str(), store_creation_mode});
+	});
 }

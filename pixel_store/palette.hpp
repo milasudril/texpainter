@@ -11,6 +11,7 @@
 
 #include <array>
 #include <algorithm>
+#include <span>
 
 namespace Texpainter::PixelStore
 {
@@ -78,6 +79,15 @@ namespace Texpainter::PixelStore
 		{ throw std::string{"Failed to open "} + filename + ": " + strerror(errno); }
 		fputs(str.c_str(), f);
 		fclose(f);
+	}
+
+	template<ColorIndex::element_type Size, class OutputStream>
+	void store(Palette<Size> const& pal, OutputStream stream)
+	{
+		nlohmann::json obj;
+		to_json(obj, pal);
+		auto const str = obj.dump(1, '\t');
+		write(stream, std::as_bytes(std::span{str}));
 	}
 
 	template<ColorIndex::element_type Size>
