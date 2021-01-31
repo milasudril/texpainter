@@ -228,6 +228,12 @@ namespace Texpainter::Model
 
 		Workspace const& workspace() const { return m_workspace; }
 
+		Document& workspace(Workspace&& obj)
+		{
+			m_workspace = std::move(obj);
+			return *this;
+		}
+
 		template<class T>
 		ItemName const& current() const;
 

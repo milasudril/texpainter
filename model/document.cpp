@@ -169,7 +169,8 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 		(void)read(src, std::as_writable_bytes(range));
 		auto obj = nlohmann::json::parse(std::begin(range), std::end(range));
 
-		auto workspace = obj.at("workspace").get<Workspace>();
+		auto doc = std::make_unique<Document>(obj.at("canvas_size").get<Size2d>());
+		doc->workspace(obj.at("workspace").get<Workspace>());
 	}
 
 
