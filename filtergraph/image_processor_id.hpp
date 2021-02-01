@@ -58,6 +58,24 @@ namespace Texpainter::FilterGraph
 		{
 			static_assert(N == 33,  // Remember nul terminator
 			              "String should be a 128 bit number written in hexadecimal notation");
+			set_val(id);
+		}
+
+		explicit ImageProcessorId(std::string_view str)
+		{
+			if(std::size(str) != 32)
+			{ throw "A ImageProcessorId must be 32 bytes";}
+
+			set_val(std::data(str));
+		}
+
+		constexpr auto const& data() const { return m_data; }
+
+	private:
+		std::array<std::byte, 16> m_data;
+
+		constexpr void set_val(char const* id)
+		{
 			auto ptr = std::begin(m_data);
 			uint8_t msb{};
 			for(int k = 0; k < 32; ++k)
@@ -71,11 +89,6 @@ namespace Texpainter::FilterGraph
 				}
 			}
 		}
-
-		constexpr auto const& data() const { return m_data; }
-
-	private:
-		std::array<std::byte, 16> m_data;
 	};
 
 	constexpr auto InvalidImgProcId = ImageProcessorId{'0'};
@@ -100,6 +113,11 @@ namespace Texpainter::FilterGraph
 	}
 
 	inline void to_json(nlohmann::json& obj, ImageProcessorId const& id) { obj = toString(id); }
+
+	inline void from_json(nlohmann::json const& obj, ImageProcessorId& id)
+	{
+		id = ImageProcessorId{obj.get<std::string>()};
+	}
 }
 
 #endif

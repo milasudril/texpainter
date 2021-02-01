@@ -212,9 +212,13 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 	{
 		auto compositor = doc_info.at("compositor");
 		auto nodes = compositor.at("nodes");
+		std::map<FilterGraph::NodeId, FilterGraph::NodeId> node_id_map;
 		for(auto it = std::begin(nodes); it != std::end(nodes); ++it)
 		{
-			printf("%s\n", it.key().c_str());
+ 		//	auto node_id = FilterGraph::NodeId{std::stoull(it.key())};
+			auto params = it.value().at("params").get<std::map<std::string, double>>();
+			auto imgproc_id = it.value().at("processor_id").get<FilterGraph::ImageProcessorId>();
+			printf("%s\n", toString(imgproc_id).c_str());
 		}
 	}
 
