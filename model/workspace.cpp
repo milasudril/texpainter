@@ -12,7 +12,7 @@ void Texpainter::Model::to_json(nlohmann::json& obj, WindowRectangle const& rect
 void Texpainter::Model::from_json(nlohmann::json const& obj, WindowRectangle& rect)
 {
 	rect.size = obj.at("size").get<Size2d>();
-	rect.location = obj.at("size").get<vec2_t>();
+	rect.location = obj.at("location").get<vec2_t>();
 }
 
 void Texpainter::Model::to_json(nlohmann::json& obj, WindowState state)
@@ -36,9 +36,9 @@ void Texpainter::Model::to_json(nlohmann::json& obj, Window const& window)
 
 void Texpainter::Model::from_json(nlohmann::json const& obj, Window& window)
 {
-	window.visible = obj.get<bool>();
-	window.state = obj.get<WindowState>();
-	window.rect = obj.get<WindowRectangle>();
+	window.visible = obj.at("visible").get<bool>();
+	window.state = obj.at("state").get<WindowState>();
+	window.rect = obj.at("rect").get<WindowRectangle>();
 }
 
 void Texpainter::Model::to_json(nlohmann::json& obj, Windows const& windows)
@@ -50,21 +50,9 @@ void Texpainter::Model::to_json(nlohmann::json& obj, Windows const& windows)
 
 void Texpainter::Model::from_json(nlohmann::json const& obj, Windows& windows)
 {
-	// TODO: This can be made constexpr
-	std::map<std::string_view, WindowType> window_types;
-	Enum::forEachEnumItem<WindowType>([&window_types](auto item) {
-		window_types[WindowTypeInfo<item.value>::name()] = item.value;
+	Enum::forEachEnumItem<WindowType>([&obj, &windows](auto item) {
+		windows.get<item.value>() = obj.at(WindowTypeInfo<item.value>::name()).template get<Window>();
 	});
-
-	for(auto i = std::begin(obj); i != std::end(obj); ++i)
-	{
-		if(auto j = window_types.find(i.key()); j!=std::end(window_types))
-		{
-			Enum::forEachEnumItem<WindowType>([&windows, &val = i.value()](auto item) {
-				windows.get<item.value>() = val.get<Window>();
-			});
-		}
-	}
 }
 
 void Texpainter::Model::to_json(nlohmann::json& obj, Workspace const& workspace)

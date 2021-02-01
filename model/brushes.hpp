@@ -83,5 +83,12 @@ namespace Texpainter::Model
 		});
 	}
 
+	inline void from_json(nlohmann::json const& obj, BrushShape& shape)
+	{
+		Enum::forEachEnumItem<BrushShape>([&shape, str = obj.get<std::string>()](auto i) {
+			if(str == BrushTraits<i.value>::name()) { shape = i.value; }
+		});
+	}
+
 }
 #endif

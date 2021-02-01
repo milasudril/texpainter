@@ -82,7 +82,9 @@ namespace nlohmann
     {
         static Texpainter::Model::BrushInfo from_json(const json& j)
 		{
-            return Texpainter::Model::BrushInfo{j.at("radius").get<float>(), j.at("shape").get<Texpainter::Model::BrushShape>()};
+			auto radius = j.at("radius").get<float>();
+			auto shape = j.at("shape").get<Texpainter::Model::BrushShape>();
+            return Texpainter::Model::BrushInfo{radius, shape};
         }
 
         static void to_json(json& j, Texpainter::Model::BrushInfo brush)

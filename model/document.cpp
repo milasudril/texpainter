@@ -205,7 +205,18 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 	auto doc = std::make_unique<Document>(doc_info.at("canvas_size").get<Size2d>());
 
 	if(auto i = doc_info.find("workspace"); i != std::end(doc_info))
-	{ doc->workspace(i->get<Workspace>()); }
+	{
+		doc->workspace(i->get<Workspace>());
+	}
+
+	{
+		auto compositor = doc_info.at("compositor");
+		auto nodes = compositor.at("nodes");
+		for(auto it = std::begin(nodes); it != std::end(nodes); ++it)
+		{
+			printf("%s\n", it.key().c_str());
+		}
+	}
 
 	return doc;
 }
