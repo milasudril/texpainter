@@ -155,6 +155,15 @@ namespace
 
 	constexpr auto store_creation_mode =
 	    Wad64::FileCreationMode::AllowOverwriteWithTruncation().allowCreation();
+
+	nlohmann::json load_document_info(Wad64::ReadonlyArchive const& archive)
+	{
+		Wad64::InputFile src{archive, "document.json"};
+		auto buffer = std::make_unique<char[]>(static_cast<size_t>(src.size()));
+		auto range = std::span{buffer.get(), buffer.get() + src.size()};
+		(void)read(src, std::as_writable_bytes(range));
+		return nlohmann::json::parse(std::begin(range), std::end(range));
+	}
 }
 
 std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty<Document>,
@@ -162,28 +171,18 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 {
 	Wad64::FdOwner input_file{"test.tex.wad64", Wad64::IoMode::AllowRead(), load_creation_mode};
 	Wad64::ReadonlyArchive archive{std::ref(input_file)};
-	{
-		Wad64::InputFile src{archive, "document.json"};
-		auto buffer = std::make_unique<char[]>(static_cast<size_t>(src.size()));
-		auto range = std::span{buffer.get(), buffer.get() + src.size()};
-		(void)read(src, std::as_writable_bytes(range));
-		auto obj = nlohmann::json::parse(std::begin(range), std::end(range));
 
-		auto doc = std::make_unique<Document>(obj.at("canvas_size").get<Size2d>());
+	auto doc_info = load_document_info(archive);
+	auto doc = std::make_unique<Document>(doc_info.at("canvas_size").get<Size2d>());
 
-		if(auto i = obj.find("workspace"); i != std::end(obj))
-		{
-			doc->workspace(i->get<Workspace>());
-		}
-	}
+	if(auto i = doc_info.find("workspace"); i != std::end(doc_info))
+	{ doc->workspace(i->get<Workspace>()); }
 
-
-	return nullptr;
+	return doc;
 }
 
 void Texpainter::Model::store(Document const& doc, char const*)
 {
-
 	Wad64::FdOwner output_file{
 	    "test.tex.wad64", Wad64::IoMode::AllowRead().allowWrite(), store_creation_mode};
 	Wad64::Archive archive{std::ref(output_file)};
