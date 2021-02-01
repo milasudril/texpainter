@@ -140,10 +140,6 @@ namespace Texpainter::Model
 	Texpainter::FilterGraph::ValidationResult validate(Compositor const& g);
 
 	std::map<FilterGraph::Node const*, FilterGraph::NodeId> mapNodesToNodeIds(Compositor const& g);
-
-	void from_json(nlohmann::json const& j, Compositor& dest);
-
-	void to_json(nlohmann::json& obj, Compositor const& src);
 }
 
 #endif

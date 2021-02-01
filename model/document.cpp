@@ -166,6 +166,35 @@ namespace
 	}
 }
 
+namespace nlohmann
+{
+	template<>
+	class adl_serializer<Texpainter::Model::Compositor>
+	{
+	public:
+		static void to_json(nlohmann::json& obj, Texpainter::Model::Compositor const& src)
+		{
+			obj["nodes"] = {};
+			auto nodes   = src.nodesWithId();
+			std::ranges::for_each(nodes, [&nodes = obj["nodes"]](auto const& item) {
+				nodes[toString(item.first)] = item.second;
+			});
+
+			obj["connections"] = {};
+			std::ranges::for_each(nodes, [&conn = obj["connections"]](auto const& item) {
+				auto inputs = item.second.inputs();
+				std::vector<Texpainter::FilterGraph::NodeId> ids;
+				ids.reserve(4);
+				std::ranges::transform(inputs, std::back_inserter(ids), [](auto const& src) {
+					if(src.valid()) { return src.processor().nodeId(); }
+					return Texpainter::FilterGraph::InvalidNodeId;
+				});
+				conn[toString(item.first)] = ids;
+			});
+		}
+	};
+}
+
 std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty<Document>,
 																	 char const*)
 {

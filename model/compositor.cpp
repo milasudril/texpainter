@@ -93,29 +93,3 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
 	task_counter.waitAndReset(m_node_array.size());
 }
 
-void Texpainter::Model::from_json(nlohmann::json const&, Compositor&)
-{
-//	auto nodes = j.at("nodes").get<std::map<FilterGraph::NodeId, FilterGraph::Node>>();
-//	printf("%zu\n", std::size(nodes));
-}
-
-void Texpainter::Model::to_json(nlohmann::json& obj, Compositor const& src)
-{
-	obj["nodes"] = {};
-	auto nodes   = src.nodesWithId();
-	std::ranges::for_each(nodes, [&nodes = obj["nodes"]](auto const& item) {
-		nodes[toString(item.first)] = item.second;
-	});
-
-	obj["connections"] = {};
-	std::ranges::for_each(nodes, [&conn = obj["connections"]](auto const& item) {
-		auto inputs = item.second.inputs();
-		std::vector<FilterGraph::NodeId> ids;
-		ids.reserve(4);
-		std::ranges::transform(inputs, std::back_inserter(ids), [](auto const& src) {
-			if(src.valid()) { return src.processor().nodeId(); }
-			return FilterGraph::InvalidNodeId;
-		});
-		conn[toString(item.first)] = ids;
-	});
-}
