@@ -31,6 +31,15 @@ namespace Texpainter::PixelStore
 		});
 	}
 
+	template<class FileReader>
+	Image load(Enum::Empty<Image>, FileReader&& reader)
+	{
+		IlmInputAdapter input{std::forward<FileReader>(reader)};
+		return load(Enum::Empty<Image>{}, &input, [](void* input) {
+			return Imf::InputFile{*static_cast<IlmInputAdapter<FileReader>*>(input)};
+		});
+	}
+
 	bool fileValid(Enum::Empty<Image>, char const* filename);
 
 
