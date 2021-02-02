@@ -61,19 +61,21 @@ namespace Texpainter
 
 namespace nlohmann
 {
-    template <>
-    struct adl_serializer<Texpainter::Size2d>
-    {
-        static Texpainter::Size2d from_json(const json& j)
+	template<>
+	struct adl_serializer<Texpainter::Size2d>
+	{
+		static Texpainter::Size2d from_json(const json& j)
 		{
-            return Texpainter::Size2d{j.at("width").get<uint32_t>(), j.at("height").get<uint32_t>()};
-        }
+			return Texpainter::Size2d{j.at("width").get<uint32_t>(),
+			                          j.at("height").get<uint32_t>()};
+		}
 
-        static void to_json(json& j, Texpainter::Size2d size)
+		static void to_json(json& j, Texpainter::Size2d size)
 		{
-            j = nlohmann::json{std::pair{"width", size.width()}, std::pair{"height", size.height()}};
-        }
-    };
+			j = nlohmann::json{std::pair{"width", size.width()},
+			                   std::pair{"height", size.height()}};
+		}
+	};
 }
 
 #endif

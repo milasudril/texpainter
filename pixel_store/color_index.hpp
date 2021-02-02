@@ -45,7 +45,10 @@ namespace Texpainter::PixelStore
 
 	inline void to_json(nlohmann::json& obj, ColorIndex id) { obj = id.value(); }
 
-	inline void from_json(nlohmann::json const& obj, ColorIndex id) { id = ColorIndex{obj.get<uint8_t>()}; };
+	inline void from_json(nlohmann::json const& obj, ColorIndex id)
+	{
+		id = ColorIndex{obj.get<uint8_t>()};
+	};
 }
 
 #endif

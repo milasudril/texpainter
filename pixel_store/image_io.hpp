@@ -28,8 +28,7 @@ namespace Texpainter::PixelStore
 
 	inline void store(Span2d<Pixel const> pixels, char const* filename)
 	{
-		store(pixels, const_cast<char*>(filename), [](void* filename, Imf::Header const& header)
-		{
+		store(pixels, const_cast<char*>(filename), [](void* filename, Imf::Header const& header) {
 			return Imf::OutputFile{static_cast<char const*>(filename), header};
 		});
 	}

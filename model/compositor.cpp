@@ -92,4 +92,3 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
 	std::ranges::for_each(m_node_array, schedule_task);
 	task_counter.waitAndReset(m_node_array.size());
 }
-

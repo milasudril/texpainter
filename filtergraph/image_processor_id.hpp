@@ -63,8 +63,7 @@ namespace Texpainter::FilterGraph
 
 		explicit ImageProcessorId(std::string_view str)
 		{
-			if(std::size(str) != 32)
-			{ throw "A ImageProcessorId must be 32 bytes";}
+			if(std::size(str) != 32) { throw "A ImageProcessorId must be 32 bytes"; }
 
 			set_val(std::data(str));
 		}

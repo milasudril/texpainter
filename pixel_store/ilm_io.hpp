@@ -16,8 +16,7 @@ namespace Texpainter::PixelStore
 		template<class T>
 		void write(T& handle, char const* buffer, int n)
 		{
-			(void)write(handle,
-			            std::as_bytes(std::span{buffer, static_cast<size_t>(n)}));
+			(void)write(handle, std::as_bytes(std::span{buffer, static_cast<size_t>(n)}));
 		}
 
 		template<class T>

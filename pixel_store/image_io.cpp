@@ -58,8 +58,9 @@ Texpainter::PixelStore::Image Texpainter::PixelStore::load(Enum::Empty<Image>, c
 	return ret;
 }
 
-void  Texpainter::PixelStore::store(Span2d<Pixel const> pixels, void* arg,
-									detail::OutputFileFactory make_output_file)
+void Texpainter::PixelStore::store(Span2d<Pixel const> pixels,
+                                   void* arg,
+                                   detail::OutputFileFactory make_output_file)
 {
 	Imf::Header header{static_cast<int>(pixels.width()), static_cast<int>(pixels.height())};
 	header.channels().insert("R", Imf::Channel{Imf::FLOAT});

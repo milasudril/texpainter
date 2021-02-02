@@ -11,7 +11,7 @@ void Texpainter::Model::to_json(nlohmann::json& obj, WindowRectangle const& rect
 
 void Texpainter::Model::from_json(nlohmann::json const& obj, WindowRectangle& rect)
 {
-	rect.size = obj.at("size").get<Size2d>();
+	rect.size     = obj.at("size").get<Size2d>();
 	rect.location = obj.at("location").get<vec2_t>();
 }
 
@@ -23,8 +23,7 @@ void Texpainter::Model::to_json(nlohmann::json& obj, WindowState state)
 
 void Texpainter::Model::from_json(nlohmann::json const& obj, WindowState& state)
 {
-	state.minimized(obj.at("minimized").get<bool>())
-		.maximized(obj.at("maximized").get<bool>());
+	state.minimized(obj.at("minimized").get<bool>()).maximized(obj.at("maximized").get<bool>());
 }
 
 void Texpainter::Model::to_json(nlohmann::json& obj, Window const& window)
@@ -37,8 +36,8 @@ void Texpainter::Model::to_json(nlohmann::json& obj, Window const& window)
 void Texpainter::Model::from_json(nlohmann::json const& obj, Window& window)
 {
 	window.visible = obj.at("visible").get<bool>();
-	window.state = obj.at("state").get<WindowState>();
-	window.rect = obj.at("rect").get<WindowRectangle>();
+	window.state   = obj.at("state").get<WindowState>();
+	window.rect    = obj.at("rect").get<WindowRectangle>();
 }
 
 void Texpainter::Model::to_json(nlohmann::json& obj, Windows const& windows)
@@ -51,7 +50,8 @@ void Texpainter::Model::to_json(nlohmann::json& obj, Windows const& windows)
 void Texpainter::Model::from_json(nlohmann::json const& obj, Windows& windows)
 {
 	Enum::forEachEnumItem<WindowType>([&obj, &windows](auto item) {
-		windows.get<item.value>() = obj.at(WindowTypeInfo<item.value>::name()).template get<Window>();
+		windows.get<item.value>() =
+		    obj.at(WindowTypeInfo<item.value>::name()).template get<Window>();
 	});
 }
 
@@ -68,11 +68,12 @@ void Texpainter::Model::to_json(nlohmann::json& obj, Workspace const& workspace)
 
 void Texpainter::Model::from_json(nlohmann::json const& obj, Workspace& workspace)
 {
-	workspace.m_node_locations = obj.at("node_locations").get<std::map<FilterGraph::NodeId, vec2_t>>();
-	workspace.m_current_image = obj.at("current_image").get<ItemName>();
-	workspace.m_current_color = obj.at("current_color").get<PixelStore::ColorIndex>();
+	workspace.m_node_locations =
+	    obj.at("node_locations").get<std::map<FilterGraph::NodeId, vec2_t>>();
+	workspace.m_current_image   = obj.at("current_image").get<ItemName>();
+	workspace.m_current_color   = obj.at("current_color").get<PixelStore::ColorIndex>();
 	workspace.m_current_palette = obj.at("current_palette").get<ItemName>();
-	workspace.m_color_history = obj.at("color_history").get<PixelStore::Palette<8>>();
-	workspace.m_windows = obj.at("windows").get<Windows>();
-	workspace.m_current_brush = obj.at("current_brush").get<BrushInfo>();
+	workspace.m_color_history   = obj.at("color_history").get<PixelStore::Palette<8>>();
+	workspace.m_windows         = obj.at("windows").get<Windows>();
+	workspace.m_current_brush   = obj.at("current_brush").get<BrushInfo>();
 }

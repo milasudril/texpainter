@@ -68,10 +68,10 @@ namespace nlohmann
 
 		static void from_json(const json& j, std::map<Texpainter::FilterGraph::NodeId, T>& ret)
 		{
-			for (auto it = std::begin(j); it != std::end(j); ++it)
+			for(auto it = std::begin(j); it != std::end(j); ++it)
 			{
-				adl_serializer<T>::
-					from_json(it.value(), ret[Texpainter::FilterGraph::NodeId{std::stoull(it.key())}]);
+				adl_serializer<T>::from_json(
+				    it.value(), ret[Texpainter::FilterGraph::NodeId{std::stoull(it.key())}]);
 			}
 		}
 	};

@@ -77,21 +77,21 @@ namespace Texpainter::Model
 
 namespace nlohmann
 {
-    template <>
-    struct adl_serializer<Texpainter::Model::BrushInfo>
-    {
-        static Texpainter::Model::BrushInfo from_json(const json& j)
+	template<>
+	struct adl_serializer<Texpainter::Model::BrushInfo>
+	{
+		static Texpainter::Model::BrushInfo from_json(const json& j)
 		{
 			auto radius = j.at("radius").get<float>();
-			auto shape = j.at("shape").get<Texpainter::Model::BrushShape>();
-            return Texpainter::Model::BrushInfo{radius, shape};
-        }
+			auto shape  = j.at("shape").get<Texpainter::Model::BrushShape>();
+			return Texpainter::Model::BrushInfo{radius, shape};
+		}
 
-        static void to_json(json& j, Texpainter::Model::BrushInfo brush)
+		static void to_json(json& j, Texpainter::Model::BrushInfo brush)
 		{
 			j["radius"] = brush.radius();
 			j["shape"]  = brush.shape();
 		}
-    };
+	};
 }
 #endif

@@ -160,7 +160,7 @@ namespace
 	{
 		Wad64::InputFile src{archive, "document.json"};
 		auto buffer = std::make_unique<char[]>(static_cast<size_t>(src.size()));
-		auto range = std::span{buffer.get(), buffer.get() + src.size()};
+		auto range  = std::span{buffer.get(), buffer.get() + src.size()};
 		(void)read(src, std::as_writable_bytes(range));
 		return nlohmann::json::parse(std::begin(range), std::end(range));
 	}
@@ -196,29 +196,40 @@ namespace nlohmann
 }
 
 std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty<Document>,
-																	 char const*)
+                                                                     char const*)
 {
 	Wad64::FdOwner input_file{"test.tex.wad64", Wad64::IoMode::AllowRead(), load_creation_mode};
 	Wad64::ReadonlyArchive archive{std::ref(input_file)};
 
 	auto doc_info = load_document_info(archive);
-	auto doc = std::make_unique<Document>(doc_info.at("canvas_size").get<Size2d>());
+	auto doc      = std::make_unique<Document>(doc_info.at("canvas_size").get<Size2d>());
 
 	if(auto i = doc_info.find("workspace"); i != std::end(doc_info))
-	{
-		doc->workspace(i->get<Workspace>());
-	}
+	{ doc->workspace(i->get<Workspace>()); }
 
 	{
 		auto compositor = doc_info.at("compositor");
-		auto nodes = compositor.at("nodes");
+		auto nodes      = compositor.at("nodes");
 		std::map<FilterGraph::NodeId, FilterGraph::NodeId> node_id_map;
 		for(auto it = std::begin(nodes); it != std::end(nodes); ++it)
 		{
- 		//	auto node_id = FilterGraph::NodeId{std::stoull(it.key())};
-			auto params = it.value().at("params").get<std::map<std::string, double>>();
+			auto node_id    = FilterGraph::NodeId{std::stoull(it.key())};
 			auto imgproc_id = it.value().at("processor_id").get<FilterGraph::ImageProcessorId>();
-			printf("%s\n", toString(imgproc_id).c_str());
+			if(node_id == FilterGraph::NodeId{0})  // Skip node id 0
+			{
+				if(imgproc_id != FilterGraph::ImageSink::id())
+				{
+					throw std::string{"Bad output image processor. Expected "
+					                  + toString(FilterGraph::ImageSink::id())};
+				}
+				continue;
+			}
+
+			if(imgproc_id == FilterGraph::InvalidImgProcId)
+			{ continue; }
+
+			auto params = it.value().at("params").get<std::map<std::string, double>>();
+			printf("%lu %s\n", node_id.value(), toString(imgproc_id).c_str());
 		}
 	}
 
