@@ -5,6 +5,7 @@
 #include "./document.hpp"
 
 #include "pixel_store/image_io.hpp"
+#include "imgproc/image_processor_registry.hpp"
 
 #include <wad64/archive.hpp>
 #include <wad64/readonly_archive.hpp>
@@ -217,6 +218,7 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 			auto imgproc_id = it.value().at("processor_id").get<FilterGraph::ImageProcessorId>();
 			if(node_id == FilterGraph::NodeId{0})  // Skip node id 0
 			{
+				// But make sure it has the expected ImageProcessorId
 				if(imgproc_id != FilterGraph::ImageSink::id())
 				{
 					throw std::string{"Bad output image processor. Expected "
@@ -228,8 +230,14 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 			if(imgproc_id == FilterGraph::InvalidImgProcId)
 			{ continue; }
 
-			auto params = it.value().at("params").get<std::map<std::string, double>>();
-			printf("%lu %s\n", node_id.value(), toString(imgproc_id).c_str());
+			auto res = doc->compositor().insert(ImageProcessorRegistry::createImageProcessor(imgproc_id));
+			std::ranges::for_each(it.value().at("params").get<std::map<std::string, double>>(),
+								  [&node = res.second.get()](auto const& param) {
+									  auto val = std::clamp(param.second, 0.0, 1.0);
+									  node.set(param.first.c_str(), FilterGraph::ParamValue{val});
+								  });
+
+			node_id_map[res.first] = node_id;
 		}
 	}
 
