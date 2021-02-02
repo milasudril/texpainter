@@ -165,6 +165,11 @@ namespace
 		(void)read(src, std::as_writable_bytes(range));
 		return nlohmann::json::parse(std::begin(range), std::end(range));
 	}
+
+	std::string make_data_path(Texpainter::Model::ItemName const& name)
+	{
+		return std::string{"data/"} + name.c_str();
+	}
 }
 
 namespace nlohmann
@@ -209,23 +214,23 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 	{ doc->workspace(i->get<Workspace>()); }
 
 	std::map<FilterGraph::NodeId, FilterGraph::NodeId> node_id_map;
-	std::ranges::for_each(
-	    doc_info.at("images").get<std::map<FilterGraph::NodeId, ItemName>>(),
-	    [&archive, document = doc.get(), &node_id_map](auto const& item) {
-		    auto data                       = load(Enum::Empty<PixelStore::Image>{},
-                             Wad64::InputFile{archive, std::string{"data/"} + item.second.c_str()});
-		    auto node_info                  = document->insert(item.second, std::move(data));
-		    node_id_map[node_info->node_id] = item.first;
-	    });
+	std::ranges::for_each(doc_info.at("images").get<std::map<FilterGraph::NodeId, ItemName>>(),
+	                      [&archive, document = doc.get(), &node_id_map](auto const& item) {
+		                      auto data =
+		                          load(Enum::Empty<PixelStore::Image>{},
+		                               Wad64::InputFile{archive, make_data_path(item.second)});
+		                      auto node_info = document->insert(item.second, std::move(data));
+		                      node_id_map[node_info->node_id] = item.first;
+	                      });
 
-	std::ranges::for_each(
-	    doc_info.at("palettes").get<std::map<FilterGraph::NodeId, ItemName>>(),
-	    [&archive, document = doc.get(), &node_id_map](auto const& item) {
-		    auto data                       = load(Enum::Empty<Palette>{},
-                             Wad64::InputFile{archive, std::string{"data/"} + item.second.c_str()});
-		    auto node_info                  = document->insert(item.second, std::move(data));
-		    node_id_map[node_info->node_id] = item.first;
-	    });
+	std::ranges::for_each(doc_info.at("palettes").get<std::map<FilterGraph::NodeId, ItemName>>(),
+	                      [&archive, document = doc.get(), &node_id_map](auto const& item) {
+		                      auto data =
+		                          load(Enum::Empty<Palette>{},
+		                               Wad64::InputFile{archive, make_data_path(item.second)});
+		                      auto node_info = document->insert(item.second, std::move(data));
+		                      node_id_map[node_info->node_id] = item.first;
+	                      });
 
 	{
 		auto compositor = doc_info.at("compositor");
@@ -260,7 +265,6 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 	}
 
 
-
 	return doc;
 }
 
@@ -284,13 +288,11 @@ void Texpainter::Model::store(Document const& doc, char const*)
 
 	std::ranges::for_each(doc.palettes(), [&archive](auto const& item) {
 		store(item.second.source.get(),
-		      Wad64::OutputFile{
-		          archive, std::string{"data/"} + item.first.c_str(), store_creation_mode});
+		      Wad64::OutputFile{archive, make_data_path(item.first), store_creation_mode});
 	});
 
 	std::ranges::for_each(doc.images(), [&archive](auto const& item) {
 		store(item.second.source.get(),
-		      Wad64::OutputFile{
-		          archive, std::string{"data/"} + item.first.c_str(), store_creation_mode});
+		      Wad64::OutputFile{archive, make_data_path(item.first), store_creation_mode});
 	});
 }
