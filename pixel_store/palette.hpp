@@ -139,6 +139,19 @@ namespace Texpainter::PixelStore
 		return ret;
 	}
 
+	template<ColorIndex::element_type Size, class InputStream>
+	Palette<Size> load(Enum::Empty<Palette<Size>>, InputStream stream)
+	{
+		auto const n           = static_cast<size_t>(stream.size());
+		auto buffer            = std::make_unique<char[]>(stream.size());
+		auto const input_range = std::span{buffer.get(), n};
+		read(stream, std::as_writable_bytes(input_range));
+		auto obj = nlohmann::json::parse(std::begin(input_range), std::end(input_range));
+		Palette<Size> ret;
+		from_json(obj, ret);
+		return ret;
+	}
+
 	template<ColorIndex::element_type Size>
 	bool fileValid(Enum::Empty<Palette<Size>> e, char const* filename)
 	{

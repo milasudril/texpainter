@@ -244,9 +244,19 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 	std::ranges::for_each(
 	    doc_info.at("images").get<std::map<FilterGraph::NodeId, ItemName>>(),
 	    [&archive, document = doc.get(), &node_id_map](auto const& item) {
-		    auto image =
-		        load(Enum::Empty<PixelStore::Image>{},
-		             Wad64::InputFile{archive, std::string{"data/"} + item.second.c_str()});
+		    auto data                       = load(Enum::Empty<PixelStore::Image>{},
+                             Wad64::InputFile{archive, std::string{"data/"} + item.second.c_str()});
+		    auto node_info                  = document->insert(item.second, std::move(data));
+		    node_id_map[node_info->node_id] = item.first;
+	    });
+
+	std::ranges::for_each(
+	    doc_info.at("palettes").get<std::map<FilterGraph::NodeId, ItemName>>(),
+	    [&archive, document = doc.get(), &node_id_map](auto const& item) {
+		    auto data                       = load(Enum::Empty<Palette>{},
+                             Wad64::InputFile{archive, std::string{"data/"} + item.second.c_str()});
+		    auto node_info                  = document->insert(item.second, std::move(data));
+		    node_id_map[node_info->node_id] = item.first;
 	    });
 
 	return doc;
