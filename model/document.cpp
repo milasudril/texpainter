@@ -227,25 +227,26 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 				continue;
 			}
 
-			if(imgproc_id == FilterGraph::InvalidImgProcId)
-			{ continue; }
+			if(imgproc_id == FilterGraph::InvalidImgProcId) { continue; }
 
-			auto res = doc->compositor().insert(ImageProcessorRegistry::createImageProcessor(imgproc_id));
+			auto res =
+			    doc->compositor().insert(ImageProcessorRegistry::createImageProcessor(imgproc_id));
 			std::ranges::for_each(it.value().at("params").get<std::map<std::string, double>>(),
-								  [&node = res.second.get()](auto const& param) {
-									  auto val = std::clamp(param.second, 0.0, 1.0);
-									  node.set(param.first.c_str(), FilterGraph::ParamValue{val});
-								  });
+			                      [&node = res.second.get()](auto const& param) {
+				                      auto val = std::clamp(param.second, 0.0, 1.0);
+				                      node.set(param.first.c_str(), FilterGraph::ParamValue{val});
+			                      });
 
 			node_id_map[res.first] = node_id;
 		}
 	}
 
-	std::ranges::for_each(doc_info.at("images").get<std::map<FilterGraph::NodeId, ItemName>>(),
-							[&archive, document = doc.get(), &node_id_map](auto const& item) {
-							Wad64::InputFile src{archive, std::string{"data/"} + item.second.c_str()};
-							printf("%ld\n", src.size());
-							});
+	std::ranges::for_each(
+	    doc_info.at("images").get<std::map<FilterGraph::NodeId, ItemName>>(),
+	    [&archive, document = doc.get(), &node_id_map](auto const& item) {
+		    Wad64::InputFile src{archive, std::string{"data/"} + item.second.c_str()};
+		    printf("%ld\n", src.size());
+	    });
 
 	return doc;
 }

@@ -8,9 +8,11 @@
 #include <OpenEXR/ImfArray.h>
 #include <OpenEXR/ImfTestFile.h>
 
-Texpainter::PixelStore::Image Texpainter::PixelStore::load(Enum::Empty<Image>, const char* filename)
+Texpainter::PixelStore::Image Texpainter::PixelStore::load(Enum::Empty<Image>,
+                                                           void* arg,
+                                                           detail::InputFileFactory make_input_file)
 {
-	Imf::InputFile src{filename};
+	auto src = make_input_file(arg);
 
 	auto box = src.header().dataWindow();
 
@@ -53,7 +55,6 @@ Texpainter::PixelStore::Image Texpainter::PixelStore::load(Enum::Empty<Image>, c
 			return val;
 		});
 	}
-
 
 	return ret;
 }

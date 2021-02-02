@@ -12,17 +12,27 @@
 #include "libenum/empty.hpp"
 
 #include <OpenEXR/ImfOutputFile.h>
+#include <OpenEXR/ImfInputFile.h>
 
 namespace Texpainter::PixelStore
 {
-	Image load(Enum::Empty<Image>, char const* filename);
-
-	bool fileValid(Enum::Empty<Image>, char const* filename);
-
 	namespace detail
 	{
 		using OutputFileFactory = Imf::OutputFile (*)(void*, Imf::Header const&);
+		using InputFileFactory  = Imf::InputFile (*)(void*);
 	}
+
+	Image load(Enum::Empty<Image>, void* arg, detail::InputFileFactory make_input_file);
+
+	inline Image load(Enum::Empty<Image>, char const* filename)
+	{
+		return load(Enum::Empty<Image>{}, const_cast<char*>(filename), [](void* filename) {
+			return Imf::InputFile{static_cast<char const*>(filename)};
+		});
+	}
+
+	bool fileValid(Enum::Empty<Image>, char const* filename);
+
 
 	void store(Span2d<Pixel const> pixels, void* arg, detail::OutputFileFactory make_output_file);
 

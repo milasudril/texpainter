@@ -20,6 +20,18 @@ namespace Texpainter::PixelStore
 		}
 
 		template<class T>
+		bool read(T& handle, char* buffer, int n)
+		{
+			auto n_read =
+			    read(handle, std::as_writable_bytes(std::span{buffer, static_cast<size_t>(n)}));
+			if(n_read == 0) { return false; }
+
+			if(n_read != static_cast<size_t>(n)) { throw "Unexpected end of file"; }
+
+			return true;
+		}
+
+		template<class T>
 		Imath::Int64 tellp(T& handle)
 		{
 			return tell(handle);
@@ -50,6 +62,28 @@ namespace Texpainter::PixelStore
 
 	private:
 		FileWriter m_writer;
+	};
+
+	template<class FileReader>
+	class IlmInputAdapter: public Imf::IStream
+	{
+	public:
+		explicit IlmInputAdapter(FileReader&& reader)
+		    : Imf::IStream{"Dummy"}
+		    , m_reader{std::move(reader)}
+		{
+		}
+
+		bool read(char* buffer, int n) override { return detail::read(m_reader, buffer, n); }
+
+		Imath::Int64 tellg() override { return detail::tellp(m_reader); }
+
+		void seekg(Imath::Int64 pos) override { detail::seekp(m_reader, pos); }
+
+		void clear() override {}
+
+	private:
+		FileReader m_reader;
 	};
 }
 
