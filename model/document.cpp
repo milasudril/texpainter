@@ -244,8 +244,9 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 	std::ranges::for_each(
 	    doc_info.at("images").get<std::map<FilterGraph::NodeId, ItemName>>(),
 	    [&archive, document = doc.get(), &node_id_map](auto const& item) {
-		    Wad64::InputFile src{archive, std::string{"data/"} + item.second.c_str()};
-		    printf("%ld\n", src.size());
+		    auto image =
+		        load(Enum::Empty<PixelStore::Image>{},
+		             Wad64::InputFile{archive, std::string{"data/"} + item.second.c_str()});
 	    });
 
 	return doc;
