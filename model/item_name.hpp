@@ -80,7 +80,8 @@ namespace Texpainter::Model
 
 	inline void from_json(nlohmann::json const& obj, ItemName& name)
 	{
-		name = ItemName{obj.get<std::string>().c_str()};
+		auto str = obj.get<std::string>();
+		name = (std::size(str) != 0)?ItemName{str.c_str()}:ItemName{};
 	}
 }
 
