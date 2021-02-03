@@ -79,6 +79,8 @@ namespace Texpainter::Model
 
 		auto node(FilterGraph::NodeId id) const { return m_graph.node(id); }
 
+		auto node(FilterGraph::NodeId id) { return m_graph.node(id); }
+
 		Compositor& erase(FilterGraph::NodeId id)
 		{
 			m_graph.erase(id);

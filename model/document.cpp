@@ -210,7 +210,7 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 	auto doc_info = load_document_info(archive);
 	auto doc      = std::make_unique<Document>(doc_info.at("canvas_size").get<Size2d>());
 
-	std::map<FilterGraph::NodeId, FilterGraph::NodeId> node_id_map;
+	std::map<FilterGraph::NodeId, FilterGraph::NodeId> node_id_map{{FilterGraph::NodeId{0}, FilterGraph::NodeId{0}}};
 	std::ranges::for_each(doc_info.at("images").get<std::map<FilterGraph::NodeId, ItemName>>(),
 	                      [&archive, document = doc.get(), &node_id_map](auto const& item) {
 		                      auto data =
@@ -260,10 +260,29 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 			node_id_map[node_id] = res.first;
 		}
 
-		std::ranges::for_each(compositor.at("connections").get<std::map<FilterGraph::NodeId, std::vector<FilterGraph::NodeId>>>(), [](auto const& item) {
-			printf("%s\n", toString(item.first).c_str());
-			std::ranges::for_each(item.second, [](auto id) {
-				printf("    %s\n", toString(id).c_str());
+		std::ranges::for_each(compositor.at("connections").get<std::map<FilterGraph::NodeId, std::vector<FilterGraph::NodeId>>>(), [&node_id_map, comp = doc->compositor()](auto const& item) mutable {
+			auto new_id = node_id_map.find(item.first);
+			if(new_id == std::end(node_id_map))
+			{ throw std::string{"Connection entry points to a non-exesting node "} + toString(item.first); }
+
+			if(std::size(item.second) >= 4)  // Is it still defined if image processor has fewer inputs
+			{ throw std::string{"Too many connections to "} + toString(item.first);}
+
+			std::ranges::for_each(item.second, [comp, sink = new_id->second, &node_id_map, k = 0u](auto id_source) mutable {
+				printf("    %s\n", toString(id_source).c_str());
+
+				if(id_source == FilterGraph::InvalidNodeId)
+				{ return; }
+
+				auto new_id_source = node_id_map.find(id_source);
+				if(new_id_source == std::end(node_id_map))
+				{ throw std::string{"Connection entry points to a non-exesting node "} + toString(id_source); }
+
+				// FIXME: Use correct output port index
+				comp.connect(sink, FilterGraph::InputPortIndex{k},
+							 new_id_source->second, FilterGraph::OutputPortIndex{0});
+
+				++k;
 			});
 		});
 	}
