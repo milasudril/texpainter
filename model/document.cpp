@@ -217,7 +217,7 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 		                          load(Enum::Empty<PixelStore::Image>{},
 		                               Wad64::InputFile{archive, make_data_path(item.second)});
 		                      auto node_info = document->insert(item.second, std::move(data));
-		                      node_id_map[node_info->node_id] = item.first;
+		                      node_id_map[item.first] = node_info->node_id;
 	                      });
 
 	std::ranges::for_each(doc_info.at("palettes").get<std::map<FilterGraph::NodeId, ItemName>>(),
@@ -226,7 +226,7 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 		                          load(Enum::Empty<Palette>{},
 		                               Wad64::InputFile{archive, make_data_path(item.second)});
 		                      auto node_info = document->insert(item.second, std::move(data));
-		                      node_id_map[node_info->node_id] = item.first;
+		                      node_id_map[item.first] = node_info->node_id;
 	                      });
 
 	{
@@ -257,7 +257,7 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 				                      node.set(param.first.c_str(), FilterGraph::ParamValue{val});
 			                      });
 
-			node_id_map[res.first] = node_id;
+			node_id_map[node_id] = res.first;
 		}
 
 		std::ranges::for_each(compositor.at("connections").get<std::map<FilterGraph::NodeId, std::vector<FilterGraph::NodeId>>>(), [](auto const& item) {
