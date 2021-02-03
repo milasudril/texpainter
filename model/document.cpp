@@ -210,9 +210,6 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 	auto doc_info = load_document_info(archive);
 	auto doc      = std::make_unique<Document>(doc_info.at("canvas_size").get<Size2d>());
 
-	if(auto i = doc_info.find("workspace"); i != std::end(doc_info))
-	{ doc->workspace(i->get<Workspace>()); }
-
 	std::map<FilterGraph::NodeId, FilterGraph::NodeId> node_id_map;
 	std::ranges::for_each(doc_info.at("images").get<std::map<FilterGraph::NodeId, ItemName>>(),
 	                      [&archive, document = doc.get(), &node_id_map](auto const& item) {
@@ -264,6 +261,8 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 		}
 	}
 
+	if(auto i = doc_info.find("workspace"); i != std::end(doc_info))
+	{ doc->workspace(i->get<Workspace>()); }
 
 	return doc;
 }
