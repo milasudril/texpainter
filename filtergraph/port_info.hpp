@@ -7,6 +7,9 @@
 
 #include "./port_type.hpp"
 
+#define JSON_USE_IMPLICIT_CONVERSIONS 0
+#include <nlohmann/json.hpp>
+
 #include <cstdint>
 #include <cstring>
 
@@ -29,6 +32,12 @@ namespace Texpainter::FilterGraph
 	private:
 		uint32_t m_value;
 	};
+
+	template<PortDirection dir>
+	inline void to_json(nlohmann::json& obj, PortIndex<dir> index)
+	{
+		obj = index.value();
+	}
 
 	template<PortDirection dir>
 	constexpr bool operator==(PortIndex<dir> a, PortIndex<dir> b)

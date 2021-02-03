@@ -187,15 +187,19 @@ namespace nlohmann
 			});
 
 			obj["connections"] = {};
-			std::ranges::for_each(nodes, [&conn = obj["connections"]](auto const& item) {
-				auto inputs = item.second.inputs();
-				std::vector<Texpainter::FilterGraph::NodeId> ids;
-				ids.reserve(4);
-				std::ranges::transform(inputs, std::back_inserter(ids), [](auto const& src) {
-					if(src.valid()) { return src.processor().nodeId(); }
-					return Texpainter::FilterGraph::InvalidNodeId;
+			std::ranges::for_each(nodes, [&connections = obj["connections"]](auto const& item) {
+				std::ranges::for_each(item.second.inputs(), [&conn = connections[toString(item.first)]](auto const& src) {
+					if(src.valid())
+					{
+						conn["node"] = src.processor().nodeId();
+						conn["port"] = src.port();
+					}
+					else
+					{
+						conn["node"] = Texpainter::FilterGraph::InvalidNodeId;
+						conn["port"] = Texpainter::FilterGraph::OutputPortIndex{static_cast<uint32_t>(-1)};
+					}
 				});
-				conn[toString(item.first)] = ids;
 			});
 		}
 	};
