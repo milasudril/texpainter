@@ -48,6 +48,11 @@ namespace Texpainter::FilterGraph
 
 	inline void to_json(nlohmann::json& obj, NodeId id) { obj = id.value(); }
 
+	inline void from_json(nlohmann::json const& obj, NodeId& id)
+	{
+		id = NodeId{obj.get<uint64_t>()};
+	}
+
 	inline auto toString(NodeId id) { return Texpainter::toString(id.value()); }
 
 	constexpr auto InvalidNodeId = NodeId{std::numeric_limits<uint64_t>::max()};

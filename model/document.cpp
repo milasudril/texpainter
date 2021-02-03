@@ -259,6 +259,13 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 
 			node_id_map[res.first] = node_id;
 		}
+
+		std::ranges::for_each(compositor.at("connections").get<std::map<FilterGraph::NodeId, std::vector<FilterGraph::NodeId>>>(), [](auto const& item) {
+			printf("%s\n", toString(item.first).c_str());
+			std::ranges::for_each(item.second, [](auto id) {
+				printf("    %s\n", toString(id).c_str());
+			});
+		});
 	}
 
 	if(auto i = doc_info.find("workspace"); i != std::end(doc_info))
