@@ -275,10 +275,12 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 
 	NodeIdMap id_map{{FilterGraph::NodeId{0}, FilterGraph::NodeId{0}}};
 
-	std::ranges::for_each(doc_info.at("images").get<std::map<FilterGraph::NodeId, ItemName>>(),
+	using NodeIdItemNameMap = std::map<FilterGraph::NodeId, ItemName>;
+
+	std::ranges::for_each(doc_info.at("images").get<NodeIdItemNameMap>(),
 						  LoadItem<PixelStore::Image>{archive, *doc, id_map});
 
-	std::ranges::for_each(doc_info.at("palettes").get<std::map<FilterGraph::NodeId, ItemName>>(),
+	std::ranges::for_each(doc_info.at("palettes").get<NodeIdItemNameMap>(),
 						  LoadItem<Palette>{archive, *doc, id_map});
 
 	auto compositor_data = doc_info.at("compositor").get<std::map<FilterGraph::NodeId, FilterGraph::NodeData>>();
