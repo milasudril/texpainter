@@ -157,15 +157,6 @@ namespace
 	constexpr auto store_creation_mode =
 	    Wad64::FileCreationMode::AllowOverwriteWithTruncation().allowCreation();
 
-	nlohmann::json load_document_info(Wad64::ReadonlyArchive const& archive)
-	{
-		Wad64::InputFile src{archive, "document.json"};
-		auto buffer = std::make_unique<char[]>(static_cast<size_t>(src.size()));
-		auto range  = std::span{buffer.get(), buffer.get() + src.size()};
-		(void)read(src, std::as_writable_bytes(range));
-		return nlohmann::json::parse(std::begin(range), std::end(range));
-	}
-
 	std::string make_data_path(Texpainter::Model::ItemName const& name)
 	{
 		return std::string{"data/"} + name.c_str();
@@ -175,6 +166,45 @@ namespace
 	{
 		return nodeData(compositor);
 	}
+
+	using NodeIdMap = std::map<Texpainter::FilterGraph::NodeId, Texpainter::FilterGraph::NodeId>;
+
+	template<class T>
+	class LoadItem
+	{
+	public:
+		explicit LoadItem(std::reference_wrapper<Wad64::ReadonlyArchive> archive,
+			std::reference_wrapper<Texpainter::Model::Document> doc,
+			std::reference_wrapper<NodeIdMap> id_map):
+			m_archive{archive},
+			m_doc{doc},
+			m_id_map{id_map}
+		{}
+
+		void operator()(auto const& item) const
+		{
+			auto data = load(Enum::Empty<T>{},
+		                               Wad64::InputFile{m_archive.get(), make_data_path(item.second)});
+			auto node_info = m_doc.get().insert(item.second, std::move(data));
+		    m_id_map.get()[item.first] = node_info->node_id;
+		}
+
+	private:
+		std::reference_wrapper<Wad64::ReadonlyArchive> m_archive;
+		std::reference_wrapper<Texpainter::Model::Document> m_doc;
+		std::reference_wrapper<NodeIdMap> m_id_map;
+	};
+
+	nlohmann::json load_document_info(Wad64::ReadonlyArchive const& archive)
+	{
+		Wad64::InputFile src{archive, "document.json"};
+		auto buffer = std::make_unique<char[]>(static_cast<size_t>(src.size()));
+		auto range  = std::span{buffer.get(), buffer.get() + src.size()};
+		(void)read(src, std::as_writable_bytes(range));
+		return nlohmann::json::parse(std::begin(range), std::end(range));
+	}
+
+
 
 	template<class NodeMap, class Compositor>
 	void load_nodes(NodeMap const& nodes,
@@ -243,90 +273,20 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 	auto doc_info = load_document_info(archive);
 	auto doc      = std::make_unique<Document>(doc_info.at("canvas_size").get<Size2d>());
 
-	std::map<FilterGraph::NodeId, FilterGraph::NodeId> node_id_map{{FilterGraph::NodeId{0}, FilterGraph::NodeId{0}}};
+	NodeIdMap id_map{{FilterGraph::NodeId{0}, FilterGraph::NodeId{0}}};
 
 	std::ranges::for_each(doc_info.at("images").get<std::map<FilterGraph::NodeId, ItemName>>(),
-	                      [&archive, document = doc.get(), &node_id_map](auto const& item) {
-		                      auto data =
-		                          load(Enum::Empty<PixelStore::Image>{},
-		                               Wad64::InputFile{archive, make_data_path(item.second)});
-		                      auto node_info = document->insert(item.second, std::move(data));
-		                      node_id_map[item.first] = node_info->node_id;
-	                      });
+						  LoadItem<PixelStore::Image>{archive, *doc, id_map});
 
 	std::ranges::for_each(doc_info.at("palettes").get<std::map<FilterGraph::NodeId, ItemName>>(),
-	                      [&archive, document = doc.get(), &node_id_map](auto const& item) {
-		                      auto data =
-		                          load(Enum::Empty<Palette>{},
-		                               Wad64::InputFile{archive, make_data_path(item.second)});
-		                      auto node_info = document->insert(item.second, std::move(data));
-		                      node_id_map[item.first] = node_info->node_id;
-	                      });
+						  LoadItem<Palette>{archive, *doc, id_map});
 
 	auto compositor_data = doc_info.at("compositor").get<std::map<FilterGraph::NodeId, FilterGraph::NodeData>>();
 
-	load_nodes(compositor_data, doc->compositor(), node_id_map);
+	load_nodes(compositor_data, doc->compositor(), id_map);
 
-	connect_nodes(compositor_data, doc->compositor(), node_id_map);
-#if 0
-	{
-		auto compositor = doc_info.at("compositor");
-		auto nodes      = compositor.at("nodes");
-		for(auto it = std::begin(nodes); it != std::end(nodes); ++it)
-		{
-			auto node_id    = FilterGraph::NodeId{std::stoull(it.key())};
-			auto imgproc_id = it.value().at("processor_id").get<FilterGraph::ImageProcessorId>();
-			if(node_id == FilterGraph::NodeId{0})  // Skip node id 0
-			{
-				// But make sure it has the expected ImageProcessorId
-				if(imgproc_id != FilterGraph::ImageSink::id())
-				{
-					throw std::string{"Bad output image processor. Expected "
-					                  + toString(FilterGraph::ImageSink::id())};
-				}
-				continue;
-			}
+	connect_nodes(compositor_data, doc->compositor(), id_map);
 
-			if(imgproc_id == FilterGraph::InvalidImgProcId) { continue; }
-
-			auto res =
-			    doc->compositor().insert(ImageProcessorRegistry::createImageProcessor(imgproc_id));
-			std::ranges::for_each(it.value().at("params").get<std::map<std::string, double>>(),
-			                      [&node = res.second.get()](auto const& param) {
-				                      auto val = std::clamp(param.second, 0.0, 1.0);
-				                      node.set(param.first.c_str(), FilterGraph::ParamValue{val});
-			                      });
-
-			node_id_map[node_id] = res.first;
-		}
-
-		std::ranges::for_each(compositor.at("connections").get<std::map<FilterGraph::NodeId, std::vector<FilterGraph::NodeId>>>(), [&node_id_map, comp = doc->compositor()](auto const& item) mutable {
-			auto new_id = node_id_map.find(item.first);
-			if(new_id == std::end(node_id_map))
-			{ throw std::string{"Connection entry points to a non-exesting node "} + toString(item.first); }
-
-			if(std::size(item.second) >= 4)  // Is it still defined if image processor has fewer inputs
-			{ throw std::string{"Too many connections to "} + toString(item.first);}
-
-			std::ranges::for_each(item.second, [comp, sink = new_id->second, &node_id_map, k = 0u](auto id_source) mutable {
-				printf("    %s\n", toString(id_source).c_str());
-
-				if(id_source == FilterGraph::InvalidNodeId)
-				{ return; }
-
-				auto new_id_source = node_id_map.find(id_source);
-				if(new_id_source == std::end(node_id_map))
-				{ throw std::string{"Connection entry points to a non-exesting node "} + toString(id_source); }
-
-				// FIXME: Use correct output port index
-				comp.connect(sink, FilterGraph::InputPortIndex{k},
-							 new_id_source->second, FilterGraph::OutputPortIndex{0});
-
-				++k;
-			});
-		});
-	}
-#endif
 	if(auto i = doc_info.find("workspace"); i != std::end(doc_info))
 	{ doc->workspace(i->get<Workspace>()); }
 
