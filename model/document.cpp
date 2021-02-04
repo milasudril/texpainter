@@ -207,9 +207,7 @@ namespace
 
 
 	template<class NodeMap, class Compositor>
-	void load_nodes(NodeMap const& nodes,
- 					 Compositor compositor,
-					 std::map<Texpainter::FilterGraph::NodeId, Texpainter::FilterGraph::NodeId>& id_map)
+	void load_nodes(NodeMap const& nodes, Compositor compositor, NodeIdMap& id_map)
 	{
 		std::ranges::for_each(nodes, [compositor, &id_map](auto const& item) mutable {
 			if(item.first == Texpainter::FilterGraph::NodeId{0})
@@ -236,9 +234,7 @@ namespace
 	}
 
 	template<class NodeMap, class Compositor>
-	void connect_nodes(NodeMap const& nodes,
- 					 Compositor compositor,
-					 std::map<Texpainter::FilterGraph::NodeId, Texpainter::FilterGraph::NodeId> const& id_map)
+	void connect_nodes(NodeMap const& nodes, Compositor compositor, NodeIdMap const& id_map)
 	{
 		std::ranges::for_each(nodes, [compositor, &id_map](auto const& item) mutable {
 			auto const id_mapping = id_map.find(item.first);
