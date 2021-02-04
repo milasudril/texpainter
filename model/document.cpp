@@ -171,46 +171,11 @@ namespace
 		return std::string{"data/"} + name.c_str();
 	}
 
-	nlohmann::json toJson(Texpainter::Model::Compositor const&)
+	nlohmann::json serialize(Texpainter::Model::Compositor const& compositor)
 	{
-		return nlohmann::json{};
+		return nlohmann::json{nodeData(compositor)};
 	}
 }
-
-#if 0
-namespace nlohmann
-{
-	template<>
-	class adl_serializer<Texpainter::Model::Compositor>
-	{
-	public:
-		static void to_json(nlohmann::json& obj, Texpainter::Model::Compositor const& src)
-		{
-			obj["nodes"] = {};
-			auto nodes   = src.nodesWithId();
-			std::ranges::for_each(nodes, [&nodes = obj["nodes"]](auto const& item) {
-				nodes[toString(item.first)] = item.second;
-			});
-
-			obj["connections"] = {};
-			std::ranges::for_each(nodes, [&connections = obj["connections"]](auto const& item) {
-				std::ranges::for_each(item.second.inputs(), [&conn = connections[toString(item.first)]](auto const& src) {
-					if(src.valid())
-					{
-						conn["node"] = src.processor().nodeId();
-						conn["port"] = src.port();
-					}
-					else
-					{
-						conn["node"] = Texpainter::FilterGraph::InvalidNodeId;
-						conn["port"] = Texpainter::FilterGraph::OutputPortIndex{static_cast<uint32_t>(-1)};
-					}
-				});
-			});
-		}
-	};
-}
-#endif
 
 std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty<Document>,
                                                                      char const*)
@@ -313,7 +278,7 @@ void Texpainter::Model::store(Document const& doc, char const*)
 	{
 		nlohmann::json obj{std::pair{"workspace", doc.workspace()},
 		                   std::pair{"canvas_size", doc.canvasSize()}};
-		obj["compositor"] = toJson(doc.compositor());
+		obj["compositor"] = serialize(doc.compositor());
 		obj["images"]     = mapNodeIdsToItemName(doc.images());
 		obj["palettes"]   = mapNodeIdsToItemName(doc.palettes());
 		auto const str    = obj.dump(1, '\t');

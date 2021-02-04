@@ -113,6 +113,8 @@ namespace Texpainter::Model
 
 		auto nodeCount() const { return m_graph.size(); }
 
+		auto nodeData() const { return FilterGraph::nodeData(m_graph); }
+
 	private:
 		struct NodeState
 		{
@@ -142,6 +144,11 @@ namespace Texpainter::Model
 	Texpainter::FilterGraph::ValidationResult validate(Compositor const& g);
 
 	std::map<FilterGraph::Node const*, FilterGraph::NodeId> mapNodesToNodeIds(Compositor const& g);
+
+	inline auto nodeData(Compositor const& g)
+	{
+		return g.nodeData();
+	}
 }
 
 #endif
