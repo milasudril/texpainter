@@ -204,6 +204,34 @@ namespace
 			id_map[item.first] = res.first;
 		});
 	}
+
+	template<class NodeMap, class Compositor>
+	void connect_nodes(NodeMap const& nodes,
+ 					 Compositor compositor,
+					 std::map<Texpainter::FilterGraph::NodeId, Texpainter::FilterGraph::NodeId> const& id_map)
+	{
+		std::ranges::for_each(nodes, [compositor, &id_map](auto const& item) mutable {
+			auto const id_mapping = id_map.find(item.first);
+			if(id_mapping == std::end(id_map))
+			{ throw std::string{"Connection entry points to a non-exesting node "} + toString(item.first); }
+
+			std::ranges::for_each(item.second.inputs, [compositor,
+								  sink = id_mapping->second, &id_map, k = 0u](auto const& src) mutable {
+				printf("    %s\n", toString(src.node).c_str());
+
+				if(src.node == Texpainter::FilterGraph::InvalidNodeId)
+				{ return; }
+
+				auto const id_mapping = id_map.find(src.node);
+				if(id_mapping == std::end(id_map))
+				{ throw std::string{"Connection entry points to a non-exesting node "} + toString(src.node); }
+
+				auto const source = id_mapping->second;
+				compositor.connect(sink, Texpainter::FilterGraph::InputPortIndex{k}, source, src.output_port);
+				++k;
+			});
+		});
+	}
 }
 
 std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty<Document>,
@@ -238,6 +266,8 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 	auto compositor_data = doc_info.at("compositor").get<std::map<FilterGraph::NodeId, FilterGraph::NodeData>>();
 
 	load_nodes(compositor_data, doc->compositor(), node_id_map);
+
+	connect_nodes(compositor_data, doc->compositor(), node_id_map);
 #if 0
 	{
 		auto compositor = doc_info.at("compositor");
