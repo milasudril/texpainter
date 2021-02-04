@@ -170,8 +170,14 @@ namespace
 	{
 		return std::string{"data/"} + name.c_str();
 	}
+
+	nlohmann::json toJson(Texpainter::Model::Compositor const&)
+	{
+		return nlohmann::json{};
+	}
 }
 
+#if 0
 namespace nlohmann
 {
 	template<>
@@ -204,6 +210,7 @@ namespace nlohmann
 		}
 	};
 }
+#endif
 
 std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty<Document>,
                                                                      char const*)
@@ -306,7 +313,7 @@ void Texpainter::Model::store(Document const& doc, char const*)
 	{
 		nlohmann::json obj{std::pair{"workspace", doc.workspace()},
 		                   std::pair{"canvas_size", doc.canvasSize()}};
-		obj["compositor"] = doc.compositor();
+		obj["compositor"] = toJson(doc.compositor());
 		obj["images"]     = mapNodeIdsToItemName(doc.images());
 		obj["palettes"]   = mapNodeIdsToItemName(doc.palettes());
 		auto const str    = obj.dump(1, '\t');

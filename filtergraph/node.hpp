@@ -257,16 +257,45 @@ namespace Texpainter::FilterGraph
 		return ret;
 	}
 
-	inline void to_json(nlohmann::json& obj, Node const& node)
+	struct NodeSourceData
 	{
-		if(node.hasProcessor())
-		{
-			obj = {std::pair{"processor_id", node.processorId()},
-			       std::pair{"params", params(node)}};
-		}
+		NodeId node{InvalidNodeId};
+		OutputPortIndex output_port{OutputPortNotConnected};
+	};
+
+	inline void to_json(nlohmann::json& obj, NodeSourceData const& node_input)
+	{
+		obj["node"] = node_input.node;
+		obj["output_port"] = node_input.output_port;
 	}
 
-	void from_json(nlohmann::json const& obj, Node& node) = delete;
+	struct NodeData
+	{
+		ImageProcessorId imgproc;
+		std::array<NodeSourceData, NodeArgument::MaxNumInputs> inputs;
+		std::map<std::string, double> params;
+	};
+
+	inline NodeData nodeData(Node const& node)
+	{
+		NodeData ret{node.processorId(), {}, params(node)};
+		std::ranges::transform(node.inputs(), std::begin(ret.inputs), [](auto const& item){
+			if(item.valid())
+			{
+				return NodeSourceData{item.processor().nodeId(), item.port()};
+			}
+			return NodeSourceData{};
+		});
+
+		return ret;
+	}
+
+	inline void to_json(nlohmann::json& obj, NodeData const& node)
+	{
+		obj["imgproc"] = node.imgproc;
+		obj["inputs"] = node.inputs;
+		obj["params"] = node.params;
+	}
 }
 
 #endif

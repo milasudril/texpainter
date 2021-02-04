@@ -12,6 +12,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <limits>
 
 namespace Texpainter::FilterGraph
 {
@@ -34,6 +35,9 @@ namespace Texpainter::FilterGraph
 	};
 
 	template<PortDirection dir>
+	constexpr PortIndex<dir> InvalidPortIndex{std::numeric_limits<uint32_t>::max()};
+
+	template<PortDirection dir>
 	inline void to_json(nlohmann::json& obj, PortIndex<dir> index)
 	{
 		obj = index.value();
@@ -53,6 +57,8 @@ namespace Texpainter::FilterGraph
 
 	using InputPortIndex  = PortIndex<PortDirection::Input>;
 	using OutputPortIndex = PortIndex<PortDirection::Output>;
+	constexpr auto InputPortNotConnected = InvalidPortIndex<PortDirection::Input>;
+	constexpr auto OutputPortNotConnected = InvalidPortIndex<PortDirection::Output>;
 
 	struct PortInfo
 	{
