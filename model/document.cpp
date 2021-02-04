@@ -173,8 +173,45 @@ namespace
 
 	nlohmann::json serialize(Texpainter::Model::Compositor const& compositor)
 	{
-		return nlohmann::json{nodeData(compositor)};
+		return nodeData(compositor);
 	}
+
+#if 0
+	void load_nodes(json const& obj,
+					 Texpainter::Model::CompositorProxy compositor,
+					 std::map<Texpainter::FilterGraph::NodeId, Texpainter::FilterGraph::NodeId>& id_map)
+	{
+		for(auto it = std::begin(obj); it != std::end(obj); ++i)
+		{
+			auto const node_id = FilterGraph::NodeId{std::stoull(it.key)};
+			auto const node_data = it.value().get<FilterGraph::NodeData>();
+
+			if(node_id == FilterGraph::NodeId{0})  // Skip node id 0
+			{
+				// But make sure it has the expected ImageProcessorId
+				if(node_data.imgproc != FilterGraph::ImageSink::id())
+				{
+					throw std::string{"Bad output image processor. Expected "
+					                  + toString(FilterGraph::ImageSink::id())};
+				}
+				continue;
+			}
+
+			if(node_data.imgproc == FilterGraph::InvalidImgProcId) { continue; }
+
+			auto res =
+			    doc->compositor().insert(ImageProcessorRegistry::createImageProcessor(node_data.imgproc));
+			std::ranges::for_each(node_data.params,
+			                      [&node = res.second.get()](auto const& param) {
+				                      auto val = std::clamp(param.second, 0.0, 1.0);
+				                      node.set(param.first.c_str(), FilterGraph::ParamValue{val});
+			                      });
+			node_id_map[node_id] = res.first;
+		}
+
+		return ret;
+	}
+#endif
 }
 
 std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty<Document>,
@@ -185,6 +222,8 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 
 	auto doc_info = load_document_info(archive);
 	auto doc      = std::make_unique<Document>(doc_info.at("canvas_size").get<Size2d>());
+	auto compositor_data = doc_info.at("compositor").get<std::map<FilterGraph::NodeId, FilterGraph::NodeData>>();
+
 
 	std::map<FilterGraph::NodeId, FilterGraph::NodeId> node_id_map{{FilterGraph::NodeId{0}, FilterGraph::NodeId{0}}};
 	std::ranges::for_each(doc_info.at("images").get<std::map<FilterGraph::NodeId, ItemName>>(),
@@ -204,7 +243,7 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 		                      auto node_info = document->insert(item.second, std::move(data));
 		                      node_id_map[item.first] = node_info->node_id;
 	                      });
-
+#if 0
 	{
 		auto compositor = doc_info.at("compositor");
 		auto nodes      = compositor.at("nodes");
@@ -262,7 +301,7 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 			});
 		});
 	}
-
+#endif
 	if(auto i = doc_info.find("workspace"); i != std::end(doc_info))
 	{ doc->workspace(i->get<Workspace>()); }
 

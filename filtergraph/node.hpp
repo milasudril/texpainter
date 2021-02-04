@@ -269,6 +269,12 @@ namespace Texpainter::FilterGraph
 		obj["output_port"] = node_input.output_port;
 	}
 
+	inline void from_json(nlohmann::json const& obj, NodeSourceData& node_input)
+	{
+		node_input.node = obj.at("node").get<NodeId>();
+		node_input.output_port = obj.at("output_port").get<OutputPortIndex>();
+	}
+
 	struct NodeData
 	{
 		ImageProcessorId imgproc;
@@ -295,6 +301,17 @@ namespace Texpainter::FilterGraph
 		obj["imgproc"] = node.imgproc;
 		obj["inputs"] = node.inputs;
 		obj["params"] = node.params;
+	}
+
+	inline void from_json(nlohmann::json const& obj, NodeData& node)
+	{
+		node.imgproc = obj.at("imgproc").get<ImageProcessorId>();
+		auto inputs = obj.at("inputs").get<std::vector<NodeSourceData>>();
+		if(std::size(inputs) > NodeArgument::MaxNumInputs)
+		{ throw std::string{"Too many inputs for node"}; }
+
+		std::ranges::copy(inputs, std::begin(node.inputs));
+		node.params = obj.at("params").get<std::map<std::string, double>>();
 	}
 }
 

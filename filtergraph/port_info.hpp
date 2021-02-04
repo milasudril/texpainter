@@ -26,7 +26,7 @@ namespace Texpainter::FilterGraph
 	class PortIndex
 	{
 	public:
-		explicit constexpr PortIndex(uint32_t val): m_value{val} {}
+		explicit constexpr PortIndex(uint32_t val = std::numeric_limits<uint32_t>::max()): m_value{val} {}
 
 		constexpr uint32_t value() const { return m_value; }
 
@@ -35,12 +35,18 @@ namespace Texpainter::FilterGraph
 	};
 
 	template<PortDirection dir>
-	constexpr PortIndex<dir> InvalidPortIndex{std::numeric_limits<uint32_t>::max()};
+	constexpr PortIndex<dir> InvalidPortIndex{};
 
 	template<PortDirection dir>
 	inline void to_json(nlohmann::json& obj, PortIndex<dir> index)
 	{
 		obj = index.value();
+	}
+
+	template<PortDirection dir>
+	inline void from_json(nlohmann::json const& obj, PortIndex<dir>& index)
+	{
+		index = PortIndex<dir>{obj.get<uint32_t>()};
 	}
 
 	template<PortDirection dir>
