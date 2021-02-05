@@ -295,6 +295,23 @@ namespace
 		Compositor m_compositor;
 		std::reference_wrapper<NodeIdMap const> m_id_map;
 	};
+
+	class Remap
+	{
+	public:
+		explicit Remap(std::reference_wrapper<NodeIdMap const> id_map): m_id_map{id_map} {}
+
+		auto operator()(auto const& item) const
+		{
+			auto const mapping = m_id_map.get().find(item.first);
+			if(mapping == std::end(m_id_map.get()))
+			{ throw std::string{"Item points to a non-exesting node "} + toString(item.first); }
+			return std::pair{mapping->second, item.second};
+		}
+
+	private:
+		std::reference_wrapper<NodeIdMap const> m_id_map;
+	};
 }
 
 std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty<Document>,
@@ -326,18 +343,8 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 	{
 		auto workspace = doc_info.at("workspace").get<Workspace>();
 		std::map<FilterGraph::NodeId, vec2_t> new_loc;
-		std::ranges::transform(workspace.m_node_locations,
-		                       std::inserter(new_loc, std::end(new_loc)),
-		                       [&new_loc, &id_map](auto const& item) {
-			                       auto const mapping = id_map.find(item.first);
-			                       if(mapping == std::end(id_map))
-			                       {
-				                       throw std::string{
-				                           "Node location points to a non-exesting node "}
-				                           + toString(item.first);
-			                       }
-			                       return std::pair{mapping->second, item.second};
-		                       });
+		std::ranges::transform(
+		    workspace.m_node_locations, std::inserter(new_loc, std::end(new_loc)), Remap{id_map});
 		workspace.m_node_locations = std::move(new_loc);
 		doc->workspace(std::move(workspace));
 	}
