@@ -167,7 +167,9 @@ namespace
 		return nodeData(compositor);
 	}
 
-	using NodeIdMap = std::map<Texpainter::FilterGraph::NodeId, Texpainter::FilterGraph::NodeId>;
+	using NodeId = Texpainter::FilterGraph::NodeId;
+
+	using NodeIdMap = std::map<NodeId, NodeId>;
 
 	template<class T>
 	class LoadItem
@@ -217,7 +219,7 @@ namespace
 
 		void operator()(auto const& item)
 		{
-			if(item.first == Texpainter::FilterGraph::NodeId{0})
+			if(item.first == NodeId{0})
 			{
 				if(item.second.imgproc != Texpainter::FilterGraph::ImageSink::id())
 				{
@@ -249,10 +251,27 @@ namespace
 	class ConnectNode
 	{
 	public:
+		using InputPortIndex = Texpainter::FilterGraph::InputPortIndex;
+
 		explicit ConnectNode(Compositor compositor, std::reference_wrapper<NodeIdMap const> id_map)
 		    : m_compositor{compositor}
 		    , m_id_map{id_map}
 		{
+		}
+
+		void operator()(NodeId sink, InputPortIndex k, auto const& src)
+		{
+			if(src.node == Texpainter::FilterGraph::InvalidNodeId) { return; }
+
+			auto const id_mapping = m_id_map.get().find(src.node);
+			if(id_mapping == std::end(m_id_map.get()))
+			{
+				throw std::string{"Connection entry points to a non-exesting node "}
+				    + toString(src.node);
+			}
+
+			auto const source = id_mapping->second;
+			m_compositor.connect(sink, k, source, src.output_port);
 		}
 
 		void operator()(auto const& item)
@@ -267,18 +286,7 @@ namespace
 			std::ranges::for_each(
 			    item.second.inputs,
 			    [this, sink = id_mapping->second, k = 0u](auto const& src) mutable {
-				    if(src.node == Texpainter::FilterGraph::InvalidNodeId) { return; }
-
-				    auto const id_mapping = m_id_map.get().find(src.node);
-				    if(id_mapping == std::end(m_id_map.get()))
-				    {
-					    throw std::string{"Connection entry points to a non-exesting node "}
-					        + toString(src.node);
-				    }
-
-				    auto const source = id_mapping->second;
-				    m_compositor.connect(
-				        sink, Texpainter::FilterGraph::InputPortIndex{k}, source, src.output_port);
+				    (*this)(sink, InputPortIndex{k}, src);
 				    ++k;
 			    });
 		}
