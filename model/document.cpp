@@ -316,13 +316,31 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 	std::ranges::for_each(doc_info.at("palettes").get<NodeIdItemNameMap>(),
 	                      LoadItem<Palette>{archive, *doc, id_map});
 
-	auto compositor_data =
-	    doc_info.at("compositor").get<std::map<FilterGraph::NodeId, FilterGraph::NodeData>>();
-	std::ranges::for_each(compositor_data, LoadNode{doc->compositor(), id_map});
-	std::ranges::for_each(compositor_data, ConnectNode{doc->compositor(), id_map});
+	{
+		auto compositor_data =
+		    doc_info.at("compositor").get<std::map<FilterGraph::NodeId, FilterGraph::NodeData>>();
+		std::ranges::for_each(compositor_data, LoadNode{doc->compositor(), id_map});
+		std::ranges::for_each(compositor_data, ConnectNode{doc->compositor(), id_map});
+	}
 
-	if(auto i = doc_info.find("workspace"); i != std::end(doc_info))
-	{ doc->workspace(i->get<Workspace>()); }
+	{
+		auto workspace = doc_info.at("workspace").get<Workspace>();
+		std::map<FilterGraph::NodeId, vec2_t> new_loc;
+		std::ranges::transform(workspace.m_node_locations,
+		                       std::inserter(new_loc, std::end(new_loc)),
+		                       [&new_loc, &id_map](auto const& item) {
+			                       auto const mapping = id_map.find(item.first);
+			                       if(mapping == std::end(id_map))
+			                       {
+				                       throw std::string{
+				                           "Node location points to a non-exesting node "}
+				                           + toString(item.first);
+			                       }
+			                       return std::pair{mapping->second, item.second};
+		                       });
+		workspace.m_node_locations = std::move(new_loc);
+		doc->workspace(std::move(workspace));
+	}
 
 	return doc;
 }
