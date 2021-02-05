@@ -26,7 +26,10 @@ namespace Texpainter::FilterGraph
 	class PortIndex
 	{
 	public:
-		explicit constexpr PortIndex(uint32_t val = std::numeric_limits<uint32_t>::max()): m_value{val} {}
+		explicit constexpr PortIndex(uint32_t val = std::numeric_limits<uint32_t>::max())
+		    : m_value{val}
+		{
+		}
 
 		constexpr uint32_t value() const { return m_value; }
 
@@ -61,9 +64,9 @@ namespace Texpainter::FilterGraph
 		return !(a == b);
 	}
 
-	using InputPortIndex  = PortIndex<PortDirection::Input>;
-	using OutputPortIndex = PortIndex<PortDirection::Output>;
-	constexpr auto InputPortNotConnected = InvalidPortIndex<PortDirection::Input>;
+	using InputPortIndex                  = PortIndex<PortDirection::Input>;
+	using OutputPortIndex                 = PortIndex<PortDirection::Output>;
+	constexpr auto InputPortNotConnected  = InvalidPortIndex<PortDirection::Input>;
 	constexpr auto OutputPortNotConnected = InvalidPortIndex<PortDirection::Output>;
 
 	struct PortInfo

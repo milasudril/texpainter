@@ -143,9 +143,10 @@ namespace Texpainter::FilterGraph
 	inline std::map<NodeId, NodeData> nodeData(Graph const& g)
 	{
 		std::map<NodeId, NodeData> ret;
-		std::ranges::transform(g.nodesWithId(), std::inserter(ret, std::end(ret)), [](auto const& item) {
-			return std::pair{item.first, nodeData(item.second)};
-		});
+		std::ranges::transform(
+		    g.nodesWithId(), std::inserter(ret, std::end(ret)), [](auto const& item) {
+			    return std::pair{item.first, nodeData(item.second)};
+		    });
 		return ret;
 	}
 }

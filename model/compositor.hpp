@@ -145,10 +145,7 @@ namespace Texpainter::Model
 
 	std::map<FilterGraph::Node const*, FilterGraph::NodeId> mapNodesToNodeIds(Compositor const& g);
 
-	inline auto nodeData(Compositor const& g)
-	{
-		return g.nodeData();
-	}
+	inline auto nodeData(Compositor const& g) { return g.nodeData(); }
 }
 
 #endif

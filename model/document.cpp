@@ -174,19 +174,20 @@ namespace
 	{
 	public:
 		explicit LoadItem(std::reference_wrapper<Wad64::ReadonlyArchive> archive,
-			std::reference_wrapper<Texpainter::Model::Document> doc,
-			std::reference_wrapper<NodeIdMap> id_map):
-			m_archive{archive},
-			m_doc{doc},
-			m_id_map{id_map}
-		{}
+		                  std::reference_wrapper<Texpainter::Model::Document> doc,
+		                  std::reference_wrapper<NodeIdMap> id_map)
+		    : m_archive{archive}
+		    , m_doc{doc}
+		    , m_id_map{id_map}
+		{
+		}
 
 		void operator()(auto const& item) const
 		{
-			auto data = load(Enum::Empty<T>{},
-		                               Wad64::InputFile{m_archive.get(), make_data_path(item.second)});
-			auto node_info = m_doc.get().insert(item.second, std::move(data));
-		    m_id_map.get()[item.first] = node_info->node_id;
+			auto data                  = load(Enum::Empty<T>{},
+                             Wad64::InputFile{m_archive.get(), make_data_path(item.second)});
+			auto node_info             = m_doc.get().insert(item.second, std::move(data));
+			m_id_map.get()[item.first] = node_info->node_id;
 		}
 
 	private:
@@ -208,10 +209,11 @@ namespace
 	class LoadNode
 	{
 	public:
-		explicit LoadNode(Compositor compositor, std::reference_wrapper<NodeIdMap> id_map):
-			m_compositor{compositor},
-			m_id_map{id_map}
-		{}
+		explicit LoadNode(Compositor compositor, std::reference_wrapper<NodeIdMap> id_map)
+		    : m_compositor{compositor}
+		    , m_id_map{id_map}
+		{
+		}
 
 		void operator()(auto const& item)
 		{
@@ -225,14 +227,15 @@ namespace
 				return;
 			}
 
-			if(item.second.imgproc == Texpainter::FilterGraph::InvalidImgProcId)
-			{ return; }
+			if(item.second.imgproc == Texpainter::FilterGraph::InvalidImgProcId) { return; }
 
-			auto res = m_compositor.insert(Texpainter::ImageProcessorRegistry::createImageProcessor(item.second.imgproc));
-			std::ranges::for_each(item.second.params, [&node = res.second.get()](auto const& param) {
-				auto val = std::clamp(param.second, 0.0, 1.0);
-				node.set(param.first.c_str(), Texpainter::FilterGraph::ParamValue{val});
-			});
+			auto res = m_compositor.insert(
+			    Texpainter::ImageProcessorRegistry::createImageProcessor(item.second.imgproc));
+			std::ranges::for_each(
+			    item.second.params, [&node = res.second.get()](auto const& param) {
+				    auto val = std::clamp(param.second, 0.0, 1.0);
+				    node.set(param.first.c_str(), Texpainter::FilterGraph::ParamValue{val});
+			    });
 
 			m_id_map.get()[item.first] = res.first;
 		}
@@ -242,32 +245,51 @@ namespace
 		std::reference_wrapper<NodeIdMap> m_id_map;
 	};
 
-
-	template<class NodeMap, class Compositor>
-	void connect_nodes(NodeMap const& nodes, Compositor compositor, NodeIdMap const& id_map)
+	template<class Compositor>
+	class ConnectNode
 	{
-		std::ranges::for_each(nodes, [compositor, &id_map](auto const& item) mutable {
-			auto const id_mapping = id_map.find(item.first);
-			if(id_mapping == std::end(id_map))
-			{ throw std::string{"Connection entry points to a non-exesting node "} + toString(item.first); }
+	public:
+		explicit ConnectNode(Compositor compositor, std::reference_wrapper<NodeIdMap const> id_map)
+		    : m_compositor{compositor}
+		    , m_id_map{id_map}
+		{
+		}
 
-			std::ranges::for_each(item.second.inputs, [compositor,
-								  sink = id_mapping->second, &id_map, k = 0u](auto const& src) mutable {
-				printf("    %s\n", toString(src.node).c_str());
+		void operator()(auto const& item)
+		{
+			auto const id_mapping = m_id_map.get().find(item.first);
+			if(id_mapping == std::end(m_id_map.get()))
+			{
+				throw std::string{"Connection entry points to a non-exesting node "}
+				    + toString(item.first);
+			}
 
-				if(src.node == Texpainter::FilterGraph::InvalidNodeId)
-				{ return; }
+			std::ranges::for_each(
+			    item.second.inputs,
+			    [compositor = m_compositor,
+			     sink       = id_mapping->second,
+			     &id_map    = m_id_map.get(),
+			     k          = 0u](auto const& src) mutable {
+				    if(src.node == Texpainter::FilterGraph::InvalidNodeId) { return; }
 
-				auto const id_mapping = id_map.find(src.node);
-				if(id_mapping == std::end(id_map))
-				{ throw std::string{"Connection entry points to a non-exesting node "} + toString(src.node); }
+				    auto const id_mapping = id_map.find(src.node);
+				    if(id_mapping == std::end(id_map))
+				    {
+					    throw std::string{"Connection entry points to a non-exesting node "}
+					        + toString(src.node);
+				    }
 
-				auto const source = id_mapping->second;
-				compositor.connect(sink, Texpainter::FilterGraph::InputPortIndex{k}, source, src.output_port);
-				++k;
-			});
-		});
-	}
+				    auto const source = id_mapping->second;
+				    compositor.connect(
+				        sink, Texpainter::FilterGraph::InputPortIndex{k}, source, src.output_port);
+				    ++k;
+			    });
+		}
+
+	private:
+		Compositor m_compositor;
+		std::reference_wrapper<NodeIdMap const> m_id_map;
+	};
 }
 
 std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty<Document>,
@@ -284,16 +306,15 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 	using NodeIdItemNameMap = std::map<FilterGraph::NodeId, ItemName>;
 
 	std::ranges::for_each(doc_info.at("images").get<NodeIdItemNameMap>(),
-						  LoadItem<PixelStore::Image>{archive, *doc, id_map});
+	                      LoadItem<PixelStore::Image>{archive, *doc, id_map});
 
 	std::ranges::for_each(doc_info.at("palettes").get<NodeIdItemNameMap>(),
-						  LoadItem<Palette>{archive, *doc, id_map});
+	                      LoadItem<Palette>{archive, *doc, id_map});
 
-	auto compositor_data = doc_info.at("compositor").get<std::map<FilterGraph::NodeId, FilterGraph::NodeData>>();
-
+	auto compositor_data =
+	    doc_info.at("compositor").get<std::map<FilterGraph::NodeId, FilterGraph::NodeData>>();
 	std::ranges::for_each(compositor_data, LoadNode{doc->compositor(), id_map});
-
-	connect_nodes(compositor_data, doc->compositor(), id_map);
+	std::ranges::for_each(compositor_data, ConnectNode{doc->compositor(), id_map});
 
 	if(auto i = doc_info.find("workspace"); i != std::end(doc_info))
 	{ doc->workspace(i->get<Workspace>()); }
