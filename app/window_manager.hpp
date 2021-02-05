@@ -301,13 +301,17 @@ namespace Texpainter::App
 		template<class Source>
 		void onActivated(Enum::Tag<DocumentAction::Open>, Ui::MenuItem&, Source&)
 		{
-			if(auto compositor = m_windows.get<WindowType::Compositor>().get();
-			   compositor != nullptr)
-			{ m_document->nodeLocations(compositor->widget().nodeLocations()); }
+			auto doc = load(Enum::Empty<Model::Document>{}, "/dev/stdout");
 
-			m_document->windows(windowInfo());
+			Windows tmp;
+			Enum::forEachEnumItem<WindowType>(
+			    [&tmp, &doc, this](auto i) { tmp.get<i.value>() = createWindow<i.value>(*doc); });
 
-			(void)load(Enum::Empty<Model::Document>{}, "/dev/stdout");
+			m_document = std::move(doc);
+			m_windows  = std::move(tmp);
+
+			resetWindowPositions();
+			m_windows.get<WindowType::ImageEditor>()->window().show();
 		}
 
 		template<class Source>
