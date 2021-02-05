@@ -266,21 +266,18 @@ namespace
 
 			std::ranges::for_each(
 			    item.second.inputs,
-			    [compositor = m_compositor,
-			     sink       = id_mapping->second,
-			     &id_map    = m_id_map.get(),
-			     k          = 0u](auto const& src) mutable {
+			    [this, sink = id_mapping->second, k = 0u](auto const& src) mutable {
 				    if(src.node == Texpainter::FilterGraph::InvalidNodeId) { return; }
 
-				    auto const id_mapping = id_map.find(src.node);
-				    if(id_mapping == std::end(id_map))
+				    auto const id_mapping = m_id_map.get().find(src.node);
+				    if(id_mapping == std::end(m_id_map.get()))
 				    {
 					    throw std::string{"Connection entry points to a non-exesting node "}
 					        + toString(src.node);
 				    }
 
 				    auto const source = id_mapping->second;
-				    compositor.connect(
+				    m_compositor.connect(
 				        sink, Texpainter::FilterGraph::InputPortIndex{k}, source, src.output_port);
 				    ++k;
 			    });
