@@ -204,12 +204,17 @@ namespace
 		return nlohmann::json::parse(std::begin(range), std::end(range));
 	}
 
-
-
-	template<class NodeMap, class Compositor>
-	void load_nodes(NodeMap const& nodes, Compositor compositor, NodeIdMap& id_map)
+	template<class Compositor>
+	class LoadNode
 	{
-		std::ranges::for_each(nodes, [compositor, &id_map](auto const& item) mutable {
+	public:
+		explicit LoadNode(Compositor compositor, std::reference_wrapper<NodeIdMap> id_map):
+			m_compositor{compositor},
+			m_id_map{id_map}
+		{}
+
+		void operator()(auto const& item)
+		{
 			if(item.first == Texpainter::FilterGraph::NodeId{0})
 			{
 				if(item.second.imgproc != Texpainter::FilterGraph::ImageSink::id())
@@ -223,15 +228,20 @@ namespace
 			if(item.second.imgproc == Texpainter::FilterGraph::InvalidImgProcId)
 			{ return; }
 
-			auto res = compositor.insert(Texpainter::ImageProcessorRegistry::createImageProcessor(item.second.imgproc));
+			auto res = m_compositor.insert(Texpainter::ImageProcessorRegistry::createImageProcessor(item.second.imgproc));
 			std::ranges::for_each(item.second.params, [&node = res.second.get()](auto const& param) {
 				auto val = std::clamp(param.second, 0.0, 1.0);
 				node.set(param.first.c_str(), Texpainter::FilterGraph::ParamValue{val});
 			});
 
-			id_map[item.first] = res.first;
-		});
-	}
+			m_id_map.get()[item.first] = res.first;
+		}
+
+	private:
+		Compositor m_compositor;
+		std::reference_wrapper<NodeIdMap> m_id_map;
+	};
+
 
 	template<class NodeMap, class Compositor>
 	void connect_nodes(NodeMap const& nodes, Compositor compositor, NodeIdMap const& id_map)
@@ -281,7 +291,7 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 
 	auto compositor_data = doc_info.at("compositor").get<std::map<FilterGraph::NodeId, FilterGraph::NodeData>>();
 
-	load_nodes(compositor_data, doc->compositor(), id_map);
+	std::ranges::for_each(compositor_data, LoadNode{doc->compositor(), id_map});
 
 	connect_nodes(compositor_data, doc->compositor(), id_map);
 
