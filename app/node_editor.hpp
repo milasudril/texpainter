@@ -12,32 +12,36 @@
 #include "ui/filled_shape.hpp"
 #include "ui/labeled_input.hpp"
 #include "ui/separator.hpp"
+#include "pixel_store/hsi_rgb.hpp"
+
+#include "libenum/enum.hpp"
 
 namespace Texpainter::App
 {
 	namespace detail
 	{
+		constexpr auto NumPortTypes = Enum::distance(begin(Enum::Empty<FilterGraph::PortType>{}),
+		                                             end(Enum::Empty<FilterGraph::PortType>{}));
+
+		constexpr std::array<PixelStore::Pixel, NumPortTypes> genPortColors()
+		{
+			std::array<PixelStore::Pixel, NumPortTypes> ret{};
+
+			auto dh = 1.0f / NumPortTypes;
+
+			for(std::remove_const_t<decltype(NumPortTypes)> k = 0; k < NumPortTypes; ++k)
+			{
+				ret[k] = toRgb(PixelStore::Hsi{dh * k, 1.0f, 0.5f, 1.0f});
+			}
+
+			return ret;
+		}
+
+		constexpr auto portColors = genPortColors();
+
 		constexpr PixelStore::Pixel portColor(FilterGraph::PortType type)
 		{
-			switch(type)
-			{
-				case FilterGraph::PortType::RgbaPixels:
-					return PixelStore::Pixel{0.5f, 0.5f, 0.0f, 1.0f};
-
-				case FilterGraph::PortType::GrayscaleRealPixels:
-					return PixelStore::Pixel{0.33f, 0.33f, 0.33f, 1.0f};
-
-				case FilterGraph::PortType::GrayscaleComplexPixels:
-					return PixelStore::Pixel{0.66f, 0.0f, 0.33f, 1.0f};
-
-				case FilterGraph::PortType::TopographyData:
-					return PixelStore::Pixel{0.33f, 0.0f, 0.66f, 1.0f};
-
-				case FilterGraph::PortType::Palette:
-					return PixelStore::Pixel{0.67f, 0.33f, 0.0f, 1.0f};
-
-				default: return PixelStore::Pixel{0.33f, 0.33f, 0.33f, 1.0f};
-			}
+			return portColors[Enum::distance(begin(Enum::Empty<FilterGraph::PortType>{}), type)];
 		}
 
 		template<class PortIndex>

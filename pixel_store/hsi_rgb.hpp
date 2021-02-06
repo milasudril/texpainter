@@ -24,6 +24,8 @@ namespace Texpainter::PixelStore
 
 	namespace detail
 	{
+		constexpr float my_fmod(float a, float b) { return a - (b * int(a / b)); }
+
 		constexpr std::array<std::pair<float, float>, 11> hue_points{
 		    {{0.0f, 0.0f},
 		     {1.25e-01f, 3.6586624e-02f},
@@ -44,7 +46,7 @@ namespace Texpainter::PixelStore
 #ifdef direct
 			return value;
 #else
-			return std::fmod(hue_table.input(value), 1.0f);
+			return my_fmod(hue_table.input(value), 1.0f);
 #endif
 		}
 
@@ -53,17 +55,17 @@ namespace Texpainter::PixelStore
 #ifdef direct
 			return value;
 #else
-			return std::fmod(hue_table.output(value), 1.0f);
+			return my_fmod(hue_table.output(value), 1.0f);
 #endif
 		}
 	}
 
 
-	inline Pixel toRgb(Hsi const& hsi)
+	constexpr Pixel toRgb(Hsi const& hsi)
 	{
 		auto tmp = [](Hsi const& hsi) {
 			auto const h = static_cast<float>(6.0f * detail::unwrapHue(hsi.hue));
-			auto const z = 1.0f - std::abs(std::fmod(h, 2.0f) - 1.0f);
+			auto const z = 1.0f - std::abs(detail::my_fmod(h, 2.0f) - 1.0f);
 			auto const c = (3.0f * hsi.intensity * hsi.saturation) / (1.0f + z);
 			auto const x = c * z;
 
@@ -81,7 +83,7 @@ namespace Texpainter::PixelStore
 		return tmp + Pixel{m, m, m, hsi.alpha};
 	}
 
-	inline Hsi toHsi(Pixel pixel)
+	constexpr Hsi toHsi(Pixel pixel)
 	{
 		auto const i = intensity(pixel) / 3.0f;
 		auto h       = [](auto val) {
