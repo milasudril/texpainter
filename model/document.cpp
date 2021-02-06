@@ -322,6 +322,7 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 
 	auto doc_info = load_document_info(archive);
 	auto doc      = std::make_unique<Document>(doc_info.at("canvas_size").get<Size2d>());
+	doc->filename(filename);
 
 	NodeIdMap id_map{{FilterGraph::NodeId{0}, FilterGraph::NodeId{0}}};
 
@@ -346,6 +347,7 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 		std::ranges::transform(
 		    workspace.m_node_locations, std::inserter(new_loc, std::end(new_loc)), Remap{id_map});
 		workspace.m_node_locations = std::move(new_loc);
+		workspace.m_working_directory = doc->filename().parent_path();
 		doc->workspace(std::move(workspace));
 	}
 

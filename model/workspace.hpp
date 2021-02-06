@@ -132,7 +132,6 @@ namespace Texpainter::Model
 		Windows m_windows;
 
 		std::filesystem::path m_working_directory;
-		std::filesystem::path m_filename;
 	};
 
 	void from_json(nlohmann::json const& obj, Workspace& workspace);

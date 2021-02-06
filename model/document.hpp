@@ -246,10 +246,22 @@ namespace Texpainter::Model
 			return *this;
 		}
 
+		Document& filename(std::filesystem::path&& filename)
+		{
+			m_filename = std::move(filename);
+			return *this;
+		}
+
+		std::filesystem::path const& filename() const
+		{
+			return m_filename;
+		}
+
 	private:
 		std::map<ItemName, Compositor::NodeItem> m_input_nodes;
 
 		Workspace m_workspace;
+		std::filesystem::path m_filename;
 	};
 
 	PixelStore::Image render(Document const& document,
