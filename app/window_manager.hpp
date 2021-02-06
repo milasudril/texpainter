@@ -117,16 +117,21 @@ namespace Texpainter::App
 		template<WindowType id>
 		using WindowTypeTraits = detail::WindowTypeTraits<id, WindowManager>;
 
+		template<WindowType id>
+		static std::string make_window_title(Model::Document const& doc)
+		{
+			std::string window_title{WindowTypeTraits<id>::name()};
+			window_title += ": ";
+			window_title += doc.filename().c_str();
+			return window_title;
+		}
+
 
 		template<WindowType id, class... Args>
 		auto createWindow(Model::Document& doc, Args&&... args)
 		{
 			using T  = typename WindowTypeTraits<id>::type::element_type;
-			std::string window_title{WindowTypeTraits<id>::name()};
-			window_title += ": ";
-			window_title += doc.filename().c_str();
-			auto ret = std::make_unique<T>(
-			    window_title.c_str(), *this, doc, std::forward<Args>(args)...);
+			auto ret = std::make_unique<T>(make_window_title<id>(doc).c_str(), *this, doc, std::forward<Args>(args)...);
 			ret->window().template eventHandler<id>(*this);
 			ret->widget().template eventHandler<id>(*this);
 			return ret;
@@ -642,7 +647,18 @@ namespace Texpainter::App
 			{
 				saveDocument(filename.c_str());
 				m_document->filename(std::move(filename));
+				updateWindowTitles();
 			}
+		}
+
+		void updateWindowTitles()
+		{
+			Enum::forEachEnumItem<WindowType>([&windows = m_windows, &doc = *m_document](auto i) {
+				if(auto editor = windows.get<i.value>().get(); editor != nullptr)
+				{
+					editor->window().title(make_window_title<i.value>(doc).c_str());
+				}
+			});
 		}
 
 		void saveDocument(Ui::Container& dlg_owner)
