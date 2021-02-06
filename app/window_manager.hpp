@@ -222,7 +222,9 @@ namespace Texpainter::App
 		}
 
 		template<auto id, class Source>
-		requires(!std::same_as<decltype(id), WorkspaceAction>) void onActivated(Enum::Tag<id>,
+		requires(!std::same_as<decltype(id), WorkspaceAction>
+			&& !std::same_as<decltype(id), DocumentAction>
+		) void onActivated(Enum::Tag<id>,
 		                                                                        Ui::MenuItem&,
 		                                                                        Source&)
 		{
@@ -304,6 +306,12 @@ namespace Texpainter::App
 		void onActivated(Enum::Tag<DocumentAction::SaveAs>, Ui::MenuItem&, Source& src)
 		{
 			saveDocumentAs(src.window());
+		}
+
+		template<class Source>
+		void onActivated(Enum::Tag<DocumentAction::SaveCopy>, Ui::MenuItem&, Source& src)
+		{
+			saveDocumentCopy(src.window());
 		}
 
 		template<class Source>
@@ -648,6 +656,21 @@ namespace Texpainter::App
 				saveDocument(filename.c_str());
 				m_document->filename(std::move(filename));
 				updateWindowTitles();
+			}
+		}
+
+		void saveDocumentCopy(Ui::Container& dlg_owner)
+		{
+			std::filesystem::path filename;
+			if(Ui::filenameSelect(
+			       dlg_owner,
+			       m_document->workingDirectory(),
+			       filename,
+			       Ui::FilenameSelectMode::Save,
+			       [](char const* filename) { return fileValid(Enum::Empty<Model::Document>{}, filename); },
+			       "Texpainter documents"))
+			{
+				saveDocument(filename.c_str());
 			}
 		}
 
