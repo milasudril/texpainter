@@ -122,8 +122,11 @@ namespace Texpainter::App
 		auto createWindow(Model::Document& doc, Args&&... args)
 		{
 			using T  = typename WindowTypeTraits<id>::type::element_type;
+			std::string window_title{WindowTypeTraits<id>::name()};
+			window_title += ": ";
+			window_title += doc.filename().c_str();
 			auto ret = std::make_unique<T>(
-			    WindowTypeTraits<id>::name(), *this, doc, std::forward<Args>(args)...);
+			    window_title.c_str(), *this, doc, std::forward<Args>(args)...);
 			ret->window().template eventHandler<id>(*this);
 			ret->widget().template eventHandler<id>(*this);
 			return ret;
