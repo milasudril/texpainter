@@ -24,9 +24,6 @@ namespace Texpainter::FilterGraph
 		GrayscaleRealPixels,
 		GrayscaleComplexPixels,
 		TopographyData,
-		RgbaValue,
-		RealValue,
-		ComplexValue,
 		Palette
 	};
 
@@ -78,31 +75,6 @@ namespace Texpainter::FilterGraph
 		{
 			return std::make_unique<TopographyInfo[]>(area(size));
 		}
-	};
-
-
-	template<>
-	struct PortTypeToType<PortType::RgbaValue>
-	{
-		using type = RgbaValue;
-
-		static type createValue(Size2d) { return RgbaValue{}; }
-	};
-
-	template<>
-	struct PortTypeToType<PortType::RealValue>
-	{
-		using type = RealValue;
-
-		static type createValue(Size2d) { return RealValue{}; }
-	};
-
-	template<>
-	struct PortTypeToType<PortType::ComplexValue>
-	{
-		using type = ComplexValue;
-
-		static type createValue(Size2d) { return ComplexValue{}; }
 	};
 
 	template<>

@@ -22,14 +22,11 @@ namespace Texpainter::App
 			switch(type)
 			{
 				case FilterGraph::PortType::RgbaPixels:
-				case FilterGraph::PortType::RgbaValue:
 					return PixelStore::Pixel{0.5f, 0.5f, 0.0f, 1.0f};
 
-				case FilterGraph::PortType::RealValue:
 				case FilterGraph::PortType::GrayscaleRealPixels:
 					return PixelStore::Pixel{0.33f, 0.33f, 0.33f, 1.0f};
 
-				case FilterGraph::PortType::ComplexValue:
 				case FilterGraph::PortType::GrayscaleComplexPixels:
 					return PixelStore::Pixel{0.66f, 0.0f, 0.33f, 1.0f};
 
@@ -38,8 +35,10 @@ namespace Texpainter::App
 
 				case FilterGraph::PortType::Palette:
 					return PixelStore::Pixel{0.67f, 0.33f, 0.0f, 1.0f};
+
+				default:
+					return PixelStore::Pixel{0.33f, 0.33f, 0.33f, 1.0f};
 			}
-			__builtin_unreachable();
 		}
 
 		template<class PortIndex>
