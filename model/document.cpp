@@ -315,9 +315,9 @@ namespace
 }
 
 std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty<Document>,
-                                                                     char const*)
+                                                                     char const* filename)
 {
-	Wad64::FdOwner input_file{"test.tex.wad64", Wad64::IoMode::AllowRead(), load_creation_mode};
+	Wad64::FdOwner input_file{filename, Wad64::IoMode::AllowRead(), load_creation_mode};
 	Wad64::ReadonlyArchive archive{std::ref(input_file)};
 
 	auto doc_info = load_document_info(archive);
@@ -379,4 +379,19 @@ void Texpainter::Model::store(Document const& doc, char const*)
 		store(item.second.source.get(),
 		      Wad64::OutputFile{archive, make_data_path(item.first), store_creation_mode});
 	});
+}
+
+bool Texpainter::Model::fileValid(Enum::Empty<Document>, char const* filename)
+{
+	try
+	{
+		Wad64::FdOwner input_file{filename, Wad64::IoMode::AllowRead(), load_creation_mode};
+		Wad64::ReadonlyArchive archive{std::ref(input_file)};
+		(void)load_document_info(archive);
+		return true;
+	}
+	catch(...)
+	{
+		return false;
+	}
 }

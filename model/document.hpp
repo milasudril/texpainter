@@ -268,6 +268,8 @@ namespace Texpainter::Model
 
 	void store(Document const& doc, char const* filename);
 
+	bool fileValid(Enum::Empty<Document>, char const* filename);
+
 	template<>
 	inline ItemName const& Document::current<PixelStore::Image>() const
 	{
