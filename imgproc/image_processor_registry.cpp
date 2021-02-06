@@ -43,7 +43,7 @@
 //@		"./grayscale_power_distortion.imgproc.hpp",
 //@		"./image_spectrum_to_amplitude_and_phase.imgproc.hpp",
 //@		"./random_point_cloud.imgproc.hpp",
-//@		"./place_image_at_points.imgproc.hpp"
+//@		"./place_grayscale_image_at_points.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -120,7 +120,7 @@ namespace
 	    get_info<::GrayscalePowerDistortion::ImageProcessor>(),
 	    get_info<::ImageSpectrumToAmplitudeAndPhase::ImageProcessor>(),
 	    get_info<::RandomPointCloud::ImageProcessor>(),
-	    get_info<::PlaceImageAtPoints::ImageProcessor>()};
+	    get_info<::PlaceGrayscaleImageAtPoints::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
