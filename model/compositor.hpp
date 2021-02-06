@@ -38,7 +38,6 @@ namespace Texpainter::Model
 		Compositor(): m_valid_state{ValidationState::NotValidated}
 		{
 			using FilterGraph::ImageProcessorWrapper;
-			using FilterGraph::ImageSink;
 
 			auto output   = std::make_unique<ImageProcessorWrapper<ImageSink>>(ImageSink{});
 			r_output      = &output->processor();
@@ -135,7 +134,7 @@ namespace Texpainter::Model
 		};
 		mutable ValidationState m_valid_state;
 
-		FilterGraph::ImageSink* r_output;
+		ImageSink* r_output;
 		FilterGraph::Node* r_output_node;
 
 		FilterGraph::Graph m_graph;

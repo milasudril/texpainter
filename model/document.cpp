@@ -221,10 +221,10 @@ namespace
 		{
 			if(item.first == NodeId{0})
 			{
-				if(item.second.imgproc != Texpainter::FilterGraph::ImageSink::id())
+				if(item.second.imgproc != Texpainter::Model::ImageSink::id())
 				{
 					throw std::string{"Bad output image processor. Expected "
-					                  + toString(Texpainter::FilterGraph::ImageSink::id())};
+					                  + toString(Texpainter::Model::ImageSink::id())};
 				}
 				return;
 			}

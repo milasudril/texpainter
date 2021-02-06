@@ -13,38 +13,48 @@
 
 #include <cassert>
 
-namespace Texpainter::FilterGraph
+namespace Texpainter::Model
 {
 	class ImageSink
 	{
 	public:
 		struct InterfaceDescriptor
 		{
-			static constexpr std::array<PortInfo, 1> InputPorts{{PortType::RgbaPixels, "Pixels"}};
-			static constexpr std::array<PortInfo, 0> OutputPorts{};
-			static constexpr std::array<ParamName, 0> ParamNames{};
+			static constexpr std::array<FilterGraph::PortInfo, 1> InputPorts{
+			    {FilterGraph::PortType::RgbaPixels, "Pixels"}};
+			static constexpr std::array<FilterGraph::PortInfo, 0> OutputPorts{};
+			static constexpr std::array<FilterGraph::ParamName, 0> ParamNames{};
 		};
 
-		void operator()(ImgProcArg<InterfaceDescriptor> const& args) const
+		void operator()(FilterGraph::ImgProcArg<InterfaceDescriptor> const& args) const
 		{
 			assert(r_pixels.data() != nullptr);
 			std::copy_n(args.input<0>(), area(args.canvasSize()), r_pixels.data());
 		}
 
-		ParamValue get(ParamName) const { return ParamValue{0.0}; }
+		FilterGraph::ParamValue get(FilterGraph::ParamName) const
+		{
+			return FilterGraph::ParamValue{0.0};
+		}
 
-		void set(ParamName, ParamValue) {}
+		void set(FilterGraph::ParamName, FilterGraph::ParamValue) {}
 
-		std::span<ParamValue const> paramValues() const { return std::span<ParamValue const>{}; }
+		std::span<FilterGraph::ParamValue const> paramValues() const
+		{
+			return std::span<FilterGraph::ParamValue const>{};
+		}
 
 		static constexpr char const* name() { return "Output image"; }
 
-		static constexpr auto id() { return ImageProcessorId{"4332d23feb31f1daf36caf312aca0911"}; }
+		static constexpr auto id()
+		{
+			return FilterGraph::ImageProcessorId{"4332d23feb31f1daf36caf312aca0911"};
+		}
 
-		void sink(Span2d<RgbaValue> val) { r_pixels = val; }
+		void sink(Span2d<FilterGraph::RgbaValue> val) { r_pixels = val; }
 
 	private:
-		Span2d<RgbaValue> r_pixels;
+		Span2d<FilterGraph::RgbaValue> r_pixels;
 	};
 }
 
