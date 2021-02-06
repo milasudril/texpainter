@@ -33,6 +33,8 @@ def translateType(str):
 		return 'Palette'
 	if str == 'Topography data':
 		return 'TopographyData'
+	if str == 'Point cloud':
+		return 'PointCloud'
 	raise Exception('Unsupported port type ' + str)
 
 

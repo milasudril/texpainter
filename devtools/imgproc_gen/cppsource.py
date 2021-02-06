@@ -182,6 +182,7 @@ namespace $namespace_name
 		using Texpainter::FilterGraph::RealValue;
 		using Texpainter::FilterGraph::Palette;
 		using Texpainter::FilterGraph::TopographyInfo;
+		using Texpainter::FilterGraph::ImageCoordinates;
 		using Texpainter::vec2_t;
 		using Texpainter::Angle;
 		$impl_decl

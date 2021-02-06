@@ -24,6 +24,7 @@ namespace Texpainter::FilterGraph
 		GrayscaleRealPixels,
 		GrayscaleComplexPixels,
 		TopographyData,
+		PointCloud,
 		Palette
 	};
 
@@ -35,6 +36,12 @@ namespace Texpainter::FilterGraph
 	using ComplexValue   = std::complex<RealValue>;
 	using Palette        = PixelStore::Palette<16>;
 	using TopographyInfo = Model::TopographyInfo;
+
+	struct ImageCoordinates
+	{
+		uint32_t x;
+		uint32_t y;
+	};
 
 	template<PortType id>
 	struct PortTypeToType;
@@ -78,11 +85,19 @@ namespace Texpainter::FilterGraph
 	};
 
 	template<>
+	struct PortTypeToType<PortType::PointCloud>
+	{
+		using type = std::vector<ImageCoordinates>;
+
+		static type createValue(Size2d) { return type{}; }
+	};
+
+	template<>
 	struct PortTypeToType<PortType::Palette>
 	{
 		using type = Palette;
 
-		static type createValue(Size2d) { return Palette{}; }
+		static type createValue(Size2d) { return type{}; }
 	};
 }
 #endif
