@@ -290,15 +290,15 @@ namespace Texpainter::App
 		}
 
 		template<class Source>
-		void onActivated(Enum::Tag<DocumentAction::Save>, Ui::MenuItem&, Source&)
+		void onActivated(Enum::Tag<DocumentAction::Save>, Ui::MenuItem&, Source& src)
 		{
-			if(auto compositor = m_windows.get<WindowType::Compositor>().get();
-			   compositor != nullptr)
-			{ m_document->nodeLocations(compositor->widget().nodeLocations()); }
+			saveDocument(src.window());
+		}
 
-			m_document->windows(windowInfo());
-
-			store(*m_document, "/dev/stdout");
+		template<class Source>
+		void onActivated(Enum::Tag<DocumentAction::SaveAs>, Ui::MenuItem&, Source& src)
+		{
+			saveDocumentAs(src.window());
 		}
 
 		template<class Source>
@@ -627,6 +627,43 @@ namespace Texpainter::App
 				}
 				m_windows.get<WindowType::ImageEditor>()->window().show();
 			}
+		}
+
+		void saveDocumentAs(Ui::Container& dlg_owner)
+		{
+			std::filesystem::path filename;
+			if(Ui::filenameSelect(
+			       dlg_owner,
+			       m_document->workingDirectory(),
+			       filename,
+			       Ui::FilenameSelectMode::Save,
+			       [](char const* filename) { return fileValid(Enum::Empty<Model::Document>{}, filename); },
+			       "Texpainter documents"))
+			{
+				saveDocument(filename.c_str());
+				m_document->filename(std::move(filename));
+			}
+		}
+
+		void saveDocument(Ui::Container& dlg_owner)
+		{
+			if(m_document->filename().empty())
+			{
+				saveDocumentAs(dlg_owner);
+				return;
+			}
+			saveDocument(m_document->filename().c_str());
+		}
+
+		void saveDocument(char const* filename)
+		{
+			if(auto compositor = m_windows.get<WindowType::Compositor>().get();
+			   compositor != nullptr)
+			{ m_document->nodeLocations(compositor->widget().nodeLocations()); }
+
+			m_document->windows(windowInfo());
+
+			store(*m_document, filename);
 		}
 
 		template<class T>

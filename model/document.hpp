@@ -249,6 +249,7 @@ namespace Texpainter::Model
 		Document& filename(std::filesystem::path&& filename)
 		{
 			m_filename = std::move(filename);
+			m_workspace.m_working_directory = m_filename.parent_path();
 			return *this;
 		}
 

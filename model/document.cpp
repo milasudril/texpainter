@@ -354,10 +354,9 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 	return doc;
 }
 
-void Texpainter::Model::store(Document const& doc, char const*)
+void Texpainter::Model::store(Document const& doc, char const* filename)
 {
-	Wad64::FdOwner output_file{
-	    "test.tex.wad64", Wad64::IoMode::AllowRead().allowWrite(), store_creation_mode};
+	Wad64::FdOwner output_file{filename, Wad64::IoMode::AllowRead().allowWrite(), store_creation_mode};
 	Wad64::Archive archive{std::ref(output_file)};
 
 	{
