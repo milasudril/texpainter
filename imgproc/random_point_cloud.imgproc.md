@@ -29,7 +29,7 @@ __Source code:__
 ```c++
 void main(auto const& args, auto const& params)
 {
-	auto points          = output<0>(args).get();
+	auto& points         = output<0>(args).get();
 	auto const intensity = param<Str{"Intensity gain"}>(params).value();
 	auto const w         = args.canvasSize().width();
 	auto const h         = args.canvasSize().height();
@@ -41,7 +41,7 @@ void main(auto const& args, auto const& params)
 		for(uint32_t col = 0; col < w; ++col)
 		{
 			auto val = U(rng);
-			if(val < intensity * input<0>(args, col, row))
+			if(val <= intensity * input<0>(args, col, row))
 			{ points.push_back(ImageCoordinates{col, row}); }
 		}
 	}
