@@ -131,7 +131,8 @@ namespace Texpainter::App
 		auto createWindow(Model::Document& doc, Args&&... args)
 		{
 			using T  = typename WindowTypeTraits<id>::type::element_type;
-			auto ret = std::make_unique<T>(make_window_title<id>(doc).c_str(), *this, doc, std::forward<Args>(args)...);
+			auto ret = std::make_unique<T>(
+			    make_window_title<id>(doc).c_str(), *this, doc, std::forward<Args>(args)...);
 			ret->window().template eventHandler<id>(*this);
 			ret->widget().template eventHandler<id>(*this);
 			return ret;
@@ -222,11 +223,8 @@ namespace Texpainter::App
 		}
 
 		template<auto id, class Source>
-		requires(!std::same_as<decltype(id), WorkspaceAction>
-			&& !std::same_as<decltype(id), DocumentAction>
-		) void onActivated(Enum::Tag<id>,
-		                                                                        Ui::MenuItem&,
-		                                                                        Source&)
+		requires(!std::same_as<decltype(id), WorkspaceAction> && !std::same_as<decltype(id), DocumentAction>) void onActivated(
+		    Enum::Tag<id>, Ui::MenuItem&, Source&)
 		{
 			throw "Unimplemented action";
 		}
@@ -620,7 +618,9 @@ namespace Texpainter::App
 			       m_document->workingDirectory(),
 			       filename,
 			       Ui::FilenameSelectMode::Open,
-			       [](char const* filename) { return fileValid(Enum::Empty<Model::Document>{}, filename); },
+			       [](char const* filename) {
+				       return fileValid(Enum::Empty<Model::Document>{}, filename);
+			       },
 			       "Texpainter documents"))
 			{
 				m_document     = load(Enum::Empty<Model::Document>{}, filename.c_str());
@@ -650,7 +650,9 @@ namespace Texpainter::App
 			       m_document->workingDirectory(),
 			       filename,
 			       Ui::FilenameSelectMode::Save,
-			       [](char const* filename) { return fileValid(Enum::Empty<Model::Document>{}, filename); },
+			       [](char const* filename) {
+				       return fileValid(Enum::Empty<Model::Document>{}, filename);
+			       },
 			       "Texpainter documents"))
 			{
 				saveDocument(filename.c_str());
@@ -667,20 +669,18 @@ namespace Texpainter::App
 			       m_document->workingDirectory(),
 			       filename,
 			       Ui::FilenameSelectMode::Save,
-			       [](char const* filename) { return fileValid(Enum::Empty<Model::Document>{}, filename); },
+			       [](char const* filename) {
+				       return fileValid(Enum::Empty<Model::Document>{}, filename);
+			       },
 			       "Texpainter documents"))
-			{
-				saveDocument(filename.c_str());
-			}
+			{ saveDocument(filename.c_str()); }
 		}
 
 		void updateWindowTitles()
 		{
 			Enum::forEachEnumItem<WindowType>([&windows = m_windows, &doc = *m_document](auto i) {
 				if(auto editor = windows.get<i.value>().get(); editor != nullptr)
-				{
-					editor->window().title(make_window_title<i.value>(doc).c_str());
-				}
+				{ editor->window().title(make_window_title<i.value>(doc).c_str()); }
 			});
 		}
 

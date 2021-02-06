@@ -248,15 +248,12 @@ namespace Texpainter::Model
 
 		Document& filename(std::filesystem::path&& filename)
 		{
-			m_filename = std::move(filename);
+			m_filename                      = std::move(filename);
 			m_workspace.m_working_directory = m_filename.parent_path();
 			return *this;
 		}
 
-		std::filesystem::path const& filename() const
-		{
-			return m_filename;
-		}
+		std::filesystem::path const& filename() const { return m_filename; }
 
 	private:
 		std::map<ItemName, Compositor::NodeItem> m_input_nodes;

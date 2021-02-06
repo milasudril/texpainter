@@ -36,8 +36,7 @@ namespace Texpainter::App
 				case FilterGraph::PortType::Palette:
 					return PixelStore::Pixel{0.67f, 0.33f, 0.0f, 1.0f};
 
-				default:
-					return PixelStore::Pixel{0.33f, 0.33f, 0.33f, 1.0f};
+				default: return PixelStore::Pixel{0.33f, 0.33f, 0.33f, 1.0f};
 			}
 		}
 

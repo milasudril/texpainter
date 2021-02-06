@@ -346,7 +346,7 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 		std::map<FilterGraph::NodeId, vec2_t> new_loc;
 		std::ranges::transform(
 		    workspace.m_node_locations, std::inserter(new_loc, std::end(new_loc)), Remap{id_map});
-		workspace.m_node_locations = std::move(new_loc);
+		workspace.m_node_locations    = std::move(new_loc);
 		workspace.m_working_directory = doc->filename().parent_path();
 		doc->workspace(std::move(workspace));
 	}
@@ -356,7 +356,8 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 
 void Texpainter::Model::store(Document const& doc, char const* filename)
 {
-	Wad64::FdOwner output_file{filename, Wad64::IoMode::AllowRead().allowWrite(), store_creation_mode};
+	Wad64::FdOwner output_file{
+	    filename, Wad64::IoMode::AllowRead().allowWrite(), store_creation_mode};
 	Wad64::Archive archive{std::ref(output_file)};
 
 	{
