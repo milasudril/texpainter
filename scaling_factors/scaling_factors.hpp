@@ -16,7 +16,10 @@ namespace Texpainter::ScalingFactors
 
 	constexpr double sizeScaleFactor(double val) { return fromExponent((1.0 - val) * MinumSize); }
 
-	constexpr double areaScaleFactor(double val) { return fromExponent(2.0*(1.0 - val) * MinumSize); }
+	constexpr double areaScaleFactor(double val)
+	{
+		return fromExponent(2.0 * (1.0 - val) * MinumSize);
+	}
 
 	constexpr double sizeFromGeomMean(Size2d size, double val)
 	{

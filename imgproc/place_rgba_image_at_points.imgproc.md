@@ -20,25 +20,21 @@ __Source code:__
 void main(auto const& args)
 {
 	std::ranges::for_each(input<0>(args).get(), [&args](auto pos) {
-
 		auto const w = args.canvasSize().width();
 		auto const h = args.canvasSize().height();
 
-		auto const Δx = pos.x;
-		auto const Δy = pos.y;
+		auto const Δx = pos.x - w / 2;
+		auto const Δy = pos.y - h / 2;
 
 		for(uint32_t row = 0; row < h; ++row)
 		{
 			for(uint32_t col = 0; col < w; ++col)
 			{
 				auto src = input<1>(args, ((w + col) - Δx) % w, ((h + row) - Δy) % h);
-				output<0>(args, col, row) = (1.0f - src.alpha()) * output<0>(args, col, row) + src.alpha()*src;
+				output<0>(args, col, row) =
+				    (1.0f - src.alpha()) * output<0>(args, col, row) + src.alpha() * src;
 			}
 		}
-	});
-
-	std::ranges::for_each(input<0>(args).get(), [&args](auto pos) {
-		output<0>(args, pos.x, pos.y) = RgbaValue{1.0f, 1.0f, 1.0f, 1.0f};
 	});
 }
 ```
