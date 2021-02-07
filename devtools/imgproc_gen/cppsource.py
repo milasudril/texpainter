@@ -159,6 +159,7 @@ template = string.Template("""//@	{
 #include "filtergraph/img_proc_param.hpp"
 #include "utils/vec_t.hpp"
 #include "utils/angle.hpp"
+#include "utils/rect.hpp"
 $param_map_include
 #line $user_includes_start "$src_file"
 $user_includes
@@ -184,6 +185,7 @@ namespace $namespace_name
 		using Texpainter::FilterGraph::TopographyInfo;
 		using Texpainter::FilterGraph::ImageCoordinates;
 		using Texpainter::FilterGraph::SpawnSpot;
+		using Texpainter::AxisAlignedBoundingBox;
 		using Texpainter::vec2_t;
 		using Texpainter::Angle;
 		$impl_decl

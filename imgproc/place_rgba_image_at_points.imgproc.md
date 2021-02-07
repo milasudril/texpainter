@@ -78,12 +78,14 @@ ImageCoordinates lastX(auto const& args, ImageCoordinates last_y)
 	return last_y;
 }
 
-std::pair<vec2_t, vec2_t> findAABB(auto const& args)
+AxisAlignedBoundingBox findAABB(auto const& args)
 {
 	auto upper_left  = firstX(args, firstY(args));
 	auto lower_right = lastX(args, lastY(args));
-	return std::pair{vec2_t{static_cast<double>(upper_left.x), static_cast<double>(upper_left.y)},
-		vec2_t{static_cast<double>(lower_right.x), static_cast<double>(lower_right.y)}};
+
+	return AxisAlignedBoundingBox::fromLimits(
+		vec2_t{static_cast<double>(upper_left.x), static_cast<double>(upper_left.y)},
+		vec2_t{static_cast<double>(lower_right.x), static_cast<double>(lower_right.y)});
 }
 
 void main(auto const& args)
@@ -93,7 +95,7 @@ void main(auto const& args)
 		auto const h = args.canvasSize().height();
 
 		auto const O = vec2_t{0.5 * w, 0.5 * h};
-		auto pos     = spot.loc;
+		auto const pos     = spot.loc;
 		auto const v = vec2_t{static_cast<double>(pos.x), static_cast<double>(pos.y)};
 
 		auto const offset = v + O;
@@ -102,16 +104,20 @@ void main(auto const& args)
 
 		auto const rot_x    = s*vec2_t{cos(ϴ), -sin(ϴ)};
 		auto const rot_y    = s*vec2_t{sin(ϴ), cos(ϴ)};
-		/*
-		auto const radius = 0.5*(aabb.second - aabb.first);
-		auto rot_bb = Texpainter::axisAlignedBoundingBox(radius, ϴ);
-		auto const min = -2.0*rot_bb + radius + aabb.first;
-		auto const max = 2.0*rot_bb + radius + aabb.first;
-*/
 
-		for(uint32_t row = 0; row < h; ++row)
+		auto const aabb_rot = rotate(aabb, ϴ);
+
+		auto const min = lowerLimit(aabb_rot);
+		auto const max = upperLimit(aabb_rot);
+
+		auto x_min = static_cast<uint32_t>(min[0]);
+		auto y_min = static_cast<uint32_t>(min[1]);
+		auto x_max = static_cast<uint32_t>(max[0]);
+		auto y_max = static_cast<uint32_t>(max[1]);
+
+		for(uint32_t row = y_min; row < y_max; ++row)
 		{
-			for(uint32_t col = 0; col < w; ++col)
+			for(uint32_t col = x_min; col < x_max; ++col)
 			{
 				auto const src_pos =
 				    Texpainter::transform(vec2_t{static_cast<double>(col), static_cast<double>(row)} - O, rot_x, rot_y) + O;
