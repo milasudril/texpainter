@@ -17,8 +17,9 @@ __Source code:__
 ```c++
 void main(auto const& args)
 {
-	std::ranges::for_each(input<0>(args).get(),
-	                      [&args](auto pos) { output<0>(args, pos.x, pos.y) = RealValue{1.0f}; });
+	std::ranges::for_each(input<0>(args).get(), [&args](auto spot) {
+		output<0>(args, spot.loc.x, spot.loc.y) = RealValue{1.0f};
+	});
 }
 ```
 

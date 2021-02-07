@@ -1,10 +1,14 @@
 # Random point cloud
 
-This image processor generates a randomized point cloud, given a spatial probability distribution
+This image processor generates a randomized point cloud, given
+
+* a spatial probability distribution * a size distribution
 
 ## Input ports
 
-__Intensity:__ (Grayscale image) The probability distribution.
+__Intensity:__ (Grayscale image) The probability distribution
+
+__Size:__ (Grayscale image) The size distribution
 
 ## Output ports
 
@@ -43,7 +47,11 @@ void main(auto const& args, auto const& params)
 		{
 			auto val = U(rng);
 			if(val <= input<0>(args, col, row) / I)
-			{ points.push_back(ImageCoordinates{col, row}); }
+			{
+				points.push_back(SpawnSpot{ImageCoordinates{col, row},
+				                           Angle{0},
+				                           static_cast<float>(input<1>(args, col, row))});
+			}
 		}
 	}
 }

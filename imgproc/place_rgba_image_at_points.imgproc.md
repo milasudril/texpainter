@@ -81,20 +81,34 @@ std::pair<ImageCoordinates, ImageCoordinates> findAABB(auto const& args)
 
 void main(auto const& args)
 {
-	std::ranges::for_each(input<0>(args).get(), [&args, aabb = findAABB(args)](auto pos) {
+	std::ranges::for_each(input<0>(args).get(), [&args, aabb = findAABB(args)](auto spot) {
 		auto const w = args.canvasSize().width();
 		auto const h = args.canvasSize().height();
 
-		auto const Δx = pos.x + w / 2;
-		auto const Δy = pos.y + h / 2;
+		auto const O = vec2_t{0.5 * w, 0.5 * h};
+		auto pos     = spot.loc;
+		auto const v = vec2_t{static_cast<double>(pos.x), static_cast<double>(pos.y)};
+
+		auto const offset = v + O;
+		auto const s      = 1.0f / spot.scale;
 
 		for(uint32_t row = aabb.first.y; row < aabb.second.y; ++row)
 		{
 			for(uint32_t col = aabb.first.x; col < aabb.second.x; ++col)
 			{
-				auto src   = input<1>(args, col, row);
-				auto& dest = output<0>(args, ((w + col) + Δx) % w, ((h + row) + Δy) % h);
-				dest       = (1.0f - src.alpha()) * dest + src.alpha() * src;
+				auto const src_pos =
+				    s * (vec2_t{static_cast<double>(col), static_cast<double>(row)} - O) + O;
+
+				if(src_pos[0] >= 0 && src_pos[0] < w && src_pos[1] >= 0 && src_pos[1] < h)
+				{
+					auto const src_x = static_cast<uint32_t>(src_pos[0]);
+					auto const src_y = static_cast<uint32_t>(src_pos[1]);
+					auto src         = input<1>(args, src_x, src_y);
+					auto const Δx    = static_cast<uint32_t>(offset[0]);
+					auto const Δy    = static_cast<uint32_t>(offset[1]);
+					auto& dest = output<0>(args, ((w + col) + Δx) % w, ((h + row) + Δy) % h);
+					dest       = (1.0f - src.alpha()) * dest + src.alpha() * src;
+				}
 			}
 		}
 	});

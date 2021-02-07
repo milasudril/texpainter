@@ -8,6 +8,7 @@
 #include "pixel_store/pixel.hpp"
 #include "pixel_store/palette.hpp"
 #include "utils/size_2d.hpp"
+#include "utils/angle.hpp"
 #include "pixel_store/topography_info.hpp"
 
 #include "libenum/enum.hpp"
@@ -41,6 +42,13 @@ namespace Texpainter::FilterGraph
 	{
 		uint32_t x;
 		uint32_t y;
+	};
+
+	struct SpawnSpot
+	{
+		ImageCoordinates loc;
+		Angle rot;
+		float scale;
 	};
 
 	template<PortType id>
@@ -87,7 +95,7 @@ namespace Texpainter::FilterGraph
 	template<>
 	struct PortTypeToType<PortType::PointCloud>
 	{
-		using type = std::vector<ImageCoordinates>;
+		using type = std::vector<SpawnSpot>;
 
 		static type createValue(Size2d) { return type{}; }
 	};
