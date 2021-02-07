@@ -31,8 +31,7 @@ __Source code:__
 void main(auto const& args, auto const& params)
 {
 	auto& points = output<0>(args).get();
-	auto const I =
-	    sizeFromArea(args.canvasSize(), param<Str{"Point distance"}>(params)) / (args.resolution());
+	auto const I = sizeFromArea(args.canvasSize(), param<Str{"Point distance"}>(params));
 	auto const w = args.canvasSize().width();
 	auto const h = args.canvasSize().height();
 	std::uniform_real_distribution U{0.0, 1.0};

@@ -14,7 +14,7 @@ __Result:__ (RGBA image) The generated image
 
 ## Implementation
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 ImageCoordinates firstY(auto const& args)
@@ -25,10 +25,7 @@ ImageCoordinates firstY(auto const& args)
 	{
 		for(uint32_t col = 0; col < w; ++col)
 		{
-			if(input<1>(args, col, row).alpha() > 0.0f)
-			{
-				return ImageCoordinates{col, row};
-			}
+			if(input<1>(args, col, row).alpha() > 0.0f) { return ImageCoordinates{col, row}; }
 		}
 	}
 	return ImageCoordinates{w, h};
@@ -41,10 +38,7 @@ ImageCoordinates firstX(auto const& args, ImageCoordinates first_y)
 	{
 		for(uint32_t col = 0; col < first_y.x; ++col)
 		{
-			if(input<1>(args, col, row).alpha() > 0.0f)
-			{
-				first_y.x = col;
-			}
+			if(input<1>(args, col, row).alpha() > 0.0f) { first_y.x = col; }
 		}
 	}
 	return first_y;
@@ -59,9 +53,7 @@ ImageCoordinates lastY(auto const& args)
 		for(uint32_t col = w; col > 0; --col)
 		{
 			if(input<1>(args, col - 1, row - 1).alpha() > 0.0f)
-			{
-				return ImageCoordinates{col, row};
-			}
+			{ return ImageCoordinates{col, row}; }
 		}
 	}
 	return ImageCoordinates{0, 0};
@@ -74,10 +66,7 @@ ImageCoordinates lastX(auto const& args, ImageCoordinates last_y)
 	{
 		for(uint32_t col = w; col > last_y.x; --col)
 		{
-			if(input<1>(args, col - 1, row - 1).alpha() > 0.0f)
-			{
-				last_y.x = col;
-			}
+			if(input<1>(args, col - 1, row - 1).alpha() > 0.0f) { last_y.x = col; }
 		}
 	}
 	return last_y;
@@ -85,15 +74,14 @@ ImageCoordinates lastX(auto const& args, ImageCoordinates last_y)
 
 std::pair<ImageCoordinates, ImageCoordinates> findAABB(auto const& args)
 {
-	auto upper_left = firstX(args, firstY(args));
+	auto upper_left  = firstX(args, firstY(args));
 	auto lower_right = lastX(args, lastY(args));
 	return std::pair{upper_left, lower_right};
 }
 
 void main(auto const& args)
 {
-	std::ranges::for_each(input<0>(args).get(), [&args,
-	aabb = findAABB(args)](auto pos) {
+	std::ranges::for_each(input<0>(args).get(), [&args, aabb = findAABB(args)](auto pos) {
 		auto const w = args.canvasSize().width();
 		auto const h = args.canvasSize().height();
 
@@ -104,14 +92,11 @@ void main(auto const& args)
 		{
 			for(uint32_t col = aabb.first.x; col < aabb.second.x; ++col)
 			{
-				auto src = input<1>(args, col, row);
+				auto src   = input<1>(args, col, row);
 				auto& dest = output<0>(args, ((w + col) + Δx) % w, ((h + row) + Δy) % h);
-				dest = (1.0f - src.alpha()) * dest + src.alpha() * src;
+				dest       = (1.0f - src.alpha()) * dest + src.alpha() * src;
 			}
 		}
-	});
-	std::ranges::for_each(input<0>(args).get(), [&args](auto pos) {
-		output<0>(args, pos.x, pos.y) = RgbaValue{1.0f, 1.0f, 1.0f, 1.0f};
 	});
 }
 ```
