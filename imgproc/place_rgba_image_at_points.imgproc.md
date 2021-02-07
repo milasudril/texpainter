@@ -14,7 +14,13 @@ __Result:__ (RGBA image) The generated image
 
 ## Implementation
 
-__Source code:__ 
+__Includes:__
+
+```c++
+#include "utils/rect.hpp"
+```
+
+__Source code:__
 
 ```c++
 ImageCoordinates firstY(auto const& args)
@@ -72,11 +78,12 @@ ImageCoordinates lastX(auto const& args, ImageCoordinates last_y)
 	return last_y;
 }
 
-std::pair<ImageCoordinates, ImageCoordinates> findAABB(auto const& args)
+std::pair<vec2_t, vec2_t> findAABB(auto const& args)
 {
 	auto upper_left  = firstX(args, firstY(args));
 	auto lower_right = lastX(args, lastY(args));
-	return std::pair{upper_left, lower_right};
+	return std::pair{vec2_t{static_cast<double>(upper_left.x), static_cast<double>(upper_left.y)},
+		vec2_t{static_cast<double>(lower_right.x), static_cast<double>(lower_right.y)}};
 }
 
 void main(auto const& args)
@@ -90,14 +97,24 @@ void main(auto const& args)
 		auto const v = vec2_t{static_cast<double>(pos.x), static_cast<double>(pos.y)};
 
 		auto const offset = v + O;
+		auto const ϴ = spot.rot;
 		auto const s      = 1.0f / spot.scale;
 
-		for(uint32_t row = aabb.first.y; row < aabb.second.y; ++row)
+		auto const rot_x    = s*vec2_t{cos(ϴ), -sin(ϴ)};
+		auto const rot_y    = s*vec2_t{sin(ϴ), cos(ϴ)};
+		/*
+		auto const radius = 0.5*(aabb.second - aabb.first);
+		auto rot_bb = Texpainter::axisAlignedBoundingBox(radius, ϴ);
+		auto const min = -2.0*rot_bb + radius + aabb.first;
+		auto const max = 2.0*rot_bb + radius + aabb.first;
+*/
+
+		for(uint32_t row = 0; row < h; ++row)
 		{
-			for(uint32_t col = aabb.first.x; col < aabb.second.x; ++col)
+			for(uint32_t col = 0; col < w; ++col)
 			{
 				auto const src_pos =
-				    s * (vec2_t{static_cast<double>(col), static_cast<double>(row)} - O) + O;
+				    Texpainter::transform(vec2_t{static_cast<double>(col), static_cast<double>(row)} - O, rot_x, rot_y) + O;
 
 				if(src_pos[0] >= 0 && src_pos[0] < w && src_pos[1] >= 0 && src_pos[1] < h)
 				{

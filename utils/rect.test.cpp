@@ -42,6 +42,5 @@ int main()
 	Testcases::texpainterRectAxisAlignBoundingBox();
 	Testcases::texpainterRectAxisAlignBoundingBoxInvertedX();
 
-
 	return 0;
 }

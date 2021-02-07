@@ -2,13 +2,19 @@
 
 This image processor generates a randomized point cloud, given
 
-* a spatial probability distribution * a size distribution
+* a spatial probability distribution
+
+* a rotation
+
+* a size distribution
 
 ## Input ports
 
 __Intensity:__ (Grayscale image) The probability distribution
 
-__Size:__ (Grayscale image) The size distribution
+__Rotation:__ (Grayscale image) The rotation distribution
+
+__Scale:__ (Grayscale image) The scale distribution
 
 ## Output ports
 
@@ -20,7 +26,7 @@ __Point distance:__ (= 1.0)
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include "utils/default_rng.hpp"
@@ -29,7 +35,7 @@ __Includes:__
 #include <cmath>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 void main(auto const& args, auto const& params)
@@ -49,8 +55,8 @@ void main(auto const& args, auto const& params)
 			if(val <= input<0>(args, col, row) / I)
 			{
 				points.push_back(SpawnSpot{ImageCoordinates{col, row},
-				                           Angle{0},
-				                           static_cast<float>(input<1>(args, col, row))});
+				                           Angle{input<1>(args, col, row), Angle::Turns{}},
+				                           static_cast<float>(input<2>(args, col, row))});
 			}
 		}
 	}
