@@ -638,7 +638,9 @@ namespace Texpainter::App
 					});
 					resetWindowPositions();
 				}
-				m_windows.get<WindowType::ImageEditor>()->window().show();
+
+				if(auto editor = m_windows.get<WindowType::ImageEditor>().get(); editor != nullptr)
+				{ editor->window().show(); }
 			}
 		}
 

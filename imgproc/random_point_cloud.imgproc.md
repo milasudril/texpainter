@@ -12,25 +12,27 @@ __Point cloud:__ (Point cloud) The generated point cloud
 
 ## Parameters
 
-__Intensity gain:__ (= 1.0)
+__Point distance:__ (= 1.0)
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include "utils/default_rng.hpp"
 
 #include <random>
+#include <cmath>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 void main(auto const& args, auto const& params)
 {
 	auto& points         = output<0>(args).get();
-	auto const intensity = param<Str{"Intensity gain"}>(params).value();
+	auto const I = sizeFromArea(args.canvasSize(), param<Str{"Point distance"}>(params))
+	    / (args.resolution());
 	auto const w         = args.canvasSize().width();
 	auto const h         = args.canvasSize().height();
 	std::uniform_real_distribution U{0.0, 1.0};
@@ -41,7 +43,7 @@ void main(auto const& args, auto const& params)
 		for(uint32_t col = 0; col < w; ++col)
 		{
 			auto val = U(rng);
-			if(val <= intensity * input<0>(args, col, row))
+			if(val <= input<0>(args, col, row)/I)
 			{ points.push_back(ImageCoordinates{col, row}); }
 		}
 	}

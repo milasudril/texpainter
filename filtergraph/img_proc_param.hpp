@@ -58,6 +58,11 @@ namespace Texpainter::FilterGraph
 		return ScalingFactors::sizeFromHeight(size, val.value());
 	}
 
+	constexpr double sizeFromArea(Size2d size, ParamValue val)
+	{
+		return ScalingFactors::sizeFromArea(size, val.value());
+	}
+
 	class ParamName
 	{
 	public:

@@ -16,6 +16,8 @@ namespace Texpainter::ScalingFactors
 
 	constexpr double sizeScaleFactor(double val) { return fromExponent((1.0 - val) * MinumSize); }
 
+	constexpr double areaScaleFactor(double val) { return fromExponent(2.0*(1.0 - val) * MinumSize); }
+
 	constexpr double sizeFromGeomMean(Size2d size, double val)
 	{
 		return std::max(2.0, std::sqrt(area(size)) * sizeScaleFactor(val));
@@ -39,6 +41,11 @@ namespace Texpainter::ScalingFactors
 	constexpr double sizeFromHeight(Size2d size, double val)
 	{
 		return std::max(2.0, size.height() * sizeScaleFactor(val));
+	}
+
+	constexpr double sizeFromArea(Size2d size, double val)
+	{
+		return std::max(4.0, area(size) * areaScaleFactor(val));
 	}
 
 }
