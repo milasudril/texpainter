@@ -14,13 +14,13 @@ __Result:__ (RGBA image) The generated image
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include "utils/rect.hpp"
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 ImageCoordinates firstY(auto const& args)
@@ -84,8 +84,8 @@ AxisAlignedBoundingBox findAABB(auto const& args)
 	auto lower_right = lastX(args, lastY(args));
 
 	return AxisAlignedBoundingBox::fromLimits(
-		vec2_t{static_cast<double>(upper_left.x), static_cast<double>(upper_left.y)},
-		vec2_t{static_cast<double>(lower_right.x), static_cast<double>(lower_right.y)});
+	    vec2_t{static_cast<double>(upper_left.x), static_cast<double>(upper_left.y)},
+	    vec2_t{static_cast<double>(lower_right.x), static_cast<double>(lower_right.y)});
 }
 
 void main(auto const& args)
@@ -94,21 +94,21 @@ void main(auto const& args)
 		auto const w = args.canvasSize().width();
 		auto const h = args.canvasSize().height();
 
-		auto const O = vec2_t{0.5 * w, 0.5 * h};
-		auto const pos     = spot.loc;
-		auto const v = vec2_t{static_cast<double>(pos.x), static_cast<double>(pos.y)};
+		auto const O   = vec2_t{0.5 * w, 0.5 * h};
+		auto const pos = spot.loc;
+		auto const v   = vec2_t{static_cast<double>(pos.x), static_cast<double>(pos.y)};
 
 		auto const offset = v + O;
-		auto const ϴ = spot.rot;
+		auto const ϴ      = spot.rot;
 		auto const s      = 1.0f / spot.scale;
 
-		auto const rot_x    = s*vec2_t{cos(ϴ), -sin(ϴ)};
-		auto const rot_y    = s*vec2_t{sin(ϴ), cos(ϴ)};
+		auto const rot_x = s * vec2_t{cos(ϴ), -sin(ϴ)};
+		auto const rot_y = s * vec2_t{sin(ϴ), cos(ϴ)};
 
-		auto const aabb_rot = rotate(aabb, ϴ);
+		auto const aabb_rot = rotate(aabb, ϴ, O);
 
-		auto const min = lowerLimit(aabb_rot);
-		auto const max = upperLimit(aabb_rot);
+		auto const min = Texpainter::clamp(lowerLimit(aabb_rot), vec2_t{0.0, 0.0}, 2 * O);
+		auto const max = Texpainter::clamp(upperLimit(aabb_rot), vec2_t{0.0, 0.0}, 2 * O);
 
 		auto x_min = static_cast<uint32_t>(min[0]);
 		auto y_min = static_cast<uint32_t>(min[1]);
@@ -120,7 +120,11 @@ void main(auto const& args)
 			for(uint32_t col = x_min; col < x_max; ++col)
 			{
 				auto const src_pos =
-				    Texpainter::transform(vec2_t{static_cast<double>(col), static_cast<double>(row)} - O, rot_x, rot_y) + O;
+				    Texpainter::transform(vec2_t{static_cast<double>(col), static_cast<double>(row)}
+				                              - O,
+				                          rot_x,
+				                          rot_y)
+				    + O;
 
 				if(src_pos[0] >= 0 && src_pos[0] < w && src_pos[1] >= 0 && src_pos[1] < h)
 				{

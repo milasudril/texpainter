@@ -56,7 +56,10 @@ namespace Texpainter
 
 	constexpr auto max(vec2_t a, vec2_t b) { return a > b ? a : b; }
 
-
+	constexpr auto clamp(vec2_t v, vec2_t lo, vec2_t hi)
+	{
+		return (v < lo) ? lo : (hi < v) ? hi : v;
+	}
 
 
 	constexpr vec2_t signum(vec2_t x)

@@ -26,7 +26,7 @@ __Point distance:__ (= 1.0)
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include "utils/default_rng.hpp"
@@ -35,7 +35,7 @@ __Includes:__
 #include <cmath>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& args, auto const& params)
