@@ -4,21 +4,36 @@
 
 #include "./thread_pool.hpp"
 
+#include "./utils/default_rng.hpp"
+
+namespace
+{
+	struct Cookie
+	{
+		uint64_t rng_seed;
+		std::reference_wrapper<Texpainter::Sched::ThreadPool> threads;
+	};
+}
+
 Texpainter::Sched::ThreadPool::ThreadPool(ThreadCount n_threads)
     : m_terminate{false}
     , m_n_threads{n_threads.value()}
     , m_threads{std::make_unique<pthread_t[]>(m_n_threads)}
 {
-	std::for_each(m_threads.get(), m_threads.get() + m_n_threads, [this](auto& item) {
+	std::for_each(m_threads.get(), m_threads.get() + m_n_threads, [this](auto& item) mutable {
+		auto cookie = new Cookie{Texpainter::DefaultRng::engine()(), *this};
 		pthread_create(
 		    &item,
 		    nullptr,
-		    [](void* pool) {
-			    auto& self = *reinterpret_cast<ThreadPool*>(pool);
+		    [](void* cookie) {
+			    auto obj = reinterpret_cast<Cookie*>(cookie);
+			    Texpainter::DefaultRng::seed(obj->rng_seed);
+			    auto& self = obj->threads.get();
+			    delete obj;
 			    self.performTasks();
 			    return static_cast<void*>(nullptr);
 		    },
-		    this);
+		    cookie);
 	});
 }
 
