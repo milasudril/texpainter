@@ -4,11 +4,13 @@
 
 #include "./default_rng.hpp"
 
+#include <random>
+
 namespace
 {
-	thread_local pcg64 default_rng{};
+	thread_local Texpainter::DefaultRng::type default_rng{};
 }
 
 void Texpainter::DefaultRng::seed(uint64_t value) { default_rng.seed(value); }
 
-pcg64& Texpainter::DefaultRng::engine() { return default_rng; }
+Texpainter::DefaultRng::type& Texpainter::DefaultRng::engine() { return default_rng; }

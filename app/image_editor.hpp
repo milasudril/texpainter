@@ -369,7 +369,7 @@ namespace Texpainter::App
 				    m_selectors,
 				    (std::string{"Select color number "} + std::to_string(index.value() + 1))
 				        .c_str(),
-				    PolymorphicRng{DefaultRng::engine()},
+				    PolymorphicRng{std::ref(DefaultRng::engine())},
 				    "Recently used: ",
 				    m_doc.get().colorHistory());
 				m_color_picker->eventHandler<ImageEditor::ControlId::ColorPicker>(*this)

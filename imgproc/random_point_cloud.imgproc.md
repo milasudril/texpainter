@@ -45,7 +45,7 @@ void main(auto const& args, auto const& params)
 	auto const w = args.canvasSize().width();
 	auto const h = args.canvasSize().height();
 	std::uniform_real_distribution U{0.0, 1.0};
-	auto rng = Texpainter::DefaultRng::engine();
+	auto& rng = Texpainter::DefaultRng::engine();
 
 	for(uint32_t row = 0; row < h; ++row)
 	{

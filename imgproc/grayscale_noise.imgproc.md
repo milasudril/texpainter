@@ -24,8 +24,8 @@ void main(auto const& args)
 	auto const size = area(args.canvasSize());
 	std::generate(output<0>(args),
 	              output<0>(args) + size,
-	              [U   = std::uniform_real_distribution{0.0, 1.0},
-	               rng = Texpainter::DefaultRng::engine()]() mutable { return U(rng); });
+	              [U    = std::uniform_real_distribution{0.0, 1.0},
+	               &rng = Texpainter::DefaultRng::engine()]() mutable { return U(rng); });
 }
 ```
 

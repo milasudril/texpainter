@@ -14,7 +14,7 @@ namespace Testcases
 		std::uniform_int_distribution<int> dice{1, 6};
 
 		std::mt19937 rng;
-		Texpainter::PolymorphicRng r{rng};
+		Texpainter::PolymorphicRng r{std::ref(rng)};
 		auto a = dice(r);
 
 		// r holds a reference, not a copy

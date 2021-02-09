@@ -9,10 +9,11 @@
 
 #include "pcg-cpp/include/pcg_random.hpp"
 
-
 namespace Texpainter::DefaultRng
 {
-	pcg64& engine();
+	using type = pcg64;
+
+	type& engine();
 	void seed(uint64_t val);
 }
 

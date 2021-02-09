@@ -5,10 +5,9 @@
 #ifndef TEXPAINTER_UTILS_POLYMORPHICRNG_HPP
 #define TEXPAINTER_UTILS_POLYMORPHICRNG_HPP
 
-#include "./function_ref.hpp"
-
 #include <cstddef>
 #include <type_traits>
+#include <functional>
 
 namespace Texpainter
 {
@@ -17,22 +16,18 @@ namespace Texpainter
 	public:
 		using result_type = size_t;
 
-		template<
-		    class Rng,
-		    std::enable_if_t<
-		        std::is_unsigned_v<
-		            typename Rng::
-		                result_type> && sizeof(typename Rng::result_type) <= sizeof(result_type)
-		            && !std::is_same_v<std::decay_t<Rng>, PolymorphicRng>,
-		        int> = 0>
-		constexpr explicit PolymorphicRng(Rng& rng)
-		    : m_rng_state{rng}
-		    , m_min{rng.min()}
-		    , m_max{rng.max()}
+		template<class Rng>
+		constexpr explicit PolymorphicRng(std::reference_wrapper<Rng> rng)
+		    : m_state{&rng.get()}
+		    , m_callback{[](void* val) {
+			    return static_cast<result_type>((*static_cast<Rng*>(val))());
+		    }}
+		    , m_min{rng.get().min()}
+		    , m_max{rng.get().max()}
 		{
 		}
 
-		decltype(auto) operator()() { return m_rng_state(); }
+		decltype(auto) operator()() { return m_callback(m_state); }
 
 		result_type min() const { return m_min; }
 
@@ -40,7 +35,8 @@ namespace Texpainter
 
 
 	private:
-		FunctionRef<size_t()> m_rng_state;
+		void* m_state;
+		size_t (*m_callback)(void*);
 		result_type m_min;
 		result_type m_max;
 	};
