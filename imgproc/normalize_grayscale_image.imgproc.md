@@ -18,15 +18,20 @@ __Output max:__ (= 1.0) The maximum value in the output image
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <algorithm>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
+float mapIntensity(ParamValue val)
+{
+	return static_cast<float>(std::exp2(16.0*(val.value() - 1.0)));
+}
+
 void main(auto const& args, auto const& params)
 {
 	auto const size  = area(args.canvasSize());
@@ -37,8 +42,8 @@ void main(auto const& args, auto const& params)
 	    output<0>(args),
 	    [min_in  = *range.first,
 	     max_in  = *range.second,
-	     min_out = static_cast<float>(param<Str{"Output min"}>(params).value()),
-	     max_out = static_cast<float>(param<Str{"Output max"}>(params).value())](auto val) {
+	     min_out = mapIntensity(param<Str{"Output min"}>(params)),
+	     max_out = mapIntensity(param<Str{"Output max"}>(params))](auto val) {
 		    auto const t = (val - min_in) / (max_in - min_in);
 		    return t * max_out + (1.0f - t) * min_out;
 	    });
