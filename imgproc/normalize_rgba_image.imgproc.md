@@ -18,18 +18,18 @@ __Output max:__ (= 1.0) The maximum value in the output image
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <algorithm>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 float mapIntensity(ParamValue val)
 {
-	return static_cast<float>(std::exp2(16.0*(val.value() - 1.0)));
+	return static_cast<float>(std::exp2(16.0 * (val.value() - 1.0)));
 }
 
 void main(auto const& args, auto const& params)
@@ -40,8 +40,8 @@ void main(auto const& args, auto const& params)
         std::ranges::min_element(input_view, [](auto a, auto b) { return min(a) < min(b); }),
         std::ranges::max_element(input_view, [](auto a, auto b) { return max(a) < max(b); })};
 
-	auto const min_in_val  = min(*range.first);
-	auto const max_in_val  = max(*range.second);
+	auto const min_in_val = min(*range.first);
+	auto const max_in_val = max(*range.second);
 
 	auto const min_out_val = mapIntensity(param<Str{"Output min"}>(params));
 	auto const max_out_val = mapIntensity(param<Str{"Output max"}>(params));
