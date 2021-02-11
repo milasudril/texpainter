@@ -17,6 +17,7 @@
 #include "ui/dialog.hpp"
 #include "ui/keyboard_state.hpp"
 #include "ui/context.hpp"
+#include "ui/error_message_dialog.hpp"
 
 #include "utils/default_rng.hpp"
 #include "utils/inherit_from.hpp"
@@ -229,8 +230,9 @@ namespace Texpainter::App
 		}
 
 		template<auto, class T>
-		void handleException(char const*, T&)
+		void handleException(char const* message, T&)
 		{
+			m_err_box.show(m_root, "Texpainter", message);
 		}
 
 		template<auto>
@@ -355,6 +357,8 @@ namespace Texpainter::App
 		Ui::ImageView m_img_view;
 
 		std::unique_ptr<ColorPickerDlg> m_color_picker;
+
+		Ui::ErrorMessageDialog m_err_box;
 
 		void openColorPicker(PixelStore::ColorIndex index)
 		{
