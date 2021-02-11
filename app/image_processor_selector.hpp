@@ -5,13 +5,15 @@
 #ifndef TEXPAINTER_APP_IMAGEPROCESSORSELECTOR_HPP
 #define TEXPAINTER_APP_IMAGEPROCESSORSELECTOR_HPP
 
+#include "imgproc/image_processor_registry.hpp"
+
 #include "ui/box.hpp"
 #include "ui/labeled_input.hpp"
 #include "ui/text_entry.hpp"
 #include "ui/button.hpp"
 #include "ui/listbox.hpp"
 #include "ui/separator.hpp"
-#include "imgproc/image_processor_registry.hpp"
+#include "ui/error_message_dialog.hpp"
 
 namespace Texpainter::App
 {
@@ -53,8 +55,9 @@ namespace Texpainter::App
 		}
 
 		template<auto, class T>
-		void handleException(char const*, T&)
+		void handleException(char const* message, T&)
 		{
+			m_err_box.show(m_root, "Adding image processor", message);
 		}
 
 		template<auto>
@@ -75,6 +78,7 @@ namespace Texpainter::App
 		Ui::Button m_by_category;
 		Ui::Button m_by_name;
 		Ui::Separator m_separator;
+		Ui::ErrorMessageDialog m_err_box;
 
 		void set_by_category()
 		{
