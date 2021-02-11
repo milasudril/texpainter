@@ -32,7 +32,8 @@ namespace Texpainter::App
 		    : m_root{owner, Ui::Box::Orientation::Vertical}
 		    , m_search{m_root, Ui::Box::Orientation::Horizontal, "Search: "}
 		    , m_listbox{m_root.insertMode(Ui::Box::InsertMode{2, Ui::Box::Fill | Ui::Box::Expand})}
-		    , m_sort_buttons{m_root.insertMode(Ui::Box::InsertMode{2, 0}), Ui::Box::Orientation::Horizontal}
+		    , m_sort_buttons{m_root.insertMode(Ui::Box::InsertMode{2, 0}),
+		                     Ui::Box::Orientation::Horizontal}
 		    , m_by_category{m_sort_buttons.homogenous(true).insertMode(
 		                        Ui::Box::InsertMode{2, Ui::Box::Fill | Ui::Box::Expand}),
 		                    "By category"}
@@ -57,7 +58,7 @@ namespace Texpainter::App
 		template<auto, class T>
 		void handleException(char const* message, T&)
 		{
-			m_err_box.show(m_root, "Adding image processor", message);
+			m_err_box.show(m_root, "Texpainter: Adding image processor", message);
 		}
 
 		template<auto>

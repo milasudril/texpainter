@@ -25,6 +25,7 @@
 #include "ui/dialog.hpp"
 #include "ui/filename_select.hpp"
 #include "ui/context.hpp"
+#include "ui/error_message_dialog.hpp"
 
 #include <filesystem>
 
@@ -211,15 +212,27 @@ namespace Texpainter::App
 		}
 
 		template<auto id, class Source>
-		void handleException(char const* msg, Source&)
+		void handleException(char const* msg, Source& src)
 		{
-			fprintf(stderr, "Error: %s\n", msg);
+			m_err_box.show(src.owner(), "Texpainter", msg);
+		}
+
+		template<auto id>
+		void handleException(char const* msg, Ui::Window& src)
+		{
+			m_err_box.show(src, "Texpainter", msg);
+		}
+
+		template<auto id>
+		void handleException(Enum::Tag<id>, char const* msg, Ui::MenuItem&, Ui::Window& src)
+		{
+			m_err_box.show(src, "Texpainter", msg);
 		}
 
 		template<auto id, class Source>
-		void handleException(Enum::Tag<id>, char const* msg, Ui::MenuItem&, Source&)
+		void handleException(Enum::Tag<id>, char const* msg, Ui::MenuItem&, Source& src)
 		{
-			fprintf(stderr, "Error: %s\n", msg);
+			m_err_box.show(src.window(), "Texpainter", msg);
 		}
 
 		template<auto id, class Source>
@@ -436,21 +449,21 @@ namespace Texpainter::App
 		}
 
 		template<auto>
-		void handleException(char const* msg, ImageCreatorDlg&)
+		void handleException(char const* msg, ImageCreatorDlg& src)
 		{
-			fprintf(stderr, "Error: %s\n", msg);
+			m_err_box.show(src.owner(), "Texpainter: Creating image", msg);
 		}
 
 		template<auto>
-		void handleException(char const* msg, EmptyPaletteCreatorDlg&)
+		void handleException(char const* msg, EmptyPaletteCreatorDlg& src)
 		{
-			fprintf(stderr, "Error: %s\n", msg);
+			m_err_box.show(src.owner(), "Texpainter: Creating palette", msg);
 		}
 
 		template<auto>
-		void handleException(char const* msg, PaletteGenerateDlg&)
+		void handleException(char const* msg, PaletteGenerateDlg& src)
 		{
-			fprintf(stderr, "Error: %s\n", msg);
+			m_err_box.show(src.owner(), "Texpainter: Creating palette", msg);
 		}
 
 		template<auto>
@@ -609,6 +622,8 @@ namespace Texpainter::App
 		std::unique_ptr<ImageCreatorDlg> m_img_creator;
 		std::unique_ptr<EmptyPaletteCreatorDlg> m_empty_pal_creator;
 		std::unique_ptr<PaletteGenerateDlg> m_gen_palette;
+
+		Ui::ErrorMessageDialog m_err_box;
 
 		void openDocument(Ui::Container& dlg_owner)
 		{

@@ -20,7 +20,7 @@ __Softness:__ (= 0.0) Clipping softness. If zero, min and max are connected line
 
 ## Implementation
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 float mapIntensityLog(ParamValue val)
