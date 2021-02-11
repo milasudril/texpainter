@@ -311,13 +311,13 @@ namespace Texpainter::App
 		void handleException(char const* msg, NodeWidget const&, FilterGraph::InputPortIndex)
 		{
 			// TODO: Use NodeWidget and InputPort to format a better message
-			m_err_disp.show(r_owner.get(), "Texpainter", msg);
+			m_err_disp.show(r_owner.get(), "Texpainter: Compositor", msg);
 		}
 
 		void handleException(char const* msg, NodeWidget const&, FilterGraph::OutputPortIndex)
 		{
 			// TODO: Use NodeWidget and OutputPortIndex to format a better message
-			m_err_disp.show(r_owner.get(), "Texpainter", msg);
+			m_err_disp.show(r_owner.get(), "Texpainter: Compositor", msg);
 		}
 
 		void onChanged(NodeWidget const& src,
@@ -364,7 +364,7 @@ namespace Texpainter::App
 		template<auto id, class Src>
 		void handleException(char const* msg, Src&)
 		{
-			m_err_disp.show(r_owner.get(), "Texpainter", msg);
+			m_err_disp.show(r_owner.get(), "Texpainter: Compositor", msg);
 		}
 
 		template<ControlId>

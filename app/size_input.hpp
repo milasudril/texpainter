@@ -154,7 +154,7 @@ namespace Texpainter
 		template<ControlId, class... T>
 		void handleException(char const* msg, T&...)
 		{
-			m_err_disp.show(m_root, "Texpainter", msg);
+			m_err_disp.show(m_root, "Texpainter: Size input", msg);
 		}
 
 	private:
