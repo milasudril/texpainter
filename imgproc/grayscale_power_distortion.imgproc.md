@@ -18,16 +18,16 @@ __Exponent:__ (= 0.5) 0.5 maps to $a$ = 1.
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <cmath>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
-inline auto power(ParamValue val) { return std::exp2(std::lerp(-2.0, 2.0, val.value())); }
+inline auto power(ParamValue val) { return std::exp2(std::lerp(-3.0, 3.0, val.value())); }
 
 void main(auto const& args, auto const& params)
 {

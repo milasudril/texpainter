@@ -44,7 +44,8 @@
 //@		"./image_spectrum_to_amplitude_and_phase.imgproc.hpp",
 //@		"./random_point_cloud.imgproc.hpp",
 //@		"./place_rgba_image_at_points.imgproc.hpp",
-//@		"./select_rgba_image.imgproc.hpp"
+//@		"./select_rgba_image.imgproc.hpp",
+//@		"./make_linear_gradient.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -122,7 +123,9 @@ namespace
 	    get_info<::ImageSpectrumToAmplitudeAndPhase::ImageProcessor>(),
 	    get_info<::RandomPointCloud::ImageProcessor>(),
 	    get_info<::PlaceRgbaImageAtPoints::ImageProcessor>(),
-	    get_info<::SelectRgbaImage::ImageProcessor>()};
+	    get_info<::SelectRgbaImage::ImageProcessor>(),
+		get_info<::MakeLinearGradient::ImageProcessor>()
+	};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
