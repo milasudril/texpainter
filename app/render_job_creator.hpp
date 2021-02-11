@@ -8,6 +8,7 @@
 #include "ui/button.hpp"
 #include "ui/text_entry.hpp"
 #include "ui/filename_select.hpp"
+#include "ui/error_message_dialog.hpp"
 
 namespace Texpainter::App
 {
@@ -67,14 +68,16 @@ namespace Texpainter::App
 		}
 
 		template<auto, class T>
-		void handleException(char const*, T&)
+		void handleException(char const* msg, T&)
 		{
+			m_err_box.show(m_root, "Texpainter: Exporting image", msg);
 		}
 
 	private:
 		Ui::Box m_root;
 		Ui::LabeledInput<Ui::ReversedLabeledInput<Ui::TextEntry, Ui::Button>> m_filename;
 		Ui::LabeledInput<RenderOptionsInput> m_render_opts;
+		Ui::ErrorMessageDialog m_err_box;
 	};
 }
 
