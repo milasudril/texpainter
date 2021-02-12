@@ -8,24 +8,26 @@ __Output:__ (Grayscale image)
 
 ## Parameters
 
-__Size:__ (= 0.9333333333333333) The size of the mask, along the nominal x axis.
-
-__Orientation:__ (= 0.0) Orientation of the mask. 1.0 maps to 2*π.
+__Orientation:__ (= 0.0) Orientation of the mask. 1.0 maps to 2π.
 
 ## Implementation
 
 __Source code:__
 
 ```c++
-void main(auto const& args, auto const&)
+void main(auto const& args, auto const& params)
 {
 	auto const w = args.canvasSize().width();
 	auto const h = args.canvasSize().height();
+	auto const theta = Angle{param<Str{"Orientation"}>(params).value(), Angle::Turns{}};
+	auto const O = vec2_t{static_cast<double>(w), static_cast<double>(h)};
 	for(uint32_t row = 0; row < h; ++row)
 	{
 		for(uint32_t col = 0; col < w; ++col)
 		{
-			output<0>(args, row, col) = static_cast<double>(col)/w;
+			auto const pos = vec2_t{static_cast<double>(col), static_cast<double>(row)} - O;
+			auto const n_xy = vec2_t{cos(theta), sin(theta)};
+			output<0>(args, row, col) = Texpainter::dot(pos, n_xy)/w;
 		}
 	}
 }
