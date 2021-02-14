@@ -50,3 +50,25 @@ Texpainter::Model::Windows Texpainter::App::WindowManager::windowInfo() const
 	});
 	return ret;
 }
+
+void Texpainter::App::WindowManager::loadDocument(char const* filename)
+{
+	m_document     = load(Enum::Empty<Model::Document>{}, filename);
+	m_window_count = 0;
+	Enum::forEachEnumItem<WindowType>([&document = *m_document, this](auto i) {
+		m_windows.get<i.value>().reset();
+		if(document.workspace().m_windows.get<i.value>().visible)
+		{ createAndShowWindow<i.value>(); }
+	});
+
+	if(m_window_count == 0)
+	{
+		Enum::forEachEnumItem<WindowType>([this](auto item) {
+			m_windows.get<item.value>() = createWindow<item.value>(*m_document);
+		});
+		resetWindowPositions();
+	}
+
+	if(auto editor = m_windows.get<WindowType::ImageEditor>().get(); editor != nullptr)
+	{ editor->window().show(); }
+}

@@ -247,6 +247,7 @@ public:
 	{
 		m_min_size = size;
 		gtk_widget_set_size_request(GTK_WIDGET(m_handle), size.width(), size.height());
+		gtk_widget_set_size_request(GTK_WIDGET(m_scrolled_window), size.width(), size.height());
 	}
 
 	Size2d imageSize() const noexcept { return m_img_surface.size(); }

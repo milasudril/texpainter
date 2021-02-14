@@ -609,6 +609,8 @@ namespace Texpainter::App
 
 		Model::Windows windowInfo() const;
 
+		void loadDocument(char const* filename);
+
 	private:
 		std::unique_ptr<Model::Document> m_document;
 
@@ -637,26 +639,7 @@ namespace Texpainter::App
 				       return fileValid(Enum::Empty<Model::Document>{}, filename);
 			       },
 			       "Texpainter documents"))
-			{
-				m_document     = load(Enum::Empty<Model::Document>{}, filename.c_str());
-				m_window_count = 0;
-				Enum::forEachEnumItem<WindowType>([&document = *m_document, this](auto i) {
-					m_windows.get<i.value>().reset();
-					if(document.workspace().m_windows.get<i.value>().visible)
-					{ createAndShowWindow<i.value>(); }
-				});
-
-				if(m_window_count == 0)
-				{
-					Enum::forEachEnumItem<WindowType>([this](auto item) {
-						m_windows.get<item.value>() = createWindow<item.value>(*m_document);
-					});
-					resetWindowPositions();
-				}
-
-				if(auto editor = m_windows.get<WindowType::ImageEditor>().get(); editor != nullptr)
-				{ editor->window().show(); }
-			}
+			{ loadDocument(filename.c_str()); }
 		}
 
 		void saveDocumentAs(Ui::Container& dlg_owner)
