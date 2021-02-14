@@ -6,6 +6,7 @@
 
 #include "pixel_store/image_io.hpp"
 #include "imgproc/image_processor_registry.hpp"
+#include "log/logger.hpp"
 
 #include <wad64/archive.hpp>
 #include <wad64/readonly_archive.hpp>
@@ -235,7 +236,8 @@ namespace
 			    Texpainter::ImageProcessorRegistry::createImageProcessor(item.second.imgproc);
 			if(imgproc == nullptr)
 			{
-				//	log(Log::MessageType::Warning, toString(item.second.imgproc) + " is not a valid image processor");
+				log(Texpainter::Logger::MessageType::Warning,
+				    toString(item.second.imgproc) + " is not a valid image processor");
 				return;
 			}
 

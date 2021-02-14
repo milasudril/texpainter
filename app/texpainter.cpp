@@ -22,7 +22,7 @@ namespace
 		switch(type)
 		{
 			case Texpainter::Logger::MessageType::Info: return "dialog-information";
-			case Texpainter::Logger::MessageType::Warning: return "dialog-waring";
+			case Texpainter::Logger::MessageType::Warning: return "dialog-warning";
 			case Texpainter::Logger::MessageType::Error: return "dialog-error";
 
 			default: __builtin_unreachable();
