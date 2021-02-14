@@ -275,8 +275,10 @@ namespace
 			auto const id_mapping = m_id_map.get().find(src.node);
 			if(id_mapping == std::end(m_id_map.get()))
 			{
-				throw std::string{"Connection entry points to a non-exesting node "}
-				    + toString(src.node);
+				log(Texpainter::Logger::MessageType::Warning,
+				    std::string{"Connection entry points to a non-exesting node "}
+				        + toString(src.node));
+				return;
 			}
 
 			auto const source = id_mapping->second;
@@ -289,8 +291,10 @@ namespace
 			auto const id_mapping = m_id_map.get().find(item.first);
 			if(id_mapping == std::end(m_id_map.get()))
 			{
-				throw std::string{"Connection entry points to a non-exesting node "}
-				    + toString(item.first);
+				log(Texpainter::Logger::MessageType::Warning,
+				    std::string{"Connection entry points to a non-exesting node "}
+				        + toString(item.first));
+				return;
 			}
 
 			std::ranges::for_each(
