@@ -231,8 +231,14 @@ namespace
 
 			if(item.second.imgproc == Texpainter::FilterGraph::InvalidImgProcId) { return; }
 
-			auto res = m_compositor.insert(
-			    Texpainter::ImageProcessorRegistry::createImageProcessor(item.second.imgproc));
+			auto imgproc = Texpainter::ImageProcessorRegistry::createImageProcessor(item.second.imgproc);
+			if(imgproc == nullptr)
+			{
+			//	log(Log::MessageType::Warning, toString(item.second.imgproc) + " is not a valid image processor");
+				return;
+			}
+
+			auto res = m_compositor.insert(std::move(imgproc));
 			std::ranges::for_each(
 			    item.second.params, [&node = res.second.get()](auto const& param) {
 				    auto val = std::clamp(param.second, 0.0, 1.0);
