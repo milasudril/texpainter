@@ -124,8 +124,7 @@ namespace
 	    get_info<::RandomPointCloud::ImageProcessor>(),
 	    get_info<::PlaceRgbaImageAtPoints::ImageProcessor>(),
 	    get_info<::SelectRgbaImage::ImageProcessor>(),
-		get_info<::MakeLinearGradient::ImageProcessor>()
-	};
+	    get_info<::MakeLinearGradient::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;

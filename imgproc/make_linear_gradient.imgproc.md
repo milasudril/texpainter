@@ -14,29 +14,27 @@ __Size:__ (= 1.0) The size of the mask, along the nominal x axis.
 
 ## Implementation
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& args, auto const& params)
 {
-	auto const w = args.canvasSize().width();
-	auto const h = args.canvasSize().height();
+	auto const w     = args.canvasSize().width();
+	auto const h     = args.canvasSize().height();
 	auto const theta = Angle{param<Str{"Orientation"}>(params).value(), Angle::Turns{}};
-	auto const O = 0.5*vec2_t{static_cast<double>(w), static_cast<double>(h)};
-	auto const r_0 =
-	    0.5 * sizeFromMin(args.canvasSize(), param<Str{"Size"}>(params));
+	auto const O     = 0.5 * vec2_t{static_cast<double>(w), static_cast<double>(h)};
+	auto const r_0   = 0.5 * sizeFromMin(args.canvasSize(), param<Str{"Size"}>(params));
 
 	for(uint32_t row = 0; row < h; ++row)
 	{
 		for(uint32_t col = 0; col < w; ++col)
 		{
-			auto const pos = vec2_t{static_cast<double>(col), static_cast<double>(row)} - O;
+			auto const pos  = vec2_t{static_cast<double>(col), static_cast<double>(row)} - O;
 			auto const n_xy = vec2_t{cos(theta), sin(theta)};
-			output<0>(args, row, col) = Texpainter::dot(pos, n_xy)/r_0;
+			output<0>(args, row, col) = Texpainter::dot(pos, n_xy) / r_0;
 		}
 	}
 }
-
 ```
 
 ## Tags

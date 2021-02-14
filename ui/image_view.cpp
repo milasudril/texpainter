@@ -156,12 +156,16 @@ namespace
 class Texpainter::Ui::ImageView::Impl: private ImageView
 {
 public:
-	explicit Impl(Container& cnt): ImageView{*this}
+	explicit Impl(Container& cnt): ImageView{*this}, m_min_size{160, 120}
 	{
+		m_scrolled_window = GTK_SCROLLED_WINDOW(gtk_scrolled_window_new(nullptr, nullptr));
+		gtk_widget_set_size_request(
+		    GTK_WIDGET(m_scrolled_window), m_min_size.width(), m_min_size.height());
+		cnt.add(m_scrolled_window);
 		auto widget = gtk_drawing_area_new();
 		g_object_ref_sink(widget);
-		cnt.add(widget);
-		m_handle            = GTK_DRAWING_AREA(widget);
+		m_handle = GTK_DRAWING_AREA(widget);
+		gtk_container_add(GTK_CONTAINER(m_scrolled_window), widget);
 		r_eh                = nullptr;
 		m_emit_mouse_events = false;
 		gtk_widget_add_events(widget,
@@ -180,6 +184,7 @@ public:
 	{
 		gtk_widget_destroy(GTK_WIDGET(m_handle));
 		g_object_unref(m_handle);
+		gtk_widget_destroy(GTK_WIDGET(m_scrolled_window));
 		m_impl = nullptr;
 	}
 
@@ -218,6 +223,8 @@ public:
 	void image(Span2d<PixelStore::Pixel const> img)
 	{
 		m_img_surface = CairoSurface{img};
+		auto size     = img.size();
+		gtk_widget_set_size_request(GTK_WIDGET(m_handle), size.width(), size.height());
 		gtk_widget_queue_draw(GTK_WIDGET(m_handle));
 	}
 
@@ -226,6 +233,7 @@ public:
 		m_img_surface = CairoSurface{};
 		m_overlay     = Overlay{};
 
+		gtk_widget_set_size_request(GTK_WIDGET(m_handle), m_min_size.width(), m_min_size.height());
 		gtk_widget_queue_draw(GTK_WIDGET(m_handle));
 	}
 
@@ -237,6 +245,7 @@ public:
 
 	void minSize(Size2d size)
 	{
+		m_min_size = size;
 		gtk_widget_set_size_request(GTK_WIDGET(m_handle), size.width(), size.height());
 	}
 
@@ -270,8 +279,11 @@ private:
 	CairoSurface m_background;
 	CairoSurface m_img_surface;
 	Overlay m_overlay;
+	Size2d m_min_size;
 
+	GtkScrolledWindow* m_scrolled_window;
 	GtkDrawingArea* m_handle;
+
 	static gboolean draw_callback(GtkWidget* widget, cairo_t* cr, gpointer self)
 	{
 		auto const w = static_cast<uint32_t>(gtk_widget_get_allocated_width(widget));
