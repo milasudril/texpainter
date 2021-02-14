@@ -282,7 +282,8 @@ namespace
 			}
 
 			auto const source = id_mapping->second;
-			// FIXME: Validate port type!
+			// FIXME: Validate port type
+			// FIXME: Make sure this is not a self-connection
 			m_compositor.connect(sink, k, source, src.output_port);
 		}
 
