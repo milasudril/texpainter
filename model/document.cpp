@@ -231,10 +231,11 @@ namespace
 
 			if(item.second.imgproc == Texpainter::FilterGraph::InvalidImgProcId) { return; }
 
-			auto imgproc = Texpainter::ImageProcessorRegistry::createImageProcessor(item.second.imgproc);
+			auto imgproc =
+			    Texpainter::ImageProcessorRegistry::createImageProcessor(item.second.imgproc);
 			if(imgproc == nullptr)
 			{
-			//	log(Log::MessageType::Warning, toString(item.second.imgproc) + " is not a valid image processor");
+				//	log(Log::MessageType::Warning, toString(item.second.imgproc) + " is not a valid image processor");
 				return;
 			}
 
