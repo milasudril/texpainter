@@ -229,3 +229,24 @@ void Texpainter::App::Compositor::insertNodeEditor(FilterGraph::Graph::NodeItem 
 	m_ports.addPorts(item.second.get());
 	m_canvas.showWidgets();
 }
+
+void Texpainter::App::Compositor::refresh()
+{
+	m_node_editors.clear();
+
+	std::ranges::transform(m_doc.get().compositor().nodesWithId(),
+	                       std::inserter(m_node_editors, std::end(m_node_editors)),
+	                       MakeNodeEditor{m_canvas, m_doc.get().nodeLocations()});
+	std::ranges::for_each(m_node_editors, [this](auto& item) { item.second->eventHandler(*this); });
+
+	m_ports = PortMap{};
+	std::ranges::for_each(
+	    m_doc.get().compositor().nodesWithId(),
+	    [&ports = m_ports](auto& node_item) { ports.addPorts(node_item.second); });
+	std::ranges::for_each(
+	    m_doc.get().compositor().nodesWithId(),
+	    [&ports = m_ports](auto const& node_item) { ports.addConnections(node_item.second); });
+
+	m_canvas.showWidgets();
+	m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
+}

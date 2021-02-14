@@ -264,6 +264,7 @@ namespace Texpainter::App
 			}
 		}
 
+		void refresh();
 
 		template<ControlId>
 		void onRealized(Canvas& src);

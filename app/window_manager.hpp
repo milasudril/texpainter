@@ -201,11 +201,7 @@ namespace Texpainter::App
 		void onClose(Ui::Window&)
 		{
 			--m_window_count;
-			if constexpr(id == WindowType::Compositor)
-			{
-				m_document->nodeLocations(
-				    m_windows.get<WindowType::Compositor>()->widget().nodeLocations());
-			}
+			saveNodLocs();
 			m_document->windows(windowInfo());
 			m_windows.get<id>().reset();
 			if(m_window_count == 0) { Ui::Context::get().exit(); }
@@ -236,8 +232,9 @@ namespace Texpainter::App
 		}
 
 		template<auto id, class Source>
-		requires(!std::same_as<decltype(id), WorkspaceAction> && !std::same_as<decltype(id), DocumentAction>) void onActivated(
-		    Enum::Tag<id>, Ui::MenuItem&, Source&)
+		requires(std::same_as<decltype(id), AppAction>) void onActivated(Enum::Tag<id>,
+		                                                                 Ui::MenuItem&,
+		                                                                 Source&)
 		{
 			throw "Unimplemented action";
 		}
@@ -400,6 +397,22 @@ namespace Texpainter::App
 				           std::filesystem::path{m_document->currentPalette().c_str()},
 				           img->source.get());
 			}
+		}
+
+		template<class Source>
+		void onActivated(Enum::Tag<ImageAction::Delete>, Ui::MenuItem&, Source&)
+		{
+			saveNodLocs();
+			m_document->eraseImage(m_document->currentImage());
+			doUpdateFull();
+		}
+
+		template<class Source>
+		void onActivated(Enum::Tag<PaletteAction::Delete>, Ui::MenuItem&, Source&)
+		{
+			saveNodLocs();
+			m_document->erasePalette(m_document->currentPalette());
+			doUpdateFull();
 		}
 
 		template<class Source>
@@ -584,12 +597,7 @@ namespace Texpainter::App
 		template<WindowType id, class Src>
 		void onUpdated(Src&)
 		{
-			if(auto editor = m_windows.get<WindowType::ImageEditor>().get(); editor != nullptr)
-			{ editor->widget().refresh(); }
-
-			if(auto output = m_windows.get<WindowType::DocumentPreviewer>().get();
-			   output != nullptr)
-			{ output->widget().refresh(); }
+			doUpdate();
 		}
 
 		template<auto, class T>
@@ -696,9 +704,7 @@ namespace Texpainter::App
 
 		void saveDocument(char const* filename)
 		{
-			if(auto compositor = m_windows.get<WindowType::Compositor>().get();
-			   compositor != nullptr)
-			{ m_document->nodeLocations(compositor->widget().nodeLocations()); }
+			saveNodLocs();
 
 			m_document->windows(windowInfo());
 
@@ -772,6 +778,31 @@ namespace Texpainter::App
 			if(auto output = m_windows.get<WindowType::DocumentPreviewer>().get();
 			   output != nullptr)
 			{ output->widget().refresh(); }
+		}
+
+		void doUpdate()
+		{
+			if(auto editor = m_windows.get<WindowType::ImageEditor>().get(); editor != nullptr)
+			{ editor->widget().refresh(); }
+
+			if(auto output = m_windows.get<WindowType::DocumentPreviewer>().get();
+			   output != nullptr)
+			{ output->widget().refresh(); }
+		}
+
+		void doUpdateFull()
+		{
+			Enum::forEachEnumItem<WindowType>([&windows = m_windows](auto item) {
+				if(auto editor = windows.get<item.value>().get(); editor != nullptr)
+				{ editor->widget().refresh(); }
+			});
+		}
+
+		void saveNodLocs()
+		{
+			if(auto compositor = m_windows.get<WindowType::Compositor>().get();
+			   compositor != nullptr)
+			{ m_document->nodeLocations(compositor->widget().nodeLocations()); }
 		}
 	};
 }
