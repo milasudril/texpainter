@@ -232,7 +232,8 @@ namespace
 			{
 				log(Texpainter::Logger::MessageType::Warning,
 				    toString(item.second.imgproc) + " is not a valid image processor");
-				return;
+				auto dummy = new Texpainter::FilterGraph::ImageProcessorWrapper{Texpainter::Model::DummyProcessor{}};
+				imgproc.reset(dummy);
 			}
 
 			auto res = m_compositor.insert(std::move(imgproc));

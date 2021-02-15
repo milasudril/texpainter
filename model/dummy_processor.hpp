@@ -23,7 +23,7 @@ namespace Texpainter::Model
 			static constexpr std::array<FilterGraph::ParamName, 0> ParamNames{};
 		};
 
-		void operator()(FilterGraph::ImgProcArg<InterfaceDescriptor> const&){}
+		void operator()(FilterGraph::ImgProcArg<InterfaceDescriptor> const&) const {}
 
 		FilterGraph::ParamValue get(FilterGraph::ParamName) const
 		{
@@ -39,7 +39,8 @@ namespace Texpainter::Model
 
 		char const* name() const { return "Placeholder"; }
 
-		static constexpr auto id() { return FilterGraph::InvalidImgProcId; }
+		static constexpr auto id()
+		{ return FilterGraph::ImageProcessorId{"419ed08fefebb004dc85ee1d8771330c"}; }
 	};
 }
 
