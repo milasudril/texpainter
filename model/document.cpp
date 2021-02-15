@@ -221,15 +221,8 @@ namespace
 
 		void operator()(auto const& item)
 		{
-			if(item.first == NodeId{0})
-			{
-				if(item.second.imgproc != Texpainter::Model::ImageSink::id())
-				{
-					throw std::string{"Bad output image processor. Expected "
-					                  + toString(Texpainter::Model::ImageSink::id())};
-				}
-				return;
-			}
+			// Do not process NodeId{0}. It is the output node, which already has been created
+			if(item.first == NodeId{0}) { return; }
 
 			if(item.second.imgproc == Texpainter::FilterGraph::InvalidImgProcId) { return; }
 
