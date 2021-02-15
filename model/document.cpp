@@ -232,7 +232,8 @@ namespace
 			{
 				log(Texpainter::Logger::MessageType::Warning,
 				    toString(item.second.imgproc) + " is not a valid image processor");
-				auto dummy = new Texpainter::FilterGraph::ImageProcessorWrapper{Texpainter::Model::DummyProcessor{}};
+				auto dummy = new Texpainter::FilterGraph::ImageProcessorWrapper{
+				    Texpainter::Model::DummyProcessor{}};
 				imgproc.reset(dummy);
 			}
 
@@ -279,7 +280,13 @@ namespace
 			auto const source = id_mapping->second;
 			// FIXME: Validate port type
 			// FIXME: Make sure this is not a self-connection
-			m_compositor.connect(sink, k, source, src.output_port);
+			if(!m_compositor.checkedConnect(sink, k, source, src.output_port))
+			{
+				log(Texpainter::Logger::MessageType::Warning,
+				    std::string{"Failed to add a connection between "} + toString(sink) + ":"
+				        + std::to_string(k.value()) + " and " + toString(src.node) + ":"
+				        + std::to_string(src.output_port.value()));
+			}
 		}
 
 		void operator()(auto const& item)

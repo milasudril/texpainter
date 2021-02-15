@@ -70,6 +70,15 @@ namespace Texpainter::FilterGraph
 			return *this;
 		}
 
+		bool checkedConnect(NodeId a, InputPortIndex sink, NodeId b, OutputPortIndex src)
+		{
+			auto node_a = node(a);
+			auto node_b = node(b);
+			if(node_a == nullptr || node_b == nullptr) { return false; }
+
+			return m_nodes[a].checkedConnect(sink, m_nodes[b], src);
+		}
+
 		Graph& disconnect(NodeId a, InputPortIndex sink)
 		{
 			assert(node(a) != nullptr);

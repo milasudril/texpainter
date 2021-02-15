@@ -69,6 +69,13 @@ namespace Texpainter::Model
 			return *this;
 		}
 
+		bool checkedConnect(NodeId a, InputPortIndex sink, NodeId b, OutputPortIndex src)
+		{
+			if(!m_graph.checkedConnect(a, sink, b, src)) { return false; }
+			m_valid_state = ValidationState::NotValidated;
+			return true;
+		}
+
 		Compositor& disconnect(NodeId a, InputPortIndex sink)
 		{
 			m_graph.disconnect(a, sink);

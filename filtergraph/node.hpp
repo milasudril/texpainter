@@ -133,6 +133,28 @@ namespace Texpainter::FilterGraph
 			return *this;
 		}
 
+		bool checkedConnect(InputPortIndex input,
+		                    std::reference_wrapper<Node const> other,
+		                    OutputPortIndex output)
+		{
+			// TODO: Return status code
+			if(input.value() >= inputPorts().size()) { return false; }
+
+			if(output.value() >= other.get().outputPorts().size()) { return false; }
+
+			if(inputPorts()[input.value()].type != other.get().outputPorts()[output.value()].type)
+			{ return false; }
+
+			other.get().r_consumers[this].insert(input);
+
+			if(m_inputs[input.value()].valid())
+			{ m_inputs[input.value()].processor().r_consumers.find(this)->second.erase(input); }
+
+			m_inputs[input.value()] = Source{&other.get(), output};
+			clear_result_cache();
+			return true;
+		}
+
 		Node& disconnect(InputPortIndex input)
 		{
 			assert(input.value() < NodeArgument::MaxNumInputs);

@@ -29,6 +29,14 @@ namespace Texpainter::Model
 			return *this;
 		}
 
+		bool checkedConnect(Compositor::NodeId a,
+		                    Compositor::InputPortIndex sink,
+		                    Compositor::NodeId b,
+		                    Compositor::OutputPortIndex src)
+		{
+			return m_compositor.get().checkedConnect(a, sink, b, src);
+		}
+
 		void clearValidationState() { m_compositor.get().clearValidationState(); }
 
 		auto nodesWithId() { return m_compositor.get().nodesWithId(); }

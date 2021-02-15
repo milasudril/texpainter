@@ -37,10 +37,12 @@ namespace Texpainter::Model
 			return std::span<FilterGraph::ParamValue const>{};
 		}
 
-		char const* name() const { return "Placeholder"; }
+		char const* name() const { return "«Unknown image processor»"; }
 
 		static constexpr auto id()
-		{ return FilterGraph::ImageProcessorId{"419ed08fefebb004dc85ee1d8771330c"}; }
+		{
+			return FilterGraph::ImageProcessorId{"419ed08fefebb004dc85ee1d8771330c"};
+		}
 	};
 }
 
