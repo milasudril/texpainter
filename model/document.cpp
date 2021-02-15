@@ -3,6 +3,7 @@
 //@	}
 
 #include "./document.hpp"
+#include "./dummy_processor.hpp"
 
 #include "pixel_store/image_io.hpp"
 #include "imgproc/image_processor_registry.hpp"
