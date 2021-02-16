@@ -86,6 +86,8 @@ namespace Texpainter::Ui
 
 		ImageView& alwaysEmitMouseEvents(bool status);
 
+		ImageView& scale(double factor);
+
 	private:
 		class Impl;
 		explicit ImageView(Impl& impl): m_impl(&impl) {}

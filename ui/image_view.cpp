@@ -156,7 +156,7 @@ namespace
 class Texpainter::Ui::ImageView::Impl: private ImageView
 {
 public:
-	explicit Impl(Container& cnt): ImageView{*this}, m_min_size{160, 120}
+	explicit Impl(Container& cnt): ImageView{*this}, m_min_size{160, 120}, m_scale{1.0}
 	{
 		m_scrolled_window = GTK_SCROLLED_WINDOW(gtk_scrolled_window_new(nullptr, nullptr));
 		gtk_widget_set_size_request(
@@ -190,7 +190,7 @@ public:
 
 	void render(Size2d dim, cairo_t* cr) const
 	{
-		cairo_scale(cr, 8.0, 8.0);
+		cairo_scale(cr, m_scale, m_scale);
 		cairo_set_source_surface(cr, m_background.get(), 0.0, 0.0);
 		cairo_pattern_set_extend(cairo_get_source(cr), CAIRO_EXTEND_REPEAT);
 		cairo_pattern_set_filter(cairo_get_source(cr), CAIRO_FILTER_NEAREST);
@@ -228,7 +228,8 @@ public:
 	{
 		m_img_surface = CairoSurface{img};
 		auto size     = img.size();
-		gtk_widget_set_size_request(GTK_WIDGET(m_handle), 8*size.width(), 8*size.height());
+		gtk_widget_set_size_request(
+		    GTK_WIDGET(m_handle), m_scale * size.width(), m_scale * size.height());
 		gtk_widget_queue_draw(GTK_WIDGET(m_handle));
 	}
 
@@ -277,6 +278,16 @@ public:
 		gtk_widget_queue_draw(GTK_WIDGET(m_handle));
 	}
 
+	ImageView& scale(double factor)
+	{
+		m_scale         = factor;
+		auto const size = m_img_surface.size();
+		gtk_widget_set_size_request(
+		    GTK_WIDGET(m_handle), m_scale * size.width(), m_scale * size.height());
+		gtk_widget_queue_draw(GTK_WIDGET(m_handle));
+		return *this;
+	}
+
 private:
 	void* r_eh;
 	EventHandlerVtable m_vt;
@@ -285,6 +296,7 @@ private:
 	CairoSurface m_img_surface;
 	Overlay m_overlay;
 	Size2d m_min_size;
+	double m_scale;
 
 	GtkScrolledWindow* m_scrolled_window;
 	GtkDrawingArea* m_handle;
@@ -305,8 +317,9 @@ private:
 			auto event_button = reinterpret_cast<GdkEventButton const*>(e);
 			obj.m_vt.m_on_mouse_down(obj.r_eh,
 			                         obj,
-			                         vec2_t{event_button->x, event_button->y}/8.0,
-			                         vec2_t{event_button->x_root, event_button->y_root}/8.0,
+			                         vec2_t{event_button->x, event_button->y} / obj.m_scale,
+			                         vec2_t{event_button->x_root, event_button->y_root}
+			                             / obj.m_scale,
 			                         event_button->button);
 			return TRUE;
 		}
@@ -321,8 +334,8 @@ private:
 			auto event_button = reinterpret_cast<GdkEventButton const*>(e);
 			obj.m_vt.m_on_mouse_up(obj.r_eh,
 			                       obj,
-			                       vec2_t{event_button->x, event_button->y}/8.0,
-			                       vec2_t{event_button->x_root, event_button->y_root}/8.0,
+			                       vec2_t{event_button->x, event_button->y} / obj.m_scale,
+			                       vec2_t{event_button->x_root, event_button->y_root} / obj.m_scale,
 			                       event_button->button);
 			return TRUE;
 		}
@@ -337,8 +350,9 @@ private:
 			auto event_button = reinterpret_cast<GdkEventMotion const*>(e);
 			obj.m_vt.m_on_mouse_move(obj.r_eh,
 			                         obj,
-			                         vec2_t{event_button->x, event_button->y}/8.0,
-			                         vec2_t{event_button->x_root, event_button->y_root}/8.0);
+			                         vec2_t{event_button->x, event_button->y} / obj.m_scale,
+			                         vec2_t{event_button->x_root, event_button->y_root}
+			                             / obj.m_scale);
 			return TRUE;
 		}
 		return FALSE;
@@ -422,5 +436,11 @@ Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::overlay(Span2d<PixelStore:
 Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::overlayLocation(vec2_t pos)
 {
 	m_impl->overlayLocation(pos);
+	return *this;
+}
+
+Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::scale(double factor)
+{
+	m_impl->scale(factor);
 	return *this;
 }

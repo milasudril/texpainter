@@ -37,7 +37,12 @@ namespace Texpainter::Ui
 
 	inline bool isShiftPressed(KeyboardState const& kb)
 	{
-		return kb.isPressed(Scancodes::ShiftLeft) || kb.isPressed(Scancodes::ShiftLeft);
+		return kb.isPressed(Scancodes::ShiftLeft) || kb.isPressed(Scancodes::ShiftRight);
+	}
+
+	inline bool isCtrlPressed(KeyboardState const& kb)
+	{
+		return kb.isPressed(Scancodes::CtrlLeft) || kb.isPressed(Scancodes::CtrlRight);
 	}
 }
 

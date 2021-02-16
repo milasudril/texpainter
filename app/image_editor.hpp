@@ -98,6 +98,7 @@ namespace Texpainter::App
 		    : m_doc{doc}
 		    , m_draw_mode{false}
 		    , m_loc{0.0, 0.0}
+		    , m_scale{1.0}
 		    , m_root{owner, Ui::Box::Orientation::Vertical}
 		    , m_selectors{m_root, Ui::Box::Orientation::Horizontal}
 		    , m_image_sel{m_selectors, Ui::Box::Orientation::Horizontal, "Image: "}
@@ -322,14 +323,23 @@ namespace Texpainter::App
 		template<auto>
 		void onScroll(Ui::ImageView&, vec2_t delta)
 		{
-			auto brush = m_doc.get().currentBrush();
-			auto radius_new =
-			    std::clamp(brush.radius() + static_cast<float>(delta[1]) / 32.0f, 0.0f, 1.0f);
-			brush.radius(radius_new);
-			m_brush_sel.inputField().brush(brush);
-			m_doc.get().currentBrush(brush);
-			updateBrush();
-			m_img_view.overlayLocation(m_loc);
+			auto const& keyb_state = Ui::Context::get().keyboardState();
+			if(isCtrlPressed(keyb_state))
+			{
+				m_scale = std::clamp(m_scale + (delta[1] > 0 ? 1 : -1), 1.0, 16.0);
+				m_img_view.scale(m_scale);
+			}
+			else
+			{
+				auto brush = m_doc.get().currentBrush();
+				auto radius_new =
+				    std::clamp(brush.radius() + static_cast<float>(delta[1]) / 32.0f, 0.0f, 1.0f);
+				brush.radius(radius_new);
+				m_brush_sel.inputField().brush(brush);
+				m_doc.get().currentBrush(brush);
+				updateBrush();
+				m_img_view.overlayLocation(m_loc);
+			}
 		}
 
 
@@ -337,6 +347,7 @@ namespace Texpainter::App
 		std::reference_wrapper<Model::Document> m_doc;
 		DrawMode m_draw_mode;
 		vec2_t m_loc;
+		double m_scale;
 
 		void* r_eh;
 		void (*on_updated)(void*, ImageEditor&);
