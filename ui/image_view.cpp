@@ -190,8 +190,10 @@ public:
 
 	void render(Size2d dim, cairo_t* cr) const
 	{
+		cairo_scale(cr, 8.0, 8.0);
 		cairo_set_source_surface(cr, m_background.get(), 0.0, 0.0);
 		cairo_pattern_set_extend(cairo_get_source(cr), CAIRO_EXTEND_REPEAT);
+		cairo_pattern_set_filter(cairo_get_source(cr), CAIRO_FILTER_NEAREST);
 		cairo_rectangle(cr, 0.0, 0.0, dim.width(), dim.height());
 		cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
 		cairo_fill(cr);
@@ -200,6 +202,7 @@ public:
 		{
 			cairo_set_source_surface(cr, img, 0.0, 0.0);
 			cairo_pattern_set_extend(cairo_get_source(cr), CAIRO_EXTEND_REPEAT);
+			cairo_pattern_set_filter(cairo_get_source(cr), CAIRO_FILTER_NEAREST);
 			cairo_rectangle(cr, 0.0, 0.0, dim.width(), dim.height());
 			cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
 			cairo_fill(cr);
@@ -209,6 +212,7 @@ public:
 		{
 			cairo_set_source_surface(cr, img, m_overlay.location[0], m_overlay.location[1]);
 			cairo_pattern_set_extend(cairo_get_source(cr), CAIRO_EXTEND_NONE);
+			cairo_pattern_set_filter(cairo_get_source(cr), CAIRO_FILTER_NEAREST);
 			auto const surf_rect = m_overlay.surface.size();
 			cairo_rectangle(cr,
 			                m_overlay.location[0],
