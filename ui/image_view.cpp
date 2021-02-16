@@ -305,8 +305,8 @@ private:
 			auto event_button = reinterpret_cast<GdkEventButton const*>(e);
 			obj.m_vt.m_on_mouse_down(obj.r_eh,
 			                         obj,
-			                         vec2_t{event_button->x, event_button->y},
-			                         vec2_t{event_button->x_root, event_button->y_root},
+			                         vec2_t{event_button->x, event_button->y}/8.0,
+			                         vec2_t{event_button->x_root, event_button->y_root}/8.0,
 			                         event_button->button);
 			return TRUE;
 		}
@@ -321,8 +321,8 @@ private:
 			auto event_button = reinterpret_cast<GdkEventButton const*>(e);
 			obj.m_vt.m_on_mouse_up(obj.r_eh,
 			                       obj,
-			                       vec2_t{event_button->x, event_button->y},
-			                       vec2_t{event_button->x_root, event_button->y_root},
+			                       vec2_t{event_button->x, event_button->y}/8.0,
+			                       vec2_t{event_button->x_root, event_button->y_root}/8.0,
 			                       event_button->button);
 			return TRUE;
 		}
@@ -337,8 +337,8 @@ private:
 			auto event_button = reinterpret_cast<GdkEventMotion const*>(e);
 			obj.m_vt.m_on_mouse_move(obj.r_eh,
 			                         obj,
-			                         vec2_t{event_button->x, event_button->y},
-			                         vec2_t{event_button->x_root, event_button->y_root});
+			                         vec2_t{event_button->x, event_button->y}/8.0,
+			                         vec2_t{event_button->x_root, event_button->y_root}/8.0);
 			return TRUE;
 		}
 		return FALSE;
