@@ -228,7 +228,7 @@ public:
 	{
 		m_img_surface = CairoSurface{img};
 		auto size     = img.size();
-		gtk_widget_set_size_request(GTK_WIDGET(m_handle), size.width(), size.height());
+		gtk_widget_set_size_request(GTK_WIDGET(m_handle), 8*size.width(), 8*size.height());
 		gtk_widget_queue_draw(GTK_WIDGET(m_handle));
 	}
 
