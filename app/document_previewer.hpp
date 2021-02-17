@@ -27,6 +27,7 @@ namespace Texpainter::App
 		    : m_doc{doc}
 		    , m_img_view{owner}
 		{
+			m_img_view.scale(0.5);
 			refresh();
 		}
 

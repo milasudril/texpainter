@@ -194,7 +194,7 @@ public:
 		cairo_set_source_surface(cr, m_background.get(), 0.0, 0.0);
 		cairo_pattern_set_extend(cairo_get_source(cr), CAIRO_EXTEND_REPEAT);
 		cairo_pattern_set_filter(cairo_get_source(cr), CAIRO_FILTER_NEAREST);
-		cairo_rectangle(cr, 0.0, 0.0, dim.width(), dim.height());
+		cairo_rectangle(cr, 0.0, 0.0, dim.width()/m_scale, dim.height()/m_scale);
 		cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
 		cairo_fill(cr);
 
@@ -203,7 +203,7 @@ public:
 			cairo_set_source_surface(cr, img, 0.0, 0.0);
 			cairo_pattern_set_extend(cairo_get_source(cr), CAIRO_EXTEND_REPEAT);
 			cairo_pattern_set_filter(cairo_get_source(cr), CAIRO_FILTER_NEAREST);
-			cairo_rectangle(cr, 0.0, 0.0, dim.width(), dim.height());
+			cairo_rectangle(cr, 0.0, 0.0, dim.width()/m_scale, dim.height()/m_scale);
 			cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
 			cairo_fill(cr);
 		}
