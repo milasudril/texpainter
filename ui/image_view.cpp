@@ -194,7 +194,7 @@ public:
 		cairo_set_source_surface(cr, m_background.get(), 0.0, 0.0);
 		cairo_pattern_set_extend(cairo_get_source(cr), CAIRO_EXTEND_REPEAT);
 		cairo_pattern_set_filter(cairo_get_source(cr), CAIRO_FILTER_NEAREST);
-		cairo_rectangle(cr, 0.0, 0.0, dim.width()/m_scale, dim.height()/m_scale);
+		cairo_rectangle(cr, 0.0, 0.0, dim.width() / m_scale, dim.height() / m_scale);
 		cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
 		cairo_fill(cr);
 
@@ -203,7 +203,7 @@ public:
 			cairo_set_source_surface(cr, img, 0.0, 0.0);
 			cairo_pattern_set_extend(cairo_get_source(cr), CAIRO_EXTEND_REPEAT);
 			cairo_pattern_set_filter(cairo_get_source(cr), CAIRO_FILTER_NEAREST);
-			cairo_rectangle(cr, 0.0, 0.0, dim.width()/m_scale, dim.height()/m_scale);
+			cairo_rectangle(cr, 0.0, 0.0, dim.width() / m_scale, dim.height() / m_scale);
 			cairo_set_operator(cr, CAIRO_OPERATOR_OVER);
 			cairo_fill(cr);
 		}
@@ -284,8 +284,34 @@ public:
 		auto const size = m_img_surface.size();
 		gtk_widget_set_size_request(
 		    GTK_WIDGET(m_handle), m_scale * size.width(), m_scale * size.height());
-		gtk_widget_queue_draw(GTK_WIDGET(m_handle));
 		return *this;
+	}
+
+	void scrollTo(vec2_t loc)
+	{
+		while(gtk_events_pending())
+		{
+			gtk_main_iteration();
+		}
+
+		auto const hadj       = gtk_scrolled_window_get_hadjustment(m_scrolled_window);
+		auto const vadj       = gtk_scrolled_window_get_vadjustment(m_scrolled_window);
+		auto const hadj_lower = gtk_adjustment_get_lower(hadj);
+		auto const vadj_lower = gtk_adjustment_get_lower(vadj);
+		auto const hadj_upper = gtk_adjustment_get_upper(hadj) - gtk_adjustment_get_page_size(hadj);
+		auto const vadj_upper = gtk_adjustment_get_upper(vadj) - gtk_adjustment_get_page_size(vadj);
+
+		auto const lower = vec2_t{hadj_lower, vadj_lower};
+		auto const upper = vec2_t{hadj_upper, vadj_upper};
+
+		auto const diff = upper - lower;
+		auto const size = m_img_surface.size();
+		auto const loc_normalized =
+		    loc / vec2_t{static_cast<double>(size.width()), static_cast<double>(size.height())};
+		auto const loc_new = lower + diff * loc_normalized;
+
+		gtk_adjustment_set_value(hadj, loc_new[0]);
+		gtk_adjustment_set_value(vadj, loc_new[1]);
 	}
 
 private:
@@ -442,5 +468,11 @@ Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::overlayLocation(vec2_t pos
 Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::scale(double factor)
 {
 	m_impl->scale(factor);
+	return *this;
+}
+
+Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::scrollTo(vec2_t loc)
+{
+	m_impl->scrollTo(loc);
 	return *this;
 }

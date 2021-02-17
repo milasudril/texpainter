@@ -88,6 +88,8 @@ namespace Texpainter::Ui
 
 		ImageView& scale(double factor);
 
+		ImageView& scrollTo(vec2_t loc);
+
 	private:
 		class Impl;
 		explicit ImageView(Impl& impl): m_impl(&impl) {}

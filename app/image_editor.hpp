@@ -327,7 +327,7 @@ namespace Texpainter::App
 			if(isCtrlPressed(keyb_state))
 			{
 				m_scale = std::clamp(m_scale + (delta[1] > 0 ? 1 : -1), 1.0, 16.0);
-				m_img_view.scale(m_scale);
+				m_img_view.scale(m_scale).scrollTo(m_loc);
 			}
 			else
 			{
@@ -341,7 +341,6 @@ namespace Texpainter::App
 				m_img_view.overlayLocation(m_loc);
 			}
 		}
-
 
 	private:
 		std::reference_wrapper<Model::Document> m_doc;
