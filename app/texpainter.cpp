@@ -1,6 +1,7 @@
 //@	{"targets":[{"name":"texpainter","type":"application", "dependencies":[{"ref":"notify", "rel":"external"}]}]}
 
 #include "./window_manager.hpp"
+#include "./start_dialog.hpp"
 
 #include "ui/context.hpp"
 #include "log/logger.hpp"
@@ -44,11 +45,21 @@ int main(int argc, char* argv[])
 	try
 	{
 		auto& context = Texpainter::Ui::Context::get();
-		Texpainter::App::WindowManager wm;
 
-		if(argc > 1) { wm.loadDocument(argv[1]); }
+		if(argc > 1)
+		{
+			Texpainter::App::WindowManager wm;
+			wm.loadDocument(argv[1]);
+			context.run();
+		}
+		else
+		{
+			Texpainter::Ui::Window mainwin{"Texpainter"};
+			Texpainter::App::StartDialog start_dlg{mainwin};
+			mainwin.show();
+			context.run();
+		}
 
-		context.run();
 		return 0;
 	}
 	catch(std::string const& msg)
