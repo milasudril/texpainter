@@ -659,19 +659,23 @@ namespace Texpainter::App
 
 		Ui::ErrorMessageDialog m_err_box;
 
-		void openDocument(Ui::Container& dlg_owner)
+		bool openDocument(Ui::Container& dlg_owner)
 		{
 			std::filesystem::path filename;
 			if(Ui::filenameSelect(
 			       dlg_owner,
-			       m_document->workingDirectory(),
+			       m_document != nullptr?m_document->workingDirectory() : "",
 			       filename,
 			       Ui::FilenameSelectMode::Open,
 			       [](char const* filename) {
 				       return fileValid(Enum::Empty<Model::Document>{}, filename);
 			       },
 			       "Texpainter documents"))
-			{ loadDocument(filename.c_str()); }
+			{
+				loadDocument(filename.c_str());
+				return true;
+			}
+			return false;
 		}
 
 		void saveDocumentAs(Ui::Container& dlg_owner)
@@ -837,9 +841,12 @@ namespace Texpainter::App
 	}
 
 	template<>
-	inline void WindowManager::onClicked<StartDialog::ControlId::Open>(Ui::Button&)
+	inline void WindowManager::onClicked<StartDialog::ControlId::Open>(Ui::Button& src)
 	{
-		m_start_win.reset();
+		if(openDocument(m_start_win->owner))
+		{ m_start_win.reset(); }
+		else
+		{ src.state(false); }
 	}
 
 	template<>
