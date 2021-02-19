@@ -15,6 +15,7 @@
 #include "./size_input.hpp"
 #include "./render_job_creator.hpp"
 #include "./render_to_img_job_creator.hpp"
+#include "./start_dialog.hpp"
 
 #include "model/document.hpp"
 #include "model/window_type.hpp"
@@ -88,6 +89,12 @@ namespace Texpainter::App
 		{
 			static constexpr auto id = Model::WindowType::DocumentPreviewer;
 		};
+
+		struct StartWindow
+		{
+			Ui::Window owner{"Texpainter main menu"};
+			StartDialog start_dlg{owner};
+		};
 	}
 
 	template<class T>
@@ -150,8 +157,14 @@ namespace Texpainter::App
 		using Windows = Enum::Tuple<WindowType, WindowTypeTraits>;
 
 	public:
-		[[nodiscard]] WindowManager()
-		    : m_document{std::make_unique<Model::Document>(Size2d{512, 512})}
+		[[nodiscard]] WindowManager(): m_start_win{std::make_unique<detail::StartWindow>()}
+		{
+			m_start_win->owner.show();
+			m_start_win->start_dlg.eventHandler(*this);
+		}
+
+		[[nodiscard]] WindowManager(char const* filename)
+		    : m_document{load(Enum::Empty<Model::Document>{}, filename)}
 		    , m_window_count{m_windows.size()}
 		{
 			Enum::forEachEnumItem<WindowType>([this](auto item) {
@@ -619,6 +632,15 @@ namespace Texpainter::App
 
 		void loadDocument(char const* filename);
 
+		template<StartDialog::ControlId>
+		void onClicked(Ui::Button&);
+
+		template<StartDialog::ControlId>
+		void handleException(char const* msg, Ui::Button&)
+		{
+			m_err_box.show(m_start_win->owner, "Texpainter: Creating palette", msg);
+		}
+
 	private:
 		std::unique_ptr<Model::Document> m_document;
 
@@ -632,6 +654,8 @@ namespace Texpainter::App
 		std::unique_ptr<ImageCreatorDlg> m_img_creator;
 		std::unique_ptr<EmptyPaletteCreatorDlg> m_empty_pal_creator;
 		std::unique_ptr<PaletteGenerateDlg> m_gen_palette;
+
+		std::unique_ptr<detail::StartWindow> m_start_win;
 
 		Ui::ErrorMessageDialog m_err_box;
 
@@ -805,6 +829,30 @@ namespace Texpainter::App
 			{ m_document->nodeLocations(compositor->widget().nodeLocations()); }
 		}
 	};
+
+	template<>
+	inline void WindowManager::onClicked<StartDialog::ControlId::New>(Ui::Button&)
+	{
+		m_start_win.reset();
+	}
+
+	template<>
+	inline void WindowManager::onClicked<StartDialog::ControlId::Open>(Ui::Button&)
+	{
+		m_start_win.reset();
+	}
+
+	template<>
+	inline void WindowManager::onClicked<StartDialog::ControlId::ReadUsrGuide>(Ui::Button&)
+	{
+		m_start_win.reset();
+	}
+
+	template<>
+	inline void WindowManager::onClicked<StartDialog::ControlId::Quit>(Ui::Button&)
+	{
+		Ui::Context::get().exit();
+	}
 }
 
 #endif
