@@ -26,8 +26,8 @@ namespace
 	{
 		Texpainter::PixelStore::Image ret{size};
 		generate(ret.pixels(), [intensity, alpha, size](auto col, auto row) {
-			auto x   = static_cast<float>(col) / size.width();
-			auto y   = 1.0f - static_cast<float>(row) / size.height();
+			auto x   = static_cast<float>(col) / static_cast<float>(size.width());
+			auto y   = 1.0f - static_cast<float>(row) / static_cast<float>(size.height());
 			auto ret = toRgb(Texpainter::PixelStore::Hsi{x, y, intensity, alpha});
 			return ret;
 		});
@@ -175,7 +175,7 @@ namespace
 					return std::optional<Texpainter::PixelStore::Pixel>{};
 				}
 
-			vals[k] = (*msb << 4) | (*lsb);
+			vals[k] = static_cast<uint8_t>((*msb << 4) | (*lsb));
 
 			str += 2;
 		}
@@ -341,13 +341,13 @@ private:
 		auto loc = loc_window / vec2_t{384.0, 384.0};
 		switch(m_key)
 		{
-			case 29: m_hsi.hue = std::clamp(loc[0], 0.0, 1.0); break;
+			case 29: m_hsi.hue = static_cast<float>(std::clamp(loc[0], 0.0, 1.0)); break;
 
-			case 42: m_hsi.saturation = 1.0f - std::clamp(loc[1], 0.0, 1.0); break;
+			case 42: m_hsi.saturation = 1.0f - static_cast<float>(std::clamp(loc[1], 0.0, 1.0)); break;
 
 			default:
-				m_hsi.hue        = std::clamp(loc[0], 0.0, 1.0);
-				m_hsi.saturation = 1.0f - std::clamp(loc[1], 0.0, 1.0);
+				m_hsi.hue        = static_cast<float>(std::clamp(loc[0], 0.0, 1.0));
+				m_hsi.saturation = 1.0f - static_cast<float>(std::clamp(loc[1], 0.0, 1.0));
 		}
 		update();
 	}
@@ -414,7 +414,7 @@ void Texpainter::Ui::ColorPicker::ColorPicker::Impl::onKeyUp<ControlId::Colors>(
 template<>
 void Texpainter::Ui::ColorPicker::Impl::onChanged<ControlId::Intensity>(Slider& src)
 {
-	m_hsi.intensity = logValue(src.value(), -16);
+	m_hsi.intensity = static_cast<float>(logValue(src.value(), -16.0));
 	m_colors_cache  = gen_colors(m_hsi.intensity, m_hsi.alpha, Size2d{384, 384});
 	update();
 }

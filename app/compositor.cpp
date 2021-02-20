@@ -86,7 +86,7 @@ namespace
 			auto const i   = r_node_locs.find(item.first);
 			auto const loc = i != std::end(r_node_locs)
 			                     ? Texpainter::vec2_t{i->second}
-			                     : Texpainter::vec2_t{20.0 + 200.0 * k, 20.0};
+			                     : Texpainter::vec2_t{20.0 + 200.0 * static_cast<double>(k), 20.0};
 			auto tmp = r_canvas.template insert<NodeWidget>(
 			    item.first, Texpainter::Ui::WidgetCoordinates{loc}, item.second);
 			++k;

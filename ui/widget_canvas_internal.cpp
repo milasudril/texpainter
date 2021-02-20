@@ -59,8 +59,8 @@ static void widget_canvas_internal_class_init(WidgetCanvasInternalClass* klass)
 			                      {
 				                      alloc.width  = req.width;
 				                      alloc.height = req.height;
-				                      alloc.x      = item.second.loc.x();
-				                      alloc.y      = item.second.loc.y();
+				                      alloc.x      = static_cast<int>(item.second.loc.x());
+				                      alloc.y      = static_cast<int>(item.second.loc.y());
 			                      }
 			                      gtk_widget_size_allocate(item.first, &alloc);
 		                      });

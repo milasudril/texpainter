@@ -71,17 +71,17 @@ namespace Texpainter
 		static constexpr SizeFunc s_size_mode[] = {
 		    size_from_width, size_from_height, size_from_square_size};
 
-		static constexpr uint32_t width_from_area(size_t A, double r)
+		static constexpr uint32_t width_from_area(double A, double r)
 		{
 			return static_cast<uint32_t>(std::sqrt(r * A));
 		}
 
-		static constexpr uint32_t height_from_area(size_t A, double r)
+		static constexpr uint32_t height_from_area(double A, double r)
 		{
 			return static_cast<uint32_t>(std::sqrt(A / r));
 		}
 
-		using LengthFunc = uint32_t (*)(size_t A, double r);
+		using LengthFunc = uint32_t (*)(double A, double r);
 
 		static constexpr LengthFunc s_size[] = {width_from_area, height_from_area, width_from_area};
 
@@ -142,7 +142,7 @@ namespace Texpainter
 					auto const size_mode = m_size.label().selected();
 					auto const r         = Ui::logValue(
                         m_asplect_ratio.inputField().value(), MinRatio, MaxRatio, false);
-					auto const length = s_size[size_mode](area(m_max_size), r);
+					auto const length = s_size[size_mode](static_cast<double>(area(m_max_size)), r);
 					m_size.inputField().content(std::to_string(length).c_str());
 					size = value();
 				}

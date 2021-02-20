@@ -5,7 +5,9 @@
 			"..",
 			".",
 			".git",
-			"__targets"
+			"__targets_gcov",
+			"__targets_dbg",
+			"__targets_rel"
 		],
 		"recursive": 1
 	},
@@ -18,9 +20,7 @@
 				"appcompile": {
 					"args": [
 						"-std=c++20",
-						"-g",
 						"{cxxversion}",
-						"-Wall",
 						"{cflags_extra}",
 						"{iquote}",
 						"{includedir}",
@@ -35,23 +35,17 @@
 					],
 					"name": "g++-10"
 				},
-				"autorun_launcher": {
-					"args": [],
-					"name": ""
-				},
 				"cflags_extra": [
-					"Wno-parentheses",
+					"Wconversion",
+					"Wall",
 					"Werror",
-					"Wextra",
-					"mavx2"
+					"Wextra"
 				],
 				"cflags_format": "-^",
 				"dllcompile": {
 					"args": [
 						"-std=c++20",
-						"-g",
 						"{cxxversion}",
-						"-Wall",
 						"{cflags_extra}",
 						"{iquote}",
 						"{includedir}",
@@ -93,9 +87,7 @@
 					"args": [
 						"-std=c++20",
 						"-c",
-						"-g",
 						"{cxxversion}",
-						"-Wall",
 						"{cflags_extra}",
 						"{iquote}",
 						"{includedir}",
@@ -140,8 +132,7 @@
 			],
 			"name": "targetcxx_default",
 			"plugin": "targetcxx"
-		},
-		{
+		},{
 			"config": {
 				"command": {
 					"args": [
@@ -164,10 +155,6 @@
 			],
 			"name": "imgproc",
 			"plugin": "targettrivial"
-		}
-	],
-	"targetinfo": {
-		"project_root": "",
-		"target_directory": "__targets"
-	}
+ 		}
+	]
 }

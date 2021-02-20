@@ -14,7 +14,7 @@ __Output:__ (RGBA image)
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include "utils/n_ary_transform.hpp"
@@ -22,13 +22,16 @@ __Includes:__
 #include <algorithm>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 void main(auto const& args)
 {
 	auto const size = area(args.canvasSize());
-	auto blend      = [](auto a, auto b, auto factor) { return a * (1.0f - factor) + b * factor; };
+	auto blend      = [](auto a, auto b, auto factor) {
+		auto const xi = static_cast<float>(factor);
+		return a * (1.0f - xi) + b * xi;
+	};
 
 	Texpainter::transform(blend,
 	                      output<0>(args),

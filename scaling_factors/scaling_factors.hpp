@@ -48,7 +48,7 @@ namespace Texpainter::ScalingFactors
 
 	constexpr double sizeFromArea(Size2d size, double val)
 	{
-		return std::max(4.0, area(size) * areaScaleFactor(val));
+		return std::max(4.0, static_cast<double>(area(size)) * areaScaleFactor(val));
 	}
 
 }

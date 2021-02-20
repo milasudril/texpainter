@@ -223,14 +223,14 @@ private:
 		}
 		auto width_item = 0.0f;
 		auto div        = m_colors.size();
-		while(width_item < m_min_size.width())
+		while(width_item < static_cast<float>(m_min_size.width()))
 		{
 			width_item = static_cast<float>(w) / static_cast<float>(div);
 			--div;
 		}
 		++div;
-		m_n_cols = div;
-		m_n_rows = m_colors.size() / div + ((m_colors.size() % div) != 0);
+		m_n_cols = static_cast<int>(div);
+		m_n_rows = static_cast<int>(m_colors.size() / div + ((m_colors.size() % div) != 0));
 		gtk_widget_set_size_request(widget,
 		                            std::max(-1, static_cast<int>(m_min_size.width())),
 		                            m_n_rows * m_min_size.height());

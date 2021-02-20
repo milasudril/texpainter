@@ -31,7 +31,7 @@ namespace Texpainter::App
 
 			for(std::remove_const_t<decltype(NumPortTypes)> k = 0; k < NumPortTypes; ++k)
 			{
-				ret[k] = toRgb(PixelStore::Hsi{dh * k, 1.0f, 0.5f, 1.0f});
+				ret[k] = toRgb(PixelStore::Hsi{dh * static_cast<float>(k), 1.0f, 0.5f, 1.0f});
 			}
 
 			return ret;

@@ -1,0 +1,34 @@
+{
+	"target_hooks": [
+		{
+			"config": {
+				"cflags_extra": [
+					"g",
+					"Wconversion",
+					"Wall",
+					"Werror",
+					"Wextra"
+				]
+			},
+			"name": "targetcxx_default",
+			"plugin": "targetcxx",
+			"filename_exts": [
+				".c++",
+				".cc",
+				".cpp",
+				".cxx",
+				".h",
+				".h++",
+				".hh",
+				".hpp",
+				".hxx"
+			],
+			"name": "targetcxx_default",
+			"plugin": "targetcxx"
+		}
+	],
+	"targetinfo": {
+		"project_root": "",
+		"target_directory": "__targets_dbg"
+	}
+}

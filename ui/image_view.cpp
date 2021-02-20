@@ -14,7 +14,7 @@ namespace
 		std::array<uint8_t, 42868> ret{};
 		for(int k = 0; k < static_cast<int>(ret.size()); ++k)
 		{
-			ret[k] = static_cast<float>(
+			ret[k] = static_cast<uint8_t>(
 			    255.0 * std::pow(static_cast<double>(k) / (ret.size() - 1), 1 / 2.2));
 		}
 
@@ -95,7 +95,7 @@ namespace
 					write_ptr[0] = gamma_22[as_ints[2]];
 					write_ptr[1] = gamma_22[as_ints[1]];
 					write_ptr[2] = gamma_22[as_ints[0]];
-					write_ptr[3] = 255.0f * read_ptr->alpha();
+					write_ptr[3] = static_cast<uint8_t>(255.0f * read_ptr->alpha());
 
 					write_ptr += 4;
 					++read_ptr;
@@ -229,7 +229,7 @@ public:
 		m_img_surface = CairoSurface{img};
 		auto size     = img.size();
 		gtk_widget_set_size_request(
-		    GTK_WIDGET(m_handle), m_scale * size.width(), m_scale * size.height());
+		    GTK_WIDGET(m_handle), static_cast<int>(m_scale * size.width()), static_cast<int>(m_scale * size.height()));
 		gtk_widget_queue_draw(GTK_WIDGET(m_handle));
 	}
 
@@ -283,7 +283,7 @@ public:
 		m_scale         = factor;
 		auto const size = m_img_surface.size();
 		gtk_widget_set_size_request(
-		    GTK_WIDGET(m_handle), m_scale * size.width(), m_scale * size.height());
+		    GTK_WIDGET(m_handle), static_cast<int>(m_scale * size.width()), static_cast<int>(m_scale * size.height()));
 		return *this;
 	}
 

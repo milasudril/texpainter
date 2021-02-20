@@ -12,14 +12,14 @@ __Output:__ (Image spectrum) The computed image spectrum
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include "dft/engine.hpp"
 #include "pixel_store/image.hpp"
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 using TempBuffer = Texpainter::PixelStore::BasicImage<ComplexValue>;
@@ -44,8 +44,8 @@ void main(auto const& args)
 	auto const out = output<0>(args);
 	auto& engine   = Dft::engineInstance();
 	engine.run<Dft::Direction::Forward>(size, input_buffer.pixels().data(), out);
-	auto const A = area(size);
-	std::for_each(out, out + A, [A](auto& val) { return val /= A; });
+	auto const N = area(size);
+	std::for_each(out, out + N, [A = static_cast<double>(N)](auto& val) { return val /= A; });
 }
 ```
 

@@ -117,7 +117,7 @@ namespace Texpainter::App
 			    items, [val](auto const& item) { return strcasestr(item.name, val) != nullptr; });
 			if(i == std::end(items)) { return; }
 
-			auto const index = i - std::begin(items);
+			auto const index = static_cast<int>(i - std::begin(items));
 			m_listbox.scrollIntoView(index).selected(index);
 		}
 	};

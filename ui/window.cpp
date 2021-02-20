@@ -83,7 +83,7 @@ public:
 		gtk_window_resize(m_handle, size.width(), size.height());
 	}
 
-	void move(ScreenCoordinates coords) { gtk_window_move(m_handle, coords.x(), coords.y()); }
+	void move(ScreenCoordinates coords) { gtk_window_move(m_handle, static_cast<int>(coords.x()), static_cast<int>(coords.y())); }
 
 	void shrinkToContent() { gtk_window_resize(m_handle, 1, 1); }
 

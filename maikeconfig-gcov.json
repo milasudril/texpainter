@@ -1,0 +1,43 @@
+{
+	"target_hooks": [
+		{
+			"config": {
+				"cflags_extra": [
+					"g",
+					"Wconversion",
+					"Wall",
+					"Werror",
+					"Wextra",
+					"fprofile-arcs",
+					"ftest-coverage"
+				],"autorun_launcher": {
+					"args": [
+						"{target_directory}",
+						"{current_directory}",
+						"{target}"
+					],
+					"name": "./testrunner.sh"
+				}
+			},
+			"name": "targetcxx_default",
+			"plugin": "targetcxx",
+			"filename_exts": [
+				".c++",
+				".cc",
+				".cpp",
+				".cxx",
+				".h",
+				".h++",
+				".hh",
+				".hpp",
+				".hxx"
+			],
+			"name": "targetcxx_default",
+			"plugin": "targetcxx"
+		}
+	],
+	"targetinfo": {
+		"project_root": "",
+		"target_directory": "__targets_gcov"
+	}
+}
