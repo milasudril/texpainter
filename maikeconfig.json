@@ -132,11 +132,12 @@
 			],
 			"name": "targetcxx_default",
 			"plugin": "targetcxx"
-		},{
+		},
+		{
 			"config": {
 				"command": {
 					"args": [
-						"__targets",
+						"{target_directory}",
 						"{source}",
 						"{target}"
 					],
@@ -155,6 +156,6 @@
 			],
 			"name": "imgproc",
 			"plugin": "targettrivial"
- 		}
+		}
 	]
 }

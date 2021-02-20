@@ -26,7 +26,7 @@ public:
 
 private:
 	GtkMenu* m_handle;
-	unsigned int  m_k;
+	unsigned int m_k;
 };
 
 Texpainter::Ui::Menu::Impl::Impl(Container* cnt): Menu{*this}, m_k{0}

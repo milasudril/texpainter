@@ -20,13 +20,10 @@ __Softness:__ (= 0.0) Clipping softness. If zero, min and max are connected line
 
 ## Implementation
 
-__Source code:__
+__Source code:__ 
 
 ```c++
-double mapIntensityLog(ParamValue val)
-{
-	return std::exp2(16.0 * (val.value() - 1.0));
-}
+double mapIntensityLog(ParamValue val) { return std::exp2(16.0 * (val.value() - 1.0)); }
 
 double mapIntensityLin(ParamValue val) { return val.value(); }
 
@@ -35,9 +32,9 @@ inline double computeValue(double x, double x_min, double x_max, double softness
 	auto xi = (2.0 * x - x_min - x_max) / (x_max - x_min);
 	return xi <= -1.0
 	           ? 0.0
-	           : (xi >= 1.0 ? 1.0
-	                         : std::lerp(
-	                             0.5 * (xi + 1.0), (xi * (3 - xi * xi) + 2.0) / 4.0, softness));
+	           : (xi >= 1.0
+	                  ? 1.0
+	                  : std::lerp(0.5 * (xi + 1.0), (xi * (3 - xi * xi) + 2.0) / 4.0, softness));
 }
 
 void main(auto const& args, auto const& params)

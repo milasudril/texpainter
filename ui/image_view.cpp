@@ -228,8 +228,9 @@ public:
 	{
 		m_img_surface = CairoSurface{img};
 		auto size     = img.size();
-		gtk_widget_set_size_request(
-		    GTK_WIDGET(m_handle), static_cast<int>(m_scale * size.width()), static_cast<int>(m_scale * size.height()));
+		gtk_widget_set_size_request(GTK_WIDGET(m_handle),
+		                            static_cast<int>(m_scale * size.width()),
+		                            static_cast<int>(m_scale * size.height()));
 		gtk_widget_queue_draw(GTK_WIDGET(m_handle));
 	}
 
@@ -282,8 +283,9 @@ public:
 	{
 		m_scale         = factor;
 		auto const size = m_img_surface.size();
-		gtk_widget_set_size_request(
-		    GTK_WIDGET(m_handle), static_cast<int>(m_scale * size.width()), static_cast<int>(m_scale * size.height()));
+		gtk_widget_set_size_request(GTK_WIDGET(m_handle),
+		                            static_cast<int>(m_scale * size.width()),
+		                            static_cast<int>(m_scale * size.height()));
 		return *this;
 	}
 

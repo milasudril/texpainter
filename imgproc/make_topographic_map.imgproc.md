@@ -20,14 +20,15 @@ __Max elevation:__ (= 0.5) Max elevation in range $\sqrt{A} \cdot \left[2^{-4}, 
 
 ## Implementation
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& arg, auto const& params)
 {
-	auto size = arg.canvasSize();
+	auto size    = arg.canvasSize();
 	auto const A = area(size);
-	auto height = std::sqrt(static_cast<double>(A)) * exp2(std::lerp(-4.0, 4.0, param<Str{"Max elevation"}>(params).value()));
+	auto height  = std::sqrt(static_cast<double>(A))
+	              * exp2(std::lerp(-4.0, 4.0, param<Str{"Max elevation"}>(params).value()));
 	for(uint32_t row = 0; row < size.height(); ++row)
 	{
 		for(uint32_t col = 0; col < size.width(); ++col)

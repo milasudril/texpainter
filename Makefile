@@ -1,5 +1,8 @@
 .PHONY: all
-all:
+all: release doc
+
+.PHONY: release
+release:
 	maike --configfiles=maikeconfig.json,maikeconfig-rel.json
 
 .PHONY: debug

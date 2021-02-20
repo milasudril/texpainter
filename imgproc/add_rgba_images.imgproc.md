@@ -22,17 +22,20 @@ __Gain B:__ (= 0.5) Amplification factor for `B`, between -2.0 evFS and +2.0 evF
 
 To loop through all pixels in `A` and `B`, `std::transform` is used. As callback to `std::transform`, a function object with access to the mapped parameter values are used. The function object returns a weighted sum of its two arguments, where the weights are deterimened by the parameters.
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <algorithm>
 #include <cmath>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
-inline float mapParameter(ParamValue val) { return static_cast<float>(std::exp2(std::lerp(-2.0, 2.0, val.value()))); }
+inline float mapParameter(ParamValue val)
+{
+	return static_cast<float>(std::exp2(std::lerp(-2.0, 2.0, val.value())));
+}
 
 void main(auto const& args, auto const& params)
 {

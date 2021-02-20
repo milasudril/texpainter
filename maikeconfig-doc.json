@@ -14,7 +14,8 @@
 	"source_files": [
 		"."
 	],
-	"target_hooks": [{
+	"target_hooks": [
+		{
 			"config": {
 				"command": {
 					"args": [
@@ -38,6 +39,10 @@
 			],
 			"name": "markdown",
 			"plugin": "targettrivial"
- 		}
-	]
+		}
+	],
+	"targetinfo": {
+		"project_root": "",
+		"target_directory": "__targets_rel"
+	}
 }

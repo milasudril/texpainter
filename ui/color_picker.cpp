@@ -343,7 +343,9 @@ private:
 		{
 			case 29: m_hsi.hue = static_cast<float>(std::clamp(loc[0], 0.0, 1.0)); break;
 
-			case 42: m_hsi.saturation = 1.0f - static_cast<float>(std::clamp(loc[1], 0.0, 1.0)); break;
+			case 42:
+				m_hsi.saturation = 1.0f - static_cast<float>(std::clamp(loc[1], 0.0, 1.0));
+				break;
 
 			default:
 				m_hsi.hue        = static_cast<float>(std::clamp(loc[0], 0.0, 1.0));

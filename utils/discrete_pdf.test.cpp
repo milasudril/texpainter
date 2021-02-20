@@ -38,7 +38,8 @@ namespace Testcases
 		std::array<float, 4> output_probs{};
 		std::array<float, 4> expected_probs{0.25f, 0.25f, 0.25f, 0.25f};
 		std::ranges::transform(counts, std::begin(output_probs), [](auto val) {
-			return static_cast<float>(std::round(factor * static_cast<double>(val) / static_cast<double>(N)) / factor);
+			return static_cast<float>(
+			    std::round(factor * static_cast<double>(val) / static_cast<double>(N)) / factor);
 		});
 
 		assert(output_probs == expected_probs);
@@ -61,7 +62,8 @@ namespace Testcases
 		std::array<float, 4> output_probs{};
 		std::array<float, 4> expected_probs{0.25f, 0.25f, 0.25f, 0.25f};
 		std::ranges::transform(counts, std::begin(output_probs), [](auto val) {
-			return static_cast<float>(std::round(factor * static_cast<double>(val) / static_cast<double>(N)) / factor);
+			return static_cast<float>(
+			    std::round(factor * static_cast<double>(val) / static_cast<double>(N)) / factor);
 		});
 
 		assert(output_probs == expected_probs);
@@ -83,7 +85,10 @@ namespace Testcases
 
 		std::array<float, 4> output_probs{};
 		std::ranges::transform(counts, std::begin(output_probs), [](auto val) {
-			return static_cast<float>(16.0 * (std::round(factor * static_cast<double>(val) / static_cast<double>(N)) / factor));
+			return static_cast<float>(
+			    16.0
+			    * (std::round(factor * static_cast<double>(val) / static_cast<double>(N))
+			       / factor));
 		});
 		assert(weights == output_probs);
 	}

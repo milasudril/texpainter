@@ -36,7 +36,10 @@ public:
 		});
 
 		if(!m_vertical)
-		{ gtk_widget_set_size_request(GTK_WIDGET(m_handle), static_cast<int>(48 * marks.size()), 32); }
+		{
+			gtk_widget_set_size_request(
+			    GTK_WIDGET(m_handle), static_cast<int>(48 * marks.size()), 32);
+		}
 	}
 
 private:

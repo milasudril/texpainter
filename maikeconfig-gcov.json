@@ -2,6 +2,14 @@
 	"target_hooks": [
 		{
 			"config": {
+				"autorun_launcher": {
+					"args": [
+						"{target_directory}",
+						"{current_directory}",
+						"{target}"
+					],
+					"name": "./testrunner.sh"
+				},
 				"cflags_extra": [
 					"g",
 					"Wconversion",
@@ -10,17 +18,8 @@
 					"Wextra",
 					"fprofile-arcs",
 					"ftest-coverage"
-				],"autorun_launcher": {
-					"args": [
-						"{target_directory}",
-						"{current_directory}",
-						"{target}"
-					],
-					"name": "./testrunner.sh"
-				}
+				]
 			},
-			"name": "targetcxx_default",
-			"plugin": "targetcxx",
 			"filename_exts": [
 				".c++",
 				".cc",
@@ -34,30 +33,7 @@
 			],
 			"name": "targetcxx_default",
 			"plugin": "targetcxx"
-		},{
-			"config": {
-				"command": {
-					"args": [
-						"__targets_gcov",
-						"{source}",
-						"{target}"
-					],
-					"name": "devtools/imgproc_gen/make_imgproc.py"
-				},
-				"dependencies": [
-					{
-						"ref": "maikeconfig.json",
-						"rel": "misc"
-					}
-				],
-				"filename_ext": ".hpp"
-			},
-			"filename_exts": [
-				".imgproc.md"
-			],
-			"name": "imgproc",
-			"plugin": "targettrivial"
- 		}
+		}
 	],
 	"targetinfo": {
 		"project_root": "",

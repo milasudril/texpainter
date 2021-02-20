@@ -24,8 +24,8 @@ namespace Texpainter
 			std::array<Ui::Slider::TickMark, 12> ret;
 			for(size_t k = 0; k < ret.size(); ++k)
 			{
-				ret[k] =
-				    Ui::Slider::TickMark{Ui::SliderValue{static_cast<double>(k) / static_cast<double>(ret.size())}, ""};
+				ret[k] = Ui::Slider::TickMark{
+				    Ui::SliderValue{static_cast<double>(k) / static_cast<double>(ret.size())}, ""};
 			}
 			return ret;
 		}

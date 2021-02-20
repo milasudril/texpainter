@@ -7,5 +7,7 @@
 namespace Texpainter::CurrentProcess
 {
 	inline std::filesystem::path executableFilename()
-	{return read_symlink(std::filesystem::path{"/proc/self/exe"});}
+	{
+		return read_symlink(std::filesystem::path{"/proc/self/exe"});
+	}
 }
