@@ -303,18 +303,7 @@ namespace Texpainter::App
 		template<class Source>
 		void onActivated(Enum::Tag<DocumentAction::New>, Ui::MenuItem&, Source& src)
 		{
-			if(m_doc_creator == nullptr) [[likely]]
-				{
-					m_doc_creator =
-					    std::make_unique<DocumentCreatorDlg>(src.window(),
-					                                         "Create new document",
-					                                         Ui::Box::Orientation::Vertical,
-					                                         "Canvas size:",
-					                                         m_document->canvasSize(),
-					                                         Size2d{65535, 65535});
-					m_doc_creator->eventHandler<DocumentAction::New>(*this);
-				}
-			m_doc_creator->show();
+			createNewDoc<DocumentAction::New>(src.window());
 		}
 
 		template<class Source>
@@ -831,6 +820,23 @@ namespace Texpainter::App
 			if(auto compositor = m_windows.get<WindowType::Compositor>().get();
 			   compositor != nullptr)
 			{ m_document->nodeLocations(compositor->widget().nodeLocations()); }
+		}
+
+		template<auto action>
+		void createNewDoc(Ui::Window& owner)
+		{
+			if(m_doc_creator == nullptr) [[likely]]
+				{
+					m_doc_creator =
+					    std::make_unique<DocumentCreatorDlg>(owner,
+					                                         "Create new document",
+					                                         Ui::Box::Orientation::Vertical,
+					                                         "Canvas size:",
+					                                         m_document->canvasSize(),
+					                                         Size2d{65535, 65535});
+					m_doc_creator->eventHandler<DocumentAction::New>(*this);
+				}
+			m_doc_creator->show();
 		}
 	};
 
