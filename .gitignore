@@ -1,5 +1,6 @@
 __targets
 __targets_dbg
 __targets_rel
+__targets_doc
 gmon.out
 __pycache__

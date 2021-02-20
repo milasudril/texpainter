@@ -19,6 +19,7 @@
 
 #include "model/document.hpp"
 #include "model/window_type.hpp"
+#include "user_guide/show_help.hpp"
 #include "model/palette_generate.hpp"
 #include "pixel_store/image_io.hpp"
 #include "ui/window.hpp"
@@ -877,9 +878,10 @@ namespace Texpainter::App
 	}
 
 	template<>
-	inline void WindowManager::onClicked<StartDialog::ControlId::ReadUsrGuide>(Ui::Button&)
+	inline void WindowManager::onClicked<StartDialog::ControlId::ReadUsrGuide>(Ui::Button& src)
 	{
-		m_start_win.reset();
+		Help::showHelp("user_guide/getting_started.html");
+		src.state(false);
 	}
 
 	template<>
