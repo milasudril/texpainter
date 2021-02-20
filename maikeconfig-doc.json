@@ -1,0 +1,43 @@
+{
+	"directoryoptions": {
+		"paths_full_reject": [],
+		"paths_reject": [
+			"..",
+			".",
+			".git",
+			"__targets_gcov",
+			"__targets_dbg",
+			"__targets_rel"
+		],
+		"recursive": 1
+	},
+	"source_files": [
+		"."
+	],
+	"target_hooks": [{
+			"config": {
+				"command": {
+					"args": [
+						"--mathml",
+						"-o",
+						"{target}",
+						"{source}"
+					],
+					"name": "pandoc"
+				},
+				"dependencies": [
+					{
+						"ref": "maikeconfig-doc.json",
+						"rel": "misc"
+					}
+				],
+				"filename_ext": ".html"
+			},
+			"filename_exts": [
+				".md"
+			],
+			"name": "markdown",
+			"plugin": "targettrivial"
+ 		}
+	]
+}

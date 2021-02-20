@@ -6,6 +6,10 @@ all:
 debug:
 	maike --configfiles=maikeconfig.json,maikeconfig-dbg.json
 
+.PHONY: doc
+doc:
+	maike --configfiles=maikeconfig-doc.json
+
 .PHONY: clean
 clean:
 	rm -rf __targets*
