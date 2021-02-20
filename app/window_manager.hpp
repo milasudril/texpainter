@@ -526,18 +526,7 @@ namespace Texpainter::App
 		template<auto>
 		void confirmPositive(DocumentCreatorDlg& src)
 		{
-			auto doc = std::make_unique<Model::Document>(src.widget().inputField().value());
-
-			Windows tmp;
-			Enum::forEachEnumItem<WindowType>(
-			    [&tmp, &doc, this](auto i) { tmp.get<i.value>() = createWindow<i.value>(*doc); });
-
-			m_document = std::move(doc);
-			m_windows  = std::move(tmp);
-
-			m_doc_creator.reset();
-			resetWindowPositions();
-			m_windows.get<WindowType::ImageEditor>()->window().show();
+			createDocument(src);
 		}
 
 		template<auto>
@@ -628,6 +617,20 @@ namespace Texpainter::App
 		void handleException(char const* msg, Ui::Button&)
 		{
 			m_err_box.show(m_start_win->owner, "Texpainter: Creating palette", msg);
+		}
+
+		template<StartDialog::ControlId>
+		void confirmPositive(DocumentCreatorDlg& src)
+		{
+			createDocument(src);
+			m_start_win.reset();
+		}
+
+		template<StartDialog::ControlId id>
+		void confirmNegative(DocumentCreatorDlg&)
+		{
+			m_doc_creator.reset();
+			m_start_win->start_dlg.resetButtonState<id>();
 		}
 
 	private:
@@ -832,18 +835,35 @@ namespace Texpainter::App
 					                                         "Create new document",
 					                                         Ui::Box::Orientation::Vertical,
 					                                         "Canvas size:",
-					                                         m_document->canvasSize(),
+					                                         m_document!=nullptr?m_document->canvasSize():Size2d{512, 512},
 					                                         Size2d{65535, 65535});
 					m_doc_creator->eventHandler<DocumentAction::New>(*this);
 				}
 			m_doc_creator->show();
+		}
+
+
+		void createDocument(DocumentCreatorDlg& src)
+		{
+			auto doc = std::make_unique<Model::Document>(src.widget().inputField().value());
+
+			Windows tmp;
+			Enum::forEachEnumItem<WindowType>(
+			    [&tmp, &doc, this](auto i) { tmp.get<i.value>() = createWindow<i.value>(*doc); });
+
+			m_document = std::move(doc);
+			m_windows  = std::move(tmp);
+
+			m_doc_creator.reset();
+			resetWindowPositions();
+			m_windows.get<WindowType::ImageEditor>()->window().show();
 		}
 	};
 
 	template<>
 	inline void WindowManager::onClicked<StartDialog::ControlId::New>(Ui::Button&)
 	{
-		m_start_win.reset();
+		createNewDoc<StartDialog::ControlId::New>(m_start_win->owner);
 	}
 
 	template<>

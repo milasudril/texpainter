@@ -39,6 +39,9 @@ namespace Texpainter::App
 			m_quit.eventHandler<ControlId::Quit>(eh);
 		}
 
+		template<ControlId id>
+		void resetButtonState();
+
 	private:
 		Ui::Box m_root;
 		Ui::Button m_new;
@@ -46,6 +49,12 @@ namespace Texpainter::App
 		Ui::Button m_read_usr_guide;
 		Ui::Button m_quit;
 	};
+
+	template<>
+	inline void StartDialog::resetButtonState<StartDialog::ControlId::New>()
+	{
+		m_new.state(false);
+	}
 }
 
 #endif
