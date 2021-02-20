@@ -5,6 +5,8 @@
 #include "ui/context.hpp"
 #include "log/logger.hpp"
 
+#include "utils/procinfo.hpp"
+
 #include <libnotify/notify.h>
 
 namespace
@@ -41,6 +43,7 @@ int main(int argc, char* argv[])
 {
 	NotifyLog notify{"Texpainter"};
 	Texpainter::Logger::logger(notify);
+
 	try
 	{
 		auto& context = Texpainter::Ui::Context::get();

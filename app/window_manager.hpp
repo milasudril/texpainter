@@ -656,7 +656,7 @@ namespace Texpainter::App
 			std::filesystem::path filename;
 			if(Ui::filenameSelect(
 			       dlg_owner,
-			       m_document != nullptr?m_document->workingDirectory() : "",
+			       m_document != nullptr ? m_document->workingDirectory() : "",
 			       filename,
 			       Ui::FilenameSelectMode::Open,
 			       [](char const* filename) {
@@ -830,13 +830,13 @@ namespace Texpainter::App
 		{
 			if(m_doc_creator == nullptr) [[likely]]
 				{
-					m_doc_creator =
-					    std::make_unique<DocumentCreatorDlg>(owner,
-					                                         "Create new document",
-					                                         Ui::Box::Orientation::Vertical,
-					                                         "Canvas size:",
-					                                         m_document!=nullptr?m_document->canvasSize():Size2d{512, 512},
-					                                         Size2d{65535, 65535});
+					m_doc_creator = std::make_unique<DocumentCreatorDlg>(
+					    owner,
+					    "Create new document",
+					    Ui::Box::Orientation::Vertical,
+					    "Canvas size:",
+					    m_document != nullptr ? m_document->canvasSize() : Size2d{512, 512},
+					    Size2d{65535, 65535});
 					m_doc_creator->eventHandler<DocumentAction::New>(*this);
 				}
 			m_doc_creator->show();
@@ -869,10 +869,11 @@ namespace Texpainter::App
 	template<>
 	inline void WindowManager::onClicked<StartDialog::ControlId::Open>(Ui::Button& src)
 	{
-		if(openDocument(m_start_win->owner))
-		{ m_start_win.reset(); }
+		if(openDocument(m_start_win->owner)) { m_start_win.reset(); }
 		else
-		{ src.state(false); }
+		{
+			src.state(false);
+		}
 	}
 
 	template<>
