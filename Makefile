@@ -1,6 +1,14 @@
 .PHONY: all
 all:
-	maike
+	maike --configfiles=maikeconfig.json,maikeconfig-rel.json
+
+.PHONY: debug
+debug:
+	maike --configfiles=maikeconfig.json,maikeconfig-dbg.json
+
+.PHONY: clean
+clean:
+	rm -rf __targets*
 
 .PHONY: format
 format:

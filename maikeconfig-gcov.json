@@ -34,7 +34,30 @@
 			],
 			"name": "targetcxx_default",
 			"plugin": "targetcxx"
-		}
+		},{
+			"config": {
+				"command": {
+					"args": [
+						"__targets_gcov",
+						"{source}",
+						"{target}"
+					],
+					"name": "devtools/imgproc_gen/make_imgproc.py"
+				},
+				"dependencies": [
+					{
+						"ref": "maikeconfig.json",
+						"rel": "misc"
+					}
+				],
+				"filename_ext": ".hpp"
+			},
+			"filename_exts": [
+				".imgproc.md"
+			],
+			"name": "imgproc",
+			"plugin": "targettrivial"
+ 		}
 	],
 	"targetinfo": {
 		"project_root": "",
