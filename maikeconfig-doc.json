@@ -23,6 +23,10 @@
 						"--mathml",
 						"--columns",
 						"10000",
+						"--include-in-header",
+						"user_guide/page_header",
+						"--metadata",
+						"pagetitle=Texpainter user guide",
 						"-o",
 						"{target}",
 						"{source}"
@@ -32,6 +36,10 @@
 				"dependencies": [
 					{
 						"ref": "maikeconfig-doc.json",
+						"rel": "misc"
+					},
+					{
+						"ref": "user_guide/page_header",
 						"rel": "misc"
 					}
 				],
