@@ -14,7 +14,7 @@ namespace Texpainter::Help
 	{
 		auto exe = CurrentProcess::executableFilename();
 		std::string cmd{"xdg-open "};
-		auto helpfile = exe.parent_path().parent_path()/"share/help/C/texpainter";
+		auto helpfile = exe.parent_path().parent_path() / "share/help/C/texpainter";
 		helpfile /= help_file;
 		cmd += helpfile;
 		[[maybe_unused]] auto dummy = system(cmd.c_str());

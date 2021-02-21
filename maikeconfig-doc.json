@@ -21,6 +21,8 @@
 				"command": {
 					"args": [
 						"--mathml",
+						"--columns",
+						"10000",
 						"-o",
 						"{target}",
 						"{source}"
