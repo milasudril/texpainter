@@ -6,3 +6,8 @@ find the option in the "Document" menu. This will bring up a dialog box that all
 the canvas size. The canvas is basically the domain where the final render will be drawn. You will
 find more information about size specification in the documentation for the
 <a href="../app/size_input.html">size input widget</a>.
+
+When you have created a new document, you will have a workspace that looks something like this:
+
+![The initial workspace layout](workspace_init.png)
+
