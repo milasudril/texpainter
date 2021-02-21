@@ -27,6 +27,6 @@ Texpainter is a utility program intended for creating tilable textures. It consi
 
     Should do the trick
 
- 3. Run make (this currently has the same effect as running maike directly)
+ 3. Run make
 
- 4. The binary can now be started with the command `__targets/app/texpainter`
+ 4. The binary can now be started with the command `__targets_rel/app/texpainter`
