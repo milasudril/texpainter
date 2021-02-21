@@ -23,9 +23,9 @@ namespace Texpainter::App
 
 		explicit StartDialog(Ui::Container& owner)
 		    : m_root{owner, Ui::Box::Orientation::Vertical}
-		    , m_new{m_root, "Create document"}
-		    , m_open{m_root, "Open document"}
-		    , m_read_usr_guide{m_root, "Open user guide"}
+		    , m_new{m_root, "Create a new document"}
+		    , m_open{m_root, "Open a document"}
+		    , m_read_usr_guide{m_root, "Read the quick-start guide"}
 		    , m_quit{m_root, "Quit"}
 		{
 		}
