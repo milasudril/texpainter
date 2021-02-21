@@ -1,5 +1,6 @@
 <style type="text/css">
 body{font-family: "Andika", sans-serif}
-img{width: 80%;}
-figure{text-align:center}
+h1, h2, h3{font-weight: bolder}
+img{max-width: 80%;}
+figure{text-align: center}
 </style>
