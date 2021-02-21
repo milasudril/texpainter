@@ -14,6 +14,7 @@ doc:
 	maike --configfiles=maikeconfig-doc.json
 	mkdir -p __targets_rel/share/help/C/
 	cp -r __targets_doc/ __targets_rel/share/help/C/texpainter
+	cp -r __targets_doc/ __targets_dbg/share/help/C/texpainter
 
 .PHONY: clean
 clean:
