@@ -1,10 +1,5 @@
 <style type="text/css">
-img
-{
-	width: 80%;
-}
-figure{
-	text-align:center
-}
-
+body{font-family: "Andika", sans-serif}
+img{width: 80%;}
+figure{text-align:center}
 </style>
