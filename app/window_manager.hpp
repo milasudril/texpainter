@@ -93,7 +93,7 @@ namespace Texpainter::App
 
 		struct StartWindow
 		{
-			Ui::Window owner{"Texpainter main menu"};
+			Ui::Window owner{"Texpainter startup menu"};
 			StartDialog start_dlg{owner};
 		};
 	}
@@ -160,7 +160,7 @@ namespace Texpainter::App
 	public:
 		[[nodiscard]] WindowManager(): m_start_win{std::make_unique<detail::StartWindow>()}
 		{
-			m_start_win->owner.show();
+			m_start_win->owner.show().resize(Size2d{280, 200});
 			m_start_win->start_dlg.eventHandler(*this);
 		}
 
@@ -880,7 +880,7 @@ namespace Texpainter::App
 	template<>
 	inline void WindowManager::onClicked<StartDialog::ControlId::ReadUsrGuide>(Ui::Button& src)
 	{
-		Help::showHelp("user_guide/getting_started.html");
+		Help::showHelp("user_guide/quickstart_guide.html");
 		src.state(false);
 	}
 

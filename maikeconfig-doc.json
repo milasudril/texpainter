@@ -40,6 +40,29 @@
 			],
 			"name": "markdown",
 			"plugin": "targettrivial"
+		},
+		{
+			"config": {
+				"command": {
+					"args": [
+						"{source}",
+						"{target}"
+					],
+					"name": "cp"
+				},
+				"dependencies": [
+					{
+						"ref": "maikeconfig-doc.json",
+						"rel": "misc"
+					}
+				],
+				"filename_ext": ".png"
+			},
+			"filename_exts": [
+				".png"
+			],
+			"name": "imgconv",
+			"plugin": "targettrivial"
 		}
 	],
 	"targetinfo": {

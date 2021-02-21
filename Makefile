@@ -13,12 +13,17 @@ debug:
 doc:
 	maike --configfiles=maikeconfig-doc.json
 	mkdir -p __targets_rel/share/help/C/
-	cp -r __targets_doc/ __targets_rel/share/help/C/texpainter
-	cp -r __targets_doc/ __targets_dbg/share/help/C/texpainter
+	mkdir -p __targets_dbg/share/help/C/
+	cp -r __targets_doc/* __targets_rel/share/help/C/texpainter
+	cp -r __targets_doc/* __targets_dbg/share/help/C/texpainter
 
 .PHONY: clean
 clean:
 	rm -rf __targets*
+
+.PHONY: clean_doc
+clean_doc:
+	rm -rf __targets_doc
 
 .PHONY: format
 format:
