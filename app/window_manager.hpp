@@ -524,7 +524,8 @@ namespace Texpainter::App
 			m_gen_palette.reset();
 		}
 
-		template<auto>
+		template<auto val>
+		requires(!std::same_as<decltype(val), StartDialog::ControlId>)
 		void confirmPositive(DocumentCreatorDlg& src)
 		{
 			createDocument(src);
@@ -838,7 +839,7 @@ namespace Texpainter::App
 					    "Canvas size:",
 					    m_document != nullptr ? m_document->canvasSize() : Size2d{512, 512},
 					    Size2d{65535, 65535});
-					m_doc_creator->eventHandler<DocumentAction::New>(*this);
+					m_doc_creator->eventHandler<action>(*this);
 				}
 			m_doc_creator->show();
 		}
