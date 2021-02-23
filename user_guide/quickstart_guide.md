@@ -163,7 +163,35 @@ of vertices". We will discuss "Scale with resolution" in the next section.
 
 ## Exportinig the result
 
-Before exporting the image, it is a good idea to save your document. Do so by selecting "Save" from
-the <a href="../app/document_menu.html">Document menu</a>. By convention, the filename extension for
-Texpainter files is "txp". However you are free to choose any other extension if that works better
-for you. When you have saved your document, its filename will appear in the title bar.
+Before exporting the texture image, it is a good idea to save your document. Do so by selecting
+"Save" from the <a href="../app/document_menu.html">Document menu</a>. By convention, the filename
+extension for Texpainter files is "txp". However you are free to choose any other extension if that
+works better for you. When you have saved your document, its filename will appear in the title bar.
+
+To export the texture image, select Export from the <a href="../app/document_menu.html">Document
+menu</a>. Set the name of the exported file.
+
+![The "Export" dialog](../app/export_dlg.png)
+
+To increase render quality, it is possible to use
+<a href="terminology.html#isupersampling">supersampling</a>. For the purpose of this tutorial, set
+supersampling to 4. This will use 16 times the amount of RAM.
+
+![Filename and supersampling set](export_dlg_with_name_and_supersampling_set.png)
+
+To export the texture image click on Export.
+
+![The exported image](my_export.png)
+
+Go back to the <a href="../app/compositor.html">Compositor</a>, and set "Scale with resolution" of
+"Make radial gradient" to 0. Then export the texture image under a new name and compare the result.
+
+![Disable "Scale with resulotion"](scale_with_resolution_off.png)
+
+Notice that the blur is mutch less prominent now. This is because the mask was not scaled to
+compensate for the larger surface in use when using supersampling. If the exported image looks
+different than the image in the <a href="../app/document_preview.html">Document preview</a> you
+should check the setting of any "Scale with resolution" parameter.
+
+![The exported image with "Scale with resulotion" turned off. Notice the difference in blur
+prominence](my_export_2.png)
