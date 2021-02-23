@@ -24,7 +24,7 @@
 						"--columns",
 						"10000",
 						"--include-in-header",
-						"user_guide/page_header",
+						"page_header",
 						"--metadata",
 						"pagetitle=Texpainter user guide",
 						"-o",
@@ -39,7 +39,7 @@
 						"rel": "misc"
 					},
 					{
-						"ref": "user_guide/page_header",
+						"ref": "page_header",
 						"rel": "misc"
 					}
 				],

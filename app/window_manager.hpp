@@ -16,10 +16,10 @@
 #include "./render_job_creator.hpp"
 #include "./render_to_img_job_creator.hpp"
 #include "./start_dialog.hpp"
+#include "./show_help.hpp"
 
 #include "model/document.hpp"
 #include "model/window_type.hpp"
-#include "user_guide/show_help.hpp"
 #include "model/palette_generate.hpp"
 #include "pixel_store/image_io.hpp"
 #include "ui/window.hpp"
@@ -881,7 +881,7 @@ namespace Texpainter::App
 	template<>
 	inline void WindowManager::onClicked<StartDialog::ControlId::ReadUsrGuide>(Ui::Button& src)
 	{
-		Help::showHelp("user_guide/quickstart_guide.html");
+		Help::showHelp("quick-start_guide/index.html");
 		src.state(false);
 	}
 
