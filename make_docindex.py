@@ -49,13 +49,17 @@ def resolve_sections(paths):
 def print_outline(sections):
 	prev_chapter = ''
 	for section in sections:
+		if section[2] < 2:
+			continue
+		indent = section[2] - 1
+
 		if section[0] != prev_chapter:
 			prev_chapter = section[0]
-			for k in range(section[2] - 1):
+			for k in range(indent - 1):
 				print('  ', end='')
 			print('* %s'%(section[0]))
 
-		for k in range(section[2]):
+		for k in range(indent):
 			print('  ', end='')
 		print('* %s'%(section[1]))
 
