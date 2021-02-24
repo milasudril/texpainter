@@ -42,7 +42,7 @@ def resolve_sections(paths):
 			continue
 
 		section = get_header(os.path.join(f[0], f[1]))
-		resolved_sections.append((chapter, section, f[2], os.path.join(f[0], f[1])))
+		resolved_sections.append((chapter, section, f[2], f[0], os.path.join(f[0], f[1])))
 
 	return resolved_sections
 
@@ -57,11 +57,11 @@ def print_outline(sections):
 			prev_chapter = section[0]
 			for k in range(indent - 1):
 				print('  ', end='')
-			print('* %s'%(section[0]))
+			print('* [%s](%s)'%(section[0], os.path.join(section[3], 'index.html')))
 
 		for k in range(indent):
 			print('  ', end='')
-		print('* %s'%(section[1]))
+		print('* [%s](%s.html)'%(section[1], os.path.splitext(section[4])[0]))
 
 print_outline(resolve_sections(collect_paths('.')))
 
