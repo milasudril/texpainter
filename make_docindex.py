@@ -64,19 +64,3 @@ def print_outline(sections):
 		print('* [%s](%s.html)'%(section[1], os.path.splitext(section[4])[0]))
 
 print_outline(resolve_sections(collect_paths('.')))
-
-
-#print(collect_paths('.'))
-#
-#
-# headings=$(find -name index.md | while read line; do
-# 	echo -e $(grep '^# ' $line) '\t' $line
-# done | sed 's/^# //g')
-#
-# pages=$(find -name '*.md' | grep -v 'index\.md' | while read line; do
-# 	echo -e $(grep '^# ' $line) '\t' $line
-# done | sed 's/^# //g')
-#
-# echo "$headings"
-#
-# echo "$pages"
