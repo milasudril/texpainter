@@ -46,7 +46,8 @@ def resolve_sections(paths):
 
 	return resolved_sections
 
-def print_outline(sections):
+def gen_outline(sections):
+	lines = []
 	prev_chapter = ''
 	for section in sections:
 		if section[2] < 2:
@@ -55,12 +56,25 @@ def print_outline(sections):
 
 		if section[0] != prev_chapter:
 			prev_chapter = section[0]
+			line = ''
 			for k in range(indent - 1):
-				print('  ', end='')
-			print('* [%s](%s)'%(section[0], os.path.join(section[3], 'index.html')))
+				line += '  '
+			line += '* [%s](%s)'%(section[0], os.path.join(section[3], 'index.html'))
+			lines.append(line)
 
+		line = ''
 		for k in range(indent):
-			print('  ', end='')
-		print('* [%s](%s.html)'%(section[1], os.path.splitext(section[4])[0]))
+			line += '  '
+		line += '* [%s](%s.html)'%(section[1], os.path.splitext(section[4])[0])
+		lines.append(line)
 
-print_outline(resolve_sections(collect_paths('.')))
+	return lines
+
+def make_index_page(dir):
+	with open(os.path.join(dir, 'index.md')) as f:
+		lines = f.readlines()
+		lines.append('## Sections')
+		lines.extend(gen_outline(resolve_sections(collect_paths('.'))))
+		return lines
+
+print('\n'.join(make_index_page('.')))
