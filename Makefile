@@ -14,8 +14,6 @@ doc:
 	maike --configfiles=maikeconfig-doc.json
 	mkdir -p __targets_rel/share/help/C/texpainter
 	mkdir -p __targets_dbg/share/help/C/texpainter
-	./make_docindex.py | pandoc "--mathml" "--columns" "10000" "--include-in-header" \
-	"page_header" "--metadata" "pagetitle=Texpainter user guide" > __targets_doc/index.html
 	cp -r __targets_doc/* __targets_rel/share/help/C/texpainter
 	cp -r __targets_doc/* __targets_dbg/share/help/C/texpainter
 

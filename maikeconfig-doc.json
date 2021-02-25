@@ -20,6 +20,7 @@
 			"config": {
 				"command": {
 					"args": [
+						"{source}",
 						"--mathml",
 						"--columns",
 						"10000",
@@ -28,10 +29,9 @@
 						"--metadata",
 						"pagetitle=Texpainter user guide",
 						"-o",
-						"{target}",
-						"{source}"
+						"{target}"
 					],
-					"name": "pandoc"
+					"name": "./make_doc_page.py"
 				},
 				"dependencies": [
 					{
@@ -48,7 +48,7 @@
 			"filename_exts": [
 				".md"
 			],
-			"name": "markdown",
+			"name": "docpage",
 			"plugin": "targettrivial"
 		},
 		{

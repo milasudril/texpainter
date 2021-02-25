@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 
 import os
+import sys
+import subprocess
 
 def collect_paths(dir, depth = 1):
 	ret = []
@@ -59,22 +61,44 @@ def gen_outline(sections):
 			line = ''
 			for k in range(indent - 1):
 				line += '  '
-			line += '* [%s](%s)'%(section[0], os.path.join(section[3], 'index.html'))
+			line += '* [%s](%s)\n'%(section[0], os.path.join(section[3], 'index.html'))
 			lines.append(line)
 
 		line = ''
 		for k in range(indent):
 			line += '  '
-		line += '* [%s](%s.html)'%(section[1], os.path.splitext(section[4])[0])
+		line += '* [%s](%s.html)\n'%(section[1], os.path.splitext(section[4])[0])
 		lines.append(line)
 
 	return lines
 
-def make_index_page(dir):
-	with open(os.path.join(dir, 'index.md')) as f:
+def make_index_page(index):
+	with open(index) as f:
 		lines = f.readlines()
-		lines.append('## Sections')
-		lines.extend(gen_outline(resolve_sections(collect_paths('.'))))
+		lines.append('## Sections\n\n')
+		dir = os.path.dirname(index)
+		if dir == '':
+			dir = '.'
+		lines.extend(gen_outline(resolve_sections(collect_paths(dir))))
 		return lines
 
-print('\n'.join(make_index_page('.')))
+def make_content_page(page):
+	with open(page) as f:
+		lines = ['[« To index](index.html)\n\n']
+		lines.extend(f.readlines())
+		return lines
+
+def make_doc(filename):
+	if os.path.split(filename)[-1] == 'index.md':
+		return make_index_page(filename)
+	else:
+		return make_content_page(filename)
+
+def convert(lines, pandoc_args):
+	cmd = ['pandoc']
+	cmd.extend(pandoc_args)
+	with subprocess.Popen(cmd, stdin=subprocess.PIPE) as proc:
+		for line in lines:
+			proc.stdin.write(line.encode('utf-8'))
+
+convert(make_doc(sys.argv[1]), sys.argv[2:])
