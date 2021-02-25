@@ -13,8 +13,9 @@ def collect_paths(dir, depth = 1):
 			continue
 
 		if os.path.isfile(fullpath) and f.endswith('.md'):
-			print('%d %s'%(depth, fullpath))
-			ret.append((dir, f, depth))
+			path_split=dir.split('/')  # It's a UNIX system. I know this!
+			skip = 1 + len(path_split) - depth
+			ret.append((dir, f, '/'.join(path_split[skip:]), depth))
 			continue
 
 		if os.path.isdir(fullpath) and f != '.' and f != '..':
@@ -45,7 +46,7 @@ def resolve_sections(paths):
 			continue
 
 		section = get_header(os.path.join(f[0], f[1]))
-		resolved_sections.append((chapter, section, f[2], f[0], os.path.join(f[0], f[1])))
+		resolved_sections.append((chapter, section, f[3], f[0], os.path.join(f[2], f[1])))
 
 	return resolved_sections
 
