@@ -1,4 +1,4 @@
-# Terminology
+# Glossary
 
 This pages summarizes different concepts used in Texpainter.
 

@@ -34,18 +34,22 @@ def get_chapter(section):
 	except:
 		return None
 
-def resolve_sections(paths):
+def resolve_sections(paths, current_index):
 	resolved_sections = []
 
 	for f in paths:
-		if f[1] == 'index.md' or f[1] == 'README.md':
+		filename = os.path.join(f[0], f[1])
+		if filename == current_index:
+			continue
+
+		if f[1] == 'README.md':
 			continue
 
 		chapter = get_chapter(f)
 		if chapter == None:
 			continue
 
-		section = get_header(os.path.join(f[0], f[1]))
+		section = get_header(filename)
 		resolved_sections.append((chapter, section, f[3], f[0], os.path.join(f[2], f[1])))
 
 	return resolved_sections
@@ -55,13 +59,15 @@ def gen_outline(sections):
 	prev_chapter = ''
 	for section in sections:
 		indent = section[2] - 1
-
 		if section[0] != prev_chapter and prev_chapter != '':
 			line = ''
 			for k in range(indent - 1):
 				line += '  '
 			line += '* [%s](%s)\n'%(section[0], os.path.join(section[3], 'index.html'))
 			lines.append(line)
+
+		if os.path.split(section[4])[1] == 'index.md':
+			continue
 
 		line = ''
 		for k in range(indent):
@@ -84,7 +90,7 @@ def make_index_page(index):
 
 		lines.extend(f.readlines())
 		lines.append('## Sections\n\n')
-		lines.extend(gen_outline(resolve_sections(collect_paths(dir))))
+		lines.extend(gen_outline(resolve_sections(collect_paths(dir), index)))
 		return lines
 
 def make_content_page(page):

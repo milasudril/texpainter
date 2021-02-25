@@ -15,14 +15,14 @@ When you have created a new document, you will have a workspace that looks somet
 
 ![The initial workspace](workspace_init.png)
 
-Now you need to create a new <a href="terminology.html#image">image</a> to paint on. You create a
+Now you need to create a new <a href="../glossary.html#image">image</a> to paint on. You create a
 new image from the <a href="../app/image_menu.html">Image menu</a>. After creating a new image, you
 will see its name in the <a href="../app/image_editor.html">Image editor</a>. It also appears as a
-new <a href="terminology.html#node">node</a> in the <a href="../app/compositor.html">Compositor</a>.
+new <a href="../glossary.html#node">node</a> in the <a href="../app/compositor.html">Compositor</a>.
 
 ![The workspace after creating a new image](workspace_with_new_image.png)
 
-Before you can paint anything, you need to have a <a href="terminology.html#palette">palette</a> to
+Before you can paint anything, you need to have a <a href="../glossary.html#palette">palette</a> to
 select a color from. Palettes are managed from the <a href="../app/palette_menu">Palette menu</a>.
 To change a color in the palette, right-click on the slot that should have the desired color. To
 select what color to paint with, left-click.
@@ -47,7 +47,7 @@ move the output node to the right.
 ![The compositor after moving nodes](compositor_after_organizing.png)
 
 We want to copy the pixels of "texpainter demo" to the "Output image". Left-click either of red
-<a href="terminology.html#port">ports</a>. When you move the mouse cursor, you will se a line
+<a href="../glossary.html#port">ports</a>. When you move the mouse cursor, you will se a line
 segment connecting the port with the mouse cursor.
 
 ![The process of connecting nodes](connecting_nodes.png)
@@ -62,9 +62,9 @@ Now, the document preview shows the pattern in scale 1:2.
 
 ## Applying some filters
 
-Filters are applied by adding <a href="terminology.html#node">node</a>s in the path between the
+Filters are applied by adding <a href="../glossary.html#node">node</a>s in the path between the
 source image and the output image. This tutorial will demonstrate how to add Gaussian blur to the
-image. Gaussian blur is achieved by multipying the <a href="terminology.html#image_spectrum">image
+image. Gaussian blur is achieved by multipying the <a href="../glossary.html#image_spectrum">image
 spectrum</a> with a mask, where the intensity is shaped like a Gaussian, ie
 
 $$
@@ -174,7 +174,7 @@ menu</a>. Set the name of the exported file.
 ![The "Export" dialog](../app/export_dlg.png)
 
 To increase render quality, it is possible to use
-<a href="terminology.html#isupersampling">supersampling</a>. For the purpose of this tutorial, set
+<a href="../glossary.html#isupersampling">supersampling</a>. For the purpose of this tutorial, set
 supersampling to 4. This will use 16 times the amount of RAM.
 
 ![Filename and supersampling set](export_dlg_with_name_and_supersampling_set.png)
