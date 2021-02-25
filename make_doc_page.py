@@ -13,6 +13,7 @@ def collect_paths(dir, depth = 1):
 			continue
 
 		if os.path.isfile(fullpath) and f.endswith('.md'):
+			print('%d %s'%(depth, fullpath))
 			ret.append((dir, f, depth))
 			continue
 
@@ -52,12 +53,9 @@ def gen_outline(sections):
 	lines = []
 	prev_chapter = ''
 	for section in sections:
-		if section[2] < 2:
-			continue
 		indent = section[2] - 1
 
-		if section[0] != prev_chapter:
-			prev_chapter = section[0]
+		if section[0] != prev_chapter and prev_chapter != '':
 			line = ''
 			for k in range(indent - 1):
 				line += '  '
@@ -70,15 +68,21 @@ def gen_outline(sections):
 		line += '* [%s](%s.html)\n'%(section[1], os.path.splitext(section[4])[0])
 		lines.append(line)
 
+		prev_chapter = section[0]
+
 	return lines
 
 def make_index_page(index):
 	with open(index) as f:
-		lines = f.readlines()
-		lines.append('## Sections\n\n')
 		dir = os.path.dirname(index)
+		lines = []
 		if dir == '':
 			dir = '.'
+		else:
+			lines.append('[« To index](../index.html)\n\n')
+
+		lines.extend(f.readlines())
+		lines.append('## Sections\n\n')
 		lines.extend(gen_outline(resolve_sections(collect_paths(dir))))
 		return lines
 
