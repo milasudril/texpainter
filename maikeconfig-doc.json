@@ -86,7 +86,7 @@
 			"filename_exts": [
 				".css"
 			],
-			"name": "imgconv",
+			"name": "csscopy",
 			"plugin": "targettrivial"
 		}
 	],
