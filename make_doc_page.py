@@ -9,11 +9,20 @@ def collect_paths(dir, depth = 1):
 	for f in os.listdir(dir):
 		fullpath = os.path.join(dir, f)
 
+		if depth == 2:
+			if f == 'index.md' and os.path.isfile(fullpath) and f.endswith('.md'):
+				path_split=dir.split('/')
+				skip = 1 + len(path_split) - depth
+				ret.append((dir, f, '/'.join(path_split[skip:]), depth))
+				return ret
+			continue
+
+
 		if os.path.islink(fullpath):
 			continue
 
 		if os.path.isfile(fullpath) and f.endswith('.md'):
-			path_split=dir.split('/')  # It's a UNIX system. I know this!
+			path_split=dir.split('/')
 			skip = 1 + len(path_split) - depth
 			ret.append((dir, f, '/'.join(path_split[skip:]), depth))
 			continue
