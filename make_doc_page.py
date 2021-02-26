@@ -3,6 +3,7 @@
 import os
 import sys
 import subprocess
+import string
 
 def collect_paths(dir, depth = 1):
 	ret = []
@@ -119,11 +120,22 @@ def make_doc(filename):
 	else:
 		return make_content_page(filename)
 
+def make_path_prefix(filename):
+	ret = []
+	for k in range(0, len(filename.split('/')) - 1):
+		ret.append('..')
+	return ret
+
 def convert(lines, pandoc_args):
 	cmd = ['pandoc']
 	cmd.extend(pandoc_args)
+	print(cmd)
 	with subprocess.Popen(cmd, stdin=subprocess.PIPE) as proc:
 		for line in lines:
 			proc.stdin.write(line.encode('utf-8'))
 
-convert(make_doc(sys.argv[1]), sys.argv[2:])
+stylesheet = make_path_prefix(sys.argv[1])
+stylesheet.append('format.css')
+pandoc_args = sys.argv[2:]
+pandoc_args.extend(['-s', '--css', '/'.join(stylesheet)])
+convert(make_doc(sys.argv[1]), pandoc_args)

@@ -24,10 +24,6 @@
 						"--mathml",
 						"--columns",
 						"10000",
-						"--include-in-header",
-						"page_header",
-						"--metadata",
-						"pagetitle=Texpainter user guide",
 						"-o",
 						"{target}"
 					],
@@ -36,10 +32,6 @@
 				"dependencies": [
 					{
 						"ref": "maikeconfig-doc.json",
-						"rel": "misc"
-					},
-					{
-						"ref": "page_header",
 						"rel": "misc"
 					}
 				],
@@ -70,6 +62,29 @@
 			},
 			"filename_exts": [
 				".png"
+			],
+			"name": "imgconv",
+			"plugin": "targettrivial"
+		},
+		{
+			"config": {
+				"command": {
+					"args": [
+						"{source}",
+						"{target}"
+					],
+					"name": "cp"
+				},
+				"dependencies": [
+					{
+						"ref": "maikeconfig-doc.json",
+						"rel": "misc"
+					}
+				],
+				"filename_ext": ".css"
+			},
+			"filename_exts": [
+				".css"
 			],
 			"name": "imgconv",
 			"plugin": "targettrivial"
