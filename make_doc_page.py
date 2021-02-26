@@ -134,8 +134,10 @@ def convert(lines, pandoc_args):
 		for line in lines:
 			proc.stdin.write(line.encode('utf-8'))
 
-stylesheet = make_path_prefix(sys.argv[1])
-stylesheet.append('format.css')
-pandoc_args = sys.argv[2:]
-pandoc_args.extend(['-s', '--css', '/'.join(stylesheet)])
-convert(make_doc(sys.argv[1]), pandoc_args)
+def gen_webpage(src, pandoc_args):
+	stylesheet = make_path_prefix(src)
+	stylesheet.append('format.css')
+	pandoc_args.extend(['-s', '--css', '/'.join(stylesheet)])
+	convert(make_doc(src), pandoc_args)
+
+gen_webpage(sys.argv[1], sys.argv[2:])
