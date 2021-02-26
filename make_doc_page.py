@@ -129,15 +129,15 @@ def make_path_prefix(filename):
 def convert(lines, pandoc_args):
 	cmd = ['pandoc']
 	cmd.extend(pandoc_args)
-	print(cmd)
 	with subprocess.Popen(cmd, stdin=subprocess.PIPE) as proc:
 		for line in lines:
 			proc.stdin.write(line.encode('utf-8'))
 
 def gen_webpage(src, pandoc_args):
 	stylesheet = make_path_prefix(src)
+	title = ['Texpainter: ', get_header(src)]
 	stylesheet.append('format.css')
-	pandoc_args.extend(['-s', '--css', '/'.join(stylesheet)])
+	pandoc_args.extend(['-s', '--css', '/'.join(stylesheet), '--metadata', 'pagetitle='+''.join(title)])
 	convert(make_doc(src), pandoc_args)
 
 gen_webpage(sys.argv[1], sys.argv[2:])
