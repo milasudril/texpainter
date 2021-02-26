@@ -12,6 +12,7 @@ debug:
 .PHONY: doc
 doc:
 	maike --configfiles=maikeconfig-doc.json
+#	htmlproofer __targets_doc
 	mkdir -p __targets_rel/share/help/C/texpainter
 	mkdir -p __targets_dbg/share/help/C/texpainter
 	cp -r __targets_doc/* __targets_rel/share/help/C/texpainter

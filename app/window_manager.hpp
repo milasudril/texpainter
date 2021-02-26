@@ -254,6 +254,12 @@ namespace Texpainter::App
 		}
 
 		template<class Source>
+		void onActivated(Enum::Tag<AppAction::Help>, Ui::MenuItem&, Source&)
+		{
+			Help::showHelp("index.html");
+		}
+
+		template<class Source>
 		void onActivated(Enum::Tag<AppAction::Quit>, Ui::MenuItem&, Source&)
 		{
 			Ui::Context::get().exit();
