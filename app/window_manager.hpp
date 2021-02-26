@@ -525,8 +525,8 @@ namespace Texpainter::App
 		}
 
 		template<auto val>
-		requires(!std::same_as<decltype(val), StartDialog::ControlId>)
-		void confirmPositive(DocumentCreatorDlg& src)
+		requires(!std::same_as<decltype(val), StartDialog::ControlId>) void confirmPositive(
+		    DocumentCreatorDlg& src)
 		{
 			createDocument(src);
 		}

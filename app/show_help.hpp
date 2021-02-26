@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"open_help.hpp","type":"include"}]}
 
-#ifndef TEXPAINTER_USERGUIDE_SHOWHELP_HPP
-#define TEXPAINTER_USERGUIDE_SHOWHELP_HPP
+#ifndef TEXPAINTER_APP_SHOWHELP_HPP
+#define TEXPAINTER_APP_SHOWHELP_HPP
 
 #include "utils/procinfo.hpp"
 

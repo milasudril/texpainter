@@ -5,25 +5,25 @@ import sys
 import subprocess
 import string
 
-def collect_paths(dir, depth = 1):
+
+def collect_paths(dir, depth=1):
 	ret = []
 	for f in os.listdir(dir):
 		fullpath = os.path.join(dir, f)
 
 		if depth == 2:
 			if f == 'index.md' and os.path.isfile(fullpath) and f.endswith('.md'):
-				path_split=dir.split('/')
+				path_split = dir.split('/')
 				skip = 1 + len(path_split) - depth
 				ret.append((dir, f, '/'.join(path_split[skip:]), depth))
 				return ret
 			continue
 
-
 		if os.path.islink(fullpath):
 			continue
 
 		if os.path.isfile(fullpath) and f.endswith('.md'):
-			path_split=dir.split('/')
+			path_split = dir.split('/')
 			skip = 1 + len(path_split) - depth
 			ret.append((dir, f, '/'.join(path_split[skip:]), depth))
 			continue
@@ -34,15 +34,18 @@ def collect_paths(dir, depth = 1):
 
 	return ret
 
+
 def get_header(file):
 	with open(os.path.join(file)) as f:
 		return f.readline()[2:].strip()
+
 
 def get_chapter(section):
 	try:
 		return get_header(os.path.join(section[0], 'index.md'))
 	except:
 		return None
+
 
 def resolve_sections(paths, current_index):
 	resolved_sections = []
@@ -64,6 +67,7 @@ def resolve_sections(paths, current_index):
 
 	return resolved_sections
 
+
 def gen_outline(sections):
 	lines = []
 	prev_chapter = ''
@@ -73,7 +77,7 @@ def gen_outline(sections):
 			line = ''
 			for k in range(indent - 1):
 				line += '  '
-			line += '* [%s](%s)\n'%(section[0], os.path.join(section[3], 'index.html'))
+			line += '* [%s](%s)\n' % (section[0], os.path.join(section[3], 'index.html'))
 			lines.append(line)
 
 		if os.path.split(section[4])[1] == 'index.md':
@@ -82,12 +86,13 @@ def gen_outline(sections):
 		line = ''
 		for k in range(indent):
 			line += '  '
-		line += '* [%s](%s.html)\n'%(section[1], os.path.splitext(section[4])[0])
+		line += '* [%s](%s.html)\n' % (section[1], os.path.splitext(section[4])[0])
 		lines.append(line)
 
 		prev_chapter = section[0]
 
 	return lines
+
 
 def make_index_page(index):
 	with open(index) as f:
@@ -108,11 +113,13 @@ def make_index_page(index):
 
 		return lines
 
+
 def make_content_page(page):
 	with open(page) as f:
 		lines = ['[« To index](index.html)\n\n']
 		lines.extend(f.readlines())
 		return lines
+
 
 def make_doc(filename):
 	if os.path.split(filename)[-1] == 'index.md':
@@ -120,11 +127,13 @@ def make_doc(filename):
 	else:
 		return make_content_page(filename)
 
+
 def make_path_prefix(filename):
 	ret = []
 	for k in range(0, len(filename.split('/')) - 1):
 		ret.append('..')
 	return ret
+
 
 def convert(lines, pandoc_args):
 	cmd = ['pandoc']
@@ -133,11 +142,14 @@ def convert(lines, pandoc_args):
 		for line in lines:
 			proc.stdin.write(line.encode('utf-8'))
 
+
 def gen_webpage(src, pandoc_args):
 	stylesheet = make_path_prefix(src)
 	title = ['Texpainter: ', get_header(src)]
 	stylesheet.append('format.css')
-	pandoc_args.extend(['-s', '--css', '/'.join(stylesheet), '--metadata', 'pagetitle='+''.join(title)])
+	pandoc_args.extend(
+		['-s', '--css', '/'.join(stylesheet), '--metadata', 'pagetitle=' + ''.join(title)])
 	convert(make_doc(src), pandoc_args)
+
 
 gen_webpage(sys.argv[1], sys.argv[2:])
