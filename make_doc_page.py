@@ -98,8 +98,13 @@ def make_index_page(index):
 			lines.append('[« To index](../index.html)\n\n')
 
 		lines.extend(f.readlines())
-		lines.append('## Sections\n\n')
-		lines.extend(gen_outline(resolve_sections(collect_paths(dir), index)))
+
+		outline = gen_outline(resolve_sections(collect_paths(dir), index))
+
+		if len(outline) > 0:
+			lines.append('## Sections\n\n')
+			lines.extend(outline)
+
 		return lines
 
 def make_content_page(page):
