@@ -145,9 +145,10 @@ def make_about(page):
 		data = json.load(f)
 
 	lines = []
-	lines.append('# %s %s\n' % (data['name'], changelog.describe()))
-	lines.append('\n')
-	lines.append('<p class="title">%s</p>\n'% data['description_short'])
+	lines.append('<header>\n')
+	lines.append('<h1>%s %s</h1>\n' % (data['name'], changelog.describe()))
+	lines.append('<summary class="title">%s</summary>\n'% data['description_short'])
+	lines.append('</header>\n')
 	lines.append('\n')
 
 	lines.append('## Copyright\n')
