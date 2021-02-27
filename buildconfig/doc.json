@@ -36,7 +36,7 @@
 						"rel": "misc"
 					},
 					{
-						"ref": "./devtools/changelog.py",
+						"ref": "./devtools/vcs_info.py",
 						"rel": "misc"
 					}
 				],

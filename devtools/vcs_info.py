@@ -11,7 +11,7 @@ def collect_commits(repo):
 
 	return ret
 
-def vcs_info():
+def get():
 	ret = dict()
 	repo = pygit2.Repository('.git')
 	ret['commit'] = repo.revparse_single('HEAD').hex

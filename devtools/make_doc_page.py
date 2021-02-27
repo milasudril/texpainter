@@ -4,7 +4,7 @@ import os
 import sys
 import subprocess
 import string
-import changelog
+import vcs_info
 import json
 
 
@@ -130,7 +130,7 @@ def make_changelog(page):
 	with open(page) as f:
 		lines = ['[« Back](javascript:history.back())\n\n']
 		lines.extend(f.readlines())
-		log = changelog.vcs_info()['changelog']
+		log = vcs_info.get()['changelog']
 		header = [''] * len(log[0])
 		delimiter = ['--'] * len(log[0])
 		lines.extend('\n|%s|\n' % '|'.join(header))
@@ -145,12 +145,12 @@ def make_about(page, target_dir):
 	with open(page) as f:
 		data = json.load(f)
 
-	vcs_info = changelog.vcs_info()
+	vcsdata = vcs_info.get()
 
 	lines = ['[« Back](javascript:history.back())\n']
 	lines.append('\n')
 	lines.append('<header>\n')
-	lines.append('<h1>%s %s</h1>\n' % (data['name'], vcs_info['tag']))
+	lines.append('<h1>%s %s</h1>\n' % (data['name'], vcsdata['tag']))
 	lines.append('<summary class="title">%s</summary>\n' % data['description_short'])
 	lines.append('</header>\n')
 	lines.append('\n')
@@ -197,7 +197,7 @@ def make_about(page, target_dir):
 	lines.append('| - | - |\n')
 	lines.append('| __Timestamp:__ | %s |\n' % os.environ['TIMESTAMP'])
 	lines.append('| __Id:__ | %s |\n' % os.environ['BUILD_ID'])
-	lines.append('| __VCS revision id:__ | %s | \n' % vcs_info['commit'])
+	lines.append('| __VCS revision id:__ | %s | \n' % vcsdata['commit'])
 	lines.append('| __Compiler:__ | %s | \n' % compiler)
 	lines.append('| __Libraries:__ | %s | \n' % ', '.join(libs))
 	lines.append('\n')

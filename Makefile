@@ -26,8 +26,8 @@ doc: release
 	cp -r __targets_doc/* __targets_rel/share/help/C/texpainter
 	cp -r __targets_doc/* __targets_dbg/share/help/C/texpainter
 
-vcs_info.json: devtools/changelog.py devtools/make_vcs_info.py
-	devtools/make_vcs_info.py
+vcs_info.json: devtools/vcs_info.py
+	devtools/vcs_info.py vcs_info.json
 
 .PHONY: archive
 archive: vcs_info.json
