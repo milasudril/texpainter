@@ -146,7 +146,7 @@
 				},
 				"dependencies": [
 					{
-						"ref": "buildconfig/base.json",
+						"ref": "maikeconfig.json",
 						"rel": "misc"
 					}
 				],
