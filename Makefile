@@ -2,6 +2,7 @@
 
 BUILD_ID=$(shell devtools/make_imgproc_id.sh)
 TIMESTAMP=$(shell LC_ALL="C" date)
+VCS_TAG=$(shell git describe --always --dirty)
 
 .PHONY: all
 all: release doc
@@ -30,7 +31,7 @@ doc: release
 archive:
 	devtools/vcs_info.py
 	mkdir -p __targets_rel
-	tar --exclude='__pycache__' --exclude='__targets*' --exclude='.git' --xform s:'\(.*\)':'texpainter/\1': -zcf __targets_rel/texpainter.tar.gz *
+	tar --exclude='__pycache__' --exclude='__targets*' --exclude='.git' --xform s:'\(.*\)':'texpainter_$(VCS_TAG)/\1': -zcf __targets_rel/texpainter_$(VCS_TAG).tar.gz *
 
 .PHONY: clean
 clean:
