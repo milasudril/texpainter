@@ -1,3 +1,8 @@
+.EXPORT_ALL_VARIABLES:
+
+BUILD_ID=$(shell devtools/make_imgproc_id.sh)
+TIMESTAMP=$(shell LC_ALL="C" date)
+
 .PHONY: all
 all: release doc
 
@@ -11,6 +16,7 @@ debug:
 
 .PHONY: doc
 doc:
+#	env | grep $(BUILD_ID)
 	maike --configfiles=maikeconfig-doc.json
 #	htmlproofer __targets_doc
 	mkdir -p __targets_rel/share/help/C/texpainter

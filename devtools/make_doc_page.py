@@ -174,6 +174,17 @@ def make_about(page):
 		lines.append('| %s | %s |\n' %(entry['who'], entry['what']))
 	lines.append('\n')
 
+	lines.append('## Build info\n')
+	lines.append('\n')
+	lines.append('| | |\n')
+	lines.append('| - | - |\n')
+	lines.append('| __Timestamp:__ | %s |\n' % os.environ['TIMESTAMP'])
+	lines.append('| __Id:__ | %s |\n' % os.environ['BUILD_ID'])
+	lines.append('| __Compiler:__ | %s | \n' % 'foobar')
+	lines.append('| __Libraries:__ | %s | \n' % 'foobar')
+	lines.append('\n')
+	lines.append('\n')
+
 	return lines
 
 
