@@ -1,5 +1,9 @@
+#!/usr/bin/python3
+
 import pygit2
 import datetime
+import sys
+import json
 
 def collect_commits(repo):
 	ret = []
@@ -19,3 +23,7 @@ def get():
 	ret['changelog'] = collect_commits(repo)
 	return ret
 
+if __name__ == '__main__':
+	data = get()
+	with open('vcs_info.json', 'w') as f:
+		json.dump(data, f)
