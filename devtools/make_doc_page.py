@@ -107,14 +107,17 @@ def make_index_page(index):
 		if dir == '':
 			dir = '.'
 		else:
-			lines.append('[« To index](../index.html)\n\n')
+			lines.append('[« To index](../index.html)\n')
+			lines.append('\n')
 
 		lines.extend(f.readlines())
 
 		outline = gen_outline(resolve_sections(collect_paths(dir), index))
 
 		if len(outline) > 0:
-			lines.append('## Sections\n\n')
+			lines.append('\n')
+			lines.append('## Sections')
+			lines.append('\n')
 			lines.extend(outline)
 
 		return lines
