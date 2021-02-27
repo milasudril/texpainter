@@ -1,14 +1,6 @@
 {
 	"acknowledgement": [
 		{
-			"what": "The PCG32 random number generator",
-			"who": "Melissa O'Neill"
-		},
-		{
-			"what": "The UI toolkit",
-			"who": "The GTK+ team"
-		},
-		{
 			"what": "The OpenEXR file format and support library",
 			"who": "Academy Software Foundation"
 		},
@@ -17,12 +9,20 @@
 			"who": "The FFTW team"
 		},
 		{
-			"what": "The nlohmann-json library",
-			"who": "Niels Lohmann"
-		},
-		{
 			"what": "The libnotify library",
 			"who": "The GNOME Project"
+		},
+		{
+			"what": "The UI toolkit",
+			"who": "The GTK+ team"
+		},
+		{
+			"what": "The PCG32 random number generator",
+			"who": "Melissa O'Neill"
+		},
+		{
+			"what": "The nlohmann-json library",
+			"who": "Niels Lohmann"
 		}
 	],
 	"copyright": [{"author": "Torbjörn Rathsman", "years": [

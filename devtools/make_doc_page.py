@@ -144,7 +144,8 @@ def make_about(page):
 	with open(page) as f:
 		data = json.load(f)
 
-	lines = []
+	lines = ['[« Back](javascript:history.back())\n']
+	lines.append('\n')
 	lines.append('<header>\n')
 	lines.append('<h1>%s %s</h1>\n' % (data['name'], changelog.describe()))
 	lines.append('<summary class="title">%s</summary>\n'% data['description_short'])
@@ -160,6 +161,15 @@ def make_about(page):
 		for year in entry['years']:
 			years.append(str(year))
 		lines.append('| %s | %s |\n' %(entry['author'], ', '.join(years)))
+	lines.append('\n')
+
+	lines.append('## Acknowledgement\n')
+	lines.append('\n')
+	lines.append('| | |\n')
+	lines.append('| - | - |\n')
+	for entry in data['acknowledgement']:
+		lines.append('| %s | %s |\n' %(entry['who'], entry['what']))
+
 	lines.append('\n')
 
 	return lines
