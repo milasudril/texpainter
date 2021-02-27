@@ -6,6 +6,7 @@ import subprocess
 import string
 import changelog
 
+
 def collect_paths(dir, depth=1):
 	ret = []
 	for f in os.listdir(dir):
@@ -120,17 +121,18 @@ def make_content_page(page):
 		lines.extend(f.readlines())
 		return lines
 
+
 def make_changelog(page):
 	with open(page) as f:
 		lines = ['[« Back](javascript:history.back())\n\n']
 		lines.extend(f.readlines())
 		log = changelog.get()
-		header = ['']*len(log[0])
-		delimiter = ['--']*len(log[0])
-		lines.extend('\n|%s|\n'%'|'.join(header))
-		lines.extend('|%s|\n'%'|'.join(delimiter))
+		header = [''] * len(log[0])
+		delimiter = ['--'] * len(log[0])
+		lines.extend('\n|%s|\n' % '|'.join(header))
+		lines.extend('|%s|\n' % '|'.join(delimiter))
 		for item in log:
-			lines.append('|%s|\n'%'|'.join(item))
+			lines.append('|%s|\n' % '|'.join(item))
 
 	return lines
 
@@ -157,6 +159,7 @@ def convert(lines, pandoc_args):
 	with subprocess.Popen(cmd, stdin=subprocess.PIPE) as proc:
 		for line in lines:
 			proc.stdin.write(line.encode('utf-8'))
+
 
 def gen_webpage(src, pandoc_args):
 	stylesheet = make_path_prefix(src)

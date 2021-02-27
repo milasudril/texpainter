@@ -1,0 +1,54 @@
+{
+	"acknowledgement": [
+		{
+			"what": "The PCG32 random number generator",
+			"who": "Melissa O'Neill"
+		},
+		{
+			"what": "The UI toolkit",
+			"who": "The GTK+ team"
+		},
+		{
+			"what": "The OpenEXR file format and support library",
+			"who": "Academy Software Foundation"
+		},
+		{
+			"what": "The fftw3 library",
+			"who": "The FFTW team"
+		},
+		{
+			"what": "The nlohmann-json library",
+			"who": "Niels Lohmann"
+		},
+		{
+			"what": "The libnotify library",
+			"who": "The GNOME Project"
+		}
+	],
+	"authors": [
+		"Torbjörn Rathsman"
+	],
+	"copyright_years": [
+		2020,
+		2021
+	],
+	"description_long": [
+		"Texpainter is a tool for creating tilable textures. Texpainter supports",
+		"",
+		"* Drawing utility that wraps on image boundaries",
+		"* Non-desctructive filters and compositing",
+		"* Linear HDR workflow"
+	],
+	"description_short": "A tool for creating tilable textures",
+	"homepage": "https://github.com/milasudril/texpainter",
+	"legal_info": {
+		"disclaimers": {
+			"liability_of_authors": "IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MODIFIES AND/OR CONVEYS THE PROGRAM, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.",
+			"warranty": "THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM *AS IS* WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION."
+		},
+		"license_short": "Texpainter comes with ABSOLUTELY NO WARRANTY; for details see section 15 and 16 in the GNU General Public License version 3. Texpainter is free software, and you are welcome to redistribute it under the terms of the GNU General Public License, either version 3, or at your option, any later version.",
+		"license_tag": "GPL-3.0-or-later"
+	},
+	"name": "Texpainter",
+	"vcs_url": "https://github.com/milasudril/texpainter/texpainter.git"
+}

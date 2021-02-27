@@ -1,6 +1,7 @@
 import pygit2
 import datetime
 
+
 def collect_commits(repo):
 	ret = []
 	last = repo[repo.head.target]
@@ -10,6 +11,7 @@ def collect_commits(repo):
 		ret.append([str(timestamp), shortmsg, commit.short_id])
 
 	return ret
+
 
 def get():
 	repo = pygit2.Repository('.git')

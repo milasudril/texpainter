@@ -33,7 +33,8 @@
 					{
 						"ref": "maikeconfig-doc.json",
 						"rel": "misc"
-					},{
+					},
+					{
 						"ref": "./devtools/changelog.py",
 						"rel": "misc"
 					}
