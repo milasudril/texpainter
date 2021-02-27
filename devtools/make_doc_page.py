@@ -187,7 +187,7 @@ def make_about(page, target_dir):
 			if item['name'] == 'targetcxx_default':
 				program = item['config']['objcompile']['name']
 				with subprocess.Popen([program, '--version'], stdout=subprocess.PIPE) as proc:
-					compiler = proc.stdout.readlines()[0].decode()
+					compiler = proc.stdout.readlines()[0].decode().strip()
 				break
 
 	lines.append('## Build info\n')
