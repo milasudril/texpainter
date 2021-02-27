@@ -9,5 +9,5 @@ The options are
 
 * Create a new document
 * Open an existing document
-* Read the <a href="../user_guide/quickstart_guide.html">quick-start guide</a>
+* Read the <a href="../quick-start_guide/index.html">quick-start guide</a>
 * Quit
