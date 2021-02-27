@@ -152,6 +152,9 @@ def make_about(page):
 	lines.append('</header>\n')
 	lines.append('\n')
 
+	lines.append('%s\n'%data['legal_info']['license_short'])
+	lines.append('\n')
+
 	lines.append('## Copyright\n')
 	lines.append('\n')
 	lines.append('| | |\n')
@@ -169,7 +172,6 @@ def make_about(page):
 	lines.append('| - | - |\n')
 	for entry in data['acknowledgement']:
 		lines.append('| %s | %s |\n' %(entry['who'], entry['what']))
-
 	lines.append('\n')
 
 	return lines
