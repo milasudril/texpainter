@@ -16,8 +16,6 @@ def vcs_info():
 	repo = pygit2.Repository('.git')
 	ret['commit'] = repo.revparse_single('HEAD').hex
 	ret['tag'] = repo.describe(show_commit_oid_as_fallback=True, dirty_suffix='-dirty')
+	ret['changelog'] = collect_commits(repo)
 	return ret
 
-def get():
-	repo = pygit2.Repository('.git')
-	return collect_commits(repo)

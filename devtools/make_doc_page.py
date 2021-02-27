@@ -130,7 +130,7 @@ def make_changelog(page):
 	with open(page) as f:
 		lines = ['[« Back](javascript:history.back())\n\n']
 		lines.extend(f.readlines())
-		log = changelog.get()
+		log = changelog.vcs_info()['changelog']
 		header = [''] * len(log[0])
 		delimiter = ['--'] * len(log[0])
 		lines.extend('\n|%s|\n' % '|'.join(header))
