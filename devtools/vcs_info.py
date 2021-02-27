@@ -5,14 +5,19 @@ import datetime
 import sys
 import json
 
+
 def collect_commits(repo):
 	ret = []
 	last = repo[repo.head.target]
 	for commit in repo.walk(last.id, pygit2.GIT_SORT_TIME):
 		shortmsg = commit.message.split('\n')[0]
-		ret.append([commit.author.time, shortmsg, commit.short_id])
+		tag = repo.describe(committish=commit.hex,
+			show_commit_oid_as_fallback=True,
+			dirty_suffix='-dirty')
+		ret.append([commit.author.time, shortmsg, tag])
 
 	return ret
+
 
 def get():
 	try:
@@ -25,6 +30,7 @@ def get():
 	except:
 		with open('vcs_info.json') as f:
 			return json.load(f)
+
 
 if __name__ == '__main__':
 	data = get()

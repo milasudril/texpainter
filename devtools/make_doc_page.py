@@ -142,6 +142,7 @@ def make_changelog(page):
 
 	return lines
 
+
 def make_about(page, target_dir):
 	data = dict()
 	with open(page) as f:
