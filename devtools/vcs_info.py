@@ -15,12 +15,16 @@ def collect_commits(repo):
 	return ret
 
 def get():
-	ret = dict()
-	repo = pygit2.Repository('.git')
-	ret['commit'] = repo.revparse_single('HEAD').hex
-	ret['tag'] = repo.describe(show_commit_oid_as_fallback=True, dirty_suffix='-dirty')
-	ret['changelog'] = collect_commits(repo)
-	return ret
+	try:
+		ret = dict()
+		repo = pygit2.Repository('.git')
+		ret['commit'] = repo.revparse_single('HEAD').hex
+		ret['tag'] = repo.describe(show_commit_oid_as_fallback=True, dirty_suffix='-dirty')
+		ret['changelog'] = collect_commits(repo)
+		return ret
+	except:
+		with open('vcs_info.json') as f:
+			return json.load(f)
 
 if __name__ == '__main__':
 	data = get()

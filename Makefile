@@ -26,11 +26,9 @@ doc: release
 	cp -r __targets_doc/* __targets_rel/share/help/C/texpainter
 	cp -r __targets_doc/* __targets_dbg/share/help/C/texpainter
 
-vcs_info.json: devtools/vcs_info.py
-	devtools/vcs_info.py
-
 .PHONY: archive
-archive: vcs_info.json
+archive:
+	devtools/vcs_info.py
 	mkdir -p __targets_rel
 	tar --exclude='__pycache__' --exclude='__targets*' --exclude='.git' --xform s:'\(.*\)':'texpainter/\1': -zcf __targets_rel/texpainter.tar.gz *
 
