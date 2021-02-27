@@ -4,7 +4,7 @@ import os
 import sys
 import subprocess
 import string
-
+import changelog
 
 def collect_paths(dir, depth=1):
 	ret = []
@@ -120,10 +120,21 @@ def make_content_page(page):
 		lines.extend(f.readlines())
 		return lines
 
+def make_changelog(page):
+	with open(page) as f:
+		lines = ['[« Back](javascript:history.back())\n\n']
+		lines.extend(f.readlines())
+		lines.extend(['\n','| | |\n','| - | - |\n'])
+
+		lines.extend(changelog.get())
+	return lines
+
 
 def make_doc(filename):
 	if os.path.split(filename)[-1] == 'index.md':
 		return make_index_page(filename)
+	if os.path.split(filename)[-1] == 'changelog.git.md':
+		return make_changelog(filename)
 	else:
 		return make_content_page(filename)
 
@@ -141,7 +152,6 @@ def convert(lines, pandoc_args):
 	with subprocess.Popen(cmd, stdin=subprocess.PIPE) as proc:
 		for line in lines:
 			proc.stdin.write(line.encode('utf-8'))
-
 
 def gen_webpage(src, pandoc_args):
 	stylesheet = make_path_prefix(src)

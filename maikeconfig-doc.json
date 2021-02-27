@@ -33,6 +33,9 @@
 					{
 						"ref": "maikeconfig-doc.json",
 						"rel": "misc"
+					},{
+						"ref": "changelog.py",
+						"rel": "misc"
 					}
 				],
 				"filename_ext": ".html"
