@@ -49,6 +49,20 @@ format:
 	find -name '*.imgproc.md' | xargs devtools/imgproc_gen/format_imgproc.py
 	find -name '*.py' | xargs yapf3 -i
 
+DESTDIR?=""
+PREFIX?="/usr"
+.PHONY: install
+install: release doc
+	mkdir -p $(DESTDIR)$(PREFIX)/bin
+	# TODO: enable before release mkdir -p $(DESTDIR)$(PREFIX)/man/man1
+	mkdir -p $(DESTDIR)$(PREFIX)/share/mime/packages
+	cp __targets_rel/app/texpainter $(DESTDIR)$(PREFIX)/bin/texpainter
+	# TODO: enable before release cp bin/wad64.1.man $(DESTDIR)$(PREFIX)/man/man1/wad64.1
+	# TODO: enable before release cp xdg/application-x-texpainter.xml $(DESTDIR)$(PREFIX)/share/mime/packages
+	mkdir -p $(DESTDIR)$(PREFIX)/share/help/C/texpainter
+	cp -r __targets_rel/share/help/C/texpainter/* $(DESTDIR)$(PREFIX)/share/help/C/texpainter
+
+
 .PHONY:
 imgproc_id:
 	devtools/make_imgproc_id.sh
