@@ -139,7 +139,7 @@ def make_changelog(page):
 
 	return lines
 
-def make_about(page):
+def make_about(page, target_dir):
 	data = dict()
 	with open(page) as f:
 		data = json.load(f)
@@ -174,6 +174,10 @@ def make_about(page):
 		lines.append('| %s | %s |\n' %(entry['who'], entry['what']))
 	lines.append('\n')
 
+	libs = []
+	with open(target_dir + '/app_externals.json') as f:
+		libs = json.load(f)['libraries']
+
 	lines.append('## Build info\n')
 	lines.append('\n')
 	lines.append('| | |\n')
@@ -182,20 +186,20 @@ def make_about(page):
 	lines.append('| __Id:__ | %s |\n' % os.environ['BUILD_ID'])
 	lines.append('| __VCS revision id:__ | %s | \n' % changelog.head())
 	lines.append('| __Compiler:__ | %s | \n' % 'foobar')
-	lines.append('| __Libraries:__ | %s | \n' % 'foobar')
+	lines.append('| __Libraries:__ | %s | \n' % ', '.join(libs))
 	lines.append('\n')
 	lines.append('\n')
 
 	return lines
 
 
-def make_doc(filename):
+def make_doc(filename, target_dir):
 	if os.path.split(filename)[-1] == 'index.md':
 		return make_index_page(filename)
 	if os.path.split(filename)[-1] == 'changelog.git.md':
 		return make_changelog(filename)
 	if os.path.split(filename)[-1].endswith('.projinfo.json'):
-		return make_about(filename)
+		return make_about(filename, target_dir)
 	else:
 		return make_content_page(filename)
 
@@ -215,13 +219,13 @@ def convert(lines, pandoc_args):
 			proc.stdin.write(line.encode('utf-8'))
 
 
-def gen_webpage(src, pandoc_args):
+def gen_webpage(src, target_dir, pandoc_args):
 	stylesheet = make_path_prefix(src)
 	title = ['Texpainter: ', get_header(src)]
 	stylesheet.append('format.css')
 	pandoc_args.extend(
 		['-s', '--css', '/'.join(stylesheet), '--metadata', 'pagetitle=' + ''.join(title)])
-	convert(make_doc(src), pandoc_args)
+	convert(make_doc(src, target_dir), pandoc_args)
 
 
-gen_webpage(sys.argv[1], sys.argv[2:])
+gen_webpage(sys.argv[1], sys.argv[2], sys.argv[3:])

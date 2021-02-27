@@ -21,6 +21,7 @@
 				"command": {
 					"args": [
 						"{source}",
+						"{target_directory}",
 						"--mathml",
 						"--columns",
 						"10000",

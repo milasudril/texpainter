@@ -15,8 +15,9 @@ debug:
 	maike --configfiles=maikeconfig.json,maikeconfig-dbg.json
 
 .PHONY: doc
-doc:
-#	env | grep $(BUILD_ID)
+doc: release
+	cp __targets_rel/externals.json __targets_doc/app_externals.json
+	cp __targets_rel/maikeconfig.json __targets_doc/app_config.json
 	maike --configfiles=maikeconfig-doc.json
 #	htmlproofer __targets_doc
 	mkdir -p __targets_rel/share/help/C/texpainter
