@@ -27,14 +27,14 @@
 						"-o",
 						"{target}"
 					],
-					"name": "./make_doc_page.py"
+					"name": "./devtools/make_doc_page.py"
 				},
 				"dependencies": [
 					{
 						"ref": "maikeconfig-doc.json",
 						"rel": "misc"
 					},{
-						"ref": "changelog.py",
+						"ref": "./devtools/changelog.py",
 						"rel": "misc"
 					}
 				],
