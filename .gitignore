@@ -4,3 +4,4 @@ __targets_rel
 __targets_doc
 gmon.out
 __pycache__
+vcs_info.json

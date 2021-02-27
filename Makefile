@@ -25,6 +25,11 @@ doc: release
 	cp -r __targets_doc/* __targets_rel/share/help/C/texpainter
 	cp -r __targets_doc/* __targets_dbg/share/help/C/texpainter
 
+.PHONY: archive
+archive:
+	mkdir -p __targets_rel
+	tar --exclude='__pycache__' --exclude='__targets*' --exclude='.git' --xform s:'^\./':'texpainter/': -zcf __targets_rel/texpainter.tar.gz `ls -A`
+
 .PHONY: clean
 clean:
 	rm -rf __targets*
