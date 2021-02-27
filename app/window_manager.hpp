@@ -245,12 +245,10 @@ namespace Texpainter::App
 			m_err_box.show(src.window(), "Texpainter", msg);
 		}
 
-		template<auto id, class Source>
-		requires(std::same_as<decltype(id), AppAction>) void onActivated(Enum::Tag<id>,
-		                                                                 Ui::MenuItem&,
-		                                                                 Source&)
+		template<class Source>
+		void onActivated(Enum::Tag<AppAction::About>, Ui::MenuItem&, Source&)
 		{
-			throw "Unimplemented action";
+			Help::showHelp("texpainter.projinfo.html");
 		}
 
 		template<class Source>
