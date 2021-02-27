@@ -8,17 +8,18 @@ all: release doc
 
 .PHONY: release
 release:
-	maike --configfiles=maikeconfig.json,maikeconfig-rel.json
+	maike --configfiles=buildconfig/base.json,buildconfig/release.json
 
 .PHONY: debug
 debug:
-	maike --configfiles=maikeconfig.json,maikeconfig-dbg.json
+	maike --configfiles=buildconfig/base.json,buildconfig/debug.json
 
 .PHONY: doc
 doc: release
+	mkdir -p __targets_doc
 	cp __targets_rel/externals.json __targets_doc/app_externals.json
 	cp __targets_rel/maikeconfig.json __targets_doc/app_config.json
-	maike --configfiles=maikeconfig-doc.json
+	maike --configfiles=buildconfig/doc.json
 #	htmlproofer __targets_doc
 	mkdir -p __targets_rel/share/help/C/texpainter
 	mkdir -p __targets_dbg/share/help/C/texpainter

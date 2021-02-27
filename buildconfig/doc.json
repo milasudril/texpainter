@@ -32,7 +32,7 @@
 				},
 				"dependencies": [
 					{
-						"ref": "maikeconfig-doc.json",
+						"ref": "buildconfig/doc.json",
 						"rel": "misc"
 					},
 					{
@@ -60,7 +60,7 @@
 				},
 				"dependencies": [
 					{
-						"ref": "maikeconfig-doc.json",
+						"ref": "buildconfig/doc.json",
 						"rel": "misc"
 					}
 				],
@@ -83,7 +83,7 @@
 				},
 				"dependencies": [
 					{
-						"ref": "maikeconfig-doc.json",
+						"ref": "buildconfig/doc.json",
 						"rel": "misc"
 					}
 				],
