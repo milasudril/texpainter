@@ -5,7 +5,7 @@ def collect_commits(repo):
 	last = repo[repo.head.target]
 	for commit in repo.walk(last.id, pygit2.GIT_SORT_TIME):
 		shortmsg = commit.message.split('\n')[0]
-		ret.append('|%s | %s |\n'%(commit.short_id, shortmsg))
+		ret.append([shortmsg, commit.short_id])
 
 	return ret
 

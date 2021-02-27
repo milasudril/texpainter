@@ -124,9 +124,14 @@ def make_changelog(page):
 	with open(page) as f:
 		lines = ['[« Back](javascript:history.back())\n\n']
 		lines.extend(f.readlines())
-		lines.extend(['\n','| | |\n','| - | - |\n'])
+		log = changelog.get()
+		header = ['']*len(log[0])
+		delimiter = ['--']*len(log[0])
+		lines.extend('\n|%s|\n'%'|'.join(header))
+		lines.extend('|%s|\n'%'|'.join(delimiter))
+		for item in log:
+			lines.append('|%s|\n'%'|'.join(item))
 
-		lines.extend(changelog.get())
 	return lines
 
 
