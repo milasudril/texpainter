@@ -42,7 +42,8 @@
 				"filename_ext": ".html"
 			},
 			"filename_exts": [
-				".md"
+				".md",
+				".projinfo.json"
 			],
 			"name": "docpage",
 			"plugin": "targettrivial"

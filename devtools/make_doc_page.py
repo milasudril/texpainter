@@ -5,7 +5,7 @@ import sys
 import subprocess
 import string
 import changelog
-
+import json
 
 def collect_paths(dir, depth=1):
 	ret = []
@@ -13,7 +13,7 @@ def collect_paths(dir, depth=1):
 		fullpath = os.path.join(dir, f)
 
 		if depth == 2:
-			if f == 'index.md' and os.path.isfile(fullpath) and f.endswith('.md'):
+			if f == 'index.md' and os.path.isfile(fullpath):
 				path_split = dir.split('/')
 				skip = 1 + len(path_split) - depth
 				ret.append((dir, f, '/'.join(path_split[skip:]), depth))
@@ -23,7 +23,7 @@ def collect_paths(dir, depth=1):
 		if os.path.islink(fullpath):
 			continue
 
-		if os.path.isfile(fullpath) and f.endswith('.md'):
+		if os.path.isfile(fullpath) and (f.endswith('.md') or f.endswith('.projinfo.json')):
 			path_split = dir.split('/')
 			skip = 1 + len(path_split) - depth
 			ret.append((dir, f, '/'.join(path_split[skip:]), depth))
@@ -37,6 +37,9 @@ def collect_paths(dir, depth=1):
 
 
 def get_header(file):
+	if file.endswith('.projinfo.json'):
+		return 'About'
+
 	with open(os.path.join(file)) as f:
 		return f.readline()[2:].strip()
 
@@ -136,12 +139,29 @@ def make_changelog(page):
 
 	return lines
 
+def make_about(page):
+	data = dict()
+	with open(page) as f:
+		data = json.load(f)
+
+	lines = []
+	lines.append('# %s %s\n' % (data['name'], changelog.describe()))
+	lines.append('<p class="title">%s</p>\n'% data['description_short'])
+	lines.append('\n')
+
+
+
+
+	return lines
+
 
 def make_doc(filename):
 	if os.path.split(filename)[-1] == 'index.md':
 		return make_index_page(filename)
 	if os.path.split(filename)[-1] == 'changelog.git.md':
 		return make_changelog(filename)
+	if os.path.split(filename)[-1].endswith('.projinfo.json'):
+		return make_about(filename)
 	else:
 		return make_content_page(filename)
 

@@ -25,14 +25,11 @@
 			"who": "The GNOME Project"
 		}
 	],
-	"authors": [
-		"Torbjörn Rathsman"
-	],
-	"copyright_years": [
+	"copyright": [{"author": "Torbjörn Rathsman", "years": [
 		2020,
 		2021
-	],
-	"description_long": [
+	]}],
+	"description": [
 		"Texpainter is a tool for creating tilable textures. Texpainter supports",
 		"",
 		"* Drawing utility that wraps on image boundaries",
