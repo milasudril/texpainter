@@ -146,11 +146,20 @@ def make_about(page):
 
 	lines = []
 	lines.append('# %s %s\n' % (data['name'], changelog.describe()))
+	lines.append('\n')
 	lines.append('<p class="title">%s</p>\n'% data['description_short'])
 	lines.append('\n')
 
-
-
+	lines.append('## Copyright\n')
+	lines.append('\n')
+	lines.append('| | |\n')
+	lines.append('| - | - |\n')
+	for entry in data['copyright']:
+		years = []
+		for year in entry['years']:
+			years.append(str(year))
+		lines.append('| %s | %s |\n' %(entry['author'], ', '.join(years)))
+	lines.append('\n')
 
 	return lines
 
