@@ -2,3 +2,6 @@ body{font-family: "Andika", sans-serif; background-image: url("background.png");
 h1, h2, h3{font-weight: bolder}
 img{max-width: 80%;}
 figure{text-align: center}
+table{border-collapse: collapse; border-top:2px solid;  border-bottom:3px solid}
+th{border-bottom:1px solid; padding-right:0.5em; padding-left:0.5em}
+td{border-bottom:1px solid; padding-right:0.5em; padding-left:0.5em}
