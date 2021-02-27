@@ -20,14 +20,17 @@ doc: release
 	cp __targets_rel/externals.json __targets_doc/app_externals.json
 	cp __targets_rel/maikeconfig.json __targets_doc/app_config.json
 	maike --configfiles=buildconfig/doc.json
-#	htmlproofer __targets_doc
+	#TODO: enable before release htmlproofer __targets_doc
 	mkdir -p __targets_rel/share/help/C/texpainter
 	mkdir -p __targets_dbg/share/help/C/texpainter
 	cp -r __targets_doc/* __targets_rel/share/help/C/texpainter
 	cp -r __targets_doc/* __targets_dbg/share/help/C/texpainter
 
+vcs_info.json: devtools/changelog.py devtools/make_vcs_info.py
+	devtools/make_vcs_info.py
+
 .PHONY: archive
-archive:
+archive: vcs_info.json
 	mkdir -p __targets_rel
 	tar --exclude='__pycache__' --exclude='__targets*' --exclude='.git' --xform s:'^\./':'texpainter/': -zcf __targets_rel/texpainter.tar.gz `ls -A`
 

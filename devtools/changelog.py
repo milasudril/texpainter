@@ -1,7 +1,6 @@
 import pygit2
 import datetime
 
-
 def collect_commits(repo):
 	ret = []
 	last = repo[repo.head.target]
@@ -12,17 +11,12 @@ def collect_commits(repo):
 
 	return ret
 
-
-def head():
+def vcs_info():
+	ret = dict()
 	repo = pygit2.Repository('.git')
-	commit = repo.revparse_single('HEAD')
-	return commit.hex
-
-
-def describe():
-	repo = pygit2.Repository('.git')
-	return repo.describe(show_commit_oid_as_fallback=True, dirty_suffix='-dirty')
-
+	ret['commit'] = repo.revparse_single('HEAD').hex
+	ret['tag'] = repo.describe(show_commit_oid_as_fallback=True, dirty_suffix='-dirty')
+	return ret
 
 def get():
 	repo = pygit2.Repository('.git')

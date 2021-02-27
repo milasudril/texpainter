@@ -7,7 +7,8 @@
 			".git",
 			"__targets_gcov",
 			"__targets_dbg",
-			"__targets_rel"
+			"__targets_rel",
+			"__targets_doc"
 		],
 		"recursive": 1
 	},
