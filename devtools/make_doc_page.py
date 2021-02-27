@@ -6,6 +6,7 @@ import subprocess
 import string
 import vcs_info
 import json
+import datetime
 
 
 def collect_paths(dir, depth=1):
@@ -136,7 +137,8 @@ def make_changelog(page):
 		lines.extend('\n|%s|\n' % '|'.join(header))
 		lines.extend('|%s|\n' % '|'.join(delimiter))
 		for item in log:
-			lines.append('|%s|\n' % '|'.join(item))
+			timestamp = datetime.datetime.fromtimestamp(item[0])
+			lines.append('|%s|%s|\n' % (timestamp, '|'.join(item[1:])))
 
 	return lines
 
