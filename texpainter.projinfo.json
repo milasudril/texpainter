@@ -25,10 +25,15 @@
 			"who": "Niels Lohmann"
 		}
 	],
-	"copyright": [{"author": "Torbjörn Rathsman", "years": [
-		2020,
-		2021
-	]}],
+	"copyright": [
+		{
+			"author": "Torbjörn Rathsman",
+			"years": [
+				2020,
+				2021
+			]
+		}
+	],
 	"description": [
 		"Texpainter is a tool for creating tilable textures. Texpainter supports",
 		"",

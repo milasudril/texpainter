@@ -7,6 +7,7 @@ import string
 import changelog
 import json
 
+
 def collect_paths(dir, depth=1):
 	ret = []
 	for f in os.listdir(dir):
@@ -139,6 +140,7 @@ def make_changelog(page):
 
 	return lines
 
+
 def make_about(page, target_dir):
 	data = dict()
 	with open(page) as f:
@@ -148,11 +150,11 @@ def make_about(page, target_dir):
 	lines.append('\n')
 	lines.append('<header>\n')
 	lines.append('<h1>%s %s</h1>\n' % (data['name'], changelog.describe()))
-	lines.append('<summary class="title">%s</summary>\n'% data['description_short'])
+	lines.append('<summary class="title">%s</summary>\n' % data['description_short'])
 	lines.append('</header>\n')
 	lines.append('\n')
 
-	lines.append('%s\n'%data['legal_info']['license_short'])
+	lines.append('%s\n' % data['legal_info']['license_short'])
 	lines.append('\n')
 
 	lines.append('## Copyright\n')
@@ -163,7 +165,7 @@ def make_about(page, target_dir):
 		years = []
 		for year in entry['years']:
 			years.append(str(year))
-		lines.append('| %s | %s |\n' %(entry['author'], ', '.join(years)))
+		lines.append('| %s | %s |\n' % (entry['author'], ', '.join(years)))
 	lines.append('\n')
 
 	lines.append('## Acknowledgement\n')
@@ -171,12 +173,22 @@ def make_about(page, target_dir):
 	lines.append('| | |\n')
 	lines.append('| - | - |\n')
 	for entry in data['acknowledgement']:
-		lines.append('| %s | %s |\n' %(entry['who'], entry['what']))
+		lines.append('| %s | %s |\n' % (entry['who'], entry['what']))
 	lines.append('\n')
 
 	libs = []
 	with open(target_dir + '/app_externals.json') as f:
 		libs = json.load(f)['libraries']
+
+	compiler = ''
+	with open(target_dir + '/app_config.json') as f:
+		cfg = json.load(f)
+		for item in cfg['target_hooks']:
+			if item['name'] == 'targetcxx_default':
+				program = item['config']['objcompile']['name']
+				with subprocess.Popen([program, '--version'], stdout=subprocess.PIPE) as proc:
+					compiler = proc.stdout.readlines()[0].decode()
+				break
 
 	lines.append('## Build info\n')
 	lines.append('\n')
@@ -185,7 +197,7 @@ def make_about(page, target_dir):
 	lines.append('| __Timestamp:__ | %s |\n' % os.environ['TIMESTAMP'])
 	lines.append('| __Id:__ | %s |\n' % os.environ['BUILD_ID'])
 	lines.append('| __VCS revision id:__ | %s | \n' % changelog.head())
-	lines.append('| __Compiler:__ | %s | \n' % 'foobar')
+	lines.append('| __Compiler:__ | %s | \n' % compiler)
 	lines.append('| __Libraries:__ | %s | \n' % ', '.join(libs))
 	lines.append('\n')
 	lines.append('\n')
