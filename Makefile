@@ -61,6 +61,8 @@ install: release doc
 	# TODO: enable before release cp xdg/application-x-texpainter.xml $(DESTDIR)$(PREFIX)/share/mime/packages
 	mkdir -p $(DESTDIR)$(PREFIX)/share/help/C/texpainter
 	cp -r __targets_rel/share/help/C/texpainter/* $(DESTDIR)$(PREFIX)/share/help/C/texpainter
+	find $(DESTDIR)$(PREFIX)/share/help/C/texpainter -type d | xargs chmod o+x
+	find $(DESTDIR)$(PREFIX)/share/help/C/texpainter | xargs chmod o+r
 
 
 .PHONY:
