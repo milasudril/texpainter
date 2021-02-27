@@ -32,7 +32,7 @@ vcs_info.json: devtools/vcs_info.py
 .PHONY: archive
 archive: vcs_info.json
 	mkdir -p __targets_rel
-	tar --exclude='__pycache__' --exclude='__targets*' --exclude='.git' --xform s:'^\./':'texpainter/': -zcf __targets_rel/texpainter.tar.gz `ls -A`
+	tar --exclude='__pycache__' --exclude='__targets*' --exclude='.git' --xform s:'\(.*\)':'texpainter/\1': -zcf __targets_rel/texpainter.tar.gz *
 
 .PHONY: clean
 clean:
