@@ -116,7 +116,7 @@ def make_index_page(index):
 
 def make_content_page(page):
 	with open(page) as f:
-		lines = ['[« To index](index.html)\n\n']
+		lines = ['[« Back](javascript:history.back())\n\n']
 		lines.extend(f.readlines())
 		return lines
 
