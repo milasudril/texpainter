@@ -1,9 +1,12 @@
 [submodule "pcg-cpp"]
 	path = pcg-cpp
 	url = https://github.com/imneme/pcg-cpp
+	ignore = all
 [submodule "libenum"]
 	path = libenum
 	url = https://github.com/milasudril/libenum
+	ignore = all
 [submodule "test_pattern"]
 	path = test_pattern
 	url = https://github.com/milasudril/test_pattern
+	ignore = all
