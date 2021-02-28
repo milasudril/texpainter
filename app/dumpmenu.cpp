@@ -12,7 +12,7 @@ int main()
 		       Texpainter::MainMenuItemTraits<id.value>::description());
 		using T      = Texpainter::MainMenuItemTraits<id.value>;
 		using Action = typename T::Action;
-		printf("| | |\n|-|-|\n");
+		printf("| Option | Description |\n|-|-|\n");
 		Enum::forEachEnumItem<Action>([id](auto id_inner) {
 			using U = T::template Traits<id_inner.value>;
 			printf("|%s|%s|\n", U::displayName(), U::description());

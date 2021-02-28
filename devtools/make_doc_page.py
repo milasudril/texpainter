@@ -131,6 +131,19 @@ def make_content_page(page):
 		return lines
 
 
+def make_menu_content_page(page, target_dir):
+	with open(page) as f:
+		lines = ['[« Back](javascript:history.back())\n\n']
+		lines.extend(f.readlines())
+
+	with subprocess.Popen([target_dir + '/dumpmenu'], stdout=subprocess.PIPE) as proc:
+		output = proc.stdout.readlines()
+		for x in output:
+			lines.append(x.decode())
+
+	return lines
+
+
 def make_changelog(page):
 	with open(page) as f:
 		lines = ['[« Back](javascript:history.back())\n\n']
@@ -220,6 +233,8 @@ def make_doc(filename, target_dir):
 		return make_changelog(filename)
 	if os.path.split(filename)[-1].endswith('.projinfo.json'):
 		return make_about(filename, target_dir)
+	if filename == 'app/menubar.md':  # HACK: Add special rule to show the expanded menu
+		return make_menu_content_page(filename, target_dir)
 	else:
 		return make_content_page(filename)
 

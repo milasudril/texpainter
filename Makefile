@@ -20,6 +20,7 @@ doc: release
 	mkdir -p __targets_doc
 	cp __targets_rel/externals.json __targets_doc/app_externals.json
 	cp __targets_rel/maikeconfig.json __targets_doc/app_config.json
+	cp __targets_rel/app/dumpmenu __targets_doc/dumpmenu
 	maike --configfiles=buildconfig/doc.json
 	# htmlproofer __targets_doc
 	mkdir -p __targets_rel/share/help/C/texpainter
