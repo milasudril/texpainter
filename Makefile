@@ -25,11 +25,14 @@ doc: release
 	rm -f __targets_doc/app_externals.json
 	rm -f __targets_doc/app_config.json
 	rm -f __targets_doc/dumpmenu
-	htmlproofer __targets_doc
 	mkdir -p __targets_rel/share/help/C/texpainter
 	mkdir -p __targets_dbg/share/help/C/texpainter
 	cp -r __targets_doc/* __targets_rel/share/help/C/texpainter
 	cp -r __targets_doc/* __targets_dbg/share/help/C/texpainter
+
+.PHONY: doc_check
+doc_check: doc
+	htmlproofer __targets_doc
 
 .PHONY: archive
 archive:

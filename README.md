@@ -9,11 +9,15 @@ Texpainter is a utility program intended for creating tilable textures. It consi
 ### On *ubuntu
 
  1. Install
+    * bsdmainutils
+    * pkg-config
     * libfftw3-dev
-    * libgtk+-3.0-dev
     * libopenexr-dev
-    * nlohmann-json3
+    * libgtk-3-dev
+    * nlohmann-json3-dev
     * libnotify-dev
+    * python3-pygit2
+    * pandoc
 
     If you do not have it, also install g++ version 10 or later, since the code uses some new features from C++20.
 
