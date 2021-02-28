@@ -65,8 +65,8 @@ install: release doc
 	mkdir -p $(DESTDIR)$(PREFIX)/share/mime/packages
 	cp __targets_rel/app/texpainter $(DESTDIR)$(PREFIX)/bin/texpainter
 	# TODO: enable before release cp app/texpainter.1.man $(DESTDIR)$(PREFIX)/man/man1/texpainter.1
-	# TODO: enable before release cp cli/texprender.1.man $(DESTDIR)$(PREFIX)/man/man1/texprender.1
-	# TODO: enable before release cp xdg/application-x-texpainter.xml $(DESTDIR)$(PREFIX)/share/mime/packages
+	# TODO: enable before release cp cli/texporter.1.man $(DESTDIR)$(PREFIX)/man/man1/texprender.1
+	cp xdg/application-x-texpainter.xml $(DESTDIR)$(PREFIX)/share/mime/packages
 	mkdir -p $(DESTDIR)$(PREFIX)/share/help/C/texpainter
 	cp -r __targets_rel/share/help/C/texpainter/* $(DESTDIR)$(PREFIX)/share/help/C/texpainter
 	find $(DESTDIR)$(PREFIX)/share/help/C/texpainter -type d | xargs chmod o+x
