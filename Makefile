@@ -22,6 +22,9 @@ doc: release
 	cp __targets_rel/maikeconfig.json __targets_doc/app_config.json
 	cp __targets_rel/app/dumpmenu __targets_doc/dumpmenu
 	maike --configfiles=buildconfig/doc.json
+	rm -f __targets_doc/app_externals.json
+	rm -f __targets_doc/app_config.json
+	rm -f __targets_doc/dumpmenu
 	htmlproofer __targets_doc
 	mkdir -p __targets_rel/share/help/C/texpainter
 	mkdir -p __targets_dbg/share/help/C/texpainter
