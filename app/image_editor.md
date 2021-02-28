@@ -1,7 +1,7 @@
 # The image editor
 
 The image editor provides a surfavce to draw images on. You select which image to modify from the
-Image dropdown menu. To draw, select a color from the <a href="palette_selector.html">palette</a>
+Image dropdown menu. To draw, select a color from the <a href="color_selector.html">palette</a>
 and press the left mouse button while the mouse cursor is over the drawing area. To erase what you
 have drawn, use the right mouse button. The mouse wheel can be used to change the brush size. If you
 cross the image boundary, painting will continue on the opposite edge. This is so you can easliy
