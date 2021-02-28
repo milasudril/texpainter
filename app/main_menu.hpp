@@ -44,7 +44,12 @@ namespace Texpainter
 			       "application, or showing the online help.";
 		}
 
-		using type = Ui::SubmenuBuilder<AppAction, AppActionTraits>;
+		using Action = AppAction;
+
+		template<auto action>
+		using Traits = AppActionTraits<action>;
+
+		using type = Ui::SubmenuBuilder<Action, Traits>;
 	};
 
 	template<>
@@ -58,7 +63,12 @@ namespace Texpainter
 			       "windows and rearranging them.";
 		}
 
-		using type = Ui::SubmenuBuilder<WorkspaceAction, WorkspaceActionMenuTraits>;
+		using Action = WorkspaceAction;
+
+		template<auto action>
+		using Traits = WorkspaceActionMenuTraits<action>;
+
+		using type = Ui::SubmenuBuilder<Action, Traits>;
 	};
 
 	template<>
@@ -71,7 +81,12 @@ namespace Texpainter
 			return "This menu contains document-related options, such as Open, Save and export.";
 		}
 
-		using type = Ui::SubmenuBuilder<DocumentAction, DocumentActionTraits>;
+		using Action = DocumentAction;
+
+		template<auto action>
+		using Traits = DocumentActionTraits<action>;
+
+		using type = Ui::SubmenuBuilder<Action, Traits>;
 	};
 
 	template<>
@@ -85,7 +100,12 @@ namespace Texpainter
 			       "deleting an existing one.";
 		}
 
-		using type = Ui::SubmenuBuilder<ImageAction, ImageActionTraits>;
+		using Action = ImageAction;
+
+		template<auto action>
+		using Traits = ImageActionTraits<action>;
+
+		using type = Ui::SubmenuBuilder<Action, Traits>;
 	};
 
 	template<>
@@ -99,8 +119,12 @@ namespace Texpainter
 			       "deleting an existing one.";
 		}
 
+		using Action = PaletteAction;
 
-		using type = Ui::SubmenuBuilder<PaletteAction, PaletteActionTraits>;
+		template<auto action>
+		using Traits = PaletteActionTraits<action>;
+
+		using type = Ui::SubmenuBuilder<Action, Traits>;
 	};
 
 	template<PaletteAction>

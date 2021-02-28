@@ -31,6 +31,10 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Help"; }
+		static constexpr char const* description()
+		{
+			return "Opens the online help in the default web browser";
+		}
 	};
 
 	template<>
@@ -38,6 +42,10 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "About"; }
+		static constexpr char const* description()
+		{
+			return "Opens the about page in the default web browser";
+		}
 	};
 
 	template<>
@@ -45,6 +53,7 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Quit"; }
+		static constexpr char const* description() { return "Exits the application"; }
 	};
 }
 

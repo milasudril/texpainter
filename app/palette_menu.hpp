@@ -33,6 +33,7 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "New"; }
+		static constexpr char const* description() { return "Creates a new and empty palette"; }
 	};
 
 	template<>
@@ -40,6 +41,10 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Generate"; }
+		static constexpr char const* description()
+		{
+			return "Generates a new palette by using the palette creator tool";
+		}
 	};
 
 	template<>
@@ -47,6 +52,7 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Import"; }
+		static constexpr char const* description() { return "Imports an existing palette file"; }
 	};
 
 	template<>
@@ -54,6 +60,10 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Export"; }
+		static constexpr char const* description()
+		{
+			return "Exports the current palette to a file";
+		}
 	};
 
 	template<>
@@ -61,6 +71,7 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Delete"; }
+		static constexpr char const* description() { return "Deletes the current palette"; }
 	};
 }
 

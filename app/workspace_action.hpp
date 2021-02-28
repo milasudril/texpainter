@@ -32,6 +32,7 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Show image editor"; }
+		static constexpr char const* description() { return "Makes the Image editor visible"; }
 	};
 
 	template<>
@@ -39,6 +40,7 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Show compositor"; }
+		static constexpr char const* description() { return "Makes the Compositor visible"; }
 	};
 
 	template<>
@@ -46,6 +48,10 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Show document preview"; }
+		static constexpr char const* description()
+		{
+			return "Makes the Document previewer visible";
+		}
 	};
 
 	template<>
@@ -53,6 +59,10 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Reset layout"; }
+		static constexpr char const* description()
+		{
+			return "Restores all window locations to their default state";
+		}
 	};
 }
 

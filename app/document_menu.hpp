@@ -36,6 +36,7 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "New"; }
+		static constexpr char const* description() { return "Creates a new document"; }
 	};
 
 	template<>
@@ -43,6 +44,7 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Open"; }
+		static constexpr char const* description() { return "Opens an existing document"; }
 	};
 
 	template<>
@@ -50,6 +52,7 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Save"; }
+		static constexpr char const* description() { return "Saves current document"; }
 	};
 
 
@@ -58,6 +61,10 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Save As"; }
+		static constexpr char const* description()
+		{
+			return "Saves current document under a new name";
+		}
 	};
 
 	template<>
@@ -65,6 +72,10 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Save copy"; }
+		static constexpr char const* description()
+		{
+			return "Saves current document under a new name, but keeps the original \"open\"";
+		}
 	};
 
 	template<>
@@ -72,6 +83,10 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Export"; }
+		static constexpr char const* description()
+		{
+			return "Renders current document and saves the result to an image file";
+		}
 	};
 
 	template<>
@@ -79,6 +94,7 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Set canvas size"; }
+		static constexpr char const* description() { return "Sets a new canvas size"; }
 	};
 
 	template<>
@@ -86,6 +102,10 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Render to image"; }
+		static constexpr char const* description()
+		{
+			return "Renders current document to an image";
+		}
 	};
 }
 

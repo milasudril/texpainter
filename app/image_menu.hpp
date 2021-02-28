@@ -32,6 +32,7 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "New"; }
+		static constexpr char const* description() { return "Creates a new image"; }
 	};
 
 	template<>
@@ -39,6 +40,10 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Import"; }
+		static constexpr char const* description()
+		{
+			return "Imports an existing image from a file";
+		}
 	};
 
 	template<>
@@ -46,6 +51,7 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Export"; }
+		static constexpr char const* description() { return "Exports an current image to a file"; }
 	};
 
 	template<>
@@ -53,6 +59,7 @@ namespace Texpainter
 	{
 		using type = Ui::MenuItem;
 		static constexpr char const* displayName() { return "Delete"; }
+		static constexpr char const* description() { return "Deletes current image"; }
 	};
 }
 
