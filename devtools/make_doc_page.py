@@ -116,6 +116,7 @@ def make_index_page(index):
 
 		if len(outline) > 0:
 			lines.append('\n')
+			lines.append('\n')
 			lines.append('## Sections')
 			lines.append('\n')
 			lines.extend(outline)
