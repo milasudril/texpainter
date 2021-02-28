@@ -21,7 +21,7 @@ doc: release
 	cp __targets_rel/externals.json __targets_doc/app_externals.json
 	cp __targets_rel/maikeconfig.json __targets_doc/app_config.json
 	maike --configfiles=buildconfig/doc.json
-	#TODO: enable before release htmlproofer __targets_doc
+	# htmlproofer __targets_doc
 	mkdir -p __targets_rel/share/help/C/texpainter
 	mkdir -p __targets_dbg/share/help/C/texpainter
 	cp -r __targets_doc/* __targets_rel/share/help/C/texpainter
@@ -57,7 +57,8 @@ install: release doc
 	# TODO: enable before release mkdir -p $(DESTDIR)$(PREFIX)/man/man1
 	mkdir -p $(DESTDIR)$(PREFIX)/share/mime/packages
 	cp __targets_rel/app/texpainter $(DESTDIR)$(PREFIX)/bin/texpainter
-	# TODO: enable before release cp bin/wad64.1.man $(DESTDIR)$(PREFIX)/man/man1/wad64.1
+	# TODO: enable before release cp app/texpainter.1.man $(DESTDIR)$(PREFIX)/man/man1/texpainter.1
+	# TODO: enable before release cp cli/texprender.1.man $(DESTDIR)$(PREFIX)/man/man1/texprender.1
 	# TODO: enable before release cp xdg/application-x-texpainter.xml $(DESTDIR)$(PREFIX)/share/mime/packages
 	mkdir -p $(DESTDIR)$(PREFIX)/share/help/C/texpainter
 	cp -r __targets_rel/share/help/C/texpainter/* $(DESTDIR)$(PREFIX)/share/help/C/texpainter

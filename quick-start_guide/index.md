@@ -6,7 +6,7 @@ how to export the resulting image.
 
 To create a texture image, you first need to create a new document. You can do this by clicking
 "Create a new document" in the <a href="../app/startup_menu.html">startup menu</a>. You will also
-find the option in the <a href="../app/document_menu.html">Document menu</a>. This will bring up a
+find the option in the document <a href="../app/menubar.html">menu</a>. This will bring up a
 dialog box that allows you to specify the canvas size. The canvas is basically the domain where the
 final render will be drawn. You will find more information about size specification in the
 documentation for the <a href="../app/size_input.html">size input widget</a>.
@@ -16,14 +16,14 @@ When you have created a new document, you will have a workspace that looks somet
 ![The initial workspace](workspace_init.png)
 
 Now you need to create a new <a href="../glossary.html#image">image</a> to paint on. You create a
-new image from the <a href="../app/image_menu.html">Image menu</a>. After creating a new image, you
+new image from the image <a href="../app/menubar.html">menu</a>. After creating a new image, you
 will see its name in the <a href="../app/image_editor.html">Image editor</a>. It also appears as a
 new <a href="../glossary.html#node">node</a> in the <a href="../app/compositor.html">Compositor</a>.
 
 ![The workspace after creating a new image](workspace_with_new_image.png)
 
-Before you can paint anything, you need to have a <a href="../glossary.html#palette">palette</a> to
-select a color from. Palettes are managed from the <a href="../app/palette_menu">Palette menu</a>.
+Before you can paint anything, you need to have a <a href="../glossary.html#palette">Palette</a> to
+select a color from. Palettes are managed from the palette <a href="../app/menubar.html">menu</a>.
 To change a color in the palette, right-click on the slot that should have the desired color. To
 select what color to paint with, left-click.
 
@@ -38,16 +38,16 @@ image boundary (indicated with a solid line), it will wrap-around.
 pattern](painting.png)
 
 Now, it is time to have a look at the <a href="../app/compositor.html">Compositor</a>, and the
-<a href="../app/document_preview.html">Document preview</a>. Currently, the Document preview shows
-a checkerboard pattern. This indicates that there is nothing to be drawn. This is because nothing
-has been connected to the input of the output node. To connect the nodes, you probably want to move
-them around so you can see everything. To move a node, simply drag its title. It is a good idea to
-move the output node to the right.
+<a href="../app/document_previewer.html">Document previewer</a>. Currently, the Document previewer
+shows a checkerboard pattern. This indicates that there is nothing to be drawn. This is because
+nothing has been connected to the input of the output node. To connect the nodes, you probably want
+to move them around so you can see everything. To move a node, simply drag its title. It is a good
+idea to move the output node to the right.
 
 ![The compositor after moving nodes](compositor_after_organizing.png)
 
 We want to copy the pixels of "texpainter demo" to the "Output image". Left-click either of red
-<a href="../glossary.html#port">ports</a>. When you move the mouse cursor, you will se a line
+<a href="../glossary.html#port">port</a>s. When you move the mouse cursor, you will se a line
 segment connecting the port with the mouse cursor.
 
 ![The process of connecting nodes](connecting_nodes.png)
@@ -64,7 +64,7 @@ Now, the document preview shows the pattern in scale 1:2.
 
 Filters are applied by adding <a href="../glossary.html#node">node</a>s in the path between the
 source image and the output image. This tutorial will demonstrate how to add Gaussian blur to the
-image. Gaussian blur is achieved by multipying the <a href="../glossary.html#image_spectrum">image
+image. Gaussian blur is achieved by multipying the <a href="../glossary.html#image-spectrum">image
 spectrum</a> with a mask, where the intensity is shaped like a Gaussian, ie
 
 $$
@@ -138,8 +138,8 @@ looks like this:
 
 ![The completed Gaussian blur filter](back_to_rgba_image.png)
 
-Still, the original image is shown in the <a href="../app/document_preview.html">Document
-preview</a>. This is because we have not yet connected the result of the Gaussian blur to the
+Still, the original image is shown in the <a href="../app/document_previewer.html">Document
+previewer</a>. This is because we have not yet connected the result of the Gaussian blur to the
 output node. Connect the output port of "Make RGBA image" to the input port of the "Output image"
 node. Notice, that this time it takes some time to finnish the connection. This is because the
 output source has changed to something that needs some computation: It has to apply the Gaussian
@@ -164,17 +164,17 @@ of vertices". We will discuss "Scale with resolution" in the next section.
 ## Exportinig the result
 
 Before exporting the texture image, it is a good idea to save your document. Do so by selecting
-"Save" from the <a href="../app/document_menu.html">Document menu</a>. By convention, the filename
+"Save" from the document <a href="../app/menubar.html">menu</a>. By convention, the filename
 extension for Texpainter files is "txp". However you are free to choose any other extension if that
 works better for you. When you have saved your document, its filename will appear in the title bar.
 
-To export the texture image, select Export from the <a href="../app/document_menu.html">Document
-menu</a>. Set the name of the exported file.
+To export the texture image, select Export from the document <a href="../app/menubar.html">menu</a>.
+Set the name of the exported file.
 
 ![The "Export" dialog](../app/export_dlg.png)
 
 To increase render quality, it is possible to use
-<a href="../glossary.html#isupersampling">supersampling</a>. For the purpose of this tutorial, set
+<a href="../glossary.html#supersampling">supersampling</a>. For the purpose of this tutorial, set
 supersampling to 4. This will use 16 times the amount of RAM.
 
 ![Filename and supersampling set](export_dlg_with_name_and_supersampling_set.png)
@@ -190,7 +190,7 @@ Go back to the <a href="../app/compositor.html">Compositor</a>, and set "Scale w
 
 Notice that the blur is mutch less prominent now. This is because the mask was not scaled to
 compensate for the larger surface in use when using supersampling. If the exported image looks
-different than the image in the <a href="../app/document_preview.html">Document preview</a> you
+different than the image in the <a href="../app/document_previewer.html">Document previewer</a> you
 should check the setting of any "Scale with resolution" parameter.
 
 ![The exported image with "Scale with resulotion" turned off. Notice the difference in blur

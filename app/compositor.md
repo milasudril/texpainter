@@ -3,7 +3,7 @@
 The compositor controls how images are transformed and composed. It provides a description of the
 signal flow from different sources to the output <a href="../glossary.html#node">node</a>. Different
 nodes are represented by movable boxes. A node wrapps an instance of an
-<a href="../glossary.html#image_processor">Image processor</a>, takes up to four inputs, and has up
+<a href="../glossary.html#image-processor">Image processor</a>, takes up to four inputs, and has up
 to four outputs. These inputs and outputs (ports) are represented by colored squares. Input ports
 are located on the left side of a node, and output ports are located on the right side. Thus, the
 signal flows from left to right.
@@ -26,7 +26,7 @@ final image to render.
 ## Adding a node
 
 As soon as an image or a palette is created or imported, they are avaiable for use in the
-compositor. Other <a href="../glossary.html#image_processor">Image processor</a>s can be added by
+compositor. Other <a href="../glossary.html#image-processor">Image processor</a>s can be added by
 right-clicking in the compositor. It is also possible to press <kbd>Shift</kbd> + <kbd>A</kbd>.
 Doing so brings up the image processor selection dialog.
 
@@ -50,6 +50,6 @@ void between all nodes.
 
 ## Adjusting parameters
 
-Some <a href="../glossary.html#image_processor">Image processor</a>s takes parameters. These are
+Some <a href="../glossary.html#image-processor">Image processor</a>s takes parameters. These are
 constant values, that do not depend on the pixel location. Compare this to "uniforms" in GLSL. To
 change a parameter, move the corresponding slider in the desired direction.
