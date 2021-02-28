@@ -9,6 +9,7 @@
 			"__targets_dbg",
 			"__targets_rel",
 			"__targets_doc",
+			"samples",
 			"pcg-cpp",
 			"libenum"
 		],
@@ -95,6 +96,29 @@
 				".css"
 			],
 			"name": "csscopy",
+			"plugin": "targettrivial"
+		},{
+			"config": {
+				"command": {
+					"args": [
+						"{source}",
+						"{target}",
+						"{target_directory}"
+					],
+					"name": "devtools/txp_render.sh"
+				},
+				"dependencies": [
+					{
+						"ref": "buildconfig/doc.json",
+						"rel": "misc"
+					}
+				],
+				"filename_ext": ".png"
+			},
+			"filename_exts": [
+				".txp"
+			],
+			"name": "txprender",
 			"plugin": "targettrivial"
 		}
 	],
