@@ -7,7 +7,63 @@ import string
 import vcs_info
 import json
 import datetime
+import pathlib
 
+def get_page_file(file):
+	return file
+
+def get_page_dir(dir):
+	return dir / 'index.html'
+
+def get_title_file(file):
+	if str(file).endswith('.projinfo.json'):
+		return 'About'
+
+	if str(file).endswith('.md'):
+		with open(os.path.join(file)) as f:
+			return f.readline()[2:].strip()
+
+	return None
+
+def get_title_dir(dir):
+	try:
+		return get_title_file(dir / 'index.md')
+	except:
+		return None
+
+class Entry:
+	def __init__(self, path):
+		if path.is_file() and path.name != 'index.md' and path.name != 'README.md':
+			self.page=get_page_file(path)
+			self.title=get_title_file(path)
+			self.children = []
+		elif path.is_dir():
+			self.page = get_page_dir(path)
+			self.title=get_title_dir(path)
+			self.children = []
+			for item in path.iterdir():
+				e = Entry(pathlib.Path(item))
+				if e.title != None:
+					self.children.append(e)
+			self.children.sort()
+		else:
+			self.page = None
+			self.title = None
+			self.children = []
+
+
+	def __lt__(self, other):
+		return self.title < other.title
+
+def tree(entry, depth = 0):
+	line = ''
+	for k in range(depth):
+		line += '  '
+	line += str(entry.title)
+	print(line)
+	for child in entry.children:
+		if child != None and child.title != None:
+			tree(child, depth + 1)
 
 def collect_paths(dir, depth=1):
 	ret = []
@@ -111,6 +167,8 @@ def make_index_page(index):
 			lines.append('\n')
 
 		lines.extend(f.readlines())
+
+		tree(Entry(pathlib.Path(dir)))
 
 		outline = gen_outline(resolve_sections(collect_paths(dir), index))
 
@@ -261,6 +319,5 @@ def gen_webpage(src, target_dir, pandoc_args):
 	pandoc_args.extend(
 		['-s', '--css', '/'.join(stylesheet), '--metadata', 'pagetitle=' + ''.join(title)])
 	convert(make_doc(src, target_dir), pandoc_args)
-
 
 gen_webpage(sys.argv[1], sys.argv[2], sys.argv[3:])
