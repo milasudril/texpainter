@@ -97,7 +97,8 @@
 			],
 			"name": "csscopy",
 			"plugin": "targettrivial"
-		},{
+		},
+		{
 			"config": {
 				"command": {
 					"args": [
