@@ -11,7 +11,6 @@ import pathlib
 
 
 def get_page_file(file):
-	print(file.with_suffix('.html'))
 	return file.with_suffix('.html')
 
 
