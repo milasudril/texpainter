@@ -8,7 +8,8 @@
 			"__targets_gcov",
 			"__targets_dbg",
 			"__targets_rel",
-			"__targets_doc"
+			"__targets_doc",
+			"__targets_man"
 		],
 		"recursive": 1
 	},

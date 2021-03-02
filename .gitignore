@@ -2,6 +2,7 @@ __targets
 __targets_dbg
 __targets_rel
 __targets_doc
+__targets_man
 gmon.out
 __pycache__
 vcs_info.json

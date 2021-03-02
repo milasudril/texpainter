@@ -9,6 +9,7 @@
 			"__targets_dbg",
 			"__targets_rel",
 			"__targets_doc",
+			"__targets_man",
 			"samples",
 			"pcg-cpp",
 			"libenum"

@@ -1,0 +1,49 @@
+{
+	"directoryoptions": {
+		"paths_full_reject": [],
+		"paths_reject": [
+			"..",
+			".",
+			".git",
+			"__targets_gcov",
+			"__targets_dbg",
+			"__targets_rel",
+			"__targets_doc",
+			"__targets_man",
+			"samples",
+			"pcg-cpp",
+			"libenum"
+		],
+		"recursive": 1
+	},
+	"source_files": [
+		"."
+	],
+	"target_hooks": [
+		{
+			"config": {
+				"command": {
+					"args": [
+						"{source}",
+						"-s",
+						"-t",
+						"man",
+						"-o",
+						"{target}"
+					],
+					"name": "pandoc"
+				},
+				"filename_ext": ".1"
+			},
+			"filename_exts": [
+				".man.md"
+			],
+			"name": "manpage",
+			"plugin": "targettrivial"
+		}
+	],
+	"targetinfo": {
+		"project_root": "",
+		"target_directory": "__targets_man"
+	}
+}

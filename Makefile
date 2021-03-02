@@ -5,7 +5,7 @@ TIMESTAMP=$(shell LC_ALL="C" date)
 VCS_TAG=$(shell git describe --always --dirty)
 
 .PHONY: all
-all: release doc
+all: release doc manpages
 
 .PHONY: release
 release:
@@ -29,6 +29,10 @@ doc: release
 	mkdir -p __targets_dbg/share/help/C/texpainter
 	cp -r __targets_doc/* __targets_rel/share/help/C/texpainter
 	cp -r __targets_doc/* __targets_dbg/share/help/C/texpainter
+
+.PHONY: manpages
+manpages:
+	maike --configfiles=buildconfig/manpage.json
 
 .PHONY: doc_check
 doc_check: doc
