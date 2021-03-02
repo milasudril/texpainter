@@ -11,7 +11,8 @@ import pathlib
 
 
 def get_page_file(file):
-	return file
+	print(file.with_suffix('.html'))
+	return file.with_suffix('.html')
 
 
 def get_page_dir(dir):
@@ -65,105 +66,10 @@ class Entry:
 		return self.title < other.title
 
 
-def tree(entry, depth=0):
-	line = ''
-	for k in range(depth):
-		line += '  '
-	line += str(entry.title)
-	print(line)
-	for child in entry.children:
-		if child != None and child.title != None:
-			tree(child, depth + 1)
-
-
-def collect_paths(dir, depth=1):
-	ret = []
-	for f in os.listdir(dir):
-		fullpath = os.path.join(dir, f)
-
-		if depth == 2:
-			if f == 'index.md' and os.path.isfile(fullpath):
-				path_split = dir.split('/')
-				skip = 1 + len(path_split) - depth
-				ret.append((dir, f, '/'.join(path_split[skip:]), depth))
-				return ret
-			continue
-
-		if os.path.islink(fullpath):
-			continue
-
-		if os.path.isfile(fullpath) and (f.endswith('.md') or f.endswith('.projinfo.json')):
-			path_split = dir.split('/')
-			skip = 1 + len(path_split) - depth
-			ret.append((dir, f, '/'.join(path_split[skip:]), depth))
-			continue
-
-		if os.path.isdir(fullpath) and f != '.' and f != '..':
-			ret.extend(collect_paths(fullpath, depth + 1))
-			continue
-
-	return ret
-
-
-def get_header(file):
-	if file.endswith('.projinfo.json'):
-		return 'About'
-
-	with open(os.path.join(file)) as f:
-		return f.readline()[2:].strip()
-
-
-def get_chapter(section):
-	try:
-		return get_header(os.path.join(section[0], 'index.md'))
-	except:
-		return None
-
-
-def resolve_sections(paths, current_index):
-	resolved_sections = []
-
-	for f in paths:
-		filename = os.path.join(f[0], f[1])
-		if filename == current_index:
-			continue
-
-		if f[1] == 'README.md':
-			continue
-
-		chapter = get_chapter(f)
-		if chapter == None:
-			continue
-
-		section = get_header(filename)
-		resolved_sections.append((chapter, section, f[3], f[0], os.path.join(f[2], f[1])))
-
-	return resolved_sections
-
-
-def gen_outline(sections):
+def gen_outline(root, dir):
 	lines = []
-	prev_chapter = ''
-	for section in sections:
-		indent = section[2] - 1
-		if section[0] != prev_chapter and prev_chapter != '':
-			line = ''
-			for k in range(indent - 1):
-				line += '  '
-			line += '* [%s](%s)\n' % (section[0], os.path.join(section[3], 'index.html'))
-			lines.append(line)
-
-		if os.path.split(section[4])[1] == 'index.md':
-			continue
-
-		line = ''
-		for k in range(indent):
-			line += '  '
-		line += '* [%s](%s.html)\n' % (section[1], os.path.splitext(section[4])[0])
-		lines.append(line)
-
-		prev_chapter = section[0]
-
+	for child in root.children:
+		lines.append('* [%s](%s)\n' % (child.title, child.page.relative_to(dir)))
 	return lines
 
 
@@ -179,9 +85,7 @@ def make_index_page(index):
 
 		lines.extend(f.readlines())
 
-		tree(Entry(pathlib.Path(dir)))
-
-		outline = gen_outline(resolve_sections(collect_paths(dir), index))
+		outline = gen_outline(Entry(pathlib.Path(dir)), dir)
 
 		if len(outline) > 0:
 			lines.append('\n')
@@ -325,7 +229,7 @@ def convert(lines, pandoc_args):
 
 def gen_webpage(src, target_dir, pandoc_args):
 	stylesheet = make_path_prefix(src)
-	title = ['Texpainter: ', get_header(src)]
+	title = ['Texpainter: ', get_title_file(src)]
 	stylesheet.append('format.css')
 	pandoc_args.extend(
 		['-s', '--css', '/'.join(stylesheet), '--metadata', 'pagetitle=' + ''.join(title)])
