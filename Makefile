@@ -65,11 +65,11 @@ PREFIX?="/usr"
 .PHONY: install
 install: release doc manpages
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
-	# TODO: enable before release mkdir -p $(DESTDIR)$(PREFIX)/man/man1
+	mkdir -p $(DESTDIR)$(PREFIX)/man/man1
 	mkdir -p $(DESTDIR)$(PREFIX)/share/mime/packages
 	cp __targets_rel/app/texpainter $(DESTDIR)$(PREFIX)/bin/texpainter
-	# TODO: enable before release cp app/texpainter.1.man $(DESTDIR)$(PREFIX)/man/man1/texpainter.1
-	# TODO: enable before release cp cli/texporter.1.man $(DESTDIR)$(PREFIX)/man/man1/texprender.1
+	cp __targets_man/app/texpainter.man.1 $(DESTDIR)$(PREFIX)/man/man1/texpainter.1
+	cp __targets_man/cli/texporter.man.1 $(DESTDIR)$(PREFIX)/man/man1/texporter.1
 	cp xdg/application-x-texpainter.xml $(DESTDIR)$(PREFIX)/share/mime/packages
 	mkdir -p $(DESTDIR)$(PREFIX)/share/help/C/texpainter
 	cp -r __targets_rel/share/help/C/texpainter/* $(DESTDIR)$(PREFIX)/share/help/C/texpainter
