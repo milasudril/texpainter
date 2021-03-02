@@ -10,7 +10,7 @@ date: 2021-03-02
 texpaitner - A tool for creating tilable textures
 
 # SYNOPSIS
-**texpainter** [filename]
+**texpainter** [*filename*]
 
 # DESCRIPTION
 

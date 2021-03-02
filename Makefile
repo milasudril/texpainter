@@ -63,7 +63,7 @@ format:
 DESTDIR?=""
 PREFIX?="/usr"
 .PHONY: install
-install: release doc
+install: release doc manpages
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
 	# TODO: enable before release mkdir -p $(DESTDIR)$(PREFIX)/man/man1
 	mkdir -p $(DESTDIR)$(PREFIX)/share/mime/packages
