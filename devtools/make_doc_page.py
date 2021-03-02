@@ -39,7 +39,7 @@ def get_title_dir(dir):
 class Entry:
 	def __init__(self, path):
 		if (path.name == 'index.md' or path.name == 'README.md' or path.name == '.git'
-			or path.name.startswith('__')):
+			or path.name.startswith('__') or path.name.endswith('.man.md')):
 			self.page = None
 			self.title = None
 			self.children = []
