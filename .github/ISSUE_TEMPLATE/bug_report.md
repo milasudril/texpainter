@@ -16,7 +16,7 @@ __Compiler:__
 
 # Information about the problem
 
-__Bug type:__ <crash | unexpected behavior>
+__Bug type:__ <crash | unexpected behavior | build error>
 
 ## Detailed description
 
