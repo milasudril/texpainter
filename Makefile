@@ -68,6 +68,7 @@ install: release doc manpages
 	mkdir -p $(DESTDIR)$(PREFIX)/man/man1
 	mkdir -p $(DESTDIR)$(PREFIX)/share/mime/packages
 	cp __targets_rel/app/texpainter $(DESTDIR)$(PREFIX)/bin/texpainter
+	cp __targets_rel/cli/texporter $(DESTDIR)$(PREFIX)/bin/texporter
 	cp __targets_man/app/texpainter.man.1 $(DESTDIR)$(PREFIX)/man/man1/texpainter.1
 	cp __targets_man/cli/texporter.man.1 $(DESTDIR)$(PREFIX)/man/man1/texporter.1
 	cp xdg/application-x-texpainter.xml $(DESTDIR)$(PREFIX)/share/mime/packages
