@@ -19,6 +19,7 @@ Texpainter is a utility program intended for creating tilable textures. It consi
     * python3-pygit2
     * pandoc
     * imagemagick
+    * libmagickcore-6.q16-6-extra
 
     If you do not have it, also install g++ version 10 or later, since the code uses some new features from C++20.
 
