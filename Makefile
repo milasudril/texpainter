@@ -72,6 +72,7 @@ install: release doc manpages
 	cp __targets_man/app/texpainter.man.1 $(DESTDIR)$(PREFIX)/man/man1/texpainter.1
 	cp __targets_man/cli/texporter.man.1 $(DESTDIR)$(PREFIX)/man/man1/texporter.1
 	cp xdg/application-x-texpainter.xml $(DESTDIR)$(PREFIX)/share/mime/packages
+	cp xdg/texpainter.desktop $(DESTDIR)$(PREFIX)/share/applications
 	mkdir -p $(DESTDIR)$(PREFIX)/share/help/C/texpainter
 	cp -r __targets_rel/share/help/C/texpainter/* $(DESTDIR)$(PREFIX)/share/help/C/texpainter
 	find $(DESTDIR)$(PREFIX)/share/help/C/texpainter -type d | xargs chmod o+x
