@@ -20,3 +20,5 @@ Terminal=false
 
 # Describes the categories in which this entry should be shown
 Categories=Graphics;RasterGraphics
+
+Icon=texpainter
