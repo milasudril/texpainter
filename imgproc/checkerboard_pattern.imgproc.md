@@ -12,21 +12,23 @@ __Intensity:__ (Grayscale image) The generated intensity function
 
 ## Parameters
 
-__Div/x:__ (= 0.8666666666666667) The number of cells per pattern period
+__Div/x:__ (= 0.8666666666666667) The number of cells per pattern period. The default value is set
+such that the cells have a size of 4 pixels.
 
-__Scale with resolution:__ (= 0.0) If > 0.5, scale the size with rendering resolution. Use for spectral filtering.
+__Scale with resolution:__ (= 0.0) If > 0.5, scale the size with rendering resolution. Enable this
+on for use with spectral filtering.
 
 __Aspect ratio:__ (= 1.0) The aspect ratio of cells. 1.0 means that they are squares
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <cmath>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 void main(auto const& args, auto const& params)
