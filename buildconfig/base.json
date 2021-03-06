@@ -9,7 +9,8 @@
 			"__targets_dbg",
 			"__targets_rel",
 			"__targets_doc",
-			"__targets_man"
+			"__targets_man",
+			"samples"
 		],
 		"recursive": 1
 	},
@@ -157,6 +158,34 @@
 				".imgproc.md"
 			],
 			"name": "imgproc",
+			"plugin": "targettrivial"
+		},
+		{
+			"config": {
+				"command": {
+					"args": [
+						"{source}",
+						"{target}",
+						"{target_directory}"
+					],
+					"name": "devtools/txp_render.sh"
+				},
+				"dependencies": [
+					{
+						"ref": "buildconfig/base.json",
+						"rel": "misc"
+					},
+					{
+						"ref": "cli/texporter",
+						"rel": "misc"
+					}
+				],
+				"filename_ext": ".png"
+			},
+			"filename_exts": [
+				".txp"
+			],
+			"name": "txprender",
 			"plugin": "targettrivial"
 		}
 	]
