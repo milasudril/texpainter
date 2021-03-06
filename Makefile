@@ -66,7 +66,10 @@ PREFIX?="/usr"
 install: release doc manpages
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
 	mkdir -p $(DESTDIR)$(PREFIX)/man/man1
+	mkdir -p $(DESTDIR)$(PREFIX)/share/applications
+	mkdir -p $(DESTDIR)$(PREFIX)/share/help/C/texpainter
 	mkdir -p $(DESTDIR)$(PREFIX)/share/mime/packages
+	mkdir -p $(DESTDIR)$(PREFIX)/share/pixmaps
 	cp __targets_rel/app/texpainter $(DESTDIR)$(PREFIX)/bin/texpainter
 	cp __targets_rel/cli/texporter $(DESTDIR)$(PREFIX)/bin/texporter
 	cp __targets_man/app/texpainter.man.1 $(DESTDIR)$(PREFIX)/man/man1/texpainter.1
@@ -74,7 +77,6 @@ install: release doc manpages
 	cp xdg/application-x-texpainter.xml $(DESTDIR)$(PREFIX)/share/mime/packages
 	cp xdg/texpainter.desktop $(DESTDIR)$(PREFIX)/share/applications
 	cp __targets_rel/xdg/texpainter.png $(DESTDIR)$(PREFIX)/share/pixmaps
-	mkdir -p $(DESTDIR)$(PREFIX)/share/help/C/texpainter
 	cp -r __targets_rel/share/help/C/texpainter/* $(DESTDIR)$(PREFIX)/share/help/C/texpainter
 	find $(DESTDIR)$(PREFIX)/share/help/C/texpainter -type d | xargs chmod o+x
 	find $(DESTDIR)$(PREFIX)/share/help/C/texpainter | xargs chmod o+r
