@@ -15,8 +15,8 @@ __Intensity:__ (Grayscale image) The generated intensity function
 __Div/x:__ (= 0.8666666666666667) . The default value is set such that the cells have a size of
 4 pixels.
 
-__Scale with resolution:__ (= 0.0) If > 0.5, scale the size with rendering resolution. Enable this
-on for use with spectral filtering.
+__Scale with resolution:__ (= 1.0) If > 0.5, scale the size with rendering resolution. Enable this
+when output is used for spectral filtering.
 
 __Aspect ratio:__ (= 1.0) The aspect ratio of cells. 1.0 means that they are squares
 

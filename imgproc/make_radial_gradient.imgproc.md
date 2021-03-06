@@ -15,7 +15,7 @@ __Size:__ (= 0.9333333333333333) The size of the mask, along the nominal x axis.
 is set such that the diameter is halve the size of the image.
 
 __Scale with resolution:__ (= 1.0) If > 0.5, scale the size with rendering resolution. Enable this
-on for use with spectral filtering.
+when output is used for spectral filtering.
 
 __Aspect ratio:__ (= 1.0) The aspect ratio of mask. 1.0 means that the mask is circular.
 
