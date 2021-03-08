@@ -12,11 +12,8 @@ __Intensity:__ (Grayscale image) The generated intensity function
 
 ## Parameters
 
-__Div/x:__ (= 0.8666666666666667) The number of cells per pattern period. The default value is set
-such that the cells have a size of 4 pixels.
-
-__Scale with resolution:__ (= 1.0) If > 0.5, scale the size with rendering resolution. Enable this
-when output is used for spectral filtering.
+__Wavelength:__ (= 0.8666666666666667) Wavelength. The default value is set such that it results in
+a wavelength of $1/4$ of the image size.
 
 __Aspect ratio:__ (= 1.0) The aspect ratio of cells. 1.0 means that they are squares
 
@@ -35,17 +32,10 @@ void main(auto const& args, auto const& params)
 {
 	auto const w = args.canvasSize().width();
 	auto const h = args.canvasSize().height();
-	auto const res_scale =
-	    param<Str{"Scale with resolution"}>(params).value() < 0.5 ? args.resolution() : 1.0;
 
-	auto const scaled_size = Size2d{w / static_cast<uint32_t>(res_scale), 1u};
-	auto const n =
-	    2 * static_cast<int>(0.5 * sizeFromWidth(scaled_size, param<Str{"Div/x"}>(params)));
-
-	auto const fx = (n * 1.0) / w;
-	auto const fy =
-	    2.0 * static_cast<int>(0.5 * fx * sizeScaleFactor(param<Str{"Aspect ratio"}>(params)) * h)
-	    / h;
+	auto const f         = 2.0 / sizeFromWidth(args.canvasSize(), param<Str{"Wavelength"}>(params));
+	auto const fx = f;
+	auto const fy = fx * sizeScaleFactor(param<Str{"Aspect ratio"}>(params));
 
 	for(uint32_t row = 0; row < h; ++row)
 	{
