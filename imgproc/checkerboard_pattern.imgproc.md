@@ -12,20 +12,19 @@ __Intensity:__ (Grayscale image) The generated intensity function
 
 ## Parameters
 
-__Wavelength:__ (= 0.8666666666666667) Wavelength. The default value is set such that it results in
-a wavelength of $1/4$ of the image size.
+__Wavelength:__ (= 0.8666666666666667) Wavelength. The default value is set such that it results in a wavelength of $1/4$ of the image size.
 
 __Aspect ratio:__ (= 1.0) The aspect ratio of cells. 1.0 means that they are squares
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <cmath>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& args, auto const& params)
@@ -33,9 +32,9 @@ void main(auto const& args, auto const& params)
 	auto const w = args.canvasSize().width();
 	auto const h = args.canvasSize().height();
 
-	auto const f         = 2.0 / sizeFromWidth(args.canvasSize(), param<Str{"Wavelength"}>(params));
+	auto const f  = 2.0 / sizeFromWidth(args.canvasSize(), param<Str{"Wavelength"}>(params));
 	auto const fx = f;
-	auto const fy = fx * w/ sizeFromWidth(args.canvasSize(), param<Str{"Aspect ratio"}>(params));
+	auto const fy = fx * w / sizeFromHeight(args.canvasSize(), param<Str{"Aspect ratio"}>(params));
 
 	for(uint32_t row = 0; row < h; ++row)
 	{

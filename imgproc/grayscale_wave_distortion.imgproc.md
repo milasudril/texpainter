@@ -1,7 +1,6 @@
 # Grayscale wave distortion
 
-This image processor takes a grayscale image, and transforms its pixel values so they are wrapped
-periodically. The pixel-wise transformation rule is
+This image processor takes a grayscale image, and transforms its pixel values so they are wrapped periodically. The pixel-wise transformation rule is
 
 $$ g(z, y) = f\left(\nu \left( z(x, y) + \phi\right)\right) $$
 
@@ -19,23 +18,21 @@ __Ouptut:__ (Grayscale image) The output image
 
 __Waveform:__ (= 0.0) Sine, Sawtooth, Square, Triangle
 
-__Wavelength:__ (= 0.8666666666666667) Wavelength. The default value is set such that it results in
-a wavelength of $1/8$ of the image size.
+__Wavelength:__ (= 0.8666666666666667) Wavelength. The default value is set such that it results in a wavelength of $1/8$ of the image size.
 
 __Phase:__ (= 0.0) Phase
 
-__Add DC offset:__ (= 1.0) Whether or not to add a DC offset to make sure that output values are
-between 0 and 1
+__Add DC offset:__ (= 1.0) Whether or not to add a DC offset to make sure that output values are between 0 and 1
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <numbers>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 inline RealValue sin(RealValue val) { return std::sin(val * std::numbers::pi); }

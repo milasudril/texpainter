@@ -1,9 +1,6 @@
 # Make radial gradient
 
-This image processor generates a radial gradient from black to white, with black in the origin. The
-pixel values are proportional to the square of the distance to the origin. "Distance" can be chosen
-such that the gradient is circular, or forms an even-sided polygon, with the number of vertices in
-the range 4 to 12.
+This image processor generates a radial gradient from black to white, with black in the origin. The pixel values are proportional to the square of the distance to the origin. "Distance" can be chosen such that the gradient is circular, or forms an even-sided polygon, with the number of vertices in the range 4 to 12.
 
 ## Output ports
 
@@ -11,29 +8,26 @@ __Output:__ (Grayscale image) Output image
 
 ## Parameters
 
-__Size:__ (= 0.9333333333333333) The size of the mask, along the nominal x axis. The default value
-is set such that the diameter is halve the size of the image.
+__Size:__ (= 0.9333333333333333) The size of the mask, along the nominal x axis. The default value is set such that the diameter is halve the size of the image.
 
-__Scale with resolution:__ (= 1.0) If > 0.5, scale the size with rendering resolution. Enable this
-when output is used for spectral filtering.
+__Scale with resolution:__ (= 1.0) If > 0.5, scale the size with rendering resolution. Enable this when output is used for spectral filtering.
 
 __Aspect ratio:__ (= 1.0) The aspect ratio of mask. 1.0 means that the mask is circular.
 
 __Orientation:__ (= 0.0) Orientation of the mask. 1.0 maps to π.
 
-__Number of vertices:__ (= 1.0) The number of vertices. 0.0 maps to four vertices. 1.0 makes a
-circle. The largest number of vertices before the polygon turning into a circle is 12.
+__Number of vertices:__ (= 1.0) The number of vertices. 0.0 maps to four vertices. 1.0 makes a circle. The largest number of vertices before the polygon turning into a circle is 12.
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <cmath>
 #include <numbers>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 template<int n>
