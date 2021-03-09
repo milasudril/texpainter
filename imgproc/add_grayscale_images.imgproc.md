@@ -1,7 +1,6 @@
 # Add grayscale images
 
-This image processor takes two grayscale images `A` and `B` and computes their pixel-wise sum. The
-output `Sum` is the pixel-wise sum of `A` and `B`.
+This image processor takes two grayscale images `A` and `B` and computes their pixel-wise sum. The output `Sum` is the pixel-wise sum of `A` and `B`.
 
 ## Input ports
 
@@ -15,22 +14,20 @@ __Sum:__ (Grayscale image) The sum of `A` and `B`
 
 ## Parameters
 
-__Gain A:__ (= 0.5) Amplification factor for `A`, between -8.0 evFS and +8.0 evFS. 0.5 maps to
-0 evFS.
+__Gain A:__ (= 0.5) Amplification factor for `A`, between -8.0 evFS and +8.0 evFS. 0.5 maps to 0 evFS.
 
-__Gain B:__ (= 0.5) Amplification factor for `B`, between -8.0 evFS and +8.0 evFS. 0.5 maps to
-0 evFS.
+__Gain B:__ (= 0.5) Amplification factor for `B`, between -8.0 evFS and +8.0 evFS. 0.5 maps to 0 evFS.
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <algorithm>
 #include <cmath>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 inline double mapParameter(ParamValue val) { return std::exp2(std::lerp(-8.0, 8.0, val.value())); }

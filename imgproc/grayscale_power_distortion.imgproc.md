@@ -14,18 +14,17 @@ __Ouptut:__ (Grayscale image) The output image
 
 ## Parameters
 
-__Exponent:__ (= 0.5) Controls the exponent $a$. $a$ can take any value between $1/16$ and $16$. A
-parameter value of 0.5 correspnds to 1.
+__Exponent:__ (= 0.5) Controls the exponent $a$. $a$ can take any value between $1/16$ and $16$. A parameter value of 0.5 correspnds to 1.
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <cmath>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 inline auto power(ParamValue val) { return std::exp2(std::lerp(-4.0, 4.0, val.value())); }
