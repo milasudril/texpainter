@@ -35,7 +35,7 @@ void main(auto const& args, auto const& params)
 
 	auto const f         = 2.0 / sizeFromWidth(args.canvasSize(), param<Str{"Wavelength"}>(params));
 	auto const fx = f;
-	auto const fy = fx * sizeScaleFactor(param<Str{"Aspect ratio"}>(params));
+	auto const fy = fx * w/ sizeFromWidth(args.canvasSize(), param<Str{"Aspect ratio"}>(params));
 
 	for(uint32_t row = 0; row < h; ++row)
 	{
