@@ -27,9 +27,9 @@ __Includes:__
 __Source code:__ 
 
 ```c++
-double quantize(double val, uint32_t n)
+inline double quantize(double val, uint32_t n)
 {
-	return static_cast<uint32_t>(val * n) / static_cast<double>(n);
+	return static_cast<uint32_t>(val * n + 0.5) / static_cast<double>(n);
 }
 
 void main(auto const& args, auto const& params)

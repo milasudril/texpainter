@@ -29,14 +29,22 @@ __Source code:__
 ```c++
 constexpr RealValue pattern[2][2] = {0.0, 0.5, 0.5, 1.0};
 
+inline double quantize(double val, uint32_t n)
+{
+	return static_cast<uint32_t>(val * n + 0.5) / static_cast<double>(n);
+}
+
 void main(auto const& args, auto const& params)
 {
 	auto const w = args.canvasSize().width();
 	auto const h = args.canvasSize().height();
 
 	auto const f  = 2.0 / sizeFromWidth(args.canvasSize(), param<Str{"Wavelength"}>(params));
-	auto const fx = f;
-	auto const fy = fx * sizeScaleFactor(param<Str{"Aspect ratio"}>(params));
+	auto const fx = 2.0 * quantize(0.5 * f, w);
+	auto const fy =
+	    2.0
+	    * quantize(
+	        0.5 * f * w / sizeFromHeight(args.canvasSize(), param<Str{"Aspect ratio"}>(params)), h);
 
 	for(uint32_t row = 0; row < h; ++row)
 	{
