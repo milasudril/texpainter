@@ -4,7 +4,7 @@ This image processor places a RGBA image at location deterimed by the input poin
 
 ## Input ports
 
-__Locations:__ (Point cloud) The probability distribution.
+__Locations:__ (Point cloud) The points where `image` should be placed
 
 __Image:__ (RGBA image) the image to place at the points
 

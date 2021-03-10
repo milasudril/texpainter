@@ -1,6 +1,6 @@
 # Make radial gradient
 
-This image processor generates a radial gradient from black to white, with black in the origin. The pixel values are proportional to the square of the distance to the origin. "Distance" can be chosen such that the gradient is circular, or forms an even-sided polygon, with the number of vertices in the range 4 to 12.
+This image processor generates a radial gradient from black to white, with black in the origin. The pixel values are proportional to the square of the distance to the origin. "Number of vertices" can be chosen such that the gradient is circular, or forms an even-sided polygon, with the number of vertices in the range 4 to 12.
 
 ## Output ports
 
@@ -8,7 +8,7 @@ __Output:__ (Grayscale image) Output image
 
 ## Parameters
 
-__Size:__ (= 0.9333333333333333) The size of the mask, along the nominal x axis. The default value is set such that the diameter is halve the size of the image.
+__Size:__ (= 0.9333333333333333) The size of the gradient, along the nominal x axis. The default value is set such that the diameter is half the size of the image.
 
 __Scale with resolution:__ (= 1.0) If > 0.5, scale the size with rendering resolution. Enable this when output is used for spectral filtering.
 

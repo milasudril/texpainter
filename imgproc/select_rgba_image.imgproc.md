@@ -1,6 +1,6 @@
 # Select RGBA image
 
-This image processor uses a grayscale image to select one of three rgba images
+This image processor uses a grayscale image to select one of three rgba images.
 
 ## Input ports
 

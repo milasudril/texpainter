@@ -22,7 +22,7 @@ __Point cloud:__ (Point cloud) The generated point cloud
 
 ## Parameters
 
-__Point distance:__ (= 1.0)
+__Point distance:__ (= 1.0) The expected distance between two points. Notice that a higher value will result in a lower density.
 
 ## Implementation
 

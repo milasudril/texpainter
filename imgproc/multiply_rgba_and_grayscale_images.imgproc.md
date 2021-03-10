@@ -14,8 +14,6 @@ __Product:__ (RGBA image) The product of `A` and `B`
 
 ## Implementation
 
-To loop through all pixels in `A` and `B`, `std::transform` is used. As callback to `std::transform`, `std::multiplies` is used.
-
 __Includes:__ 
 
 ```c++

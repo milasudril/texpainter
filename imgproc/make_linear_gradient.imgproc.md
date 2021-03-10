@@ -8,9 +8,9 @@ __Output:__ (Grayscale image)
 
 ## Parameters
 
-__Orientation:__ (= 0.0) Orientation of the mask. 1.0 maps to 2π.
+__Orientation:__ (= 0.0) Orientation of the gradient. 1.0 maps to 2π.
 
-__Size:__ (= 1.0) The size of the mask, along the nominal x axis.
+__Size:__ (= 1.0) The size of the gradient, along the nominal x axis.
 
 ## Implementation
 

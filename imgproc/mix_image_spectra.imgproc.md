@@ -1,5 +1,7 @@
 # Mix image spectra
 
+This image processor mixes two iamge spectra together by using a grayscale image as blend factor.
+
 ## Input ports
 
 __A:__ (Image spectrum)

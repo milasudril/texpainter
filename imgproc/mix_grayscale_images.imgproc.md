@@ -1,5 +1,7 @@
 # Mix Grayscale images
 
+This image processor mixes two grayscale images together by using a third grayscale image as blend factor.
+
 ## Input ports
 
 __A:__ (Grayscale image)

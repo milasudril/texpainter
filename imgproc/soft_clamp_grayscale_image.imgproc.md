@@ -1,5 +1,7 @@
 # Soft clamp grayscale image
 
+This image processor clamps the input grayscale image so such that output values are between 0 and 1.
+
 ## Input ports
 
 __Input:__ (Grayscale image) The input image

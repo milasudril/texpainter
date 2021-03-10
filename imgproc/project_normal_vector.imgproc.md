@@ -1,6 +1,8 @@
 # Project normal vector
 
-This image processor takes the normal vector (possibly computed by \ref{Make topographic map}), and projects int onto another vector.
+This image processor takes the normal vector (possibly computed by \ref{Make topographic map}), and projects int onto another vector. The projection is computed from the expression
+
+$$ f(x, y) = \vec{n}(x, y) \cdot \begin{bmatrix} \sin(\theta) \cos(\phi) \\ \sin(\theta) \sin(\phi) \\ \cos(\theta) \end{bmatrix} $$
 
 ## Input ports
 

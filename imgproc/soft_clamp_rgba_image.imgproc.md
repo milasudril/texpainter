@@ -1,5 +1,7 @@
 # Soft clamp RGBA image
 
+This image processor clamps the input RGBA image so such that output values are between 0 and 1. The image processor operates component-wise.
+
 ## Input ports
 
 __Input:__ (RGBA image) The input image

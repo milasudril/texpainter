@@ -1,5 +1,7 @@
 # Mix RGBA images
 
+This image processor mixes two RGBA iamges together by using a grayscale image as blend factor.
+
 ## Input ports
 
 __A:__ (RGBA image)
