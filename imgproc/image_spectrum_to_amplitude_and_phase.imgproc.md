@@ -10,7 +10,7 @@ __Input:__ (Image spectrum) The image spectrum to convert
 
 __Amplitude:__ (Grayscale image) The amplitude (absolute value) of the spectrum
 
-__Phase:__ (Grayscale image) The phase (argument) of the spectrum
+__Phase:__ (Grayscale image) The phase (argument) of the spectrum. The phase is computed by using `std::arg`.
 
 ## Implementation
 
