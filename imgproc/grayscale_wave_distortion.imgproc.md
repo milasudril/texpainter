@@ -37,13 +37,13 @@ __Source code:__
 ```c++
 inline RealValue sin(RealValue val) { return std::sin(val * std::numbers::pi); }
 
-inline RealValue sawtooth(RealValue val) { return 2.0 * (val - std::floor(val + 0.5)); }
+inline RealValue sawtooth(RealValue val) { return 2.0 * (0.5 * val - std::floor(0.5 * val + 0.5)); }
 
 inline RealValue sgn(RealValue val) { return val < 0.0 ? -1.0 : 1.0; }
 
 inline RealValue square(RealValue val) { return sgn(sawtooth(val)); }
 
-inline RealValue triangle(RealValue val) { return 2.0 * std::abs(sawtooth(0.5 * val)) - 1; }
+inline RealValue triangle(RealValue val) { return 2.0 * std::abs(sawtooth(val)) - 1; }
 
 using Function = RealValue (*)(RealValue val);
 

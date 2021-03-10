@@ -18,14 +18,14 @@ __Order:__ (= 0.0) The order $n$. 0.0 maps to 1 and 1.0 maps to 4.
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <cmath>
 #include <algorithm>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 inline auto order(ParamValue val)
