@@ -2,7 +2,7 @@
 
 This image processor takes a grayscale image, and transforms its pixel values by a power function.
 
-$$ g(z, y) = z(x, y)^a $$
+$$ g(z, y) = f(x, y)^a $$
 
 ## Input ports
 

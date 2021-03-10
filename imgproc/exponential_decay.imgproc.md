@@ -12,30 +12,24 @@ __Input:__ (Grayscale image) The input image
 
 __Output:__ (Grayscale image) The output image
 
-## Parameters
-
-__Rate:__ (= 0.5)
-
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <cmath>
 #include <algorithm>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
-void main(auto const& args, auto const& params)
+void main(auto const& args)
 {
 	auto const size = area(args.canvasSize());
-	std::transform(input<0>(args),
-	               input<0>(args) + size,
-	               output<0>(args),
-	               [rate = std::exp2(std::lerp(-4, 4, param<Str{"Rate"}>(params).value()))](
-	                   auto val) { return std::exp2(-0.5 * val * rate); });
+	std::transform(input<0>(args), input<0>(args) + size, output<0>(args), [](auto val) {
+		return std::exp2(-0.5 * val);
+	});
 }
 ```
 

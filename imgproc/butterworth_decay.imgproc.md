@@ -16,18 +16,16 @@ __Output:__ (Grayscale image) The output image
 
 __Order:__ (= 0.0) The order $n$. 0.0 maps to 1 and 1.0 maps to 4.
 
-__Rate:__ (= 0.5)
-
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <cmath>
 #include <algorithm>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 inline auto order(ParamValue val)
@@ -41,9 +39,9 @@ void main(auto const& args, auto const& params)
 	std::transform(input<0>(args),
 	               input<0>(args) + size,
 	               output<0>(args),
-	               [n    = order(param<Str{"Order"}>(params)),
-	                rate = std::exp2(std::lerp(-4, 4, param<Str{"Rate"}>(params).value()))](
-	                   auto val) { return 1.0 / sqrt(1 + std::pow(val, n)); });
+	               [n = order(param<Str{"Order"}>(params))](auto val) {
+		               return 1.0 / sqrt(1 + std::pow(val, n));
+	               });
 }
 ```
 

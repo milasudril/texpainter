@@ -20,8 +20,6 @@ __Gain B:__ (= 0.5) Amplification factor for `B`, between -8.0 evFS and +8.0 evF
 
 ## Implementation
 
-To loop through all pixels in `A` and `B`, `std::transform` is used. As callback to `std::transform`, a function object with access to the mapped parameter values are used. The function object returns a weighted sum of its two arguments, where the weights are deterimened by the parameters.
-
 __Includes:__ 
 
 ```c++

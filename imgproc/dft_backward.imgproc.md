@@ -4,7 +4,7 @@ This image computes the DFT of a grayscale image.
 
 ## Input ports
 
-__Input:__ (Image spectrum) The image spectrum (re)construct the image from
+__Input:__ (Image spectrum) The image spectrum to (re)construct the image from
 
 ## Output ports
 

@@ -14,17 +14,17 @@ __Intensity:__ (Grayscale image) The generated intensity function
 
 __Wavelength:__ (= 0.8666666666666667) Wavelength. The default value is set such that it results in a wavelength of $1/4$ of the image size.
 
-__Aspect ratio:__ (= 1.0) The aspect ratio of cells. 1.0 means that they are squares
+__Aspect ratio:__ (= 1.0) The aspect ratio of cells. 1.0 means that they are squares, in case the canvas is a square.
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <cmath>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 constexpr RealValue pattern[2][2] = {0.0, 0.5, 0.5, 1.0};
