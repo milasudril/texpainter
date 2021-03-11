@@ -226,7 +226,8 @@ namespace
 
 			if(item.second.imgproc == Texpainter::FilterGraph::InvalidImgProcId) { return; }
 
-			if(item.second.proc_relstate == Texpainter::FilterGraph::ImgProcReleaseState::Experimental)
+			if(item.second.proc_relstate
+			   == Texpainter::FilterGraph::ImgProcReleaseState::Experimental)
 			{
 				log(Texpainter::Logger::MessageType::Warning,
 				    toString(item.second.imgproc) + " was experimental when document was saved");
@@ -246,7 +247,7 @@ namespace
 			if(imgproc->releaseState() == Texpainter::FilterGraph::ImgProcReleaseState::Deprecated)
 			{
 				log(Texpainter::Logger::MessageType::Warning,
-				    toString(item.second.imgproc) + " is Deprecated");
+				    toString(item.second.imgproc) + " is deprecated");
 			}
 
 			auto res = m_compositor.insert(std::move(imgproc));
