@@ -302,13 +302,14 @@ namespace Texpainter::FilterGraph
 	struct NodeData
 	{
 		ImageProcessorId imgproc;
+		ImgProcReleaseState proc_relstate;
 		std::array<NodeSourceData, NodeArgument::MaxNumInputs> inputs;
 		std::map<std::string, double> params;
 	};
 
 	inline NodeData nodeData(Node const& node)
 	{
-		NodeData ret{node.processorId(), {}, params(node)};
+		NodeData ret{node.processorId(), node.processorReleaseState(), {}, params(node)};
 		std::ranges::transform(node.inputs(), std::begin(ret.inputs), [](auto const& item) {
 			if(item.valid()) { return NodeSourceData{item.processor().nodeId(), item.port()}; }
 			return NodeSourceData{};
@@ -319,9 +320,10 @@ namespace Texpainter::FilterGraph
 
 	inline void to_json(nlohmann::json& obj, NodeData const& node)
 	{
-		obj["imgproc"] = node.imgproc;
-		obj["inputs"]  = node.inputs;
-		obj["params"]  = node.params;
+		obj["imgproc"]       = node.imgproc;
+		obj["inputs"]        = node.inputs;
+		obj["params"]        = node.params;
+		obj["proc_relstate"] = node.proc_relstate;
 	}
 
 	inline void from_json(nlohmann::json const& obj, NodeData& node)

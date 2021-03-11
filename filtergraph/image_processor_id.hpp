@@ -1,5 +1,6 @@
 //@	{
 //@	 "targets":[{"name":"image_processor_id.hpp", "type":"include"}]
+//@	,"dependencies_extra":[{"ref":"image_processor_id.o","rel":"implementation"}]
 //@	}
 
 #ifndef TEXPAINTER_FILTERGRAPH_IMAGEPROCESSORID_HPP
@@ -124,6 +125,8 @@ namespace Texpainter::FilterGraph
 		Stable,
 		Deprecated
 	};
+
+	void to_json(nlohmann::json& obj, ImgProcReleaseState val);
 }
 
 #endif
