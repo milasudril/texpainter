@@ -226,6 +226,12 @@ namespace
 
 			if(item.second.imgproc == Texpainter::FilterGraph::InvalidImgProcId) { return; }
 
+			if(item.second.proc_relstate == Texpainter::FilterGraph::ImgProcReleaseState::Experimental)
+			{
+				log(Texpainter::Logger::MessageType::Warning,
+				    toString(item.second.imgproc) + " was experimental when document was saved");
+			}
+
 			auto imgproc =
 			    Texpainter::ImageProcessorRegistry::createImageProcessor(item.second.imgproc);
 			if(imgproc == nullptr)
@@ -235,6 +241,12 @@ namespace
 				auto dummy = new Texpainter::FilterGraph::ImageProcessorWrapper{
 				    Texpainter::Model::DummyProcessor{}};
 				imgproc.reset(dummy);
+			}
+
+			if(imgproc->releaseState() == Texpainter::FilterGraph::ImgProcReleaseState::Deprecated)
+			{
+				log(Texpainter::Logger::MessageType::Warning,
+				    toString(item.second.imgproc) + " is Deprecated");
 			}
 
 			auto res = m_compositor.insert(std::move(imgproc));
