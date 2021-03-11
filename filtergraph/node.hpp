@@ -328,8 +328,11 @@ namespace Texpainter::FilterGraph
 
 	inline void from_json(nlohmann::json const& obj, NodeData& node)
 	{
-		node.imgproc = obj.at("imgproc").get<ImageProcessorId>();
-		auto inputs  = obj.at("inputs").get<std::vector<NodeSourceData>>();
+		node.imgproc       = obj.at("imgproc").get<ImageProcessorId>();
+		node.proc_relstate = ImgProcReleaseState::Stable;
+		if(auto i = obj.find("proc_relstate"); i != std::end(obj)) { node.proc_relstate = *i; }
+
+		auto inputs = obj.at("inputs").get<std::vector<NodeSourceData>>();
 		if(std::size(inputs) > NodeArgument::MaxNumInputs)
 		{ throw std::string{"Too many inputs for node"}; }
 

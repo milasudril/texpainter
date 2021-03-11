@@ -100,17 +100,7 @@ namespace Texpainter::FilterGraph
 
 	constexpr bool operator!=(ImageProcessorId a, ImageProcessorId b) { return !(a == b); }
 
-	inline std::string toString(ImageProcessorId const& id)
-	{
-		std::string ret{};
-		ret.reserve(32);
-		std::ranges::for_each(id.data(), [&ret](auto val) {
-			auto hexdigits = detail::to_hex_digits(val);
-			ret.push_back(hexdigits.first);
-			ret.push_back(hexdigits.second);
-		});
-		return ret;
-	}
+	std::string toString(ImageProcessorId const& id);
 
 	inline void to_json(nlohmann::json& obj, ImageProcessorId const& id) { obj = toString(id); }
 
@@ -127,6 +117,10 @@ namespace Texpainter::FilterGraph
 	};
 
 	void to_json(nlohmann::json& obj, ImgProcReleaseState val);
+
+	void from_json(nlohmann::json const& obj, ImgProcReleaseState& val);
+
+
 }
 
 #endif
