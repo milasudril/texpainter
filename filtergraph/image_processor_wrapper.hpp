@@ -95,6 +95,8 @@ namespace Texpainter::FilterGraph
 
 		Proc& processor() { return m_proc; }
 
+		ImgProcReleaseState releaseState() const { return Proc::releaseState(); }
+
 	private:
 		Proc m_proc;
 	};

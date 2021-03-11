@@ -192,6 +192,8 @@ namespace Texpainter::FilterGraph
 
 		auto nodeId() const { return m_id; }
 
+		auto processorReleaseState() const { return m_proc->releaseState(); }
+
 		~Node()
 		{
 			std::ranges::for_each(r_consumers, [](auto const& item) {

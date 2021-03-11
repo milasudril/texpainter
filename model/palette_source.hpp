@@ -49,6 +49,8 @@ namespace Texpainter::Model
 
 		static constexpr auto id() { return FilterGraph::InvalidImgProcId; }
 
+		static constexpr auto releaseState() { return FilterGraph::ImgProcReleaseState::Stable; }
+
 		PaletteSource& source(std::reference_wrapper<Palette const> src)
 		{
 			r_pal = &src.get();

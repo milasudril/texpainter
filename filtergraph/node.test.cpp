@@ -84,6 +84,11 @@ namespace
 		{
 			return Texpainter::FilterGraph::ImageProcessorId{"32520701CBF9985E5E3866051A9FC52D"};
 		}
+
+		Texpainter::FilterGraph::ImgProcReleaseState releaseState() const override
+		{
+			return Texpainter::FilterGraph::ImgProcReleaseState::Stable;
+		}
 	};
 }
 

@@ -43,6 +43,8 @@ namespace Texpainter::Model
 		{
 			return FilterGraph::ImageProcessorId{"419ed08fefebb004dc85ee1d8771330c"};
 		}
+
+		static constexpr auto releaseState() { return FilterGraph::ImgProcReleaseState::Stable; }
 	};
 }
 

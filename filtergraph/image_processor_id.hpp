@@ -117,6 +117,13 @@ namespace Texpainter::FilterGraph
 	{
 		id = ImageProcessorId{obj.get<std::string>()};
 	}
+
+	enum class ImgProcReleaseState : int
+	{
+		Experimental,
+		Stable,
+		Deprecated
+	};
 }
 
 #endif

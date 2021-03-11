@@ -48,6 +48,8 @@ namespace Texpainter::Model
 
 		static constexpr auto id() { return FilterGraph::InvalidImgProcId; }
 
+		static constexpr auto releaseState() { return FilterGraph::ImgProcReleaseState::Stable; }
+
 		ImageSource& source(Span2d<FilterGraph::RgbaValue const> src)
 		{
 			r_pixels = src;

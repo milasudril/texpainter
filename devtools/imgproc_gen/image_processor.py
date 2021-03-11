@@ -10,7 +10,8 @@ class ImageProcessor:
 		description='',
 		category='',
 		impl_start=0,
-		user_includes_start=0):
+		user_includes_start=0,
+		release_state='Experimental'):
 		self.__name = name
 		self.__body = body
 		self.__user_includes = user_includes
@@ -22,6 +23,7 @@ class ImageProcessor:
 		self.__category = category
 		self.__impl_start = impl_start
 		self.__user_includes_start = user_includes_start
+		self.__release_state = release_state
 
 	def name(self):
 		return self.__name
@@ -55,3 +57,6 @@ class ImageProcessor:
 
 	def userIncludesStart(self):
 		return self.__user_includes_start
+
+	def releaseState(self):
+		return self.__release_state

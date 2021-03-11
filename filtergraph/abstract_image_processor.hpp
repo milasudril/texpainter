@@ -31,6 +31,7 @@ namespace Texpainter::FilterGraph
 		virtual std::unique_ptr<AbstractImageProcessor> clone() const               = 0;
 		virtual char const* name() const                                            = 0;
 		virtual ImageProcessorId id() const                                         = 0;
+		virtual ImgProcReleaseState releaseState() const                            = 0;
 		virtual ~AbstractImageProcessor()                                           = default;
 	};
 }

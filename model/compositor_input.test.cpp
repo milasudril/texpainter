@@ -51,6 +51,11 @@ namespace
 			return Texpainter::FilterGraph::ImageProcessorId{"66bc12285d8881c91ff74fcde23e992f"};
 		}
 
+		static constexpr auto releaseState()
+		{
+			return Texpainter::FilterGraph::ImgProcReleaseState::Stable;
+		}
+
 	private:
 		std::string m_name;
 	};

@@ -39,6 +39,11 @@ namespace Texpainter::FilterGraph
 			T::id()
 		}
 		->std::same_as<ImageProcessorId>;
+
+		{
+			T::releaseState()
+		}
+		->std::same_as<ImgProcReleaseState>;
 	}
 	&&std::copy_constructible<T>;
 }

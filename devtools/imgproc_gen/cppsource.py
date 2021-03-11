@@ -168,6 +168,7 @@ namespace $namespace_name
 {
 	using Texpainter::Size2d;
 	using Texpainter::FilterGraph::ImageProcessorId;
+	using Texpainter::FilterGraph::ImgProcReleaseState;
 	using Texpainter::FilterGraph::ImgProcArg;
 	using Texpainter::FilterGraph::ParamName;
 	using Texpainter::FilterGraph::ParamValue;
@@ -218,6 +219,8 @@ namespace $namespace_name
 
 		static constexpr char const* category() { return "$category"; }
 
+		static constexpr auto releaseState() { return ImgProcReleaseState::$release_state; }
+
 	private:
 		$param_map
 	};
@@ -257,5 +260,6 @@ def makeCppSource(imgproc, src_file):
 	main_substitutes['impl_start'] = str(imgproc.implStart())
 	main_substitutes['user_includes_start'] = str(imgproc.userIncludesStart())
 	main_substitutes['src_file'] = src_file
+	main_substitutes['release_state'] = imgproc.releaseState()
 
 	return template.substitute(main_substitutes)

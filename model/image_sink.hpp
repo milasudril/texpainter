@@ -51,6 +51,8 @@ namespace Texpainter::Model
 			return FilterGraph::ImageProcessorId{"4332d23feb31f1daf36caf312aca0911"};
 		}
 
+		static constexpr auto releaseState() { return FilterGraph::ImgProcReleaseState::Stable; }
+
 		void sink(Span2d<FilterGraph::RgbaValue> val) { r_pixels = val; }
 
 	private:

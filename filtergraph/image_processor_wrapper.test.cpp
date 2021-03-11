@@ -55,6 +55,11 @@ namespace
 			args_result = args;
 		}
 
+		static constexpr auto releaseState()
+		{
+			return Texpainter::FilterGraph::ImgProcReleaseState::Stable;
+		}
+
 		std::array<Texpainter::FilterGraph::ParamValue, 3> m_params{
 		    Texpainter::FilterGraph::ParamValue{1},
 		    Texpainter::FilterGraph::ParamValue{2},
@@ -172,6 +177,12 @@ namespace Testcases
 	{
 		Texpainter::FilterGraph::ImageProcessorWrapper obj{ImgProcStub{}};
 		assert(strcmp(obj.name(), ImgProcStub::name()) == 0);
+	}
+
+	void texpainterFilterGraphImageProcessorReleaseState()
+	{
+		Texpainter::FilterGraph::ImageProcessorWrapper obj{ImgProcStub{}};
+		assert(obj.releaseState() == ImgProcStub::releaseState());
 	}
 }
 
