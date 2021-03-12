@@ -28,23 +28,35 @@ namespace Texpainter::App
 		};
 
 	public:
+		struct SortButtons
+		{
+			SortButtons(Ui::Container& owner)
+			    : root{owner, Ui::Box::Orientation::Horizontal}
+			    , by_category{root.homogenous(true).insertMode(
+			                      Ui::Box::InsertMode{2, Ui::Box::Fill | Ui::Box::Expand}),
+			                  "category"}
+			    , by_name{root, "name"}
+			{
+			}
+			Ui::Box root;
+			Ui::Button by_category;
+			Ui::Button by_name;
+		};
+
 		explicit ImageProcessorSelector(Ui::Container& owner)
 		    : m_root{owner, Ui::Box::Orientation::Vertical}
 		    , m_search{m_root, Ui::Box::Orientation::Horizontal, "Search: "}
 		    , m_listbox{m_root.insertMode(Ui::Box::InsertMode{2, Ui::Box::Fill | Ui::Box::Expand})}
 		    , m_sort_buttons{m_root.insertMode(Ui::Box::InsertMode{2, 0}),
-		                     Ui::Box::Orientation::Horizontal}
-		    , m_by_category{m_sort_buttons.homogenous(true).insertMode(
-		                        Ui::Box::InsertMode{2, Ui::Box::Fill | Ui::Box::Expand}),
-		                    "By category"}
-		    , m_by_name{m_sort_buttons, "By name"}
+		                     Ui::Box::Orientation::Horizontal,
+		                     "Order by "}
 		    , m_separator{m_root}
 
 		{
 			set_by_category();
 			m_search.inputField().eventHandler<ControlId::Name>(*this).continuousUpdate(true);
-			m_by_category.eventHandler<ControlId::ByCategory>(*this);
-			m_by_name.eventHandler<ControlId::ByName>(*this);
+			m_sort_buttons.inputField().by_category.eventHandler<ControlId::ByCategory>(*this);
+			m_sort_buttons.inputField().by_name.eventHandler<ControlId::ByName>(*this);
 		}
 
 		char const* value() const { return m_listbox.get(m_listbox.selected()); }
@@ -75,23 +87,21 @@ namespace Texpainter::App
 		Ui::Box m_root;
 		Ui::LabeledInput<Ui::TextEntry> m_search;
 		Ui::Listbox m_listbox;
-		Ui::Box m_sort_buttons;
-		Ui::Button m_by_category;
-		Ui::Button m_by_name;
+		Ui::LabeledInput<SortButtons> m_sort_buttons;
 		Ui::Separator m_separator;
 		Ui::ErrorMessageDialog m_err_box;
 
 		void set_by_category()
 		{
-			m_by_category.state(true);
-			m_by_name.state(false);
+			m_sort_buttons.inputField().by_category.state(true);
+			m_sort_buttons.inputField().by_name.state(false);
 			reset_list(ImageProcessorRegistry::imageProcessorsByCategory());
 		}
 
 		void set_by_name()
 		{
-			m_by_category.state(false);
-			m_by_name.state(true);
+			m_sort_buttons.inputField().by_category.state(false);
+			m_sort_buttons.inputField().by_name.state(true);
 			reset_list(ImageProcessorRegistry::imageProcessorsByName());
 		}
 
@@ -109,7 +119,7 @@ namespace Texpainter::App
 
 		void select(char const* val)
 		{
-			auto const items = m_by_category.state()
+			auto const items = m_sort_buttons.inputField().by_category.state()
 			                       ? ImageProcessorRegistry::imageProcessorsByCategory()
 			                       : ImageProcessorRegistry::imageProcessorsByName();
 
