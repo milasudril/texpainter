@@ -54,3 +54,5 @@ void main(auto const& args, auto const& params)
 __Id:__ c5fdebcfc3b0a40c9edcceebacc5d288
 
 __Category:__ Arithmetic operators
+
+__Release state:__ Stable

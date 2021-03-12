@@ -37,3 +37,5 @@ inline void main(auto const& args)
 __Id:__ b50bf360be9b511bf8bc6129956f0158
 
 __Category:__ Arithmetic operators
+
+__Release state:__ Stable

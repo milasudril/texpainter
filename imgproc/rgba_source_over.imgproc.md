@@ -41,3 +41,5 @@ void main(auto const& args)
 __Id:__ b65334b771e511c1e4cc198d60ef792a
 
 __Category:__ Arithmetic operators
+
+__Release state:__ Stable

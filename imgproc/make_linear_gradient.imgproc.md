@@ -42,3 +42,5 @@ void main(auto const& args, auto const& params)
 __Id:__ d5024afd1121398e571ab0c29962d0cb
 
 __Category:__ Generators
+
+__Release state:__ Stable

@@ -89,3 +89,5 @@ __Category:__ Generators
 ## TODO:s
 
 * Add mode which fits the long diameter in addition to the short diameter
+
+__Release state:__ Stable

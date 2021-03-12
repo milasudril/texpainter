@@ -82,3 +82,5 @@ void main(auto const& args, auto const& params)
 __Id:__ c3847088432d8e2ead6e112d57a0ca22
 
 __Category:__ Converters
+
+__Release state:__ Stable

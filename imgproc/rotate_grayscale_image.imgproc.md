@@ -59,3 +59,5 @@ void main(auto const& args, auto const& params)
 __Id:__ 1227304b94eaf3c2db36165b2c8ae0f2
 
 __Category:__ Spatial transformations
+
+__Release state:__ Stable

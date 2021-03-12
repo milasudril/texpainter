@@ -45,3 +45,5 @@ void main(auto const& args, auto const& params)
 __Id:__ 1593892b70359b6cf53c08d7fe37840f
 
 __Category:__ Dynamic range adjustments
+
+__Release state:__ Stable

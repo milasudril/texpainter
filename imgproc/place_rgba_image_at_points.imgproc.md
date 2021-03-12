@@ -147,3 +147,5 @@ void main(auto const& args)
 __Id:__ f872b1455c56665160d5faa3e0eae98c
 
 __Category:__ Converters
+
+__Release state:__ Stable

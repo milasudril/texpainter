@@ -36,3 +36,5 @@ void main(auto const& args)
 __Id:__ 8f926e6ad5f96aaebc86f5f8bb70068e
 
 __Category:__ Generators
+
+__Release state:__ Stable

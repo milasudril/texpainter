@@ -40,3 +40,5 @@ void main(auto const& arg)
 __Id:__ d2763711c660c5f8a7bd761276cc6757
 
 __Category:__ Converters
+
+__Release state:__ Stable

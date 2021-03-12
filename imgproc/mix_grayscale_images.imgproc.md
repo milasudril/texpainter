@@ -46,3 +46,5 @@ void main(auto const& args)
 __Id:__ a3740f87b6396c3d80d5aa736a6fec39
 
 __Category:__ Arithmetic operators
+
+__Release state:__ Stable
