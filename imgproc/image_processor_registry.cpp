@@ -74,6 +74,7 @@ namespace
 	constexpr ImageProcessorDetailedInfo get_info()
 	{
 		return ImageProcessorDetailedInfo{Proc::id(),
+		                                  Proc::releaseState(),
 		                                  Proc::name(),
 		                                  Proc::category(),
 		                                  Texpainter::FilterGraph::createImageProcessor<Proc>};

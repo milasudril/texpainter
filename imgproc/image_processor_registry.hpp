@@ -20,6 +20,7 @@ namespace Texpainter::ImageProcessorRegistry
 	struct ImageProcessorInfo
 	{
 		FilterGraph::ImageProcessorId id;
+		FilterGraph::ImgProcReleaseState release_state;
 		char const* name;
 		char const* category;
 	};

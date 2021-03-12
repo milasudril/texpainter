@@ -24,7 +24,9 @@ namespace Texpainter::App
 			Name,
 			Listbox,
 			ByCategory,
-			ByName
+			ByName,
+			Experimental,
+			Deprecated
 		};
 
 	public:
@@ -43,6 +45,21 @@ namespace Texpainter::App
 			Ui::Button by_name;
 		};
 
+		struct FilterButtons
+		{
+			FilterButtons(Ui::Container& owner)
+			    : root{owner, Ui::Box::Orientation::Horizontal}
+			    , experimental{root.homogenous(true).insertMode(
+			                       Ui::Box::InsertMode{2, Ui::Box::Fill | Ui::Box::Expand}),
+			                   "experimental"}
+			    , deprecated{root, "deprecated"}
+			{
+			}
+			Ui::Box root;
+			Ui::Button experimental;
+			Ui::Button deprecated;
+		};
+
 		explicit ImageProcessorSelector(Ui::Container& owner)
 		    : m_root{owner, Ui::Box::Orientation::Vertical}
 		    , m_search{m_root, Ui::Box::Orientation::Horizontal, "Search: "}
@@ -50,6 +67,9 @@ namespace Texpainter::App
 		    , m_sort_buttons{m_root.insertMode(Ui::Box::InsertMode{2, 0}),
 		                     Ui::Box::Orientation::Horizontal,
 		                     "Order by "}
+		    , m_filter_buttons{m_root.insertMode(Ui::Box::InsertMode{2, 0}),
+		                       Ui::Box::Orientation::Horizontal,
+		                       "Show "}
 		    , m_separator{m_root}
 
 		{
@@ -57,6 +77,8 @@ namespace Texpainter::App
 			m_search.inputField().eventHandler<ControlId::Name>(*this).continuousUpdate(true);
 			m_sort_buttons.inputField().by_category.eventHandler<ControlId::ByCategory>(*this);
 			m_sort_buttons.inputField().by_name.eventHandler<ControlId::ByName>(*this);
+			m_filter_buttons.inputField().experimental.eventHandler<ControlId::Experimental>(*this);
+			m_filter_buttons.inputField().deprecated.eventHandler<ControlId::Deprecated>(*this);
 		}
 
 		char const* value() const { return m_listbox.get(m_listbox.selected()); }
@@ -88,8 +110,10 @@ namespace Texpainter::App
 		Ui::LabeledInput<Ui::TextEntry> m_search;
 		Ui::Listbox m_listbox;
 		Ui::LabeledInput<SortButtons> m_sort_buttons;
+		Ui::LabeledInput<FilterButtons> m_filter_buttons;
 		Ui::Separator m_separator;
 		Ui::ErrorMessageDialog m_err_box;
+		std::vector<ImageProcessorRegistry::ImageProcessorInfo> m_filtered_procs;
 
 		void set_by_category()
 		{
@@ -108,9 +132,27 @@ namespace Texpainter::App
 		void reset_list(std::span<ImageProcessorRegistry::ImageProcessorInfo const> imgprocs)
 		{
 			auto selected = m_listbox.get(m_listbox.selected());
+
+			m_filtered_procs.clear();
+			std::ranges::copy_if(
+			    imgprocs,
+			    std::back_inserter(m_filtered_procs),
+			    [show_experimental = m_filter_buttons.inputField().experimental.state(),
+			     show_deprecated   = m_filter_buttons.inputField().deprecated.state()](auto item) {
+				    return item.release_state == FilterGraph::ImgProcReleaseState::Stable
+				           || (show_experimental && show_deprecated)
+				           || (show_experimental
+				               && item.release_state
+				                      == FilterGraph::ImgProcReleaseState::Experimental)
+				           || (show_deprecated
+				               && item.release_state
+				                      == FilterGraph::ImgProcReleaseState::Deprecated);
+			    });
+
 			std::string sel{selected != nullptr ? selected : ""};
 			m_listbox.clear();
-			std::ranges::for_each(imgprocs,
+
+			std::ranges::for_each(m_filtered_procs,
 			                      [&list = m_listbox](auto item) { list.append(item.name); });
 			m_listbox.update();
 
@@ -119,15 +161,12 @@ namespace Texpainter::App
 
 		void select(char const* val)
 		{
-			auto const items = m_sort_buttons.inputField().by_category.state()
-			                       ? ImageProcessorRegistry::imageProcessorsByCategory()
-			                       : ImageProcessorRegistry::imageProcessorsByName();
+			auto i = std::ranges::find_if(m_filtered_procs, [val](auto const& item) {
+				return strcasestr(item.name, val) != nullptr;
+			});
+			if(i == std::end(m_filtered_procs)) { return; }
 
-			auto i = std::ranges::find_if(
-			    items, [val](auto const& item) { return strcasestr(item.name, val) != nullptr; });
-			if(i == std::end(items)) { return; }
-
-			auto const index = static_cast<int>(i - std::begin(items));
+			auto const index = static_cast<int>(i - std::begin(m_filtered_procs));
 			m_listbox.scrollIntoView(index).selected(index);
 		}
 	};
@@ -144,6 +183,28 @@ namespace Texpainter::App
 	    Ui::Button&)
 	{
 		set_by_name();
+	}
+
+	template<>
+	inline void ImageProcessorSelector::onClicked<ImageProcessorSelector::ControlId::Deprecated>(
+	    Ui::Button&)
+	{
+		if(m_sort_buttons.inputField().by_name.state()) { set_by_name(); }
+		else
+		{
+			set_by_category();
+		}
+	}
+
+	template<>
+	inline void ImageProcessorSelector::onClicked<ImageProcessorSelector::ControlId::Experimental>(
+	    Ui::Button&)
+	{
+		if(m_sort_buttons.inputField().by_name.state()) { set_by_name(); }
+		else
+		{
+			set_by_category();
+		}
 	}
 }
 
