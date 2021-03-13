@@ -244,10 +244,16 @@ namespace
 				imgproc.reset(dummy);
 			}
 
-			if(imgproc->releaseState() == Texpainter::FilterGraph::ImgProcReleaseState::Deprecated)
+			switch(imgproc->releaseState())
 			{
-				log(Texpainter::Logger::MessageType::Warning,
-				    toString(item.second.imgproc) + " is deprecated");
+				case Texpainter::FilterGraph::ImgProcReleaseState::Deprecated:
+					log(Texpainter::Logger::MessageType::Warning,
+					    toString(item.second.imgproc) + " is deprecated");
+					break;
+				case Texpainter::FilterGraph::ImgProcReleaseState::Experimental:
+					log(Texpainter::Logger::MessageType::Warning,
+					    toString(item.second.imgproc) + " is experimental");
+				default: break;
 			}
 
 			auto res = m_compositor.insert(std::move(imgproc));
