@@ -2,6 +2,7 @@
 
 #include "model/document.hpp"
 #include "pixel_store/image_io.hpp"
+#include "log/logger.hpp"
 
 #include <cstdio>
 #include <string_view>
@@ -19,6 +20,7 @@ int main(int argc, char** argv)
 {
 	try
 	{
+		Texpainter::Logger::logger(stderr);
 		if(argc < 2)
 		{
 			puts("Try texporter --help");

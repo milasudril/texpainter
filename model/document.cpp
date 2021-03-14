@@ -253,6 +253,7 @@ namespace
 				case Texpainter::FilterGraph::ImgProcReleaseState::Experimental:
 					log(Texpainter::Logger::MessageType::Warning,
 					    toString(item.second.imgproc) + " is experimental");
+					break;
 				default: break;
 			}
 

@@ -26,7 +26,7 @@ __Point distance:__ (= 1.0) The expected distance between two points. Notice tha
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include "utils/default_rng.hpp"
@@ -35,13 +35,13 @@ __Includes:__
 #include <cmath>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
-void main(auto const& args, auto const& params)
+void main(auto const& args, auto const&)
 {
 	auto& points = output<0>(args).get();
-	auto const I = sizeFromArea(args.canvasSize(), param<Str{"Point distance"}>(params));
+//	auto const I = sizeFromArea(args.canvasSize(), param<Str{"Point distance"}>(params));
 	auto const w = args.canvasSize().width();
 	auto const h = args.canvasSize().height();
 	std::uniform_real_distribution U{0.0, 1.0};
@@ -52,7 +52,7 @@ void main(auto const& args, auto const& params)
 		for(uint32_t col = 0; col < w; ++col)
 		{
 			auto val = U(rng);
-			if(val <= input<0>(args, col, row) / I)
+			if(val <= input<0>(args, col, row))
 			{
 				points.push_back(SpawnSpot{ImageCoordinates{col, row},
 				                           Angle{input<1>(args, col, row), Angle::Turns{}},
@@ -60,6 +60,7 @@ void main(auto const& args, auto const& params)
 			}
 		}
 	}
+	printf("%zu\n", points.size());
 }
 ```
 
