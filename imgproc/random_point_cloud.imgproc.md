@@ -22,11 +22,11 @@ __Point cloud:__ (Point cloud) The generated point cloud
 
 ## Parameters
 
-__Point distance:__ (= 1.0) The expected distance between two points. Notice that a higher value will result in a lower density.
+__Point intensity:__ (= 0.5)
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include "utils/default_rng.hpp"
@@ -35,16 +35,16 @@ __Includes:__
 #include <cmath>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
-void main(auto const& args, auto const&)
+void main(auto const& args, auto const& params)
 {
 	auto& points = output<0>(args).get();
-//	auto const I = sizeFromArea(args.canvasSize(), param<Str{"Point distance"}>(params));
+	auto const I = std::exp2(std::lerp(0.0, 12.0, param<Str{"Point intensity"}>(params).value()));
 	auto const w = args.canvasSize().width();
 	auto const h = args.canvasSize().height();
-	std::uniform_real_distribution U{0.0, 1.0};
+	std::uniform_real_distribution U{0.0, args.resolution() * args.resolution() * w * h / I};
 	auto& rng = Texpainter::DefaultRng::engine();
 
 	for(uint32_t row = 0; row < h; ++row)
@@ -60,7 +60,6 @@ void main(auto const& args, auto const&)
 			}
 		}
 	}
-	printf("%zu\n", points.size());
 }
 ```
 
@@ -70,4 +69,4 @@ __Id:__ bdb21855bb013b570a0bd47806d65f51
 
 __Category:__ Converters
 
-__Release state:__ Experimental
+__Release state:__ Stable
