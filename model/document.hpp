@@ -115,6 +115,10 @@ namespace Texpainter::Model
 
 		auto insert(ItemName const& name, Palette&& pal)
 		{
+			if(palettes().size() == 0)
+			{
+				currentColor(PixelStore::ColorIndex{0});
+			}
 			return insert(name, std::forward<Palette>(pal), *this, m_input_nodes);
 		}
 
