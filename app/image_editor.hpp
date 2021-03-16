@@ -406,12 +406,12 @@ namespace Texpainter::App
 			auto const brush    = m_doc.get().currentBrush();
 			auto const& imgdisp = img_ref->source.get();
 			auto brush_radius =
-			    std::floor(ScalingFactors::sizeFromGeomMean(imgdisp.size(), brush.radius()));
-			PixelStore::Image rendered_brush{Size2d{static_cast<uint32_t>(brush_radius + 2),
-			                                        static_cast<uint32_t>(brush_radius + 2)}};
+			    std::round(0.5 * ScalingFactors::sizeFromGeomMean(imgdisp.size(), brush.radius()));
+			PixelStore::Image rendered_brush{Size2d{static_cast<uint32_t>(2.0 * brush_radius + 2),
+			                                        static_cast<uint32_t>(2.0 * brush_radius + 2)}};
 			Model::paint(rendered_brush.pixels(),
-			             0.5 * vec2_t{brush_radius, brush_radius},
-			             0.5 * brush_radius,
+			             vec2_t{brush_radius, brush_radius},
+			             brush_radius,
 			             Model::BrushFunction{brush.shape()},
 			             color);
 			m_img_view.overlay(rendered_brush);
@@ -474,7 +474,7 @@ namespace Texpainter::App
 			{
 				m_draw_mode     = DrawMode::Erase;
 				auto brush      = m_doc.get().currentBrush();
-				auto radius_new = std::floor(std::clamp(brush.radius() + 1.0f / 32.0f, 0.0f, 1.0f));
+				auto radius_new = std::round(std::clamp(brush.radius() + 1.0f / 32.0f, 0.0f, 1.0f));
 				paint(m_doc, loc_window, radius_new, PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
 			}
 			on_updated(r_eh, *this);
