@@ -164,18 +164,7 @@ namespace Texpainter::App
 			m_start_win->start_dlg.eventHandler(*this);
 		}
 
-		[[nodiscard]] WindowManager(char const* filename)
-		    : m_document{load(Enum::Empty<Model::Document>{}, filename)}
-		    , m_window_count{m_windows.size()}
-		{
-			Enum::forEachEnumItem<WindowType>([this](auto item) {
-				m_windows.get<item.value>() = createWindow<item.value>(*m_document);
-			});
-
-			resetWindowPositions();
-
-			m_windows.get<WindowType::ImageEditor>()->window().show();
-		}
+		[[nodiscard]] WindowManager(char const* filename) { loadDocument(filename); }
 
 		void resetWindowPositions();
 
