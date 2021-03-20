@@ -216,11 +216,6 @@ private:
 
 		auto widget = GTK_WIDGET(m_handle);
 		auto w      = static_cast<uint32_t>(gtk_widget_get_allocated_width(widget));
-		auto h      = static_cast<uint32_t>(gtk_widget_get_allocated_height(widget));
-
-		if(w == 1 || h == 1)
-		{ return; }
-
 		if(w < m_min_size.width())
 		{
 			w = m_min_size.width();
@@ -239,8 +234,6 @@ private:
 		gtk_widget_set_size_request(widget,
 		                            std::max(-1, static_cast<int>(m_min_size.width())),
 		                            m_n_rows * m_min_size.height());
-	//	auto const e = gdk_event_new();
-
 	}
 
 	PixelStore::ColorIndex coordsToItem(vec2_t loc) const
