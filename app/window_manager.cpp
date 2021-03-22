@@ -72,6 +72,9 @@ void Texpainter::App::WindowManager::loadDocument(char const* filename)
 	if(auto editor = m_windows.get<WindowType::ImageEditor>().get(); editor != nullptr)
 	{
 		editor->window().show();
+
+		// Workaround for #23
+		Ui::Context::get().flush();
 		editor->widget().refresh();
 	}
 }

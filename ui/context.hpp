@@ -38,12 +38,14 @@ namespace Texpainter::Ui
 		template<class F, class... Args>
 		void scheduleAction(uint64_t iteration_offset, F&& func, Args&&... args)
 		{
-			m_actions.push(
-			    std::pair{m_event_index + iteration_offset,
-			              std::bind_front(std::forward<F>(func), std::forward<Args>(args)...)});
+			m_actions.push(ScheduledAction{
+			    m_event_index + iteration_offset,
+			    std::bind_front(std::forward<F>(func), std::forward<Args>(args)...)});
 		}
 
 		Size2d primaryWorkspaceSize() const;
+
+		void flush();
 
 
 	private:

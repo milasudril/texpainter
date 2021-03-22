@@ -660,6 +660,7 @@ namespace Texpainter::App
 			       "Texpainter documents"))
 			{
 				loadDocument(filename.c_str());
+				//Ui::Context::get().flush();
 				return true;
 			}
 			return false;
