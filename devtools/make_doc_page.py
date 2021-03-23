@@ -98,14 +98,14 @@ def make_index_page(index):
 
 def make_content_page(page):
 	with open(page) as f:
-		lines = ['[« Back](javascript:history.back())\n\n']
+		lines = ['[« To index](index.html)\n\n']
 		lines.extend(f.readlines())
 		return lines
 
 
 def make_menu_content_page(page, target_dir):
 	with open(page) as f:
-		lines = ['[« Back](javascript:history.back())\n\n']
+		lines = ['[« To index](index.html)\n\n']
 		lines.extend(f.readlines())
 
 	with subprocess.Popen([target_dir + '/dumpmenu'], stdout=subprocess.PIPE) as proc:
@@ -118,7 +118,7 @@ def make_menu_content_page(page, target_dir):
 
 def make_changelog(page):
 	with open(page) as f:
-		lines = ['[« Back](javascript:history.back())\n\n']
+		lines = ['[« To index](index.html)\n\n']
 		lines.extend(f.readlines())
 		log = vcs_info.get()['changelog']
 		header = [''] * len(log[0])
@@ -139,7 +139,7 @@ def make_about(page, target_dir):
 
 	vcsdata = vcs_info.get()
 
-	lines = ['[« Back](javascript:history.back())\n']
+	lines = ['[« To index](index.html)\n']
 	lines.append('\n')
 	lines.append('<header>\n')
 	lines.append('<h1>%s %s</h1>\n' % (data['name'], vcsdata['tag']))
