@@ -28,6 +28,7 @@
 #include "ui/filename_select.hpp"
 #include "ui/context.hpp"
 #include "ui/error_message_dialog.hpp"
+#include "utils/unique_function.hpp"
 
 #include <filesystem>
 
@@ -96,6 +97,7 @@ namespace Texpainter::App
 			Ui::Window owner{"Texpainter startup menu"};
 			StartDialog start_dlg{owner};
 		};
+
 	}
 
 	template<class T>
@@ -144,6 +146,7 @@ namespace Texpainter::App
 			    make_window_title<id>(doc).c_str(), *this, doc, std::forward<Args>(args)...);
 			ret->window().template eventHandler<id>(*this);
 			ret->widget().template eventHandler<id>(*this);
+			++m_window_count;
 			return ret;
 		}
 
@@ -154,17 +157,30 @@ namespace Texpainter::App
 		using ImageCreatorDlg          = Ui::Dialog<ImageCreator>;
 		using EmptyPaletteCreatorDlg   = Ui::Dialog<Ui::LabeledInput<Ui::TextEntry>>;
 		using PaletteGenerateDlg       = Ui::Dialog<PaletteCreator>;
+		using AskSaveDlg =
+		    Ui::Dialog<InheritFrom<UniqueFunction<void()>, Ui::Label>, Ui::DialogYesNoCancel>;
 
 		using Windows = Enum::Tuple<WindowType, WindowTypeTraits>;
 
+		enum class ControlId : int
+		{
+			AskSaveDlg
+		};
+
 	public:
-		[[nodiscard]] WindowManager(): m_start_win{std::make_unique<detail::StartWindow>()}
+		[[nodiscard]] WindowManager()
+		    : m_window_count{0}
+		    , m_may_close{false}
+		    , m_start_win{std::make_unique<detail::StartWindow>()}
 		{
 			m_start_win->owner.show().resize(Size2d{280, 200});
 			m_start_win->start_dlg.eventHandler(*this);
 		}
 
-		[[nodiscard]] WindowManager(char const* filename) { loadDocument(filename); }
+		[[nodiscard]] WindowManager(char const* filename): m_window_count{0}, m_may_close{false}
+		{
+			loadDocument(filename);
+		}
 
 		void resetWindowPositions();
 
@@ -201,13 +217,21 @@ namespace Texpainter::App
 		}
 
 		template<WindowType id>
-		void onClose(Ui::Window&)
+		void onClose(Ui::Window& window)
 		{
+			if(m_window_count == 1)
+			{
+				if(!okToClose(window, [this, &window]() { Ui::Context::get().exit(); })) { return; }
+			}
 			--m_window_count;
 			saveNodLocs();
 			m_document->windows(windowInfo());
 			m_windows.get<id>().reset();
-			if(m_window_count == 0) { Ui::Context::get().exit(); }
+			if(m_window_count == 0)
+			{
+				printf("Exiting now\n");
+				Ui::Context::get().exit();
+			}
 		}
 
 		template<auto id, class Source>
@@ -247,8 +271,10 @@ namespace Texpainter::App
 		}
 
 		template<class Source>
-		void onActivated(Enum::Tag<AppAction::Quit>, Ui::MenuItem&, Source&)
+		void onActivated(Enum::Tag<AppAction::Quit>, Ui::MenuItem&, Source& src)
 		{
+			if(!okToClose(src.window(), []() { Ui::Context::get().exit(); })) { return; }
+
 			Ui::Context::get().exit();
 		}
 
@@ -272,8 +298,6 @@ namespace Texpainter::App
 				{
 					window.resize(Size2d{800, 600 - 28});
 				}
-
-				++m_window_count;
 			}
 			else
 			{
@@ -628,6 +652,34 @@ namespace Texpainter::App
 			m_start_win->start_dlg.resetButtonState<id>();
 		}
 
+		template<ControlId>
+		void dismiss(AskSaveDlg&)
+		{
+			m_may_close = false;
+			m_ask_save.reset();
+		}
+
+		template<ControlId>
+		void confirmPositive(AskSaveDlg& src)
+		{
+			if(saveDocument(src.owner()))
+			{
+				m_may_close = true;
+				src.widget()();
+			}
+			m_may_close = false;
+			m_ask_save.reset();
+		}
+
+		template<ControlId>
+		void confirmNegative(AskSaveDlg& src)
+		{
+			m_may_close = true;
+			src.widget()();
+			m_may_close = false;
+			m_ask_save.reset();
+		}
+
 	private:
 		std::unique_ptr<Model::Document> m_document;
 
@@ -641,13 +693,31 @@ namespace Texpainter::App
 		std::unique_ptr<ImageCreatorDlg> m_img_creator;
 		std::unique_ptr<EmptyPaletteCreatorDlg> m_empty_pal_creator;
 		std::unique_ptr<PaletteGenerateDlg> m_gen_palette;
+		std::unique_ptr<AskSaveDlg> m_ask_save;
+		bool m_may_close;
 
 		std::unique_ptr<detail::StartWindow> m_start_win;
 
 		Ui::ErrorMessageDialog m_err_box;
 
+		bool okToClose(Ui::Container& dlg_owner, UniqueFunction<void()>&& cb)
+		{
+			if(m_document == nullptr || m_may_close) { return true; }
+
+			std::string msg{"Do you want to save the latest changes to "};
+			msg += m_document->filename();
+			msg += "?";
+			m_ask_save =
+			    std::make_unique<AskSaveDlg>(std::move(cb), dlg_owner, "Texpainter", msg.c_str());
+			m_ask_save->eventHandler<ControlId::AskSaveDlg>(*this);
+			return false;
+		}
+
 		bool openDocument(Ui::Container& dlg_owner)
 		{
+			if(!okToClose(dlg_owner, [this, &dlg_owner]() { openDocument(dlg_owner); }))
+			{ return false; }
+
 			std::filesystem::path filename;
 			if(Ui::filenameSelect(
 			       dlg_owner,
@@ -660,13 +730,12 @@ namespace Texpainter::App
 			       "Texpainter documents"))
 			{
 				loadDocument(filename.c_str());
-				//Ui::Context::get().flush();
 				return true;
 			}
 			return false;
 		}
 
-		void saveDocumentAs(Ui::Container& dlg_owner)
+		bool saveDocumentAs(Ui::Container& dlg_owner)
 		{
 			std::filesystem::path filename;
 			if(Ui::filenameSelect(
@@ -682,10 +751,12 @@ namespace Texpainter::App
 				saveDocument(filename.c_str());
 				m_document->filename(std::move(filename));
 				updateWindowTitles();
+				return true;
 			}
+			return false;
 		}
 
-		void saveDocumentCopy(Ui::Container& dlg_owner)
+		bool saveDocumentCopy(Ui::Container& dlg_owner)
 		{
 			std::filesystem::path filename;
 			if(Ui::filenameSelect(
@@ -697,7 +768,11 @@ namespace Texpainter::App
 				       return fileValid(Enum::Empty<Model::Document>{}, filename);
 			       },
 			       "Texpainter documents"))
-			{ saveDocument(filename.c_str()); }
+			{
+				saveDocument(filename.c_str());
+				return true;
+			}
+			return false;
 		}
 
 		void updateWindowTitles()
@@ -708,14 +783,11 @@ namespace Texpainter::App
 			});
 		}
 
-		void saveDocument(Ui::Container& dlg_owner)
+		bool saveDocument(Ui::Container& dlg_owner)
 		{
-			if(m_document->filename().empty())
-			{
-				saveDocumentAs(dlg_owner);
-				return;
-			}
+			if(m_document->filename().empty()) { return saveDocumentAs(dlg_owner); }
 			saveDocument(m_document->filename().c_str());
+			return true;
 		}
 
 		void saveDocument(char const* filename)
@@ -824,6 +896,9 @@ namespace Texpainter::App
 		template<auto action>
 		void createNewDoc(Ui::Window& owner)
 		{
+			if(!okToClose(owner, [this, &owner](){createNewDoc<action>(owner);}))
+			{ return; }
+
 			if(m_doc_creator == nullptr) [[likely]]
 				{
 					m_doc_creator = std::make_unique<DocumentCreatorDlg>(

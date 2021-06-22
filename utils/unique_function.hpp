@@ -22,7 +22,7 @@ namespace Texpainter
 
 		template<class F,
 		         std::enable_if_t<!std::is_same_v<std::decay_t<F>, UniqueFunction>, int> = 0>
-		explicit UniqueFunction(F&& obj)
+		UniqueFunction(F&& obj)
 		    : m_data{new std::decay_t<F>{std::forward<F>(obj)}}
 		    , r_callback{callback<std::decay_t<F>>}
 		    , r_dtor{dtor<std::decay_t<F>>}
