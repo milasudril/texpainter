@@ -896,8 +896,7 @@ namespace Texpainter::App
 		template<auto action>
 		void createNewDoc(Ui::Window& owner)
 		{
-			if(!okToClose(owner, [this, &owner](){createNewDoc<action>(owner);}))
-			{ return; }
+			if(!okToClose(owner, [this, &owner]() { createNewDoc<action>(owner); })) { return; }
 
 			if(m_doc_creator == nullptr) [[likely]]
 				{
