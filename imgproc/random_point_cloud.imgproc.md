@@ -44,7 +44,7 @@ void main(auto const& args, auto const& params)
 	auto const I = std::exp2(std::lerp(0.0, 12.0, param<Str{"Point intensity"}>(params).value()));
 	auto const w = args.canvasSize().width();
 	auto const h = args.canvasSize().height();
-	std::uniform_real_distribution U{0.0, args.resolution() * args.resolution() * w * h / I};
+	std::uniform_real_distribution U{0.0, w * h / I};
 	auto& rng = Texpainter::DefaultRng::engine();
 
 	for(uint32_t row = 0; row < h; ++row)
