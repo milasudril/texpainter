@@ -26,17 +26,19 @@ namespace Texpainter::FilterGraph
 		GrayscaleComplexPixels,
 		TopographyData,
 		PointCloud,
-		Palette
+		Palette,
+		PolylineSet
 	};
 
 	constexpr PortType begin(Enum::Empty<PortType>) { return PortType::RgbaPixels; }
-	constexpr PortType end(Enum::Empty<PortType>) { return Enum::add(PortType::Palette); }
+	constexpr PortType end(Enum::Empty<PortType>) { return Enum::add(PortType::PolylineSet); }
 
 	using RgbaValue      = PixelStore::Pixel;
 	using RealValue      = double;
 	using ComplexValue   = std::complex<RealValue>;
 	using Palette        = PixelStore::Palette<16>;
 	using TopographyInfo = Model::TopographyInfo;
+	using PolylineSet    = std::vector<std::vector<vec2_t>>;
 
 	struct ImageCoordinates
 	{
@@ -104,6 +106,14 @@ namespace Texpainter::FilterGraph
 	struct PortTypeToType<PortType::Palette>
 	{
 		using type = Palette;
+
+		static type createValue(Size2d) { return type{}; }
+	};
+
+	template<>
+	struct PortTypeToType<PortType::PolylineSet>
+	{
+		using type = PolylineSet;
 
 		static type createValue(Size2d) { return type{}; }
 	};

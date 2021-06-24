@@ -47,7 +47,9 @@
 //@		"./select_rgba_image.imgproc.hpp",
 //@		"./make_linear_gradient.imgproc.hpp",
 //@		"./select_min_grayscale.imgproc.hpp",
-//@		"./select_max_grayscale.imgproc.hpp"
+//@		"./select_max_grayscale.imgproc.hpp",
+//@		"./steepest_descent.imgproc.hpp",
+//@		"./render_polylines.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -129,7 +131,9 @@ namespace
 	    get_info<::SelectRgbaImage::ImageProcessor>(),
 	    get_info<::MakeLinearGradient::ImageProcessor>(),
 	    get_info<::SelectMinGrayscale::ImageProcessor>(),
-	    get_info<::SelectMaxGrayscale::ImageProcessor>()
+	    get_info<::SelectMaxGrayscale::ImageProcessor>(),
+	    get_info<::SteepestDescent::ImageProcessor>(),
+	    get_info<::RenderPolylines::ImageProcessor>(),
 	};
 
 	template<class Keys, class Value, class Compare>

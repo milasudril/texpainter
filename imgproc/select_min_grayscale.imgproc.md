@@ -14,23 +14,23 @@ __Output:__ (Grayscale image)
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <algorithm>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& args)
 {
 	auto const size = area(args.canvasSize());
 
-	std::transform(input<0>(args),
-	               input<0>(args) + size,
-	               input<1>(args),
-	               output<0>(args), [](auto a, auto b){ return std::min(a, b); });
+	std::transform(
+	    input<0>(args), input<0>(args) + size, input<1>(args), output<0>(args), [](auto a, auto b) {
+		    return std::min(a, b);
+	    });
 }
 ```
 

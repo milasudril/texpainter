@@ -186,6 +186,7 @@ namespace $namespace_name
 		using Texpainter::FilterGraph::TopographyInfo;
 		using Texpainter::FilterGraph::ImageCoordinates;
 		using Texpainter::FilterGraph::SpawnSpot;
+		using Texpainter::FilterGraph::PolylineSet;
 		using Texpainter::AxisAlignedBoundingBox;
 		using Texpainter::vec2_t;
 		using Texpainter::Angle;
