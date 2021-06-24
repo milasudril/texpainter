@@ -14,7 +14,7 @@ __Output:__ (Polyline set)
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <algorithm>
@@ -22,13 +22,12 @@ __Includes:__
 #include <numbers>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 void main(auto const& args)
 {
 	auto const& points = input<1>(args);
-	printf("num points: %zu\n", std::size(points.get()));
 	std::ranges::for_each(points.get(), [&args, size = args.canvasSize()](auto const& item) {
 		auto loc = vec2_t{static_cast<double>(item.loc.x), static_cast<double>(item.loc.y)};
 		std::vector<vec2_t> points;
