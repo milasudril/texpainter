@@ -14,7 +14,7 @@ __Output:__ (Polyline set)
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <algorithm>
@@ -22,7 +22,7 @@ __Includes:__
 #include <numbers>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& args)

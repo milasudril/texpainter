@@ -49,7 +49,9 @@
 //@		"./select_min_grayscale.imgproc.hpp",
 //@		"./select_max_grayscale.imgproc.hpp",
 //@		"./steepest_descent.imgproc.hpp",
-//@		"./render_polylines.imgproc.hpp"
+//@		"./render_polylines.imgproc.hpp",
+//@		"./gradient_size_from_normal_vector.imgproc.hpp",
+//@		"./subtract_grayscale_images.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -134,7 +136,8 @@ namespace
 	    get_info<::SelectMaxGrayscale::ImageProcessor>(),
 	    get_info<::SteepestDescent::ImageProcessor>(),
 	    get_info<::RenderPolylines::ImageProcessor>(),
-	};
+	    get_info<::GradientSizeFromNormalVector::ImageProcessor>(),
+	    get_info<::SubtractGrayscaleImages::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
