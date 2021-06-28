@@ -7,7 +7,12 @@
 					"Wconversion",
 					"Wall",
 					"Werror",
-					"Wextra"
+					"Wextra",
+					"fassociative-math",
+					"freciprocal-math",
+					"fno-signed-zeros",
+					"fno-trapping-math",
+					"fno-math-errno"
 				]
 			},
 			"filename_exts": [
