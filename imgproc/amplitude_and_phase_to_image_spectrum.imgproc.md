@@ -14,19 +14,20 @@ __Result:__ (Image spectrum) The resulting image spectrum
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <algorithm>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& arg)
 {
 	auto size = area(arg.canvasSize());
-	std::transform(input<0>(arg), input<0>(arg) + size, input<1>(arg), output<0>(arg), std::polar<double>);
+	std::transform(
+	    input<0>(arg), input<0>(arg) + size, input<1>(arg), output<0>(arg), std::polar<double>);
 }
 ```
 

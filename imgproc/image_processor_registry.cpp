@@ -53,7 +53,8 @@
 //@		"./gradient_size_from_normal_vector.imgproc.hpp",
 //@		"./subtract_grayscale_images.imgproc.hpp",
 //@		"./amplitude_and_phase_to_image_spectrum.imgproc.hpp",
-//@		"./make_spiral.imgproc.hpp"
+//@		"./make_spiral.imgproc.hpp",
+//@		"./grayscale_exp_distortion.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -140,9 +141,9 @@ namespace
 	    get_info<::RenderPolylines::ImageProcessor>(),
 	    get_info<::GradientSizeFromNormalVector::ImageProcessor>(),
 	    get_info<::SubtractGrayscaleImages::ImageProcessor>(),
-		get_info<::AmplitudeAndPhaseToImageSpectrum::ImageProcessor>(),
-		get_info<::MakeSpiral::ImageProcessor>()
-	};
+	    get_info<::AmplitudeAndPhaseToImageSpectrum::ImageProcessor>(),
+	    get_info<::MakeSpiral::ImageProcessor>(),
+	    get_info<::GrayscaleExpDistortion::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;

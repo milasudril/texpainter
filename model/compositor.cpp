@@ -82,7 +82,7 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
 	    [&workers = m_workers, size = canvas.size(), resolution, &task_counter](auto& item) {
 		    workers.addTask([&item, size, resolution, &task_counter]() {
 			    item.counter->waitAndReset(item.node.get().inputPorts().size());
-				_mm_setcsr(_mm_getcsr() | 0x8040);  // Denormals are zero
+			    _mm_setcsr(_mm_getcsr() | 0x8040);  // Denormals are zero
 			    item.node(size, resolution);
 			    std::ranges::for_each(item.signal_counters, [](auto& counter) {
 				    std::ranges::for_each(counter, [](auto value) { ++(*value); });
