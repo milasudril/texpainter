@@ -32,13 +32,13 @@ namespace Texpainter::PixelStore
 		}
 
 		template<class T>
-		Imath::Int64 tellp(T& handle)
+		uint64_t tellp(T& handle)
 		{
 			return tell(handle);
 		}
 
 		template<class T>
-		void seekp(T& handle, Imath::Int64 pos)
+		void seekp(T& handle, uint64_t pos)
 		{
 			(void)seek(handle, pos);
 		}
@@ -56,9 +56,9 @@ namespace Texpainter::PixelStore
 
 		void write(char const* buffer, int n) override { detail::write(m_writer, buffer, n); }
 
-		Imath::Int64 tellp() override { return detail::tellp(m_writer); }
+		uint64_t tellp() override { return detail::tellp(m_writer); }
 
-		void seekp(Imath::Int64 pos) override { detail::seekp(m_writer, pos); }
+		void seekp(uint64_t pos) override { detail::seekp(m_writer, pos); }
 
 	private:
 		FileWriter m_writer;
@@ -76,9 +76,9 @@ namespace Texpainter::PixelStore
 
 		bool read(char* buffer, int n) override { return detail::read(m_reader, buffer, n); }
 
-		Imath::Int64 tellg() override { return detail::tellp(m_reader); }
+		uint64_t tellg() override { return detail::tellp(m_reader); }
 
-		void seekg(Imath::Int64 pos) override { detail::seekp(m_reader, pos); }
+		void seekg(uint64_t pos) override { detail::seekp(m_reader, pos); }
 
 		void clear() override {}
 

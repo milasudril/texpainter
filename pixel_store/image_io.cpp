@@ -7,6 +7,8 @@
 #include <OpenEXR/ImfChannelList.h>
 #include <OpenEXR/ImfArray.h>
 #include <OpenEXR/ImfTestFile.h>
+#include <OpenEXR/ImfHeader.h>
+#include <OpenEXR/ImfFrameBuffer.h>
 
 Texpainter::PixelStore::Image Texpainter::PixelStore::load(Enum::Empty<Image>,
                                                            void* arg,
