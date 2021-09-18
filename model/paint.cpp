@@ -19,11 +19,11 @@ void Texpainter::Model::paint(Span2d<PixelStore::Pixel> pixels,
 	auto const end_coords   = origin + r_vec;
 
 	for(uint32_t row = static_cast<uint32_t>(begin_coords[1]);
-	    row <= static_cast<uint32_t>(end_coords[1]);
+	    row != static_cast<uint32_t>(end_coords[1]) + 1u;
 	    ++row)
 	{
 		for(uint32_t col = static_cast<uint32_t>(begin_coords[0]);
-		    col <= static_cast<uint32_t>(end_coords[0]);
+		    col != static_cast<uint32_t>(end_coords[0]) + 1u;
 		    ++col)
 		{
 			auto const loc_ret = vec2_t{static_cast<double>(col), static_cast<double>(row)};
