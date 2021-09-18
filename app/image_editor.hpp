@@ -474,7 +474,7 @@ namespace Texpainter::App
 			{
 				m_draw_mode     = DrawMode::Erase;
 				auto brush      = m_doc.get().currentBrush();
-				auto radius_new = std::round(std::clamp(brush.radius() + 1.0f / 32.0f, 0.0f, 1.0f));
+				auto radius_new = std::clamp(brush.radius() + 1.0f / 32.0f, 0.0f, 1.0f);
 				paint(m_doc, loc_window, radius_new, PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
 			}
 			on_updated(r_eh, *this);
