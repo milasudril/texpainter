@@ -31,35 +31,19 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel>,
                                             double) const
 {
 	assert(valid());
-#if 0
 	if(m_node_array.size() == 0) [[unlikely]]
 		{
-			std::vector<NodeState> nodes;
+			std::vector<std::reference_wrapper<FilterGraph::Node const>> nodes;
 			nodes.reserve(m_graph.size());
 			processGraphNodeRecursive(
 			    [&nodes](auto const& node, auto) {
-				    nodes.push_back(NodeState{std::cref(node),
-				                              std::make_unique<Sched::SignalingCounter<size_t>>()});
-
-				    // NOTE: This works because we are visiting nodes in topological order. Thus, it is
-				    //       known that all sources have been added to nodes.
-				    auto& item = nodes.back();
-				    std::ranges::for_each(
-				        item.node.get().inputs(),
-				        [&nodes, counter = item.counter.get()](auto& ref) {
-					        auto i = std::ranges::find_if(
-					            nodes, [&value = ref.processor()](auto const& item) {
-						            return &item.node.get() == &value;
-					            });
-					        assert(i != std::end(nodes));
-					        i->signal_counters[ref.port().value()].push_back(counter);
-				        });
-
+				    nodes.push_back(std::ref(node));
 				    return GraphProcessing::Continue;
 			    },
 			    *r_output_node);
 			m_node_array = std::move(nodes);
 		}
+#if 0
 
 	r_output->sink(canvas);
 
