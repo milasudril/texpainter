@@ -51,10 +51,14 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas, do
 	//       in case we already have computed the output result.
 	r_output_node->forceUpdate();
 
-	std::list<std::pair<std::reference_wrapper<FilterGraph::Node const>, bool>> task_list;
-	std::ranges::transform(m_node_array, std::back_inserter(task_list), [](auto item){
-		return std::pair{item, false};
-	});
+	std::list<std::tuple<std::reference_wrapper<FilterGraph::Node const>, bool, size_t>> task_list;
+	std::ranges::transform(m_node_array,
+	                       std::back_inserter(task_list),
+	                       [index = static_cast<size_t>(0)](auto item) mutable {
+		                       return std::tuple{item, false, index++};
+	                       });
+
+	std::vector<std::atomic<bool>> task_results(std::size(task_list));
 
 #if 0
 
