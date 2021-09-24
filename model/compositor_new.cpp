@@ -7,6 +7,7 @@
 #include "utils/graphutils.hpp"
 
 #include <limits>
+#include <list>
 
 Texpainter::FilterGraph::ValidationResult Texpainter::Model::validate(Compositor const& g)
 {
@@ -20,14 +21,13 @@ Texpainter::FilterGraph::ValidationResult Texpainter::Model::validate(Compositor
 			    result = ValidationResult::CyclicConnections;
 			    return GraphProcessing::Stop;
 		    }
-			return GraphProcessing::Continue;
+		    return GraphProcessing::Continue;
 	    },
 	    *g.node(Compositor::OutputNodeId));
 	return result;
 }
 
-void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
-                                            double) const
+void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas, double) const
 {
 	assert(valid());
 	if(m_node_array.size() == 0) [[unlikely]]
@@ -50,6 +50,12 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
 	//       recompute the output node. Otherwise, the contents of ret will be undefined,
 	//       in case we already have computed the output result.
 	r_output_node->forceUpdate();
+
+	std::list<std::pair<std::reference_wrapper<FilterGraph::Node const>, bool>> task_list;
+	std::ranges::transform(m_node_array, std::back_inserter(task_list), [](auto item){
+		return std::pair{item, false};
+	});
+
 #if 0
 
 	Sched::SignalingCounter<size_t> task_counter;

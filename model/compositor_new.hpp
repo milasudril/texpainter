@@ -3,8 +3,8 @@
 //@	 ,"dependencies_extra":[{"ref":"compositor_new.o","rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_MODEL_COMPOSITOR_HPP
-#define TEXPAINTER_MODEL_COMPOSITOR_HPP
+#ifndef TEXPAINTER_MODEL_COMPOSITORNEW_HPP
+#define TEXPAINTER_MODEL_COMPOSITORNEW_HPP
 
 #include "./image_sink.hpp"
 
