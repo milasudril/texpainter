@@ -7,7 +7,6 @@
 #define TEXPAINTER_MODEL_COMPOSITOR_HPP
 
 #include "./image_sink.hpp"
-#include "./topography_sink.hpp"
 
 #include "filtergraph/graph.hpp"
 #include "pixel_store/image.hpp"
@@ -40,18 +39,9 @@ namespace Texpainter::Model
 		{
 			using FilterGraph::ImageProcessorWrapper;
 
-			{
-				auto output   = std::make_unique<ImageProcessorWrapper<ImageSink>>(ImageSink{});
-				r_output      = &output->processor();
-				r_output_node = &m_graph.insert(std::move(output)).second.get();
-			}
-
-			{
-				auto output =
-				    std::make_unique<ImageProcessorWrapper<TopographySink>>(TopographySink{});
-				r_topo_output      = &output->processor();
-				r_topo_output_node = &m_graph.insert(std::move(output)).second.get();
-			}
+			auto output   = std::make_unique<ImageProcessorWrapper<ImageSink>>(ImageSink{});
+			r_output      = &output->processor();
+			r_output_node = &m_graph.insert(std::move(output)).second.get();
 		}
 
 		Compositor(Compositor const& other) = delete;
@@ -153,9 +143,6 @@ namespace Texpainter::Model
 
 		ImageSink* r_output;
 		FilterGraph::Node* r_output_node;
-
-		TopographySink* r_topo_output;
-		FilterGraph::Node* r_topo_output_node;
 
 		FilterGraph::Graph m_graph;
 	};
