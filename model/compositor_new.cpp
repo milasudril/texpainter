@@ -6,7 +6,9 @@
 
 #include "utils/graphutils.hpp"
 
-#include <limits>
+#include "sched/event.hpp"
+#include "sched/signaling_counter.hpp"
+
 #include <list>
 
 Texpainter::FilterGraph::ValidationResult Texpainter::Model::validate(Compositor const& g)
@@ -59,6 +61,25 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas, do
 	                       });
 
 	std::vector<std::atomic<bool>> task_results(std::size(task_list));
+
+	auto i = std::begin(task_list);
+	Sched::Event e;
+#if 0
+	auto wrap_iterator = [&task_list, &i, &e]() {
+		if(i == std::end(task_list))
+		{
+			i = std::begin(task_list);
+			e.waitAndReset();
+		}
+	};
+#endif
+
+	Sched::SignalingCounter<size_t> counter;
+//	size_t num_tasks = 0;
+	while(!task_list.empty())
+	{
+		i=task_list.erase(i);
+	}
 
 #if 0
 
