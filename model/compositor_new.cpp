@@ -7,7 +7,6 @@
 #include "utils/graphutils.hpp"
 
 #include <limits>
-#include <xmmintrin.h>
 
 Texpainter::FilterGraph::ValidationResult Texpainter::Model::validate(Compositor const& g)
 {
@@ -27,7 +26,7 @@ Texpainter::FilterGraph::ValidationResult Texpainter::Model::validate(Compositor
 	return result;
 }
 
-void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel>,
+void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
                                             double) const
 {
 	assert(valid());
@@ -43,7 +42,6 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel>,
 			    *r_output_node);
 			m_node_array = std::move(nodes);
 		}
-#if 0
 
 	r_output->sink(canvas);
 
@@ -52,6 +50,7 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel>,
 	//       recompute the output node. Otherwise, the contents of ret will be undefined,
 	//       in case we already have computed the output result.
 	r_output_node->forceUpdate();
+#if 0
 
 	Sched::SignalingCounter<size_t> task_counter;
 
