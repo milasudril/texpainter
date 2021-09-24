@@ -118,15 +118,7 @@ namespace Texpainter::Model
 		auto nodeData() const { return FilterGraph::nodeData(m_graph); }
 
 	private:
-		struct NodeState
-		{
-			using Node = FilterGraph::Node;
-			std::reference_wrapper<Node const> node;
-			std::unique_ptr<Sched::SignalingCounter<size_t>> counter;
-			std::array<std::vector<Sched::SignalingCounter<size_t>*>, Node::MaxNumOutputs>
-			    signal_counters{};
-		};
-		mutable std::vector<NodeState> m_node_array;
+		mutable std::vector<std::reference_wrapper<FilterGraph::Node const>> m_node_array;
 		mutable Texpainter::Sched::ThreadPool m_workers;
 
 		enum class ValidationState : size_t

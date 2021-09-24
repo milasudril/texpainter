@@ -15,30 +15,23 @@ Texpainter::FilterGraph::ValidationResult Texpainter::Model::validate(Compositor
 
 	ValidationResult result{ValidationResult::NoError};
 	processGraphNodeRecursive(
-	    [&result]<class Tag>(auto const& node, Tag) {
+	    [&result]<class Tag>(auto const&, Tag) {
 		    if constexpr(Tag::value == GraphProcessingEvent::LoopDetected)
 		    {
 			    result = ValidationResult::CyclicConnections;
 			    return GraphProcessing::Stop;
 		    }
-		    else if constexpr(Tag::value == GraphProcessingEvent::ProcessNode)
-		    {
-			    if(!isConnected(node))
-			    {
-				    result = ValidationResult::InputsNotConnected;
-				    return GraphProcessing::Stop;
-			    }
-			    return GraphProcessing::Continue;
-		    }
+			return GraphProcessing::Continue;
 	    },
 	    *g.node(Compositor::OutputNodeId));
 	return result;
 }
 
-void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
-                                            double resolution) const
+void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel>,
+                                            double) const
 {
 	assert(valid());
+#if 0
 	if(m_node_array.size() == 0) [[unlikely]]
 		{
 			std::vector<NodeState> nodes;
@@ -93,4 +86,5 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
 
 	std::ranges::for_each(m_node_array, schedule_task);
 	task_counter.waitAndReset(m_node_array.size());
+#endif
 }
