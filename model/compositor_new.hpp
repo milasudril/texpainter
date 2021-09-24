@@ -10,15 +10,11 @@
 
 #include "filtergraph/graph.hpp"
 #include "pixel_store/image.hpp"
-#include "utils/iter_pair.hpp"
-#include "utils/pair_iterator.hpp"
 #include "sched/signaling_counter.hpp"
 #include "sched/thread_pool.hpp"
 
 #define JSON_USE_IMPLICIT_CONVERSIONS 0
 #include <nlohmann/json.hpp>
-
-#include <algorithm>
 
 namespace Texpainter::Model
 {
