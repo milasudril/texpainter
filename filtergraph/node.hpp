@@ -164,6 +164,11 @@ namespace Texpainter::FilterGraph
 			return *this;
 		}
 
+		static constexpr auto maxNumInputs()
+		{
+			return NodeArgument::MaxNumInputs;
+		}
+
 		bool isConnected(InputPortIndex input) const
 		{
 			assert(input.value() < NodeArgument::MaxNumInputs);

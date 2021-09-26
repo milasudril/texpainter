@@ -121,6 +121,17 @@ namespace Texpainter::Model
 		mutable std::vector<std::reference_wrapper<FilterGraph::Node const>> m_node_array;
 		mutable Texpainter::Sched::ThreadPool m_workers;
 
+		struct Task
+		{
+			using Node = FilterGraph::Node;
+
+			enum class Status:int{WaitingForInputs, Ready};
+
+			std::reference_wrapper<Node const> node;
+			std::array<size_t, Node::maxNumInputs()> task_inputs;
+			Status status;
+		};
+
 		enum class ValidationState : size_t
 		{
 			NotValidated,
