@@ -14,8 +14,9 @@ namespace Texpainter::FilterGraph
 	class NodeOutput
 	{
 	public:
-		explicit NodeOutput(Node& source):m_last_modified{1}, m_last_rendered{0}, m_source{source}
-		{}
+		explicit NodeOutput(Node& source): m_last_modified{1}, m_last_rendered{0}, m_source{source}
+		{
+		}
 
 		Node::result_type const& result() const { return m_result; }
 
@@ -29,32 +30,29 @@ namespace Texpainter::FilterGraph
 		bool modifyNode(Mutator&& mut)
 		{
 			if(!mut(m_source.get())) [[unlikely]]
-			{ return false; }
+				{
+					return false;
+				}
 
 			m_last_modified = m_last_rendered + 1;
 			return true;
 		}
 
-		Node const& source() const
-		{
-			return m_source.get();
-		}
+		Node const& source() const { return m_source.get(); }
 
 		template<class NodeOutputMap>
-		void render(NodeOutputMap const& result_map, Size2d size,  double resolution)
+		void render(NodeOutputMap const& result_map, Size2d size, double resolution)
 		{
 			auto const& src = m_source.get();
 			std::array<InputPortValue, NodeArgument::MaxNumInputs> args{};
-			std::ranges::transform(src.inputs(),
-			               std::begin(args),
-			               [&result_map](auto const& val) {
-							   assert(val.valid());
-							   auto& src = val.processor();
-							   auto i = result_map.find(src.nodeId());
-							   assert(i != std::end(result_map));
-				               return makeInputPortValue(i->second.result());
-			               });
-			m_result = src.processor()(NodeArgument{size, resolution, args});
+			std::ranges::transform(src.inputs(), std::begin(args), [&result_map](auto const& val) {
+				assert(val.valid());
+				auto& src = val.processor();
+				auto i    = result_map.find(src.nodeId());
+				assert(i != std::end(result_map));
+				return makeInputPortValue(i->second.result());
+			});
+			m_result        = src.processor()(NodeArgument{size, resolution, args});
 			m_last_rendered = m_last_modified;
 		}
 
@@ -78,12 +76,16 @@ namespace Texpainter::FilterGraph
 		for(size_t k = 0; k != std::size(inputs); ++k)
 		{
 			if(!inputs[k].valid()) [[unlikely]]
-			{ continue; }
+				{
+					continue;
+				}
 
 			auto& src = inputs[k].processor();
-			auto i = result_map.find(src.nodeId());
+			auto i    = result_map.find(src.nodeId());
 			if(i == std::end(result_map)) [[unlikely]]
-			{ continue; }
+				{
+					continue;
+				}
 
 			last_updated = std::max(lastUpdated(i->second, result_map), last_updated);
 		}
