@@ -9,9 +9,11 @@
 #include "./image_sink.hpp"
 
 #include "filtergraph/graph.hpp"
+
 #include "pixel_store/image.hpp"
 #include "sched/signaling_counter.hpp"
 #include "sched/thread_pool.hpp"
+
 
 #define JSON_USE_IMPLICIT_CONVERSIONS 0
 #include <nlohmann/json.hpp>
@@ -125,7 +127,11 @@ namespace Texpainter::Model
 		{
 			using Node = FilterGraph::Node;
 
-			enum class Status:int{WaitingForInputs, Ready};
+			enum class Status : int
+			{
+				WaitingForInputs,
+				Ready
+			};
 
 			std::reference_wrapper<Node const> node;
 			std::array<size_t, Node::maxNumInputs()> task_inputs;

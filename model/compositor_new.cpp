@@ -30,8 +30,7 @@ Texpainter::FilterGraph::ValidationResult Texpainter::Model::validate(Compositor
 	return result;
 }
 
-void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
-                                            double) const
+void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas, double) const
 {
 	assert(valid());
 	if(m_node_array.size() == 0) [[unlikely]]
