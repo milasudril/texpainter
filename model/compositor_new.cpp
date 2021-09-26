@@ -10,6 +10,7 @@
 #include "sched/signaling_counter.hpp"
 
 #include <list>
+#include <xmmintrin.h>  // _mm_setcsr
 
 Texpainter::FilterGraph::ValidationResult Texpainter::Model::validate(Compositor const& g)
 {
@@ -29,11 +30,13 @@ Texpainter::FilterGraph::ValidationResult Texpainter::Model::validate(Compositor
 	return result;
 }
 
-void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas, double) const
+void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
+                                            double) const
 {
 	assert(valid());
 	if(m_node_array.size() == 0) [[unlikely]]
 		{
+			// TODO: prune disconnected branches
 			std::vector<std::reference_wrapper<FilterGraph::Node const>> nodes;
 			nodes.reserve(m_graph.size());
 			processGraphNodeRecursive(
@@ -60,11 +63,11 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas, do
 		                       return std::tuple{item, false, index++};
 	                       });
 
-	std::vector<std::atomic<bool>> task_results(std::size(task_list));
+	std::vector<std::atomic<bool>> status(std::size(task_list));
 
+#if 0
 	auto i = std::begin(task_list);
 	Sched::Event e;
-#if 0
 	auto wrap_iterator = [&task_list, &i, &e]() {
 		if(i == std::end(task_list))
 		{
@@ -72,14 +75,37 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas, do
 			e.waitAndReset();
 		}
 	};
-#endif
 
 	Sched::SignalingCounter<size_t> counter;
-//	size_t num_tasks = 0;
+	size_t num_tasks = 0;
 	while(!task_list.empty())
 	{
-		i=task_list.erase(i);
+		if(i->blocked())
+		{
+			++i;
+			wrap_iterator();
+		}
+		else
+		{
+			++num_tasks;
+			workers.addTask([item = std::move(*i),
+			                 resolution,
+			                 &status,
+			                 counter = std::unique_lock{counter},
+			                 at_exit = ScopeExitHandler{[&e]() { e.set(); }}]() {
+				if(isConnected(item.node())
+				{
+					_mm_setcsr(_mm_getcsr() | 0x8040);  // Denormals are zero
+					item.node(size, resolution);
+				}
+				status[item.index()] = true;
+			});
+			i = task_list.erase(i);
+			wrap_iterator();
+		}
 	}
+	counter.waitAndReset(0);
+#endif
 
 #if 0
 
