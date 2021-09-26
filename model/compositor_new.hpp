@@ -8,7 +8,8 @@
 
 #include "./image_sink.hpp"
 
-#include "filtergraph/graph.hpp"
+#include "filtergraph/graph_new.hpp"
+#include "filtergraph/node_output.hpp"
 
 #include "pixel_store/image.hpp"
 #include "sched/signaling_counter.hpp"
@@ -149,16 +150,7 @@ namespace Texpainter::Model
 		ImageSink* r_output;
 		FilterGraph::Node* r_output_node;
 
-		struct NodeOutput
-		{
-			using Node = FilterGraph::Node;
-			size_t last_modified;
-			size_t last_rendered;
-			std::reference_wrapper<Node> source;
-			Node::result_type result;
-		};
-
-		mutable std::map<FilterGraph::NodeId, NodeOutput> m_node_output;
+		mutable std::map<FilterGraph::NodeId, FilterGraph::NodeOutput> m_node_output;
 		FilterGraph::Graph m_graph;
 	};
 
