@@ -149,6 +149,16 @@ namespace Texpainter::Model
 		ImageSink* r_output;
 		FilterGraph::Node* r_output_node;
 
+		struct NodeOutput
+		{
+			using Node = FilterGraph::Node;
+			size_t last_modified;
+			size_t last_rendered;
+			std::reference_wrapper<Node> source;
+			Node::result_type result;
+		};
+
+		mutable std::map<FilterGraph::NodeId, NodeOutput> m_node_output;
 		FilterGraph::Graph m_graph;
 	};
 
