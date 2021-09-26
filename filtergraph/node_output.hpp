@@ -40,6 +40,24 @@ namespace Texpainter::FilterGraph
 			return m_source.get();
 		}
 
+		template<class NodeOutputMap>
+		void render(NodeOutputMap const& result_map, Size2d size,  double resolution)
+		{
+			auto const& src = m_source.get();
+			std::array<InputPortValue, NodeArgument::MaxNumInputs> args{};
+			std::ranges::transform(src.inputs(),
+			               std::begin(args),
+			               [&result_map](auto const& val) {
+							   assert(val.valid());
+							   auto& src = val.processor();
+							   auto i = result_map.find(src.nodeId());
+							   assert(i != std::end(result_map));
+				               return makeInputPortValue(i->second.result());
+			               });
+			m_result = src.processor()(NodeArgument{size, resolution, args});
+			m_last_rendered = m_last_modified;
+		}
+
 	private:
 		size_t m_last_modified;
 		size_t m_last_rendered;
@@ -56,14 +74,14 @@ namespace Texpainter::FilterGraph
 	size_t lastUpdated(NodeOutput const& result, NodeOutputMap const& result_map)
 	{
 		auto last_updated = lastUpdated(result);
-		auto inputs = result.source().inputs();
+		auto const inputs = result.source().inputs();
 		for(size_t k = 0; k != std::size(inputs); ++k)
 		{
 			if(!inputs[k].valid()) [[unlikely]]
 			{ continue; }
 
 			auto& src = inputs[k].processor();
-			auto i = result_map.find(inputs[i].nodeId());
+			auto i = result_map.find(src.nodeId());
 			if(i == std::end(result_map)) [[unlikely]]
 			{ continue; }
 
@@ -76,7 +94,7 @@ namespace Texpainter::FilterGraph
 	template<class NodeOutputMap>
 	bool isUpToDate(NodeOutput const& result, NodeOutputMap const& result_map)
 	{
-		return result.lastRendered() >= lastUpdated(result, result_map);
+		return lastUpdated(result, result_map) < result.lastRendered();
 	}
 }
 
