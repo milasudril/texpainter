@@ -35,6 +35,13 @@ namespace Texpainter::FilterGraph
 			{
 			}
 
+			auto const& result() const
+			{
+				assert(valid());
+				auto const& ret = r_processor->result();
+				return ret[m_index.value()];
+			}
+
 			Node const& processor() const { return *r_processor; }
 
 			OutputPortIndex port() const { return m_index; }
@@ -51,14 +58,16 @@ namespace Texpainter::FilterGraph
 		static constexpr size_t MaxNumOutputs = AbstractImageProcessor::MaxNumOutputs;
 
 		explicit Node(std::unique_ptr<AbstractImageProcessor> proc, NodeId id)
-		    : m_proc{std::move(proc)}
+		    : m_last_modified{1}
+		    , m_last_rendered{0}
+		    , m_proc{std::move(proc)}
 		    , m_id{id}
 		{
 		}
 
 		Node(Node&&) = delete;
 
-		Node(): m_proc{nullptr}, m_id{InvalidNodeId} {}
+		Node(): m_last_modified{0}, m_last_rendered{0}, m_proc{nullptr}, m_id{InvalidNodeId} {}
 
 		auto clonedProcessor() const { return m_proc->clone(); }
 
@@ -71,6 +80,31 @@ namespace Texpainter::FilterGraph
 		auto inputPorts() const { return m_proc->inputPorts(); }
 
 		auto outputPorts() const { return m_proc->outputPorts(); }
+
+		result_type const& update(Size2d size, double resolution)
+		{
+			assert(FilterGraph::isConnected(*this));
+
+			std::array<InputPortValue, NodeArgument::MaxNumInputs> args{};
+			auto const n_ports   = inputPorts().size();
+			auto const input_end = std::begin(m_inputs) + n_ports;
+			std::transform(
+			    std::begin(m_inputs),
+			    input_end,
+			    std::begin(args),
+			    [size, resolution](auto const& val) { return makeInputPortValue(val.result()); });
+			m_result_cache = (*m_proc)(NodeArgument{size, resolution, args});
+
+			m_last_rendered = m_last_modified + 1;
+
+			return m_result_cache;
+		}
+
+		result_type const& result() const
+		{
+			assert(m_last_modified < m_last_rendered);
+			return m_result_cache;
+		}
 
 		Node& connect(InputPortIndex input,
 		              std::reference_wrapper<Node const> other,
@@ -86,6 +120,7 @@ namespace Texpainter::FilterGraph
 			{ m_inputs[input.value()].processor().r_consumers.find(this)->second.erase(input); }
 
 			m_inputs[input.value()] = Source{&other.get(), output};
+			touch();
 			return *this;
 		}
 
@@ -107,6 +142,7 @@ namespace Texpainter::FilterGraph
 			{ m_inputs[input.value()].processor().r_consumers.find(this)->second.erase(input); }
 
 			m_inputs[input.value()] = Source{&other.get(), output};
+			touch();
 			return true;
 		}
 
@@ -115,6 +151,7 @@ namespace Texpainter::FilterGraph
 			assert(input.value() < NodeArgument::MaxNumInputs);
 			m_inputs[input.value()].processor().r_consumers.find(this)->second.erase(input);
 			m_inputs[input.value()] = Source{};
+			touch();
 			return *this;
 		}
 
@@ -131,7 +168,24 @@ namespace Texpainter::FilterGraph
 			return {std::begin(m_inputs), std::begin(m_inputs) + inputPorts().size()};
 		}
 
+		auto paramNames() const { return m_proc->paramNames(); }
+
+		Node& set(ParamName param_name, ParamValue val)
+		{
+			m_proc->set(param_name, val);
+			touch();
+			return *this;
+		}
+
+		ParamValue get(ParamName param_name) const { return m_proc->get(param_name); }
+
+		char const* name() const { return m_proc->name(); }
+
+		auto processorId() const { return m_proc->id(); }
+
 		auto nodeId() const { return m_id; }
+
+		auto processorReleaseState() const { return m_proc->releaseState(); }
 
 		~Node()
 		{
@@ -152,7 +206,17 @@ namespace Texpainter::FilterGraph
 			}
 		}
 
+		void touch() { m_last_modified = m_last_rendered + 1; }
+
+		size_t lastModified() const { return m_last_modified; }
+
+		size_t lastRendered() const { return m_last_rendered; }
+
 	private:
+		size_t m_last_modified;
+		mutable size_t m_last_rendered;
+		mutable result_type m_result_cache;
+
 		std::array<Source, NodeArgument::MaxNumInputs> m_inputs;
 		std::unique_ptr<AbstractImageProcessor> m_proc;
 		NodeId m_id;
@@ -165,13 +229,25 @@ namespace Texpainter::FilterGraph
 			}
 		};
 
-
 		// NOTE: Using mutable here is not a very good solution, but allows treating producer nodes
 		//       as const from the consumer side.
 		//
 		// TODO: Using std::set here is slightly overkill when there are only 4 ports
 		mutable std::map<Node*, std::set<InputPortIndex, InputPortIndexCompare>> r_consumers;
 	};
+
+	inline size_t lastUpdated(Node const& node)
+	{
+		auto ret = std::max(node.lastModified(), node.lastRendered());
+
+		std::ranges::for_each(node.inputs(), [&ret](auto const& item) {
+			if(item.valid()) { ret = std::max(ret, lastUpdated(item.processor())); }
+		});
+
+		return ret;
+	}
+
+	inline size_t isUpToDate(Node const& node) { return lastUpdated(node) < node.lastRendered(); }
 
 	inline bool isConnected(Node const& node)
 	{
@@ -190,13 +266,13 @@ namespace Texpainter::FilterGraph
 		return src.valid() ? &src.processor() : nullptr;
 	}
 
-	inline std::map<std::string, double> params(AbstractImageProcessor const& proc)
+	inline std::map<std::string, double> params(Node const& node)
 	{
 		std::map<std::string, double> ret;
-		auto param_names = proc.paramNames();
+		auto param_names = node.paramNames();
 		std::ranges::transform(
-		    param_names, std::inserter(ret, std::begin(ret)), [&proc](auto const& name) {
-			    return std::pair{std::string{name.c_str()}, proc.get(name).value()};
+		    param_names, std::inserter(ret, std::begin(ret)), [&node](auto const& name) {
+			    return std::pair{std::string{name.c_str()}, node.get(name).value()};
 		    });
 		return ret;
 	}
@@ -229,8 +305,7 @@ namespace Texpainter::FilterGraph
 
 	inline NodeData nodeData(Node const& node)
 	{
-		auto& proc = node.processor();
-		NodeData ret{proc.id(), proc.releaseState(), {}, params(proc)};
+		NodeData ret{node.processorId(), node.processorReleaseState(), {}, params(node)};
 		std::ranges::transform(node.inputs(), std::begin(ret.inputs), [](auto const& item) {
 			if(item.valid()) { return NodeSourceData{item.processor().nodeId(), item.port()}; }
 			return NodeSourceData{};
