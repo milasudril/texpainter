@@ -247,7 +247,11 @@ namespace Texpainter::FilterGraph
 		return ret;
 	}
 
-	inline size_t isUpToDate(Node const& node) { return lastUpdated(node) < node.lastRendered(); }
+	inline bool isUpToDateRecursive(Node const& node)
+	{ return lastUpdated(node) < node.lastRendered(); }
+
+	inline bool isUpToDate(Node const& node)
+	{ return node.lastModified() < node.lastRendered(); }
 
 	inline bool isConnected(Node const& node)
 	{

@@ -36,11 +36,11 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas, do
 	if(m_node_array.size() == 0) [[unlikely]]
 		{
 			// TODO: prune disconnected branches
-			std::vector<std::reference_wrapper<FilterGraph::Node const>> nodes;
+			std::vector<Task> nodes;
 			nodes.reserve(m_graph.size());
 			processGraphNodeRecursive(
 			    [&nodes](auto const& node, auto) {
-				    nodes.push_back(std::ref(node));
+				    nodes.push_back(Task{std::ref(node)});
 				    return GraphProcessing::Continue;
 			    },
 			    *r_output_node);
@@ -49,16 +49,16 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas, do
 
 	r_output->sink(canvas);
 
-	std::list<std::tuple<std::reference_wrapper<FilterGraph::Node const>, bool, size_t>> task_list;
+#if 0
+	std::list<Task> task_list;
 	std::ranges::transform(m_node_array,
 	                       std::back_inserter(task_list),
 	                       [index = static_cast<size_t>(0)](auto item) mutable {
-		                       return std::tuple{item, false, index++};
+		                       return Task{item};
 	                       });
 
 	std::vector<std::atomic<bool>> status(std::size(task_list));
 
-#if 0
 	auto i = std::begin(task_list);
 	Sched::Event e;
 	auto wrap_iterator = [&task_list, &i, &e]() {
