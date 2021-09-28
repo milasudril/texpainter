@@ -25,10 +25,22 @@ namespace Texpainter::Sched
 			m_value = 0;
 		}
 
+		void lock() { ++(*this); }
+
+		void unlock() { --(*this); }
+
 		SignalingCounter& operator++()
 		{
 			std::lock_guard lock{m_mtx};
 			++m_value;
+			m_cv.notify_all();
+			return *this;
+		}
+
+		SignalingCounter& operator--()
+		{
+			std::lock_guard lock{m_mtx};
+			--m_value;
 			m_cv.notify_all();
 			return *this;
 		}

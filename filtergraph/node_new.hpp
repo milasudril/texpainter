@@ -81,7 +81,7 @@ namespace Texpainter::FilterGraph
 
 		auto outputPorts() const { return m_proc->outputPorts(); }
 
-		result_type const& update(Size2d size, double resolution)
+		result_type const& operator()(Size2d size, double resolution) const
 		{
 			assert(FilterGraph::isConnected(*this));
 
@@ -248,10 +248,17 @@ namespace Texpainter::FilterGraph
 	}
 
 	inline bool isUpToDateRecursive(Node const& node)
-	{ return lastUpdated(node) < node.lastRendered(); }
+	{
+		return lastUpdated(node) < node.lastRendered();
+	}
 
-	inline bool isUpToDate(Node const& node)
-	{ return node.lastModified() < node.lastRendered(); }
+	inline bool isUpToDate(Node const& node) { return node.lastModified() < node.lastRendered(); }
+
+	inline bool inputsUpToDate(Node const& node)
+	{
+		return std::ranges::all_of(node.inputs(),
+		                           [](auto const& item) { return isUpToDate(item.processor()); });
+	}
 
 	inline bool isConnected(Node const& node)
 	{

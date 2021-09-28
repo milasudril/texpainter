@@ -5,6 +5,7 @@
 #include "./compositor_new.hpp"
 
 #include "utils/graphutils.hpp"
+#include "utils/scope_exit_handler.hpp"
 
 #include "sched/event.hpp"
 #include "sched/signaling_counter.hpp"
@@ -30,7 +31,8 @@ Texpainter::FilterGraph::ValidationResult Texpainter::Model::validate(Compositor
 	return result;
 }
 
-void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas, double) const
+void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
+                                            double resolution) const
 {
 	assert(valid());
 	if(m_node_array.size() == 0) [[unlikely]]
@@ -49,15 +51,7 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas, do
 
 	r_output->sink(canvas);
 
-#if 0
-	std::list<Task> task_list;
-	std::ranges::transform(m_node_array,
-	                       std::back_inserter(task_list),
-	                       [index = static_cast<size_t>(0)](auto item) mutable {
-		                       return Task{item};
-	                       });
-
-	std::vector<std::atomic<bool>> status(std::size(task_list));
+	std::list<Task> task_list{std::begin(m_node_array), std::end(m_node_array)};
 
 	auto i = std::begin(task_list);
 	Sched::Event e;
@@ -69,55 +63,29 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas, do
 		}
 	};
 
-	Sched::SignalingCounter<size_t> counter;
-	size_t num_tasks = 0;
+	Sched::SignalingCounter<size_t> num_running_tasks;
 	while(!task_list.empty())
 	{
-		if(i->blocked())
+		if(inputsUpToDate(i->node))
 		{
-			++i;
-			wrap_iterator();
-		}
-		else
-		{
-			++num_tasks;
-			workers.addTask([item = std::move(*i),
-			                 resolution,
-			                 &status,
-			                 counter = std::unique_lock{counter},
-			                 at_exit = ScopeExitHandler{[&e]() { e.set(); }}]() {
-				if(isConnected(item.node())
+			m_workers.addTask([item = std::move(*i),
+			                   size = canvas.size(),
+			                   resolution,
+			                   counter = std::unique_lock{num_running_tasks},
+			                   at_exit = ScopeExitHandler{[&e]() { e.set(); }}]() {
+				if(!isUpToDate(item.node))
 				{
 					_mm_setcsr(_mm_getcsr() | 0x8040);  // Denormals are zero
 					item.node(size, resolution);
 				}
-				status[item.index()] = true;
 			});
 			i = task_list.erase(i);
-			wrap_iterator();
 		}
+		else
+		{
+			++i;
+		}
+		wrap_iterator();
 	}
-	counter.waitAndReset(0);
-#endif
-
-#if 0
-
-	Sched::SignalingCounter<size_t> task_counter;
-
-	auto schedule_task =
-	    [&workers = m_workers, size = canvas.size(), resolution, &task_counter](auto& item) {
-		    workers.addTask([&item, size, resolution, &task_counter]() {
-			    item.counter->waitAndReset(item.node.get().inputPorts().size());
-			    _mm_setcsr(_mm_getcsr() | 0x8040);  // Denormals are zero
-			    item.node(size, resolution);
-			    std::ranges::for_each(item.signal_counters, [](auto& counter) {
-				    std::ranges::for_each(counter, [](auto value) { ++(*value); });
-			    });
-			    ++task_counter;
-		    });
-	    };
-
-	std::ranges::for_each(m_node_array, schedule_task);
-	task_counter.waitAndReset(m_node_array.size());
-#endif
+	num_running_tasks.waitAndReset(0);
 }
