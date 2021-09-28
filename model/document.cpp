@@ -27,7 +27,7 @@ namespace
 		{
 			auto node_item = doc.inputNodeItem(item.first);
 			assert(node_item != nullptr);
-			node_item->second.get().forceUpdate();
+			node_item->second.get().touch();
 		}
 	}
 }

@@ -127,13 +127,13 @@ namespace Texpainter::FilterGraph
 		auto get(NodeId id, ParamName paramname) const
 		{
 			assert(node(id) != nullptr);
-			return m_nodes.find(id)->second.get(paramname);
+			return m_nodes.find(id)->second.processor().get(paramname);
 		}
 
 		void set(NodeId id, ParamName paramname, ParamValue val)
 		{
 			assert(node(id) != nullptr);
-			m_nodes.find(id)->second.set(paramname, val);
+			m_nodes.find(id)->second.processor().set(paramname, val);
 		}
 
 		auto currentId() const { return m_current_id; }

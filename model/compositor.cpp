@@ -5,9 +5,13 @@
 #include "./compositor.hpp"
 
 #include "utils/graphutils.hpp"
+#include "utils/scope_exit_handler.hpp"
 
-#include <limits>
-#include <xmmintrin.h>
+#include "sched/event.hpp"
+#include "sched/signaling_counter.hpp"
+
+#include <list>
+#include <xmmintrin.h>  // _mm_setcsr
 
 Texpainter::FilterGraph::ValidationResult Texpainter::Model::validate(Compositor const& g)
 {
@@ -15,21 +19,13 @@ Texpainter::FilterGraph::ValidationResult Texpainter::Model::validate(Compositor
 
 	ValidationResult result{ValidationResult::NoError};
 	processGraphNodeRecursive(
-	    [&result]<class Tag>(auto const& node, Tag) {
+	    [&result]<class Tag>(auto const&, Tag) {
 		    if constexpr(Tag::value == GraphProcessingEvent::LoopDetected)
 		    {
 			    result = ValidationResult::CyclicConnections;
 			    return GraphProcessing::Stop;
 		    }
-		    else if constexpr(Tag::value == GraphProcessingEvent::ProcessNode)
-		    {
-			    if(!isConnected(node))
-			    {
-				    result = ValidationResult::InputsNotConnected;
-				    return GraphProcessing::Stop;
-			    }
-			    return GraphProcessing::Continue;
-		    }
+		    return GraphProcessing::Continue;
 	    },
 	    *g.node(Compositor::OutputNodeId));
 	return result;
@@ -41,27 +37,13 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
 	assert(valid());
 	if(m_node_array.size() == 0) [[unlikely]]
 		{
-			std::vector<NodeState> nodes;
+			// TODO: prune disconnected branches
+			std::vector<Task> nodes;
 			nodes.reserve(m_graph.size());
 			processGraphNodeRecursive(
 			    [&nodes](auto const& node, auto) {
-				    nodes.push_back(NodeState{std::cref(node),
-				                              std::make_unique<Sched::SignalingCounter<size_t>>()});
-
-				    // NOTE: This works because we are visiting nodes in topological order. Thus, it is
-				    //       known that all sources have been added to nodes.
-				    auto& item = nodes.back();
-				    std::ranges::for_each(
-				        item.node.get().inputs(),
-				        [&nodes, counter = item.counter.get()](auto& ref) {
-					        auto i = std::ranges::find_if(
-					            nodes, [&value = ref.processor()](auto const& item) {
-						            return &item.node.get() == &value;
-					            });
-					        assert(i != std::end(nodes));
-					        i->signal_counters[ref.port().value()].push_back(counter);
-				        });
-
+				    printf("Adding node %p\n", &node);
+				    nodes.push_back(Task{std::ref(node)});
 				    return GraphProcessing::Continue;
 			    },
 			    *r_output_node);
@@ -70,27 +52,46 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
 
 	r_output->sink(canvas);
 
-	// NOTE: Since OutputNode does not use the internal image cache (it has no outputs)
-	//       and it may happen that it is not connected to the input node, we must always
-	//       recompute the output node. Otherwise, the contents of ret will be undefined,
-	//       in case we already have computed the output result.
-	r_output_node->forceUpdate();
+	std::list<Task> task_list{std::begin(m_node_array), std::end(m_node_array)};
 
-	Sched::SignalingCounter<size_t> task_counter;
+	auto i = std::begin(task_list);
+	Sched::Event e;
+	auto wrap_iterator = [&task_list, &i, &e]() {
+		if(i == std::end(task_list))
+		{
+			i = std::begin(task_list);
+			e.waitAndReset();
+		}
+	};
 
-	auto schedule_task =
-	    [&workers = m_workers, size = canvas.size(), resolution, &task_counter](auto& item) {
-		    workers.addTask([&item, size, resolution, &task_counter]() {
-			    item.counter->waitAndReset(item.node.get().inputPorts().size());
-			    _mm_setcsr(_mm_getcsr() | 0x8040);  // Denormals are zero
-			    item.node(size, resolution);
-			    std::ranges::for_each(item.signal_counters, [](auto& counter) {
-				    std::ranges::for_each(counter, [](auto value) { ++(*value); });
-			    });
-			    ++task_counter;
-		    });
-	    };
-
-	std::ranges::for_each(m_node_array, schedule_task);
-	task_counter.waitAndReset(m_node_array.size());
+	Sched::SignalingCounter<size_t> num_running_tasks;
+	while(!task_list.empty())
+	{
+		if(inputsUpToDate(i->node))
+		{
+			m_workers.addTask([item = std::move(*i),
+			                   size = canvas.size(),
+			                   resolution,
+			                   counter = std::unique_lock{num_running_tasks},
+			                   at_exit = ScopeExitHandler{[&e]() { e.set(); }}]() {
+				if(!isUpToDate(item.node))
+				{
+					_mm_setcsr(_mm_getcsr() | 0x8040);  // Denormals are zero
+					item.node(size, resolution);
+				}
+				else
+				{
+					puts("Node up-to-date");
+				}
+			});
+			i = task_list.erase(i);
+		}
+		else
+		{
+			printf("%p has inputs that is being processed\n", &i->node.get());
+			++i;
+		}
+		wrap_iterator();
+	}
+	num_running_tasks.waitAndReset(0);
 }

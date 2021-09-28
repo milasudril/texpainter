@@ -9,16 +9,14 @@
 #include "./image_sink.hpp"
 
 #include "filtergraph/graph.hpp"
+
 #include "pixel_store/image.hpp"
-#include "utils/iter_pair.hpp"
-#include "utils/pair_iterator.hpp"
 #include "sched/signaling_counter.hpp"
 #include "sched/thread_pool.hpp"
 
+
 #define JSON_USE_IMPLICIT_CONVERSIONS 0
 #include <nlohmann/json.hpp>
-
-#include <algorithm>
 
 namespace Texpainter::Model
 {
@@ -122,16 +120,14 @@ namespace Texpainter::Model
 		auto nodeData() const { return FilterGraph::nodeData(m_graph); }
 
 	private:
-		struct NodeState
+		struct Task
 		{
 			using Node = FilterGraph::Node;
 			std::reference_wrapper<Node const> node;
-			std::unique_ptr<Sched::SignalingCounter<size_t>> counter;
-			std::array<std::vector<Sched::SignalingCounter<size_t>*>, Node::MaxNumOutputs>
-			    signal_counters{};
 		};
-		mutable std::vector<NodeState> m_node_array;
+		mutable std::vector<Task> m_node_array;
 		mutable Texpainter::Sched::ThreadPool m_workers;
+
 
 		enum class ValidationState : size_t
 		{

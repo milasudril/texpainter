@@ -44,6 +44,7 @@ namespace Testcases
 			}));
 		}
 
+		puts("===================");
 		src.modify([](auto& img) noexcept {
 			assert((img.size() == Texpainter::Size2d{3, 2}));
 			img(0, 0) = Texpainter::PixelStore::Pixel{1.0f, 0.5f, 0.0f, 1.0f};

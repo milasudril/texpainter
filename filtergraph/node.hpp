@@ -30,17 +30,15 @@ namespace Texpainter::FilterGraph
 			Source(): r_processor{nullptr}, m_index{OutputPortIndex{0}} {}
 
 			explicit Source(Node const* node, OutputPortIndex index)
-			    : m_last_usecount{0}
-			    , r_processor{node}
+			    : r_processor{node}
 			    , m_index{index}
 			{
 			}
 
-			auto const& operator()(Size2d size, double resolution) const
+			auto const& result() const
 			{
 				assert(valid());
-				auto const& ret = (*r_processor)(size, resolution);
-				m_last_usecount = r_processor->m_usecount;
+				auto const& ret = r_processor->result();
 				return ret[m_index.value()];
 			}
 
@@ -50,10 +48,7 @@ namespace Texpainter::FilterGraph
 
 			bool valid() const { return r_processor != nullptr; }
 
-			bool hasOldResult() const { return m_last_usecount < r_processor->m_usecount; }
-
 		private:
-			mutable size_t m_last_usecount;
 			Node const* r_processor;
 			OutputPortIndex m_index;
 		};
@@ -63,10 +58,8 @@ namespace Texpainter::FilterGraph
 		static constexpr size_t MaxNumOutputs = AbstractImageProcessor::MaxNumOutputs;
 
 		explicit Node(std::unique_ptr<AbstractImageProcessor> proc, NodeId id)
-		    : m_dirty{1}
-		    , m_rendered_size{0, 0}
-		    , m_rendered_resolution{0.0}
-		    , m_usecount{static_cast<size_t>(-1)}
+		    : m_last_modified{1}
+		    , m_last_rendered{0}
 		    , m_proc{std::move(proc)}
 		    , m_id{id}
 		{
@@ -74,7 +67,7 @@ namespace Texpainter::FilterGraph
 
 		Node(Node&&) = delete;
 
-		Node(): m_dirty{0}, m_rendered_size{0, 0}, m_proc{nullptr}, m_id{InvalidNodeId} {}
+		Node(): m_last_modified{0}, m_last_rendered{0}, m_proc{nullptr}, m_id{InvalidNodeId} {}
 
 		auto clonedProcessor() const { return m_proc->clone(); }
 
@@ -88,32 +81,30 @@ namespace Texpainter::FilterGraph
 
 		auto outputPorts() const { return m_proc->outputPorts(); }
 
-		void forceUpdate() const { m_dirty = true; }
-
 		result_type const& operator()(Size2d size, double resolution) const
 		{
 			assert(FilterGraph::isConnected(*this));
 
-			if(!dirty(size, resolution)) { return m_result_cache; }
-
 			std::array<InputPortValue, NodeArgument::MaxNumInputs> args{};
 			auto const n_ports   = inputPorts().size();
 			auto const input_end = std::begin(m_inputs) + n_ports;
-			std::transform(std::begin(m_inputs),
-			               input_end,
-			               std::begin(args),
-			               [size, resolution](auto const& val) {
-				               return makeInputPortValue(val(size, resolution));
-			               });
+			std::transform(
+			    std::begin(m_inputs),
+			    input_end,
+			    std::begin(args),
+			    [size, resolution](auto const& val) { return makeInputPortValue(val.result()); });
+			m_result_cache = (*m_proc)(NodeArgument{size, resolution, args});
 
-			m_result_cache        = (*m_proc)(NodeArgument{size, resolution, args});
-			m_rendered_size       = size;
-			m_rendered_resolution = resolution;
-			++m_usecount;
-			m_dirty = 0;
+			m_last_rendered = m_last_modified + 1;
+
 			return m_result_cache;
 		}
 
+		result_type const& result() const
+		{
+			assert(m_last_modified < m_last_rendered);
+			return m_result_cache;
+		}
 
 		Node& connect(InputPortIndex input,
 		              std::reference_wrapper<Node const> other,
@@ -129,7 +120,7 @@ namespace Texpainter::FilterGraph
 			{ m_inputs[input.value()].processor().r_consumers.find(this)->second.erase(input); }
 
 			m_inputs[input.value()] = Source{&other.get(), output};
-			clear_result_cache();
+			touch();
 			return *this;
 		}
 
@@ -151,7 +142,7 @@ namespace Texpainter::FilterGraph
 			{ m_inputs[input.value()].processor().r_consumers.find(this)->second.erase(input); }
 
 			m_inputs[input.value()] = Source{&other.get(), output};
-			clear_result_cache();
+			touch();
 			return true;
 		}
 
@@ -160,7 +151,7 @@ namespace Texpainter::FilterGraph
 			assert(input.value() < NodeArgument::MaxNumInputs);
 			m_inputs[input.value()].processor().r_consumers.find(this)->second.erase(input);
 			m_inputs[input.value()] = Source{};
-			clear_result_cache();
+			touch();
 			return *this;
 		}
 
@@ -182,7 +173,7 @@ namespace Texpainter::FilterGraph
 		Node& set(ParamName param_name, ParamValue val)
 		{
 			m_proc->set(param_name, val);
-			clear_result_cache();
+			touch();
 			return *this;
 		}
 
@@ -215,14 +206,24 @@ namespace Texpainter::FilterGraph
 			}
 		}
 
+		void touch()
+		{
+			//	printf("\n%p before touch %zu %zu\n", this, m_last_modified, m_last_rendered);
+			m_last_modified = m_last_rendered + 1;
+			printf("%p after touch %zu %zu\n", this, m_last_modified, m_last_rendered);
+		}
+
+		size_t lastModified() const { return m_last_modified; }
+
+		size_t lastRendered() const { return m_last_rendered; }
+
 	private:
-		mutable size_t m_dirty;
-		mutable Size2d m_rendered_size;
-		mutable double m_rendered_resolution;
-		mutable size_t m_usecount;
+		size_t m_last_modified;
+		mutable size_t m_last_rendered;
+		mutable result_type m_result_cache;
+
 		std::array<Source, NodeArgument::MaxNumInputs> m_inputs;
 		std::unique_ptr<AbstractImageProcessor> m_proc;
-		mutable result_type m_result_cache;
 		NodeId m_id;
 
 		struct InputPortIndexCompare
@@ -238,22 +239,50 @@ namespace Texpainter::FilterGraph
 		//
 		// TODO: Using std::set here is slightly overkill when there are only 4 ports
 		mutable std::map<Node*, std::set<InputPortIndex, InputPortIndexCompare>> r_consumers;
-
-
-		void clear_result_cache()
-		{
-			m_dirty        = 1;
-			m_result_cache = result_type{};
-		}
-
-		bool dirty(Size2d size, double resolution) const
-		{
-			return m_dirty || size != m_rendered_size || resolution != m_rendered_resolution
-			       || std::ranges::any_of(inputs(), [size, resolution](auto const& item) {
-				          return item.processor().dirty(size, resolution) || item.hasOldResult();
-			          });
-		}
 	};
+
+	inline size_t lastUpdated(Node const& node)
+	{
+		auto ret = std::max(node.lastModified(), node.lastRendered());
+
+		std::ranges::for_each(node.inputs(), [&ret](auto const& item) {
+			if(item.valid()) { ret = std::max(ret, lastUpdated(item.processor())); }
+		});
+
+		return ret;
+	}
+
+	inline bool isUpToDateRecursive(Node const& node)
+	{
+		return lastUpdated(node) < node.lastRendered();
+	}
+
+	inline bool isUpToDate(Node const& node)
+	{
+		auto const inputs = node.inputs();
+		if(std::size(inputs) != 0)
+		{
+			auto const& newest_input =
+			    *std::ranges::max_element(inputs, [](auto const& a, auto const& b) {
+				    return std::max(a.processor().lastModified(), a.processor().lastRendered())
+				           < std::max(b.processor().lastModified(), b.processor().lastRendered());
+			    });
+			return node.lastModified() < node.lastRendered()
+			       && std::max(newest_input.processor().lastModified(),
+			                   newest_input.processor().lastRendered())
+			              < node.lastRendered();
+		}
+		else
+		{
+			return node.lastModified() < node.lastRendered();
+		}
+	}
+
+	inline bool inputsUpToDate(Node const& node)
+	{
+		return std::ranges::all_of(node.inputs(),
+		                           [](auto const& item) { return isUpToDate(item.processor()); });
+	}
 
 	inline bool isConnected(Node const& node)
 	{
