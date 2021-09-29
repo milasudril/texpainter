@@ -131,6 +131,7 @@ namespace Testcases
 		    .connect(Texpainter::FilterGraph::InputPortIndex{1},
 		             input,
 		             Texpainter::FilterGraph::OutputPortIndex{2});
+		input(Texpainter::Size2d{1, 1}, 1.0);
 		obj(Texpainter::Size2d{1, 1}, 1.0);
 	}
 
