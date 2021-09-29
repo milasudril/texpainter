@@ -180,7 +180,11 @@ namespace Texpainter::App
 		NodeEditor(Ui::Container& owner, std::reference_wrapper<FilterGraph::Node> node)
 		    : r_node{node}
 		    , m_root{owner, Ui::Box::Orientation::Vertical}
-		    , m_name{m_root, node.get().name()}
+		    , m_name{m_root,
+		             std::to_string(node.get().nodeId().value())
+		                 .append(" ")
+		                 .append(node.get().name())
+		                 .c_str()}
 		    , m_content{m_root, Ui::Box::Orientation::Horizontal}
 		    , m_input_col{m_content.insertMode(Ui::Box::InsertMode{0, 0}),
 		                  Ui::Box::Orientation::Vertical}

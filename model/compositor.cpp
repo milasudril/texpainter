@@ -58,6 +58,7 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
 	auto wrap_iterator = [&task_list, &i, &e]() {
 		if(i == std::end(task_list))
 		{
+			puts("====================");
 			i = std::begin(task_list);
 			e.waitAndReset();
 		}
@@ -83,6 +84,7 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
 		}
 		else
 		{
+			printf("%zu is blocked\n", i->node.get().nodeId().value());
 			++i;
 		}
 		wrap_iterator();

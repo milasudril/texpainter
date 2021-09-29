@@ -96,7 +96,21 @@ namespace Texpainter::FilterGraph
 			    [size, resolution](auto const& val) { return makeInputPortValue(val.result()); });
 			m_result_cache = (*m_proc)(NodeArgument{size, resolution, args});
 
-			m_last_rendered = m_last_modified + 1;
+			if(std::size(inputs()) != 0)
+			{
+				auto const& newest_input =
+				    *std::ranges::max_element(inputs(), [](auto const& a, auto const& b) {
+					    auto const ta = a.processor().lastModified();
+					    auto const tb = b.processor().lastModified();
+					    return ta < tb;
+				    });
+				auto const t    = newest_input.processor().lastModified();
+				m_last_rendered = std::max(lastModified(), t) + 1;
+			}
+			else
+			{
+				m_last_rendered = m_last_modified + 1;
+			}
 
 			return m_result_cache;
 		}
@@ -209,7 +223,7 @@ namespace Texpainter::FilterGraph
 
 		void touch()
 		{
-			//	printf("\n%p before touch %zu %zu\n", this, m_last_modified, m_last_rendered);
+			printf("touch %zu\n", m_id.value());
 			m_last_modified = m_last_rendered + 1;
 		}
 
@@ -253,6 +267,11 @@ namespace Texpainter::FilterGraph
 				    return ta < tb;
 			    });
 			auto const t = newest_input.processor().lastModified();
+			printf("isUpToDate(%zu) %zu %zu %zu\n",
+			       node.nodeId().value(),
+			       node.lastModified(),
+			       node.lastRendered(),
+			       t);
 			return node.lastModified() < node.lastRendered() && t < node.lastRendered();
 		}
 		else
@@ -263,6 +282,7 @@ namespace Texpainter::FilterGraph
 
 	inline bool inputsUpToDate(Node const& node)
 	{
+		printf("inputsUpToDate(%zu)\n", node.nodeId().value());
 		return std::ranges::all_of(node.inputs(),
 		                           [](auto const& item) { return isUpToDate(item.processor()); });
 	}
