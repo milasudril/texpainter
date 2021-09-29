@@ -42,7 +42,6 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
 			nodes.reserve(m_graph.size());
 			processGraphNodeRecursive(
 			    [&nodes](auto const& node, auto) {
-				    printf("Adding node %p\n", &node);
 				    nodes.push_back(Task{std::ref(node)});
 				    return GraphProcessing::Continue;
 			    },
@@ -79,16 +78,11 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
 					_mm_setcsr(_mm_getcsr() | 0x8040);  // Denormals are zero
 					item.node(size, resolution);
 				}
-				else
-				{
-					puts("Node up-to-date");
-				}
 			});
 			i = task_list.erase(i);
 		}
 		else
 		{
-			printf("%p has inputs that is being processed\n", &i->node.get());
 			++i;
 		}
 		wrap_iterator();

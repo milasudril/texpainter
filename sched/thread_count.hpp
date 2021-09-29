@@ -16,6 +16,8 @@ namespace Texpainter::Sched
 	public:
 		ThreadCount(): m_val{-1} {}
 
+		explicit ThreadCount(int val): m_val{val} {}
+
 		int value() const { return m_val < 0 ? std::max(get_nprocs(), 1) : m_val; }
 
 	private:

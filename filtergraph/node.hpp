@@ -13,6 +13,7 @@
 
 #include <map>
 #include <set>
+#include <atomic>
 #include <cassert>
 
 namespace Texpainter::FilterGraph
@@ -210,7 +211,6 @@ namespace Texpainter::FilterGraph
 		{
 			//	printf("\n%p before touch %zu %zu\n", this, m_last_modified, m_last_rendered);
 			m_last_modified = m_last_rendered + 1;
-			printf("%p after touch %zu %zu\n", this, m_last_modified, m_last_rendered);
 		}
 
 		size_t lastModified() const { return m_last_modified; }
@@ -218,8 +218,8 @@ namespace Texpainter::FilterGraph
 		size_t lastRendered() const { return m_last_rendered; }
 
 	private:
-		size_t m_last_modified;
-		mutable size_t m_last_rendered;
+		std::atomic<size_t> m_last_modified;
+		mutable std::atomic<size_t> m_last_rendered;
 		mutable result_type m_result_cache;
 
 		std::array<Source, NodeArgument::MaxNumInputs> m_inputs;
@@ -241,22 +241,6 @@ namespace Texpainter::FilterGraph
 		mutable std::map<Node*, std::set<InputPortIndex, InputPortIndexCompare>> r_consumers;
 	};
 
-	inline size_t lastUpdated(Node const& node)
-	{
-		auto ret = std::max(node.lastModified(), node.lastRendered());
-
-		std::ranges::for_each(node.inputs(), [&ret](auto const& item) {
-			if(item.valid()) { ret = std::max(ret, lastUpdated(item.processor())); }
-		});
-
-		return ret;
-	}
-
-	inline bool isUpToDateRecursive(Node const& node)
-	{
-		return lastUpdated(node) < node.lastRendered();
-	}
-
 	inline bool isUpToDate(Node const& node)
 	{
 		auto const inputs = node.inputs();
@@ -264,13 +248,12 @@ namespace Texpainter::FilterGraph
 		{
 			auto const& newest_input =
 			    *std::ranges::max_element(inputs, [](auto const& a, auto const& b) {
-				    return std::max(a.processor().lastModified(), a.processor().lastRendered())
-				           < std::max(b.processor().lastModified(), b.processor().lastRendered());
+				    auto const ta = a.processor().lastModified();
+				    auto const tb = b.processor().lastModified();
+				    return ta < tb;
 			    });
-			return node.lastModified() < node.lastRendered()
-			       && std::max(newest_input.processor().lastModified(),
-			                   newest_input.processor().lastRendered())
-			              < node.lastRendered();
+			auto const t = newest_input.processor().lastModified();
+			return node.lastModified() < node.lastRendered() && t < node.lastRendered();
 		}
 		else
 		{
