@@ -58,8 +58,13 @@ namespace Texpainter::FilterGraph
 
 		static constexpr size_t MaxNumOutputs = AbstractImageProcessor::MaxNumOutputs;
 
+		static size_t now()
+		{
+			return s_clock.fetch_add(1);
+		}
+
 		explicit Node(std::unique_ptr<AbstractImageProcessor> proc, NodeId id)
-		    : m_last_modified{1}
+		    : m_last_modified{now()}
 		    , m_last_rendered{0}
 		    , m_proc{std::move(proc)}
 		    , m_id{id}
@@ -68,7 +73,7 @@ namespace Texpainter::FilterGraph
 
 		Node(Node&&) = delete;
 
-		Node(): m_last_modified{0}, m_last_rendered{0}, m_proc{nullptr}, m_id{InvalidNodeId} {}
+		Node(): m_last_modified{now()}, m_last_rendered{0}, m_proc{nullptr}, m_id{InvalidNodeId} {}
 
 		auto clonedProcessor() const { return m_proc->clone(); }
 
@@ -95,23 +100,7 @@ namespace Texpainter::FilterGraph
 			    std::begin(args),
 			    [size, resolution](auto const& val) { return makeInputPortValue(val.result()); });
 			m_result_cache = (*m_proc)(NodeArgument{size, resolution, args});
-
-			if(std::size(inputs()) != 0)
-			{
-				auto const& newest_input =
-				    *std::ranges::max_element(inputs(), [](auto const& a, auto const& b) {
-					    auto const ta = a.processor().lastModified();
-					    auto const tb = b.processor().lastModified();
-					    return ta < tb;
-				    });
-				auto const t    = newest_input.processor().lastModified();
-				m_last_rendered = std::max(lastModified(), t) + 1;
-			}
-			else
-			{
-				m_last_rendered = m_last_modified + 1;
-			}
-
+			m_last_rendered = now();
 			return m_result_cache;
 		}
 
@@ -223,8 +212,8 @@ namespace Texpainter::FilterGraph
 
 		void touch()
 		{
-			printf("touch %zu\n", m_id.value());
-			m_last_modified = m_last_rendered + 1;
+			m_last_modified = now();
+			++s_clock;
 		}
 
 		size_t lastModified() const { return m_last_modified; }
@@ -232,6 +221,7 @@ namespace Texpainter::FilterGraph
 		size_t lastRendered() const { return m_last_rendered; }
 
 	private:
+		inline static std::atomic<size_t> s_clock;
 		std::atomic<size_t> m_last_modified;
 		mutable std::atomic<size_t> m_last_rendered;
 		mutable result_type m_result_cache;
@@ -267,11 +257,13 @@ namespace Texpainter::FilterGraph
 				    return ta < tb;
 			    });
 			auto const t = newest_input.processor().lastModified();
-			printf("isUpToDate(%zu) %zu %zu %zu\n",
+			printf("isUpToDate(%zu) %zu %zu %zu -- %d\n",
 			       node.nodeId().value(),
 			       node.lastModified(),
 			       node.lastRendered(),
-			       t);
+			       t,
+				   node.lastModified() < node.lastRendered() && t < node.lastRendered()
+  				);
 			return node.lastModified() < node.lastRendered() && t < node.lastRendered();
 		}
 		else
