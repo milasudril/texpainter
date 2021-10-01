@@ -124,8 +124,12 @@ namespace Texpainter::Model
 		{
 			using Node = FilterGraph::Node;
 			std::reference_wrapper<Node const> node;
+			size_t task_id;
+			std::array<size_t, Node::maxNumInputs()> dependent_tasks;
+			size_t input_count;
 		};
 		mutable std::vector<Task> m_node_array;
+		mutable std::vector<std::atomic<bool>> m_node_status;
 		mutable Texpainter::Sched::ThreadPool m_workers;
 
 

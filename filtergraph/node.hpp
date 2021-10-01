@@ -58,11 +58,6 @@ namespace Texpainter::FilterGraph
 
 		static constexpr size_t MaxNumOutputs = AbstractImageProcessor::MaxNumOutputs;
 
-		static size_t now()
-		{
-			return s_clock.fetch_add(1);
-		}
-
 		explicit Node(std::unique_ptr<AbstractImageProcessor> proc, NodeId id)
 		    : m_last_modified{now()}
 		    , m_last_rendered{0}
@@ -99,7 +94,7 @@ namespace Texpainter::FilterGraph
 			    input_end,
 			    std::begin(args),
 			    [size, resolution](auto const& val) { return makeInputPortValue(val.result()); });
-			m_result_cache = (*m_proc)(NodeArgument{size, resolution, args});
+			m_result_cache  = (*m_proc)(NodeArgument{size, resolution, args});
 			m_last_rendered = now();
 			return m_result_cache;
 		}
@@ -222,6 +217,7 @@ namespace Texpainter::FilterGraph
 
 	private:
 		inline static std::atomic<size_t> s_clock;
+		static size_t now() { return s_clock.fetch_add(1); }
 		std::atomic<size_t> m_last_modified;
 		mutable std::atomic<size_t> m_last_rendered;
 		mutable result_type m_result_cache;
@@ -252,18 +248,11 @@ namespace Texpainter::FilterGraph
 		{
 			auto const& newest_input =
 			    *std::ranges::max_element(inputs, [](auto const& a, auto const& b) {
-				    auto const ta = a.processor().lastModified();
-				    auto const tb = b.processor().lastModified();
+				    auto const ta = a.processor().lastRendered();
+				    auto const tb = b.processor().lastRendered();
 				    return ta < tb;
 			    });
-			auto const t = newest_input.processor().lastModified();
-			printf("isUpToDate(%zu) %zu %zu %zu -- %d\n",
-			       node.nodeId().value(),
-			       node.lastModified(),
-			       node.lastRendered(),
-			       t,
-				   node.lastModified() < node.lastRendered() && t < node.lastRendered()
-  				);
+			auto const t = newest_input.processor().lastRendered();
 			return node.lastModified() < node.lastRendered() && t < node.lastRendered();
 		}
 		else
@@ -274,7 +263,6 @@ namespace Texpainter::FilterGraph
 
 	inline bool inputsUpToDate(Node const& node)
 	{
-		printf("inputsUpToDate(%zu)\n", node.nodeId().value());
 		return std::ranges::all_of(node.inputs(),
 		                           [](auto const& item) { return isUpToDate(item.processor()); });
 	}
