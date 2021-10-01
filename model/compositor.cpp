@@ -45,9 +45,12 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
 			processGraphNodeRecursive(
 			    [&nodes, &node_to_task_id, task_id = static_cast<size_t>(0)](auto const& node,
 			                                                                 auto) mutable {
-				    nodes.push_back(Task{std::ref(node), task_id, {}, std::size(node.inputs())});
-				    node_to_task_id.insert(std::pair{&node, task_id});
-				    ++task_id;
+				    if(isConnected(node))
+					{
+						nodes.push_back(Task{std::ref(node), task_id, {}, std::size(node.inputs())});
+						node_to_task_id.insert(std::pair{&node, task_id});
+						++task_id;
+					}
 				    return GraphProcessing::Continue;
 			    },
 			    *r_output_node);
