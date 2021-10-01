@@ -63,21 +63,21 @@ namespace Texpainter::Model
 		Compositor& connect(NodeId a, InputPortIndex sink, NodeId b, OutputPortIndex src)
 		{
 			m_graph.connect(a, sink, b, src);
-			m_valid_state = ValidationState::NotValidated;
+			clearValidationState();
 			return *this;
 		}
 
 		bool checkedConnect(NodeId a, InputPortIndex sink, NodeId b, OutputPortIndex src)
 		{
 			if(!m_graph.checkedConnect(a, sink, b, src)) { return false; }
-			m_valid_state = ValidationState::NotValidated;
+			clearValidationState();
 			return true;
 		}
 
 		Compositor& disconnect(NodeId a, InputPortIndex sink)
 		{
 			m_graph.disconnect(a, sink);
-			m_valid_state = ValidationState::NotValidated;
+			clearValidationState();
 			return *this;
 		}
 
@@ -88,7 +88,7 @@ namespace Texpainter::Model
 		Compositor& erase(FilterGraph::NodeId id)
 		{
 			m_graph.erase(id);
-			m_valid_state = ValidationState::NotValidated;
+			clearValidationState();
 			return *this;
 		}
 
