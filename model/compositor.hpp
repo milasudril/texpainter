@@ -43,13 +43,6 @@ namespace Texpainter::Model
 				r_output      = &output->processor();
 				r_output_node = &m_graph.insert(std::move(output)).second.get();
 			}
-
-			{
-				auto output =
-				    std::make_unique<ImageProcessorWrapper<TopographySink>>(TopographySink{});
-				r_topo_output      = &output->processor();
-				r_topo_output_node = &m_graph.insert(std::move(output)).second.get();
-			}
 		}
 
 		Compositor(Compositor const& other) = delete;
@@ -58,6 +51,18 @@ namespace Texpainter::Model
 		Compositor& operator=(Compositor&&) = default;
 
 		void process(Span2d<PixelStore::Pixel> canvas, double resolution) const;
+
+		void addTopoOutput()
+		{
+			if(r_topo_output_node != nullptr)
+			{
+				using FilterGraph::ImageProcessorWrapper;
+				auto output =
+					std::make_unique<ImageProcessorWrapper<TopographySink>>(TopographySink{});
+				r_topo_output      = &output->processor();
+				r_topo_output_node = &m_graph.insert(std::move(output)).second.get();
+			}
+		}
 
 		NodeItem insert(std::unique_ptr<FilterGraph::AbstractImageProcessor> proc)
 		{
