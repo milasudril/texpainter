@@ -25,6 +25,13 @@ namespace Texpainter
 		LoopDetected
 	};
 
+	template<GraphProcessingEvent e>
+	using GraphutilsEvent = std::integral_constant<GraphProcessingEvent, e>;
+
+	using GraphutilsProcessNode = GraphutilsEvent<GraphProcessingEvent::ProcessNode>;
+
+	using GraphutilsLoopDetected = GraphutilsEvent<GraphProcessingEvent::LoopDetected>;
+
 	namespace graphutils_detail
 	{
 		enum class Mark : int
@@ -58,20 +65,20 @@ namespace Texpainter
 									    {
 										    switch(visited[other])
 										    {
-											    case Mark::Init: nodes_to_visit.push(other); break;
+											    case Mark::Init:
+												    nodes_to_visit.push(other);
+												    return GraphProcessing::Continue;
 
 											    case Mark::InProgress:
-												    if(cb(*other,
-												          std::integral_constant<
-												              GraphProcessingEvent,
-												              GraphProcessingEvent::LoopDetected>{})
+												    if(cb(*other, GraphutilsLoopDetected{})
 												       == GraphProcessing::Stop)
-												    { return; }
+												    { return GraphProcessing::Stop; }
 												    break;
 
-											    case Mark::Done: break;
+											    case Mark::Done: return GraphProcessing::Continue;
 										    }
 									    }
+									    return GraphProcessing::Continue;
 								    };
 								visited[node_next] = Mark::InProgress;
 								visitEdges(std::move(processEdge), *node_next);
@@ -79,10 +86,7 @@ namespace Texpainter
 							}
 							case Mark::InProgress:
 								visited[node_next] = Mark::Done;
-								if(cb(*node_next,
-								      std::integral_constant<GraphProcessingEvent,
-								                             GraphProcessingEvent::ProcessNode>{})
-								   == GraphProcessing::Stop)
+								if(cb(*node_next, GraphutilsProcessNode{}) == GraphProcessing::Stop)
 								{ return; }
 								nodes_to_visit.pop();
 								break;
