@@ -61,31 +61,28 @@ namespace Texpainter::FilterGraph
 		using type = std::reference_wrapper<T>;
 	};
 
-	namespace detail
+	template<class T>
+	auto makeInputPortValue(T const& val) requires(sizeof(T) <= 16)
 	{
-		template<class T>
-		auto makeInputPortValue(T const& val) requires(sizeof(T) <= 16)
-		{
-			return val;
-		}
+		return val;
+	}
 
-		template<class T>
-		T const* makeInputPortValue(std::unique_ptr<T[]> const& val)
-		{
-			return val.get();
-		}
+	template<class T>
+	T const* makeInputPortValue(std::unique_ptr<T[]> const& val)
+	{
+		return val.get();
+	}
 
-		template<class T>
-		T const* makeInputPortValue(std::unique_ptr<T> const& val)
-		{
-			return val.get();
-		}
+	template<class T>
+	T const* makeInputPortValue(std::unique_ptr<T> const& val)
+	{
+		return val.get();
+	}
 
-		template<class T>
-		auto makeInputPortValue(T const& val) requires(sizeof(T) > 16)
-		{
-			return std::ref(val);
-		}
+	template<class T>
+	auto makeInputPortValue(T const& val) requires(sizeof(T) > 16)
+	{
+		return std::ref(val);
 	}
 
 	namespace detail
@@ -104,8 +101,7 @@ namespace Texpainter::FilterGraph
 	{
 		using std::visit;
 
-		return visit(
-		    [](auto const& val) { return InputPortValue{detail::makeInputPortValue(val)}; }, val);
+		return visit([](auto const& val) { return InputPortValue{makeInputPortValue(val)}; }, val);
 	}
 }
 #endif

@@ -31,8 +31,8 @@ Texpainter::FilterGraph::ValidationResult Texpainter::Model::validate(Compositor
 	return result;
 }
 
-void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
-                                            double resolution) const
+Texpainter::FilterGraph::PortValue const& Texpainter::Model::Compositor::process(
+    Size2d canvas_size, double resolution) const
 {
 	assert(valid());
 	if(m_node_array.size() == 0) [[unlikely]]
@@ -67,8 +67,6 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
 			m_node_status = std::vector<std::atomic<bool>>(std::size(m_node_array));
 		}
 
-	r_output->sink(canvas);
-
 	std::list<Task> task_list{std::begin(m_node_array), std::end(m_node_array)};
 	std::ranges::fill(m_node_status, false);
 
@@ -96,7 +94,7 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
 		if(task_can_run(*i))
 		{
 			m_workers.addTask([item = *i,
-			                   size = canvas.size(),
+			                   canvas_size,
 			                   resolution,
 			                   counter = std::unique_lock{num_running_tasks},
 			                   at_exit = ScopeExitHandler{
@@ -107,7 +105,7 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
 				if(!isUpToDate(item.node))
 				{
 					_mm_setcsr(_mm_getcsr() | 0x8040);  // Denormals are zero
-					item.node(size, resolution);
+					item.node(canvas_size, resolution);
 				}
 			});
 			i = task_list.erase(i);
@@ -119,4 +117,5 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
 		wrap_iterator();
 	}
 	num_running_tasks.waitAndReset(0);
+	return r_output_node->result()[0];
 }

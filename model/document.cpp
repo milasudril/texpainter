@@ -46,16 +46,10 @@ Texpainter::PixelStore::Image Texpainter::Model::render(Document const& document
 		forceUpdateIfDirty(item, document, force_update);
 	});
 
-	PixelStore::Image ret{scale * document.canvasSize().width(),
-	                      scale * document.canvasSize().height()};
-	if(document.compositor().valid()) [[likely]]
-		{
-			document.compositor().process(ret.pixels(), static_cast<double>(scale));
-		}
-	else
-	{
-		std::ranges::fill(ret.pixels(), PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
-	}
+	auto ret = processIfValid(
+	    document.compositor(),
+	    Size2d{scale * document.canvasSize().width(), scale * document.canvasSize().height()},
+	    static_cast<double>(scale));
 
 	std::ranges::for_each(document.images(),
 	                      [&document](auto const& item) { item.second.source.clearStatus(); });

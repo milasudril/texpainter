@@ -29,8 +29,7 @@ namespace Texpainter::Model
 
 		void operator()(FilterGraph::ImgProcArg<InterfaceDescriptor> const& args) const
 		{
-			assert(r_pixels.data() != nullptr);
-			std::copy_n(args.input<0>(), area(args.canvasSize()), r_pixels.data());
+			std::copy_n(args.input<0>(), area(args.canvasSize()), args.output<0>());
 		}
 
 		FilterGraph::ParamValue get(FilterGraph::ParamName) const
@@ -53,11 +52,6 @@ namespace Texpainter::Model
 		}
 
 		static constexpr auto releaseState() { return FilterGraph::ImgProcReleaseState::Stable; }
-
-		void sink(Span2d<FilterGraph::RgbaValue> val) { r_pixels = val; }
-
-	private:
-		Span2d<FilterGraph::RgbaValue> r_pixels;
 	};
 }
 
