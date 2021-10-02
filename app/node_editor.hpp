@@ -160,7 +160,8 @@ namespace Texpainter::App
 
 			auto operator()(auto portinfo)
 			{
-				return Connector{r_owner, typename Connector::type{m_k++}, portinfo};
+				if(portinfo.hidden) { return std::optional<Connector>{}; }
+				return std::optional{Connector{r_owner, typename Connector::type{m_k++}, portinfo}};
 			}
 
 		private:
@@ -226,8 +227,18 @@ namespace Texpainter::App
 
 		NodeEditor& eventHandler(EventHandler& eh)
 		{
-			std::ranges::for_each(m_inputs, [this](auto& item) { item.eventHandler(*this); });
-			std::ranges::for_each(m_outputs, [this](auto& item) { item.eventHandler(*this); });
+			std::ranges::for_each(m_inputs, [this](auto& item) {
+				if(item) [[likely]]
+					{
+						item->eventHandler(*this);
+					}
+			});
+			std::ranges::for_each(m_outputs, [this](auto& item) {
+				if(item) [[likely]]
+					{
+						item->eventHandler(*this);
+					}
+			});
 			std::ranges::for_each(m_params, [this](auto& item) { item.eventHandler(*this); });
 			r_eh = &eh;
 			return *this;
@@ -271,9 +282,9 @@ namespace Texpainter::App
 		Ui::Separator m_output_sep;
 		Ui::Box m_output_col;
 
-		std::vector<InputConnector> m_inputs;
+		std::vector<std::optional<InputConnector>> m_inputs;
 		std::vector<ParamInput> m_params;
-		std::vector<OutputConnector> m_outputs;
+		std::vector<std::optional<OutputConnector>> m_outputs;
 		size_t m_num_completed_connectors;
 	};
 }

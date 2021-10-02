@@ -22,7 +22,8 @@ namespace Texpainter::Model
 		{
 			static constexpr std::array<FilterGraph::PortInfo, 1> InputPorts{
 			    {FilterGraph::PortType::RgbaPixels, "Pixels"}};
-			static constexpr std::array<FilterGraph::PortInfo, 0> OutputPorts{};
+			static constexpr std::array<FilterGraph::PortInfo, 1> OutputPorts{
+			    {FilterGraph::PortType::RgbaPixels, "Pixels", true}};
 			static constexpr std::array<FilterGraph::ParamName, 0> ParamNames{};
 		};
 

@@ -83,7 +83,7 @@ namespace Texpainter::App
 
 		void operator()(auto const& item)
 		{
-			r_connectors.node(*m_iter) = item.location() + m_offset;
+			if(item) { r_connectors.node(*m_iter) = item->location() + m_offset; }
 			++m_iter;
 		}
 

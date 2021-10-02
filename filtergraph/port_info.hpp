@@ -73,12 +73,12 @@ namespace Texpainter::FilterGraph
 	{
 		PortType type;
 		char const* name;
+		bool hidden = false;
 	};
 
 	constexpr bool operator==(PortInfo a, PortInfo b)
 	{
-		if(a.type == b.type) { return strcmp(a.name, b.name) == 0; }
-		return false;
+		return a.type == b.type && a.hidden == b.hidden && strcmp(a.name, b.name) == 0;
 	}
 
 	constexpr bool operator!=(PortInfo a, PortInfo b) { return !(a == b); }
