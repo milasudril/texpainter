@@ -58,7 +58,9 @@ namespace Texpainter
 									    {
 										    switch(visited[other])
 										    {
-											    case Mark::Init: nodes_to_visit.push(other); break;
+											    case Mark::Init:
+												    nodes_to_visit.push(other);
+												    return GraphProcessing::Continue;
 
 											    case Mark::InProgress:
 												    if(cb(*other,
@@ -66,12 +68,13 @@ namespace Texpainter
 												              GraphProcessingEvent,
 												              GraphProcessingEvent::LoopDetected>{})
 												       == GraphProcessing::Stop)
-												    { return; }
+												    { return GraphProcessing::Stop; }
 												    break;
 
-											    case Mark::Done: break;
+											    case Mark::Done: return GraphProcessing::Continue;
 										    }
 									    }
+									    return GraphProcessing::Continue;
 								    };
 								visited[node_next] = Mark::InProgress;
 								visitEdges(std::move(processEdge), *node_next);
