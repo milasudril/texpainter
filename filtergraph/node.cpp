@@ -12,18 +12,14 @@ namespace
 	{
 		IsConnectedElemHandler(): result{true} {}
 
-		Texpainter::GraphProcessing operator()(
-		    Texpainter::FilterGraph::Node const&,
-		    std::integral_constant<Texpainter::GraphProcessingEvent,
-		                           Texpainter::GraphProcessingEvent::LoopDetected>)
+		Texpainter::GraphProcessing operator()(Texpainter::FilterGraph::Node const&,
+		                                       Texpainter::GraphutilsLoopDetected)
 		{
 			throw std::runtime_error{"Cyclic dependency detected"};
 		}
 
-		Texpainter::GraphProcessing operator()(
-		    Texpainter::FilterGraph::Node const& node,
-		    std::integral_constant<Texpainter::GraphProcessingEvent,
-		                           Texpainter::GraphProcessingEvent::ProcessNode>)
+		Texpainter::GraphProcessing operator()(Texpainter::FilterGraph::Node const& node,
+		                                       Texpainter::GraphutilsProcessNode)
 		{
 			if(!isConnected(node))
 			{
