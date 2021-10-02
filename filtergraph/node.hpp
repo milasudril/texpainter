@@ -1,5 +1,6 @@
 //@	{
 //@	 "targets":[{"name":"node.hpp", "type":"include"}]
+//@	,"dependencies_extra":[{"ref":"./node.o", "rel":"implementation"}]
 //@	}
 
 #ifndef TEXPAINTER_FILTERGRAPH_NODE_HPP
@@ -259,6 +260,8 @@ namespace Texpainter::FilterGraph
 		       && std::ranges::none_of(node.inputs(), [](auto node) { return !node.valid(); });
 	}
 
+	bool isConnectedDeep(Node const& node);
+
 	template<class Visitor>
 	void visitEdges(Visitor&& visitor, Node const& node)
 	{
@@ -270,16 +273,7 @@ namespace Texpainter::FilterGraph
 		return src.valid() ? &src.processor() : nullptr;
 	}
 
-	inline std::map<std::string, double> params(Node const& node)
-	{
-		std::map<std::string, double> ret;
-		auto param_names = node.paramNames();
-		std::ranges::transform(
-		    param_names, std::inserter(ret, std::begin(ret)), [&node](auto const& name) {
-			    return std::pair{std::string{name.c_str()}, node.get(name).value()};
-		    });
-		return ret;
-	}
+	std::map<std::string, double> params(Node const& node);
 
 	struct NodeSourceData
 	{
