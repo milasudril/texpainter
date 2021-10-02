@@ -34,7 +34,7 @@ namespace Texpainter::Model
 		using InputPortIndex  = FilterGraph::InputPortIndex;
 		using OutputPortIndex = FilterGraph::OutputPortIndex;
 
-		Compositor(): m_valid_state{ValidationState::NotValidated}
+		Compositor(): m_valid_state{ValidationState::NotValidated}, r_topo_output_node{nullptr}
 		{
 			using FilterGraph::ImageProcessorWrapper;
 
@@ -52,16 +52,20 @@ namespace Texpainter::Model
 
 		void process(Span2d<PixelStore::Pixel> canvas, double resolution) const;
 
-		void addTopoOutput()
+		auto addTopoOutput()
 		{
-			if(r_topo_output_node != nullptr)
+			if(r_topo_output_node == nullptr)
 			{
 				using FilterGraph::ImageProcessorWrapper;
 				auto output =
-					std::make_unique<ImageProcessorWrapper<TopographySink>>(TopographySink{});
-				r_topo_output      = &output->processor();
-				r_topo_output_node = &m_graph.insert(std::move(output)).second.get();
+				    std::make_unique<ImageProcessorWrapper<TopographySink>>(TopographySink{});
+				r_topo_output = &output->processor();
+				auto ret      = m_graph.insert(std::move(output));
+
+				m_topo_output_node_id = ret.first;
+				r_topo_output_node    = &ret.second.get();
 			}
+			return std::pair{m_topo_output_node_id, std::ref(*r_topo_output_node)};
 		}
 
 		NodeItem insert(std::unique_ptr<FilterGraph::AbstractImageProcessor> proc)
@@ -160,6 +164,7 @@ namespace Texpainter::Model
 		FilterGraph::Node* r_output_node;
 
 		TopographySink* r_topo_output;
+		FilterGraph::NodeId m_topo_output_node_id;
 		FilterGraph::Node* r_topo_output_node;
 
 		FilterGraph::Graph m_graph;

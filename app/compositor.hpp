@@ -262,6 +262,23 @@ namespace Texpainter::App
 				    std::make_unique<ImageProcessorSelectorDlg>(r_owner, "Select image processor");
 				m_filtermenu->eventHandler<ControlId::FilterMenu>(*this);
 			}
+			else
+			{
+				if(scancode == Ui::Scancodes::B)
+				{
+					puts("Hej");
+					auto item = m_doc.get().compositor().addTopoOutput();
+
+					auto ip = m_node_editors.insert(
+					    std::pair{item.first,
+					              m_canvas.template insert<NodeWidget>(
+					                  item.first, Ui::WidgetCoordinates{0, 0}, item.second)});
+					ip.first->second->eventHandler(*this);
+					m_ports.addPorts(item.second.get());
+
+					m_canvas.showWidgets();
+				}
+			}
 		}
 
 		void refresh();

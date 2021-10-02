@@ -41,19 +41,20 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
 			nodes.reserve(m_graph.size());
 			using Node = FilterGraph::Node;
 			std::map<Node const*, size_t> node_to_task_id;
+
+			auto add_task = [&nodes, &node_to_task_id, task_id = static_cast<size_t>(0)](
+			                    auto const& node, auto) mutable {
+				nodes.push_back(Task{std::ref(node), task_id, {}, std::size(node.inputs())});
+				node_to_task_id.insert(std::pair{&node, task_id});
+				++task_id;
+				return GraphProcessing::Continue;
+			};
+
 			if(isConnectedDeep(*r_output_node))
-			{
-				processGraphNodeRecursive(
-				    [&nodes, &node_to_task_id, task_id = static_cast<size_t>(0)](auto const& node,
-				                                                                 auto) mutable {
-					    nodes.push_back(
-					        Task{std::ref(node), task_id, {}, std::size(node.inputs())});
-					    node_to_task_id.insert(std::pair{&node, task_id});
-					    ++task_id;
-					    return GraphProcessing::Continue;
-				    },
-				    *r_output_node);
-			}
+			{ processGraphNodeRecursive(add_task, *r_output_node); }
+
+			if(r_topo_output_node != nullptr && isConnectedDeep(*r_topo_output_node))
+			{ processGraphNodeRecursive(add_task, *r_topo_output_node); }
 
 			std::ranges::for_each(nodes, [&node_to_task_id](auto& item) {
 				auto const inputs = item.node.get().inputs();
