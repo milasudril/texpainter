@@ -49,8 +49,17 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::meshSize(Size2d size
 		glGenBuffers(1, &xy_id);
 		auto xy_data = gen_xy(size);
 		glNamedBufferStorage(xy_id, 2 * sizeof(float) * std::size(xy_data), std::data(xy_data), 0);
+
+		GLuint topo_id{};
+		glGenBuffers(1, &topo_id);
+		glNamedBufferStorage(topo_id,
+		                     sizeof(Model::TopographyInfo) * std::size(xy_data),
+		                     nullptr,
+		                     GL_DYNAMIC_STORAGE_BIT);
+
 		m_mesh_size = size;
 		m_xy        = VertexBuffer{GlHandle{xy_id}};
+		m_topo      = VertexBuffer{GlHandle{topo_id}};
 	}
 
 	return *this;
