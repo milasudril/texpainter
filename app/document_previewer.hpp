@@ -32,6 +32,7 @@ namespace Texpainter::App
 		    , m_gl_area{m_views.widgetName("glarea")}
 		{
 			m_img_view.scale(0.5);
+			m_views.showWidget("glarea");
 			refresh();
 		}
 

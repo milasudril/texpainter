@@ -31,7 +31,9 @@ public:
 
 	void showWidget(char const* widget_name)
 	{
-		gtk_stack_set_visible_child_name(m_handle, widget_name);
+		auto widget = gtk_stack_get_child_by_name(m_handle, widget_name);
+		gtk_widget_show(widget);
+		gtk_stack_set_visible_child(m_handle, widget);
 	}
 
 private:
