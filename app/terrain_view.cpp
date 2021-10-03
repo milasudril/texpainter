@@ -28,6 +28,22 @@ void Texpainter::App::TerrainView::realize<Texpainter::App::TerrainView::Control
 
 namespace
 {
+	constexpr char const* vertex_shader = R"shader(#version 460 core
+layout (location = 0) in vec2 xy;
+layout (location = 1) in vec4 n_elev;
+
+out vec3 vertex_normal;
+out vec3 frag_pos;
+
+void main()
+{
+	vec4 pos = vec4(xy.x xy.y, n_elev.w, 1.0);
+	gl_Position = pos;
+	frag_pos = pos;
+	vertex_normal = n_elev.xyz;
+}
+)shader"
+
 	std::vector<std::pair<float, float>> gen_xy(Texpainter::Size2d size)
 	{
 		std::vector<std::pair<float, float>> ret(area(size));
