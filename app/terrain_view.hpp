@@ -25,47 +25,45 @@
 
 namespace Texpainter::App
 {
+	class GlHandle
+	{
+	public:
+		explicit GlHandle(GLuint handle): m_handle{handle} {}
+
+		GlHandle(nullptr_t): m_handle{0} {}
+
+		GlHandle() = default;
+
+		GlHandle(GlHandle const&) = default;
+
+		GlHandle& operator=(GlHandle const&) = default;
+
+		GlHandle& operator=(std::nullptr_t)
+		{
+			m_handle = 0;
+			return *this;
+		}
+
+		GLuint operator*() const { return m_handle; }
+
+		explicit operator bool() const { return m_handle != 0; }
+
+		bool operator==(GlHandle const&) const = default;
+
+	private:
+		GLuint m_handle;
+	};
+
 	namespace terrain_view_detail
 	{
-		class GlResource
-		{
-		public:
-			explicit GlResource(GLuint handle):m_handle{handle}{}
-
-			GlResource(nullptr_t):m_handle{0}{}
-
-			GlResource() = default;
-
-			GlResource(GlResource const&) = default;
-
-			GlResource& operator=(GlResource const&) = default;
-
-			GlResource& operator=(std::nullptr_t)
-			{
-				m_handle = 0;
-				return *this;
-			}
-
-			GLuint operator*() const
-			{ return m_handle; }
-
-			explicit operator bool() const
-			{ return m_handle != 0; }
-
-			bool operator==(GlResource const&) const = default;
-
-		private:
-			GLuint m_handle;
-		};
-
 		struct GlResourceTraits
 		{
-			using pointer = GlResource;
+			using pointer = GlHandle;
 		};
 
-		struct VertexBufferDeleter:GlResourceTraits
+		struct VertexBufferDeleter: GlResourceTraits
 		{
-			void operator()(GlResource id)
+			void operator()(GlHandle id)
 			{
 				auto handle = *id;
 				glDeleteBuffers(1, &handle);
@@ -85,7 +83,7 @@ namespace Texpainter::App
 	public:
 		TerrainView(TerrainView&&) = delete;
 
-		explicit TerrainView(Ui::Container& owner): m_gl_area{owner}
+		explicit TerrainView(Ui::Container& owner): m_gl_area{owner}, m_mesh_size{0, 0}
 		{
 			m_gl_area.eventHandler<ControlId::GlArea>(*this);
 		}
@@ -107,15 +105,15 @@ namespace Texpainter::App
 			puts("Resize");
 		}
 
-		TerrainView& canvasSize(Size2d size);
+		TerrainView& meshSize(Size2d size);
 
 		TerrainView& topography(Span2d<Model::TopographyInfo const>);
 
-
 	private:
 		Ui::GLArea m_gl_area;
-		VertexBuffer m_mesh;
+		VertexBuffer m_xy;
 		VertexBuffer m_topo;
+		Size2d m_mesh_size;
 	};
 }
 

@@ -64,7 +64,7 @@ Texpainter::Ui::GLArea::Impl::Impl(Container& cnt): GLArea(*this)
 {
 	r_cb_obj     = nullptr;
 	auto gl_area = GTK_GL_AREA(gtk_gl_area_new());
-	gtk_gl_area_set_required_version (gl_area, 4, 6);
+	gtk_gl_area_set_required_version(gl_area, 4, 6);
 	g_signal_connect(gl_area, "render", G_CALLBACK(render), this);
 	g_signal_connect(gl_area, "resize", G_CALLBACK(resize), this);
 	g_signal_connect(gl_area, "realize", G_CALLBACK(realize), this);
