@@ -11,6 +11,8 @@
 #include "ui/glarea.hpp"
 #include "ui/keyboard_state.hpp"
 #include "ui/widget_multiplexer.hpp"
+#include "ui/box.hpp"
+#include "ui/combobox.hpp"
 
 #include <utility>
 #include <functional>
@@ -21,7 +23,7 @@ namespace Texpainter::App
 	{
 		enum class ControlId : int
 		{
-			DocumentView
+			ViewSelector,
 		};
 
 	public:
@@ -29,12 +31,17 @@ namespace Texpainter::App
 
 		explicit DocumentPreviewer(Ui::Container& owner, Model::Document& doc)
 		    : m_doc{doc}
-		    , m_views{owner}
+		    , m_root{owner, Ui::Box::Orientation::Vertical}
+		    , m_view_selector{m_root}
+		    , m_views{m_root.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
 		    , m_img_view{m_views.widgetName("imgview")}
 		    , m_terrain_view{m_views.widgetName("terrainview")}
 		{
 			m_img_view.scale(0.5);
-			m_views.showWidget("terrainview");
+			m_view_selector.append("imgview")
+			    .append("terrainview")
+			    .selected(0)
+			    .eventHandler<ControlId::ViewSelector>(*this);
 			refresh();
 		}
 
@@ -64,6 +71,21 @@ namespace Texpainter::App
 			return *this;
 		}
 
+		template<ControlId>
+		void onChanged(Ui::Combobox& src)
+		{
+			if(src.selected() == 0) { m_views.showWidget("imgview"); }
+			else
+			{
+				m_views.showWidget("terrainview");
+			}
+		}
+
+		template<ControlId, class... T>
+		void handleException(const T&...)
+		{
+		}
+
 	private:
 		std::reference_wrapper<Model::Document> m_doc;
 		void* r_eh;
@@ -75,6 +97,8 @@ namespace Texpainter::App
 			src.refresh();
 		}
 
+		Ui::Box m_root;
+		Ui::Combobox m_view_selector;
 		Ui::WidgetMultiplexer m_views;
 		Ui::ImageView m_img_view;
 		TerrainView m_terrain_view;

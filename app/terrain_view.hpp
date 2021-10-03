@@ -50,7 +50,7 @@ namespace Texpainter::App
 		template<ControlId>
 		void resize(Ui::GLArea const&, int, int)
 		{
-			puts("Realize");
+			puts("Resize");
 		}
 
 
