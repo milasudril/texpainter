@@ -18,14 +18,11 @@ public:
 
 	void minSize(int w, int h) { gtk_widget_set_size_request(GTK_WIDGET(m_handle), w, h); }
 
-	void callback(const Vtable& vt, void* cb_obj, int id)
+	void eventHandler(void* cb_obj, const EventHandlerVtable& vt)
 	{
-		m_id     = id;
-		m_vt     = vt;
 		r_cb_obj = cb_obj;
+		m_vt     = vt;
 	}
-
-	int id() const noexcept { return m_id; }
 
 	void glActivate() { gtk_gl_area_make_current(m_handle); }
 
@@ -37,9 +34,8 @@ public:
 	void redraw() noexcept { gtk_widget_queue_draw(GTK_WIDGET(m_handle)); }
 
 private:
-	int m_id;
-	Vtable m_vt;
 	void* r_cb_obj;
+	EventHandlerVtable m_vt;
 	GtkGLArea* m_handle;
 
 	static gboolean render(GtkGLArea*, GdkGLContext*, void* user_data)
@@ -109,8 +105,6 @@ Texpainter::Ui::GLArea& Texpainter::Ui::GLArea::minSize(int w, int h)
 	return *this;
 }
 
-int Texpainter::Ui::GLArea::id() const noexcept { return m_impl->id(); }
-
 Texpainter::Ui::GLArea& Texpainter::Ui::GLArea::glActivate()
 {
 	m_impl->glActivate();
@@ -122,9 +116,10 @@ Texpainter::Ui::GLArea& Texpainter::Ui::GLArea::versionRequest(int major, int mi
 	m_impl->versionRequest(major, minor);
 	return *this;
 }
-Texpainter::Ui::GLArea& Texpainter::Ui::GLArea::callback(const Vtable& vt, void* cb_obj, int id)
+Texpainter::Ui::GLArea& Texpainter::Ui::GLArea::eventHandler(void* cb_obj,
+                                                             const EventHandlerVtable& vt)
 {
-	m_impl->callback(vt, cb_obj, id);
+	m_impl->eventHandler(cb_obj, vt);
 	return *this;
 }
 

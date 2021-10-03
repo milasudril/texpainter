@@ -32,14 +32,23 @@ namespace Texpainter::Ui
 
 		GLArea& minSize(int w, int h);
 
-		template<class Callback, class IdType>
-		GLArea& callback(Callback& cb_obj, IdType id)
+		template<auto id, class EventHandler>
+		GLArea& eventHandler(EventHandler& eh)
 		{
-			return callback(Vtable{cb_obj, id}, &cb_obj, static_cast<int>(id));
+			return eventHandler(&eh,
+			                    {[](void* event_handler, GLArea& self) {
+				                     auto& obj = *static_cast<EventHandler*>(event_handler);
+				                     obj.template render<id>(self);
+			                     },
+			                     [](void* event_handler, GLArea& self, int width, int height) {
+				                     auto& obj = *static_cast<EventHandler*>(event_handler);
+				                     obj.template resize<id>(self, width, height);
+			                     },
+			                     [](void* event_handler, GLArea& self) {
+				                     auto& obj = *reinterpret_cast<EventHandler*>(event_handler);
+				                     obj.template realize<id>(self);
+			                     }});
 		}
-
-		int id() const noexcept;
-
 		GLArea& glActivate();
 
 		GLArea& versionRequest(int major, int minor);
@@ -52,33 +61,14 @@ namespace Texpainter::Ui
 
 		GLArea(Impl& impl): m_impl(&impl) {}
 
-		struct Vtable
+		struct EventHandlerVtable
 		{
-			Vtable() = default;
-
-			template<class Callback, class IdType>
-			explicit Vtable(Callback& cb, IdType) noexcept
-			{
-				render = [](void* cb_obj, GLArea& source) {
-					reinterpret_cast<Callback*>(cb_obj)->render(source,
-					                                            static_cast<IdType>(source.id()));
-				};
-				realize = [](void* cb_obj, GLArea& source) {
-					reinterpret_cast<Callback*>(cb_obj)->realize(source,
-					                                             static_cast<IdType>(source.id()));
-				};
-				resize = [](void* cb_obj, GLArea& source, int width, int height) {
-					reinterpret_cast<Callback*>(cb_obj)->resize(
-					    source, static_cast<IdType>(source.id()), width, height);
-				};
-			}
-
 			void (*render)(void* cb_obj, GLArea& source);
-			void (*realize)(void* cb_obj, GLArea& source);
 			void (*resize)(void* cb_obj, GLArea& source, int width, int height);
+			void (*realize)(void* cb_obj, GLArea& source);
 		};
 
-		GLArea& callback(const Vtable& vt, void* cb_obj, int id);
+		GLArea& eventHandler(void* cb_obj, const EventHandlerVtable& vt);
 	};
 }
 

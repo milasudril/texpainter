@@ -27,7 +27,29 @@ namespace Texpainter::App
 	public:
 		TerrainView(TerrainView&&) = delete;
 
-		explicit TerrainView(Ui::Container& owner): m_gl_area{owner} {}
+		explicit TerrainView(Ui::Container& owner): m_gl_area{owner}
+		{
+			m_gl_area.eventHandler<ControlId::GlArea>(*this);
+		}
+
+		template<ControlId>
+		void render(Ui::GLArea const&)
+		{
+			puts("Render");
+		}
+
+		template<ControlId>
+		void realize(Ui::GLArea const&)
+		{
+			puts("Realize");
+		}
+
+		template<ControlId>
+		void resize(Ui::GLArea const&, int, int)
+		{
+			puts("Realize");
+		}
+
 
 	private:
 		Ui::GLArea m_gl_area;
