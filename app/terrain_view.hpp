@@ -83,7 +83,7 @@ namespace Texpainter::App
 	public:
 		TerrainView(TerrainView&&) = delete;
 
-		explicit TerrainView(Ui::Container& owner): m_gl_area{owner}, m_mesh_size{0, 0}
+		explicit TerrainView(Ui::Container& owner): m_gl_area{owner}, m_initialized{false}, m_mesh_size{0, 0}
 		{
 			m_gl_area.eventHandler<ControlId::GlArea>(*this);
 		}
@@ -111,6 +111,7 @@ namespace Texpainter::App
 
 	private:
 		Ui::GLArea m_gl_area;
+		bool m_initialized;
 		VertexBuffer m_xy;
 		VertexBuffer m_topo;
 		VertexBuffer m_faces;

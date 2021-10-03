@@ -55,6 +55,8 @@ namespace Texpainter::Ui
 
 		GLArea& redraw() noexcept;
 
+		GLArea& activate() noexcept;
+
 	private:
 		class Impl;
 		Impl* m_impl;

@@ -20,6 +20,7 @@ void Texpainter::App::TerrainView::realize<Texpainter::App::TerrainView::Control
 		            reinterpret_cast<char const*>(glewGetErrorString(err)));
 		return;
 	}
+	m_initialized = true;
 
 	Logger::log(Logger::MessageType::Info, reinterpret_cast<char const*>(glGetString(GL_VERSION)));
 	// TODO: Create shader program
@@ -70,8 +71,9 @@ std::vector<std::array<unsigned int, 3>> gen_faces(Texpainter::Size2d size)
 
 Texpainter::App::TerrainView& Texpainter::App::TerrainView::meshSize(Size2d size)
 {
-	if(area(size) != area(m_mesh_size) || m_xy == nullptr)
+	if((area(size) != area(m_mesh_size) || m_xy == nullptr) && m_initialized)
 	{
+		m_gl_area.activate();
 		GLuint xy_id{};
 		{
 			glGenBuffers(1, &xy_id);

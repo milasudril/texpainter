@@ -50,6 +50,7 @@ namespace Texpainter::App
 		{
 			auto result = render(m_doc.get(), force_update);
 			m_img_view.image(result.pixels());
+			m_terrain_view.meshSize(result.pixels().size());
 			return *this;
 		}
 

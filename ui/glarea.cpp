@@ -33,6 +33,8 @@ public:
 
 	void redraw() noexcept { gtk_widget_queue_draw(GTK_WIDGET(m_handle)); }
 
+	void activate() noexcept { gtk_gl_area_make_current(m_handle); }
+
 private:
 	void* r_cb_obj;
 	EventHandlerVtable m_vt;
@@ -127,5 +129,11 @@ Texpainter::Ui::GLArea& Texpainter::Ui::GLArea::eventHandler(void* cb_obj,
 Texpainter::Ui::GLArea& Texpainter::Ui::GLArea::redraw() noexcept
 {
 	m_impl->redraw();
+	return *this;
+}
+
+Texpainter::Ui::GLArea& Texpainter::Ui::GLArea::activate() noexcept
+{
+	m_impl->activate();
 	return *this;
 }
