@@ -76,7 +76,7 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::meshSize(Size2d size
 		m_gl_area.activate();
 		GLuint xy_id{};
 		{
-			glGenBuffers(1, &xy_id);
+			glCreateBuffers(1, &xy_id);
 			auto xy_data = gen_xy(size);
 			glNamedBufferStorage(
 			    xy_id, 2 * sizeof(float) * std::size(xy_data), std::data(xy_data), 0);
@@ -84,7 +84,7 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::meshSize(Size2d size
 
 		GLuint faces_id{};
 		{
-			glGenBuffers(1, &faces_id);
+			glCreateBuffers(1, &faces_id);
 			auto faces_data = gen_faces(size);
 			glNamedBufferStorage(faces_id,
 			                     3 * sizeof(unsigned int) * std::size(faces_data),
@@ -93,7 +93,7 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::meshSize(Size2d size
 		}
 
 		GLuint topo_id{};
-		glGenBuffers(1, &topo_id);
+		glCreateBuffers(1, &topo_id);
 		glNamedBufferStorage(
 		    topo_id, sizeof(Model::TopographyInfo) * area(size), nullptr, GL_DYNAMIC_STORAGE_BIT);
 
