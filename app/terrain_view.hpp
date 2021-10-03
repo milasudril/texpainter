@@ -28,9 +28,9 @@ namespace Texpainter::App
 	class GlHandle
 	{
 	public:
-		explicit GlHandle(GLuint handle): m_handle{handle} {}
+		explicit GlHandle(GLuint handle) noexcept: m_handle{handle} {}
 
-		GlHandle(nullptr_t): m_handle{0} {}
+		GlHandle(nullptr_t) noexcept: m_handle{0} {}
 
 		GlHandle() = default;
 
@@ -38,15 +38,15 @@ namespace Texpainter::App
 
 		GlHandle& operator=(GlHandle const&) = default;
 
-		GlHandle& operator=(std::nullptr_t)
+		GlHandle& operator=(std::nullptr_t) noexcept
 		{
 			m_handle = 0;
 			return *this;
 		}
 
-		GLuint operator*() const { return m_handle; }
+		GLuint operator*() const noexcept { return m_handle; }
 
-		explicit operator bool() const { return m_handle != 0; }
+		explicit operator bool() const noexcept { return m_handle != 0; }
 
 		bool operator==(GlHandle const&) const = default;
 
