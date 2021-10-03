@@ -6,6 +6,7 @@
 #include "model/document.hpp"
 
 #include "ui/image_view.hpp"
+#include "ui/glarea.hpp"
 #include "ui/keyboard_state.hpp"
 #include "ui/widget_multiplexer.hpp"
 
@@ -27,7 +28,8 @@ namespace Texpainter::App
 		explicit DocumentPreviewer(Ui::Container& owner, Model::Document& doc)
 		    : m_doc{doc}
 		    , m_views{owner}
-		    , m_img_view{m_views.widgetName("Default output")}
+		    , m_img_view{m_views.widgetName("imgview")}
+		    , m_gl_area{m_views.widgetName("glarea")}
 		{
 			m_img_view.scale(0.5);
 			refresh();
@@ -72,6 +74,7 @@ namespace Texpainter::App
 
 		Ui::WidgetMultiplexer m_views;
 		Ui::ImageView m_img_view;
+		Ui::GLArea m_gl_area;
 	};
 }
 
