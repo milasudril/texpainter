@@ -53,6 +53,13 @@ Texpainter::Ui::WidgetMultiplexer& Texpainter::Ui::WidgetMultiplexer::add(void* 
 	return *this;
 }
 
+Texpainter::Ui::WidgetMultiplexer& Texpainter::Ui::WidgetMultiplexer::widgetName(
+    char const* widget_name)
+{
+	m_impl->widgetName(widget_name);
+	return *this;
+}
+
 Texpainter::Ui::WidgetMultiplexer& Texpainter::Ui::WidgetMultiplexer::show()
 {
 	m_impl->_show();
@@ -71,7 +78,8 @@ Texpainter::Ui::WidgetMultiplexer& Texpainter::Ui::WidgetMultiplexer::killFocus(
 	return *this;
 }
 
-Texpainter::Ui::WidgetMultiplexer& Texpainter::Ui::WidgetMultiplexer::showWidget(char const* widget_name)
+Texpainter::Ui::WidgetMultiplexer& Texpainter::Ui::WidgetMultiplexer::showWidget(
+    char const* widget_name)
 {
 	m_impl->showWidget(widget_name);
 	return *this;

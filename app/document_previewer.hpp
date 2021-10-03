@@ -1,4 +1,4 @@
-//@	{"targets":[{"name":"document_preview.hpp","type":"include"}]}
+//@	{"targets":[{"name":"document_previewer.hpp","type":"include"}]}
 
 #ifndef TEXPAINTER_APP_DOCUMENTPREVIEWER_HPP
 #define TEXPAINTER_APP_DOCUMENTPREVIEWER_HPP
@@ -7,6 +7,7 @@
 
 #include "ui/image_view.hpp"
 #include "ui/keyboard_state.hpp"
+#include "ui/widget_multiplexer.hpp"
 
 #include <utility>
 #include <functional>
@@ -25,7 +26,8 @@ namespace Texpainter::App
 
 		explicit DocumentPreviewer(Ui::Container& owner, Model::Document& doc)
 		    : m_doc{doc}
-		    , m_img_view{owner}
+		    , m_views{owner}
+		    , m_img_view{m_views.widgetName("Default output")}
 		{
 			m_img_view.scale(0.5);
 			refresh();
@@ -68,6 +70,7 @@ namespace Texpainter::App
 			src.refresh();
 		}
 
+		Ui::WidgetMultiplexer m_views;
 		Ui::ImageView m_img_view;
 	};
 }
