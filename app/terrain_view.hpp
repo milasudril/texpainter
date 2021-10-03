@@ -1,4 +1,4 @@
-//@	{"targets":[{"name":"terrain_view.hpp","type":"include"}]}
+//@	{"targets":[{"name":"terrain_view.hpp","type":"include", "dependencies":[{"ref": "GL", "rel":"external"}]}]}
 
 #ifndef TEXPAINTER_APP_TERRAINVIEW_HPP
 #define TEXPAINTER_APP_TERRAINVIEW_HPP
@@ -12,6 +12,7 @@
 #include "ui/keyboard_state.hpp"
 #include "ui/widget_multiplexer.hpp"
 
+#include <GL/gl.h>
 #include <utility>
 #include <functional>
 
@@ -35,6 +36,8 @@ namespace Texpainter::App
 		template<ControlId>
 		void render(Ui::GLArea const&)
 		{
+			glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT);
 			puts("Render");
 		}
 
