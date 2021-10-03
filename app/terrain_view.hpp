@@ -53,6 +53,10 @@ namespace Texpainter::App
 			puts("Resize");
 		}
 
+		TerrainView& canvasSize(Size2d size);
+
+		TerrainView& topography(Span2d<Model::TopographyInfo const>);
+
 
 	private:
 		Ui::GLArea m_gl_area;
