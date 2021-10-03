@@ -26,49 +26,52 @@ void Texpainter::App::TerrainView::realize<Texpainter::App::TerrainView::Control
 	// TODO: Create shader program
 }
 
-std::vector<std::pair<float, float>> gen_xy(Texpainter::Size2d size)
+namespace
 {
-	std::vector<std::pair<float, float>> ret(area(size));
-	auto const r_x = 0.5f*static_cast<float>(size.width());
-	auto const r_y = 0.5f*static_cast<float>(size.height());
-	for(uint32_t k = 0; k != size.height(); ++k)
+	std::vector<std::pair<float, float>> gen_xy(Texpainter::Size2d size)
 	{
-		for(uint32_t l = 0; l != size.width(); ++l)
+		std::vector<std::pair<float, float>> ret(area(size));
+		auto const r_x = 0.5f*static_cast<float>(size.width());
+		auto const r_y = 0.5f*static_cast<float>(size.height());
+		for(uint32_t k = 0; k != size.height(); ++k)
 		{
-			auto const x = static_cast<float>(l);
-			auto const y = static_cast<float>(k);
-			ret[k * size.width() + l] = std::pair{x - r_x, y - r_y};
+			for(uint32_t l = 0; l != size.width(); ++l)
+			{
+				auto const x = static_cast<float>(l);
+				auto const y = static_cast<float>(k);
+				ret[k * size.width() + l] = std::pair{x - r_x, y - r_y};
+			}
 		}
+
+		return ret;
 	}
 
-	return ret;
-}
-
-std::vector<std::array<unsigned int, 3>> gen_faces(Texpainter::Size2d size)
-{
-	std::vector<std::array<unsigned int, 3>> ret(2 * (size.width() - 1) * (size.height() - 1));
-
-	auto k_prev         = 0;
-	auto l_prev         = 0;
-	size_t write_offset = 0;
-
-	for(uint32_t k = 1; k != size.height(); ++k)
+	std::vector<std::array<unsigned int, 3>> gen_faces(Texpainter::Size2d size)
 	{
-		for(uint32_t l = 1; l != size.width(); ++l)
+		std::vector<std::array<unsigned int, 3>> ret(2 * (size.width() - 1) * (size.height() - 1));
+
+		auto k_prev         = 0;
+		auto l_prev         = 0;
+		size_t write_offset = 0;
+
+		for(uint32_t k = 1; k != size.height(); ++k)
 		{
-			ret[write_offset + 0] = std::array<unsigned int, 3>{
-			    k_prev * size.width() + l_prev, k_prev * size.width() + l, k * size.width() + l};
+			for(uint32_t l = 1; l != size.width(); ++l)
+			{
+				ret[write_offset + 0] = std::array<unsigned int, 3>{
+					k_prev * size.width() + l_prev, k_prev * size.width() + l, k * size.width() + l};
 
-			ret[write_offset + 1] = std::array<unsigned int, 3>{
-			    k * size.width() + l, k * size.width() + l_prev, k_prev * size.width() + l_prev};
+				ret[write_offset + 1] = std::array<unsigned int, 3>{
+					k * size.width() + l, k * size.width() + l_prev, k_prev * size.width() + l_prev};
 
-			write_offset += 2;
-			l_prev = l;
+				write_offset += 2;
+				l_prev = l;
+			}
+			k_prev = k;
 		}
-		k_prev = k;
-	}
 
-	return ret;
+		return ret;
+	}
 }
 
 Texpainter::App::TerrainView& Texpainter::App::TerrainView::meshSize(Size2d size)
@@ -106,4 +109,11 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::meshSize(Size2d size
 	}
 
 	return *this;
+}
+
+template<>
+void Texpainter::App::TerrainView::render<Texpainter::App::TerrainView::ControlId::GlArea>(Ui::GLArea const&)
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+	puts("Render");
 }

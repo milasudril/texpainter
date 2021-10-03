@@ -89,12 +89,7 @@ namespace Texpainter::App
 		}
 
 		template<ControlId>
-		void render(Ui::GLArea const&)
-		{
-			glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT);
-			puts("Render");
-		}
+		void render(Ui::GLArea const&);
 
 		template<ControlId>
 		void realize(Ui::GLArea const&);
