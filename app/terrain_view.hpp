@@ -113,6 +113,7 @@ namespace Texpainter::App
 		Ui::GLArea m_gl_area;
 		VertexBuffer m_xy;
 		VertexBuffer m_topo;
+		VertexBuffer m_faces;
 		Size2d m_mesh_size;
 	};
 }
