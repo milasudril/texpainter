@@ -124,8 +124,9 @@ namespace Texpainter::Model
 					m_valid_state = validate(*this) == ValidationResult::NoError
 					                    ? ValidationState::ValidatedValid
 					                    : ValidationState::ValidatedNotValid;
+					compile();
 				}
-			return m_valid_state == ValidationState::ValidatedValid;
+			return m_valid_state == ValidationState::ValidatedValid && std::size(m_node_array) != 0;
 		}
 
 		void clearValidationState()
@@ -147,6 +148,7 @@ namespace Texpainter::Model
 			std::array<size_t, Node::maxNumInputs()> dependent_tasks;
 			size_t input_count;
 		};
+		void compile() const;
 		mutable std::vector<Task> m_node_array;
 		mutable std::vector<std::atomic<bool>> m_node_status;
 		mutable Texpainter::Sched::ThreadPool m_workers;

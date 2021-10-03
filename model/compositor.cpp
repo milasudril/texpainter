@@ -31,40 +31,44 @@ Texpainter::FilterGraph::ValidationResult Texpainter::Model::validate(Compositor
 	return result;
 }
 
+void Texpainter::Model::Compositor::compile() const
+{
+	std::vector<Task> nodes;
+	nodes.reserve(m_graph.size());
+	using Node = FilterGraph::Node;
+	std::map<Node const*, size_t> node_to_task_id;
+
+	auto add_task = [&nodes, &node_to_task_id, task_id = static_cast<size_t>(0)](auto const& node,
+	                                                                             auto) mutable {
+		nodes.push_back(Task{std::ref(node), task_id, {}, std::size(node.inputs())});
+		node_to_task_id.insert(std::pair{&node, task_id});
+		++task_id;
+		return GraphProcessing::Continue;
+	};
+
+	if(isConnectedDeep(*r_output_node)) { processGraphNodeRecursive(add_task, *r_output_node); }
+
+	if(r_topo_output_node != nullptr && isConnectedDeep(*r_topo_output_node))
+	{ processGraphNodeRecursive(add_task, *r_topo_output_node); }
+
+	std::ranges::for_each(nodes, [&node_to_task_id](auto& item) {
+		auto const inputs = item.node.get().inputs();
+		for(size_t k = 0; k < std::size(inputs); ++k)
+		{
+			item.dependent_tasks[k] = node_to_task_id.find(&inputs[k].processor())->second;
+		}
+	});
+	m_node_array  = std::move(nodes);
+	m_node_status = std::vector<std::atomic<bool>>(std::size(m_node_array));
+}
+
 Texpainter::FilterGraph::PortValue const& Texpainter::Model::Compositor::process(
     Size2d canvas_size, double resolution) const
 {
 	assert(valid());
 	if(m_node_array.size() == 0) [[unlikely]]
 		{
-			std::vector<Task> nodes;
-			nodes.reserve(m_graph.size());
-			using Node = FilterGraph::Node;
-			std::map<Node const*, size_t> node_to_task_id;
-
-			auto add_task = [&nodes, &node_to_task_id, task_id = static_cast<size_t>(0)](
-			                    auto const& node, auto) mutable {
-				nodes.push_back(Task{std::ref(node), task_id, {}, std::size(node.inputs())});
-				node_to_task_id.insert(std::pair{&node, task_id});
-				++task_id;
-				return GraphProcessing::Continue;
-			};
-
-			if(isConnectedDeep(*r_output_node))
-			{ processGraphNodeRecursive(add_task, *r_output_node); }
-
-			if(r_topo_output_node != nullptr && isConnectedDeep(*r_topo_output_node))
-			{ processGraphNodeRecursive(add_task, *r_topo_output_node); }
-
-			std::ranges::for_each(nodes, [&node_to_task_id](auto& item) {
-				auto const inputs = item.node.get().inputs();
-				for(size_t k = 0; k < std::size(inputs); ++k)
-				{
-					item.dependent_tasks[k] = node_to_task_id.find(&inputs[k].processor())->second;
-				}
-			});
-			m_node_array  = std::move(nodes);
-			m_node_status = std::vector<std::atomic<bool>>(std::size(m_node_array));
+			compile();
 		}
 
 	std::list<Task> task_list{std::begin(m_node_array), std::end(m_node_array)};
