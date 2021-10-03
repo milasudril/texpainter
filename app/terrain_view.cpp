@@ -29,13 +29,15 @@ void Texpainter::App::TerrainView::realize<Texpainter::App::TerrainView::Control
 std::vector<std::pair<float, float>> gen_xy(Texpainter::Size2d size)
 {
 	std::vector<std::pair<float, float>> ret(area(size));
-
+	auto const r_x = 0.5f*static_cast<float>(size.width());
+	auto const r_y = 0.5f*static_cast<float>(size.height());
 	for(uint32_t k = 0; k != size.height(); ++k)
 	{
 		for(uint32_t l = 0; l != size.width(); ++l)
 		{
-			ret[k * size.width() + l] =
-			    std::pair{static_cast<float>(l - l / 2), static_cast<float>(k - k / 2)};
+			auto const x = static_cast<float>(l);
+			auto const y = static_cast<float>(k);
+			ret[k * size.width() + l] = std::pair{x - r_x, y - r_y};
 		}
 	}
 
