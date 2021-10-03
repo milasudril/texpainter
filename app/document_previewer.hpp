@@ -3,6 +3,8 @@
 #ifndef TEXPAINTER_APP_DOCUMENTPREVIEWER_HPP
 #define TEXPAINTER_APP_DOCUMENTPREVIEWER_HPP
 
+#include "./terrain_view.hpp"
+
 #include "model/document.hpp"
 
 #include "ui/image_view.hpp"
@@ -29,10 +31,10 @@ namespace Texpainter::App
 		    : m_doc{doc}
 		    , m_views{owner}
 		    , m_img_view{m_views.widgetName("imgview")}
-		    , m_gl_area{m_views.widgetName("glarea")}
+		    , m_terrain_view{m_views.widgetName("terrainview")}
 		{
 			m_img_view.scale(0.5);
-			m_views.showWidget("glarea");
+			m_views.showWidget("terrainview");
 			refresh();
 		}
 
@@ -75,7 +77,7 @@ namespace Texpainter::App
 
 		Ui::WidgetMultiplexer m_views;
 		Ui::ImageView m_img_view;
-		Ui::GLArea m_gl_area;
+		TerrainView m_terrain_view;
 	};
 }
 
