@@ -87,6 +87,15 @@ namespace Texpainter::App
 				glDeleteProgram(handle);
 			}
 		};
+
+		struct VertexArrayDeleter: GlResourceTraits
+		{
+			void operator()(GlHandle id)
+			{
+				auto handle = *id;
+				glDeleteVertexArrays(1, &handle);
+			}
+		};
 	}
 
 	using VertexBuffer = std::unique_ptr<GLuint, terrain_view_detail::VertexBufferDeleter>;
@@ -94,6 +103,8 @@ namespace Texpainter::App
 	using Shader = std::unique_ptr<GLuint, terrain_view_detail::ShaderDeleter>;
 
 	using ShaderProgram = std::unique_ptr<GLuint, terrain_view_detail::ShaderProgramDeleter>;
+
+	using VertexArray =  std::unique_ptr<GLuint, terrain_view_detail::VertexArrayDeleter>;
 
 	class TerrainView
 	{
@@ -135,6 +146,7 @@ namespace Texpainter::App
 		VertexBuffer m_xy;
 		VertexBuffer m_topo;
 		VertexBuffer m_faces;
+		VertexArray m_vert_array;
 		Size2d m_mesh_size;
 		ShaderProgram m_shader_program;
 	};

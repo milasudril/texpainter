@@ -82,6 +82,10 @@ void Texpainter::App::TerrainView::realize<Texpainter::App::TerrainView::Control
 
 	m_shader_program = make_program(std::move(shaders));
 	glUseProgram(*m_shader_program.get());
+
+	GLuint id{};
+	glCreateVertexArrays(1, &id);
+	m_vert_array = VertexArray{GlHandle{id}};
 }
 
 namespace
