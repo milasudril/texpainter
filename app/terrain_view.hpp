@@ -69,9 +69,31 @@ namespace Texpainter::App
 				glDeleteBuffers(1, &handle);
 			}
 		};
+
+		struct ShaderDeleter: GlResourceTraits
+		{
+			void operator()(GlHandle id)
+			{
+				auto handle = *id;
+				glDeleteShader(handle);
+			}
+		};
+
+		struct ShaderProgramDeleter: GlResourceTraits
+		{
+			void operator()(GlHandle id)
+			{
+				auto handle = *id;
+				glDeleteProgram(handle);
+			}
+		};
 	}
 
 	using VertexBuffer = std::unique_ptr<GLuint, terrain_view_detail::VertexBufferDeleter>;
+
+	using Shader = std::unique_ptr<GLuint, terrain_view_detail::ShaderDeleter>;
+
+	using ShaderProgram = std::unique_ptr<GLuint, terrain_view_detail::ShaderProgramDeleter>;
 
 	class TerrainView
 	{
@@ -83,7 +105,10 @@ namespace Texpainter::App
 	public:
 		TerrainView(TerrainView&&) = delete;
 
-		explicit TerrainView(Ui::Container& owner): m_gl_area{owner}, m_initialized{false}, m_mesh_size{0, 0}
+		explicit TerrainView(Ui::Container& owner)
+		    : m_gl_area{owner}
+		    , m_initialized{false}
+		    , m_mesh_size{0, 0}
 		{
 			m_gl_area.eventHandler<ControlId::GlArea>(*this);
 		}
@@ -111,6 +136,7 @@ namespace Texpainter::App
 		VertexBuffer m_topo;
 		VertexBuffer m_faces;
 		Size2d m_mesh_size;
+		ShaderProgram m_shader_program;
 	};
 }
 
