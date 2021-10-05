@@ -31,7 +31,7 @@ public:
 		gtk_gl_area_set_required_version(m_handle, major, minor);
 	}
 
-	void redraw() noexcept { gtk_widget_queue_draw(GTK_WIDGET(m_handle)); }
+	void redraw() noexcept { gtk_gl_area_queue_render(m_handle); }
 
 	void activate() noexcept { gtk_gl_area_make_current(m_handle); }
 
@@ -72,7 +72,7 @@ Texpainter::Ui::GLArea::Impl::Impl(Container& cnt): GLArea(*this)
 	g_signal_connect(gl_area, "realize", G_CALLBACK(realize), this);
 	gtk_gl_area_set_has_depth_buffer(gl_area, TRUE);
 	gtk_gl_area_set_has_stencil_buffer(gl_area, TRUE);
-	g_object_ref_sink(gl_area);
+	gtk_gl_area_set_auto_render(gl_area, FALSE);
 	cnt.add(gl_area);
 
 	m_handle = gl_area;
@@ -83,7 +83,6 @@ Texpainter::Ui::GLArea::Impl::~Impl()
 	m_impl   = nullptr;
 	r_cb_obj = nullptr;
 	gtk_widget_destroy(GTK_WIDGET(m_handle));
-	g_object_unref(m_handle);
 }
 
 Texpainter::Ui::GLArea::GLArea(Container& cnt): m_impl(new Impl(cnt)) {}
