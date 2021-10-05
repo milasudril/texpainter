@@ -133,7 +133,6 @@ namespace Texpainter::App
 		template<ControlId>
 		void resize(Ui::GLArea const&, int, int)
 		{
-			puts("Resize");
 		}
 
 		TerrainView& meshSize(Size2d size);

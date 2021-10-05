@@ -51,7 +51,7 @@ private:
 	{
 		auto self = reinterpret_cast<Impl*>(user_data);
 		if(self->r_cb_obj != nullptr) { self->m_vt.resize(self->r_cb_obj, *self, width, height); }
-		return TRUE;
+		return FALSE;
 	}
 
 	static void realize(GtkWidget*, void* user_data)

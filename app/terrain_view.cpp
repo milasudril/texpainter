@@ -185,6 +185,7 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::meshSize(Size2d size
 		m_xy        = VertexBuffer{GlHandle{xy_id}};
 		m_topo      = VertexBuffer{GlHandle{topo_id}};
 		m_faces     = VertexBuffer{GlHandle{faces_id}};
+		m_gl_area.redraw();
 	}
 
 	return *this;
@@ -212,7 +213,9 @@ void Texpainter::App::TerrainView::render<Texpainter::App::TerrainView::ControlI
 {
 	if(m_xy != nullptr)
 	{
-		glClear(GL_COLOR_BUFFER_BIT);
+		puts("Render");
+		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
 		auto const face_count = 2 * (m_mesh_size.width() - 1) * (m_mesh_size.height() - 1);
 		glDrawElements(
 		    GL_TRIANGLES, 3 * static_cast<GLsizei>(face_count), GL_UNSIGNED_INT, nullptr);
