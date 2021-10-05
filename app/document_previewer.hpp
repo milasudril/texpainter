@@ -79,6 +79,7 @@ namespace Texpainter::App
 			else
 			{
 				m_views.showWidget("terrainview");
+				m_terrain_view.meshSize(m_doc.get().canvasSize());
 			}
 		}
 

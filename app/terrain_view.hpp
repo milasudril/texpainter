@@ -104,7 +104,7 @@ namespace Texpainter::App
 
 	using ShaderProgram = std::unique_ptr<GLuint, terrain_view_detail::ShaderProgramDeleter>;
 
-	using VertexArray =  std::unique_ptr<GLuint, terrain_view_detail::VertexArrayDeleter>;
+	using VertexArray = std::unique_ptr<GLuint, terrain_view_detail::VertexArrayDeleter>;
 
 	class TerrainView
 	{

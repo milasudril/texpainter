@@ -36,13 +36,15 @@ namespace
 	constexpr char const* vertex_shader = R"shader(#version 460 core
 layout (location = 0) in vec2 xy;
 layout (location = 1) in vec4 n_elev;
+layout (location = 2) uniform float scale;
 
 out vec4 vertex_normal;
 out vec4 frag_pos;
 
 void main()
 {
-	vec4 pos = vec4(xy.xy, n_elev.w, 1.0);
+	vec3 r = vec3(xy.xy, n_elev.w)/scale;
+	vec4 pos = vec4(r.xyz, 1.0);
 	gl_Position = pos;
 	frag_pos = pos;
 	vertex_normal = vec4(n_elev.xyz, 0.0);
@@ -57,7 +59,7 @@ in vec4 frag_pos;
 
 void main()
 {
-	frag_color = vec4(1.0, 0.5, 0.25, 1.0);
+	frag_color = vec4(frag_pos.x + 0.5, 0.5, frag_pos.y + 0.5, 1.0);
 }
 )shader";
 }
@@ -85,6 +87,9 @@ void Texpainter::App::TerrainView::realize<Texpainter::App::TerrainView::Control
 
 	GLuint id{};
 	glCreateVertexArrays(1, &id);
+	glEnableVertexArrayAttrib(id, 0);
+	glEnableVertexArrayAttrib(id, 1);
+	glClearColor(0, 0, 0, 1.0);
 	m_vert_array = VertexArray{GlHandle{id}};
 }
 
@@ -101,7 +106,7 @@ namespace
 			{
 				auto const x              = static_cast<float>(l);
 				auto const y              = static_cast<float>(k);
-				ret[k * size.width() + l] = std::pair{x - r_x, y - r_y};
+				ret[k * size.width() + l] = std::pair{x - r_x + 0.5f, y - r_y + 0.5f};
 			}
 		}
 
@@ -113,11 +118,11 @@ namespace
 		std::vector<std::array<unsigned int, 3>> ret(2 * (size.width() - 1) * (size.height() - 1));
 
 		auto k_prev         = 0;
-		auto l_prev         = 0;
 		size_t write_offset = 0;
 
 		for(uint32_t k = 1; k != size.height(); ++k)
 		{
+			auto l_prev = 0;
 			for(uint32_t l = 1; l != size.width(); ++l)
 			{
 				ret[write_offset + 0] = std::array<unsigned int, 3>{k_prev * size.width() + l_prev,
@@ -166,6 +171,16 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::meshSize(Size2d size
 		glNamedBufferStorage(
 		    topo_id, sizeof(Model::TopographyInfo) * area(size), nullptr, GL_DYNAMIC_STORAGE_BIT);
 
+		glVertexArrayVertexBuffer(*m_vert_array.get(), 0, xy_id, 0, 2 * sizeof(float));
+		glVertexArrayVertexBuffer(
+		    *m_vert_array.get(), 1, topo_id, 0, sizeof(Model::TopographyInfo));
+		glVertexArrayAttribFormat(*m_vert_array.get(), 0, 2, GL_FLOAT, GL_FALSE, 0);
+		glVertexArrayAttribFormat(*m_vert_array.get(), 1, 4, GL_FLOAT, GL_FALSE, 0);
+		glVertexArrayAttribBinding(*m_vert_array.get(), 0, 0);
+		glVertexArrayAttribBinding(*m_vert_array.get(), 1, 1);
+		glVertexArrayElementBuffer(*m_vert_array.get(), faces_id);
+		glBindVertexArray(*m_vert_array.get());
+		glUniform1f(2, static_cast<float>(std::max(size.width(), size.height())));
 		m_mesh_size = size;
 		m_xy        = VertexBuffer{GlHandle{xy_id}};
 		m_topo      = VertexBuffer{GlHandle{topo_id}};
@@ -179,6 +194,11 @@ template<>
 void Texpainter::App::TerrainView::render<Texpainter::App::TerrainView::ControlId::GlArea>(
     Ui::GLArea const&)
 {
-	glClear(GL_COLOR_BUFFER_BIT);
-	puts("Render");
+	if(m_xy != nullptr)
+	{
+		glClear(GL_COLOR_BUFFER_BIT);
+		auto const face_count = 2 * (m_mesh_size.width() - 1) * (m_mesh_size.height() - 1);
+		glDrawElements(
+		    GL_TRIANGLES, 3 * static_cast<GLsizei>(face_count), GL_UNSIGNED_INT, nullptr);
+	}
 }
