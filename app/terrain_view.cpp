@@ -190,6 +190,22 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::meshSize(Size2d size
 	return *this;
 }
 
+Texpainter::App::TerrainView& Texpainter::App::TerrainView::topography(Span2d<Model::TopographyInfo const> n_elev)
+{
+	if(m_mesh_size != n_elev.size())
+	{
+		meshSize(n_elev.size());
+	}
+
+	if(m_xy == nullptr)
+	{ return *this; }
+
+	m_gl_area.activate();
+	glBufferSubData(*m_topo.get(), 0, static_cast<GLsizei>(sizeof(Model::TopographyInfo)*area(n_elev)), n_elev.data());
+	m_gl_area.redraw();
+	return *this;
+}
+
 template<>
 void Texpainter::App::TerrainView::render<Texpainter::App::TerrainView::ControlId::GlArea>(
     Ui::GLArea const&)
