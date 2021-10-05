@@ -40,7 +40,6 @@ namespace Texpainter::Model
 
 			{
 				auto output   = std::make_unique<ImageProcessorWrapper<ImageSink>>(ImageSink{});
-				r_output      = &output->processor();
 				r_output_node = &m_graph.insert(std::move(output)).second.get();
 			}
 		}
@@ -162,7 +161,6 @@ namespace Texpainter::Model
 		};
 		mutable ValidationState m_valid_state;
 
-		ImageSink* r_output;
 		FilterGraph::Node* r_output_node;
 
 		TopographySink* r_topo_output;
