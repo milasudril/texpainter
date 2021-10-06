@@ -32,7 +32,8 @@ namespace Texpainter::App
 	public:
 		DocumentPreviewer(DocumentPreviewer&&) = delete;
 
-		explicit DocumentPreviewer(Ui::Container& owner, std::reference_wrapper<Model::Document const> doc)
+		explicit DocumentPreviewer(Ui::Container& owner,
+		                           std::reference_wrapper<Model::Document const> doc)
 		    : m_doc{doc}
 		    , m_root{owner, Ui::Box::Orientation::Vertical}
 		    , m_node_selector{m_root}
@@ -79,6 +80,7 @@ namespace Texpainter::App
 		template<ControlId>
 		void onChanged(Ui::Combobox&)
 		{
+			m_node_selected = &m_index_to_node[m_node_selector.selected()].get();
 		}
 
 		template<ControlId, class... T>
@@ -99,6 +101,8 @@ namespace Texpainter::App
 
 		Ui::Box m_root;
 		Ui::Combobox m_node_selector;
+		std::vector<std::reference_wrapper<FilterGraph::Node const>> m_index_to_node;
+		FilterGraph::Node const* m_node_selected;
 		Ui::WidgetMultiplexer m_views;
 		Ui::ImageView m_img_view;
 		TerrainView m_terrain_view;

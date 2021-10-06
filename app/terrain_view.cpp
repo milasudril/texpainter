@@ -191,18 +191,18 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::meshSize(Size2d size
 	return *this;
 }
 
-Texpainter::App::TerrainView& Texpainter::App::TerrainView::topography(Span2d<Model::TopographyInfo const> n_elev)
+Texpainter::App::TerrainView& Texpainter::App::TerrainView::topography(
+    Span2d<Model::TopographyInfo const> n_elev)
 {
-	if(m_mesh_size != n_elev.size())
-	{
-		meshSize(n_elev.size());
-	}
+	if(m_mesh_size != n_elev.size()) { meshSize(n_elev.size()); }
 
-	if(m_xy == nullptr)
-	{ return *this; }
+	if(m_xy == nullptr) { return *this; }
 
 	m_gl_area.activate();
-	glBufferSubData(*m_topo.get(), 0, static_cast<GLsizei>(sizeof(Model::TopographyInfo)*area(n_elev)), n_elev.data());
+	glBufferSubData(*m_topo.get(),
+	                0,
+	                static_cast<GLsizei>(sizeof(Model::TopographyInfo) * area(n_elev)),
+	                n_elev.data());
 	m_gl_area.redraw();
 	return *this;
 }
@@ -214,7 +214,7 @@ void Texpainter::App::TerrainView::render<Texpainter::App::TerrainView::ControlI
 	if(m_xy != nullptr)
 	{
 		puts("Render");
-		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		auto const face_count = 2 * (m_mesh_size.width() - 1) * (m_mesh_size.height() - 1);
 		glDrawElements(

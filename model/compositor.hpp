@@ -58,7 +58,7 @@ namespace Texpainter::Model
 				using FilterGraph::ImageProcessorWrapper;
 				auto output =
 				    std::make_unique<ImageProcessorWrapper<TopographySink>>(TopographySink{});
-				auto ret      = m_graph.insert(std::move(output));
+				auto ret = m_graph.insert(std::move(output));
 
 				m_topo_output_node_id = ret.first;
 				r_topo_output_node    = &ret.second.get();
