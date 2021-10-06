@@ -1,4 +1,7 @@
-//@	{"targets":[{"name":"document_previewer.hpp","type":"include"}]}
+//@	{
+//@	 "targets":[{"name":"document_previewer.hpp", "type":"include"}]
+//@	,"dependencies_extra":[{"ref":"./document_previewer.o", "rel":"implementation"}]
+//@	}
 
 #ifndef TEXPAINTER_APP_DOCUMENTPREVIEWER_HPP
 #define TEXPAINTER_APP_DOCUMENTPREVIEWER_HPP
@@ -23,25 +26,22 @@ namespace Texpainter::App
 	{
 		enum class ControlId : int
 		{
-			ViewSelector,
+			NodeSelector
 		};
 
 	public:
 		DocumentPreviewer(DocumentPreviewer&&) = delete;
 
-		explicit DocumentPreviewer(Ui::Container& owner, Model::Document& doc)
+		explicit DocumentPreviewer(Ui::Container& owner, std::reference_wrapper<Model::Document const> doc)
 		    : m_doc{doc}
 		    , m_root{owner, Ui::Box::Orientation::Vertical}
-		    , m_view_selector{m_root}
+		    , m_node_selector{m_root}
 		    , m_views{m_root.insertMode(Ui::Box::InsertMode{0, Ui::Box::Fill | Ui::Box::Expand})}
 		    , m_img_view{m_views.widgetName("imgview")}
 		    , m_terrain_view{m_views.widgetName("terrainview")}
 		{
 			m_img_view.scale(0.5);
-			m_view_selector.append("imgview")
-			    .append("terrainview")
-			    .selected(0)
-			    .eventHandler<ControlId::ViewSelector>(*this);
+			m_node_selector.eventHandler<ControlId::NodeSelector>(*this);
 			refresh();
 		}
 
@@ -57,8 +57,12 @@ namespace Texpainter::App
 		DocumentPreviewer& refresh(
 		    Model::Document::ForceUpdate force_update = Model::Document::ForceUpdate{true})
 		{
-			return refreshImageView(force_update);
+			refreshNodeSelector();
+			refreshImageView(force_update);
+			return *this;
 		}
+
+		void refreshNodeSelector();
 
 		void onKeyDown(Ui::KeyboardState const&) {}
 
@@ -73,14 +77,8 @@ namespace Texpainter::App
 		}
 
 		template<ControlId>
-		void onChanged(Ui::Combobox& src)
+		void onChanged(Ui::Combobox&)
 		{
-			if(src.selected() == 0) { m_views.showWidget("imgview"); }
-			else
-			{
-				m_views.showWidget("terrainview");
-				m_terrain_view.meshSize(m_doc.get().canvasSize());
-			}
 		}
 
 		template<ControlId, class... T>
@@ -89,7 +87,7 @@ namespace Texpainter::App
 		}
 
 	private:
-		std::reference_wrapper<Model::Document> m_doc;
+		std::reference_wrapper<Model::Document const> m_doc;
 		void* r_eh;
 		void (*on_updated)(void*, DocumentPreviewer&);
 
@@ -100,7 +98,7 @@ namespace Texpainter::App
 		}
 
 		Ui::Box m_root;
-		Ui::Combobox m_view_selector;
+		Ui::Combobox m_node_selector;
 		Ui::WidgetMultiplexer m_views;
 		Ui::ImageView m_img_view;
 		TerrainView m_terrain_view;
