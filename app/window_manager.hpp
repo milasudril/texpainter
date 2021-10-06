@@ -595,7 +595,7 @@ namespace Texpainter::App
 
 			if(auto output = m_windows.get<WindowType::DocumentPreviewer>().get();
 			   output != nullptr)
-			{ output->widget().refresh(Model::Document::ForceUpdate{true}); }
+			{ output->widget().refresh(); }
 		}
 
 		template<auto>

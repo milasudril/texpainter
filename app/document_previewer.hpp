@@ -46,20 +46,18 @@ namespace Texpainter::App
 			refresh();
 		}
 
-		DocumentPreviewer& refreshImageView(
-		    Model::Document::ForceUpdate force_update = Model::Document::ForceUpdate{true})
+		DocumentPreviewer& refreshImageView()
 		{
-			auto result = render(m_doc.get(), force_update);
+			auto result = render(m_doc.get(), Model::Document::ForceUpdate{false});
 			m_img_view.image(result.pixels());
 			m_terrain_view.meshSize(result.pixels().size());
 			return *this;
 		}
 
-		DocumentPreviewer& refresh(
-		    Model::Document::ForceUpdate force_update = Model::Document::ForceUpdate{true})
+		DocumentPreviewer& refresh()
 		{
 			refreshNodeSelector();
-			refreshImageView(force_update);
+			refreshImageView();
 			return *this;
 		}
 
@@ -80,7 +78,7 @@ namespace Texpainter::App
 		template<ControlId>
 		void onChanged(Ui::Combobox&)
 		{
-			if(std::size(m_node_to_index) != 0)
+			if(std::size(m_index_to_node) != 0)
 			{ m_node_selected = &m_index_to_node[m_node_selector.selected()].get(); }
 			else
 			{ m_node_selected = nullptr; }
