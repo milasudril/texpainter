@@ -401,6 +401,7 @@ namespace Texpainter::App
 			{
 				insert(ImageProcessorRegistry::createImageProcessor(name), m_filtermenuloc);
 				m_filtermenu.reset();
+				r_callback(r_eh, *this);
 			}
 		}
 
@@ -419,6 +420,7 @@ namespace Texpainter::App
 			{
 				insert(ImageProcessorRegistry::createImageProcessor(name), m_filtermenuloc);
 				m_filtermenu.reset();
+				r_callback(r_eh, *this);
 			}
 		}
 
@@ -565,6 +567,7 @@ namespace Texpainter::App
 		widget.second.insertNodeWithName<Compositor::ControlId::CopyNode>(
 		    *this, widget.first, Model::ItemName{widget.inputField().content()});
 		m_copy_name.reset();
+		r_callback(r_eh, *this);
 	}
 }
 

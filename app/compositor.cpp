@@ -228,6 +228,7 @@ void Texpainter::App::Compositor::insertNodeEditor(FilterGraph::Graph::NodeItem 
 	ip.first->second->eventHandler(*this);
 	m_ports.addPorts(item.second.get());
 	m_canvas.showWidgets();
+	r_callback(r_eh, *this);
 }
 
 void Texpainter::App::Compositor::refresh()
