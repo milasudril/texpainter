@@ -80,7 +80,10 @@ namespace Texpainter::App
 		template<ControlId>
 		void onChanged(Ui::Combobox&)
 		{
-			m_node_selected = &m_index_to_node[m_node_selector.selected()].get();
+			if(std::size(m_node_to_index) != 0)
+			{ m_node_selected = &m_index_to_node[m_node_selector.selected()].get(); }
+			else
+			{ m_node_selected = nullptr; }
 		}
 
 		template<ControlId, class... T>
