@@ -34,7 +34,7 @@ namespace Texpainter::Model
 		using InputPortIndex  = FilterGraph::InputPortIndex;
 		using OutputPortIndex = FilterGraph::OutputPortIndex;
 
-		Compositor(): m_valid_state{ValidationState::NotValidated}, r_topo_output_node{nullptr}
+		Compositor(): m_valid_state{ValidationState::NotValidated}
 		{
 			using FilterGraph::ImageProcessorWrapper;
 
@@ -122,6 +122,11 @@ namespace Texpainter::Model
 
 		auto nodeData() const { return FilterGraph::nodeData(m_graph); }
 
+		FilterGraph::Node const* outputNode() const
+		{
+			return r_output_node;
+		}
+
 	private:
 		struct Task
 		{
@@ -146,9 +151,6 @@ namespace Texpainter::Model
 		mutable ValidationState m_valid_state;
 
 		FilterGraph::Node* r_output_node;
-
-		FilterGraph::NodeId m_topo_output_node_id;
-		FilterGraph::Node* r_topo_output_node;
 
 		FilterGraph::Graph m_graph;
 	};

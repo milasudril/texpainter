@@ -48,9 +48,6 @@ void Texpainter::Model::Compositor::compile() const
 
 	if(isConnectedDeep(*r_output_node)) { processGraphNodeRecursive(add_task, *r_output_node); }
 
-	if(r_topo_output_node != nullptr && isConnectedDeep(*r_topo_output_node))
-	{ processGraphNodeRecursive(add_task, *r_topo_output_node); }
-
 	std::ranges::for_each(nodes, [&node_to_task_id](auto& item) {
 		auto const inputs = item.node.get().inputs();
 		for(size_t k = 0; k < std::size(inputs); ++k)
