@@ -29,8 +29,6 @@ namespace Texpainter::Model
 			return *this;
 		}
 
-		auto addTopoOutput() { return m_compositor.get().addTopoOutput(); }
-
 		bool checkedConnect(Compositor::NodeId a,
 		                    Compositor::InputPortIndex sink,
 		                    Compositor::NodeId b,

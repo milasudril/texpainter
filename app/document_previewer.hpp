@@ -81,7 +81,9 @@ namespace Texpainter::App
 			if(std::size(m_index_to_node) != 0)
 			{ m_node_selected = &m_index_to_node[m_node_selector.selected()].get(); }
 			else
-			{ m_node_selected = nullptr; }
+			{
+				m_node_selected = nullptr;
+			}
 		}
 
 		template<ControlId, class... T>

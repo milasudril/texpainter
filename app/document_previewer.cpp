@@ -9,7 +9,7 @@ void Texpainter::App::DocumentPreviewer::refreshNodeSelector()
 	m_node_selector.clear();
 	m_index_to_node.clear();
 
-	auto const& nodes      = m_doc.get().compositor().nodesWithId();
+	auto const& nodes    = m_doc.get().compositor().nodesWithId();
 	auto index_to_select = static_cast<size_t>(-1);
 	std::ranges::for_each(
 	    nodes,
@@ -26,9 +26,7 @@ void Texpainter::App::DocumentPreviewer::refreshNodeSelector()
 	    });
 
 	if(index_to_select != static_cast<size_t>(-1))
-	{
-		m_node_selector.selected(static_cast<int>(index_to_select));
-	}
+	{ m_node_selector.selected(static_cast<int>(index_to_select)); }
 	else
 	{
 		m_node_selected = nullptr;
