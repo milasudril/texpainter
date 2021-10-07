@@ -41,6 +41,7 @@ namespace Texpainter::Model
 			{
 				auto output   = std::make_unique<ImageProcessorWrapper<ImageSink>>(ImageSink{});
 				r_output_node = &m_graph.insert(std::move(output)).second.get();
+				r_default_output_node = r_output_node;
 			}
 		}
 
@@ -89,6 +90,10 @@ namespace Texpainter::Model
 
 		Compositor& erase(FilterGraph::NodeId id)
 		{
+			if(id == r_output_node->nodeId())
+			{
+				r_output_node = r_default_output_node;
+			}
 			m_graph.erase(id);
 			clearValidationState();
 			return *this;
@@ -127,6 +132,13 @@ namespace Texpainter::Model
 			return r_output_node;
 		}
 
+		Compositor& outputNode(std::reference_wrapper<FilterGraph::Node const> node)
+		{
+			r_output_node = &node.get();
+			clearValidationState();
+			return *this;
+		}
+
 	private:
 		struct Task
 		{
@@ -150,7 +162,8 @@ namespace Texpainter::Model
 		};
 		mutable ValidationState m_valid_state;
 
-		FilterGraph::Node* r_output_node;
+		FilterGraph::Node const* r_output_node;
+		FilterGraph::Node const* r_default_output_node;
 
 		FilterGraph::Graph m_graph;
 	};
