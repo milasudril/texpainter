@@ -14,21 +14,15 @@ void Texpainter::App::DocumentPreviewer::refreshNodeSelector()
 	std::ranges::for_each(
 	    nodes,
 	    [&node_selector = m_node_selector,
-	     node_selected  = m_node_selected,
+	     &node_selected = m_doc.get().compositor().outputNode(),
 	     &index_to_select,
 	     &index_to_node = m_index_to_node,
 	     index          = static_cast<size_t>(0)](auto const& item) mutable {
 		    node_selector.append(
 		        std::to_string(item.first.value()).append(" ").append(item.second.name()).c_str());
-		    if(&item.second == node_selected) { index_to_select = index; }
+		    if(&item.second == &node_selected) { index_to_select = index; }
 		    index_to_node.push_back(item.second);
 		    ++index;
 	    });
-
-	if(index_to_select != static_cast<size_t>(-1))
-	{ m_node_selector.selected(static_cast<int>(index_to_select)); }
-	else
-	{
-		m_node_selected = nullptr;
-	}
+	m_node_selector.selected(static_cast<int>(index_to_select));
 }

@@ -90,10 +90,7 @@ namespace Texpainter::Model
 
 		Compositor& erase(FilterGraph::NodeId id)
 		{
-			if(id == r_output_node->nodeId())
-			{
-				r_output_node = r_default_output_node;
-			}
+			if(id == r_output_node->nodeId()) { r_output_node = r_default_output_node; }
 			m_graph.erase(id);
 			clearValidationState();
 			return *this;
@@ -127,10 +124,7 @@ namespace Texpainter::Model
 
 		auto nodeData() const { return FilterGraph::nodeData(m_graph); }
 
-		FilterGraph::Node const* outputNode() const
-		{
-			return r_output_node;
-		}
+		FilterGraph::Node const& outputNode() const { return *r_output_node; }
 
 		Compositor& outputNode(std::reference_wrapper<FilterGraph::Node const> node)
 		{

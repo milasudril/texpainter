@@ -78,6 +78,15 @@ namespace Texpainter::Model
 			throw std::string{"An item with the given name already exist."};
 		}
 
+		CompositorProxy& outputNode(std::reference_wrapper<FilterGraph::Node const> node)
+		{
+			m_compositor.get().outputNode(node);
+			return *this;
+		}
+
+		decltype(auto) outputNode() const { return m_compositor.get().outputNode(); }
+
+
 	private:
 		std::reference_wrapper<NodeManager> m_owner;
 		std::reference_wrapper<Compositor> m_compositor;

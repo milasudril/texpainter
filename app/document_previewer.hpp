@@ -33,7 +33,7 @@ namespace Texpainter::App
 		DocumentPreviewer(DocumentPreviewer&&) = delete;
 
 		explicit DocumentPreviewer(Ui::Container& owner,
-		                           std::reference_wrapper<Model::Document const> doc)
+		                           std::reference_wrapper<Model::Document> doc)
 		    : m_doc{doc}
 		    , m_root{owner, Ui::Box::Orientation::Vertical}
 		    , m_node_selector{m_root}
@@ -78,12 +78,8 @@ namespace Texpainter::App
 		template<ControlId>
 		void onChanged(Ui::Combobox&)
 		{
-			if(std::size(m_index_to_node) != 0)
-			{ m_node_selected = &m_index_to_node[m_node_selector.selected()].get(); }
-			else
-			{
-				m_node_selected = nullptr;
-			}
+			m_doc.get().compositor().outputNode(m_index_to_node[m_node_selector.selected()]);
+			refreshImageView();
 		}
 
 		template<ControlId, class... T>
@@ -92,7 +88,7 @@ namespace Texpainter::App
 		}
 
 	private:
-		std::reference_wrapper<Model::Document const> m_doc;
+		std::reference_wrapper<Model::Document> m_doc;
 		void* r_eh;
 		void (*on_updated)(void*, DocumentPreviewer&);
 
@@ -105,7 +101,6 @@ namespace Texpainter::App
 		Ui::Box m_root;
 		Ui::Combobox m_node_selector;
 		std::vector<std::reference_wrapper<FilterGraph::Node const>> m_index_to_node;
-		FilterGraph::Node const* m_node_selected;
 		Ui::WidgetMultiplexer m_views;
 		Ui::ImageView m_img_view;
 		TerrainView m_terrain_view;
