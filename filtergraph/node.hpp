@@ -90,11 +90,9 @@ namespace Texpainter::FilterGraph
 			std::array<InputPortValue, NodeArgument::MaxNumInputs> args{};
 			auto const n_ports   = inputPorts().size();
 			auto const input_end = std::begin(m_inputs) + n_ports;
-			std::transform(
-			    std::begin(m_inputs),
-			    input_end,
-			    std::begin(args),
-			    [size, resolution](auto const& val) { return makeInputPortValue(val.result()); });
+			std::transform(std::begin(m_inputs), input_end, std::begin(args), [](auto const& val) {
+				return makeInputPortValue(val.result());
+			});
 			m_result_cache  = (*m_proc)(NodeArgument{size, resolution, args});
 			m_last_rendered = now();
 			return m_result_cache;
