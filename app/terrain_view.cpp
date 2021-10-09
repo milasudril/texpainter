@@ -9,6 +9,10 @@
 #include "./terrain_view.hpp"
 #include "log/logger.hpp"
 
+#define GLM_FORCE_INLINE
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 namespace
 {
 	Texpainter::App::Shader make_shader(char const* src, GLuint type)
@@ -37,16 +41,22 @@ namespace
 layout (location = 0) in vec2 xy;
 layout (location = 1) in vec4 n_elev;
 layout (location = 2) uniform float scale;
+layout (location = 3) uniform vec4 cam_loc;
+layout (location = 7) uniform mat4 cam_rot;
 
 out vec4 vertex_normal;
 out vec4 frag_pos;
 
 void main()
 {
-	vec3 r = vec3(xy.xy, n_elev.w)/scale;
-	vec4 pos = vec4(r.xyz, 1.0);
-	gl_Position = pos;
-	frag_pos = pos;
+	vec4 origin = vec4(0.0, 0.0, 0.0, 1.0);
+	vec4 vert_world_loc = vec4(xy.xy, n_elev.w, 1.0);
+	vec4 vert_world_loc_scaled = (vert_world_loc - origin)/scale + origin;
+	vec4 vert_cam_loc = cam_rot*(vert_world_loc_scaled - origin) + origin + (cam_loc - origin) + origin;
+
+	gl_Position = vert_cam_loc;
+
+	frag_pos = vert_world_loc_scaled;
 	vertex_normal = vec4(n_elev.xyz, 0.0);
 }
 )shader";
@@ -59,7 +69,7 @@ in vec4 frag_pos;
 
 void main()
 {
-	frag_color = vec4(frag_pos.x + 0.5, frag_pos.z, frag_pos.y + 0.5, 1.0);
+	frag_color = vec4(frag_pos.x + 0.5, frag_pos.y + 0.5, frag_pos.z, 1.0);
 }
 )shader";
 }
@@ -84,6 +94,21 @@ void Texpainter::App::TerrainView::realize<Texpainter::App::TerrainView::Control
 
 	m_shader_program = make_program(std::move(shaders));
 	glUseProgram(*m_shader_program.get());
+
+	auto const cam_loc = glm::vec4{0.0f, -1.0f, 0.0f * (std::numbers::phi_v<float> - 1.0f), 1.0f};
+	glUniform4f(3, cam_loc.x, cam_loc.y, cam_loc.z, cam_loc.w);
+
+	auto const cam_x   = 0.5f * std::numbers::pi_v<float>;
+	auto const cam_y   = -1.0f * std::numbers::pi_v<float> / 6.0f;
+	auto const cam_rot = glm::mat4{glm::vec4{std::cos(cam_y), 0.0f, -std::sin(cam_y), 0.0f},
+	                               glm::vec4{0.0f, 1.0f, 0.0f, 0.0f},
+	                               glm::vec4{std::sin(cam_y), 0.0f, std::cos(cam_y), 0.0f},
+	                               glm::vec4{0.0f, 0.0f, 0.0f, 1.0f}}
+	                     * glm::mat4{glm::vec4{1.0f, 0.0f, 0.0f, 0.0f},
+	                                 glm::vec4{0.0f, std::cos(cam_x), -std::sin(cam_x), 0.0f},
+	                                 glm::vec4{0.0f, std::sin(cam_x), std::cos(cam_x), 0.0f},
+	                                 glm::vec4{1.0f, 0.0f, 0.0f, 1.0f}};
+	glUniformMatrix4fv(7, 1, GL_FALSE, glm::value_ptr(cam_rot));
 
 	GLuint id{};
 	glCreateVertexArrays(1, &id);
@@ -198,10 +223,11 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::topography(
 
 	if(m_xy == nullptr) { return *this; }
 
-	auto peak = std::ranges::max_element(n_elev, [](auto a, auto b){
-		return a.elevation() < b.elevation();
-	})->elevation();
-	glUniform1f(2, std::max(static_cast<float>(std::max(m_mesh_size.width(), m_mesh_size.height())), peak) );
+	auto peak = std::ranges::max_element(n_elev, [](auto a, auto b) {
+		            return a.elevation() < b.elevation();
+	            })->elevation();
+	glUniform1f(
+	    2, std::max(static_cast<float>(std::max(m_mesh_size.width(), m_mesh_size.height())), peak));
 
 	m_gl_area.activate();
 
@@ -220,7 +246,7 @@ void Texpainter::App::TerrainView::render<Texpainter::App::TerrainView::ControlI
 	if(m_xy != nullptr)
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		auto const face_count = 2 * (m_mesh_size.width() - 1) * (m_mesh_size.height() - 1);
 		glDrawElements(
 		    GL_TRIANGLES, 3 * static_cast<GLsizei>(face_count), GL_UNSIGNED_INT, nullptr);
