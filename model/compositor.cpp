@@ -59,8 +59,8 @@ void Texpainter::Model::Compositor::compile() const
 	m_node_status = std::vector<std::atomic<bool>>(std::size(m_node_array));
 }
 
-Texpainter::FilterGraph::PortValue const& Texpainter::Model::Compositor::process(
-    Size2d canvas_size, double resolution) const
+Texpainter::Model::CompositorOutput Texpainter::Model::Compositor::process(Size2d canvas_size,
+                                                                           uint32_t scale) const
 {
 	assert(valid());
 	if(m_node_array.size() == 0) [[unlikely]]
@@ -90,23 +90,24 @@ Texpainter::FilterGraph::PortValue const& Texpainter::Model::Compositor::process
 	};
 
 	Sched::SignalingCounter<size_t> num_running_tasks;
+	auto const domain_size = Size2d{canvas_size.width() * scale, canvas_size.height() * scale};
 	while(!task_list.empty())
 	{
 		if(task_can_run(*i))
 		{
 			m_workers.addTask([item = *i,
-			                   canvas_size,
-			                   resolution,
-			                   counter = std::unique_lock{num_running_tasks},
-			                   at_exit = ScopeExitHandler{
-			                       [&e, &node_status = m_node_status, task_id = i->task_id]() {
-				                       node_status[task_id] = true;
-				                       e.set();
-			                       }}]() {
+			                   domain_size,
+			                   resolution = static_cast<double>(scale),
+			                   counter    = std::unique_lock{num_running_tasks},
+			                   at_exit    = ScopeExitHandler{
+                                   [&e, &node_status = m_node_status, task_id = i->task_id]() {
+                                       node_status[task_id] = true;
+                                       e.set();
+                                   }}]() {
 				if(!isUpToDate(item.node))
 				{
 					_mm_setcsr(_mm_getcsr() | 0x8040);  // Denormals are zero
-					item.node(canvas_size, resolution);
+					item.node(domain_size, resolution);
 				}
 			});
 			i = task_list.erase(i);
@@ -118,5 +119,5 @@ Texpainter::FilterGraph::PortValue const& Texpainter::Model::Compositor::process
 		wrap_iterator();
 	}
 	num_running_tasks.waitAndReset(0);
-	return r_output_node->result()[0];
+	return CompositorOutput{canvas_size, r_output_node->result()[0], scale};
 }

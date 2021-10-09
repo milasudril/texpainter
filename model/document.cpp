@@ -46,10 +46,7 @@ Texpainter::PixelStore::Image Texpainter::Model::render(Document const& document
 		forceUpdateIfDirty(item, document, force_update);
 	});
 
-	auto ret = processIfValid(
-	    document.compositor(),
-	    Size2d{scale * document.canvasSize().width(), scale * document.canvasSize().height()},
-	    static_cast<double>(scale));
+	auto ret = processIfValid(document.compositor(), document.canvasSize(), scale);
 
 	std::ranges::for_each(document.images(),
 	                      [&document](auto const& item) { item.second.source.clearStatus(); });
@@ -57,28 +54,13 @@ Texpainter::PixelStore::Image Texpainter::Model::render(Document const& document
 	std::ranges::for_each(document.palettes(),
 	                      [&document](auto const& item) { item.second.source.clearStatus(); });
 
-	if(scale == 1) [[likely]]
-		{
-			return ret;
-		}
-
-	PixelStore::Image downsampled{document.canvasSize()};
-	for(uint32_t row = 0; row < document.canvasSize().height(); ++row)
+	if(auto image = get_if<std::unique_ptr<PixelStore::Pixel[]>>(&ret.data()); image != nullptr)
 	{
-		for(uint32_t col = 0; col < document.canvasSize().width(); ++col)
-		{
-			PixelStore::Pixel result{0.0, 0.0, 0.0, 0.0};
-			for(uint32_t row_src = 0; row_src < scale; ++row_src)
-			{
-				for(uint32_t col_src = 0; col_src < scale; ++col_src)
-				{
-					result += ret(scale * col + col_src, scale * row + row_src);
-				}
-			}
-			downsampled(col, row) = result / static_cast<float>(scale * scale);
-		}
+		PixelStore::Image ret{document.canvasSize().width(), document.canvasSize().height()};
+		std::copy_n(image->get(), area(ret), ret.pixels().data());
+		return ret;
 	}
-	return downsampled;
+	return PixelStore::Image{document.canvasSize().width(), document.canvasSize().height()};
 }
 
 void Texpainter::Model::paint(Document& doc, vec2_t location)

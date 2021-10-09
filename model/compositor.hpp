@@ -51,7 +51,7 @@ namespace Texpainter::Model
 		Compositor(Compositor&&) = default;
 		Compositor& operator=(Compositor&&) = default;
 
-		FilterGraph::PortValue const& process(Size2d canvas_size, double resolution) const;
+		CompositorOutput process(Size2d canvas_size, uint32_t scale) const;
 
 		NodeItem insert(std::unique_ptr<FilterGraph::AbstractImageProcessor> proc)
 		{
@@ -169,29 +169,15 @@ namespace Texpainter::Model
 
 	inline auto nodeData(Compositor const& g) { return g.nodeData(); }
 
-	inline auto processIfValid(Compositor const& compositor, Size2d canvas_size, double scale)
+	inline auto processIfValid(Compositor const& compositor, Size2d canvas_size, uint32_t scale)
 	{
 		if(compositor.valid()) [[likely]]
 			{
-				auto const& res = compositor.process(canvas_size, scale);
-				return visit(
-				    [canvas_size](auto const& result) -> PixelStore::Image {
-					    auto value       = FilterGraph::makeInputPortValue(result);
-					    using ResultType = decltype(value);
-					    if constexpr(std::is_same_v<ResultType, PixelStore::Pixel const*>)
-					    { return PixelStore::Image{Span2d{value, canvas_size}}; }
-					    else
-					    {
-						    return PixelStore::Image{canvas_size};
-					    }
-				    },
-				    res);
+				return compositor.process(canvas_size, scale);
 			}
 		else
 		{
-			PixelStore::Image ret{canvas_size};
-			std::ranges::fill(ret.pixels(), PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
-			return ret;
+			return CompositorOutput{canvas_size};
 		}
 	}
 }

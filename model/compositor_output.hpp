@@ -24,9 +24,7 @@ namespace Texpainter::Model
 			m_data = std::move(val);
 		}
 
-		explicit CompositorOutput(Size2d size,
-		                          FilterGraph::PortValue const& src,
-		                          uint32_t resolution);
+		explicit CompositorOutput(Size2d size, FilterGraph::PortValue const& src, uint32_t scale);
 
 		Size2d size() const { return m_size; }
 

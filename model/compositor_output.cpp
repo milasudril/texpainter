@@ -21,17 +21,16 @@ namespace
 	template<class T>
 	std::unique_ptr<T[]> downsample(Texpainter::Size2d size, T const* src, uint32_t scale)
 	{
+		auto ret = std::make_unique<T[]>(area(size));
+
 		if(scale == 1) [[likely]]
 			{
-				auto ret = std::make_unique<T[]>(area(size));
 				std::copy_n(src, area(size), ret.get());
 				return ret;
 			}
 
-		auto const w = size.width() / scale;
-		auto const h = size.height() / scale;
-
-		auto ret = std::make_unique<T[]>(w * h);
+		auto const w = size.width();
+		auto const h = size.height();
 
 		for(uint32_t row = 0; row < h; ++row)
 		{
@@ -68,12 +67,12 @@ namespace
 	}
 
 	Texpainter::FilterGraph::PortValue downsample_impl(
-	    Texpainter::Size2d size, Texpainter::FilterGraph::PortValue const& src, uint32_t resolution)
+	    Texpainter::Size2d size, Texpainter::FilterGraph::PortValue const& src, uint32_t scale)
 	{
 		return visit(
-		    [size, resolution](auto const& item) {
-			    return Texpainter::FilterGraph::PortValue{downsample(
-			        size, Texpainter::FilterGraph::makeInputPortValue(item), resolution)};
+		    [size, scale](auto const& item) {
+			    return Texpainter::FilterGraph::PortValue{
+			        downsample(size, Texpainter::FilterGraph::makeInputPortValue(item), scale)};
 		    },
 		    src);
 	}
@@ -81,8 +80,8 @@ namespace
 
 Texpainter::Model::CompositorOutput::CompositorOutput(Size2d size,
                                                       FilterGraph::PortValue const& src,
-                                                      uint32_t resolution)
-    : m_size{size.width() / resolution, size.height() / resolution}
-    , m_data{downsample_impl(size, src, resolution)}
+                                                      uint32_t scale)
+    : m_size{size}
+    , m_data{downsample_impl(size, src, scale)}
 {
 }
