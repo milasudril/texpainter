@@ -26,3 +26,47 @@ void Texpainter::App::DocumentPreviewer::refreshNodeSelector()
 	    });
 	m_node_selector.selected(static_cast<int>(index_to_select));
 }
+
+namespace
+{
+	class ViewUpdater
+	{
+	public:
+		explicit ViewUpdater(Texpainter::Size2d canvas_size,
+		                     Texpainter::Ui::WidgetMultiplexer& views,
+		                     Texpainter::Ui::ImageView& img_view,
+		                     Texpainter::App::TerrainView& terrain_view)
+		    : m_canvas_size{canvas_size}
+		    , m_views{views}
+		    , m_img_view{img_view}
+		    , m_terrain_view{terrain_view}
+		{
+		}
+
+		template<class T>
+		void operator()(T const&) const
+		{
+//	m_img_view.image(result.pixels());
+//	m_terrain_view.meshSize(result.pixels().size());
+		}
+
+		void operator()(std::unique_ptr<Texpainter::PixelStore::Pixel[]> const& data)
+		{
+			m_views.get().showWidget("imgview");
+			m_img_view.get().image(Texpainter::Span2d{data.get(), m_canvas_size});
+		}
+
+	private:
+		Texpainter::Size2d m_canvas_size;
+		std::reference_wrapper<Texpainter::Ui::WidgetMultiplexer> m_views;
+		std::reference_wrapper<Texpainter::Ui::ImageView> m_img_view;
+		std::reference_wrapper<Texpainter::App::TerrainView> m_terrain_view;
+	};
+}
+
+Texpainter::App::DocumentPreviewer& Texpainter::App::DocumentPreviewer::refreshImageView()
+{
+	auto result = render(m_doc.get(), Model::Document::ForceUpdate{false});
+	visit(ViewUpdater{result.size(), m_views, m_img_view, m_terrain_view}, result.data());
+	return *this;
+}

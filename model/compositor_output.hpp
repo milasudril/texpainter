@@ -34,6 +34,8 @@ namespace Texpainter::Model
 		Size2d m_size;
 		FilterGraph::PortValue m_data;
 	};
+
+	void store(CompositorOutput const&, char const*);
 }
 
 #endif

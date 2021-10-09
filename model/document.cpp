@@ -32,9 +32,9 @@ namespace
 	}
 }
 
-Texpainter::PixelStore::Image Texpainter::Model::render(Document const& document,
-                                                        Document::ForceUpdate force_update,
-                                                        uint32_t scale)
+Texpainter::Model::CompositorOutput Texpainter::Model::render(Document const& document,
+                                                              Document::ForceUpdate force_update,
+                                                              uint32_t scale)
 {
 	std::ranges::for_each(document.images(), [&document, force_update](auto const& item) {
 		item.second.processor.get().processor().source(item.second.source.get().pixels());
@@ -54,13 +54,7 @@ Texpainter::PixelStore::Image Texpainter::Model::render(Document const& document
 	std::ranges::for_each(document.palettes(),
 	                      [&document](auto const& item) { item.second.source.clearStatus(); });
 
-	if(auto image = get_if<std::unique_ptr<PixelStore::Pixel[]>>(&ret.data()); image != nullptr)
-	{
-		PixelStore::Image ret{document.canvasSize().width(), document.canvasSize().height()};
-		std::copy_n(image->get(), area(ret), ret.pixels().data());
-		return ret;
-	}
-	return PixelStore::Image{document.canvasSize().width(), document.canvasSize().height()};
+	return ret;
 }
 
 void Texpainter::Model::paint(Document& doc, vec2_t location)

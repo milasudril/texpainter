@@ -37,14 +37,19 @@ namespace Testcases
 
 		{
 			auto result = render(doc);
-			assert(std::ranges::equal(src.get().pixels(), result.pixels(), [](auto a, auto b) {
-				a -= b;
-				return a.red() == 0.0f && a.green() == 0.0f && a.blue() == 0.0f
-				       && a.alpha() == 0.0f;
-			}));
+			auto const res_img =
+			    get_if<std::unique_ptr<Texpainter::PixelStore::Pixel[]>>(&result.data());
+			assert(res_img != nullptr);
+			assert(std::equal(src.get().pixels().data(),
+			                  src.get().pixels().data() + area(doc.canvasSize()),
+			                  res_img->get(),
+			                  [](auto a, auto b) {
+				                  a -= b;
+				                  return a.red() == 0.0f && a.green() == 0.0f && a.blue() == 0.0f
+				                         && a.alpha() == 0.0f;
+			                  }));
 		}
 
-		puts("===================");
 		src.modify([](auto& img) noexcept {
 			assert((img.size() == Texpainter::Size2d{3, 2}));
 			img(0, 0) = Texpainter::PixelStore::Pixel{1.0f, 0.5f, 0.0f, 1.0f};
@@ -55,11 +60,17 @@ namespace Testcases
 
 		{
 			auto result = render(doc);
-			assert(std::ranges::equal(src.get().pixels(), result.pixels(), [](auto a, auto b) {
-				a -= b;
-				return a.red() == 0.0f && a.green() == 0.0f && a.blue() == 0.0f
-				       && a.alpha() == 0.0f;
-			}));
+			auto const res_img =
+			    get_if<std::unique_ptr<Texpainter::PixelStore::Pixel[]>>(&result.data());
+			assert(res_img != nullptr);
+			assert(std::equal(src.get().pixels().data(),
+			                  src.get().pixels().data() + area(doc.canvasSize()),
+			                  res_img->get(),
+			                  [](auto a, auto b) {
+				                  a -= b;
+				                  return a.red() == 0.0f && a.green() == 0.0f && a.blue() == 0.0f
+				                         && a.alpha() == 0.0f;
+			                  }));
 		}
 	}
 

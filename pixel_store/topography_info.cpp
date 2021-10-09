@@ -32,7 +32,7 @@ std::unique_ptr<Texpainter::Model::TopographyInfo[]> Texpainter::Model::downsamp
 				{
 					auto const x = scale * col + col_src;
 					auto const y = scale * row + row_src;
-					result += src[y * size.width() + x].value();
+					result += src[y * scale * size.width() + x].value();
 				}
 			}
 			result /= static_cast<float>(scale * scale);

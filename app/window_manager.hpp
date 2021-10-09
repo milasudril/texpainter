@@ -558,8 +558,9 @@ namespace Texpainter::App
 		void confirmPositive(RenderToImgJobCreatorDlg& src)
 		{
 			auto opts = src.widget().value();
-			insert(std::move(opts.name),
-			       render(*m_document, Model::Document::ForceUpdate{true}, opts.supersampling));
+		// FIXME:
+		//	insert(std::move(opts.name),
+		//	       render(*m_document, Model::Document::ForceUpdate{true}, opts.supersampling));
 
 			m_render_to_img_job_creator.reset();
 		}

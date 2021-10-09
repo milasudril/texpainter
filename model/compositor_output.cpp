@@ -4,6 +4,9 @@
 
 #include "./compositor_output.hpp"
 
+#include "utils/span_2d.hpp"
+#include "pixel_store/image_io.hpp"
+
 namespace
 {
 	template<class T>
@@ -32,18 +35,18 @@ namespace
 		auto const w = size.width();
 		auto const h = size.height();
 
-		for(uint32_t row = 0; row < h; ++row)
+		for(uint32_t row = 0; row != h; ++row)
 		{
-			for(uint32_t col = 0; col < w; ++col)
+			for(uint32_t col = 0; col != w; ++col)
 			{
 				T result{};
-				for(uint32_t row_src = 0; row_src < scale; ++row_src)
+				for(uint32_t row_src = 0; row_src != scale; ++row_src)
 				{
-					for(uint32_t col_src = 0; col_src < scale; ++col_src)
+					for(uint32_t col_src = 0; col_src != scale; ++col_src)
 					{
 						auto const x = scale * col + col_src;
 						auto const y = scale * row + row_src;
-						result += src[y * size.width() + x];
+						result += src[y * scale * size.width() + x];
 					}
 				}
 				ret[row * w + col] =
@@ -76,6 +79,24 @@ namespace
 		    },
 		    src);
 	}
+
+	template<class T>
+	void store(T const&, Texpainter::Size2d, char const*)
+	{
+	}
+
+	void store(std::unique_ptr<Texpainter::PixelStore::Pixel[]> const& src,
+	           Texpainter::Size2d size,
+	           char const* filename)
+	{
+		store(Texpainter::Span2d{src.get(), size}, filename);
+	}
+
+	template<class T>
+	void store_impl(T const& src, Texpainter::Size2d size, char const* filename)
+	{
+		store(src, size, filename);
+	}
 }
 
 Texpainter::Model::CompositorOutput::CompositorOutput(Size2d size,
@@ -84,4 +105,10 @@ Texpainter::Model::CompositorOutput::CompositorOutput(Size2d size,
     : m_size{size}
     , m_data{downsample_impl(size, src, scale)}
 {
+}
+
+void Texpainter::Model::store(CompositorOutput const& src, char const* filename)
+{
+	visit([size = src.size(), filename](auto const& item) { store_impl(item, size, filename); },
+	      src.data());
 }

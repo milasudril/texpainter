@@ -46,13 +46,7 @@ namespace Texpainter::App
 			refresh();
 		}
 
-		DocumentPreviewer& refreshImageView()
-		{
-			auto result = render(m_doc.get(), Model::Document::ForceUpdate{false});
-			m_img_view.image(result.pixels());
-			m_terrain_view.meshSize(result.pixels().size());
-			return *this;
-		}
+		DocumentPreviewer& refreshImageView();
 
 		DocumentPreviewer& refresh()
 		{
