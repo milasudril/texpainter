@@ -198,7 +198,13 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::topography(
 
 	if(m_xy == nullptr) { return *this; }
 
+	auto peak = std::ranges::max_element(n_elev, [](auto a, auto b){
+		return a.elevation() < b.elevation();
+	})->elevation();
+	glUniform1f(2, std::max(static_cast<float>(std::max(m_mesh_size.width(), m_mesh_size.height())), peak) );
+
 	m_gl_area.activate();
+
 	glNamedBufferSubData(*m_topo.get(),
 	                     0,
 	                     static_cast<GLsizei>(sizeof(Model::TopographyInfo) * area(n_elev)),
