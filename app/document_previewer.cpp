@@ -44,7 +44,9 @@ namespace
 		}
 
 		template<class T>
-		void operator()(T const&) const {}
+		void operator()(T const&) const
+		{
+		}
 
 		void operator()(std::unique_ptr<Texpainter::PixelStore::Pixel[]> const& data)
 		{

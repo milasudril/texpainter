@@ -200,9 +200,9 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::topography(
 
 	m_gl_area.activate();
 	glNamedBufferSubData(*m_topo.get(),
-	                0,
-	                static_cast<GLsizei>(sizeof(Model::TopographyInfo) * area(n_elev)),
-	                n_elev.data());
+	                     0,
+	                     static_cast<GLsizei>(sizeof(Model::TopographyInfo) * area(n_elev)),
+	                     n_elev.data());
 	m_gl_area.redraw();
 	return *this;
 }
