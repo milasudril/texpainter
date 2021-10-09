@@ -44,16 +44,18 @@ namespace
 		}
 
 		template<class T>
-		void operator()(T const&) const
-		{
-//	m_img_view.image(result.pixels());
-//	m_terrain_view.meshSize(result.pixels().size());
-		}
+		void operator()(T const&) const {}
 
 		void operator()(std::unique_ptr<Texpainter::PixelStore::Pixel[]> const& data)
 		{
 			m_views.get().showWidget("imgview");
 			m_img_view.get().image(Texpainter::Span2d{data.get(), m_canvas_size});
+		}
+
+		void operator()(std::unique_ptr<Texpainter::Model::TopographyInfo[]> const& data)
+		{
+			m_views.get().showWidget("terrainview");
+			m_terrain_view.get().topography(Texpainter::Span2d{data.get(), m_canvas_size});
 		}
 
 	private:

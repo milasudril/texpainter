@@ -59,7 +59,7 @@ in vec4 frag_pos;
 
 void main()
 {
-	frag_color = vec4(frag_pos.x + 0.5, 0.5, frag_pos.y + 0.5, 1.0);
+	frag_color = vec4(frag_pos.x + 0.5, frag_pos.z, frag_pos.y + 0.5, 1.0);
 }
 )shader";
 }
@@ -199,7 +199,7 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::topography(
 	if(m_xy == nullptr) { return *this; }
 
 	m_gl_area.activate();
-	glBufferSubData(*m_topo.get(),
+	glNamedBufferSubData(*m_topo.get(),
 	                0,
 	                static_cast<GLsizei>(sizeof(Model::TopographyInfo) * area(n_elev)),
 	                n_elev.data());
@@ -213,7 +213,6 @@ void Texpainter::App::TerrainView::render<Texpainter::App::TerrainView::ControlI
 {
 	if(m_xy != nullptr)
 	{
-		puts("Render");
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		auto const face_count = 2 * (m_mesh_size.width() - 1) * (m_mesh_size.height() - 1);
