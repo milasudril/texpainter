@@ -4,6 +4,7 @@
 #define TEXPAINTER_PIXELSTORE_PIXEL_HPP
 
 #include "utils/vec_t.hpp"
+#include "utils/size_2d.hpp"
 
 #include "libenum/empty.hpp"
 
