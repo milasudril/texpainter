@@ -98,7 +98,7 @@ void Texpainter::App::TerrainView::realize<Texpainter::App::TerrainView::Control
 	auto const cam_loc = glm::vec4{0.0f, -1.0f, 0.0f * (std::numbers::phi_v<float> - 1.0f), 1.0f};
 	glUniform4f(3, cam_loc.x, cam_loc.y, cam_loc.z, cam_loc.w);
 
-	auto const cam_x   = 0.5f * std::numbers::pi_v<float>;
+	auto const cam_x   =  7.0f * std::numbers::pi_v<float> /12.0f;
 	auto const cam_y   = -1.0f * std::numbers::pi_v<float> / 6.0f;
 	auto const cam_rot = glm::mat4{glm::vec4{std::cos(cam_y), 0.0f, -std::sin(cam_y), 0.0f},
 	                               glm::vec4{0.0f, 1.0f, 0.0f, 0.0f},
@@ -109,7 +109,7 @@ void Texpainter::App::TerrainView::realize<Texpainter::App::TerrainView::Control
 	                                 glm::vec4{0.0f, std::sin(cam_x), std::cos(cam_x), 0.0f},
 	                                 glm::vec4{1.0f, 0.0f, 0.0f, 1.0f}};
 	glUniformMatrix4fv(7, 1, GL_FALSE, glm::value_ptr(cam_rot));
-
+	glEnable(GL_DEPTH_TEST);
 	GLuint id{};
 	glCreateVertexArrays(1, &id);
 	glEnableVertexArrayAttrib(id, 0);
@@ -246,7 +246,7 @@ void Texpainter::App::TerrainView::render<Texpainter::App::TerrainView::ControlI
 	if(m_xy != nullptr)
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		auto const face_count = 2 * (m_mesh_size.width() - 1) * (m_mesh_size.height() - 1);
 		glDrawElements(
 		    GL_TRIANGLES, 3 * static_cast<GLsizei>(face_count), GL_UNSIGNED_INT, nullptr);
