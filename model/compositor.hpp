@@ -7,6 +7,7 @@
 #define TEXPAINTER_MODEL_COMPOSITOR_HPP
 
 #include "./image_sink.hpp"
+#include "./compositor_output.hpp"
 #include "./topography_sink.hpp"
 
 #include "filtergraph/graph.hpp"
