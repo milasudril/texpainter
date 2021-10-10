@@ -20,6 +20,7 @@
 #include "ui/widget_multiplexer.hpp"
 
 #include <GL/glew.h>
+
 #include <utility>
 #include <functional>
 
@@ -131,9 +132,7 @@ namespace Texpainter::App
 		void realize(Ui::GLArea const&);
 
 		template<ControlId>
-		void resize(Ui::GLArea const&, int, int)
-		{
-		}
+		void resize(Ui::GLArea const&, int width, int height);
 
 		TerrainView& meshSize(Size2d size);
 
