@@ -32,6 +32,7 @@ Texpainter::FilterGraph::ValidationResult Texpainter::Model::validate(Compositor
 }
 
 void Texpainter::Model::Compositor::compile() const
+
 {
 	std::vector<Task> nodes;
 	nodes.reserve(m_graph.size());
@@ -118,6 +119,7 @@ Texpainter::Model::CompositorOutput Texpainter::Model::Compositor::process(Size2
 		}
 		wrap_iterator();
 	}
+	m_current_size = domain_size;
 	num_running_tasks.waitAndReset(0);
 	return CompositorOutput{canvas_size, r_output_node->result()[0], scale};
 }
