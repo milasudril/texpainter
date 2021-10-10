@@ -35,6 +35,7 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
                                             double resolution) const
 {
 	assert(valid());
+
 	if(m_node_array.size() == 0) [[unlikely]]
 		{
 			std::vector<Task> nodes;
@@ -64,6 +65,13 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
 			});
 			m_node_array  = std::move(nodes);
 			m_node_status = std::vector<std::atomic<bool>>(std::size(m_node_array));
+		}
+
+	auto const new_size = Size2d{static_cast<uint32_t>(canvas.width() * resolution),
+	                             static_cast<uint32_t>(canvas.height() * resolution)};
+	if(new_size != m_current_size) [[unlikely]]
+		{
+			std::ranges::for_each(m_node_array, [](auto const& item) { item.node.get().touch(); });
 		}
 
 	r_output->sink(canvas);
@@ -117,5 +125,6 @@ void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
 		}
 		wrap_iterator();
 	}
+	m_current_size = new_size;
 	num_running_tasks.waitAndReset(0);
 }

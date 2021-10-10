@@ -33,7 +33,7 @@ namespace Texpainter::Model
 		using InputPortIndex  = FilterGraph::InputPortIndex;
 		using OutputPortIndex = FilterGraph::OutputPortIndex;
 
-		Compositor(): m_valid_state{ValidationState::NotValidated}
+		Compositor(): m_current_size{0, 0}, m_valid_state{ValidationState::NotValidated}
 		{
 			using FilterGraph::ImageProcessorWrapper;
 
@@ -128,10 +128,10 @@ namespace Texpainter::Model
 			std::array<size_t, Node::maxNumInputs()> dependent_tasks;
 			size_t input_count;
 		};
+		mutable Size2d m_current_size;
 		mutable std::vector<Task> m_node_array;
 		mutable std::vector<std::atomic<bool>> m_node_status;
 		mutable Texpainter::Sched::ThreadPool m_workers;
-
 
 		enum class ValidationState : size_t
 		{
