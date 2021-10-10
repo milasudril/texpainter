@@ -75,9 +75,10 @@ void main()
 {
 	vec4 diffuse_color = vec4(1.0, 1.0, 1.0, 1.0);
 	vec4 light_color = vec4(1.0, 1.0, 1.0, 1.0);
-	vec4 light_dir = vec4(0.0, 0.0, 1.0, 0.0);
-	vec4 result = diffuse_color*light_color*clamp(dot(light_dir, vertex_normal), 0.0, 1.0);
-	frag_color = pow(result, vec4(1.0/2.2));
+	vec4 light_dir = normalize(vec4(1.0, 0.0, 1.0, 0.0));
+	vec4 sun = diffuse_color*light_color*clamp(dot(light_dir, vertex_normal), 0.0, 1.0);
+	vec4 ambient = vec4(1.0, 1.0, 1.0, 1.0);
+	frag_color = pow(mix(sun, ambient, 0.1), vec4(1.0/2.2));
 }
 )shader";
 }
@@ -271,6 +272,6 @@ void Texpainter::App::TerrainView::resize<Texpainter::App::TerrainView::ControlI
 {
 	auto const ratio = static_cast<float>(width) / static_cast<float>(height);
 	auto const camproj =
-	    glm::perspective(0.25f * std::numbers::pi_v<float>, ratio, 1.0f / 1024.0f, 4.0f);
+	    glm::perspective(0.25f * std::numbers::pi_v<float>, ratio, 1.0f / 1024.0f, 16.0f);
 	glUniformMatrix4fv(23, 1, GL_FALSE, glm::value_ptr(camproj));
 }
