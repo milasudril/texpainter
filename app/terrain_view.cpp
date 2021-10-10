@@ -49,6 +49,7 @@ layout (location = 39) uniform mat4 obj_rot;
 
 out vec4 vertex_normal;
 out vec4 frag_pos;
+out vec4 light_dir;
 
 void main()
 {
@@ -60,7 +61,7 @@ void main()
 	gl_Position = cam_proj*vert_cam_loc;
 
 	frag_pos = vert_world_loc_scaled;
-	vertex_normal = vec4(n_elev.xyz, 0.0);
+	vertex_normal = obj_rot*vec4(n_elev.xyz, 0.0);
 }
 )shader";
 
@@ -72,7 +73,11 @@ in vec4 frag_pos;
 
 void main()
 {
-	frag_color = pow(vec4(frag_pos.x + 0.5, frag_pos.y + 0.5, frag_pos.z, 1.0), vec4(1.0/2.2));
+	vec4 diffuse_color = vec4(1.0, 1.0, 1.0, 1.0);
+	vec4 light_color = vec4(1.0, 1.0, 1.0, 1.0);
+	vec4 light_dir = vec4(0.0, 0.0, 1.0, 0.0);
+	vec4 result = diffuse_color*light_color*clamp(dot(light_dir, vertex_normal), 0.0, 1.0);
+	frag_color = pow(result, vec4(1.0/2.2));
 }
 )shader";
 }
