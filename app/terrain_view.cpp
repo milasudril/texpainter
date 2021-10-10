@@ -105,10 +105,10 @@ void Texpainter::App::TerrainView::realize<Texpainter::App::TerrainView::Control
 	glUseProgram(*m_shader_program.get());
 
 	auto const cam_loc =
-	    glm::vec4{0.0f, -std::numbers::phi_v<float>, std::numbers::phi_v<float> - 1.0f, 1.0f};
+	    glm::vec4{0.0f, -std::numbers::phi_v<float>, 0.5f*(std::numbers::phi_v<float> - 1.0f), 1.0f};
 	glUniform4f(3, cam_loc.x, cam_loc.y, cam_loc.z, cam_loc.w);
 
-	auto const cam_x   = 5.0f * std::numbers::pi_v<float> / 12.0f;
+	auto const cam_x   = 6.0f * std::numbers::pi_v<float> / 12.0f;
 	auto const cam_rot = glm::mat4{glm::vec4{1.0f, 0.0f, 0.0f, 0.0f},
 	                               glm::vec4{0.0f, std::cos(cam_x), -std::sin(cam_x), 0.0f},
 	                               glm::vec4{0.0f, std::sin(cam_x), std::cos(cam_x), 0.0f},
@@ -241,9 +241,22 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::topography(
 		            return a.elevation() < b.elevation();
 	            })->elevation();
 
-	glUniform1f(2,
-	            std::max(static_cast<float>(std::max(m_mesh_size.width(), m_mesh_size.height())),
-	                     2.0f * peak));
+	auto const wh_max= static_cast<float>(std::max(m_mesh_size.width(), m_mesh_size.height()));
+
+	glUniform1f(2, std::max(wh_max, 2.0f * peak));
+
+	if(wh_max > 2.0f*peak)
+	{
+		auto const cam_loc =
+	    glm::vec4{0.0f, -std::numbers::phi_v<float>, peak*(std::numbers::phi_v<float> - 1.0f)/wh_max, 1.0f};
+		glUniform4f(3, cam_loc.x, cam_loc.y, cam_loc.z, cam_loc.w);
+	}
+	else
+	{
+		auto const cam_loc =
+	    glm::vec4{0.0f, -std::numbers::phi_v<float>, 0.5f*(std::numbers::phi_v<float> - 1.0f), 1.0f};
+		glUniform4f(3, cam_loc.x, cam_loc.y, cam_loc.z, cam_loc.w);
+	}
 
 	glNamedBufferSubData(*m_topo.get(),
 	                     0,
