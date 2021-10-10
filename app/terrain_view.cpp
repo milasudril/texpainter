@@ -72,7 +72,7 @@ in vec4 frag_pos;
 
 void main()
 {
-	frag_color = vec4(frag_pos.x + 0.5, frag_pos.y + 0.5, frag_pos.z, 1.0);
+	frag_color = pow(vec4(frag_pos.x + 0.5, frag_pos.y + 0.5, frag_pos.z, 1.0), vec4(1.0/2.2));
 }
 )shader";
 }
