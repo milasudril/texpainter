@@ -45,6 +45,7 @@ layout (location = 2) uniform float scale;
 layout (location = 3) uniform vec4 cam_loc;
 layout (location = 7) uniform mat4 cam_rot;
 layout (location = 23) uniform mat4 cam_proj;
+layout (location = 39) uniform mat4 obj_rot;
 
 out vec4 vertex_normal;
 out vec4 frag_pos;
@@ -53,7 +54,7 @@ void main()
 {
 	vec4 origin = vec4(0.0, 0.0, 0.0, 1.0);
 	vec4 vert_world_loc = vec4(xy.xy, n_elev.w, 1.0);
-	vec4 vert_world_loc_scaled = (vert_world_loc - origin)/scale + origin;
+	vec4 vert_world_loc_scaled = (obj_rot*(vert_world_loc - origin))/scale + origin;
 	vec4 vert_cam_loc = cam_rot*((vert_world_loc_scaled - origin) - (cam_loc - origin)) + origin;
 
 	gl_Position = cam_proj*vert_cam_loc;
@@ -106,7 +107,14 @@ void Texpainter::App::TerrainView::realize<Texpainter::App::TerrainView::Control
 	                               glm::vec4{0.0f, std::cos(cam_x), -std::sin(cam_x), 0.0f},
 	                               glm::vec4{0.0f, std::sin(cam_x), std::cos(cam_x), 0.0f},
 	                               glm::vec4{1.0f, 0.0f, 0.0f, 1.0f}};
+	auto const obj_z = 1.0f*std::numbers::pi_v<float> / 6.0f;
+	auto const obj_rot = glm::mat4{glm::vec4{std::cos(obj_z), std::sin(obj_z), 0.0f, 0.0f},
+	                               glm::vec4{-std::sin(obj_z), std::cos(obj_z), 0.0f, 0.0f},
+	                               glm::vec4{0.0f, 0.0f, 1.0f, 0.0f},
+	                               glm::vec4{1.0f, 0.0f, 0.0f, 1.0f}};
+
 	glUniformMatrix4fv(7, 1, GL_FALSE, glm::value_ptr(cam_rot));
+	glUniformMatrix4fv(39, 1, GL_FALSE, glm::value_ptr(obj_rot));
 	glEnable(GL_DEPTH_TEST);
 	GLuint id{};
 	glCreateVertexArrays(1, &id);
