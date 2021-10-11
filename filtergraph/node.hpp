@@ -204,7 +204,7 @@ namespace Texpainter::FilterGraph
 			}
 		}
 
-		void touch() const { m_last_modified = now(); }
+		void touch() { m_last_modified = now(); }
 
 		size_t lastModified() const { return m_last_modified; }
 
@@ -213,7 +213,7 @@ namespace Texpainter::FilterGraph
 	private:
 		inline static std::atomic<size_t> s_clock;
 		static size_t now() { return s_clock.fetch_add(1); }
-		mutable std::atomic<size_t> m_last_modified;
+		std::atomic<size_t> m_last_modified;
 		mutable std::atomic<size_t> m_last_rendered;
 		mutable result_type m_result_cache;
 
