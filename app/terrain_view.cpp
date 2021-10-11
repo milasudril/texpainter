@@ -104,16 +104,16 @@ void Texpainter::App::TerrainView::realize<Texpainter::App::TerrainView::Control
 	m_shader_program = make_program(std::move(shaders));
 	glUseProgram(*m_shader_program.get());
 
-	auto const cam_loc =
-	    glm::vec4{0.0f, -std::numbers::phi_v<float>, 0.5f*(std::numbers::phi_v<float> - 1.0f), 1.0f};
+	auto const cam_loc = glm::vec4{
+	    0.0f, -std::numbers::phi_v<float>, 0.5f * (std::numbers::phi_v<float> - 1.0f), 1.0f};
 	glUniform4f(3, cam_loc.x, cam_loc.y, cam_loc.z, cam_loc.w);
 
-	auto const cam_x   = 6.0f * std::numbers::pi_v<float> / 12.0f;
+	auto const cam_x   = 5.0f * std::numbers::pi_v<float> / 12.0f;
 	auto const cam_rot = glm::mat4{glm::vec4{1.0f, 0.0f, 0.0f, 0.0f},
 	                               glm::vec4{0.0f, std::cos(cam_x), -std::sin(cam_x), 0.0f},
 	                               glm::vec4{0.0f, std::sin(cam_x), std::cos(cam_x), 0.0f},
 	                               glm::vec4{1.0f, 0.0f, 0.0f, 1.0f}};
-	auto const obj_z = 1.0f*std::numbers::pi_v<float> / 6.0f;
+	auto const obj_z   = 1.0f * std::numbers::pi_v<float> / 6.0f;
 	auto const obj_rot = glm::mat4{glm::vec4{std::cos(obj_z), std::sin(obj_z), 0.0f, 0.0f},
 	                               glm::vec4{-std::sin(obj_z), std::cos(obj_z), 0.0f, 0.0f},
 	                               glm::vec4{0.0f, 0.0f, 1.0f, 0.0f},
@@ -241,20 +241,25 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::topography(
 		            return a.elevation() < b.elevation();
 	            })->elevation();
 
-	auto const wh_max= static_cast<float>(std::max(m_mesh_size.width(), m_mesh_size.height()));
+	auto const wh_max = static_cast<float>(std::max(m_mesh_size.width(), m_mesh_size.height()));
 
 	glUniform1f(2, std::max(wh_max, 2.0f * peak));
+	auto const z_off = std::numbers::phi_v<float> * std::tan(std::numbers::pi_v<float> / 12.0f);
 
-	if(wh_max > 2.0f*peak)
+	if(wh_max > 2.0f * peak)
 	{
-		auto const cam_loc =
-	    glm::vec4{0.0f, -std::numbers::phi_v<float>, peak*(std::numbers::phi_v<float> - 1.0f)/wh_max, 1.0f};
+		auto const cam_loc = glm::vec4{0.0f,
+		                               -std::numbers::phi_v<float>,
+		                               peak * (std::numbers::phi_v<float> - 1.0f) / wh_max + z_off,
+		                               1.0f};
 		glUniform4f(3, cam_loc.x, cam_loc.y, cam_loc.z, cam_loc.w);
 	}
 	else
 	{
-		auto const cam_loc =
-	    glm::vec4{0.0f, -std::numbers::phi_v<float>, 0.5f*(std::numbers::phi_v<float> - 1.0f), 1.0f};
+		auto const cam_loc = glm::vec4{0.0f,
+		                               -std::numbers::phi_v<float>,
+		                               0.5f * (std::numbers::phi_v<float> - 1.0f) + z_off,
+		                               1.0f};
 		glUniform4f(3, cam_loc.x, cam_loc.y, cam_loc.z, cam_loc.w);
 	}
 
