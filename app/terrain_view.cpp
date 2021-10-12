@@ -92,6 +92,20 @@ void main()
 	frag_color = pow(mix(sun, ambient, 0.1), vec4(1.0/2.2));
 }
 )shader";
+
+	bool check_gl_version(int major_req, int minor_req)
+	{
+		int major{};
+		int minor{};
+		glGetIntegerv(GL_MAJOR_VERSION, &major);
+		glGetIntegerv(GL_MINOR_VERSION, &minor);
+
+		if(major < major_req) { return false; }
+
+		if(major == major_req) { return minor >= minor_req; }
+
+		return true;
+	}
 }
 
 template<>
@@ -107,7 +121,13 @@ void Texpainter::App::TerrainView::realize<Texpainter::App::TerrainView::Control
 	}
 	m_initialized = true;
 
-	Logger::log(Logger::MessageType::Info, reinterpret_cast<char const*>(glGetString(GL_VERSION)));
+	glClearColor(0.73f, 0.73f, 0.73f, 1.0f);
+	if(!check_gl_version(4, 6))
+	{
+		Logger::log(Logger::MessageType::Error,
+		            "OpenGL 4.6 or later is required to render a topographic map");
+		return;
+	}
 
 	std::array<Shader, 2> shaders{{make_shader(vertex_shader, GL_VERTEX_SHADER),
 	                               make_shader(frag_shader, GL_FRAGMENT_SHADER)}};
@@ -136,7 +156,6 @@ void Texpainter::App::TerrainView::realize<Texpainter::App::TerrainView::Control
 	glCreateVertexArrays(1, &id);
 	glEnableVertexArrayAttrib(id, ShaderInputs::Xy);
 	glEnableVertexArrayAttrib(id, ShaderInputs::NElev);
-	glClearColor(0, 0, 0, 1.0);
 	m_vert_array = VertexArray{GlHandle{id}};
 }
 
