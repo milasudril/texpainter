@@ -38,6 +38,17 @@ namespace
 		return ret;
 	}
 
+	namespace ShaderInputs
+	{
+		constexpr auto Xy      = 0;
+		constexpr auto NElev   = 1;
+		constexpr auto Scale   = 2;
+		constexpr auto CamLoc  = 3;
+		constexpr auto CamRot  = 7;
+		constexpr auto CamProj = 23;
+		constexpr auto ObjRot  = 39;
+	}
+
 	constexpr char const* vertex_shader = R"shader(#version 460 core
 layout (location = 0) in vec2 xy;
 layout (location = 1) in vec4 n_elev;
@@ -103,10 +114,9 @@ void Texpainter::App::TerrainView::realize<Texpainter::App::TerrainView::Control
 
 	m_shader_program = make_program(std::move(shaders));
 	glUseProgram(*m_shader_program.get());
-
-	auto const cam_loc = glm::vec4{
-	    0.0f, -std::numbers::phi_v<float>, 0.5f * (std::numbers::phi_v<float> - 1.0f), 1.0f};
-	glUniform4f(3, cam_loc.x, cam_loc.y, cam_loc.z, cam_loc.w);
+	auto const z_off   = std::numbers::phi_v<float> * std::tan(std::numbers::pi_v<float> / 12.0f);
+	auto const cam_loc = glm::vec4{0.0f, -std::numbers::phi_v<float>, z_off, 1.0f};
+	glUniform4f(ShaderInputs::CamLoc, cam_loc.x, cam_loc.y, cam_loc.z, cam_loc.w);
 
 	auto const cam_x   = 5.0f * std::numbers::pi_v<float> / 12.0f;
 	auto const cam_rot = glm::mat4{glm::vec4{1.0f, 0.0f, 0.0f, 0.0f},
@@ -119,13 +129,13 @@ void Texpainter::App::TerrainView::realize<Texpainter::App::TerrainView::Control
 	                               glm::vec4{0.0f, 0.0f, 1.0f, 0.0f},
 	                               glm::vec4{1.0f, 0.0f, 0.0f, 1.0f}};
 
-	glUniformMatrix4fv(7, 1, GL_FALSE, glm::value_ptr(cam_rot));
-	glUniformMatrix4fv(39, 1, GL_FALSE, glm::value_ptr(obj_rot));
+	glUniformMatrix4fv(ShaderInputs::CamRot, 1, GL_FALSE, glm::value_ptr(cam_rot));
+	glUniformMatrix4fv(ShaderInputs::ObjRot, 1, GL_FALSE, glm::value_ptr(obj_rot));
 	glEnable(GL_DEPTH_TEST);
 	GLuint id{};
 	glCreateVertexArrays(1, &id);
-	glEnableVertexArrayAttrib(id, 0);
-	glEnableVertexArrayAttrib(id, 1);
+	glEnableVertexArrayAttrib(id, ShaderInputs::Xy);
+	glEnableVertexArrayAttrib(id, ShaderInputs::NElev);
 	glClearColor(0, 0, 0, 1.0);
 	m_vert_array = VertexArray{GlHandle{id}};
 }
@@ -211,13 +221,14 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::meshSize(Size2d size
 		glVertexArrayVertexBuffer(*m_vert_array.get(), 0, xy_id, 0, 2 * sizeof(float));
 		glVertexArrayVertexBuffer(
 		    *m_vert_array.get(), 1, topo_id, 0, sizeof(Model::TopographyInfo));
-		glVertexArrayAttribFormat(*m_vert_array.get(), 0, 2, GL_FLOAT, GL_FALSE, 0);
-		glVertexArrayAttribFormat(*m_vert_array.get(), 1, 4, GL_FLOAT, GL_FALSE, 0);
-		glVertexArrayAttribBinding(*m_vert_array.get(), 0, 0);
-		glVertexArrayAttribBinding(*m_vert_array.get(), 1, 1);
+		glVertexArrayAttribFormat(*m_vert_array.get(), ShaderInputs::Xy, 2, GL_FLOAT, GL_FALSE, 0);
+		glVertexArrayAttribFormat(
+		    *m_vert_array.get(), ShaderInputs::NElev, 4, GL_FLOAT, GL_FALSE, 0);
+		glVertexArrayAttribBinding(*m_vert_array.get(), ShaderInputs::Xy, ShaderInputs::Xy);
+		glVertexArrayAttribBinding(*m_vert_array.get(), ShaderInputs::NElev, ShaderInputs::NElev);
 		glVertexArrayElementBuffer(*m_vert_array.get(), faces_id);
 		glBindVertexArray(*m_vert_array.get());
-		glUniform1f(2, static_cast<float>(std::max(size.width(), size.height())));
+		glUniform1f(ShaderInputs::Scale, static_cast<float>(std::max(size.width(), size.height())));
 		m_mesh_size = size;
 		m_xy        = VertexBuffer{GlHandle{xy_id}};
 		m_topo      = VertexBuffer{GlHandle{topo_id}};
@@ -243,7 +254,7 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::topography(
 
 	auto const wh_max = static_cast<float>(std::max(m_mesh_size.width(), m_mesh_size.height()));
 
-	glUniform1f(2, std::max(wh_max, 2.0f * peak));
+	glUniform1f(ShaderInputs::Scale, std::max(wh_max, 2.0f * peak));
 	auto const z_off = std::numbers::phi_v<float> * std::tan(std::numbers::pi_v<float> / 12.0f);
 
 	if(wh_max > 2.0f * peak)
@@ -252,7 +263,7 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::topography(
 		                               -std::numbers::phi_v<float>,
 		                               peak * (std::numbers::phi_v<float> - 1.0f) / wh_max + z_off,
 		                               1.0f};
-		glUniform4f(3, cam_loc.x, cam_loc.y, cam_loc.z, cam_loc.w);
+		glUniform4f(ShaderInputs::CamLoc, cam_loc.x, cam_loc.y, cam_loc.z, cam_loc.w);
 	}
 	else
 	{
@@ -260,7 +271,7 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::topography(
 		                               -std::numbers::phi_v<float>,
 		                               0.5f * (std::numbers::phi_v<float> - 1.0f) + z_off,
 		                               1.0f};
-		glUniform4f(3, cam_loc.x, cam_loc.y, cam_loc.z, cam_loc.w);
+		glUniform4f(ShaderInputs::CamLoc, cam_loc.x, cam_loc.y, cam_loc.z, cam_loc.w);
 	}
 
 	glNamedBufferSubData(*m_topo.get(),
@@ -291,5 +302,5 @@ void Texpainter::App::TerrainView::resize<Texpainter::App::TerrainView::ControlI
 	auto const ratio = static_cast<float>(width) / static_cast<float>(height);
 	auto const camproj =
 	    glm::perspective(0.25f * std::numbers::pi_v<float>, ratio, 1.0f / 1024.0f, 16.0f);
-	glUniformMatrix4fv(23, 1, GL_FALSE, glm::value_ptr(camproj));
+	glUniformMatrix4fv(ShaderInputs::CamProj, 1, GL_FALSE, glm::value_ptr(camproj));
 }
