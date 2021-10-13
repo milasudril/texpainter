@@ -117,18 +117,20 @@ void Texpainter::App::TerrainView::realize<Texpainter::App::TerrainView::Control
 	{
 		Logger::log(Logger::MessageType::Error,
 		            reinterpret_cast<char const*>(glewGetErrorString(err)));
+		m_defered_action.reset();
 		return;
 	}
-	m_initialized = true;
 
 	glClearColor(0.73f, 0.73f, 0.73f, 1.0f);
 	if(!check_gl_version(4, 6))
 	{
 		Logger::log(Logger::MessageType::Error,
 		            "OpenGL 4.6 or later is required to render a topographic map");
+		m_defered_action.reset();
 		return;
 	}
 
+	m_initialized = true;
 	std::array<Shader, 2> shaders{{make_shader(vertex_shader, GL_VERTEX_SHADER),
 	                               make_shader(frag_shader, GL_FRAGMENT_SHADER)}};
 
