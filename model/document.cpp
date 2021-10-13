@@ -349,6 +349,17 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 	}
 
 	{
+		if(auto i = doc_info.find("output_node"); i != std::end(doc_info))
+		{
+			if(auto j = id_map.find(i->get<FilterGraph::NodeId>()); j!=std::end(id_map))
+			{
+				auto const node = std::as_const(*doc).compositor().node(j->second);
+				doc->compositor().outputNode(*node);
+			}
+		}
+	}
+
+	{
 		auto workspace = doc_info.at("workspace").get<Workspace>();
 		std::map<FilterGraph::NodeId, vec2_t> new_loc;
 		std::ranges::transform(
@@ -370,9 +381,10 @@ void Texpainter::Model::store(Document const& doc, char const* filename)
 	{
 		nlohmann::json obj{std::pair{"workspace", doc.workspace()},
 		                   std::pair{"canvas_size", doc.canvasSize()}};
-		obj["compositor"] = serialize(doc.compositor());
-		obj["images"]     = mapNodeIdsToItemName(doc.images());
-		obj["palettes"]   = mapNodeIdsToItemName(doc.palettes());
+		obj["compositor"]  = serialize(doc.compositor());
+		obj["images"]      = mapNodeIdsToItemName(doc.images());
+		obj["palettes"]    = mapNodeIdsToItemName(doc.palettes());
+		obj["output_node"] = doc.compositor().outputNode().nodeId();
 		auto const str    = obj.dump(1, '\t');
 
 		Wad64::OutputFile output{archive, "document.json", store_creation_mode};
