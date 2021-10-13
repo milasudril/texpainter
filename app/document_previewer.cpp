@@ -4,6 +4,8 @@
 
 #include "./document_previewer.hpp"
 
+#include "ui/context.hpp"
+
 void Texpainter::App::DocumentPreviewer::refreshNodeSelector()
 {
 	m_node_selector.clear();

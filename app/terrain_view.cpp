@@ -157,6 +157,12 @@ void Texpainter::App::TerrainView::realize<Texpainter::App::TerrainView::Control
 	glEnableVertexArrayAttrib(id, ShaderInputs::Xy);
 	glEnableVertexArrayAttrib(id, ShaderInputs::NElev);
 	m_vert_array = VertexArray{GlHandle{id}};
+
+	if(m_defered_action.valid())
+	{
+		m_defered_action(*this);
+		m_defered_action.reset();
+	}
 }
 
 namespace
@@ -261,6 +267,14 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::meshSize(Size2d size
 Texpainter::App::TerrainView& Texpainter::App::TerrainView::topography(
     Span2d<Model::TopographyInfo const> n_elev)
 {
+	if(!m_initialized) [[unlikely]]
+		{
+			m_defered_action = [buffer = PixelStore::BasicImage{n_elev}](TerrainView& self) {
+				self.topography(buffer.pixels());
+			};
+			return *this;
+		}
+
 	if(m_mesh_size != n_elev.size()) { meshSize(n_elev.size()); }
 
 	if(m_xy == nullptr) { return *this; }

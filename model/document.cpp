@@ -351,7 +351,7 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 	{
 		if(auto i = doc_info.find("output_node"); i != std::end(doc_info))
 		{
-			if(auto j = id_map.find(i->get<FilterGraph::NodeId>()); j!=std::end(id_map))
+			if(auto j = id_map.find(i->get<FilterGraph::NodeId>()); j != std::end(id_map))
 			{
 				auto const node = std::as_const(*doc).compositor().node(j->second);
 				doc->compositor().outputNode(*node);
@@ -385,7 +385,7 @@ void Texpainter::Model::store(Document const& doc, char const* filename)
 		obj["images"]      = mapNodeIdsToItemName(doc.images());
 		obj["palettes"]    = mapNodeIdsToItemName(doc.palettes());
 		obj["output_node"] = doc.compositor().outputNode().nodeId();
-		auto const str    = obj.dump(1, '\t');
+		auto const str     = obj.dump(1, '\t');
 
 		Wad64::OutputFile output{archive, "document.json", store_creation_mode};
 		output.write(std::as_bytes(std::span{str}));

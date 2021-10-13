@@ -18,7 +18,7 @@ namespace Texpainter
 	class UniqueFunction<R(Args...)>
 	{
 	public:
-		UniqueFunction() = delete;
+		UniqueFunction(): r_dtor{null_dtor} {};
 
 		template<class F,
 		         std::enable_if_t<!std::is_same_v<std::decay_t<F>, UniqueFunction>, int> = 0>
@@ -59,6 +59,12 @@ namespace Texpainter
 		}
 
 		bool valid() const { return r_dtor != null_dtor; }
+
+		void reset()
+		{
+			r_dtor(m_data);
+			r_dtor = null_dtor;
+		}
 
 	private:
 		void* m_data;

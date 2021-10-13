@@ -14,6 +14,8 @@
 
 #include "model/document.hpp"
 
+#include "utils/unique_function.hpp"
+
 #include "ui/image_view.hpp"
 #include "ui/glarea.hpp"
 #include "ui/keyboard_state.hpp"
@@ -147,6 +149,8 @@ namespace Texpainter::App
 		VertexArray m_vert_array;
 		Size2d m_mesh_size;
 		ShaderProgram m_shader_program;
+
+		UniqueFunction<void(TerrainView&)> m_defered_action;
 	};
 }
 
