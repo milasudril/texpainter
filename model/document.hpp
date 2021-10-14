@@ -11,6 +11,7 @@
 #include "./item_name.hpp"
 #include "./image_source.hpp"
 #include "./palette_source.hpp"
+#include "./topography_info_source.hpp"
 #include "./compositor_proxy.hpp"
 #include "./brush.hpp"
 #include "./paint.hpp"
@@ -37,17 +38,26 @@ namespace Texpainter::Model
 		{
 			using type = PaletteSource;
 		};
+
+		template<>
+		struct ImageProcessor<WithStatus<PixelStore::BasicImage<TopographyInfo>>>
+		{
+			using type = TopographyInfoSource;
+		};
 	}
 
 	class Document: private Size2d,
 	                private Compositor,
 	                private CompositorInputManager<PixelStore::Image>,
-	                private CompositorInputManager<Palette>
+	                private CompositorInputManager<Palette>,
+	                private CompositorInputManager<PixelStore::BasicImage<TopographyInfo>>
 	{
 		using CompositorInputManager<PixelStore::Image>::insert;
-		using CompositorInputManager<Palette>::insert;
 		using CompositorInputManager<PixelStore::Image>::erase;
+		using CompositorInputManager<Palette>::insert;
 		using CompositorInputManager<Palette>::erase;
+		using CompositorInputManager<PixelStore::BasicImage<TopographyInfo>>::insert;
+		using CompositorInputManager<PixelStore::BasicImage<TopographyInfo>>::erase;
 
 
 	public:
@@ -69,6 +79,10 @@ namespace Texpainter::Model
 		using CompositorInputManager<Palette>::getBefore;
 		using CompositorInputManager<Palette>::getAfter;
 		using CompositorInputManager<Palette>::modify;
+		using CompositorInputManager<PixelStore::BasicImage<TopographyInfo>>::get;
+		using CompositorInputManager<PixelStore::BasicImage<TopographyInfo>>::getBefore;
+		using CompositorInputManager<PixelStore::BasicImage<TopographyInfo>>::getAfter;
+		using CompositorInputManager<PixelStore::BasicImage<TopographyInfo>>::modify;
 
 		explicit Document(Size2d canvas_size): Size2d{canvas_size} {}
 
