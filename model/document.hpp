@@ -102,16 +102,20 @@ namespace Texpainter::Model
 		}
 
 
-		auto const& images() const { return get(std::type_identity<PixelStore::Image>{}); }
-
 		template<class T>
 		auto insert(Model::ItemName const&, T&&, Size2d)
-		{ return nullptr;}
+		{
+			return nullptr;
+		}
 
 		template<class T>
 		auto insert(Model::ItemName const&, PixelStore::BasicImage<T>&&)
-		{ return nullptr;}
+		{
+			return nullptr;
+		}
 
+
+		auto const& images() const { return get(std::type_identity<PixelStore::Image>{}); }
 
 		auto image(ItemName const& name) const
 		{
@@ -129,6 +133,11 @@ namespace Texpainter::Model
 		}
 
 
+		auto const& topographicMaps() const
+		{
+			return get(std::type_identity<PixelStore::BasicImage<TopographyInfo>>{});
+		}
+
 		auto topographicMap(ItemName const& name) const
 		{
 			return get(std::type_identity<PixelStore::BasicImage<TopographyInfo>>{}, name);
@@ -141,7 +150,10 @@ namespace Texpainter::Model
 
 		bool eraseTopographicMap(ItemName const& name)
 		{
-			return erase(std::type_identity<PixelStore::BasicImage<TopographyInfo>>{}, name, *this, m_input_nodes);
+			return erase(std::type_identity<PixelStore::BasicImage<TopographyInfo>>{},
+			             name,
+			             *this,
+			             m_input_nodes);
 		}
 
 

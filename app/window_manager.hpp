@@ -837,7 +837,7 @@ namespace Texpainter::App
 				m_document->currentImage(std::move(name));
 
 				if(auto img_editor = m_windows.get<WindowType::ImageEditor>().get();
-				img_editor != nullptr)
+				   img_editor != nullptr)
 				{
 					img_editor->widget().refresh();
 					img_editor->window().show();
@@ -845,14 +845,15 @@ namespace Texpainter::App
 			}
 
 			if(auto output = m_windows.get<WindowType::DocumentPreviewer>().get();
-				output != nullptr)
+			   output != nullptr)
 			{ output->widget().refresh(); }
 		}
 
 		template<class T>
 		void insert(Model::ItemName&& name, std::unique_ptr<T[]> data, Size2d size)
 		{
-			if(m_document->insert(name, PixelStore::BasicImage<T>{Span2d{data.get(), size}}) == nullptr)
+			if(m_document->insert(name, PixelStore::BasicImage<T>{Span2d{data.get(), size}})
+			   == nullptr)
 			{ throw std::string{"Item already exists"}; }
 
 			if(auto compositor = m_windows.get<WindowType::Compositor>().get();
@@ -867,7 +868,7 @@ namespace Texpainter::App
 				m_document->currentImage(std::move(name));
 
 				if(auto img_editor = m_windows.get<WindowType::ImageEditor>().get();
-				img_editor != nullptr)
+				   img_editor != nullptr)
 				{
 					img_editor->widget().refresh();
 					img_editor->window().show();
@@ -875,7 +876,7 @@ namespace Texpainter::App
 			}
 
 			if(auto output = m_windows.get<WindowType::DocumentPreviewer>().get();
-				output != nullptr)
+			   output != nullptr)
 			{ output->widget().refresh(); }
 		}
 

@@ -46,6 +46,11 @@ Texpainter::Model::CompositorOutput Texpainter::Model::render(Document const& do
 		forceUpdateIfDirty(item, document, force_update);
 	});
 
+	std::ranges::for_each(document.topographicMaps(), [&document, force_update](auto const& item) {
+		item.second.processor.get().processor().source(item.second.source.get());
+		forceUpdateIfDirty(item, document, force_update);
+	});
+
 	auto ret = processIfValid(document.compositor(), document.canvasSize(), scale);
 
 	std::ranges::for_each(document.images(),
