@@ -558,9 +558,11 @@ namespace Texpainter::App
 		void confirmPositive(RenderToImgJobCreatorDlg& src)
 		{
 			auto opts = src.widget().value();
-			// FIXME:
-			//	insert(std::move(opts.name),
-			//	       render(*m_document, Model::Document::ForceUpdate{true}, opts.supersampling));
+			auto render_res =
+			    render(*m_document, Model::Document::ForceUpdate{true}, opts.supersampling);
+			visit([this, name = std::move(opts.name), size = std::size(render_res)]<class T>(
+			          T&& item) mutable { insert(std::move(name), std::forward<T>(item), size); },
+			      render_res.takeData());
 
 			m_render_to_img_job_creator.reset();
 		}
@@ -814,6 +816,34 @@ namespace Texpainter::App
 			{
 				insert(Model::createItemNameFromFilename(filename.c_str()),
 				       load(Enum::Empty<T>{}, filename.c_str()));
+			}
+		}
+
+		template<class T>
+		void insert(Model::ItemName&& name, T&& item, Size2d size)
+		{
+			if(m_document->insert(std::move(name), std::forward<T>(item), size) == nullptr)
+			{ throw std::string{"Item already exists"}; }
+
+			if(auto compositor = m_windows.get<WindowType::Compositor>().get();
+			   compositor != nullptr)
+			{
+				auto node = std::as_const(*m_document).inputNodeItem(name);
+				compositor->widget().insertNodeEditor(*node);
+			}
+		}
+
+		template<class T>
+		void insert(Model::ItemName&& name, std::unique_ptr<T[]> data, Size2d size)
+		{
+			if(m_document->insert(name, PixelStore::BasicImage<T>{Span2d{data.get(), size}}) == nullptr)
+			{ throw std::string{"Item already exists"}; }
+
+			if(auto compositor = m_windows.get<WindowType::Compositor>().get();
+			   compositor != nullptr)
+			{
+				auto node = std::as_const(*m_document).inputNodeItem(name);
+				compositor->widget().insertNodeEditor(*node);
 			}
 		}
 

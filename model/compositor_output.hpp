@@ -30,6 +30,8 @@ namespace Texpainter::Model
 
 		FilterGraph::PortValue const& data() const { return m_data; }
 
+		FilterGraph::PortValue&& takeData() { return std::move(m_data); }
+
 	private:
 		Size2d m_size;
 		FilterGraph::PortValue m_data;

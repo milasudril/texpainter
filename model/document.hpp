@@ -104,6 +104,15 @@ namespace Texpainter::Model
 
 		auto const& images() const { return get(std::type_identity<PixelStore::Image>{}); }
 
+		template<class T>
+		auto insert(Model::ItemName const&, T&&, Size2d)
+		{ return nullptr;}
+
+		template<class T>
+		auto insert(Model::ItemName const&, PixelStore::BasicImage<T>&&)
+		{ return nullptr;}
+
+
 		auto image(ItemName const& name) const
 		{
 			return get(std::type_identity<PixelStore::Image>{}, name);
@@ -111,12 +120,28 @@ namespace Texpainter::Model
 
 		auto insert(ItemName const& name, PixelStore::Image&& img)
 		{
-			return insert(name, std::forward<PixelStore::Image>(img), *this, m_input_nodes);
+			return insert(name, std::move(img), *this, m_input_nodes);
 		}
 
 		bool eraseImage(ItemName const& name)
 		{
 			return erase(std::type_identity<PixelStore::Image>{}, name, *this, m_input_nodes);
+		}
+
+
+		auto topographicMap(ItemName const& name) const
+		{
+			return get(std::type_identity<PixelStore::BasicImage<TopographyInfo>>{}, name);
+		}
+
+		auto insert(ItemName const& name, PixelStore::BasicImage<TopographyInfo>&& img)
+		{
+			return insert(name, std::move(img), *this, m_input_nodes);
+		}
+
+		bool eraseTopographicMap(ItemName const& name)
+		{
+			return erase(std::type_identity<PixelStore::BasicImage<TopographyInfo>>{}, name, *this, m_input_nodes);
 		}
 
 
@@ -130,14 +155,13 @@ namespace Texpainter::Model
 		auto insert(ItemName const& name, Palette&& pal)
 		{
 			if(palettes().size() == 0) { currentColor(PixelStore::ColorIndex{0}); }
-			return insert(name, std::forward<Palette>(pal), *this, m_input_nodes);
+			return insert(name, std::move(pal), *this, m_input_nodes);
 		}
 
 		bool erasePalette(ItemName const& name)
 		{
 			return erase(std::type_identity<Palette>{}, name, *this, m_input_nodes);
 		}
-
 
 		Compositor::NodeItem const* inputNodeItem(ItemName const& name) const
 		{
