@@ -831,6 +831,22 @@ namespace Texpainter::App
 				auto node = std::as_const(*m_document).inputNodeItem(name);
 				compositor->widget().insertNodeEditor(*node);
 			}
+
+			if constexpr(std::is_same_v<T, Model::Palette>)
+			{
+				m_document->currentImage(std::move(name));
+
+				if(auto img_editor = m_windows.get<WindowType::ImageEditor>().get();
+				img_editor != nullptr)
+				{
+					img_editor->widget().refresh();
+					img_editor->window().show();
+				}
+			}
+
+			if(auto output = m_windows.get<WindowType::DocumentPreviewer>().get();
+				output != nullptr)
+			{ output->widget().refresh(); }
 		}
 
 		template<class T>
@@ -845,6 +861,22 @@ namespace Texpainter::App
 				auto node = std::as_const(*m_document).inputNodeItem(name);
 				compositor->widget().insertNodeEditor(*node);
 			}
+
+			if constexpr(std::is_same_v<T, PixelStore::Pixel>)
+			{
+				m_document->currentImage(std::move(name));
+
+				if(auto img_editor = m_windows.get<WindowType::ImageEditor>().get();
+				img_editor != nullptr)
+				{
+					img_editor->widget().refresh();
+					img_editor->window().show();
+				}
+			}
+
+			if(auto output = m_windows.get<WindowType::DocumentPreviewer>().get();
+				output != nullptr)
+			{ output->widget().refresh(); }
 		}
 
 		void insert(Model::ItemName&& name, PixelStore::Image&& img)
