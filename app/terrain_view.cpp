@@ -242,8 +242,10 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::meshSize(Size2d size
 
 		GLuint topo_id{};
 		glCreateBuffers(1, &topo_id);
-		glNamedBufferStorage(
-		    topo_id, sizeof(PixelStore::TopographyInfo) * area(size), nullptr, GL_DYNAMIC_STORAGE_BIT);
+		glNamedBufferStorage(topo_id,
+		                     sizeof(PixelStore::TopographyInfo) * area(size),
+		                     nullptr,
+		                     GL_DYNAMIC_STORAGE_BIT);
 
 		glVertexArrayVertexBuffer(*m_vert_array.get(), 0, xy_id, 0, 2 * sizeof(float));
 		glVertexArrayVertexBuffer(

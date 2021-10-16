@@ -852,8 +852,7 @@ namespace Texpainter::App
 		template<class T>
 		void insert(Model::ItemName&& name, std::unique_ptr<T[]> data, Size2d size)
 		{
-			if(m_document->insert(name, PixelStore::Image<T>{Span2d{data.get(), size}})
-			   == nullptr)
+			if(m_document->insert(name, PixelStore::Image<T>{Span2d{data.get(), size}}) == nullptr)
 			{ throw std::string{"Item already exists"}; }
 
 			if(auto compositor = m_windows.get<WindowType::Compositor>().get();
