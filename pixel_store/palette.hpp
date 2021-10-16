@@ -15,11 +15,12 @@
 
 namespace Texpainter::PixelStore
 {
-	template<ColorIndex::element_type Size>
-	class Palette
+	template<class PixelType, ColorIndex::element_type Size>
+	class BasicPalette
 	{
 	public:
 		using index_type = ColorIndex;
+		using value_type = PixelType;
 
 		constexpr auto begin() const { return std::begin(m_data); }
 
@@ -40,7 +41,7 @@ namespace Texpainter::PixelStore
 		static constexpr auto size() { return Size; }
 
 
-		constexpr explicit Palette(Pixel color_init = Pixel{0.0f, 0.0f, 0.0f, 0.0f})
+		constexpr explicit BasicPalette(PixelType color_init = PixelType{0.0f, 0.0f, 0.0f, 0.0f})
 		{
 			std::ranges::fill(m_data, color_init);
 		}
@@ -55,8 +56,11 @@ namespace Texpainter::PixelStore
 		constexpr auto lastIndex() const { return index_type{size() - 1}; }
 
 	private:
-		std::array<Pixel, Size> m_data;
+		std::array<PixelType, Size> m_data;
 	};
+
+	template<ColorIndex::element_type Size>
+	using Palette = BasicPalette<Pixel, Size>;
 
 	template<ColorIndex::element_type Size>
 	void to_json(nlohmann::json& j, Palette<Size> const& pal)
