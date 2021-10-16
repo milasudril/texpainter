@@ -13,7 +13,7 @@
 
 namespace Texpainter::PixelStore
 {
-	using TopographicMap = PixelStore::Image<TopographyInfo>;
+	using TopographicMap = Image<TopographyInfo>;
 
 	TopographicMap load(Enum::Empty<TopographicMap>, void* arg, detail::InputFileFactory make_input_file);
 
