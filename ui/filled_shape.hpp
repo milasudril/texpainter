@@ -11,7 +11,7 @@
 #include "./toplevel_coordinates.hpp"
 #include "./dispatch_event.hpp"
 
-#include "pixel_store/pixel.hpp"
+#include "pixel_store/rgba_value.hpp"
 
 #include <utility>
 #include <numbers>
@@ -21,10 +21,11 @@ namespace Texpainter::Ui
 	class FilledShape
 	{
 	public:
-		explicit FilledShape(Container& cnt,
-		                     PixelStore::Pixel color = PixelStore::Pixel{0.5f, 0.5f, 0.5f, 1.0f},
-		                     double radius           = 1.0 - 1.0 / std::numbers::phi,
-		                     vec2_t location         = vec2_t{0.0, 0.0});
+		explicit FilledShape(
+		    Container& cnt,
+		    PixelStore::RgbaValue color = PixelStore::RgbaValue{0.5f, 0.5f, 0.5f, 1.0f},
+		    double radius               = 1.0 - 1.0 / std::numbers::phi,
+		    vec2_t location             = vec2_t{0.0, 0.0});
 
 		~FilledShape();
 

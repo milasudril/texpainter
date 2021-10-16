@@ -9,7 +9,7 @@
 #include "./container.hpp"
 #include "./dispatch_event.hpp"
 
-#include "pixel_store/pixel.hpp"
+#include "pixel_store/rgba_value.hpp"
 #include "pixel_store/color_index.hpp"
 #include "utils/size_2d.hpp"
 
@@ -64,8 +64,8 @@ namespace Texpainter::Ui
 			     }});
 		}
 
-		PaletteView& palette(std::span<PixelStore::Pixel const> predef_colors);
-		std::span<PixelStore::Pixel const> palette() const;
+		PaletteView& palette(std::span<PixelStore::RgbaValue const> predef_colors);
+		std::span<PixelStore::RgbaValue const> palette() const;
 		PaletteView& update();
 
 		enum class HighlightMode
@@ -75,8 +75,8 @@ namespace Texpainter::Ui
 			Write
 		};
 
-		PaletteView& color(PixelStore::ColorIndex index, PixelStore::Pixel value);
-		PixelStore::Pixel color(PixelStore::ColorIndex index) const;
+		PaletteView& color(PixelStore::ColorIndex index, PixelStore::RgbaValue value);
+		PixelStore::RgbaValue color(PixelStore::ColorIndex index) const;
 
 		PaletteView& highlightMode(PixelStore::ColorIndex index, HighlightMode mode);
 

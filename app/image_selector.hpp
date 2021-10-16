@@ -4,7 +4,7 @@
 #define TEXPAINTER_APP_IMAGESELECTOR_HPP
 
 #include "model/item_name.hpp"
-#include "pixel_store/image.hpp"
+#include "pixel_store/rgba_image.hpp"
 
 #include "ui/combobox.hpp"
 

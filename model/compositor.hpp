@@ -47,7 +47,7 @@ namespace Texpainter::Model
 		Compositor(Compositor&&) = default;
 		Compositor& operator=(Compositor&&) = default;
 
-		void process(Span2d<PixelStore::Pixel> canvas, double resolution) const;
+		void process(Span2d<PixelStore::RgbaValue> canvas, double resolution) const;
 
 		NodeItem insert(std::unique_ptr<FilterGraph::AbstractImageProcessor> proc)
 		{

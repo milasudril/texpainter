@@ -16,7 +16,7 @@
 #include "./paint.hpp"
 #include "./workspace.hpp"
 
-#include "pixel_store/image.hpp"
+#include "pixel_store/rgba_image.hpp"
 #include "utils/with_status.hpp"
 
 #include <algorithm>
@@ -216,7 +216,7 @@ namespace Texpainter::Model
 			return m_workspace.m_color_history;
 		}
 
-		Document& saveColor(PixelStore::Pixel color)
+		Document& saveColor(PixelStore::RgbaValue color)
 		{
 			std::rotate(std::rbegin(m_workspace.m_color_history),
 			            std::rbegin(m_workspace.m_color_history) + 1,
@@ -272,11 +272,11 @@ namespace Texpainter::Model
 
 	void paint(Document& doc, vec2_t location);
 
-	void paint(Document& doc, vec2_t location, float brush_radius, PixelStore::Pixel color);
+	void paint(Document& doc, vec2_t location, float brush_radius, PixelStore::RgbaValue color);
 
 	void floodfill(Document& doc, vec2_t location);
 
-	void floodfill(Document& doc, vec2_t location, PixelStore::Pixel color);
+	void floodfill(Document& doc, vec2_t location, PixelStore::RgbaValue color);
 
 	std::unique_ptr<Document> load(Enum::Empty<Document>, char const* filename);
 

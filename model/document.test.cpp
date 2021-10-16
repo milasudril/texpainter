@@ -18,12 +18,12 @@ namespace Testcases
 		auto& src = input->source;
 		src.modify([](auto& img) noexcept {
 			assert((img.size() == Texpainter::Size2d{3, 2}));
-			img(0, 0) = Texpainter::PixelStore::Pixel{1.0f, 0.0f, 0.0f, 1.0f};
-			img(1, 0) = Texpainter::PixelStore::Pixel{0.0f, 1.0f, 0.0f, 1.0f};
-			img(2, 0) = Texpainter::PixelStore::Pixel{0.0f, 0.0f, 1.0f, 1.0f};
-			img(0, 1) = Texpainter::PixelStore::Pixel{1.0f, 1.0f, 0.0f, 1.0f};
-			img(1, 1) = Texpainter::PixelStore::Pixel{0.0f, 1.0f, 1.0f, 1.0f};
-			img(2, 1) = Texpainter::PixelStore::Pixel{1.0f, 0.0f, 1.0f, 1.0f};
+			img(0, 0) = Texpainter::PixelStore::RgbaValue{1.0f, 0.0f, 0.0f, 1.0f};
+			img(1, 0) = Texpainter::PixelStore::RgbaValue{0.0f, 1.0f, 0.0f, 1.0f};
+			img(2, 0) = Texpainter::PixelStore::RgbaValue{0.0f, 0.0f, 1.0f, 1.0f};
+			img(0, 1) = Texpainter::PixelStore::RgbaValue{1.0f, 1.0f, 0.0f, 1.0f};
+			img(1, 1) = Texpainter::PixelStore::RgbaValue{0.0f, 1.0f, 1.0f, 1.0f};
+			img(2, 1) = Texpainter::PixelStore::RgbaValue{1.0f, 0.0f, 1.0f, 1.0f};
 			return true;
 		});
 		src.clearStatus();
@@ -47,7 +47,7 @@ namespace Testcases
 		puts("===================");
 		src.modify([](auto& img) noexcept {
 			assert((img.size() == Texpainter::Size2d{3, 2}));
-			img(0, 0) = Texpainter::PixelStore::Pixel{1.0f, 0.5f, 0.0f, 1.0f};
+			img(0, 0) = Texpainter::PixelStore::RgbaValue{1.0f, 0.5f, 0.0f, 1.0f};
 			return true;
 		});
 

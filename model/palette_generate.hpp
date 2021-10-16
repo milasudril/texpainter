@@ -14,7 +14,7 @@ namespace Texpainter::Model
 {
 	struct PaletteParameters
 	{
-		std::array<PixelStore::Pixel, 4> colors;
+		std::array<PixelStore::RgbaValue, 4> colors;
 		bool intensity_to_intensity;
 		bool intensity_to_alpha;
 		bool by_intensity;

@@ -6,7 +6,7 @@
 
 namespace Testcases
 {
-	static_assert(std::is_trivial_v<Texpainter::PixelTypes::RgbaValue>);
+	static_assert(std::is_trivial_v<Texpainter::PixelStore::RgbaValue>);
 }
 
 int main() { return 0; }

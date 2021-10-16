@@ -5,19 +5,21 @@
 
 #include "./brush.hpp"
 
-#include "pixel_store/pixel.hpp"
+#include "pixel_store/rgba_value.hpp"
 #include "utils/vec_t.hpp"
 #include "utils/span_2d.hpp"
 
 namespace Texpainter::Model
 {
-	void paint(Span2d<PixelStore::Pixel> pixels,
+	void paint(Span2d<PixelStore::RgbaValue> pixels,
 	           vec2_t origin,
 	           double radius,
 	           BrushFunction brush,
-	           PixelStore::Pixel color);
+	           PixelStore::RgbaValue color);
 
-	void floodfill(Span2d<PixelStore::Pixel> pixels, vec2_t origin, PixelStore::Pixel color);
+	void floodfill(Span2d<PixelStore::RgbaValue> pixels,
+	               vec2_t origin,
+	               PixelStore::RgbaValue color);
 
-	void drawOutline(Span2d<PixelStore::Pixel> pixels);
+	void drawOutline(Span2d<PixelStore::RgbaValue> pixels);
 }

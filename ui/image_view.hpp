@@ -9,7 +9,7 @@
 #include "./container.hpp"
 #include "./dispatch_event.hpp"
 
-#include "pixel_store/pixel.hpp"
+#include "pixel_store/rgba_value.hpp"
 #include "utils/span_2d.hpp"
 
 #include <utility>
@@ -69,9 +69,9 @@ namespace Texpainter::Ui
 			     }});
 		}
 
-		ImageView& image(Span2d<PixelStore::Pixel const> img);
+		ImageView& image(Span2d<PixelStore::RgbaValue const> img);
 
-		ImageView& overlay(Span2d<PixelStore::Pixel const> img,
+		ImageView& overlay(Span2d<PixelStore::RgbaValue const> img,
 		                   vec2_t initial_location = vec2_t{0.0, 0.0});
 
 		ImageView& overlayLocation(vec2_t loc);

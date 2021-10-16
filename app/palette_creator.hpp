@@ -149,7 +149,7 @@ namespace Texpainter
 		Ui::Button m_by_intensity;
 		Ui::Button m_reversed;
 
-		std::array<PixelStore::Pixel, 4> generateColors() const
+		std::array<PixelStore::RgbaValue, 4> generateColors() const
 		{
 			auto const base_hue =
 			    static_cast<float>(linValue(m_base_hue.inputField().slider().value()));
@@ -169,7 +169,7 @@ namespace Texpainter
 
 			auto const saturation = static_cast<float>(linValue(m_saturation.inputField().value()));
 
-			std::array<PixelStore::Pixel, 4> colors;
+			std::array<PixelStore::RgbaValue, 4> colors;
 			std::ranges::for_each(colors, [saturation, hue, k = 0](auto& value) mutable {
 				auto constexpr intensity = 1.0f / 3.0f;
 				auto constexpr alpha     = 1.0f;

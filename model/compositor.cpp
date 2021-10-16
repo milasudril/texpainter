@@ -31,7 +31,7 @@ Texpainter::FilterGraph::ValidationResult Texpainter::Model::validate(Compositor
 	return result;
 }
 
-void Texpainter::Model::Compositor::process(Span2d<PixelStore::Pixel> canvas,
+void Texpainter::Model::Compositor::process(Span2d<PixelStore::RgbaValue> canvas,
                                             double resolution) const
 {
 	assert(valid());

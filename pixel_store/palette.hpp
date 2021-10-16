@@ -3,7 +3,7 @@
 #ifndef TEXPAINTER_PIXELSTORE_PALETTE_HPP
 #define TEXPAINTER_PIXELSTORE_PALETTE_HPP
 
-#include "./pixel.hpp"
+#include "./rgba_value.hpp"
 #include "./color_index.hpp"
 
 #define JSON_USE_IMPLICIT_CONVERSIONS 0
@@ -60,7 +60,7 @@ namespace Texpainter::PixelStore
 	};
 
 	template<ColorIndex::element_type Size>
-	using RgbaPalette = Palette<Pixel, Size>;
+	using RgbaPalette = Palette<RgbaValue, Size>;
 
 	template<ColorIndex::element_type Size>
 	void to_json(nlohmann::json& j, RgbaPalette<Size> const& pal)
@@ -104,14 +104,14 @@ namespace Texpainter::PixelStore
 			if(colorspace == "g22")
 			{
 				return +[](std::string const& value) {
-					return Pixel{
-					    fromString(Enum::Empty<BasicPixel<ColorProfiles::Gamma22>>{}, value)};
+					return RgbaValue{
+					    fromString(Enum::Empty<BasicRgbaValue<ColorProfiles::Gamma22>>{}, value)};
 				};
 			}
 			if(colorspace == "linear")
 			{
 				return +[](std::string const& value) {
-					return fromString(Enum::Empty<Pixel>{}, value);
+					return fromString(Enum::Empty<RgbaValue>{}, value);
 				};
 			}
 			else

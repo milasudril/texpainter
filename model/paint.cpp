@@ -4,11 +4,11 @@
 
 #include <stack>
 
-void Texpainter::Model::paint(Span2d<PixelStore::Pixel> pixels,
+void Texpainter::Model::paint(Span2d<PixelStore::RgbaValue> pixels,
                               vec2_t origin,
                               double radius,
                               BrushFunction brush,
-                              PixelStore::Pixel color)
+                              PixelStore::RgbaValue color)
 {
 	auto const w = pixels.width();
 	auto const h = pixels.height();
@@ -33,9 +33,9 @@ void Texpainter::Model::paint(Span2d<PixelStore::Pixel> pixels,
 	}
 }
 
-void Texpainter::Model::floodfill(Span2d<PixelStore::Pixel> pixels,
+void Texpainter::Model::floodfill(Span2d<PixelStore::RgbaValue> pixels,
                                   vec2_t origin,
-                                  PixelStore::Pixel color)
+                                  PixelStore::RgbaValue color)
 {
 	auto const w   = pixels.width();
 	auto const h   = pixels.height();
@@ -75,13 +75,13 @@ void Texpainter::Model::floodfill(Span2d<PixelStore::Pixel> pixels,
 	}
 }
 
-void Texpainter::Model::drawOutline(Span2d<PixelStore::Pixel> pixels)
+void Texpainter::Model::drawOutline(Span2d<PixelStore::RgbaValue> pixels)
 {
 	auto const w = pixels.width();
 	auto const h = pixels.height();
 
-	constexpr auto dark  = PixelStore::Pixel{0.0f, 0.0f, 0.0f, 1.0f};
-	constexpr auto light = PixelStore::Pixel{1.0f, 1.0f, 1.0f, 1.0f};
+	constexpr auto dark  = PixelStore::RgbaValue{0.0f, 0.0f, 0.0f, 1.0f};
+	constexpr auto light = PixelStore::RgbaValue{1.0f, 1.0f, 1.0f, 1.0f};
 
 	for(uint32_t k = 0; k < w; ++k)
 	{

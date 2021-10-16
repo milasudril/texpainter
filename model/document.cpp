@@ -5,7 +5,7 @@
 #include "./document.hpp"
 #include "./dummy_processor.hpp"
 
-#include "pixel_store/image_io.hpp"
+#include "pixel_store/rgba_image.hpp"
 #include "imgproc/image_processor_registry.hpp"
 #include "log/logger.hpp"
 
@@ -54,7 +54,7 @@ Texpainter::PixelStore::RgbaImage Texpainter::Model::render(Document const& docu
 		}
 	else
 	{
-		std::ranges::fill(ret.pixels(), PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
+		std::ranges::fill(ret.pixels(), PixelStore::RgbaValue{0.0f, 0.0f, 0.0f, 0.0f});
 	}
 
 	std::ranges::for_each(document.images(),
@@ -73,7 +73,7 @@ Texpainter::PixelStore::RgbaImage Texpainter::Model::render(Document const& docu
 	{
 		for(uint32_t col = 0; col < document.canvasSize().width(); ++col)
 		{
-			PixelStore::Pixel result{0.0, 0.0, 0.0, 0.0};
+			PixelStore::RgbaValue result{0.0, 0.0, 0.0, 0.0};
 			for(uint32_t row_src = 0; row_src < scale; ++row_src)
 			{
 				for(uint32_t col_src = 0; col_src < scale; ++col_src)
@@ -110,7 +110,7 @@ void Texpainter::Model::paint(Document& doc, vec2_t location)
 void Texpainter::Model::paint(Document& doc,
                               vec2_t location,
                               float brush_radius,
-                              PixelStore::Pixel color)
+                              PixelStore::RgbaValue color)
 {
 	doc.modify(
 	    [location,
@@ -142,7 +142,7 @@ void Texpainter::Model::floodfill(Document& doc, vec2_t location)
 	    doc.currentImage());
 }
 
-void Texpainter::Model::floodfill(Document& doc, vec2_t location, PixelStore::Pixel color)
+void Texpainter::Model::floodfill(Document& doc, vec2_t location, PixelStore::RgbaValue color)
 {
 	doc.modify(
 	    [location, color](PixelStore::RgbaImage& img) noexcept {

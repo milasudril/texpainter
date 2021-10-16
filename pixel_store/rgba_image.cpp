@@ -10,7 +10,7 @@
 #include <OpenEXR/ImfHeader.h>
 #include <OpenEXR/ImfFrameBuffer.h>
 
-Texpainter::PixelTypes::RgbaImage Texpainter::PixelTypes::load(
+Texpainter::PixelStore::RgbaImage Texpainter::PixelStore::load(
     Enum::Empty<RgbaImage>, void* arg, detail::InputFileFactory make_input_file)
 {
 	auto src = make_input_file(arg);
@@ -60,7 +60,7 @@ Texpainter::PixelTypes::RgbaImage Texpainter::PixelTypes::load(
 	return ret;
 }
 
-void Texpainter::PixelTypes::store(Span2d<RgbaValue const> pixels,
+void Texpainter::PixelStore::store(Span2d<RgbaValue const> pixels,
                                    void* arg,
                                    detail::OutputFileFactory make_output_file)
 {
@@ -97,7 +97,7 @@ void Texpainter::PixelTypes::store(Span2d<RgbaValue const> pixels,
 	dest.writePixels(pixels.height());
 }
 
-bool Texpainter::PixelTypes::fileValid(Enum::Empty<RgbaImage>, char const* filename)
+bool Texpainter::PixelStore::fileValid(Enum::Empty<RgbaImage>, char const* filename)
 {
 	return Imf::isOpenExrFile(filename);
 }

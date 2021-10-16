@@ -3,8 +3,6 @@
 #ifndef TEXPAINTER_PIXELSTORE_IMAGE_HPP
 #define TEXPAINTER_PIXELSTORE_IMAGE_HPP
 
-#include "./pixel.hpp"
-
 #include "utils/span_2d.hpp"
 
 #include <algorithm>
@@ -83,8 +81,6 @@ namespace Texpainter::PixelStore
 	{
 		return area(img.size());
 	}
-
-	using RgbaImage = Image<Pixel>;
 }
 
 #endif

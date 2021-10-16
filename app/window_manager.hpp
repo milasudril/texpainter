@@ -21,7 +21,7 @@
 #include "model/document.hpp"
 #include "model/window_type.hpp"
 #include "model/palette_generate.hpp"
-#include "pixel_store/image_io.hpp"
+#include "pixel_store/rgba_image.hpp"
 #include "ui/window.hpp"
 #include "ui/image_view.hpp"
 #include "ui/dialog.hpp"

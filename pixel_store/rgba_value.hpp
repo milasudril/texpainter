@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"rgba_value.hpp", "type":"include"}]}
 
-#ifndef TEXPAINTER_PIXELTYPES_RGBAVALUE_HPP
-#define TEXPAINTER_PIXELTYPES_RGBAVALUE_HPP
+#ifndef TEXPAINTER_PIXELSTORE_RGBAVALUE_HPP
+#define TEXPAINTER_PIXELSTORE_RGBAVALUE_HPP
 
 #include "utils/vec_t.hpp"
 
@@ -11,7 +11,7 @@
 #include <cmath>
 #include <algorithm>
 
-namespace Texpainter::PixelTypes
+namespace Texpainter::PixelStore
 {
 	namespace ColorProfiles
 	{
@@ -195,6 +195,8 @@ namespace Texpainter::PixelTypes
 	}
 
 	using RgbaValue = BasicRgbaValue<ColorProfiles::LinearRgba>;
+
+	using RgbaValueG22 = BasicRgbaValue<ColorProfiles::Gamma22>;
 
 	constexpr RgbaValue black() { return RgbaValue{0.0f, 0.0f, 0.0f}; }
 

@@ -2,8 +2,8 @@
 //@	 "targets":[{"name":"ilm_io.hpp", "type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_PIXELTYPES_ILMIO_HPP
-#define TEXPAINTER_PIXELTYPES_ILMIO_HPP
+#ifndef TEXPAINTER_PIXELSTORE_ILMIO_HPP
+#define TEXPAINTER_PIXELSTORE_ILMIO_HPP
 
 #include <OpenEXR/ImfIO.h>
 #include <OpenEXR/ImfOutputFile.h>
@@ -11,7 +11,7 @@
 
 #include <span>
 
-namespace Texpainter::PixelTypes
+namespace Texpainter::PixelStore
 {
 	namespace detail
 	{

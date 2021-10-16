@@ -22,7 +22,7 @@ static_assert(std::is_same_v<std::decay_t<decltype(std::get<0>(args))>,
 static_assert(std::is_same_v<std::decay_t<decltype(std::get<1>(args))>,
                              Texpainter::FilterGraph::ComplexValue const*>);
 static_assert(std::is_same_v<std::decay_t<decltype(std::get<2>(args))>,
-                             Texpainter::PixelStore::Pixel const*>);
+                             Texpainter::PixelStore::RgbaValue const*>);
 static_assert(std::tuple_size_v<MyArgTuple> == std::size(types));
 
 namespace Testcases
@@ -31,7 +31,7 @@ namespace Testcases
 	{
 		Texpainter::FilterGraph::RealValue x;
 		Texpainter::FilterGraph::ComplexValue y;
-		Texpainter::PixelStore::Pixel z;
+		Texpainter::PixelStore::RgbaValue z;
 		MyArgTuple args{&x, &y, &z};
 
 		assert(std::get<0>(std::as_const(args)) == &x);

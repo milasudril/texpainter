@@ -34,7 +34,7 @@ namespace Texpainter::App
 		PaletteSelector& clear()
 		{
 			m_name.clear();
-			m_palette.palette(std::span<PixelStore::Pixel>{});
+			m_palette.palette(std::span<PixelStore::RgbaValue>{});
 			return *this;
 		}
 

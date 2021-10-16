@@ -3,15 +3,15 @@
 //@	,"dependencies_extra":[{"ref":"rgba_image.o", "rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_PIXELTYPES_RGBAIMAGE_HPP
-#define TEXPAINTER_PIXELTYPES_RGBAIMAGE_HPP
+#ifndef TEXPAINTER_PIXELSTORE_RGBAIMAGE_HPP
+#define TEXPAINTER_PIXELSTORE_RGBAIMAGE_HPP
 
 #include "./rgba_value.hpp"
 #include "./ilm_io.hpp"
 
 #include "pixel_store/image.hpp"
 
-namespace Texpainter::PixelTypes
+namespace Texpainter::PixelStore
 {
 	using RgbaImage = PixelStore::Image<RgbaValue>;
 
