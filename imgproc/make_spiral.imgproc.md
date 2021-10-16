@@ -30,7 +30,7 @@ void main(auto const& args, auto const&)
 		for(uint32_t x = 0; x < w; ++x)
 		{
 			auto v                = vec2_t{static_cast<double>(x), static_cast<double>(y)} - O;
-			output<0>(args, x, y) = std::atan2(v[1], v[0]);
+			output<0>(args, x, y) = static_cast<RealValue>(std::atan2(v[1], v[0]));
 		}
 	}
 }

@@ -30,7 +30,7 @@ __Includes:__
 __Source code:__ 
 
 ```c++
-inline double mapParameter(ParamValue val) { return std::exp2(std::lerp(-8.0, 8.0, val.value())); }
+inline auto mapParameter(ParamValue val) { return std::exp2(std::lerp(-8.0f, 8.0f, val.value())); }
 
 void main(auto const& args, auto const& params)
 {

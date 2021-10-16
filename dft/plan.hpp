@@ -18,9 +18,9 @@ namespace Texpainter::Dft
 {
 	struct PlanDeleter
 	{
-		void operator()(fftw_plan plan)
+		void operator()(fftwf_plan plan)
 		{
-			if(plan != nullptr) { fftw_destroy_plan(plan); }
+			if(plan != nullptr) { fftwf_destroy_plan(plan); }
 		}
 	};
 
@@ -37,21 +37,21 @@ namespace Texpainter::Dft
 
 		BasicPlan(): m_plan{nullptr} {}
 
-		using sample_type = std::complex<double>;
+		using sample_type = std::complex<float>;
 
 		void execute(sample_type const* input_buffer, sample_type* output_buffer) const
 		{
 			assert(valid());
 			auto input_buffer_ptr =
-			    reinterpret_cast<fftw_complex*>(const_cast<sample_type*>(input_buffer));
-			auto output_buffer_ptr = reinterpret_cast<fftw_complex*>(output_buffer);
-			fftw_execute_dft(m_plan.get(), input_buffer_ptr, output_buffer_ptr);
+			    reinterpret_cast<fftwf_complex*>(const_cast<sample_type*>(input_buffer));
+			auto output_buffer_ptr = reinterpret_cast<fftwf_complex*>(output_buffer);
+			fftwf_execute_dft(m_plan.get(), input_buffer_ptr, output_buffer_ptr);
 		}
 
 		bool valid() const { return m_plan != nullptr; }
 
 	private:
-		using PlanType = std::remove_pointer_t<fftw_plan>;
+		using PlanType = std::remove_pointer_t<fftwf_plan>;
 		std::unique_ptr<PlanType, PlanDeleter> m_plan;
 	};
 

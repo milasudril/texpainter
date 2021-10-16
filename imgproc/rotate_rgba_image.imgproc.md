@@ -39,7 +39,7 @@ using Texpainter::PixelStore::renderTiled;
 
 inline Angle angle(ParamValue val)
 {
-	return Angle{std::lerp(-0.5, 0.5, val.value()), Angle::Turns{}};
+	return Angle{std::lerp(-0.5, 0.5, static_cast<double>(val.value())), Angle::Turns{}};
 }
 
 void main(auto const& args, auto const& params)

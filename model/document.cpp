@@ -260,7 +260,7 @@ namespace
 			auto res = m_compositor.insert(std::move(imgproc));
 			std::ranges::for_each(
 			    item.second.params, [&node = res.second.get()](auto const& param) {
-				    auto val = std::clamp(param.second, 0.0, 1.0);
+				    auto val = static_cast<float>(std::clamp(param.second, 0.0, 1.0));
 				    node.set(param.first.c_str(), Texpainter::FilterGraph::ParamValue{val});
 			    });
 

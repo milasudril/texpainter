@@ -137,7 +137,8 @@ namespace Texpainter::App
 
 			auto value() const
 			{
-				return FilterGraph::ParamValue{m_slider.inputField().value().value()};
+				return FilterGraph::ParamValue{
+				    static_cast<float>(m_slider.inputField().value().value())};
 			}
 
 			void value(FilterGraph::ParamValue val)

@@ -23,7 +23,7 @@ __Source code:__
 ```c++
 inline int32_t mapParameter(ParamValue value, uint32_t scale)
 {
-	return static_cast<int32_t>(std::lerp(-0.5, 0.5, value.value()) * scale);
+	return static_cast<int32_t>(std::lerp(-0.5f, 0.5f, value.value()) * static_cast<float>(scale));
 }
 
 void main(auto const& args, auto const& params)

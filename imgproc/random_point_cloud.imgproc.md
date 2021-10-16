@@ -41,10 +41,10 @@ __Source code:__
 void main(auto const& args, auto const& params)
 {
 	auto& points = output<0>(args).get();
-	auto const I = std::exp2(std::lerp(0.0, 12.0, param<Str{"Point intensity"}>(params).value()));
+	auto const I = std::exp2(std::lerp(0.0f, 12.0f, param<Str{"Point intensity"}>(params).value()));
 	auto const w = args.canvasSize().width();
 	auto const h = args.canvasSize().height();
-	std::uniform_real_distribution U{0.0, w * h / I};
+	std::uniform_real_distribution U{0.0f, static_cast<RealValue>(w * h) / I};
 	auto& rng = Texpainter::DefaultRng::engine();
 
 	for(uint32_t row = 0; row < h; ++row)
@@ -56,7 +56,7 @@ void main(auto const& args, auto const& params)
 			{
 				points.push_back(SpawnSpot{ImageCoordinates{col, row},
 				                           Angle{input<1>(args, col, row), Angle::Turns{}},
-				                           static_cast<float>(input<2>(args, col, row))});
+				                           input<2>(args, col, row)});
 			}
 		}
 	}

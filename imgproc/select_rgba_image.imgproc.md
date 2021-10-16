@@ -18,9 +18,9 @@ __Result:__ (RGBA image) The generated image
 
 ## Parameters
 
-__Stop 1:__ (= 0.33) Transition point from 1 to 2
+__Stop 1:__ (= 0.33333333) Transition point from 1 to 2
 
-__Stop 2:__ (= 0.66) Transition point from 2 to 3
+__Stop 2:__ (= 0.66666667) Transition point from 2 to 3
 
 ## Implementation
 

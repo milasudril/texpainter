@@ -39,7 +39,7 @@ using Texpainter::vec2_t;
 using Texpainter::PixelStore::renderCentered;
 using Texpainter::PixelStore::renderTiled;
 
-inline double mapParameter(ParamValue value) { return std::lerp(-1.0, 1.0, value.value()); }
+inline auto mapParameter(ParamValue value) { return std::lerp(-1.0f, 1.0f, value.value()); }
 
 void main(auto const& args, auto const& params)
 {

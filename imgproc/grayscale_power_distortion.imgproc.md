@@ -27,7 +27,7 @@ __Includes:__
 __Source code:__ 
 
 ```c++
-inline auto power(ParamValue val) { return std::exp2(std::lerp(-4.0, 4.0, val.value())); }
+inline auto power(ParamValue val) { return std::exp2(std::lerp(-4.0f, 4.0f, val.value())); }
 
 void main(auto const& args, auto const& params)
 {
