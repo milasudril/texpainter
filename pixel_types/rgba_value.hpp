@@ -1,7 +1,7 @@
-//@	{"targets":[{"name":"pixel.hpp", "type":"include"}]}
+//@	{"targets":[{"name":"rgba_value.hpp", "type":"include"}]}
 
-#ifndef TEXPAINTER_PIXELTYPES_PIXEL_HPP
-#define TEXPAINTER_PIXELTYPES_PIXEL_HPP
+#ifndef TEXPAINTER_PIXELTYPES_RGBAVALUE_HPP
+#define TEXPAINTER_PIXELTYPES_RGBAVALUE_HPP
 
 #include "utils/vec_t.hpp"
 
@@ -11,7 +11,7 @@
 #include <cmath>
 #include <algorithm>
 
-namespace Texpainter::PixelStore
+namespace Texpainter::PixelTypes
 {
 	namespace ColorProfiles
 	{
@@ -41,52 +41,52 @@ namespace Texpainter::PixelStore
 	}
 
 	template<class ColorProfile>
-	class BasicPixel
+	class BasicRgbaValue
 	{
 	public:
-		constexpr explicit BasicPixel(vec4_t value): m_value{value} {}
+		constexpr explicit BasicRgbaValue(vec4_t value): m_value{value} {}
 
 		template<class ColorProfileOther,
 		         std::enable_if_t<!std::is_same_v<ColorProfile, ColorProfileOther>, int> = 0>
-		constexpr explicit BasicPixel(BasicPixel<ColorProfileOther> x)
+		constexpr explicit BasicRgbaValue(BasicRgbaValue<ColorProfileOther> x)
 		    : m_value{ColorProfile::fromLinear(toLinear(x).value())}
 		{
 		}
 
-		constexpr explicit BasicPixel(float r, float g, float b, float a = 1.0f)
+		constexpr explicit BasicRgbaValue(float r, float g, float b, float a = 1.0f)
 		    : m_value{r, g, b, a}
 		{
 		}
 
-		constexpr BasicPixel() = default;
+		constexpr BasicRgbaValue() = default;
 
-		constexpr BasicPixel(BasicPixel const&) = default;
+		constexpr BasicRgbaValue(BasicRgbaValue const&) = default;
 
-		constexpr BasicPixel& red(float val)
+		constexpr BasicRgbaValue& red(float val)
 		{
 			m_value[0] = val;
 			return *this;
 		}
 
-		constexpr BasicPixel& green(float val)
+		constexpr BasicRgbaValue& green(float val)
 		{
 			m_value[1] = val;
 			return *this;
 		}
 
-		constexpr BasicPixel& blue(float val)
+		constexpr BasicRgbaValue& blue(float val)
 		{
 			m_value[2] = val;
 			return *this;
 		}
 
-		constexpr BasicPixel& alpha(float val)
+		constexpr BasicRgbaValue& alpha(float val)
 		{
 			m_value[3] = val;
 			return *this;
 		}
 
-		constexpr BasicPixel& value(vec4_t val) { return *this; }
+		constexpr BasicRgbaValue& value(vec4_t val) { return *this; }
 
 
 		constexpr float red() const { return m_value[0]; }
@@ -100,42 +100,42 @@ namespace Texpainter::PixelStore
 
 		constexpr auto value() const { return m_value; }
 
-		constexpr BasicPixel& operator+=(BasicPixel other)
+		constexpr BasicRgbaValue& operator+=(BasicRgbaValue other)
 		{
 			static_assert(std::is_same_v<ColorProfiles::LinearRgba, ColorProfile>);
 			m_value += other.m_value;
 			return *this;
 		}
 
-		constexpr BasicPixel& operator-=(BasicPixel other)
+		constexpr BasicRgbaValue& operator-=(BasicRgbaValue other)
 		{
 			static_assert(std::is_same_v<ColorProfiles::LinearRgba, ColorProfile>);
 			m_value -= other.m_value;
 			return *this;
 		}
 
-		constexpr BasicPixel& operator/=(BasicPixel other)
+		constexpr BasicRgbaValue& operator/=(BasicRgbaValue other)
 		{
 			static_assert(std::is_same_v<ColorProfiles::LinearRgba, ColorProfile>);
 			m_value /= other.m_value;
 			return *this;
 		}
 
-		constexpr BasicPixel& operator*=(BasicPixel other)
+		constexpr BasicRgbaValue& operator*=(BasicRgbaValue other)
 		{
 			static_assert(std::is_same_v<ColorProfiles::LinearRgba, ColorProfile>);
 			m_value *= other.m_value;
 			return *this;
 		}
 
-		constexpr BasicPixel& operator*=(float factor)
+		constexpr BasicRgbaValue& operator*=(float factor)
 		{
 			static_assert(std::is_same_v<ColorProfiles::LinearRgba, ColorProfile>);
 			m_value *= factor;
 			return *this;
 		}
 
-		constexpr BasicPixel& operator/=(float factor)
+		constexpr BasicRgbaValue& operator/=(float factor)
 		{
 			static_assert(std::is_same_v<ColorProfiles::LinearRgba, ColorProfile>);
 			m_value /= factor;
@@ -147,73 +147,73 @@ namespace Texpainter::PixelStore
 	};
 
 	template<class ColorProfile>
-	constexpr auto toLinear(BasicPixel<ColorProfile> a)
+	constexpr auto toLinear(BasicRgbaValue<ColorProfile> a)
 	{
-		return BasicPixel<ColorProfiles::LinearRgba>{ColorProfile::toLinear(a.value())};
+		return BasicRgbaValue<ColorProfiles::LinearRgba>{ColorProfile::toLinear(a.value())};
 	}
 
 	template<class ColorProfileA, class ColorProfileB>
-	constexpr auto operator+(BasicPixel<ColorProfileA> a, BasicPixel<ColorProfileB> b)
+	constexpr auto operator+(BasicRgbaValue<ColorProfileA> a, BasicRgbaValue<ColorProfileB> b)
 	{
 		return a += b;
 	}
 
 	template<class ColorProfileA, class ColorProfileB>
-	constexpr auto operator-(BasicPixel<ColorProfileA> a, BasicPixel<ColorProfileB> b)
+	constexpr auto operator-(BasicRgbaValue<ColorProfileA> a, BasicRgbaValue<ColorProfileB> b)
 	{
 		return a -= b;
 	}
 
 	template<class ColorProfileA, class ColorProfileB>
-	constexpr auto operator*(BasicPixel<ColorProfileA> a, BasicPixel<ColorProfileB> b)
+	constexpr auto operator*(BasicRgbaValue<ColorProfileA> a, BasicRgbaValue<ColorProfileB> b)
 	{
 		return a *= b;
 	}
 
 	template<class ColorProfileA, class ColorProfileB>
-	constexpr auto operator/(BasicPixel<ColorProfileA> a, BasicPixel<ColorProfileB> b)
+	constexpr auto operator/(BasicRgbaValue<ColorProfileA> a, BasicRgbaValue<ColorProfileB> b)
 	{
 		return a /= b;
 	}
 
 	template<class ColorProfile>
-	constexpr auto operator/(BasicPixel<ColorProfile> a, float c)
+	constexpr auto operator/(BasicRgbaValue<ColorProfile> a, float c)
 	{
 		return a /= c;
 	}
 
 	template<class ColorProfile>
-	constexpr auto operator*(BasicPixel<ColorProfile> a, float c)
+	constexpr auto operator*(BasicRgbaValue<ColorProfile> a, float c)
 	{
 		return a *= c;
 	}
 
 	template<class ColorProfile>
-	constexpr auto operator*(float c, BasicPixel<ColorProfile> a)
+	constexpr auto operator*(float c, BasicRgbaValue<ColorProfile> a)
 	{
 		return a * c;
 	}
 
-	using Pixel = BasicPixel<ColorProfiles::LinearRgba>;
+	using RgbaValue = BasicRgbaValue<ColorProfiles::LinearRgba>;
 
-	constexpr Pixel black() { return Pixel{0.0f, 0.0f, 0.0f}; }
+	constexpr RgbaValue black() { return RgbaValue{0.0f, 0.0f, 0.0f}; }
 
-	constexpr Pixel red() { return Pixel{1.0f, 0.0f, 0.0f}; }
+	constexpr RgbaValue red() { return RgbaValue{1.0f, 0.0f, 0.0f}; }
 
-	constexpr Pixel green() { return Pixel{0.0f, 1.0f, 0.0f}; }
+	constexpr RgbaValue green() { return RgbaValue{0.0f, 1.0f, 0.0f}; }
 
-	constexpr Pixel blue() { return Pixel{0.0f, 0.0f, 1.0f}; }
+	constexpr RgbaValue blue() { return RgbaValue{0.0f, 0.0f, 1.0f}; }
 
-	constexpr Pixel cyan() { return Pixel{0.0f, 1.0f, 1.0f}; }
+	constexpr RgbaValue cyan() { return RgbaValue{0.0f, 1.0f, 1.0f}; }
 
-	constexpr Pixel magenta() { return Pixel{1.0f, 0.0f, 1.0f}; }
+	constexpr RgbaValue magenta() { return RgbaValue{1.0f, 0.0f, 1.0f}; }
 
-	constexpr Pixel yellow() { return Pixel{1.0f, 1.0f, 0.0f}; }
+	constexpr RgbaValue yellow() { return RgbaValue{1.0f, 1.0f, 0.0f}; }
 
-	constexpr Pixel white() { return Pixel{1.0f, 1.0f, 1.0f}; }
+	constexpr RgbaValue white() { return RgbaValue{1.0f, 1.0f, 1.0f}; }
 
 	template<class ColorProfileA, class ColorProfileB>
-	constexpr auto distanceSquared(BasicPixel<ColorProfileA> a, BasicPixel<ColorProfileB> b)
+	constexpr auto distanceSquared(BasicRgbaValue<ColorProfileA> a, BasicRgbaValue<ColorProfileB> b)
 	{
 		auto tmp = a - b;
 		tmp *= tmp;
@@ -221,36 +221,36 @@ namespace Texpainter::PixelStore
 	}
 
 	template<class ColorProfile>
-	constexpr auto absDiff(BasicPixel<ColorProfile> a, BasicPixel<ColorProfile> b)
+	constexpr auto absDiff(BasicRgbaValue<ColorProfile> a, BasicRgbaValue<ColorProfile> b)
 	{
 		auto tmp = a - b;
-		return BasicPixel<ColorProfile>{abs(tmp.value())};
+		return BasicRgbaValue<ColorProfile>{abs(tmp.value())};
 	}
 
 	template<class ColorProfile>
-	constexpr auto intensity(BasicPixel<ColorProfile> a)
+	constexpr auto intensity(BasicRgbaValue<ColorProfile> a)
 	{
 		return a.red() + a.green() + a.blue();
 	}
 
 	template<class ColorProfile>
-	constexpr auto max(BasicPixel<ColorProfile> a)
+	constexpr auto max(BasicRgbaValue<ColorProfile> a)
 	{
 		return std::max(a.red(), std::max(a.green(), a.blue()));
 	}
 
 	template<class ColorProfile>
-	constexpr auto min(BasicPixel<ColorProfile> a)
+	constexpr auto min(BasicRgbaValue<ColorProfile> a)
 	{
 		return std::min(a.red(), std::min(a.green(), a.blue()));
 	}
 
-	inline std::string toString(Pixel val) { return Texpainter::toString(val.value()); }
+	inline std::string toString(RgbaValue val) { return Texpainter::toString(val.value()); }
 
 	template<class ColorProfile>
-	inline auto fromString(Enum::Empty<BasicPixel<ColorProfile>>, std::string const& str)
+	inline auto fromString(Enum::Empty<BasicRgbaValue<ColorProfile>>, std::string const& str)
 	{
-		return BasicPixel<ColorProfile>{Texpainter::fromString(Enum::Empty<vec4_t>{}, str)};
+		return BasicRgbaValue<ColorProfile>{Texpainter::fromString(Enum::Empty<vec4_t>{}, str)};
 	}
 }
 #endif
