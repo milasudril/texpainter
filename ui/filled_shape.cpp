@@ -8,7 +8,7 @@
 class Texpainter::Ui::FilledShape::Impl: private FilledShape
 {
 public:
-	Impl(Container& cnt, PixelStore::Pixel color, double radius, vec2_t location);
+	Impl(Container& cnt, PixelStore::RgbaValue color, double radius, vec2_t location);
 	~Impl();
 
 	ToplevelCoordinates location() const
@@ -36,7 +36,7 @@ private:
 	void* r_eh;
 	Vtable m_vt;
 
-	PixelStore::Pixel m_color;
+	PixelStore::RgbaValue m_color;
 	double m_radius;
 	vec2_t m_loc;
 	bool m_completed;
@@ -45,9 +45,8 @@ private:
 
 	static gboolean draw_callback(GtkWidget* widget, cairo_t* cr, gpointer data)
 	{
-		auto self = reinterpret_cast<Impl*>(data);
-		auto const color_g22 =
-		    PixelStore::BasicPixel<PixelStore::ColorProfiles::Gamma22>(self->m_color);
+		auto self            = reinterpret_cast<Impl*>(data);
+		auto const color_g22 = PixelStore::RgbaValueG22(self->m_color);
 		cairo_set_source_rgba(
 		    cr, color_g22.red(), color_g22.green(), color_g22.blue(), color_g22.alpha());
 
@@ -105,7 +104,7 @@ private:
 };
 
 Texpainter::Ui::FilledShape::FilledShape(Container& cnt,
-                                         PixelStore::Pixel color,
+                                         PixelStore::RgbaValue color,
                                          double radius,
                                          vec2_t location)
 {
@@ -115,7 +114,7 @@ Texpainter::Ui::FilledShape::FilledShape(Container& cnt,
 Texpainter::Ui::FilledShape::~FilledShape() { delete m_impl; }
 
 Texpainter::Ui::FilledShape::Impl::Impl(Container& cnt,
-                                        PixelStore::Pixel color,
+                                        PixelStore::RgbaValue color,
                                         double radius,
                                         vec2_t location)
     : FilledShape{*this}

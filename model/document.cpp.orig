@@ -32,9 +32,15 @@ namespace
 	}
 }
 
+<<<<<<< HEAD
 Texpainter::Model::CompositorOutput Texpainter::Model::render(Document const& document,
                                                               Document::ForceUpdate force_update,
                                                               uint32_t scale)
+=======
+Texpainter::PixelStore::RgbaImage Texpainter::Model::render(Document const& document,
+                                                            Document::ForceUpdate force_update,
+                                                            uint32_t scale)
+>>>>>>> master
 {
 	std::ranges::for_each(document.images(), [&document, force_update](auto const& item) {
 		item.second.processor.get().processor().source(item.second.source.get().pixels());
@@ -46,12 +52,25 @@ Texpainter::Model::CompositorOutput Texpainter::Model::render(Document const& do
 		forceUpdateIfDirty(item, document, force_update);
 	});
 
+<<<<<<< HEAD
 	std::ranges::for_each(document.topographicMaps(), [&document, force_update](auto const& item) {
 		item.second.processor.get().processor().source(item.second.source.get());
 		forceUpdateIfDirty(item, document, force_update);
 	});
 
 	auto ret = processIfValid(document.compositor(), document.canvasSize(), scale);
+=======
+	PixelStore::RgbaImage ret{scale * document.canvasSize().width(),
+	                          scale * document.canvasSize().height()};
+	if(document.compositor().valid()) [[likely]]
+		{
+			document.compositor().process(ret.pixels(), static_cast<double>(scale));
+		}
+	else
+	{
+		std::ranges::fill(ret.pixels(), PixelStore::RgbaValue{0.0f, 0.0f, 0.0f, 0.0f});
+	}
+>>>>>>> master
 
 	std::ranges::for_each(document.images(),
 	                      [&document](auto const& item) { item.second.source.clearStatus(); });
@@ -59,7 +78,32 @@ Texpainter::Model::CompositorOutput Texpainter::Model::render(Document const& do
 	std::ranges::for_each(document.palettes(),
 	                      [&document](auto const& item) { item.second.source.clearStatus(); });
 
+<<<<<<< HEAD
 	return ret;
+=======
+	if(scale == 1) [[likely]]
+		{
+			return ret;
+		}
+
+	PixelStore::RgbaImage downsampled{document.canvasSize()};
+	for(uint32_t row = 0; row < document.canvasSize().height(); ++row)
+	{
+		for(uint32_t col = 0; col < document.canvasSize().width(); ++col)
+		{
+			PixelStore::RgbaValue result{0.0, 0.0, 0.0, 0.0};
+			for(uint32_t row_src = 0; row_src < scale; ++row_src)
+			{
+				for(uint32_t col_src = 0; col_src < scale; ++col_src)
+				{
+					result += ret(scale * col + col_src, scale * row + row_src);
+				}
+			}
+			downsampled(col, row) = result / static_cast<float>(scale * scale);
+		}
+	}
+	return downsampled;
+>>>>>>> master
 }
 
 void Texpainter::Model::paint(Document& doc, vec2_t location)

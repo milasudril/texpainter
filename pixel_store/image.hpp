@@ -3,8 +3,6 @@
 #ifndef TEXPAINTER_PIXELSTORE_IMAGE_HPP
 #define TEXPAINTER_PIXELSTORE_IMAGE_HPP
 
-#include "./pixel.hpp"
-
 #include "utils/span_2d.hpp"
 
 #include <algorithm>
@@ -14,29 +12,27 @@
 namespace Texpainter::PixelStore
 {
 	template<class PixelType>
-	class BasicImage
+	class Image
 	{
 	public:
-		explicit BasicImage(Span2d<PixelType const> src): BasicImage{src.size()}
+		explicit Image(Span2d<PixelType const> src): Image{src.size()}
 		{
 			std::ranges::copy(src, m_data.get());
 		}
 
-		explicit BasicImage(uint32_t width, uint32_t height): BasicImage{Size2d{width, height}} {}
+		explicit Image(uint32_t width, uint32_t height): Image{Size2d{width, height}} {}
 
-		explicit BasicImage(Size2d size)
-		    : m_size{size}
-		    , m_data{std::make_unique<PixelType[]>(area(size))}
+		explicit Image(Size2d size): m_size{size}, m_data{std::make_unique<PixelType[]>(area(size))}
 		{
 		}
 
-		BasicImage(BasicImage const& src): BasicImage{src.pixels()} {}
+		Image(Image const& src): Image{src.pixels()} {}
 
-		BasicImage& operator=(BasicImage&&) = default;
+		Image& operator=(Image&&) = default;
 
-		BasicImage(BasicImage&&) = default;
+		Image(Image&&) = default;
 
-		BasicImage& operator=(BasicImage const&) = delete;
+		Image& operator=(Image const&) = delete;
 
 		auto width() const { return m_size.width(); }
 
@@ -75,18 +71,16 @@ namespace Texpainter::PixelStore
 	};
 
 	template<class PixelType>
-	inline auto size(BasicImage<PixelType> const& img)
+	inline auto size(Image<PixelType> const& img)
 	{
 		return img.size();
 	}
 
 	template<class PixelType>
-	inline auto area(BasicImage<PixelType> const& img)
+	inline auto area(Image<PixelType> const& img)
 	{
 		return area(img.size());
 	}
-
-	using Image = BasicImage<Pixel>;
 }
 
 #endif

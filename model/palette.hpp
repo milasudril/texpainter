@@ -7,7 +7,7 @@
 
 namespace Texpainter::Model
 {
-	using Palette = PixelStore::Palette<16>;
+	using Palette = PixelStore::RgbaPalette<16>;
 }
 
 #endif

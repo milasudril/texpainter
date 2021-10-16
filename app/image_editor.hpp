@@ -146,7 +146,7 @@ namespace Texpainter::App
 			}
 			else
 			{
-				m_img_view.image(Span2d<PixelStore::Pixel>{});
+				m_img_view.image(Span2d<PixelStore::RgbaValue>{});
 			}
 			return *this;
 		}
@@ -302,7 +302,10 @@ namespace Texpainter::App
 				{
 					auto brush      = m_doc.get().currentBrush();
 					auto radius_new = std::clamp(brush.radius() + 1.0f / 32.0f, 0.0f, 1.0f);
-					paint(m_doc, loc_window, radius_new, PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
+					paint(m_doc,
+					      loc_window,
+					      radius_new,
+					      PixelStore::RgbaValue{0.0f, 0.0f, 0.0f, 0.0f});
 					on_updated(r_eh, *this);
 					break;
 				}
@@ -398,7 +401,7 @@ namespace Texpainter::App
 			auto const img_ref     = m_doc.get().image(m_doc.get().currentImage());
 			if(palette_ref == nullptr || img_ref == nullptr)
 			{
-				m_img_view.overlay(Span2d<PixelStore::Pixel const>{});
+				m_img_view.overlay(Span2d<PixelStore::RgbaValue const>{});
 				return;
 			}
 
@@ -407,8 +410,9 @@ namespace Texpainter::App
 			auto const& imgdisp = img_ref->source.get();
 			auto brush_radius =
 			    std::round(0.5 * ScalingFactors::sizeFromGeomMean(imgdisp.size(), brush.radius()));
-			PixelStore::Image rendered_brush{Size2d{static_cast<uint32_t>(2.0 * brush_radius + 2),
-			                                        static_cast<uint32_t>(2.0 * brush_radius + 2)}};
+			PixelStore::RgbaImage rendered_brush{
+			    Size2d{static_cast<uint32_t>(2.0 * brush_radius + 2),
+			           static_cast<uint32_t>(2.0 * brush_radius + 2)}};
 			Model::paint(rendered_brush.pixels(),
 			             vec2_t{brush_radius, brush_radius},
 			             brush_radius,
@@ -469,13 +473,13 @@ namespace Texpainter::App
 		{
 			auto& keyb_state = Ui::Context::get().keyboardState();
 			if(isShiftPressed(keyb_state))
-			{ floodfill(m_doc, loc_window, PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f}); }
+			{ floodfill(m_doc, loc_window, PixelStore::RgbaValue{0.0f, 0.0f, 0.0f, 0.0f}); }
 			else
 			{
 				m_draw_mode     = DrawMode::Erase;
 				auto brush      = m_doc.get().currentBrush();
 				auto radius_new = std::clamp(brush.radius() + 1.0f / 32.0f, 0.0f, 1.0f);
-				paint(m_doc, loc_window, radius_new, PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
+				paint(m_doc, loc_window, radius_new, PixelStore::RgbaValue{0.0f, 0.0f, 0.0f, 0.0f});
 			}
 			on_updated(r_eh, *this);
 		}

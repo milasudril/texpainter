@@ -1,7 +1,7 @@
 //@	{"targets":[{"name":"palette_view.o","type":"object","pkgconfig_libs":["gtk+-3.0"]}]}
 
 #include "./palette_view.hpp"
-#include "pixel_store/pixel.hpp"
+#include "pixel_store/rgba_value.hpp"
 
 #include <gtk/gtk.h>
 
@@ -9,23 +9,16 @@
 
 namespace
 {
-	constexpr Texpainter::PixelStore::BasicPixel<Texpainter::PixelStore::ColorProfiles::Gamma22>
-	toRgbGamma22(Texpainter::Ui::PaletteView::HighlightMode mode)
+	constexpr auto toRgbGamma22(Texpainter::Ui::PaletteView::HighlightMode mode)
 	{
 		switch(mode)
 		{
 			case Texpainter::Ui::PaletteView::HighlightMode::None:
-				return Texpainter::PixelStore::BasicPixel<
-				    Texpainter::PixelStore::ColorProfiles::Gamma22>{
-				    Texpainter::PixelStore::Pixel{0.16f, 0.16f, 0.16f, 1.0f}};
+				return Texpainter::PixelStore::RgbaValueG22{0.16f, 0.16f, 0.16f, 1.0f};
 			case Texpainter::Ui::PaletteView::HighlightMode::Read:
-				return Texpainter::PixelStore::BasicPixel<
-				    Texpainter::PixelStore::ColorProfiles::Gamma22>{
-				    Texpainter::PixelStore::Pixel{0.0f, 0.5f, 0.0f, 0.5f}};
+				return Texpainter::PixelStore::RgbaValueG22{0.0f, 0.5f, 0.0f, 0.5f};
 			case Texpainter::Ui::PaletteView::HighlightMode::Write:
-				return Texpainter::PixelStore::BasicPixel<
-				    Texpainter::PixelStore::ColorProfiles::Gamma22>{
-				    Texpainter::PixelStore::Pixel{0.5f, 0.0f, 0.0f, 0.5f}};
+				return Texpainter::PixelStore::RgbaValueG22{0.5f, 0.0f, 0.0f, 0.5f};
 			default: __builtin_unreachable();
 		}
 	}
@@ -109,9 +102,7 @@ public:
 		                       item_height = dim.height() / m_n_rows - 4,
 		                       cols        = m_n_cols,
 		                       k           = 0](auto color) mutable {
-			                      auto const color_conv =
-			                          PixelStore::BasicPixel<PixelStore::ColorProfiles::Gamma22>{
-			                              color};
+			                      auto const color_conv = PixelStore::RgbaValueG22{color};
 			                      cairo_set_source_rgba(cr,
 			                                            color_conv.red(),
 			                                            color_conv.green(),
@@ -149,9 +140,9 @@ public:
 		                      });
 	}
 
-	void palette(std::span<PixelStore::Pixel const> pal)
+	void palette(std::span<PixelStore::RgbaValue const> pal)
 	{
-		m_colors         = std::vector<PixelStore::Pixel>{std::begin(pal), std::end(pal)};
+		m_colors         = std::vector<PixelStore::RgbaValue>{std::begin(pal), std::end(pal)};
 		m_highlight_mode = std::vector<HighlightMode>(std::size(m_colors));
 		std::ranges::fill(m_highlight_mode, HighlightMode::None);
 		recalculateWidgetSize();
@@ -180,9 +171,12 @@ public:
 		recalculateWidgetSize();
 	}
 
-	PixelStore::Pixel color(PixelStore::ColorIndex index) const { return m_colors[index.value()]; }
+	PixelStore::RgbaValue color(PixelStore::ColorIndex index) const
+	{
+		return m_colors[index.value()];
+	}
 
-	void color(PixelStore::ColorIndex index, PixelStore::Pixel value)
+	void color(PixelStore::ColorIndex index, PixelStore::RgbaValue value)
 	{
 		if(index.value() < m_colors.size())
 		{
@@ -191,7 +185,7 @@ public:
 		}
 	}
 
-	std::span<PixelStore::Pixel const> palette() const { return m_colors; }
+	std::span<PixelStore::RgbaValue const> palette() const { return m_colors; }
 
 
 private:
@@ -201,7 +195,7 @@ private:
 	Size2d m_min_size;
 	int m_n_cols;
 	int m_n_rows;
-	std::vector<PixelStore::Pixel> m_colors;
+	std::vector<PixelStore::RgbaValue> m_colors;
 	std::vector<HighlightMode> m_highlight_mode;
 
 	GtkDrawingArea* m_handle;
@@ -317,7 +311,7 @@ Texpainter::Ui::PaletteView::PaletteView(Container& cnt): m_impl{new Impl{cnt}} 
 Texpainter::Ui::PaletteView::~PaletteView() { delete m_impl; }
 
 Texpainter::Ui::PaletteView& Texpainter::Ui::PaletteView::palette(
-    std::span<PixelStore::Pixel const> pal)
+    std::span<PixelStore::RgbaValue const> pal)
 {
 	m_impl->palette(pal);
 	return *this;
@@ -349,20 +343,20 @@ Texpainter::Ui::PaletteView& Texpainter::Ui::PaletteView::minSize(Size2d size)
 	return *this;
 }
 
-Texpainter::PixelStore::Pixel Texpainter::Ui::PaletteView::PaletteView::color(
+Texpainter::PixelStore::RgbaValue Texpainter::Ui::PaletteView::PaletteView::color(
     PixelStore::ColorIndex index) const
 {
 	return m_impl->color(index);
 }
 
 Texpainter::Ui::PaletteView& Texpainter::Ui::PaletteView::color(PixelStore::ColorIndex index,
-                                                                PixelStore::Pixel value)
+                                                                PixelStore::RgbaValue value)
 {
 	m_impl->color(index, value);
 	return *this;
 }
 
-std::span<Texpainter::PixelStore::Pixel const> Texpainter::Ui::PaletteView::palette() const
+std::span<Texpainter::PixelStore::RgbaValue const> Texpainter::Ui::PaletteView::palette() const
 {
 	return m_impl->palette();
 }

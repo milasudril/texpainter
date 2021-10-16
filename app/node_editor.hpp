@@ -23,9 +23,9 @@ namespace Texpainter::App
 		constexpr auto NumPortTypes = Enum::distance(begin(Enum::Empty<FilterGraph::PortType>{}),
 		                                             end(Enum::Empty<FilterGraph::PortType>{}));
 
-		constexpr std::array<PixelStore::Pixel, NumPortTypes> genPortColors()
+		constexpr std::array<PixelStore::RgbaValue, NumPortTypes> genPortColors()
 		{
-			std::array<PixelStore::Pixel, NumPortTypes> ret{};
+			std::array<PixelStore::RgbaValue, NumPortTypes> ret{};
 
 			auto dh = 1.0f / NumPortTypes;
 
@@ -39,7 +39,7 @@ namespace Texpainter::App
 
 		constexpr auto portColors = genPortColors();
 
-		constexpr PixelStore::Pixel portColor(FilterGraph::PortType type)
+		constexpr PixelStore::RgbaValue portColor(FilterGraph::PortType type)
 		{
 			return portColors[Enum::distance(begin(Enum::Empty<FilterGraph::PortType>{}), type)];
 		}

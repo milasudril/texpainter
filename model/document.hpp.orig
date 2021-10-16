@@ -40,7 +40,7 @@ namespace Texpainter::Model
 		};
 
 		template<>
-		struct ImageProcessor<WithStatus<PixelStore::Image<TopographyInfo>>>
+		struct ImageProcessor<WithStatus<PixelStore::BasicImage<TopographyInfo>>>
 		{
 			using type = TopographyInfoSource;
 		};
@@ -48,16 +48,25 @@ namespace Texpainter::Model
 
 	class Document: private Size2d,
 	                private Compositor,
-	                private CompositorInputManager<PixelStore::RgbaImage>,
+<<<<<<< HEAD
+	                private CompositorInputManager<PixelStore::Image>,
 	                private CompositorInputManager<Palette>,
-	                private CompositorInputManager<PixelStore::Image<TopographyInfo>>
+	                private CompositorInputManager<PixelStore::BasicImage<TopographyInfo>>
+	{
+		using CompositorInputManager<PixelStore::Image>::insert;
+		using CompositorInputManager<PixelStore::Image>::erase;
+		using CompositorInputManager<Palette>::insert;
+=======
+	                private CompositorInputManager<PixelStore::RgbaImage>,
+	                private CompositorInputManager<Palette>
 	{
 		using CompositorInputManager<PixelStore::RgbaImage>::insert;
-		using CompositorInputManager<PixelStore::RgbaImage>::erase;
 		using CompositorInputManager<Palette>::insert;
+		using CompositorInputManager<PixelStore::RgbaImage>::erase;
+>>>>>>> master
 		using CompositorInputManager<Palette>::erase;
-		using CompositorInputManager<PixelStore::Image<TopographyInfo>>::insert;
-		using CompositorInputManager<PixelStore::Image<TopographyInfo>>::erase;
+		using CompositorInputManager<PixelStore::BasicImage<TopographyInfo>>::insert;
+		using CompositorInputManager<PixelStore::BasicImage<TopographyInfo>>::erase;
 
 
 	public:
@@ -79,10 +88,10 @@ namespace Texpainter::Model
 		using CompositorInputManager<Palette>::getBefore;
 		using CompositorInputManager<Palette>::getAfter;
 		using CompositorInputManager<Palette>::modify;
-		using CompositorInputManager<PixelStore::Image<TopographyInfo>>::get;
-		using CompositorInputManager<PixelStore::Image<TopographyInfo>>::getBefore;
-		using CompositorInputManager<PixelStore::Image<TopographyInfo>>::getAfter;
-		using CompositorInputManager<PixelStore::Image<TopographyInfo>>::modify;
+		using CompositorInputManager<PixelStore::BasicImage<TopographyInfo>>::get;
+		using CompositorInputManager<PixelStore::BasicImage<TopographyInfo>>::getBefore;
+		using CompositorInputManager<PixelStore::BasicImage<TopographyInfo>>::getAfter;
+		using CompositorInputManager<PixelStore::BasicImage<TopographyInfo>>::modify;
 
 		explicit Document(Size2d canvas_size): Size2d{canvas_size} {}
 
@@ -102,6 +111,7 @@ namespace Texpainter::Model
 		}
 
 
+<<<<<<< HEAD
 		template<class T>
 		auto insert(Model::ItemName const&, T&&, Size2d)
 		{
@@ -109,13 +119,16 @@ namespace Texpainter::Model
 		}
 
 		template<class T>
-		auto insert(Model::ItemName const&, PixelStore::Image<T>&&)
+		auto insert(Model::ItemName const&, PixelStore::BasicImage<T>&&)
 		{
 			return nullptr;
 		}
 
 
+		auto const& images() const { return get(std::type_identity<PixelStore::Image>{}); }
+=======
 		auto const& images() const { return get(std::type_identity<PixelStore::RgbaImage>{}); }
+>>>>>>> master
 
 		auto image(ItemName const& name) const
 		{
@@ -124,7 +137,11 @@ namespace Texpainter::Model
 
 		auto insert(ItemName const& name, PixelStore::RgbaImage&& img)
 		{
+<<<<<<< HEAD
 			return insert(name, std::move(img), *this, m_input_nodes);
+=======
+			return insert(name, std::forward<PixelStore::RgbaImage>(img), *this, m_input_nodes);
+>>>>>>> master
 		}
 
 		bool eraseImage(ItemName const& name)
@@ -135,22 +152,22 @@ namespace Texpainter::Model
 
 		auto const& topographicMaps() const
 		{
-			return get(std::type_identity<PixelStore::Image<TopographyInfo>>{});
+			return get(std::type_identity<PixelStore::BasicImage<TopographyInfo>>{});
 		}
 
 		auto topographicMap(ItemName const& name) const
 		{
-			return get(std::type_identity<PixelStore::Image<TopographyInfo>>{}, name);
+			return get(std::type_identity<PixelStore::BasicImage<TopographyInfo>>{}, name);
 		}
 
-		auto insert(ItemName const& name, PixelStore::Image<TopographyInfo>&& img)
+		auto insert(ItemName const& name, PixelStore::BasicImage<TopographyInfo>&& img)
 		{
 			return insert(name, std::move(img), *this, m_input_nodes);
 		}
 
 		bool eraseTopographicMap(ItemName const& name)
 		{
-			return erase(std::type_identity<PixelStore::Image<TopographyInfo>>{},
+			return erase(std::type_identity<PixelStore::BasicImage<TopographyInfo>>{},
 			             name,
 			             *this,
 			             m_input_nodes);
@@ -316,9 +333,15 @@ namespace Texpainter::Model
 		std::filesystem::path m_filename;
 	};
 
+<<<<<<< HEAD
 	CompositorOutput render(Document const& document,
 	                        Document::ForceUpdate foce_update = Document::ForceUpdate{false},
 	                        uint32_t scale                    = 1);
+=======
+	PixelStore::RgbaImage render(Document const& document,
+	                             Document::ForceUpdate foce_update = Document::ForceUpdate{false},
+	                             uint32_t scale                    = 1);
+>>>>>>> master
 
 	void paint(Document& doc, vec2_t location);
 

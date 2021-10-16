@@ -51,8 +51,8 @@ namespace Testcases
 
 	void texpainterRgbToHsi()
 	{
-		auto const red_rgb     = Texpainter::PixelStore::Pixel{1.0f, 0.0f, 0.0f, 1.0f};
-		auto const magenta_rgb = Texpainter::PixelStore::Pixel{0.5f, 0.0f, 0.5f, 1.0f};
+		auto const red_rgb     = Texpainter::PixelStore::RgbaValue{1.0f, 0.0f, 0.0f, 1.0f};
+		auto const magenta_rgb = Texpainter::PixelStore::RgbaValue{0.5f, 0.0f, 0.5f, 1.0f};
 
 		auto const red_hsi     = toHsi(red_rgb);
 		auto const magenta_hsi = toHsi(magenta_rgb);
@@ -80,7 +80,7 @@ namespace Testcases
 
 	void texpainterRgbHsiRgb()
 	{
-		auto const val_rgb   = Texpainter::PixelStore::Pixel{0.25f, 0.5f, 1.0f, 1.0f};
+		auto const val_rgb   = Texpainter::PixelStore::RgbaValue{0.25f, 0.5f, 1.0f, 1.0f};
 		auto const val_hsi   = toHsi(val_rgb);
 		auto const val_rgb_2 = toRgb(val_hsi);
 		assert(std::abs(val_rgb.red() - val_rgb_2.red()) < 1e-5f);

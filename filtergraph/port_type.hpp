@@ -5,7 +5,7 @@
 #ifndef TEXPAINTER_FILTERGRAPH_PORTTYPE_HPP
 #define TEXPAINTER_FILTERGRAPH_PORTTYPE_HPP
 
-#include "pixel_store/pixel.hpp"
+#include "pixel_store/rgba_value.hpp"
 #include "pixel_store/palette.hpp"
 #include "utils/size_2d.hpp"
 #include "utils/angle.hpp"
@@ -33,10 +33,10 @@ namespace Texpainter::FilterGraph
 	constexpr PortType begin(Enum::Empty<PortType>) { return PortType::RgbaPixels; }
 	constexpr PortType end(Enum::Empty<PortType>) { return Enum::add(PortType::PolylineSet); }
 
-	using RgbaValue      = PixelStore::Pixel;
+	using RgbaValue      = PixelStore::RgbaValue;
 	using RealValue      = float;
 	using ComplexValue   = std::complex<RealValue>;
-	using Palette        = PixelStore::Palette<16>;
+	using Palette        = PixelStore::RgbaPalette<16>;
 	using TopographyInfo = Model::TopographyInfo;
 	using PolylineSet    = std::vector<std::vector<vec2_t>>;
 

@@ -8,7 +8,7 @@
 
 #include "./container.hpp"
 
-#include "pixel_store/pixel.hpp"
+#include "pixel_store/rgba_value.hpp"
 #include "pixel_store/palette.hpp"
 #include "utils/polymorphic_rng.hpp"
 
@@ -23,7 +23,7 @@ namespace Texpainter::Ui
 		explicit ColorPicker(Container& cnt,
 		                     PolymorphicRng rng,
 		                     char const* predef_label,
-		                     std::span<PixelStore::Pixel const> predef_colors);
+		                     std::span<PixelStore::RgbaValue const> predef_colors);
 		~ColorPicker();
 
 		ColorPicker& operator=(ColorPicker&& obj) noexcept
@@ -34,9 +34,9 @@ namespace Texpainter::Ui
 
 		ColorPicker(ColorPicker&& obj) noexcept: m_impl(obj.m_impl) { obj.m_impl = nullptr; }
 
-		PixelStore::Pixel value() const noexcept;
+		PixelStore::RgbaValue value() const noexcept;
 
-		ColorPicker& value(PixelStore::Pixel color);
+		ColorPicker& value(PixelStore::RgbaValue color);
 
 		/** Returns a non-moving *this
 		 */

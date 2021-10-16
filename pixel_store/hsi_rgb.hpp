@@ -5,7 +5,7 @@
 #ifndef TEXPAINTER_PIXELSTORE_HSIRGB_HPP
 #define TEXPAINTER_PIXELSTORE_HSIRGB_HPP
 
-#include "./pixel.hpp"
+#include "./rgba_value.hpp"
 #include "utils/bidirectional_interpolation_table.hpp"
 
 #include <cmath>
@@ -61,7 +61,7 @@ namespace Texpainter::PixelStore
 	}
 
 
-	constexpr Pixel toRgb(Hsi const& hsi)
+	constexpr RgbaValue toRgb(Hsi const& hsi)
 	{
 		auto tmp = [](Hsi const& hsi) {
 			auto const h = static_cast<float>(6.0f * detail::unwrapHue(hsi.hue));
@@ -69,21 +69,21 @@ namespace Texpainter::PixelStore
 			auto const c = (3.0f * hsi.intensity * hsi.saturation) / (1.0f + z);
 			auto const x = c * z;
 
-			if(h < 1.0f) { return Pixel{c, x, 0.0f, 0.0f}; }
-			if(h < 2.0f) { return Pixel{x, c, 0.0f, 0.0f}; }
-			if(h < 3.0f) { return Pixel{0.0f, c, x, 0.0f}; }
-			if(h < 4.0f) { return Pixel{0.0f, x, c, 0.0f}; }
-			if(h < 5.0f) { return Pixel{x, 0.0f, c, 0.0f}; }
-			if(h < 6.0f) { return Pixel{c, 0.0f, x, 0.0f}; }
+			if(h < 1.0f) { return RgbaValue{c, x, 0.0f, 0.0f}; }
+			if(h < 2.0f) { return RgbaValue{x, c, 0.0f, 0.0f}; }
+			if(h < 3.0f) { return RgbaValue{0.0f, c, x, 0.0f}; }
+			if(h < 4.0f) { return RgbaValue{0.0f, x, c, 0.0f}; }
+			if(h < 5.0f) { return RgbaValue{x, 0.0f, c, 0.0f}; }
+			if(h < 6.0f) { return RgbaValue{c, 0.0f, x, 0.0f}; }
 
-			return Pixel{0.0f, 0.0f, 0.0f, 0.0f};
+			return RgbaValue{0.0f, 0.0f, 0.0f, 0.0f};
 		}(hsi);
 
 		auto const m = hsi.intensity * (1.0f - hsi.saturation);
-		return tmp + Pixel{m, m, m, hsi.alpha};
+		return tmp + RgbaValue{m, m, m, hsi.alpha};
 	}
 
-	constexpr Hsi toHsi(Pixel pixel)
+	constexpr Hsi toHsi(RgbaValue pixel)
 	{
 		auto const i = intensity(pixel) / 3.0f;
 		auto h       = [](auto val) {

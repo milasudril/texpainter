@@ -54,7 +54,7 @@ namespace
 			}
 		}
 
-		explicit CairoSurface(Texpainter::Span2d<Texpainter::PixelStore::Pixel const> img)
+		explicit CairoSurface(Texpainter::Span2d<Texpainter::PixelStore::RgbaValue const> img)
 		    : CairoSurface{img.size()}
 		{
 			using Texpainter::chooseValIfInRange;
@@ -224,7 +224,7 @@ public:
 		}
 	}
 
-	void image(Span2d<PixelStore::Pixel const> img)
+	void image(Span2d<PixelStore::RgbaValue const> img)
 	{
 		m_img_surface = CairoSurface{img};
 		auto size     = img.size();
@@ -262,7 +262,7 @@ public:
 
 	void alwaysEmitMouseEvents(bool status) { m_emit_mouse_events = status; }
 
-	void overlay(Span2d<PixelStore::Pixel const> img, vec2_t location)
+	void overlay(Span2d<PixelStore::RgbaValue const> img, vec2_t location)
 	{
 		m_overlay = Overlay{CairoSurface{img}, location};
 		m_overlay.location -= 0.5
@@ -412,7 +412,7 @@ Texpainter::Ui::ImageView::ImageView(Container& cnt): m_impl{new Impl{cnt}} {}
 
 Texpainter::Ui::ImageView::~ImageView() { delete m_impl; }
 
-Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::image(Span2d<PixelStore::Pixel const> img)
+Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::image(Span2d<PixelStore::RgbaValue const> img)
 {
 	m_impl->image(img);
 	return *this;
@@ -454,8 +454,8 @@ Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::clear()
 	return *this;
 }
 
-Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::overlay(Span2d<PixelStore::Pixel const> img,
-                                                              vec2_t initial_location)
+Texpainter::Ui::ImageView& Texpainter::Ui::ImageView::overlay(
+    Span2d<PixelStore::RgbaValue const> img, vec2_t initial_location)
 {
 	m_impl->overlay(img, initial_location);
 	return *this;

@@ -819,6 +819,7 @@ namespace Texpainter::App
 			}
 		}
 
+<<<<<<< HEAD
 		template<class T>
 		void insert(Model::ItemName&& name, T&& item, Size2d size)
 		{
@@ -852,7 +853,7 @@ namespace Texpainter::App
 		template<class T>
 		void insert(Model::ItemName&& name, std::unique_ptr<T[]> data, Size2d size)
 		{
-			if(m_document->insert(name, PixelStore::Image<T>{Span2d{data.get(), size}})
+			if(m_document->insert(name, PixelStore::BasicImage<T>{Span2d{data.get(), size}})
 			   == nullptr)
 			{ throw std::string{"Item already exists"}; }
 
@@ -863,7 +864,7 @@ namespace Texpainter::App
 				compositor->widget().insertNodeEditor(*node);
 			}
 
-			if constexpr(std::is_same_v<T, PixelStore::RgbaValue>)
+			if constexpr(std::is_same_v<T, PixelStore::Pixel>)
 			{
 				m_document->currentImage(std::move(name));
 
@@ -880,7 +881,10 @@ namespace Texpainter::App
 			{ output->widget().refresh(); }
 		}
 
+		void insert(Model::ItemName&& name, PixelStore::Image&& img)
+=======
 		void insert(Model::ItemName&& name, PixelStore::RgbaImage&& img)
+>>>>>>> master
 		{
 			if(m_document->insert(name, std::move(img)) == nullptr)
 			{ throw std::string{"Item already exists"}; }

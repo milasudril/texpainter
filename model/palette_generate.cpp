@@ -15,7 +15,7 @@ namespace
 namespace
 {
 	Texpainter::Model::Palette generatePaletteByHue(
-	    std::array<Texpainter::PixelStore::Pixel, 4> const& base_colors,
+	    std::array<Texpainter::PixelStore::RgbaValue, 4> const& base_colors,
 	    bool intensity_to_intensity,
 	    bool intensity_to_alpha)
 	{
@@ -44,10 +44,11 @@ namespace
 			Texpainter::PixelStore::ColorIndex const index{
 			    static_cast<Texpainter::PixelStore::ColorIndex::element_type>(
 			        IntensityLevels * base_colors.size() + k)};
-			ret[index] = intensity_to_alpha
-			                 ? Texpainter::PixelStore::Pixel{1.0f, 1.0f, 1.0f, 3.0f} / (3.0f * i)
-			                 : Texpainter::PixelStore::Pixel{1.0f, 1.0f, 1.0f, 0.0f} / (3.0f * i)
-			                       + Texpainter::PixelStore::Pixel{0.0, 0.0, 0.0, 1.0};
+			ret[index] =
+			    intensity_to_alpha
+			        ? Texpainter::PixelStore::RgbaValue{1.0f, 1.0f, 1.0f, 3.0f} / (3.0f * i)
+			        : Texpainter::PixelStore::RgbaValue{1.0f, 1.0f, 1.0f, 0.0f} / (3.0f * i)
+			              + Texpainter::PixelStore::RgbaValue{0.0, 0.0, 0.0, 1.0};
 			i *= IntensityScaleFactor;
 		}
 		return ret;

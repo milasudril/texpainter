@@ -19,8 +19,8 @@ namespace Texpainter::Model
 	public:
 		CompositorOutput(Size2d size): m_size{size}
 		{
-			auto val = std::make_unique<PixelStore::Pixel[]>(area(size));
-			std::fill_n(val.get(), area(size), PixelStore::Pixel{0.0f, 0.0f, 0.0f, 0.0f});
+			auto val = std::make_unique<PixelStore::RgbaValue[]>(area(size));
+			std::fill_n(val.get(), area(size), PixelStore::RgbaValue{0.0f, 0.0f, 0.0f, 0.0f});
 			m_data = std::move(val);
 		}
 

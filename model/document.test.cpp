@@ -13,17 +13,17 @@ namespace Testcases
 		Texpainter::Model::Document doc{Texpainter::Size2d{3, 2}};
 		auto const src_name = Texpainter::Model::ItemName{"Image source"};
 
-		auto input = doc.insert(src_name, Texpainter::PixelStore::Image{3, 2});
+		auto input = doc.insert(src_name, Texpainter::PixelStore::RgbaImage{3, 2});
 		assert(input != nullptr);
 		auto& src = input->source;
 		src.modify([](auto& img) noexcept {
 			assert((img.size() == Texpainter::Size2d{3, 2}));
-			img(0, 0) = Texpainter::PixelStore::Pixel{1.0f, 0.0f, 0.0f, 1.0f};
-			img(1, 0) = Texpainter::PixelStore::Pixel{0.0f, 1.0f, 0.0f, 1.0f};
-			img(2, 0) = Texpainter::PixelStore::Pixel{0.0f, 0.0f, 1.0f, 1.0f};
-			img(0, 1) = Texpainter::PixelStore::Pixel{1.0f, 1.0f, 0.0f, 1.0f};
-			img(1, 1) = Texpainter::PixelStore::Pixel{0.0f, 1.0f, 1.0f, 1.0f};
-			img(2, 1) = Texpainter::PixelStore::Pixel{1.0f, 0.0f, 1.0f, 1.0f};
+			img(0, 0) = Texpainter::PixelStore::RgbaValue{1.0f, 0.0f, 0.0f, 1.0f};
+			img(1, 0) = Texpainter::PixelStore::RgbaValue{0.0f, 1.0f, 0.0f, 1.0f};
+			img(2, 0) = Texpainter::PixelStore::RgbaValue{0.0f, 0.0f, 1.0f, 1.0f};
+			img(0, 1) = Texpainter::PixelStore::RgbaValue{1.0f, 1.0f, 0.0f, 1.0f};
+			img(1, 1) = Texpainter::PixelStore::RgbaValue{0.0f, 1.0f, 1.0f, 1.0f};
+			img(2, 1) = Texpainter::PixelStore::RgbaValue{1.0f, 0.0f, 1.0f, 1.0f};
 			return true;
 		});
 		src.clearStatus();
@@ -38,7 +38,7 @@ namespace Testcases
 		{
 			auto result = render(doc);
 			auto const res_img =
-			    get_if<std::unique_ptr<Texpainter::PixelStore::Pixel[]>>(&result.data());
+			    get_if<std::unique_ptr<Texpainter::PixelStore::RgbaValue[]>>(&result.data());
 			assert(res_img != nullptr);
 			assert(std::equal(src.get().pixels().data(),
 			                  src.get().pixels().data() + area(doc.canvasSize()),
@@ -52,7 +52,7 @@ namespace Testcases
 
 		src.modify([](auto& img) noexcept {
 			assert((img.size() == Texpainter::Size2d{3, 2}));
-			img(0, 0) = Texpainter::PixelStore::Pixel{1.0f, 0.5f, 0.0f, 1.0f};
+			img(0, 0) = Texpainter::PixelStore::RgbaValue{1.0f, 0.5f, 0.0f, 1.0f};
 			return true;
 		});
 
@@ -61,7 +61,7 @@ namespace Testcases
 		{
 			auto result = render(doc);
 			auto const res_img =
-			    get_if<std::unique_ptr<Texpainter::PixelStore::Pixel[]>>(&result.data());
+			    get_if<std::unique_ptr<Texpainter::PixelStore::RgbaValue[]>>(&result.data());
 			assert(res_img != nullptr);
 			assert(std::equal(src.get().pixels().data(),
 			                  src.get().pixels().data() + area(doc.canvasSize()),
@@ -79,7 +79,7 @@ namespace Testcases
 		Texpainter::Model::Document doc{Texpainter::Size2d{3, 2}};
 		auto const src_name = Texpainter::Model::ItemName{"Image source"};
 
-		auto input = doc.insert(src_name, Texpainter::PixelStore::Image{3, 2});
+		auto input = doc.insert(src_name, Texpainter::PixelStore::RgbaImage{3, 2});
 		assert(input != nullptr);
 
 		assert(doc.inputNodeItem(src_name) != nullptr);

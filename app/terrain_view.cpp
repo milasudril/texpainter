@@ -271,7 +271,7 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::topography(
 {
 	if(!m_initialized) [[unlikely]]
 		{
-			m_defered_action = [buffer = PixelStore::BasicImage{n_elev}](TerrainView& self) {
+			m_defered_action = [buffer = PixelStore::Image{n_elev}](TerrainView& self) {
 				self.topography(buffer.pixels());
 			};
 			return *this;

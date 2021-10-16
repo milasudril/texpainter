@@ -1,7 +1,7 @@
 //@	 {"targets":[{"name":"texporter", "type":"application"}]}
 
 #include "model/document.hpp"
-#include "pixel_store/image_io.hpp"
+#include "pixel_store/rgba_image.hpp"
 #include "log/logger.hpp"
 
 #include <cstdio>

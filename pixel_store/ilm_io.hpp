@@ -6,6 +6,8 @@
 #define TEXPAINTER_PIXELSTORE_ILMIO_HPP
 
 #include <OpenEXR/ImfIO.h>
+#include <OpenEXR/ImfOutputFile.h>
+#include <OpenEXR/ImfInputFile.h>
 
 #include <span>
 
@@ -42,6 +44,9 @@ namespace Texpainter::PixelStore
 		{
 			(void)seek(handle, pos);
 		}
+
+		using OutputFileFactory = Imf::OutputFile (*)(void*, Imf::Header const&);
+		using InputFileFactory  = Imf::InputFile (*)(void*);
 	}
 
 	template<class FileWriter>

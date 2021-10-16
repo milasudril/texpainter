@@ -5,7 +5,7 @@
 #include "./compositor_output.hpp"
 
 #include "utils/span_2d.hpp"
-#include "pixel_store/image_io.hpp"
+#include "pixel_store/rgba_image.hpp"
 
 namespace
 {
@@ -16,7 +16,7 @@ namespace
 	};
 
 	template<>
-	struct ScalarType<Texpainter::PixelStore::Pixel>
+	struct ScalarType<Texpainter::PixelStore::RgbaValue>
 	{
 		using type = float;
 	};
@@ -91,7 +91,7 @@ namespace
 	{
 	}
 
-	void store(std::unique_ptr<Texpainter::PixelStore::Pixel[]> const& src,
+	void store(std::unique_ptr<Texpainter::PixelStore::RgbaValue[]> const& src,
 	           Texpainter::Size2d size,
 	           char const* filename)
 	{

@@ -40,7 +40,7 @@ namespace Testcases
 {
 	void texpainterPaletteCreateFromDataBlock()
 	{
-		Texpainter::DataBlock<Texpainter::PixelStore::Pixel> dblock{3};
+		Texpainter::DataBlock<Texpainter::PixelStore::RgbaValue> dblock{3};
 		*(std::data(dblock) + 0) = Texpainter::PixelStore::red();
 		*(std::data(dblock) + 1) = Texpainter::PixelStore::green();
 		*(std::data(dblock) + 2) = Texpainter::PixelStore::blue();
@@ -91,7 +91,7 @@ namespace Testcases
 		assert(pal_2.size() == pal.size());
 		assert(memcmp(std::begin(pal),
 		              std::begin(pal),
-		              std::size(pal) * sizeof(Texpainter::PixelStore::Pixel))
+		              std::size(pal) * sizeof(Texpainter::PixelStore::RgbaValue))
 		       == 0);
 	}
 }

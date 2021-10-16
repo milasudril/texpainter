@@ -33,14 +33,14 @@ namespace Testcases
 	void texpainterFilterGraphImgProcArgTest()
 	{
 		constexpr Texpainter::Size2d size{3, 2};
-		std::array<Texpainter::PixelStore::Pixel, area(size)> const input1{};
+		std::array<Texpainter::PixelStore::RgbaValue, area(size)> const input1{};
 		std::array<Texpainter::FilterGraph::RealValue, area(size)> const input2{
 		    1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
 		std::array<Texpainter::FilterGraph::ComplexValue, area(size)> const input3{};
 
 		std::array<Texpainter::FilterGraph::ComplexValue, area(size)> output1{};
 		std::array<Texpainter::FilterGraph::RealValue, area(size)> output2{};
-		std::array<Texpainter::PixelStore::Pixel, area(size)> output3{};
+		std::array<Texpainter::PixelStore::RgbaValue, area(size)> output3{};
 
 		Texpainter::FilterGraph::ImgProcArg<Ports> const obj{
 		    size,
@@ -56,14 +56,15 @@ namespace Testcases
 		assert(obj.input<1>(0, 1) == input2[3]);
 		assert(obj.input<1>(2, 1) == input2[5]);
 
-		static_assert(std::is_same_v<decltype(obj.input<0>(0, 0)), Texpainter::PixelStore::Pixel>);
+		static_assert(
+		    std::is_same_v<decltype(obj.input<0>(0, 0)), Texpainter::PixelStore::RgbaValue>);
 		static_assert(
 		    std::is_same_v<decltype(obj.input<1>(0, 0)), Texpainter::FilterGraph::RealValue>);
 		static_assert(
 		    std::is_same_v<decltype(obj.input<2>(0, 0)), Texpainter::FilterGraph::ComplexValue>);
 
 		static_assert(
-		    std::is_same_v<decltype(obj.input<0>()), Texpainter::PixelStore::Pixel const*>);
+		    std::is_same_v<decltype(obj.input<0>()), Texpainter::PixelStore::RgbaValue const*>);
 		static_assert(
 		    std::is_same_v<decltype(obj.input<1>()), Texpainter::FilterGraph::RealValue const*>);
 		static_assert(

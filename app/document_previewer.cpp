@@ -50,7 +50,7 @@ namespace
 		{
 		}
 
-		void operator()(std::unique_ptr<Texpainter::PixelStore::Pixel[]> const& data)
+		void operator()(std::unique_ptr<Texpainter::PixelStore::RgbaValue[]> const& data)
 		{
 			m_views.get().showWidget("imgview");
 			m_img_view.get().image(Texpainter::Span2d{data.get(), m_canvas_size});
