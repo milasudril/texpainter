@@ -11,7 +11,7 @@ namespace Testcases
 {
 	void texpainterImageCreateFromDataBlock()
 	{
-		Texpainter::PixelStore::BasicImage<int> img{3u, 2u};
+		Texpainter::PixelStore::Image<int> img{3u, 2u};
 		assert(img.width() == 3);
 		assert(img.height() == 2);
 		assert(area(img) == 6);

@@ -12,17 +12,17 @@ __Output:__ (Image spectrum) The computed image spectrum
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include "dft/engine.hpp"
 #include "pixel_store/image.hpp"
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
-using TempBuffer = Texpainter::PixelStore::BasicImage<ComplexValue>;
+using TempBuffer = Texpainter::PixelStore::Image<ComplexValue>;
 namespace Dft    = Texpainter::Dft;
 
 void main(auto const& args)
