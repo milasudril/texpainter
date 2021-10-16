@@ -16,7 +16,7 @@
 namespace Texpainter::PixelStore
 {
 	template<class PixelType, ColorIndex::element_type Size>
-	class BasicPalette
+	class Palette
 	{
 	public:
 		using index_type = ColorIndex;
@@ -41,7 +41,7 @@ namespace Texpainter::PixelStore
 		static constexpr auto size() { return Size; }
 
 
-		constexpr explicit BasicPalette(PixelType color_init = PixelType{0.0f, 0.0f, 0.0f, 0.0f})
+		constexpr explicit Palette(PixelType color_init = PixelType{0.0f, 0.0f, 0.0f, 0.0f})
 		{
 			std::ranges::fill(m_data, color_init);
 		}
@@ -60,10 +60,10 @@ namespace Texpainter::PixelStore
 	};
 
 	template<ColorIndex::element_type Size>
-	using Palette = BasicPalette<Pixel, Size>;
+	using RgbaPalette = Palette<Pixel, Size>;
 
 	template<ColorIndex::element_type Size>
-	void to_json(nlohmann::json& j, Palette<Size> const& pal)
+	void to_json(nlohmann::json& j, RgbaPalette<Size> const& pal)
 	{
 		std::array<std::string, static_cast<size_t>(Size)> colors;
 		std::ranges::transform(
@@ -72,7 +72,7 @@ namespace Texpainter::PixelStore
 	}
 
 	template<ColorIndex::element_type Size>
-	void store(Palette<Size> const& pal, char const* filename)
+	void store(RgbaPalette<Size> const& pal, char const* filename)
 	{
 		nlohmann::json obj;
 		to_json(obj, pal);
@@ -86,7 +86,7 @@ namespace Texpainter::PixelStore
 	}
 
 	template<ColorIndex::element_type Size, class OutputStream>
-	void store(Palette<Size> const& pal, OutputStream stream)
+	void store(RgbaPalette<Size> const& pal, OutputStream stream)
 	{
 		nlohmann::json obj;
 		to_json(obj, pal);
@@ -95,7 +95,7 @@ namespace Texpainter::PixelStore
 	}
 
 	template<ColorIndex::element_type Size>
-	void from_json(nlohmann::json const& j, Palette<Size>& pal)
+	void from_json(nlohmann::json const& j, RgbaPalette<Size>& pal)
 	{
 		auto colorspace = j.at("colorspace").get<std::string>();
 		auto colors     = j.at("colors").get<nlohmann::json::array_t>();
@@ -131,33 +131,33 @@ namespace Texpainter::PixelStore
 	}
 
 	template<ColorIndex::element_type Size>
-	Palette<Size> load(Enum::Empty<Palette<Size>>, char const* filename)
+	RgbaPalette<Size> load(Enum::Empty<RgbaPalette<Size>>, char const* filename)
 	{
 		auto const f = std::unique_ptr<FILE, int (*)(FILE*)>{fopen(filename, "rb"), fclose};
 		if(f == nullptr)
 		{ throw std::string{"Failed to open "} + filename + ": " + strerror(errno); }
 
 		auto obj = nlohmann::json::parse(f.get());
-		Palette<Size> ret;
+		RgbaPalette<Size> ret;
 		from_json(obj, ret);
 		return ret;
 	}
 
 	template<ColorIndex::element_type Size, class InputStream>
-	Palette<Size> load(Enum::Empty<Palette<Size>>, InputStream stream)
+	RgbaPalette<Size> load(Enum::Empty<RgbaPalette<Size>>, InputStream stream)
 	{
 		auto const n           = static_cast<size_t>(stream.size());
 		auto buffer            = std::make_unique<char[]>(stream.size());
 		auto const input_range = std::span{buffer.get(), n};
 		read(stream, std::as_writable_bytes(input_range));
 		auto obj = nlohmann::json::parse(std::begin(input_range), std::end(input_range));
-		Palette<Size> ret;
+		RgbaPalette<Size> ret;
 		from_json(obj, ret);
 		return ret;
 	}
 
 	template<ColorIndex::element_type Size>
-	bool fileValid(Enum::Empty<Palette<Size>> e, char const* filename)
+	bool fileValid(Enum::Empty<RgbaPalette<Size>> e, char const* filename)
 	{
 		try
 		{

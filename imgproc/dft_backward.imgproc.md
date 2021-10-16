@@ -12,14 +12,14 @@ __Output:__ (Grayscale image) The result. Notice that it is possible that the ou
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include "dft/engine.hpp"
 #include "pixel_store/image.hpp"
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 using TempBuffer = Texpainter::PixelStore::Image<ComplexValue>;

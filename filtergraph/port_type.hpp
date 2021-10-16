@@ -36,7 +36,7 @@ namespace Texpainter::FilterGraph
 	using RgbaValue      = PixelStore::Pixel;
 	using RealValue      = float;
 	using ComplexValue   = std::complex<RealValue>;
-	using Palette        = PixelStore::Palette<16>;
+	using Palette        = PixelStore::RgbaPalette<16>;
 	using TopographyInfo = Model::TopographyInfo;
 	using PolylineSet    = std::vector<std::vector<vec2_t>>;
 

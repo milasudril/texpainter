@@ -211,7 +211,10 @@ namespace Texpainter::Model
 			return *this;
 		}
 
-		PixelStore::Palette<8> const& colorHistory() const { return m_workspace.m_color_history; }
+		PixelStore::RgbaPalette<8> const& colorHistory() const
+		{
+			return m_workspace.m_color_history;
+		}
 
 		Document& saveColor(PixelStore::Pixel color)
 		{

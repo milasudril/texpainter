@@ -73,7 +73,7 @@ void Texpainter::Model::from_json(nlohmann::json const& obj, Workspace& workspac
 	workspace.m_current_image   = obj.at("current_image").get<ItemName>();
 	workspace.m_current_color   = obj.at("current_color").get<PixelStore::ColorIndex>();
 	workspace.m_current_palette = obj.at("current_palette").get<ItemName>();
-	workspace.m_color_history   = obj.at("color_history").get<PixelStore::Palette<8>>();
+	workspace.m_color_history   = obj.at("color_history").get<PixelStore::RgbaPalette<8>>();
 	workspace.m_windows         = obj.at("windows").get<Windows>();
 	workspace.m_current_brush   = obj.at("current_brush").get<BrushInfo>();
 }

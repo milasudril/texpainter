@@ -128,7 +128,7 @@ namespace Texpainter::Model
 		ItemName m_current_image;
 		PixelStore::ColorIndex m_current_color;
 		ItemName m_current_palette;
-		PixelStore::Palette<8> m_color_history;
+		PixelStore::RgbaPalette<8> m_color_history;
 		Windows m_windows;
 
 		std::filesystem::path m_working_directory;

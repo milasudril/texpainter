@@ -629,7 +629,7 @@ Texpainter::Ui::ColorPicker::Impl::Impl(Container& cnt,
 	m_predef_colors.inputField()
 	    .palette(predef_colors)
 	    .eventHandler<ControlId::PredefColors>(*this);
-	PixelStore::Palette<1> pal;
+	PixelStore::RgbaPalette<1> pal;
 	pal[PixelStore::ColorIndex{0}] = toRgb(m_hsi);
 	m_current_color.inputField().palette(pal).minSize(Size2d{48, 48}).update();
 }
