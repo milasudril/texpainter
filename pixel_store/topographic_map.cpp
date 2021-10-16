@@ -40,7 +40,7 @@ Texpainter::PixelStore::TopographicMap Texpainter::PixelStore::load(
 	                     (char*)(ret.pixels().data()) + 2 * sizeof(float),
 	                     sizeof(TopographyInfo),
 	                     sizeof(TopographyInfo) * w});
-	fb.insert("z",
+	fb.insert("Y",
 	          Imf::Slice{Imf::FLOAT,
 	                     (char*)(ret.pixels().data()) + 3 * sizeof(float),
 	                     sizeof(TopographyInfo),
@@ -60,7 +60,7 @@ void Texpainter::PixelStore::store(Span2d<TopographyInfo const> pixels,
 	header.channels().insert("nx", Imf::Channel{Imf::FLOAT});
 	header.channels().insert("ny", Imf::Channel{Imf::FLOAT});
 	header.channels().insert("nz", Imf::Channel{Imf::FLOAT});
-	header.channels().insert("x", Imf::Channel{Imf::FLOAT});
+	header.channels().insert("Y", Imf::Channel{Imf::FLOAT});
 
 	Imf::FrameBuffer fb;
 	fb.insert("nx",
@@ -78,7 +78,7 @@ void Texpainter::PixelStore::store(Span2d<TopographyInfo const> pixels,
 	                     (char*)(pixels.data()) + 2 * sizeof(float),
 	                     sizeof(TopographyInfo),
 	                     sizeof(TopographyInfo) * pixels.width()});
-	fb.insert("z",
+	fb.insert("Y",
 	          Imf::Slice{Imf::FLOAT,
 	                     (char*)(pixels.data()) + 3 * sizeof(float),
 	                     sizeof(TopographyInfo),
