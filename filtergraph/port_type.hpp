@@ -34,7 +34,7 @@ namespace Texpainter::FilterGraph
 	constexpr PortType end(Enum::Empty<PortType>) { return Enum::add(PortType::PolylineSet); }
 
 	using RgbaValue      = PixelStore::Pixel;
-	using RealValue      = double;
+	using RealValue      = float;
 	using ComplexValue   = std::complex<RealValue>;
 	using Palette        = PixelStore::Palette<16>;
 	using TopographyInfo = Model::TopographyInfo;

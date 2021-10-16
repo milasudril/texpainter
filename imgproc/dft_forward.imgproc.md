@@ -27,25 +27,25 @@ namespace Dft    = Texpainter::Dft;
 
 void main(auto const& args)
 {
-	auto sign_row   = 1;
+	auto sign_row   = 1.0f;
 	auto const size = args.canvasSize();
 	TempBuffer input_buffer{size};
 	for(uint32_t row = 0; row < size.height(); ++row)
 	{
-		auto sign_col = 1;
+		auto sign_col = 1.0f;
 		for(uint32_t col = 0; col < size.width(); ++col)
 		{
 			input_buffer(col, row) = ComplexValue{input<0>(args, col, row) * sign_row * sign_col};
-			sign_col *= -1;
+			sign_col *= -1.0f;
 		}
-		sign_row *= -1;
+		sign_row *= -1.0f;
 	}
 
 	auto const out = output<0>(args);
 	auto& engine   = Dft::engineInstance();
 	engine.run<Dft::Direction::Forward>(size, input_buffer.pixels().data(), out);
 	auto const N = area(size);
-	std::for_each(out, out + N, [A = static_cast<double>(N)](auto& val) { return val /= A; });
+	std::for_each(out, out + N, [A = static_cast<RealValue>(N)](auto& val) { return val /= A; });
 }
 ```
 

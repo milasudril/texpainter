@@ -12,7 +12,7 @@ __Intensity:__ (Grayscale image) The generated intensity function
 
 ## Parameters
 
-__Wavelength:__ (= 0.8666666666666667) Wavelength. The default value is set such that it results in a wavelength of $1/4$ of the image size.
+__Wavelength:__ (= 0.866666667) Wavelength. The default value is set such that it results in a wavelength of $1/4$ of the image size.
 
 __Aspect ratio:__ (= 1.0) The aspect ratio of cells. 1.0 means that they are squares, in case the canvas is a square.
 

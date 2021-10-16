@@ -18,49 +18,49 @@ namespace Texpainter::FilterGraph
 	public:
 		explicit constexpr ParamValue() = default;
 
-		explicit constexpr ParamValue(double val): m_value{val} {}
+		explicit constexpr ParamValue(float val): m_value{val} {}
 
 		constexpr auto operator<=>(ParamValue const&) const = default;
 
-		constexpr double value() const { return m_value; }
+		constexpr auto value() const { return m_value; }
 
 	private:
-		double m_value;
+		float m_value;
 	};
 
-	constexpr double sizeScaleFactor(ParamValue val)
+	constexpr auto sizeScaleFactor(ParamValue val)
 	{
-		return ScalingFactors::sizeScaleFactor(val.value());
+		return static_cast<float>(ScalingFactors::sizeScaleFactor(val.value()));
 	}
 
-	constexpr double sizeFromGeomMean(Size2d size, ParamValue val)
+	constexpr auto sizeFromGeomMean(Size2d size, ParamValue val)
 	{
-		return ScalingFactors::sizeFromGeomMean(size, val.value());
+		return static_cast<float>(ScalingFactors::sizeFromGeomMean(size, val.value()));
 	}
 
-	constexpr double sizeFromMin(Size2d size, ParamValue val)
+	constexpr auto sizeFromMin(Size2d size, ParamValue val)
 	{
-		return ScalingFactors::sizeFromMin(size, val.value());
+		return static_cast<float>(ScalingFactors::sizeFromMin(size, val.value()));
 	}
 
-	constexpr double sizeFromMax(Size2d size, ParamValue val)
+	constexpr auto sizeFromMax(Size2d size, ParamValue val)
 	{
-		return ScalingFactors::sizeFromMax(size, val.value());
+		return static_cast<float>(ScalingFactors::sizeFromMax(size, val.value()));
 	}
 
-	constexpr double sizeFromWidth(Size2d size, ParamValue val)
+	constexpr auto sizeFromWidth(Size2d size, ParamValue val)
 	{
-		return ScalingFactors::sizeFromWidth(size, val.value());
+		return static_cast<float>(ScalingFactors::sizeFromWidth(size, val.value()));
 	}
 
-	constexpr double sizeFromHeight(Size2d size, ParamValue val)
+	constexpr auto sizeFromHeight(Size2d size, ParamValue val)
 	{
-		return ScalingFactors::sizeFromHeight(size, val.value());
+		return static_cast<float>(ScalingFactors::sizeFromHeight(size, val.value()));
 	}
 
-	constexpr double sizeFromArea(Size2d size, ParamValue val)
+	constexpr auto sizeFromArea(Size2d size, ParamValue val)
 	{
-		return ScalingFactors::sizeFromArea(size, val.value());
+		return static_cast<float>(ScalingFactors::sizeFromArea(size, val.value()));
 	}
 
 	class ParamName

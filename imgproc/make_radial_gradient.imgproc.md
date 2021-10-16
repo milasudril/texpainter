@@ -8,7 +8,7 @@ __Output:__ (Grayscale image) Output image
 
 ## Parameters
 
-__Size:__ (= 0.9333333333333333) The size of the gradient, along the nominal x axis. The default value is set such that the diameter is half the size of the image.
+__Size:__ (= 0.93333333) The size of the gradient, along the nominal x axis. The default value is set such that the diameter is half the size of the image.
 
 __Scale with resolution:__ (= 1.0) If > 0.5, scale the size with rendering resolution. Enable this when output is used for spectral filtering.
 
@@ -37,12 +37,12 @@ inline RealValue polygon(vec2_t loc)
 	for(int k = 0; k < n; ++k)
 	{
 		vec2_t vert{std::cos(2 * std::numbers::pi * k / n), std::sin(2 * std::numbers::pi * k / n)};
-		ret = std::max(ret, std::abs(Texpainter::dot(loc, vert)));
+		ret = std::max(ret, static_cast<RealValue>(std::abs(Texpainter::dot(loc, vert))));
 	}
 	return ret * ret;
 }
 
-inline RealValue circle(vec2_t loc) { return Texpainter::dot(loc, loc); }
+inline RealValue circle(vec2_t loc) { return static_cast<RealValue>(Texpainter::dot(loc, loc)); }
 
 using NormSquared = RealValue (*)(vec2_t loc);
 
@@ -60,8 +60,10 @@ void main(auto const& args, auto const& params)
 
 	auto const r_y = r_x * sizeScaleFactor(param<Str{"Aspect ratio"}>(params));
 	auto const θ   = Angle{0.5 * param<Str{"Orientation"}>(params).value(), Angle::Turns{}};
-	auto const n   = static_cast<int>(std::lerp(
-        0, std::nextafter(std::size(norms2), 0), param<Str{"Number of vertices"}>(params).value()));
+	auto const n =
+	    static_cast<int>(std::lerp(0.0f,
+	                               std::nextafter(static_cast<RealValue>(std::size(norms2)), 0.0f),
+	                               param<Str{"Number of vertices"}>(params).value()));
 
 	auto const r_0       = vec2_t{r_x, r_y};
 	auto const rot_vec_x = vec2_t{cos(θ), -sin(θ)};

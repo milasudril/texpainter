@@ -22,6 +22,12 @@ namespace
 	};
 
 	template<class T>
+	struct ScalarType<std::complex<T>>
+	{
+		using type = T;
+	};
+
+	template<class T>
 	std::unique_ptr<T[]> downsample(Texpainter::Size2d size, T const* src, uint32_t scale)
 	{
 		auto ret = std::make_unique<T[]>(area(size));

@@ -25,10 +25,11 @@ __Source code:__
 ```c++
 void main(auto const& arg, auto const& params)
 {
-	auto size    = arg.canvasSize();
-	auto const A = area(size);
-	auto height  = std::sqrt(static_cast<double>(A))
-	              * exp2(std::lerp(-4.0, 4.0, param<Str{"Max elevation"}>(params).value()));
+	auto const size = arg.canvasSize();
+	auto const A    = area(size);
+	auto const height =
+	    std::sqrt(static_cast<RealValue>(A))
+	    * std::exp2(std::lerp(-4.0f, 4.0f, param<Str{"Max elevation"}>(params).value()));
 	for(uint32_t row = 0; row < size.height(); ++row)
 	{
 		for(uint32_t col = 0; col < size.width(); ++col)
@@ -38,10 +39,10 @@ void main(auto const& arg, auto const& params)
 			auto const dy = input<0>(arg, col, (row + 1 + size.height()) % size.height())
 			                - input<0>(arg, col, (row - 1 + size.height()) % size.height());
 
-			output<0>(arg, col, row) = TopographyInfo{
-			    static_cast<float>(height * 0.5 * dx),
-			    static_cast<float>(height * 0.5 * dy),
-			    static_cast<float>(height * input<0>(arg, col, row) / arg.resolution())};
+			output<0>(arg, col, row) =
+			    TopographyInfo{height * 0.5f * dx,
+			                   height * 0.5f * dy,
+			                   height * input<0>(arg, col, row) / arg.resolution()};
 		}
 	}
 }

@@ -32,16 +32,16 @@ void main(auto const& args)
 	auto& engine = Dft::engineInstance();
 	engine.run<Dft::Direction::Backward>(size, input<0>(args), output_buffer.pixels().data());
 
-	auto sign_row = 1;
+	auto sign_row = 1.0f;
 	for(uint32_t row = 0; row < size.height(); ++row)
 	{
-		auto sign_col = 1;
+		auto sign_col = 1.0f;
 		for(uint32_t col = 0; col < size.width(); ++col)
 		{
 			output<0>(args, col, row) = output_buffer(col, row).real() * sign_col * sign_row;
-			sign_col *= -1;
+			sign_col *= -1.0f;
 		}
-		sign_row *= -1;
+		sign_row *= -1.0f;
 	}
 }
 ```

@@ -80,7 +80,7 @@ void draw(std::vector<vec2_t> const& points,
 void main(auto const& args, auto const& params)
 {
 	auto const line_width = sizeFromMin(args.canvasSize(), param<Str{"Line width"}>(params)) / 32.0;
-	auto const grow_rate  = std::lerp(-4.0, 4.0, param<Str{"Growth rate"}>(params).value());
+	auto const grow_rate  = std::lerp(-4.0f, 4.0f, param<Str{"Growth rate"}>(params).value());
 
 	std::ranges::for_each(input<0>(args).get(), [&args, line_width, grow_rate](auto const& item) {
 		draw(item, args, line_width, grow_rate);

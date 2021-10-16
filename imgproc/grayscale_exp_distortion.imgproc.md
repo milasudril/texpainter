@@ -27,7 +27,7 @@ __Includes:__
 __Source code:__ 
 
 ```c++
-inline auto rate(ParamValue val) { return std::exp2(std::lerp(-4.0, 4.0, val.value())); }
+inline auto rate(ParamValue val) { return std::exp2(std::lerp(-4.0f, 4.0f, val.value())); }
 
 void main(auto const& args, auto const& params)
 {
@@ -36,7 +36,7 @@ void main(auto const& args, auto const& params)
 	std::transform(input<0>(args),
 	               input<0>(args) + area(args.canvasSize()),
 	               output<0>(args),
-	               [r](auto val) { return std::exp2(r * (val - 1)); });
+	               [r](auto val) { return std::exp2(r * (val - 1.0f)); });
 }
 ```
 

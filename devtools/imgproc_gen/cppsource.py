@@ -112,7 +112,7 @@ def makeDefaultCtor(params):
 			formatted_number = '%.17g' % value
 			if not '.' in formatted_number:
 				formatted_number += '.0'
-			params_init.append('ParamValue{%s}' % formatted_number)
+			params_init.append('ParamValue{static_cast<float>(%s)}' % formatted_number)
 		return '''explicit ImageProcessor():params{{%s}}
 		{
 		}''' % ', '.join(params_init)
