@@ -7,7 +7,7 @@
 
 #include "utils/vec_t.hpp"
 
-namespace Texpainter::Model
+namespace Texpainter::PixelStore
 {
 	class TopographyInfo
 	{
