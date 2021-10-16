@@ -56,7 +56,7 @@ namespace
 			m_img_view.get().image(Texpainter::Span2d{data.get(), m_canvas_size});
 		}
 
-		void operator()(std::unique_ptr<Texpainter::Model::TopographyInfo[]> const& data)
+		void operator()(std::unique_ptr<Texpainter::PixelStore::TopographyInfo[]> const& data)
 		{
 			m_views.get().showWidget("terrainview");
 			m_terrain_view.get().topography(Texpainter::Span2d{data.get(), m_canvas_size});

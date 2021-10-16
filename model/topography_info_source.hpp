@@ -120,7 +120,7 @@ inline void Texpainter::Model::TopographyInfoSource::operator()(
 				                  + static_cast<float>(coord[1]) * z_x1;
 
 				ret((col + ret.width()) % ret.width(), (row + ret.height()) % ret.height()) =
-				    TopographyInfo{z_xy};
+				    PixelStore::TopographyInfo{z_xy};
 			}
 		}
 	}

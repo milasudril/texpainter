@@ -6,12 +6,12 @@
 
 #include <memory>
 
-std::unique_ptr<Texpainter::Model::TopographyInfo[]> Texpainter::Model::downsample(
+std::unique_ptr<Texpainter::PixelStore::TopographyInfo[]> Texpainter::PixelStore::downsample(
     Texpainter::Size2d size, TopographyInfo const* src, uint32_t scale)
 {
 	if(scale == 1) [[likely]]
 		{
-			auto ret = std::make_unique<Texpainter::Model::TopographyInfo[]>(area(size));
+			auto ret = std::make_unique<Texpainter::PixelStore::TopographyInfo[]>(area(size));
 			std::copy_n(src, area(size), ret.get());
 			return ret;
 		}
@@ -19,7 +19,7 @@ std::unique_ptr<Texpainter::Model::TopographyInfo[]> Texpainter::Model::downsamp
 	auto const w = size.width() / scale;
 	auto const h = size.height() / scale;
 
-	auto ret = std::make_unique<Texpainter::Model::TopographyInfo[]>(w * h);
+	auto ret = std::make_unique<Texpainter::PixelStore::TopographyInfo[]>(w * h);
 
 	for(uint32_t row = 0; row < h; ++row)
 	{

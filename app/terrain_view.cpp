@@ -243,11 +243,11 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::meshSize(Size2d size
 		GLuint topo_id{};
 		glCreateBuffers(1, &topo_id);
 		glNamedBufferStorage(
-		    topo_id, sizeof(Model::TopographyInfo) * area(size), nullptr, GL_DYNAMIC_STORAGE_BIT);
+		    topo_id, sizeof(PixelStore::TopographyInfo) * area(size), nullptr, GL_DYNAMIC_STORAGE_BIT);
 
 		glVertexArrayVertexBuffer(*m_vert_array.get(), 0, xy_id, 0, 2 * sizeof(float));
 		glVertexArrayVertexBuffer(
-		    *m_vert_array.get(), 1, topo_id, 0, sizeof(Model::TopographyInfo));
+		    *m_vert_array.get(), 1, topo_id, 0, sizeof(PixelStore::TopographyInfo));
 		glVertexArrayAttribFormat(*m_vert_array.get(), ShaderInputs::Xy, 2, GL_FLOAT, GL_FALSE, 0);
 		glVertexArrayAttribFormat(
 		    *m_vert_array.get(), ShaderInputs::NElev, 4, GL_FLOAT, GL_FALSE, 0);
@@ -267,7 +267,7 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::meshSize(Size2d size
 }
 
 Texpainter::App::TerrainView& Texpainter::App::TerrainView::topography(
-    Span2d<Model::TopographyInfo const> n_elev)
+    Span2d<PixelStore::TopographyInfo const> n_elev)
 {
 	if(!m_initialized) [[unlikely]]
 		{
@@ -311,7 +311,7 @@ Texpainter::App::TerrainView& Texpainter::App::TerrainView::topography(
 
 	glNamedBufferSubData(*m_topo.get(),
 	                     0,
-	                     static_cast<GLsizei>(sizeof(Model::TopographyInfo) * area(n_elev)),
+	                     static_cast<GLsizei>(sizeof(PixelStore::TopographyInfo) * area(n_elev)),
 	                     n_elev.data());
 	m_gl_area.redraw();
 	return *this;

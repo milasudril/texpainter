@@ -138,7 +138,7 @@ namespace Texpainter::App
 
 		TerrainView& meshSize(Size2d size);
 
-		TerrainView& topography(Span2d<Model::TopographyInfo const>);
+		TerrainView& topography(Span2d<PixelStore::TopographyInfo const>);
 
 	private:
 		Ui::GLArea m_gl_area;

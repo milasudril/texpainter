@@ -11,7 +11,7 @@
 
 #include <memory>
 
-namespace Texpainter::Model
+namespace Texpainter::PixelStore
 {
 	class TopographyInfo
 	{
