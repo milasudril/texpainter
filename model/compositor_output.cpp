@@ -6,6 +6,7 @@
 
 #include "utils/span_2d.hpp"
 #include "pixel_store/rgba_image.hpp"
+#include "pixel_store/topographic_map.hpp"
 
 namespace
 {
@@ -92,6 +93,13 @@ namespace
 	}
 
 	void store(std::unique_ptr<Texpainter::PixelStore::RgbaValue[]> const& src,
+	           Texpainter::Size2d size,
+	           char const* filename)
+	{
+		store(Texpainter::Span2d{src.get(), size}, filename);
+	}
+
+	void store(std::unique_ptr<Texpainter::PixelStore::TopographyInfo[]> const& src,
 	           Texpainter::Size2d size,
 	           char const* filename)
 	{
