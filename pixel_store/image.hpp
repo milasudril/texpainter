@@ -86,7 +86,7 @@ namespace Texpainter::PixelStore
 		return area(img.size());
 	}
 
-	using Image = BasicImage<Pixel>;
+	using RgbaImage = BasicImage<Pixel>;
 }
 
 #endif

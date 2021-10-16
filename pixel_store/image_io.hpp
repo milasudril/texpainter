@@ -22,25 +22,25 @@ namespace Texpainter::PixelStore
 		using InputFileFactory  = Imf::InputFile (*)(void*);
 	}
 
-	Image load(Enum::Empty<Image>, void* arg, detail::InputFileFactory make_input_file);
+	RgbaImage load(Enum::Empty<RgbaImage>, void* arg, detail::InputFileFactory make_input_file);
 
-	inline Image load(Enum::Empty<Image>, char const* filename)
+	inline RgbaImage load(Enum::Empty<RgbaImage>, char const* filename)
 	{
-		return load(Enum::Empty<Image>{}, const_cast<char*>(filename), [](void* filename) {
+		return load(Enum::Empty<RgbaImage>{}, const_cast<char*>(filename), [](void* filename) {
 			return Imf::InputFile{static_cast<char const*>(filename)};
 		});
 	}
 
 	template<class FileReader>
-	Image load(Enum::Empty<Image>, FileReader&& reader)
+	RgbaImage load(Enum::Empty<RgbaImage>, FileReader&& reader)
 	{
 		IlmInputAdapter input{std::forward<FileReader>(reader)};
-		return load(Enum::Empty<Image>{}, &input, [](void* input) {
+		return load(Enum::Empty<RgbaImage>{}, &input, [](void* input) {
 			return Imf::InputFile{*static_cast<IlmInputAdapter<FileReader>*>(input)};
 		});
 	}
 
-	bool fileValid(Enum::Empty<Image>, char const* filename);
+	bool fileValid(Enum::Empty<RgbaImage>, char const* filename);
 
 
 	void store(Span2d<Pixel const> pixels, void* arg, detail::OutputFileFactory make_output_file);
@@ -52,7 +52,7 @@ namespace Texpainter::PixelStore
 		});
 	}
 
-	inline void store(Image const& img, char const* filename) { store(img.pixels(), filename); }
+	inline void store(RgbaImage const& img, char const* filename) { store(img.pixels(), filename); }
 
 	template<class FileWriter>
 	void store(Span2d<Pixel const> pixels, FileWriter&& writer)
@@ -64,7 +64,7 @@ namespace Texpainter::PixelStore
 	}
 
 	template<class FileWriter>
-	void store(Image const& img, FileWriter&& writer)
+	void store(RgbaImage const& img, FileWriter&& writer)
 	{
 		store(img.pixels(), std::forward<FileWriter>(writer));
 	}

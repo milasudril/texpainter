@@ -403,7 +403,7 @@ namespace Texpainter::App
 		template<class Source>
 		void onActivated(Enum::Tag<ImageAction::Import>, Ui::MenuItem&, Source& src)
 		{
-			loadAndInsert<PixelStore::Image>("Image files", src.window());
+			loadAndInsert<PixelStore::RgbaImage>("Image files", src.window());
 		}
 
 		template<class Source>
@@ -509,7 +509,7 @@ namespace Texpainter::App
 		void confirmPositive(ImageCreatorDlg& src)
 		{
 			auto result = src.widget().imageInfo();
-			insert(std::move(result.name), PixelStore::Image{result.size});
+			insert(std::move(result.name), PixelStore::RgbaImage{result.size});
 			m_img_creator.reset();
 		}
 
@@ -816,7 +816,7 @@ namespace Texpainter::App
 			}
 		}
 
-		void insert(Model::ItemName&& name, PixelStore::Image&& img)
+		void insert(Model::ItemName&& name, PixelStore::RgbaImage&& img)
 		{
 			if(m_document->insert(name, std::move(img)) == nullptr)
 			{ throw std::string{"Item already exists"}; }

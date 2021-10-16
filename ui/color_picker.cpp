@@ -22,9 +22,11 @@
 
 namespace
 {
-	Texpainter::PixelStore::Image gen_colors(float intensity, float alpha, Texpainter::Size2d size)
+	Texpainter::PixelStore::RgbaImage gen_colors(float intensity,
+	                                             float alpha,
+	                                             Texpainter::Size2d size)
 	{
-		Texpainter::PixelStore::Image ret{size};
+		Texpainter::PixelStore::RgbaImage ret{size};
 		generate(ret.pixels(), [intensity, alpha, size](auto col, auto row) {
 			auto x   = static_cast<float>(col) / static_cast<float>(size.width());
 			auto y   = 1.0f - static_cast<float>(row) / static_cast<float>(size.height());
@@ -281,7 +283,7 @@ public:
 
 private:
 	PixelStore::Hsi m_hsi;
-	PixelStore::Image m_colors_cache;
+	PixelStore::RgbaImage m_colors_cache;
 	PolymorphicRng m_rng;
 
 	uint32_t m_btn_state;

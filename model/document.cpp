@@ -32,9 +32,9 @@ namespace
 	}
 }
 
-Texpainter::PixelStore::Image Texpainter::Model::render(Document const& document,
-                                                        Document::ForceUpdate force_update,
-                                                        uint32_t scale)
+Texpainter::PixelStore::RgbaImage Texpainter::Model::render(Document const& document,
+                                                            Document::ForceUpdate force_update,
+                                                            uint32_t scale)
 {
 	std::ranges::for_each(document.images(), [&document, force_update](auto const& item) {
 		item.second.processor.get().processor().source(item.second.source.get().pixels());
@@ -46,8 +46,8 @@ Texpainter::PixelStore::Image Texpainter::Model::render(Document const& document
 		forceUpdateIfDirty(item, document, force_update);
 	});
 
-	PixelStore::Image ret{scale * document.canvasSize().width(),
-	                      scale * document.canvasSize().height()};
+	PixelStore::RgbaImage ret{scale * document.canvasSize().width(),
+	                          scale * document.canvasSize().height()};
 	if(document.compositor().valid()) [[likely]]
 		{
 			document.compositor().process(ret.pixels(), static_cast<double>(scale));
@@ -68,7 +68,7 @@ Texpainter::PixelStore::Image Texpainter::Model::render(Document const& document
 			return ret;
 		}
 
-	PixelStore::Image downsampled{document.canvasSize()};
+	PixelStore::RgbaImage downsampled{document.canvasSize()};
 	for(uint32_t row = 0; row < document.canvasSize().height(); ++row)
 	{
 		for(uint32_t col = 0; col < document.canvasSize().width(); ++col)
@@ -99,7 +99,7 @@ void Texpainter::Model::paint(Document& doc, vec2_t location)
 	    [location,
 	     brush_radius = static_cast<double>(brush.radius()),
 	     brush_func   = BrushFunction{brush.shape()},
-	     color        = palette[doc.currentColor()]](PixelStore::Image& img) noexcept {
+	     color        = palette[doc.currentColor()]](PixelStore::RgbaImage& img) noexcept {
 		    auto r = std::round(0.5 * ScalingFactors::sizeFromGeomMean(img.size(), brush_radius));
 		    paint(img.pixels(), location - vec2_t{1, 1}, r, brush_func, color);
 		    return true;
@@ -116,7 +116,7 @@ void Texpainter::Model::paint(Document& doc,
 	    [location,
 	     brush_radius = static_cast<double>(brush_radius),
 	     brush_func   = BrushFunction{doc.currentBrush().shape()},
-	     color](PixelStore::Image& img) noexcept {
+	     color](PixelStore::RgbaImage& img) noexcept {
 		    auto r = std::round(0.5 * ScalingFactors::sizeFromGeomMean(img.size(), brush_radius));
 		    paint(img.pixels(), location - vec2_t{1, 1}, r, brush_func, color);
 		    return true;
@@ -135,7 +135,7 @@ void Texpainter::Model::floodfill(Document& doc, vec2_t location)
 	auto const& palette = palette_ref->source.get();
 
 	doc.modify(
-	    [location, color = palette[doc.currentColor()]](PixelStore::Image& img) noexcept {
+	    [location, color = palette[doc.currentColor()]](PixelStore::RgbaImage& img) noexcept {
 		    floodfill(img.pixels(), location, color);
 		    return true;
 	    },
@@ -145,7 +145,7 @@ void Texpainter::Model::floodfill(Document& doc, vec2_t location)
 void Texpainter::Model::floodfill(Document& doc, vec2_t location, PixelStore::Pixel color)
 {
 	doc.modify(
-	    [location, color](PixelStore::Image& img) noexcept {
+	    [location, color](PixelStore::RgbaImage& img) noexcept {
 		    floodfill(img.pixels(), location, color);
 		    return true;
 	    },
@@ -366,7 +366,7 @@ std::unique_ptr<Texpainter::Model::Document> Texpainter::Model::load(Enum::Empty
 	using NodeIdItemNameMap = std::map<FilterGraph::NodeId, ItemName>;
 
 	std::ranges::for_each(doc_info.at("images").get<NodeIdItemNameMap>(),
-	                      LoadItem<PixelStore::Image>{archive, *doc, id_map});
+	                      LoadItem<PixelStore::RgbaImage>{archive, *doc, id_map});
 
 	std::ranges::for_each(doc_info.at("palettes").get<NodeIdItemNameMap>(),
 	                      LoadItem<Palette>{archive, *doc, id_map});

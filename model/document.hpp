@@ -27,7 +27,7 @@ namespace Texpainter::Model
 	namespace detail
 	{
 		template<>
-		struct ImageProcessor<WithStatus<PixelStore::Image>>
+		struct ImageProcessor<WithStatus<PixelStore::RgbaImage>>
 		{
 			using type = ImageSource;
 		};
@@ -41,12 +41,12 @@ namespace Texpainter::Model
 
 	class Document: private Size2d,
 	                private Compositor,
-	                private CompositorInputManager<PixelStore::Image>,
+	                private CompositorInputManager<PixelStore::RgbaImage>,
 	                private CompositorInputManager<Palette>
 	{
-		using CompositorInputManager<PixelStore::Image>::insert;
+		using CompositorInputManager<PixelStore::RgbaImage>::insert;
 		using CompositorInputManager<Palette>::insert;
-		using CompositorInputManager<PixelStore::Image>::erase;
+		using CompositorInputManager<PixelStore::RgbaImage>::erase;
 		using CompositorInputManager<Palette>::erase;
 
 
@@ -61,10 +61,10 @@ namespace Texpainter::Model
 			bool m_status;
 		};
 
-		using CompositorInputManager<PixelStore::Image>::get;
-		using CompositorInputManager<PixelStore::Image>::getBefore;
-		using CompositorInputManager<PixelStore::Image>::getAfter;
-		using CompositorInputManager<PixelStore::Image>::modify;
+		using CompositorInputManager<PixelStore::RgbaImage>::get;
+		using CompositorInputManager<PixelStore::RgbaImage>::getBefore;
+		using CompositorInputManager<PixelStore::RgbaImage>::getAfter;
+		using CompositorInputManager<PixelStore::RgbaImage>::modify;
 		using CompositorInputManager<Palette>::get;
 		using CompositorInputManager<Palette>::getBefore;
 		using CompositorInputManager<Palette>::getAfter;
@@ -88,21 +88,21 @@ namespace Texpainter::Model
 		}
 
 
-		auto const& images() const { return get(std::type_identity<PixelStore::Image>{}); }
+		auto const& images() const { return get(std::type_identity<PixelStore::RgbaImage>{}); }
 
 		auto image(ItemName const& name) const
 		{
-			return get(std::type_identity<PixelStore::Image>{}, name);
+			return get(std::type_identity<PixelStore::RgbaImage>{}, name);
 		}
 
-		auto insert(ItemName const& name, PixelStore::Image&& img)
+		auto insert(ItemName const& name, PixelStore::RgbaImage&& img)
 		{
-			return insert(name, std::forward<PixelStore::Image>(img), *this, m_input_nodes);
+			return insert(name, std::forward<PixelStore::RgbaImage>(img), *this, m_input_nodes);
 		}
 
 		bool eraseImage(ItemName const& name)
 		{
-			return erase(std::type_identity<PixelStore::Image>{}, name, *this, m_input_nodes);
+			return erase(std::type_identity<PixelStore::RgbaImage>{}, name, *this, m_input_nodes);
 		}
 
 
@@ -159,7 +159,7 @@ namespace Texpainter::Model
 
 			if(auto img = image(*name); img != nullptr)
 			{
-				insert(name_new, Texpainter::PixelStore::Image{img->source.get()});
+				insert(name_new, Texpainter::PixelStore::RgbaImage{img->source.get()});
 				return inputNodeItem(name_new);
 			}
 
@@ -263,9 +263,9 @@ namespace Texpainter::Model
 		std::filesystem::path m_filename;
 	};
 
-	PixelStore::Image render(Document const& document,
-	                         Document::ForceUpdate foce_update = Document::ForceUpdate{false},
-	                         uint32_t scale                    = 1);
+	PixelStore::RgbaImage render(Document const& document,
+	                             Document::ForceUpdate foce_update = Document::ForceUpdate{false},
+	                             uint32_t scale                    = 1);
 
 	void paint(Document& doc, vec2_t location);
 
@@ -282,13 +282,13 @@ namespace Texpainter::Model
 	bool fileValid(Enum::Empty<Document>, char const* filename);
 
 	template<>
-	inline ItemName const& Document::current<PixelStore::Image>() const
+	inline ItemName const& Document::current<PixelStore::RgbaImage>() const
 	{
 		return currentImage();
 	}
 
 	template<>
-	inline Document& Document::current<PixelStore::Image>(ItemName&& name)
+	inline Document& Document::current<PixelStore::RgbaImage>(ItemName&& name)
 	{
 		currentImage(std::move(name));
 		return *this;

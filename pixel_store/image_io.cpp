@@ -10,9 +10,8 @@
 #include <OpenEXR/ImfHeader.h>
 #include <OpenEXR/ImfFrameBuffer.h>
 
-Texpainter::PixelStore::Image Texpainter::PixelStore::load(Enum::Empty<Image>,
-                                                           void* arg,
-                                                           detail::InputFileFactory make_input_file)
+Texpainter::PixelStore::RgbaImage Texpainter::PixelStore::load(
+    Enum::Empty<RgbaImage>, void* arg, detail::InputFileFactory make_input_file)
 {
 	auto src = make_input_file(arg);
 
@@ -24,7 +23,7 @@ Texpainter::PixelStore::Image Texpainter::PixelStore::load(Enum::Empty<Image>,
 	if(w > 65535 || h > 65535)
 	{ throw std::runtime_error{std::string{"This image is too large."}}; }
 
-	Image ret{static_cast<uint32_t>(w), static_cast<uint32_t>(h)};
+	RgbaImage ret{static_cast<uint32_t>(w), static_cast<uint32_t>(h)};
 	Imf::FrameBuffer fb;
 	fb.insert("R",
 	          Imf::Slice{Imf::FLOAT,
@@ -98,7 +97,7 @@ void Texpainter::PixelStore::store(Span2d<Pixel const> pixels,
 	dest.writePixels(pixels.height());
 }
 
-bool Texpainter::PixelStore::fileValid(Enum::Empty<Image>, char const* filename)
+bool Texpainter::PixelStore::fileValid(Enum::Empty<RgbaImage>, char const* filename)
 {
 	return Imf::isOpenExrFile(filename);
 }

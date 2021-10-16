@@ -16,7 +16,7 @@ namespace Texpainter::App
 	class ImageSelector
 	{
 	public:
-		using type = PixelStore::Image;
+		using type = PixelStore::RgbaImage;
 
 		explicit ImageSelector(Ui::Container& owner): m_selector{owner} {}
 
