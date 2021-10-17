@@ -8,12 +8,18 @@
 
 #include "./topography_info.hpp"
 #include "./ilm_io.hpp"
+#include "./can_export.hpp"
 
 #include "pixel_store/image.hpp"
 
 namespace Texpainter::PixelStore
 {
 	using TopographicMap = Image<TopographyInfo>;
+
+	template<>
+	struct CanExport<TopographyInfo>: std::true_type
+	{
+	};
 
 	void store(Span2d<TopographyInfo const> pixels,
 	           void* arg,

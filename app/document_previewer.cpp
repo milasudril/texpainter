@@ -13,6 +13,7 @@ void Texpainter::App::DocumentPreviewer::refreshNodeSelector()
 
 	auto const& nodes    = m_doc.get().compositor().nodesWithId();
 	auto index_to_select = static_cast<size_t>(-1);
+
 	std::ranges::for_each(
 	    nodes,
 	    [&node_selector = m_node_selector,
@@ -20,11 +21,24 @@ void Texpainter::App::DocumentPreviewer::refreshNodeSelector()
 	     &index_to_select,
 	     &index_to_node = m_index_to_node,
 	     index          = static_cast<size_t>(0)](auto const& item) mutable {
-		    node_selector.append(
-		        std::to_string(item.first.value()).append(" ").append(item.second.name()).c_str());
-		    if(&item.second == &node_selected) { index_to_select = index; }
-		    index_to_node.push_back(item.second);
-		    ++index;
+		    auto const& node    = item.second;
+		    auto const& outputs = node.outputPorts();
+		    if(std::size(outputs) == 1)
+		    {
+			    auto const res =
+			        Enum::findIfEnumItem<FilterGraph::PortType>([type = outputs[0].type](auto tag) {
+				        return PixelStore::CanExport<
+				                   typename FilterGraph::PortTypeToType<tag.value>::type>::value
+				               && type == tag.value;
+			        });
+			    if(res == end(Enum::Empty<FilterGraph::PortType>{})) { return; }
+
+			    node_selector.append(
+			        std::to_string(item.first.value()).append(" ").append(node.name()).c_str());
+			    if(&item.second == &node_selected) { index_to_select = index; }
+			    index_to_node.push_back(node);
+			    ++index;
+		    }
 	    });
 	m_node_selector.selected(static_cast<int>(index_to_select));
 }

@@ -8,12 +8,19 @@
 
 #include "./rgba_value.hpp"
 #include "./ilm_io.hpp"
+#include "./can_export.hpp"
 
 #include "pixel_store/image.hpp"
 
 namespace Texpainter::PixelStore
 {
 	using RgbaImage = PixelStore::Image<RgbaValue>;
+
+	template<>
+	struct CanExport<RgbaValue>: std::true_type
+	{
+	};
+
 
 	RgbaImage load(Enum::Empty<RgbaImage>, void* arg, detail::InputFileFactory make_input_file);
 
