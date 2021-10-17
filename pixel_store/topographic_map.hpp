@@ -15,27 +15,6 @@ namespace Texpainter::PixelStore
 {
 	using TopographicMap = Image<TopographyInfo>;
 
-	TopographicMap load(Enum::Empty<TopographicMap>, void* arg, detail::InputFileFactory make_input_file);
-
-	inline TopographicMap load(Enum::Empty<TopographicMap>, char const* filename)
-	{
-		return load(Enum::Empty<TopographicMap>{}, const_cast<char*>(filename), [](void* filename) {
-			return Imf::InputFile{static_cast<char const*>(filename)};
-		});
-	}
-
-	template<class FileReader>
-	TopographicMap load(Enum::Empty<TopographicMap>, FileReader&& reader)
-	{
-		IlmInputAdapter input{std::forward<FileReader>(reader)};
-		return load(Enum::Empty<TopographicMap>{}, &input, [](void* input) {
-			return Imf::InputFile{*static_cast<IlmInputAdapter<FileReader>*>(input)};
-		});
-	}
-
-	bool fileValid(Enum::Empty<TopographicMap>, char const* filename);
-
-
 	void store(Span2d<TopographyInfo const> pixels,
 	           void* arg,
 	           detail::OutputFileFactory make_output_file);
