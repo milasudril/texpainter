@@ -34,8 +34,10 @@ drawing area. If you want to erase, right-click. Also, try to use the mouse whee
 image you are drawing to repeated. This makes it easy to draw a periodic pattern. If you pass the
 image boundary (indicated with a solid line), it will wrap-around.
 
-![Painting. Notice that the image is repeated multiple times to make it easier to draw a periodic
+![Painting 1. Notice that the image is repeated multiple times to make it easier to draw a periodic
 pattern](painting.png)
+
+![Painting 2. Wrap-around behaviour when crossing image boundary](painting_2.png)
 
 Now, it is time to have a look at the <a href="../app/compositor.html">Compositor</a>, and the
 <a href="../app/document_previewer.html">Document previewer</a>. Currently, the Document previewer
@@ -54,7 +56,7 @@ segment connecting the port with the mouse cursor.
 
 Complete the connection by left-clicking on the other port.
 
-!["texpainter demo" is connected to "Output image"](nodes_connected.png)
+!["Texpainter demo" is connected to "Output image"](nodes_connected.png)
 
 Now, the document preview shows the pattern in scale 1:2.
 
@@ -62,10 +64,13 @@ Now, the document preview shows the pattern in scale 1:2.
 
 ## Applying some filters
 
-Filters are applied by adding <a href="../glossary.html#node">node</a>s in the path between the
-source image and the output image. This tutorial will demonstrate how to add Gaussian blur to the
-image. Gaussian blur is achieved by multipying the <a href="../glossary.html#image-spectrum">image
-spectrum</a> with a mask, where the intensity is shaped like a Gaussian, ie
+The image editor in texpainter is bare-bones. To enhance the final result, filters can be added
+in the signal path between the source and destination. Filters are applied by adding
+<a href="../glossary.html#node">node</a>s in the path between the source image and the output image.
+A commonly used filter in image processing is Gaussian blur. As the name suuggests, it makes the
+input image less sharp. It can thus be used to reduce noise or to add glow effects. Gaussian blur is
+achieved by multipying the <a href="../glossary.html#image-spectrum">image spectrum</a> with a mask,
+where the intensity is shaped like a Gaussian, ie
 
 $$
 I(x, y) = \exp(-(x^2 + y^2)/r_0^2)
@@ -112,14 +117,14 @@ has some parameters that we will play with later.
 There is an image processor "Exponential decay" that modifies pixel values according to the relation
 
 $$
-I_2(x, y) = \exp(-k I_1(x, y))
+I_2(x, y) = \exp(-I_1(x, y))
 $$
 
 If we take the output from the "Make radial gradient" instance, and feeds it into an instance of
 "Exponential decay", we have constructed the Gaussian mask. Insert an instance of
 "Exponential decay" and connect it to the "Make radial gradient" instance.
 
-!["Exponential decay will modify the pixel values according to $I_2(x, y) = \exp(-k I_1(x, y))$
+!["Exponential decay will modify the pixel values according to $I_2(x, y) = \exp(-I_1(x, y))$
 ](exp_decay_connected.png)
 
 With the mask finished, it is time to multiply it with the image spectra of all color channels. This
@@ -140,10 +145,12 @@ looks like this:
 
 Still, the original image is shown in the <a href="../app/document_previewer.html">Document
 previewer</a>. This is because we have not yet connected the result of the Gaussian blur to the
-output node. Connect the output port of "Make RGBA image" to the input port of the "Output image"
-node. Notice, that this time it takes some time to finnish the connection. This is because the
-output source has changed to something that needs some computation: It has to apply the Gaussian
-blur to the image. Anyway, when the computation has completed, the Document preview looks like this:
+output node, and "Output node" is the currently active node. To finalize the filter, either connect
+the output port of "Make RGBA image" to the input port of the "Output image", or select
+"18 Make RGBA image", from the dropdown menu in the Document preview. There will be a slight delay
+before the output is updated. This is because the output source has changed to something that needs
+some computation: It has to apply the Gaussian blur to the image. Anyway, when the computation has
+completed, the Document preview looks like this:
 
 ![The output from the Gaussian blur filter. The horizontal lines indicates that some pixels have
 values that are out of range](filtered_1.png)
@@ -158,8 +165,20 @@ It is also worth mentioning that the blur effect is not very strong. To increase
 the size of the radial gradient. Also, experiment with "Aspect ratio", "Orientation", and "Number
 of vertices". We will discuss "Scale with resolution" in the next section.
 
+![Redusing the size of the gradient](radial_gradient_reduced_size.png)
+
 ![Reducing the size of the mask makes the blur more prominent](gaussian_blur_smaller_mask.png)
 
+To conclude this section, let's summerise how the Gaussian blur is constructed.
+
+![Reducing the size of the mask makes the blur more prominent](gaussian_blur_completed.png)
+
+1. Split RGBA Image into individual channels
+2. Compute their DFT
+3. Multiply their DFT:s a radial gradient fed through an exponential decay
+4. Take the inverted DFT
+5. Recombine all channels to an RGBA Image
+6. Do dynamic range adjustments (in this example, Soft clamp is used)
 
 ## Exportinig the result
 
@@ -174,24 +193,12 @@ Set the name of the exported file.
 ![The "Export" dialog](../app/export_dlg.png)
 
 To increase render quality, it is possible to use
-<a href="../glossary.html#supersampling">supersampling</a>. For the purpose of this tutorial, set
-supersampling to 4. This will use 16 times the amount of RAM.
+<a href="../glossary.html#supersampling">supersampling</a>. Supersampling is mostly for use with
+spatial transformations such as scalinig and rotation. In this particular case, 1 (which means no
+supersampling) will produce the same result as any other value.
 
 ![Filename and supersampling set](export_dlg_with_name_and_supersampling_set.png)
 
 To export the texture image click on Export.
 
 ![The exported image](my_export.png)
-
-Go back to the <a href="../app/compositor.html">Compositor</a>, and set "Scale with resolution" of
-"Make radial gradient" to 0. Then export the texture image under a new name and compare the result.
-
-![Disable "Scale with resulotion"](scale_with_resolution_off.png)
-
-Notice that the blur is mutch less prominent now. This is because the mask was not scaled to
-compensate for the larger surface in use when using supersampling. If the exported image looks
-different than the image in the <a href="../app/document_previewer.html">Document previewer</a> you
-should check the setting of any "Scale with resolution" parameter.
-
-![The exported image with "Scale with resulotion" turned off. Notice the difference in blur
-prominence](my_export_2.png)
