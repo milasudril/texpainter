@@ -8,7 +8,7 @@
 
 void Texpainter::App::DocumentPreviewer::refreshNodeSelector()
 {
-	m_node_selector.clear();
+	m_node_selector.inputField().clear();
 	m_index_to_node.clear();
 
 	auto const& nodes    = m_doc.get().compositor().nodesWithId();
@@ -16,7 +16,7 @@ void Texpainter::App::DocumentPreviewer::refreshNodeSelector()
 
 	std::ranges::for_each(
 	    nodes,
-	    [&node_selector = m_node_selector,
+	    [&node_selector = m_node_selector.inputField(),
 	     &node_selected = m_doc.get().compositor().outputNode(),
 	     &index_to_select,
 	     &index_to_node = m_index_to_node,
@@ -40,7 +40,7 @@ void Texpainter::App::DocumentPreviewer::refreshNodeSelector()
 			    ++index;
 		    }
 	    });
-	m_node_selector.selected(static_cast<int>(index_to_select));
+	m_node_selector.inputField().selected(static_cast<int>(index_to_select));
 }
 
 namespace
