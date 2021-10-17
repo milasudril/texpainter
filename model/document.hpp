@@ -151,10 +151,8 @@ namespace Texpainter::Model
 
 		bool eraseTopographicMap(ItemName const& name)
 		{
-			return erase(std::type_identity<PixelStore::TopographicMap>{},
-			             name,
-			             *this,
-			             m_input_nodes);
+			return erase(
+			    std::type_identity<PixelStore::TopographicMap>{}, name, *this, m_input_nodes);
 		}
 
 

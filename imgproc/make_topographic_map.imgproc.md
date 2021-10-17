@@ -34,15 +34,17 @@ void main(auto const& arg, auto const& params)
 	{
 		for(uint32_t col = 0; col < size.width(); ++col)
 		{
-			auto const dx = input<0>(arg, (col + 1 + size.width()) % size.width(), row)
-			                - input<0>(arg, (col - 1 + size.width()) % size.width(), row);
-			auto const dy = input<0>(arg, col, (row + 1 + size.height()) % size.height())
-			                - input<0>(arg, col, (row - 1 + size.height()) % size.height());
+			auto const dfx = input<0>(arg, (col + 1 + size.width()) % size.width(), row)
+			                 - input<0>(arg, (col - 1 + size.width()) % size.width(), row);
+			auto const dfy = input<0>(arg, col, (row + 1 + size.height()) % size.height())
+			                 - input<0>(arg, col, (row - 1 + size.height()) % size.height());
 
-			output<0>(arg, col, row) =
-			    TopographyInfo{height * 0.5f * dx,
-			                   height * 0.5f * dy,
-			                   height * input<0>(arg, col, row) / arg.resolution()};
+			// When using supersampling, dx and dy is scaled by 1.0f/arg.resolution(). This means
+			// that dfx and dfy are also scaled by 1.0f/arg.resolution(). To compensate, multiply
+			// partial derivitives by arg.resolution()
+			output<0>(arg, col, row) = TopographyInfo{height * 0.5f * dfx * arg.resolution(),
+			                                          height * 0.5f * dfy * arg.resolution(),
+			                                          height * input<0>(arg, col, row)};
 		}
 	}
 }

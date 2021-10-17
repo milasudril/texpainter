@@ -26,7 +26,10 @@ namespace Texpainter::PixelStore
 		});
 	}
 
-	inline void store(TopographicMap const& img, char const* filename) { store(img.pixels(), filename); }
+	inline void store(TopographicMap const& img, char const* filename)
+	{
+		store(img.pixels(), filename);
+	}
 
 	template<class FileWriter>
 	void store(Span2d<TopographyInfo const> pixels, FileWriter&& writer)
