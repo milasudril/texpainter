@@ -313,12 +313,14 @@ namespace Texpainter::App
 		{
 			// TODO: Use NodeWidget and InputPort to format a better message
 			m_err_disp.show(r_owner.get(), "Texpainter: Compositor", msg);
+			m_con_proc.reset();
 		}
 
 		void handleException(char const* msg, NodeWidget const&, FilterGraph::OutputPortIndex)
 		{
 			// TODO: Use NodeWidget and OutputPortIndex to format a better message
 			m_err_disp.show(r_owner.get(), "Texpainter: Compositor", msg);
+			m_con_proc.reset();
 		}
 
 		void onChanged(NodeWidget const& src,
