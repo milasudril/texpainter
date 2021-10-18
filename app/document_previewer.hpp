@@ -73,7 +73,8 @@ namespace Texpainter::App
 		template<ControlId>
 		void onChanged(Ui::Combobox&)
 		{
-			m_doc.get().compositor().outputNode(m_index_to_node[m_node_selector.inputField().selected()]);
+			m_doc.get().compositor().outputNode(
+			    m_index_to_node[m_node_selector.inputField().selected()]);
 			refreshImageView();
 		}
 
