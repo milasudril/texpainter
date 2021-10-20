@@ -232,7 +232,9 @@ namespace
 				default: break;
 			}
 
+
 			auto res = m_compositor.insert(std::move(imgproc));
+			res.second.get().rngSeed(item.second.rng_seed);
 			std::ranges::for_each(
 			    item.second.params, [&node = res.second.get()](auto const& param) {
 				    auto val = static_cast<float>(std::clamp(param.second, 0.0, 1.0));
