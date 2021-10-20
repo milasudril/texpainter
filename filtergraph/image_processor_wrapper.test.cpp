@@ -85,7 +85,8 @@ namespace Testcases
 		std::array<Texpainter::FilterGraph::ComplexValue, 6> input3{};
 
 		Texpainter::FilterGraph::NodeArgument na{
-		    size, 2.0f, 1456, {{std::begin(input1), std::begin(input2), std::begin(input3)}}};
+		    size, 2.0f, Texpainter::DefaultRng::SeedValue{1456},
+			{{std::begin(input1), std::begin(input2), std::begin(input3)}}};
 
 		Testutils::MallocHook::init();
 		auto ret = obj(na);
@@ -94,7 +95,7 @@ namespace Testcases
 
 		assert(args.canvasSize() == size);
 		assert(args.resolution() == 2.0f);
-		assert(args.rngSeed() == 1456);
+		assert((args.rngSeed() == Texpainter::DefaultRng::SeedValue{1456}));
 		assert(get_if<std::unique_ptr<Texpainter::FilterGraph::ComplexValue[]>>(&ret[0])->get()
 		       == args.output<0>());
 		assert(get_if<std::unique_ptr<Texpainter::FilterGraph::RealValue[]>>(&ret[1])->get()

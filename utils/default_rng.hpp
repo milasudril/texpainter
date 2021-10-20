@@ -11,29 +11,63 @@
 
 namespace Texpainter::DefaultRng
 {
-	class Engine:private pcg64
+	namespace detail
+	{
+		using RngImpl = pcg64;
+		using StateType = pcg64::state_type;
+	}
+
+	class SeedValue
 	{
 	public:
-		using pcg64::pcg64;
-		using pcg64::operator();
-		using pcg64::seed;
-		using pcg64::min;
-		using pcg64::max;
-		using pcg64::state_type;
+		constexpr explicit SeedValue():m_value{}{}
+
+		constexpr explicit SeedValue(detail::StateType val):m_value{val}{}
+
+		constexpr auto value() const { return m_value; }
+
+		constexpr bool operator==(SeedValue const& other) const = default;
+
+		constexpr bool operator!=(SeedValue const& other) const = default;
+
+	private:
+		detail::StateType m_value;
 	};
 
-	using State = Engine::state_type;
+	class Engine:private detail::RngImpl
+	{
+		using Impl = detail::RngImpl;
+
+	public:
+		Engine():detail::RngImpl{}{}
+
+		explicit Engine(SeedValue seed):Impl{seed.value()}{}
+
+		Engine& seed(SeedValue seed)
+		{
+			Impl::seed(seed.value());
+			return *this;
+		}
+
+		using Impl::operator();
+		using Impl::min;
+		using Impl::max;
+	};
 
 	Engine& engine();
-	void seed(State val);
 
-	inline State makeSeed()
+	inline void seed(SeedValue val)
+	{
+		engine().seed(val);
+	}
+
+	inline SeedValue genSeed()
 	{
 		auto& rng = engine();
-		auto const a = State{rng()};
-		auto const b = State{rng()} << 64;
+		auto const a = detail::StateType{rng()};
+		auto const b = detail::StateType{rng()} << 64;
 
-		return a | b;
+		return SeedValue{a | b};
 	}
 }
 

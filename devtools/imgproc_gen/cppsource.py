@@ -160,7 +160,6 @@ template = string.Template("""//@	{
 #include "utils/vec_t.hpp"
 #include "utils/angle.hpp"
 #include "utils/rect.hpp"
-#include "pcg-cpp/include/pcg_random.hpp"
 
 $param_map_include
 #line $user_includes_start "$src_file"
