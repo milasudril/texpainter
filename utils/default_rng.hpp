@@ -11,9 +11,9 @@
 
 namespace Texpainter::DefaultRng
 {
-	using type = pcg64;
+	using Engine = pcg64;
 
-	type& engine();
+	Engine& engine();
 	void seed(uint64_t val);
 }
 

@@ -176,7 +176,7 @@ namespace $namespace_name
 	using Texpainter::FilterGraph::ParamValue;
 	using Texpainter::FilterGraph::PortInfo;
 	using Texpainter::FilterGraph::PortType;
-	using Rng = pcg64;
+	using Rng = Texpainter::DefaultRng::Engine;
 
 	namespace impl
 	{
