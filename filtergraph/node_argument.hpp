@@ -20,9 +20,11 @@ namespace Texpainter::FilterGraph
 		static constexpr size_t MaxNumInputs = 4;
 		explicit NodeArgument(Size2d size,
 		                      float resolution,
+		                      uint64_t rng_seed,
 		                      std::array<InputPortValue, MaxNumInputs> const& inputs)
 		    : m_size{size}
 		    , m_resolution{resolution}
+		    , m_rng_seed{rng_seed}
 		    , r_inputs{inputs}
 		{
 		}
@@ -33,9 +35,12 @@ namespace Texpainter::FilterGraph
 
 		float resolution() const { return m_resolution; }
 
+		uint64_t rngSeed() const { return m_rng_seed ;}
+
 	private:
 		Size2d m_size;
 		float m_resolution;
+		uint64_t m_rng_seed;
 		std::array<InputPortValue, MaxNumInputs> r_inputs;
 	};
 }

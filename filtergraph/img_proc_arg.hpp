@@ -25,10 +25,12 @@ namespace Texpainter::FilterGraph
 
 		explicit ImgProcArg(Size2d canvas_size,
 		                    float resolution,
+		                    uint64_t rng_seed,
 		                    InputArgs const& inputs,
 		                    OutputArgs const& outputs)
 		    : m_canvas_size{canvas_size}
 		    , m_resolution{resolution}
+		    , m_rng_seed{rng_seed}
 		    , m_inputs{inputs}
 		    , m_outputs{outputs}
 		{
@@ -62,9 +64,12 @@ namespace Texpainter::FilterGraph
 
 		auto resolution() const { return m_resolution; }
 
+		auto rngSeed() const { return m_rng_seed; }
+
 	private:
 		Size2d m_canvas_size;
 		float m_resolution;
+		uint64_t m_rng_seed;
 		InputArgs m_inputs;
 		OutputArgs m_outputs;
 	};

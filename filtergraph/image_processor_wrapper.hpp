@@ -44,6 +44,7 @@ namespace Texpainter::FilterGraph
 			m_proc(ImgProcArg<InterfaceDescriptor>{
 			    arg.size(),
 			    arg.resolution(),
+			    arg.rngSeed(),
 			    createTuple<InputArgs>([&inputs = arg.inputs()]<class Tag>(Tag) {
 				    constexpr auto types = portTypes(InterfaceDescriptor::InputPorts);
 				    using InputT  = typename detail::GenInputPortType<types[Tag::value]>::type;
