@@ -11,10 +11,30 @@
 
 namespace Texpainter::DefaultRng
 {
-	using Engine = pcg64;
+	class Engine:private pcg64
+	{
+	public:
+		using pcg64::pcg64;
+		using pcg64::operator();
+		using pcg64::seed;
+		using pcg64::min;
+		using pcg64::max;
+		using pcg64::state_type;
+	};
+
+	using State = Engine::state_type;
 
 	Engine& engine();
-	void seed(uint64_t val);
+	void seed(State val);
+
+	inline State makeSeed()
+	{
+		auto& rng = engine();
+		auto const a = State{rng()};
+		auto const b = State{rng()} << 64;
+
+		return a | b;
+	}
 }
 
 #endif

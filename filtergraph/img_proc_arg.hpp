@@ -7,6 +7,7 @@
 
 #include "./argtuple.hpp"
 #include "./img_proc_interface_descriptor.hpp"
+#include "./utils/default_rng.hpp"
 
 #include "utils/size_2d.hpp"
 
@@ -25,7 +26,7 @@ namespace Texpainter::FilterGraph
 
 		explicit ImgProcArg(Size2d canvas_size,
 		                    float resolution,
-		                    uint64_t rng_seed,
+		                    DefaultRng::State rng_seed,
 		                    InputArgs const& inputs,
 		                    OutputArgs const& outputs)
 		    : m_canvas_size{canvas_size}
@@ -69,7 +70,7 @@ namespace Texpainter::FilterGraph
 	private:
 		Size2d m_canvas_size;
 		float m_resolution;
-		uint64_t m_rng_seed;
+		DefaultRng::State m_rng_seed;
 		InputArgs m_inputs;
 		OutputArgs m_outputs;
 	};

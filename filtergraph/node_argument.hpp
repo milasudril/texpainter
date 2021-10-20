@@ -8,6 +8,7 @@
 #include "./port_value.hpp"
 
 #include "utils/size_2d.hpp"
+#include "utils/default_rng.hpp"
 
 #include <array>
 #include <functional>
@@ -20,7 +21,7 @@ namespace Texpainter::FilterGraph
 		static constexpr size_t MaxNumInputs = 4;
 		explicit NodeArgument(Size2d size,
 		                      float resolution,
-		                      uint64_t rng_seed,
+		                      DefaultRng::State rng_seed,
 		                      std::array<InputPortValue, MaxNumInputs> const& inputs)
 		    : m_size{size}
 		    , m_resolution{resolution}
@@ -35,12 +36,12 @@ namespace Texpainter::FilterGraph
 
 		float resolution() const { return m_resolution; }
 
-		uint64_t rngSeed() const { return m_rng_seed ;}
+		DefaultRng::State rngSeed() const { return m_rng_seed ;}
 
 	private:
 		Size2d m_size;
 		float m_resolution;
-		uint64_t m_rng_seed;
+		DefaultRng::State m_rng_seed;
 		std::array<InputPortValue, MaxNumInputs> r_inputs;
 	};
 }
