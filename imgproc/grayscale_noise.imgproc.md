@@ -8,15 +8,13 @@ __Intensity:__ (Grayscale image) The generated intensity function
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
-#include "utils/default_rng.hpp"
-
 #include <random>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 void main(auto const& args)
@@ -25,7 +23,7 @@ void main(auto const& args)
 	std::generate(output<0>(args),
 	              output<0>(args) + size,
 	              [U    = std::uniform_real_distribution{0.0, 1.0},
-	               &rng = Texpainter::DefaultRng::engine()]() mutable { return U(rng); });
+	               rng = Rng{args.rngSeed()}]() mutable { return U(rng); });
 }
 ```
 

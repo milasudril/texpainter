@@ -26,16 +26,14 @@ __Point intensity:__ (= 0.5)
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
-#include "utils/default_rng.hpp"
-
 #include <random>
 #include <cmath>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 void main(auto const& args, auto const& params)
@@ -45,7 +43,7 @@ void main(auto const& args, auto const& params)
 	auto const w = args.canvasSize().width();
 	auto const h = args.canvasSize().height();
 	std::uniform_real_distribution U{0.0f, static_cast<RealValue>(w * h) / I};
-	auto& rng = Texpainter::DefaultRng::engine();
+	auto rng = Rng{args.rngSeed()};
 
 	for(uint32_t row = 0; row < h; ++row)
 	{
