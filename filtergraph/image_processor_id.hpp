@@ -18,35 +18,6 @@
 
 namespace Texpainter::FilterGraph
 {
-#if 0
-	namespace detail
-	{
-		constexpr uint8_t from_hex_digit(char x)
-		{
-			if(x < 0) { throw "String should be a 128 bit number written in hexadecimal notation"; }
-			x = x >= 'A' + 32 ? x - 32 : x;
-
-			if((x > '9' && x < 'A') || x > 'F')
-			{ throw "String should be a 128 bit number written in hexadecimal notation"; }
-
-			return static_cast<std::uint8_t>((x >= '0' && x <= '9') ? x - '0' : 10 + (x - 'A'));
-		}
-
-		constexpr char to_hex_digit(std::byte val)
-		{
-			auto i = static_cast<uint8_t>(val);
-			if(i < 10) { return static_cast<char>(i + '0'); }
-			return static_cast<char>((i - 10) + 'a');
-		}
-
-		constexpr std::pair<char, char> to_hex_digits(std::byte val)
-		{
-			return std::make_pair(to_hex_digit(val >> 4),
-			                      to_hex_digit(val & static_cast<std::byte>(0x0f)));
-		}
-	}
-#endif
-
 	class ImageProcessorId
 	{
 	public:
