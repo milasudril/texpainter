@@ -40,12 +40,5 @@ void Texpainter::FilterGraph::from_json(nlohmann::json const& obj, ImgProcReleas
 
 std::string Texpainter::FilterGraph::toString(ImageProcessorId const& id)
 {
-	std::string ret{};
-	ret.reserve(32);
-	std::ranges::for_each(id.data(), [&ret](auto val) {
-		auto hexdigits = detail::to_hex_digits(val);
-		ret.push_back(hexdigits.first);
-		ret.push_back(hexdigits.second);
-	});
-	return ret;
+	return bytesToHex(id.data());
 }

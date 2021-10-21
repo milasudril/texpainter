@@ -85,8 +85,10 @@ namespace Testcases
 		std::array<Texpainter::FilterGraph::ComplexValue, 6> input3{};
 
 		Texpainter::FilterGraph::NodeArgument na{
-		    size, 2.0f, Texpainter::DefaultRng::SeedValue{1456},
-			{{std::begin(input1), std::begin(input2), std::begin(input3)}}};
+		    size,
+		    2.0f,
+		    Texpainter::DefaultRng::SeedValue{1456},
+		    {{std::begin(input1), std::begin(input2), std::begin(input3)}}};
 
 		Testutils::MallocHook::init();
 		auto ret = obj(na);

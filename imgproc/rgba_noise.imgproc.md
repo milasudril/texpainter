@@ -8,24 +8,24 @@ __Intensity:__ (RGBA image) The generated intensity function
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <random>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& args)
 {
 	auto const size = area(args.canvasSize());
-	std::generate(output<0>(args),
-	              output<0>(args) + size,
-	              [U    = std::uniform_real_distribution{0.0f, 1.0f},
-	               rng = Rng{args.rngSeed()}]() mutable {
-		              return RgbaValue{U(rng), U(rng), U(rng), U(rng)};
-	              });
+	std::generate(
+	    output<0>(args),
+	    output<0>(args) + size,
+	    [U = std::uniform_real_distribution{0.0f, 1.0f}, rng = Rng{args.rngSeed()}]() mutable {
+		    return RgbaValue{U(rng), U(rng), U(rng), U(rng)};
+	    });
 }
 ```
 

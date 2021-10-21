@@ -45,7 +45,7 @@ namespace Testcases
 		Texpainter::FilterGraph::ImgProcArg<Ports> const obj{
 		    size,
 		    2.0f,
-			Texpainter::DefaultRng::SeedValue{348},
+		    Texpainter::DefaultRng::SeedValue{348},
 		    InArgs{std::begin(input1), std::begin(input2), std::begin(input3)},
 		    OutArgs{std::begin(output1), std::begin(output2), std::begin(output3)}};
 

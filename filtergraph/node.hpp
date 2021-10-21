@@ -324,7 +324,8 @@ namespace Texpainter::FilterGraph
 
 	inline NodeData nodeData(Node const& node)
 	{
-		NodeData ret{node.processorId(), node.rngSeed(), node.processorReleaseState(), {}, params(node)};
+		NodeData ret{
+		    node.processorId(), node.rngSeed(), node.processorReleaseState(), {}, params(node)};
 		std::ranges::transform(node.inputs(), std::begin(ret.inputs), [](auto const& item) {
 			if(item.valid()) { return NodeSourceData{item.processor().nodeId(), item.port()}; }
 			return NodeSourceData{};
@@ -335,8 +336,8 @@ namespace Texpainter::FilterGraph
 
 	inline void to_json(nlohmann::json& obj, NodeData const& node)
 	{
-		obj["imgproc"]       = node.imgproc;
-	//	obj["rng_seed"]      = node.rng_seed;
+		obj["imgproc"] = node.imgproc;
+		//	obj["rng_seed"]      = node.rng_seed;
 		obj["inputs"]        = node.inputs;
 		obj["params"]        = node.params;
 		obj["proc_relstate"] = node.proc_relstate;
@@ -344,9 +345,9 @@ namespace Texpainter::FilterGraph
 
 	inline void from_json(nlohmann::json const& obj, NodeData& node)
 	{
-		node.imgproc       = obj.at("imgproc").get<ImageProcessorId>();
+		node.imgproc  = obj.at("imgproc").get<ImageProcessorId>();
 		node.rng_seed = DefaultRng::genSeed();
-	//	if(auto i = obj.find("rng_seed"); i != std::end(obj)) { node.rng_seed = *i; }
+		//	if(auto i = obj.find("rng_seed"); i != std::end(obj)) { node.rng_seed = *i; }
 		node.proc_relstate = ImgProcReleaseState::Stable;
 		if(auto i = obj.find("proc_relstate"); i != std::end(obj)) { node.proc_relstate = *i; }
 

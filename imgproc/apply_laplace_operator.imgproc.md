@@ -12,13 +12,13 @@ __Output:__ (Grayscale image) The laplace operator of Input
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <algorithm>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& arg)

@@ -26,7 +26,8 @@ namespace Testcases
 		Texpainter::FilterGraph::RgbaValue const c{};
 
 		Texpainter::Size2d size{23, 56};
-		Texpainter::FilterGraph::NodeArgument test{size, 2.0, Texpainter::DefaultRng::SeedValue{3455}, {&a, &b, &c}};
+		Texpainter::FilterGraph::NodeArgument test{
+		    size, 2.0, Texpainter::DefaultRng::SeedValue{3455}, {&a, &b, &c}};
 
 		assert(test.size() == size);
 		assert(test.resolution() == 2.0);

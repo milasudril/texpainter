@@ -36,7 +36,7 @@ namespace Texpainter::FilterGraph
 
 		auto resolution() const { return m_resolution; }
 
-		auto rngSeed() const { return m_rng_seed ;}
+		auto rngSeed() const { return m_rng_seed; }
 
 	private:
 		Size2d m_size;

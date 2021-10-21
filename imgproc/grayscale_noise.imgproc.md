@@ -8,13 +8,13 @@ __Intensity:__ (Grayscale image) The generated intensity function
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <random>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& args)
@@ -22,7 +22,7 @@ void main(auto const& args)
 	auto const size = area(args.canvasSize());
 	std::generate(output<0>(args),
 	              output<0>(args) + size,
-	              [U    = std::uniform_real_distribution{0.0, 1.0},
+	              [U   = std::uniform_real_distribution{0.0, 1.0},
 	               rng = Rng{args.rngSeed()}]() mutable { return U(rng); });
 }
 ```

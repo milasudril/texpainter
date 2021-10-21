@@ -6,6 +6,8 @@
 #ifndef TEXPAINTER_FILTERGRAPH_IMAGEPROCESSORID_HPP
 #define TEXPAINTER_FILTERGRAPH_IMAGEPROCESSORID_HPP
 
+#include "utils/bytes_to_hex.hpp"
+
 #define JSON_USE_IMPLICIT_CONVERSIONS 0
 #include <nlohmann/json.hpp>
 
@@ -16,6 +18,7 @@
 
 namespace Texpainter::FilterGraph
 {
+#if 0
 	namespace detail
 	{
 		constexpr uint8_t from_hex_digit(char x)
@@ -42,6 +45,7 @@ namespace Texpainter::FilterGraph
 			                      to_hex_digit(val & static_cast<std::byte>(0x0f)));
 		}
 	}
+#endif
 
 	class ImageProcessorId
 	{
@@ -59,36 +63,22 @@ namespace Texpainter::FilterGraph
 		{
 			static_assert(N == 33,  // Remember nul terminator
 			              "String should be a 128 bit number written in hexadecimal notation");
-			set_val(id);
+			if(!hexToBytes(id, std::data(m_data)))
+			{ throw "String should be a 128 bit number written in hexadecimal notation"; }
 		}
 
 		explicit ImageProcessorId(std::string_view str)
 		{
 			if(std::size(str) != 32) { throw "A ImageProcessorId must be 32 bytes"; }
 
-			set_val(std::data(str));
+			if(!hexToBytes(str, std::data(m_data)))
+			{ throw "String should be a 128 bit number written in hexadecimal notation"; }
 		}
 
 		constexpr auto const& data() const { return m_data; }
 
 	private:
 		std::array<std::byte, 16> m_data;
-
-		constexpr void set_val(char const* id)
-		{
-			auto ptr = std::begin(m_data);
-			uint8_t msb{};
-			for(int k = 0; k < 32; ++k)
-			{
-				if(k % 2 == 0) { msb = detail::from_hex_digit(id[k]); }
-				else
-				{
-					auto const lsb = detail::from_hex_digit(id[k]);
-					*ptr           = static_cast<std::byte>((msb << 4) | lsb);
-					++ptr;
-				}
-			}
-		}
 	};
 
 	constexpr auto InvalidImgProcId = ImageProcessorId{'0'};
