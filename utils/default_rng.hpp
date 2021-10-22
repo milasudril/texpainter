@@ -6,8 +6,14 @@
 #ifndef TEXPAINTER_UTILS_DEFAULTRNG_HPP
 #define TEXPAINTER_UTILS_DEFAULTRNG_HPP
 
-
 #include "pcg-cpp/include/pcg_random.hpp"
+#include "./bytes_to_hex.hpp"
+
+#define JSON_USE_IMPLICIT_CONVERSIONS 0
+
+#include <nlohmann/json.hpp>
+#include <bit>
+#include <cstring>
 
 namespace Texpainter::DefaultRng
 {
@@ -65,6 +71,23 @@ namespace Texpainter::DefaultRng
 		auto const b = detail::StateType{rng()} << 64;
 
 		return SeedValue{a | b};
+	}
+
+	inline void to_json(nlohmann::json& obj, SeedValue val)
+	{
+		static_assert(std::endian::native == std::endian::little);
+		using ArrayType = std::array<std::byte, sizeof(val)>;
+		ArrayType data{};
+		memcpy(&data, &val, sizeof(val));
+		obj = bytesToHex(data);
+	}
+
+	inline void from_json(nlohmann::json const& obj, SeedValue& val)
+	{
+		static_assert(std::endian::native == std::endian::little);
+		auto const& str = obj.get<std::string>();
+		val = SeedValue{};
+		memcpy(&val, std::data(str), std::min(sizeof(SeedValue), std::size(str)));
 	}
 }
 
