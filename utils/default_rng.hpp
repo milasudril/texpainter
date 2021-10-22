@@ -86,8 +86,13 @@ namespace Texpainter::DefaultRng
 	{
 		static_assert(std::endian::native == std::endian::little);
 		auto const& str = obj.get<std::string>();
-		val = SeedValue{};
-		memcpy(&val, std::data(str), std::min(sizeof(SeedValue), std::size(str)));
+		using ArrayType = std::array<std::byte, sizeof(val)>;
+		ArrayType bytes{};
+		if(!hexToBytes(str, std::data(bytes)))
+		{ throw "Invalid seed format"; }
+		detail::StateType seedval{};
+		memcpy(&seedval, std::data(bytes), sizeof(SeedValue));
+		val = SeedValue{seedval};
 	}
 }
 
