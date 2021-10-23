@@ -595,12 +595,13 @@ namespace Texpainter::App
 	}
 
 	template<>
-	inline void Compositor::handleException<Compositor::ControlId::SetRngSeedNode>(char const* msg, Compositor::NodeRngSeedDlg& src)
+	inline void Compositor::handleException<Compositor::ControlId::SetRngSeedNode>(
+	    char const* msg, Compositor::NodeRngSeedDlg& src)
 	{
 		m_err_disp.show(r_owner.get(), "Texpainter: Compositor", msg);
 		src.widget().inputField().content(toString(src.widget().second).c_str());
 		src.widget().first.get().rngSeed(
-			    create(Enum::Empty<DefaultRng::SeedValue>{}, src.widget().inputField().content()));
+		    create(Enum::Empty<DefaultRng::SeedValue>{}, src.widget().inputField().content()));
 	}
 }
 
