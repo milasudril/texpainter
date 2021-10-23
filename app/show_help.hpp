@@ -1,4 +1,4 @@
-//@	{"targets":[{"name":"open_help.hpp","type":"include"}]}
+//@	{"targets":[{"name":"show_help.hpp","type":"include"}]}
 
 #ifndef TEXPAINTER_APP_SHOWHELP_HPP
 #define TEXPAINTER_APP_SHOWHELP_HPP

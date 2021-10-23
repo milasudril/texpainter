@@ -1,5 +1,5 @@
 //@	{
-//@	 "targets":[{"name":"port_type.hpp", "type":"include"}]
+//@	 "targets":[{"name":"scaling_factors.hpp", "type":"include"}]
 //@	}
 
 #ifndef TEXPAINTER_SCALINGFACTORS_SCALINGFACTORS_HPP
