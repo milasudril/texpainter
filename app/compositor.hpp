@@ -216,8 +216,9 @@ namespace Texpainter::App
 		    InheritFrom<std::pair<FilterGraph::NodeId, Model::CompositorProxy<Model::Document>>,
 		                Ui::LabeledInput<Ui::TextEntry>>>;
 		using ImageProcessorSelectorDlg = Ui::Dialog<ImageProcessorSelector>;
-		using NodeRngSeedDlg = Ui::Dialog<InheritFrom<std::reference_wrapper<FilterGraph::Node>,
-		                                              Ui::LabeledInput<Ui::TextEntry>>>;
+		using NodeRngSeedDlg            = Ui::Dialog<
+            InheritFrom<std::pair<std::reference_wrapper<FilterGraph::Node>, DefaultRng::SeedValue>,
+                        Ui::LabeledInput<Ui::TextEntry>>>;
 
 	public:
 		enum class ControlId : int
@@ -385,7 +386,7 @@ namespace Texpainter::App
 		template<ControlId>
 		void confirmPositive(NodeRngSeedDlg& src)
 		{
-			src.widget().get().rngSeed(
+			src.widget().first.get().rngSeed(
 			    create(Enum::Empty<DefaultRng::SeedValue>{}, src.widget().inputField().content()));
 			m_node_set_rng_seed_dlg.reset();
 			r_callback(r_eh, *this);
@@ -517,9 +518,13 @@ namespace Texpainter::App
 	template<>
 	inline void Compositor::onActivated<Compositor::ControlId::SetRngSeedNode>(Ui::MenuItem&)
 	{
-		auto& node              = m_node_editors.find(m_sel_node)->second->node();
-		m_node_set_rng_seed_dlg = std::make_unique<NodeRngSeedDlg>(
-		    node, r_owner, "Set rng seed", Texpainter::Ui::Box::Orientation::Vertical, "Value");
+		auto& node = m_node_editors.find(m_sel_node)->second->node();
+		m_node_set_rng_seed_dlg =
+		    std::make_unique<NodeRngSeedDlg>(std::pair{std::ref(node), node.rngSeed()},
+		                                     r_owner,
+		                                     "Set rng seed",
+		                                     Texpainter::Ui::Box::Orientation::Vertical,
+		                                     "Value");
 		m_node_set_rng_seed_dlg->widget()
 		    .inputField()
 		    .content(toString(node.rngSeed()).c_str())
