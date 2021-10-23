@@ -216,6 +216,8 @@ namespace Texpainter::App
 		    InheritFrom<std::pair<FilterGraph::NodeId, Model::CompositorProxy<Model::Document>>,
 		                Ui::LabeledInput<Ui::TextEntry>>>;
 		using ImageProcessorSelectorDlg = Ui::Dialog<ImageProcessorSelector>;
+		using NodeRngSeedDlg = Ui::Dialog<InheritFrom<std::reference_wrapper<FilterGraph::Node>,
+		                                              Ui::LabeledInput<Ui::TextEntry>>>;
 
 	public:
 		enum class ControlId : int
@@ -223,7 +225,8 @@ namespace Texpainter::App
 			NodeWidgets,
 			CopyNode,
 			DeleteNode,
-			FilterMenu
+			FilterMenu,
+			SetRngSeedNode
 		};
 
 		Compositor(Compositor&&) = delete;
@@ -380,6 +383,21 @@ namespace Texpainter::App
 		}
 
 		template<ControlId>
+		void confirmPositive(NodeRngSeedDlg& src)
+		{
+			src.widget().get().rngSeed(
+			    create(Enum::Empty<DefaultRng::SeedValue>{}, src.widget().inputField().content()));
+			m_node_set_rng_seed_dlg.reset();
+			r_callback(r_eh, *this);
+		}
+
+		template<ControlId>
+		void dismiss(NodeRngSeedDlg&)
+		{
+			m_node_set_rng_seed_dlg.reset();
+		}
+
+		template<ControlId>
 		void confirmPositive(ImageProcessorSelectorDlg& src)
 		{
 			if(auto name = src.widget().value(); name != nullptr)
@@ -425,6 +443,9 @@ namespace Texpainter::App
 		Ui::Menu m_node_menu;
 		Ui::MenuItem m_node_copy;
 		Ui::MenuItem m_node_delete;
+		Ui::MenuItem m_node_set_rng_seed;
+
+		std::unique_ptr<NodeRngSeedDlg> m_node_set_rng_seed_dlg;
 
 		std::unique_ptr<FilterGraph::Connection> m_con_proc;
 		Ui::ErrorMessageDialog m_err_disp;
@@ -491,6 +512,19 @@ namespace Texpainter::App
 		m_doc.get().compositor().erase(m_sel_node);
 		m_linesegs->lineSegments(resolveLineSegs(m_ports.connectors()));
 		r_callback(r_eh, *this);
+	}
+
+	template<>
+	inline void Compositor::onActivated<Compositor::ControlId::SetRngSeedNode>(Ui::MenuItem&)
+	{
+		auto& node              = m_node_editors.find(m_sel_node)->second->node();
+		m_node_set_rng_seed_dlg = std::make_unique<NodeRngSeedDlg>(
+		    node, r_owner, "Set rng seed", Texpainter::Ui::Box::Orientation::Vertical, "Value");
+		m_node_set_rng_seed_dlg->widget()
+		    .inputField()
+		    .content(toString(node.rngSeed()).c_str())
+		    .width(32);
+		m_node_set_rng_seed_dlg->eventHandler<Compositor::ControlId::SetRngSeedNode>(*this);
 	}
 
 	template<>

@@ -6,8 +6,11 @@
 #ifndef TEXPAINTER_UTILS_DEFAULTRNG_HPP
 #define TEXPAINTER_UTILS_DEFAULTRNG_HPP
 
-#include "pcg-cpp/include/pcg_random.hpp"
 #include "./bytes_to_hex.hpp"
+
+#include "libenum/enum.hpp"
+
+#include "pcg-cpp/include/pcg_random.hpp"
 
 #define JSON_USE_IMPLICIT_CONVERSIONS 0
 
@@ -73,26 +76,32 @@ namespace Texpainter::DefaultRng
 		return SeedValue{a | b};
 	}
 
-	inline void to_json(nlohmann::json& obj, SeedValue val)
+	inline std::string toString(SeedValue val)
 	{
 		static_assert(std::endian::native == std::endian::little);
 		using ArrayType = std::array<std::byte, sizeof(val)>;
 		ArrayType data{};
 		memcpy(&data, &val, sizeof(val));
-		obj = bytesToHex(data);
+		return bytesToHex(data);
 	}
+
+	inline SeedValue create(Enum::Empty<SeedValue>, std::string_view src)
+	{
+
+		static_assert(std::endian::native == std::endian::little);
+		using ArrayType = std::array<std::byte, sizeof(SeedValue)>;
+		ArrayType bytes{};
+		if(!hexToBytes(src, std::data(bytes))) { throw "Invalid seed format"; }
+		detail::StateType seedval{};
+		memcpy(&seedval, std::data(bytes), sizeof(SeedValue));
+		return SeedValue{seedval};
+	}
+
+	inline void to_json(nlohmann::json& obj, SeedValue val) { obj = toString(val); }
 
 	inline void from_json(nlohmann::json const& obj, SeedValue& val)
 	{
-		static_assert(std::endian::native == std::endian::little);
-		auto const& str = obj.get<std::string>();
-		using ArrayType = std::array<std::byte, sizeof(val)>;
-		ArrayType bytes{};
-		if(!hexToBytes(str, std::data(bytes)))
-		{ throw "Invalid seed format"; }
-		detail::StateType seedval{};
-		memcpy(&seedval, std::data(bytes), sizeof(SeedValue));
-		val = SeedValue{seedval};
+		val = create(Enum::Empty<SeedValue>{}, obj.get<std::string>().c_str());
 	}
 }
 

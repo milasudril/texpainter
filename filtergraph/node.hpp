@@ -218,6 +218,7 @@ namespace Texpainter::FilterGraph
 		Node& rngSeed(DefaultRng::SeedValue value)
 		{
 			m_rng_seed = value;
+			touch();
 			return *this;
 		}
 
@@ -336,7 +337,7 @@ namespace Texpainter::FilterGraph
 
 	inline void to_json(nlohmann::json& obj, NodeData const& node)
 	{
-		obj["imgproc"] = node.imgproc;
+		obj["imgproc"]       = node.imgproc;
 		obj["rng_seed"]      = node.rng_seed;
 		obj["inputs"]        = node.inputs;
 		obj["params"]        = node.params;
@@ -345,7 +346,7 @@ namespace Texpainter::FilterGraph
 
 	inline void from_json(nlohmann::json const& obj, NodeData& node)
 	{
-		node.imgproc  = obj.at("imgproc").get<ImageProcessorId>();
+		node.imgproc = obj.at("imgproc").get<ImageProcessorId>();
 
 		node.rng_seed = DefaultRng::genSeed();
 		if(auto i = obj.find("rng_seed"); i != std::end(obj)) { node.rng_seed = *i; }
