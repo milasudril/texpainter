@@ -22,8 +22,8 @@ namespace Texpainter::DefaultRng
 {
 	namespace detail
 	{
-		using RngImpl   = pcg64;
-		using StateType = pcg64::state_type;
+		using RngImpl   = pcg_engines::oneseq_dxsm_128_64;
+		using StateType = RngImpl::state_type;
 	}
 
 	class SeedValue
