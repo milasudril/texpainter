@@ -18,6 +18,7 @@
 #include <set>
 #include <atomic>
 #include <cassert>
+#include <optional>
 
 namespace Texpainter::FilterGraph
 {
@@ -180,7 +181,21 @@ namespace Texpainter::FilterGraph
 
 		ParamValue get(ParamName param_name) const { return m_proc->get(param_name); }
 
-		char const* name() const { return m_proc->name(); }
+		char const* name() const { return m_name.has_value() ? m_name->c_str() : m_proc->name(); }
+
+		Node& userName(std::optional<std::string>&& val)
+		{
+			m_name = std::move(val);
+			return *this;
+		}
+
+		Node& userName(std::optional<std::string> const& val)
+		{
+			m_name = std::move(val);
+			return *this;
+		}
+
+		auto const& userName() const { return m_name; }
 
 		auto processorId() const { return m_proc->id(); }
 
@@ -233,6 +248,7 @@ namespace Texpainter::FilterGraph
 		std::unique_ptr<AbstractImageProcessor> m_proc;
 		NodeId m_id;
 		DefaultRng::SeedValue m_rng_seed;
+		std::optional<std::string> m_name;
 
 		struct InputPortIndexCompare
 		{
@@ -318,6 +334,7 @@ namespace Texpainter::FilterGraph
 	{
 		ImageProcessorId imgproc;
 		DefaultRng::SeedValue rng_seed;
+		std::optional<std::string> user_name;
 		ImgProcReleaseState proc_relstate;
 		std::array<NodeSourceData, NodeArgument::MaxNumInputs> inputs;
 		std::map<std::string, double> params;
@@ -325,8 +342,12 @@ namespace Texpainter::FilterGraph
 
 	inline NodeData nodeData(Node const& node)
 	{
-		NodeData ret{
-		    node.processorId(), node.rngSeed(), node.processorReleaseState(), {}, params(node)};
+		NodeData ret{node.processorId(),
+		             node.rngSeed(),
+		             node.userName(),
+		             node.processorReleaseState(),
+		             {},
+		             params(node)};
 		std::ranges::transform(node.inputs(), std::begin(ret.inputs), [](auto const& item) {
 			if(item.valid()) { return NodeSourceData{item.processor().nodeId(), item.port()}; }
 			return NodeSourceData{};
@@ -337,8 +358,9 @@ namespace Texpainter::FilterGraph
 
 	inline void to_json(nlohmann::json& obj, NodeData const& node)
 	{
-		obj["imgproc"]       = node.imgproc;
-		obj["rng_seed"]      = node.rng_seed;
+		obj["imgproc"]  = node.imgproc;
+		obj["rng_seed"] = node.rng_seed;
+		if(node.user_name) { obj["user_name"] = *node.user_name; }
 		obj["inputs"]        = node.inputs;
 		obj["params"]        = node.params;
 		obj["proc_relstate"] = node.proc_relstate;
@@ -351,12 +373,15 @@ namespace Texpainter::FilterGraph
 		node.rng_seed = DefaultRng::genSeed();
 		if(auto i = obj.find("rng_seed"); i != std::end(obj)) { node.rng_seed = *i; }
 
+		if(auto i = obj.find("user_name"); i != std::end(obj)) { node.user_name = *i; }
+
 		node.proc_relstate = ImgProcReleaseState::Stable;
 		if(auto i = obj.find("proc_relstate"); i != std::end(obj)) { node.proc_relstate = *i; }
 
 		auto inputs = obj.at("inputs").get<std::vector<NodeSourceData>>();
 		if(std::size(inputs) > NodeArgument::MaxNumInputs)
 		{ throw std::string{"Too many inputs for node"}; }
+
 
 		std::ranges::copy(inputs, std::begin(node.inputs));
 		node.params = obj.at("params").get<std::map<std::string, double>>();
