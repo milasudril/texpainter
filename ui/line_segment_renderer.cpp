@@ -52,7 +52,7 @@ private:
 	{
 		int x{};
 		int y{};
-		cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 1.0);
+		cairo_set_source_rgba(cr, 0.72, 0.72, 0.72, 1.0);
 		cairo_set_line_width(cr, 2.0);
 		gtk_widget_translate_coordinates(widget, gtk_widget_get_toplevel(widget), 0, 0, &x, &y);
 		auto self = reinterpret_cast<Impl*>(obj);
