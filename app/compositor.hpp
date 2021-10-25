@@ -544,7 +544,7 @@ namespace Texpainter::App
 		                                     r_owner,
 		                                     "Set rng seed",
 		                                     Texpainter::Ui::Box::Orientation::Horizontal,
-		                                     "Value");
+		                                     "Value: ");
 		m_node_set_rng_seed_dlg->widget()
 		    .inputField()
 		    .content(toString(node.rngSeed()).c_str())
@@ -561,7 +561,7 @@ namespace Texpainter::App
 		                                      r_owner,
 		                                      "Set node name",
 		                                      Texpainter::Ui::Box::Orientation::Horizontal,
-		                                      "New name");
+		                                      "New name: ");
 		m_node_set_name_dlg->widget().inputField().content(node.name());
 		m_node_set_name_dlg->eventHandler<Compositor::ControlId::SetNodeName>(*this);
 	}
@@ -614,7 +614,7 @@ namespace Texpainter::App
 		                                                 r_owner,
 		                                                 "Copy node",
 		                                                 Texpainter::Ui::Box::Orientation::Horizontal,
-		                                                 "New name");
+		                                                 "New name: ");
 		m_copy_name->eventHandler<ControlId::CopyNode>(*this);
 	}
 
