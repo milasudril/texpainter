@@ -543,7 +543,7 @@ namespace Texpainter::App
 		    std::make_unique<NodeRngSeedDlg>(std::pair{std::ref(node), node.rngSeed()},
 		                                     r_owner,
 		                                     "Set rng seed",
-		                                     Texpainter::Ui::Box::Orientation::Vertical,
+		                                     Texpainter::Ui::Box::Orientation::Horizontal,
 		                                     "Value");
 		m_node_set_rng_seed_dlg->widget()
 		    .inputField()
@@ -560,8 +560,8 @@ namespace Texpainter::App
 		    std::make_unique<NodeUserNameDlg>(std::ref(node),
 		                                      r_owner,
 		                                      "Set node name",
-		                                      Texpainter::Ui::Box::Orientation::Vertical,
-		                                      "Name");
+		                                      Texpainter::Ui::Box::Orientation::Horizontal,
+		                                      "New name");
 		m_node_set_name_dlg->widget().inputField().content(node.name());
 		m_node_set_name_dlg->eventHandler<Compositor::ControlId::SetNodeName>(*this);
 	}
@@ -613,7 +613,7 @@ namespace Texpainter::App
 		m_copy_name = std::make_unique<NodeNameInputDlg>(std::make_pair(node_id, compositor),
 		                                                 r_owner,
 		                                                 "Copy node",
-		                                                 Texpainter::Ui::Box::Orientation::Vertical,
+		                                                 Texpainter::Ui::Box::Orientation::Horizontal,
 		                                                 "New name");
 		m_copy_name->eventHandler<ControlId::CopyNode>(*this);
 	}
