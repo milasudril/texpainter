@@ -270,6 +270,9 @@ namespace Texpainter::App
 			{ r_eh->onCompleted(*this, src.port()); }
 		}
 
+		void update() { m_name.content(r_node.get().name()); }
+
+
 	private:
 		std::reference_wrapper<FilterGraph::Node> r_node;
 		EventHandler* r_eh;

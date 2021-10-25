@@ -108,6 +108,7 @@ Texpainter::App::Compositor::Compositor(Ui::Container& owner, Model::Document& d
     , m_node_copy{m_node_menu, "Copy"}
     , m_node_delete{m_node_menu, "Delete"}
     , m_node_set_rng_seed{m_node_menu, "Set random seed"}
+    , m_node_set_name{m_node_menu, "Set name"}
     , r_owner{owner}
 {
 	m_linesegs = m_canvas.insert<Ui::LineSegmentRenderer>();
@@ -120,6 +121,7 @@ Texpainter::App::Compositor::Compositor(Ui::Container& owner, Model::Document& d
 	m_node_copy.eventHandler<ControlId::CopyNode>(*this);
 	m_node_delete.eventHandler<ControlId::DeleteNode>(*this);
 	m_node_set_rng_seed.eventHandler<ControlId::SetRngSeedNode>(*this);
+	m_node_set_name.eventHandler<ControlId::SetNodeName>(*this);
 
 	std::ranges::for_each(
 	    m_doc.get().compositor().nodesWithId(),

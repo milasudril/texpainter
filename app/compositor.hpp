@@ -219,6 +219,8 @@ namespace Texpainter::App
 		using NodeRngSeedDlg            = Ui::Dialog<
             InheritFrom<std::pair<std::reference_wrapper<FilterGraph::Node>, DefaultRng::SeedValue>,
                         Ui::LabeledInput<Ui::TextEntry>>>;
+		using NodeUserNameDlg = Ui::Dialog<InheritFrom<std::reference_wrapper<FilterGraph::Node>,
+		                                               Ui::LabeledInput<Ui::TextEntry>>>;
 
 	public:
 		enum class ControlId : int
@@ -227,7 +229,8 @@ namespace Texpainter::App
 			CopyNode,
 			DeleteNode,
 			FilterMenu,
-			SetRngSeedNode
+			SetRngSeedNode,
+			SetNodeName
 		};
 
 		Compositor(Compositor&&) = delete;
@@ -399,6 +402,21 @@ namespace Texpainter::App
 		}
 
 		template<ControlId>
+		void confirmPositive(NodeUserNameDlg& src)
+		{
+			auto& node = src.widget().get();
+			node.userName(src.widget().inputField().content());
+			m_node_set_name_dlg.reset();
+			m_node_editors.find(node.nodeId())->second->update();
+		}
+
+		template<ControlId>
+		void dismiss(NodeUserNameDlg&)
+		{
+			m_node_set_name_dlg.reset();
+		}
+
+		template<ControlId>
 		void confirmPositive(ImageProcessorSelectorDlg& src)
 		{
 			if(auto name = src.widget().value(); name != nullptr)
@@ -445,8 +463,10 @@ namespace Texpainter::App
 		Ui::MenuItem m_node_copy;
 		Ui::MenuItem m_node_delete;
 		Ui::MenuItem m_node_set_rng_seed;
+		Ui::MenuItem m_node_set_name;
 
 		std::unique_ptr<NodeRngSeedDlg> m_node_set_rng_seed_dlg;
+		std::unique_ptr<NodeUserNameDlg> m_node_set_name_dlg;
 
 		std::unique_ptr<FilterGraph::Connection> m_con_proc;
 		Ui::ErrorMessageDialog m_err_disp;
@@ -530,6 +550,20 @@ namespace Texpainter::App
 		    .content(toString(node.rngSeed()).c_str())
 		    .width(32);
 		m_node_set_rng_seed_dlg->eventHandler<Compositor::ControlId::SetRngSeedNode>(*this);
+	}
+
+	template<>
+	inline void Compositor::onActivated<Compositor::ControlId::SetNodeName>(Ui::MenuItem&)
+	{
+		auto& node = m_node_editors.find(m_sel_node)->second->node();
+		m_node_set_name_dlg =
+		    std::make_unique<NodeUserNameDlg>(std::ref(node),
+		                                      r_owner,
+		                                      "Set node name",
+		                                      Texpainter::Ui::Box::Orientation::Vertical,
+		                                      "Name");
+		m_node_set_name_dlg->widget().inputField().content(node.name());
+		m_node_set_name_dlg->eventHandler<Compositor::ControlId::SetNodeName>(*this);
 	}
 
 	template<>

@@ -234,8 +234,7 @@ namespace
 
 
 			auto res = m_compositor.insert(std::move(imgproc));
-			res.second.get().rngSeed(item.second.rng_seed)
-			.userName(item.second.user_name);
+			res.second.get().rngSeed(item.second.rng_seed).userName(item.second.user_name);
 
 			std::ranges::for_each(
 			    item.second.params, [&node = res.second.get()](auto const& param) {
