@@ -610,11 +610,12 @@ namespace Texpainter::App
 	inline void Compositor::requestItemName<Compositor::ControlId::CopyNode>(
 	    FilterGraph::NodeId node_id, Model::CompositorProxy<Model::Document> compositor)
 	{
-		m_copy_name = std::make_unique<NodeNameInputDlg>(std::make_pair(node_id, compositor),
-		                                                 r_owner,
-		                                                 "Copy node",
-		                                                 Texpainter::Ui::Box::Orientation::Horizontal,
-		                                                 "New name: ");
+		m_copy_name =
+		    std::make_unique<NodeNameInputDlg>(std::make_pair(node_id, compositor),
+		                                       r_owner,
+		                                       "Copy node",
+		                                       Texpainter::Ui::Box::Orientation::Horizontal,
+		                                       "New name: ");
 		m_copy_name->eventHandler<ControlId::CopyNode>(*this);
 	}
 
