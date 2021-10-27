@@ -18,14 +18,14 @@ __Mode:__ (= 0.0) Controls whether or not to use logarithmic quantization
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <cmath>
 #include <limits>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 void main(auto const& args, auto const& params)
@@ -41,15 +41,18 @@ void main(auto const& args, auto const& params)
 		              MaxMultiplier,
 		              static_cast<double>(param<Str{"#Steps"}>(params).value()));
 
-		auto const multiplier = static_cast<int>(std::exp2(multiplier_exp));
-		std::transform(input<0>(args),
-		               input<0>(args) + area(args.canvasSize()),
-		               output<0>(args),
-		               [multiplier](auto val) {
-			               return static_cast<float>(
-			                   static_cast<int>(static_cast<double>(val) * multiplier + 0.5)
-			                   / static_cast<double>(multiplier));
-		               });
+		auto const N = static_cast<int>(std::exp2(multiplier_exp));
+
+		auto const dx = 1.0f / static_cast<float>(N);
+
+		std::transform(
+		    input<0>(args),
+		    input<0>(args) + area(args.canvasSize()),
+		    output<0>(args),
+		    [mult = dx, N](auto val) {
+			    return static_cast<float>(
+			        mult * static_cast<int>(val * static_cast<float>(N) + 0.5f));
+		    });
 	}
 	else
 	{
