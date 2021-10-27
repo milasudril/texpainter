@@ -18,57 +18,40 @@ __Mode:__ (= 0.0) Controls whether or not to use logarithmic quantization
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <cmath>
 #include <limits>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& args, auto const& params)
 {
+	constexpr auto MaxMultiplier =
+	    std::log2(static_cast<double>((1 << std::numeric_limits<float>::digits) - 1));
+	constexpr auto MinMultiplier = std::log2(1.0);
+
+	auto const multiplier_exp = std::lerp(
+	    MinMultiplier, MaxMultiplier, static_cast<double>(param<Str{"#Steps"}>(params).value()));
+
+	auto const N  = static_cast<int>(std::exp2(multiplier_exp));
+	auto const dx = 1.0f / static_cast<float>(N);
+
 	if(param<Str{"Mode"}>(params).value() < 0.5)
 	{
-		constexpr auto MaxMultiplier =
-		    std::log2(static_cast<double>((1 << std::numeric_limits<float>::digits) - 1));
-		constexpr auto MinMultiplier = std::log2(1.0);
-
-		auto const multiplier_exp =
-		    std::lerp(MinMultiplier,
-		              MaxMultiplier,
-		              static_cast<double>(param<Str{"#Steps"}>(params).value()));
-
-		auto const N = static_cast<int>(std::exp2(multiplier_exp));
-
-		auto const dx = 1.0f / static_cast<float>(N);
-
-		std::transform(
-		    input<0>(args),
-		    input<0>(args) + area(args.canvasSize()),
-		    output<0>(args),
-		    [mult = dx, N](auto val) {
-			    return static_cast<float>(
-			        mult * static_cast<int>(val * static_cast<float>(N) + 0.5f));
-		    });
+		std::transform(input<0>(args),
+		               input<0>(args) + area(args.canvasSize()),
+		               output<0>(args),
+		               [mult = dx, N](auto val) {
+			               return static_cast<float>(
+			                   mult * static_cast<int>(val * static_cast<float>(N) + 0.5f));
+		               });
 	}
 	else
 	{
-		constexpr auto MaxMultiplier =
-		    std::log2(static_cast<double>((1 << std::numeric_limits<float>::digits) - 1));
-		constexpr auto MinMultiplier = std::log2(1.0);
-
-		auto const multiplier_exp =
-		    std::lerp(MinMultiplier,
-		              MaxMultiplier,
-		              static_cast<double>(param<Str{"#Steps"}>(params).value()));
-
-		auto const N = static_cast<int>(std::exp2(multiplier_exp));
-
-		auto const dx = 1.0f / static_cast<float>(N);
-
 		std::transform(
 		    input<0>(args),
 		    input<0>(args) + area(args.canvasSize()),
