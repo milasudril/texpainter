@@ -18,14 +18,14 @@ __Mode:__ (= 0.0) Controls whether or not to use logarithmic quantization
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <cmath>
 #include <limits>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 using vec4i_t = int __attribute__((vector_size(16)));
@@ -68,6 +68,10 @@ constexpr auto minval()
 
 constexpr auto maxvec(Texpainter::vec4_t a, Texpainter::vec4_t b) { return a > b ? a : b; }
 
+constexpr auto minvec(Texpainter::vec4_t a, Texpainter::vec4_t b) { return a < b ? a : b; }
+
+constexpr auto ones = Texpainter::vec4_t{1.0f, 1.0f, 1.0f, 1.0f};
+
 void main(auto const& args, auto const& params)
 {
 	constexpr auto MaxMultiplier =
@@ -87,8 +91,9 @@ void main(auto const& args, auto const& params)
 		               input<0>(args) + area(args.canvasSize()),
 		               output<0>(args),
 		               [mult = dx, N](auto val) {
-			               return RgbaValue{
-			                   mult * toFloats(toInts(val.value() * static_cast<float>(N) + 0.5f))};
+			               auto const val_new =
+			                   mult * toFloats(toInts(val.value() * static_cast<float>(N) + 0.5f));
+			               return RgbaValue{minvec(val_new, ones)};
 		               });
 	}
 	else
@@ -104,7 +109,9 @@ void main(auto const& args, auto const& params)
 			    auto const rounded_val =
 			        mult * toFloats(toInts(transformed_val * static_cast<float>(N) + 0.5f));
 
-			    return RgbaValue{exp2vec(rounded_val * (std::log2(1.0f) - minval()) + minval())};
+				auto const val_new = exp2vec(rounded_val * (std::log2(1.0f) - minval()) + minval());
+
+			    return RgbaValue{minvec(val_new, ones)};
 		    });
 	}
 }

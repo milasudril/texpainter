@@ -18,14 +18,14 @@ __Mode:__ (= 0.0) Controls whether or not to use logarithmic quantization
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <cmath>
 #include <limits>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 void main(auto const& args, auto const& params)
@@ -46,8 +46,8 @@ void main(auto const& args, auto const& params)
 		               input<0>(args) + area(args.canvasSize()),
 		               output<0>(args),
 		               [mult = dx, N](auto val) {
-			               return static_cast<float>(
-			                   mult * static_cast<int>(val * static_cast<float>(N) + 0.5f));
+			               return std::min(static_cast<float>(
+			                   mult * static_cast<int>(val * static_cast<float>(N) + 0.5f)), 1.0f);
 		               });
 	}
 	else
@@ -65,7 +65,7 @@ void main(auto const& args, auto const& params)
 			    auto const rounded_val = static_cast<float>(
 			        mult * static_cast<int>(transformed_val * static_cast<float>(N) + 0.5f));
 
-			    return std::exp2(rounded_val * (std::log2(1.0f) - MinVal) + MinVal);
+			    return std::min(std::exp2(rounded_val * (std::log2(1.0f) - MinVal) + MinVal), 1.0f);
 		    });
 	}
 }
