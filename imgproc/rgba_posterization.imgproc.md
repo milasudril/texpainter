@@ -18,14 +18,14 @@ __Mode:__ (= 0.0) Controls whether or not to use logarithmic quantization
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <cmath>
 #include <limits>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 using vec4i_t = int __attribute__((vector_size(16)));
@@ -109,7 +109,7 @@ void main(auto const& args, auto const& params)
 			    auto const rounded_val =
 			        mult * toFloats(toInts(transformed_val * static_cast<float>(N) + 0.5f));
 
-				auto const val_new = exp2vec(rounded_val * (std::log2(1.0f) - minval()) + minval());
+			    auto const val_new = exp2vec(rounded_val * (std::log2(1.0f) - minval()) + minval());
 
 			    return RgbaValue{minvec(val_new, ones)};
 		    });

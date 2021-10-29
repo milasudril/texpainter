@@ -18,14 +18,14 @@ __Mode:__ (= 0.0) Controls whether or not to use logarithmic quantization
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <cmath>
 #include <limits>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& args, auto const& params)
@@ -42,13 +42,15 @@ void main(auto const& args, auto const& params)
 
 	if(param<Str{"Mode"}>(params).value() < 0.5)
 	{
-		std::transform(input<0>(args),
-		               input<0>(args) + area(args.canvasSize()),
-		               output<0>(args),
-		               [mult = dx, N](auto val) {
-			               return std::min(static_cast<float>(
-			                   mult * static_cast<int>(val * static_cast<float>(N) + 0.5f)), 1.0f);
-		               });
+		std::transform(
+		    input<0>(args),
+		    input<0>(args) + area(args.canvasSize()),
+		    output<0>(args),
+		    [mult = dx, N](auto val) {
+			    return std::min(
+			        static_cast<float>(mult * static_cast<int>(val * static_cast<float>(N) + 0.5f)),
+			        1.0f);
+		    });
 	}
 	else
 	{
