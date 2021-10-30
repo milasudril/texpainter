@@ -29,11 +29,11 @@ namespace Texpainter
 		{
 		}
 
-		T* allocate(size_t n)
+		[[nodiscard]] T* allocate(size_t n)
 		{
 			if(n != 1) [[unlikely]]
 				{
-					return std::allocator<T>::allocatre(n);
+					return m_default_allocator.allocate(n);
 				}
 
 			if(m_freelist_end == 0) { ++m_current_index; }
@@ -50,7 +50,7 @@ namespace Texpainter
 		{
 			if(n != 1) [[unlikely]]
 				{
-					return std::allocator<T>::deallocate(ptr, n);
+					return m_default_allocator.deallocate(ptr, n);
 				}
 
 			m_freelist[m_freelist_end] = reinterpret_cast<Chunk*>(ptr) - m_storage.get();
@@ -76,6 +76,8 @@ namespace Texpainter
 
 		std::unique_ptr<size_t[]> m_freelist;
 		size_t m_freelist_end;
+
+		std::allocator<T> m_default_allocator;
 	};
 }
 

@@ -3,23 +3,53 @@
 //@	}
 
 #include "./stack_allocator.hpp"
+
 #include <cassert>
+#include <algorithm>
 
 namespace Testcases
 {
-	void texpainterStackAllocatorAllocateBuildAndConsumeFreeList()
+	void texpainterStackAllocatorAllocateFreeAndConsumeFreeList()
 	{
 		Texpainter::StackAllocator<int> allocator{16};
 
 		assert(allocator.capacity() == 16);
 		assert(std::size(allocator.freelist()) == 0);
 		assert(std::size(allocator.localContent()) == 0);
+
+		std::array<int*, 16> vals{};
+
+		for(size_t k = 0; k != allocator.capacity(); ++k)
+		{
+			vals[k] = new(allocator.allocate(1))int{static_cast<int>(k)};
+		}
+
+		assert(std::size(allocator.localContent()) == allocator.capacity());
+
+		std::ranges::for_each(allocator.localContent(), [k = 0](int item) mutable {
+			assert(item == k);
+			++k;
+		});
+
+		for(size_t k = 0; k != allocator.capacity(); ++k)
+		{
+			allocator.deallocate(vals[k], 1);
+		}
+
+		assert(std::size(allocator.freelist()) == 16);
+
+		for(size_t k = 0; k != allocator.capacity(); ++k)
+		{
+			vals[k] = new(allocator.allocate(1))int{static_cast<int>(k)};
+		}
+
+		assert(std::size(allocator.freelist()) == 0);
 	}
 
 }
 
 int main()
 {
-	Testcases::texpainterStackAllocatorAllocateBuildAndConsumeFreeList();
+	Testcases::texpainterStackAllocatorAllocateFreeAndConsumeFreeList();
 	return 0;
 }
