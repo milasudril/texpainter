@@ -25,6 +25,8 @@ namespace Testcases
 		}
 
 		assert(std::size(allocator.localContent()) == allocator.capacity());
+		std::ranges::sort(vals);
+		assert(std::begin(std::ranges::unique(vals)) == std::end(vals));
 
 		std::ranges::for_each(allocator.localContent(), [k = 0](int item) mutable {
 			assert(item == k);
