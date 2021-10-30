@@ -38,7 +38,11 @@ namespace Testcases
 			allocator.deallocate(vals[k], 1);
 		}
 
-		assert(std::size(allocator.freelist()) == 16);
+		assert(std::size(allocator.freelist()) == allocator.capacity());
+		for(size_t k = 0; k != allocator.capacity(); ++k)
+		{
+			assert(allocator.freelist()[k] == k);
+		}
 
 		for(size_t k = 0; k != allocator.capacity(); ++k)
 		{
@@ -46,6 +50,8 @@ namespace Testcases
 		}
 
 		assert(std::size(allocator.freelist()) == 0);
+
+
 	}
 
 }
