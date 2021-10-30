@@ -22,7 +22,7 @@ namespace Texpainter
 
 		explicit StackAllocator(size_t capacity)
 		    : m_storage{std::make_unique<Chunk[]>(capacity)}
-		    , m_current_index{-1}
+		    , m_current_index{static_cast<size_t>(-1)}
 		    , m_capacity{capacity}
 		    , m_freelist{std::make_unique<size_t[]>(capacity)}
 		    , m_freelist_end{0}
@@ -59,7 +59,7 @@ namespace Texpainter
 
 		std::span<T const> localContent() const
 		{
-			return std::span{reinterpret_cast<T const>(m_storage.get()), m_current_index + 1};
+			return std::span{reinterpret_cast<T const*>(m_storage.get()), m_current_index + 1};
 		}
 
 		std::span<size_t const> freelist() const
@@ -70,7 +70,7 @@ namespace Texpainter
 		size_t capacity() const { return m_capacity; }
 
 	private:
-		std::unique_ptr<Chunk> m_storage;
+		std::unique_ptr<Chunk[]> m_storage;
 		size_t m_current_index;
 		size_t m_capacity;
 
