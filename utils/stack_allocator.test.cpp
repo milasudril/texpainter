@@ -11,9 +11,9 @@
 
 namespace Testcases
 {
-	void texpainterStackAllocatorAllocateFreeAndConsumeFreeList()
+	void texpainterPreallocStackAllocatorAllocateFreeAndConsumeFreeList()
 	{
-		Texpainter::StackAllocator<int> allocator{16};
+		Texpainter::PreallocStackAllocator<int> allocator{16};
 
 		assert(allocator.capacity() == 16);
 		assert(std::size(allocator.freelist()) == 0);
@@ -53,9 +53,9 @@ namespace Testcases
 		assert(std::size(allocator.freelist()) == 0);
 	}
 
-	void texpainterStackAllocatorFuzzer()
+	void texpainterPreallocStackAllocatorFuzzer()
 	{
-		Texpainter::StackAllocator<uint64_t> allocator{256};
+		Texpainter::PreallocStackAllocator<uint64_t> allocator{256};
 
 		std::array<uint64_t*, 256> pointers_in_use{};
 		size_t pointers_in_use_size = 0;
@@ -91,7 +91,7 @@ namespace Testcases
 
 int main()
 {
-	Testcases::texpainterStackAllocatorAllocateFreeAndConsumeFreeList();
-	Testcases::texpainterStackAllocatorFuzzer();
+	Testcases::texpainterPreallocStackAllocatorAllocateFreeAndConsumeFreeList();
+	Testcases::texpainterPreallocStackAllocatorFuzzer();
 	return 0;
 }

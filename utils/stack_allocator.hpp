@@ -14,7 +14,7 @@
 namespace Texpainter
 {
 	template<class T>
-	class StackAllocator
+	class PreallocStackAllocator
 	{
 	public:
 		using Chunk      = std::aligned_storage_t<sizeof(T), alignof(T)>;
@@ -22,7 +22,7 @@ namespace Texpainter
 
 		using value_type = T;
 
-		explicit StackAllocator(size_t capacity)
+		explicit PreallocStackAllocator(size_t capacity)
 		    : m_storage{std::make_unique<Chunk[]>(capacity)}
 		    , m_current_index{static_cast<size_t>(0)}
 		    , m_capacity{capacity}
