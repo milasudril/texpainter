@@ -14,25 +14,52 @@ __Destination:__ (RGBA image) The destination image
 
 __Output:__ (RGBA image) The composed image
 
+## Parameters
+
+__Straight α:__ (= 0.0) Set to greater than 0.5 to use straight alpha compositing
+
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <algorithm>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
-void main(auto const& args)
+void main(auto const& args, auto const& params)
 {
 	auto const size = area(args.canvasSize());
-	std::transform(input<0>(args),
-	               input<0>(args) + size,
-	               input<1>(args),
-	               output<0>(args),
-	               [](auto src, auto dest) { return src + dest * (1.0f - src.alpha()); });
+	if(param<Str{"Straight α"}>(params).value() < 0.5f)
+	{
+		std::transform(input<0>(args),
+					input<0>(args) + size,
+					input<1>(args),
+					output<0>(args),
+					[](auto src, auto dest) { return src + dest * (1.0f - src.alpha()); });
+	}
+	else
+	{
+		std::transform(input<0>(args),
+				input<0>(args) + size,
+				input<1>(args),
+				output<0>(args),
+				[](auto src, auto dest) {
+				auto output_alpha = src.alpha() + dest.alpha()*(1.0f - src.alpha());
+				if(output_alpha == 0.0f) [[unlikely ]] { return RgbaValue{0.0f, 0.0f, 0.0f, 0.0f}; }
+
+				auto const src_val = src.value();
+				auto const src_alpha = src.alpha();
+				auto const dest_val = dest.value();
+				auto const dest_alpha = dest.alpha();
+				auto output_rgb = (src_alpha*src_val + dest_alpha*(1.0f - src_alpha)*dest_val)/
+					output_alpha;
+
+				return RgbaValue(output_rgb[0], output_rgb[1], output_rgb[2], output_alpha);
+		});
+	}
 }
 ```
 
