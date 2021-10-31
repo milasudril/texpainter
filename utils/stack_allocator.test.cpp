@@ -11,48 +11,6 @@
 
 namespace Testcases
 {
-	void texpainterPreallocStackAllocatorAllocateFreeAndConsumeFreeList()
-	{
-		Texpainter::PreallocStackAllocator<int> allocator{16};
-
-		assert(allocator.capacity() == 16);
-		assert(std::size(allocator.freelist()) == 0);
-		assert(std::size(allocator.localContent()) == 0);
-
-		std::array<int*, 16> vals{};
-
-		for(size_t k = 0; k != allocator.capacity(); ++k)
-		{
-			vals[k] = new(allocator.allocate(1))int{static_cast<int>(k)};
-		}
-
-		assert(std::size(allocator.localContent()) == allocator.capacity());
-		std::ranges::sort(vals);
-		assert(std::begin(std::ranges::unique(vals)) == std::end(vals));
-
-		std::ranges::for_each(allocator.localContent(), [k = 0](int item) mutable {
-			assert(item == k);
-			++k;
-		});
-
-		for(size_t k = 0; k != allocator.capacity(); ++k)
-		{
-			allocator.deallocate(vals[k], 1);
-		}
-
-		assert(std::size(allocator.freelist()) == allocator.capacity());
-		for(size_t k = 0; k != allocator.capacity(); ++k)
-		{
-		}
-
-		for(size_t k = 0; k != allocator.capacity(); ++k)
-		{
-			vals[k] = new(allocator.allocate(1))int{static_cast<int>(k)};
-		}
-
-		assert(std::size(allocator.freelist()) == 0);
-	}
-
 	void texpainterPreallocStackAllocatorFuzzer()
 	{
 		Texpainter::PreallocStackAllocator<uint64_t> allocator{256};
@@ -91,7 +49,6 @@ namespace Testcases
 
 int main()
 {
-	Testcases::texpainterPreallocStackAllocatorAllocateFreeAndConsumeFreeList();
 	Testcases::texpainterPreallocStackAllocatorFuzzer();
 	return 0;
 }

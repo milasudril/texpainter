@@ -27,8 +27,13 @@ namespace Texpainter
 		    , m_current_index{static_cast<size_t>(0)}
 		    , m_capacity{capacity}
 		    , m_freelist{std::make_unique<size_t[]>(capacity)}
-		    , m_freelist_end{0}
+		    , m_freelist_end{capacity}
 		{
+			std::generate_n(m_freelist.get(), capacity, [k = static_cast<size_t>(0)]() mutable {
+				auto ret = k;
+				++k;
+				return ret;
+			});
 		}
 
 		[[nodiscard]] T* allocate(size_t n)
@@ -38,18 +43,9 @@ namespace Texpainter
 					return m_default_allocator.allocate(n);
 				}
 
-			if(m_freelist_end == 0)
-			{
-				auto ret = m_current_index;
-				assert(ret != m_capacity);
-				++m_current_index;
-				return reinterpret_cast<T*>(m_storage.get()) + ret;
-			}
-			else
-			{
-				--m_freelist_end;
-				return reinterpret_cast<T*>(m_storage.get()) + m_freelist[m_freelist_end];
-			}
+			assert(m_freelist_end != 0);
+			--m_freelist_end;
+			return reinterpret_cast<T*>(m_storage.get()) + m_freelist[m_freelist_end];
 		}
 
 		void deallocate(T* ptr, size_t n)
@@ -58,6 +54,9 @@ namespace Texpainter
 				{
 					return m_default_allocator.deallocate(ptr, n);
 				}
+
+			if(ptr == nullptr)
+			{ return; }
 
 			m_freelist[m_freelist_end] = reinterpret_cast<Chunk*>(ptr) - m_storage.get();
 			++m_freelist_end;
