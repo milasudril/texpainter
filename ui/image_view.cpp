@@ -77,7 +77,7 @@ namespace
 				for(uint32_t col = 0; col < w; ++col)
 				{
 					constexpr auto last_lut_entry = static_cast<int>(gamma_22.size() - 1);
-					auto const input_val          = read_ptr->alpha() * read_ptr->value();
+					auto const input_val          = read_ptr->value();
 					auto const val =
 					    chooseValIfInRange(input_val,
 					                       row % 3 == 0 ? vec4_t{0.0f, 0.0f, 0.0f, 0.0f}
