@@ -77,20 +77,22 @@ namespace
 				for(uint32_t col = 0; col < w; ++col)
 				{
 					constexpr auto last_lut_entry = static_cast<int>(gamma_22.size() - 1);
-					auto val                      = chooseValIfInRange(read_ptr->value(),
-                                                  row % 3 == 0 ? vec4_t{0.0f, 0.0f, 0.0f, 0.0f}
-                                                               : vec4_t{1.0f, 1.0f, 1.0f, 1.0f},
-                                                  row % 3 != 0 ? vec4_t{0.0f, 0.0f, 0.0f, 0.0f}
-                                                               : vec4_t{1.0f, 1.0f, 1.0f, 1.0f},
-                                                  col % 3 != 0 ? vec4_t{0.0f, 0.0f, 0.0f, 0.0f}
-                                                               : vec4_t{1.0f, 1.0f, 1.0f, 1.0f});
+					auto const input_val          = read_ptr->alpha() * read_ptr->value();
+					auto const val =
+					    chooseValIfInRange(input_val,
+					                       row % 3 == 0 ? vec4_t{0.0f, 0.0f, 0.0f, 0.0f}
+					                                    : vec4_t{1.0f, 1.0f, 1.0f, 1.0f},
+					                       row % 3 != 0 ? vec4_t{0.0f, 0.0f, 0.0f, 0.0f}
+					                                    : vec4_t{1.0f, 1.0f, 1.0f, 1.0f},
+					                       col % 3 != 0 ? vec4_t{0.0f, 0.0f, 0.0f, 0.0f}
+					                                    : vec4_t{1.0f, 1.0f, 1.0f, 1.0f});
 
-					auto pixel_out = static_cast<float>(last_lut_entry) * val;
+					auto const pixel_out = static_cast<float>(last_lut_entry) * val;
 
-					auto as_ints = vec4i_t{static_cast<int>(pixel_out[0]),
-					                       static_cast<int>(pixel_out[1]),
-					                       static_cast<int>(pixel_out[2]),
-					                       static_cast<int>(pixel_out[3])};
+					auto const as_ints = vec4i_t{static_cast<int>(pixel_out[0]),
+					                             static_cast<int>(pixel_out[1]),
+					                             static_cast<int>(pixel_out[2]),
+					                             static_cast<int>(pixel_out[3])};
 
 					write_ptr[0] = gamma_22[as_ints[2]];
 					write_ptr[1] = gamma_22[as_ints[1]];

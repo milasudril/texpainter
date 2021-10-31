@@ -17,25 +17,25 @@ namespace Texpainter
 	class PreallocStackAllocator
 	{
 	public:
-		using Chunk      = std::aligned_storage_t<sizeof(T), alignof(T)>;
+		using Chunk        = std::aligned_storage_t<sizeof(T), alignof(T)>;
 		using ChunkPointer = Chunk*;
 		static_assert(sizeof(Chunk) >= sizeof(T));
 
 		using value_type = T;
 
-		explicit PreallocStackAllocator(size_t capacity):
-		      m_freelist{std::make_unique<ChunkPointer[]>(capacity)}
+		explicit PreallocStackAllocator(size_t capacity)
+		    : m_freelist{std::make_unique<ChunkPointer[]>(capacity)}
 		    , m_freelist_end{capacity}
 		    , m_storage{std::make_unique<Chunk[]>(capacity)}
 		    , m_capacity{capacity}
 		{
-			std::generate_n(m_freelist.get(), capacity, [
-			base_address = m_storage.get(),
-			k = static_cast<size_t>(0)]() mutable {
-				auto ret = base_address + k;
-				++k;
-				return ret;
-			});
+			std::generate_n(m_freelist.get(),
+			                capacity,
+			                [base_address = m_storage.get(), k = static_cast<size_t>(0)]() mutable {
+				                auto ret = base_address + k;
+				                ++k;
+				                return ret;
+			                });
 		}
 
 		[[nodiscard]] T* allocate(size_t n)
@@ -57,8 +57,7 @@ namespace Texpainter
 					return m_default_allocator.deallocate(ptr, n);
 				}
 
-			if(ptr == nullptr)
-			{ return; }
+			if(ptr == nullptr) { return; }
 
 			m_freelist[m_freelist_end] = reinterpret_cast<Chunk*>(ptr);
 			++m_freelist_end;
@@ -79,11 +78,11 @@ namespace Texpainter
 		[[no_unique_address]] std::allocator<T> m_default_allocator;
 	};
 
-	template<class Allocator, class ... Args>
-	auto create(Allocator& alloc, Args ... args)
+	template<class Allocator, class... Args>
+	auto create(Allocator& alloc, Args... args)
 	{
 		using T = typename Allocator::value_type;
-		return new(alloc.allocate(1))T{std::forward<Args>(args)...};
+		return new(alloc.allocate(1)) T{std::forward<Args>(args)...};
 	}
 
 	template<class Allocator, class Pointer>
