@@ -18,6 +18,7 @@ namespace Texpainter
 	{
 	public:
 		using Chunk      = std::aligned_storage_t<sizeof(T), alignof(T)>;
+		using ChunkPointer = Chunk*;
 		static_assert(sizeof(Chunk) >= sizeof(T));
 
 		using value_type = T;
@@ -26,11 +27,13 @@ namespace Texpainter
 		    : m_storage{std::make_unique<Chunk[]>(capacity)}
 		    , m_current_index{static_cast<size_t>(0)}
 		    , m_capacity{capacity}
-		    , m_freelist{std::make_unique<size_t[]>(capacity)}
+		    , m_freelist{std::make_unique<ChunkPointer[]>(capacity)}
 		    , m_freelist_end{capacity}
 		{
-			std::generate_n(m_freelist.get(), capacity, [k = static_cast<size_t>(0)]() mutable {
-				auto ret = k;
+			std::generate_n(m_freelist.get(), capacity, [
+			base_address = m_storage.get(),
+			k = static_cast<size_t>(0)]() mutable {
+				auto ret = base_address + k;
 				++k;
 				return ret;
 			});
@@ -45,7 +48,7 @@ namespace Texpainter
 
 			assert(m_freelist_end != 0);
 			--m_freelist_end;
-			return reinterpret_cast<T*>(m_storage.get()) + m_freelist[m_freelist_end];
+			return reinterpret_cast<T*>(m_freelist[m_freelist_end]);
 		}
 
 		void deallocate(T* ptr, size_t n)
@@ -58,7 +61,7 @@ namespace Texpainter
 			if(ptr == nullptr)
 			{ return; }
 
-			m_freelist[m_freelist_end] = reinterpret_cast<Chunk*>(ptr) - m_storage.get();
+			m_freelist[m_freelist_end] = reinterpret_cast<Chunk*>(ptr);
 			++m_freelist_end;
 		}
 
@@ -79,7 +82,7 @@ namespace Texpainter
 		size_t m_current_index;
 		size_t m_capacity;
 
-		std::unique_ptr<size_t[]> m_freelist;
+		std::unique_ptr<ChunkPointer[]> m_freelist;
 		size_t m_freelist_end;
 
 		std::allocator<T> m_default_allocator;
