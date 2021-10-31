@@ -61,6 +61,7 @@ namespace Texpainter::DefaultRng
 		using Impl::operator();
 		using Impl::max;
 		using Impl::min;
+		using Impl::result_type;
 	};
 
 	Engine& engine();

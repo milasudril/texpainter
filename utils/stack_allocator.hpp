@@ -17,12 +17,14 @@ namespace Texpainter
 	class StackAllocator
 	{
 	public:
-		using Chunk      = std::aligned_storage<sizeof(T), alignof(T)>;
+		using Chunk      = std::aligned_storage_t<sizeof(T), alignof(T)>;
+		static_assert(sizeof(Chunk) >= sizeof(T));
+
 		using value_type = T;
 
 		explicit StackAllocator(size_t capacity)
 		    : m_storage{std::make_unique<Chunk[]>(capacity)}
-		    , m_current_index{static_cast<size_t>(-1)}
+		    , m_current_index{static_cast<size_t>(0)}
 		    , m_capacity{capacity}
 		    , m_freelist{std::make_unique<size_t[]>(capacity)}
 		    , m_freelist_end{0}
@@ -36,14 +38,18 @@ namespace Texpainter
 					return m_default_allocator.allocate(n);
 				}
 
-			if(m_freelist_end == 0) { ++m_current_index; }
+			if(m_freelist_end == 0)
+			{
+				auto ret = m_current_index;
+				assert(ret != m_capacity);
+				++m_current_index;
+				return reinterpret_cast<T*>(m_storage.get()) + ret;
+			}
 			else
 			{
 				--m_freelist_end;
-				m_current_index = m_freelist_end;
+				return reinterpret_cast<T*>(m_storage.get()) + m_freelist[m_freelist_end];
 			}
-			assert(m_current_index != m_capacity);
-			return reinterpret_cast<T*>(m_storage.get()) + m_current_index;
 		}
 
 		void deallocate(T* ptr, size_t n)
@@ -59,7 +65,7 @@ namespace Texpainter
 
 		std::span<T const> localContent() const
 		{
-			return std::span{reinterpret_cast<T const*>(m_storage.get()), m_current_index + 1};
+			return std::span{reinterpret_cast<T const*>(m_storage.get()), m_current_index};
 		}
 
 		std::span<size_t const> freelist() const
@@ -79,6 +85,21 @@ namespace Texpainter
 
 		std::allocator<T> m_default_allocator;
 	};
+
+	template<class Allocator, class ... Args>
+	auto create(Allocator& alloc, Args ... args)
+	{
+		using T = typename Allocator::value_type;
+		return new(alloc.allocate(1))T{std::forward<Args>(args)...};
+	}
+
+	template<class Allocator, class Pointer>
+	void destroy(Allocator& alloc, Pointer ptr)
+	{
+		using T = typename Allocator::value_type;
+		ptr->~T();
+		alloc.deallocate(ptr, 1);
+	}
 }
 
 #endif
