@@ -23,11 +23,11 @@ namespace Texpainter
 
 		using value_type = T;
 
-		explicit PreallocStackAllocator(size_t capacity)
-		    : m_storage{std::make_unique<Chunk[]>(capacity)}
-		    , m_capacity{capacity}
-		    , m_freelist{std::make_unique<ChunkPointer[]>(capacity)}
+		explicit PreallocStackAllocator(size_t capacity):
+		      m_freelist{std::make_unique<ChunkPointer[]>(capacity)}
 		    , m_freelist_end{capacity}
+		    , m_storage{std::make_unique<Chunk[]>(capacity)}
+		    , m_capacity{capacity}
 		{
 			std::generate_n(m_freelist.get(), capacity, [
 			base_address = m_storage.get(),
@@ -72,13 +72,11 @@ namespace Texpainter
 		size_t capacity() const { return m_capacity; }
 
 	private:
-		std::unique_ptr<Chunk[]> m_storage;
-		size_t m_capacity;
-
 		std::unique_ptr<ChunkPointer[]> m_freelist;
 		size_t m_freelist_end;
-
-		std::allocator<T> m_default_allocator;
+		std::unique_ptr<Chunk[]> m_storage;
+		size_t m_capacity;
+		[[no_unique_address]] std::allocator<T> m_default_allocator;
 	};
 
 	template<class Allocator, class ... Args>
