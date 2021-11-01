@@ -5,9 +5,11 @@
 #include "./preallocated_multiset.hpp"
 #include "./default_rng.hpp"
 
+#include <cassert>
+
 namespace Testcases
 {
-	void texpainterPreallocatedMultiset()
+	void texpainterPreallocatedMultisetCreateInsertAndErase()
 	{
 		Texpainter::PreallocatedMultiset<int> vals{16};
 		auto& rng = Texpainter::DefaultRng::engine();
@@ -35,11 +37,35 @@ namespace Testcases
 		auto const n = vals.erase(erase_val);
 		assert(static_cast<int>(n) == *freq_max - 1);
 		assert(std::size(vals) == static_cast<size_t>(16 - *freq_max));
+
+		vals.insert(35);
+	}
+
+	void texpainterPreallocatedMultisetCreateFillAndMove()
+	{
+		Texpainter::PreallocatedMultiset<int> vals{16};
+		std::generate_n(std::inserter(vals, std::end(vals)), 8, [k = 0]() mutable {
+			++k;
+			return k;
+		});
+		assert(std::size(vals) == 8);
+
+		auto other = std::move(vals);
+		assert(std::size(other) == 8);
+		assert(std::size(vals) == 0);
+
+		other.insert(9);
+
+		std::ranges::for_each(other, [k = 0](auto item) mutable {
+			++k;
+			assert(item == k);
+		});
 	}
 }
 
 int main()
 {
-	Testcases::texpainterPreallocatedMultiset();
+	Testcases::texpainterPreallocatedMultisetCreateInsertAndErase();
+	Testcases::texpainterPreallocatedMultisetCreateFillAndMove();
 	return 0;
 }
