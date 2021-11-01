@@ -63,10 +63,7 @@ namespace Texpainter
 			++m_freelist_end;
 		}
 
-		std::span<size_t const> freelist() const
-		{
-			return std::span{m_freelist.get(), m_freelist_end};
-		}
+		bool isFull() const { return m_freelist_end == 0; }
 
 		size_t capacity() const { return m_capacity; }
 

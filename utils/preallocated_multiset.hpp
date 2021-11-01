@@ -84,14 +84,10 @@ namespace Texpainter
 
 		// Additional functions
 
-		auto capacity() const { return Base::get_allocator().capacity(); }
-
-		auto max_size() const { return capacity(); }
-
 		auto erase_one(key_type const& key)
 		{
 			auto i = find(key);
-			if(i != std::end(key)) [[likely]]
+			if(i != std::end(*this)) [[likely]]
 				{
 					return erase(i);
 				}
