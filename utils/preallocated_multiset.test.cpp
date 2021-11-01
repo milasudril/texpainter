@@ -27,8 +27,14 @@ namespace Testcases
 		std::ranges::for_each(vals, [&hist](auto val) { hist[val]++; });
 		auto freq_max = std::ranges::max_element(hist);
 		assert(*freq_max > 1);
-		vals.erase_one(static_cast<int>(freq_max - std::begin(hist)));
+		auto const erase_val = static_cast<int>(freq_max - std::begin(hist));
+		vals.erase_one(erase_val);
 		assert(std::size(vals) == 15);
+
+		assert(*freq_max > 2);
+		auto const n = vals.erase(erase_val);
+		assert(static_cast<int>(n) == *freq_max - 1);
+		assert(std::size(vals) == static_cast<size_t>(16 - *freq_max));
 	}
 }
 
