@@ -57,7 +57,8 @@
 //@		"./grayscale_exp_distortion.imgproc.hpp",
 //@		"./apply_laplace_operator.imgproc.hpp",
 //@		"./grayscale_posterization.imgproc.hpp",
-//@		"./rgba_posterization.imgproc.hpp"
+//@		"./rgba_posterization.imgproc.hpp",
+//@		"./apply_grayscale_minmax.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -148,7 +149,8 @@ namespace
 	    get_info<::GrayscaleExpDistortion::ImageProcessor>(),
 	    get_info<::ApplyLaplaceOperator::ImageProcessor>(),
 	    get_info<::GrayscalePosterization::ImageProcessor>(),
-	    get_info<::RgbaPosterization::ImageProcessor>()};
+	    get_info<::RgbaPosterization::ImageProcessor>(),
+	    get_info<::ApplyGrayscaleMinmax::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
