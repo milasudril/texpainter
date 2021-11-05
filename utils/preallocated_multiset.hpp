@@ -68,12 +68,14 @@ namespace Texpainter
 		using value_type = typename Base::value_type;
 		using key_type   = typename Base::key_type;
 		using Base::begin;
+		using Base::rbegin;
 		using Base::clear;
 		using Base::contains;
 		using Base::count;
 		using Base::emplace;
 		using Base::emplace_hint;
 		using Base::end;
+		using Base::rend;
 		using Base::erase;
 		using Base::extract;
 		using Base::find;
@@ -92,6 +94,18 @@ namespace Texpainter
 					return erase(i);
 				}
 			return i;
+		}
+
+		auto min() const
+		{
+			assert(std::size(*this) != 0);
+			return *begin();
+		}
+
+		auto max() const
+		{
+			assert(std::size(*this) != 0);
+			return *rbegin();
 		}
 	};
 }

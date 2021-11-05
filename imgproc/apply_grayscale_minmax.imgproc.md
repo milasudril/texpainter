@@ -37,7 +37,7 @@ __Source code:__
 auto createMultiset(std::span<float const> mask)
 {
 	auto const n = std::ranges::count_if(mask, [](auto val) { return val >= 0.5f; });
-	return Texpainter::PreallocatedMultiset<float>{static_cast<size_t>(n)};
+	return Texpainter::PreallocatedMultiset<float>{2*static_cast<size_t>(n)};
 }
 
 struct BoundingBox
@@ -66,7 +66,7 @@ auto computeYmax(Texpainter::Span2d<float const> mask)
 	{
 		for(uint32_t x = 0; x != mask.width(); ++x)
 		{
-			if(mask(x, y - 1) >= 0.5f) { return y - 1; }
+			if(mask(x, y - 1) >= 0.5f) { return y; }
 		}
 	}
 	return 0u;
@@ -90,7 +90,7 @@ auto computeXmax(Texpainter::Span2d<float const> mask)
 	{
 		for(uint32_t y = 0; y != mask.height(); ++y)
 		{
-			if(mask(x - 1, y) >= 0.5f) { return x - 1; }
+			if(mask(x - 1, y) >= 0.5f) { return x; }
 		}
 	}
 	return 0u;
@@ -101,14 +101,113 @@ auto computeBoundingBox(Texpainter::Span2d<float const> mask)
 	return BoundingBox{computeYmin(mask), computeYmax(mask), computeXmin(mask), computeXmax(mask)};
 }
 
-void main(auto const& args, auto const&)
+struct MaskOrigin
 {
-	auto const size = args.canvasSize();
-	auto const pixel_count = area(args.canvasSize());
-	auto sorted_vals       = createMultiset(std::span{input<1>(args), pixel_count});
-	auto bb = computeBoundingBox(Texpainter::Span2d{input<1>(args), size});
+	int32_t x;
+	int32_t y;
+};
 
-	printf("(%u, %u) (%u, %u)\n", bb.x_min, bb.y_min, bb.x_max, bb.y_max);
+void eraseCol(Texpainter::PreallocatedMultiset<float>& set,
+	MaskOrigin origin,
+	Texpainter::Span2d<float const> source,
+	float const*,
+	BoundingBox bb,
+	uint32_t mask_x)
+{
+	for(uint32_t mask_y = bb.y_min; mask_y != bb.y_max; ++mask_y)
+	{
+		auto const src_x = (origin.x + mask_x + source.width())%source.width();
+		auto const src_y = (origin.y + mask_y + source.height())%source.height();
+	//	auto const mask_val = mask[mask_y * source.width() + mask_x];
+	//	if(mask_val >= 0.5f)
+		{
+		//	auto const count_before = std::size(set);
+			set.erase_one(source(src_x, src_y));
+		/*	if(count_before == std::size(set))
+			{ fprintf(stderr, "Not erased: %u %u %.8e %zu\n", src_x, src_y, source(src_x, src_y), std::size(set)); }
+			else
+			{
+				printf("Erased: %u %u %.8e %zu\n", src_x, src_y, source(src_x, src_y), std::size(set));
+			}*/
+		}
+	}
+}
+
+void insertCol(Texpainter::PreallocatedMultiset<float>& set,
+	MaskOrigin origin,
+	Texpainter::Span2d<float const> source,
+	float const* mask,
+	BoundingBox bb,
+	uint32_t mask_x)
+{
+	for(uint32_t mask_y = bb.y_min; mask_y != bb.y_max; ++mask_y)
+	{
+		auto const src_x = (origin.x + mask_x + source.width())%source.width();
+		auto const src_y = (origin.y + mask_y + source.height())%source.height();
+		auto const mask_val = mask[mask_y * source.width() + mask_x];
+		if(mask_val >= 0.5f)
+		{
+		//	printf("Insert: %u %u %.8e %zu\n", src_x, src_y, source(src_x, src_y), std::size(set) + 1);
+		//	fflush(stdout);
+			set.insert(source(src_x, src_y));
+		}
+	}
+}
+
+void fill(Texpainter::PreallocatedMultiset<float>& set,
+		  MaskOrigin origin,
+          Texpainter::Span2d<float const> source,
+          float const* mask,
+          BoundingBox bb)
+{
+	for(uint32_t mask_y = bb.y_min; mask_y != bb.y_max; ++mask_y)
+	{
+		for(uint32_t mask_x = bb.x_min; mask_x != bb.x_max; ++mask_x)
+		{
+			auto const src_x = (origin.x + mask_x + source.width())%source.width();
+			auto const src_y = (origin.y + mask_y + source.height())%source.height();
+			auto const mask_val = mask[mask_y * source.width() + mask_x];
+			if(mask_val >= 0.5f)
+			{
+		//	printf("Insert: %u %u %.8e %zu\n", src_x, src_y, source(src_x, src_y), std::size(set) + 1);
+		//	fflush(stdout);
+			set.insert(source(src_x, src_y));
+			}
+		}
+	}
+}
+
+void main(auto const& args, auto const& params)
+{
+	auto const pixel_count = area(args.canvasSize());
+	std::ranges::fill(std::span{output<0>(args), pixel_count}, 0.0f);
+
+	auto sorted_vals       = createMultiset(std::span{input<1>(args), pixel_count});
+	auto const size        = args.canvasSize();
+	auto const bb          = computeBoundingBox(Texpainter::Span2d{input<1>(args), size});
+
+	auto const rx = static_cast<int32_t>(size.width())/2;
+	auto const ry = static_cast<int32_t>(size.height())/2;
+	auto const source = Texpainter::Span2d{input<0>(args), size};
+	auto const mask = input<1>(args);
+	auto const minmax = param<Str{"Minmax"}>(params).value();
+
+	for(uint32_t y = 0; y != size.height(); ++y)
+	{
+		fill(sorted_vals, MaskOrigin{-rx, static_cast<int>(y) - ry}, source, mask, bb);
+		output<0>(args, 0, y) = std::lerp(sorted_vals.min(), sorted_vals.max(), minmax);
+		auto x_prev = 0;
+		for(uint32_t x = 1; x != size.width(); ++x)
+		{
+			auto const count_before = std::size(sorted_vals);
+			eraseCol(sorted_vals, MaskOrigin{x_prev - rx, static_cast<int32_t>(y) - ry}, source, mask, bb, bb.x_min);
+			insertCol(sorted_vals, MaskOrigin{static_cast<int32_t>(x) - rx, static_cast<int32_t>(y) - ry}, source, mask, bb, bb.x_max - 1);
+			printf("%u %u %zu %zu\n", x, y, count_before, std::size(sorted_vals));
+			output<0>(args, x, y) = std::lerp(sorted_vals.min(), sorted_vals.max(), minmax);
+			x_prev = x;
+		}
+		sorted_vals.clear();
+	}
 }
 ```
 
