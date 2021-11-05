@@ -110,7 +110,7 @@ struct MaskOrigin
 void eraseCol(Texpainter::PreallocatedMultiset<float>& set,
 	MaskOrigin origin,
 	Texpainter::Span2d<float const> source,
-	float const*,
+	float const* mask,
 	BoundingBox bb,
 	uint32_t mask_x)
 {
@@ -118,8 +118,8 @@ void eraseCol(Texpainter::PreallocatedMultiset<float>& set,
 	{
 		auto const src_x = (origin.x + mask_x + source.width())%source.width();
 		auto const src_y = (origin.y + mask_y + source.height())%source.height();
-	//	auto const mask_val = mask[mask_y * source.width() + mask_x];
-	//	if(mask_val >= 0.5f)
+		auto const mask_val = mask[mask_y * source.width() + mask_x];
+		if(mask_val >= 0.5f)
 		{
 		//	auto const count_before = std::size(set);
 			set.erase_one(source(src_x, src_y));
