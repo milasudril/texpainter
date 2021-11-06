@@ -123,7 +123,7 @@ struct Delta
 inline auto computeDelta(Texpainter::Span2d<int8_t const> mask)
 {
 	std::vector<Delta> deltas;
-	deltas.reserve(mask.height() * (mask.width() + 1));
+	deltas.reserve(2*(mask.height() + mask.width()));
 	for(auto y = 0u; y != mask.height(); ++y)
 	{
 		if(auto val = -mask(0u, y); val != 0)
