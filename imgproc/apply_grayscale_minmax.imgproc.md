@@ -130,16 +130,19 @@ void main(auto const& args)
 	{
 		for(auto x = 0u; x != w; ++x)
 		{
-			sorted_vals.clear();
+			sorted_vals.erase_one(input<0>(
+						args, (x + w - w_m / 2 - 1) % w, (y + h - h_m / 2 - 1) % h));
 			for(auto y_m = 0u; y_m != h_m; ++y_m)
 			{
-				for(auto x_m = 0u; x_m != w_m; ++x_m)
+
+				sorted_vals.erase_one(input<0>(
+						    args, (x + w - w_m / 2 - 1) % w, (y + y_m + h - h_m / 2) % h));
+
+				auto const ins_col = w_m - 1;
+				if(mask.first(ins_col, y_m) == 1)
 				{
-					if(mask.first(x_m, y_m) == 1)
-					{
-						sorted_vals.insert(input<0>(
-						    args, (x + x_m + w - w_m / 2) % w, (y + y_m + h - h_m / 2) % h));
-					}
+					sorted_vals.insert(input<0>(
+								args, (x + ins_col + w - w_m / 2) % w, (y + y_m + h - h_m / 2) % h));
 				}
 			}
 			output<0>(args, x, y) = *std::begin(sorted_vals);
