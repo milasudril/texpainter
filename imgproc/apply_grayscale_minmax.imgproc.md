@@ -14,7 +14,7 @@ __Output:__ (Grayscale image) The filtered image
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include "utils/span_2d.hpp"
@@ -23,7 +23,7 @@ __Includes:__
 #include <algorithm>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 struct BoundingBox
@@ -34,63 +34,67 @@ struct BoundingBox
 	uint32_t x_max;
 };
 
-auto computeYmin(Texpainter::Span2d<float const> mask)
+inline auto computeYmin(Texpainter::Span2d<float const> mask, float threshold)
 {
 	for(uint32_t y = 0; y != mask.height(); ++y)
 	{
 		for(uint32_t x = 0; x != mask.width(); ++x)
 		{
-			if(mask(x, y) >= 0.5f) { return y; }
+			if(mask(x, y) >= threshold) { return y; }
 		}
 	}
 	return mask.height();
 }
 
-auto computeYmax(Texpainter::Span2d<float const> mask)
+inline auto computeYmax(Texpainter::Span2d<float const> mask, float threshold)
 {
 	for(uint32_t y = mask.height(); y != 0; --y)
 	{
 		for(uint32_t x = 0; x != mask.width(); ++x)
 		{
-			if(mask(x, y - 1) >= 0.5f) { return y; }
+			if(mask(x, y - 1) >= threshold) { return y; }
 		}
 	}
 	return 0u;
 }
 
-auto computeXmin(Texpainter::Span2d<float const> mask)
+inline auto computeXmin(Texpainter::Span2d<float const> mask, float threshold)
 {
 	for(uint32_t x = 0; x != mask.width(); ++x)
 	{
 		for(uint32_t y = 0; y != mask.height(); ++y)
 		{
-			if(mask(x, y) >= 0.5f) { return x; }
+			if(mask(x, y) >= threshold) { return x; }
 		}
 	}
 	return mask.width();
 }
 
-auto computeXmax(Texpainter::Span2d<float const> mask)
+inline auto computeXmax(Texpainter::Span2d<float const> mask, float threshold)
 {
 	for(uint32_t x = mask.width(); x != 0; --x)
 	{
 		for(uint32_t y = 0; y != mask.height(); ++y)
 		{
-			if(mask(x - 1, y) >= 0.5f) { return x; }
+			if(mask(x - 1, y) >= threshold) { return x; }
 		}
 	}
 	return 0u;
 }
 
-auto computeBoundingBox(Texpainter::Span2d<float const> mask)
+inline auto computeBoundingBox(Texpainter::Span2d<float const> mask, float threshold)
 {
-	return BoundingBox{computeYmin(mask), computeYmax(mask), computeXmin(mask), computeXmax(mask)};
+	return BoundingBox{computeYmin(mask, threshold),
+	                   computeYmax(mask, threshold),
+	                   computeXmin(mask, threshold),
+	                   computeXmax(mask, threshold)};
 }
 
 using Mask = Texpainter::PixelStore::Image<char>;
 
-auto crop(Texpainter::Span2d<float const> img, BoundingBox bb)
+inline auto crop(Texpainter::Span2d<float const> img, float threshold)
 {
+	auto const bb     = computeBoundingBox(img, threshold);
 	auto const width  = bb.x_max - bb.x_min;
 	auto const height = bb.y_max - bb.y_min;
 	Mask ret{width, height};
@@ -99,8 +103,8 @@ auto crop(Texpainter::Span2d<float const> img, BoundingBox bb)
 	{
 		for(auto x = bb.x_min; x != bb.x_max; ++x)
 		{
-			N += static_cast<size_t>(img(x, y) >= 0.5f);
-			ret(x - bb.x_min, y - bb.y_min) = img(x, y) >= 0.5f ? 1 : 0;
+			N += static_cast<size_t>(img(x, y) >= threshold);
+			ret(x - bb.x_min, y - bb.y_min) = img(x, y) >= threshold ? 1 : 0;
 		}
 	}
 
@@ -109,13 +113,12 @@ auto crop(Texpainter::Span2d<float const> img, BoundingBox bb)
 
 void main(auto const& args)
 {
-	auto const size    = args.canvasSize();
-	auto const mask_bb = computeBoundingBox(Texpainter::Span2d{input<1>(args), size});
-	auto const mask    = crop(Texpainter::Span2d{input<1>(args), size}, mask_bb);
-	auto const w       = size.width();
-	auto const h       = size.height();
-	auto const w_m     = mask.first.width();
-	auto const h_m     = mask.first.height();
+	auto const size = args.canvasSize();
+	auto const mask = crop(Texpainter::Span2d{input<1>(args), size}, 0.5f);
+	auto const w    = size.width();
+	auto const h    = size.height();
+	auto const w_m  = mask.first.width();
+	auto const h_m  = mask.first.height();
 
 	auto const masked_pixels = std::make_unique<float[]>(mask.second);
 
@@ -136,7 +139,7 @@ void main(auto const& args)
 					}
 				}
 			}
-			auto const m = masked_pixels.get() + mask.second / 2;
+			auto const m = masked_pixels.get();  //+ mask.second / 2;
 			std::nth_element(masked_pixels.get(), m, masked_pixels_end);
 			output<0>(args, x, y) = *m;
 		}
