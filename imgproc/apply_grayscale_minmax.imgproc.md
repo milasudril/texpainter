@@ -92,7 +92,7 @@ inline auto computeBoundingBox(Texpainter::Span2d<float const> mask, float thres
 	                   computeXmax(mask, threshold)};
 }
 
-using Mask = Texpainter::PixelStore::Image<char>;
+using Mask = Texpainter::PixelStore::Image<int8_t>;
 
 inline auto crop(Texpainter::Span2d<float const> img, float threshold)
 {
@@ -113,15 +113,41 @@ inline auto crop(Texpainter::Span2d<float const> img, float threshold)
 	return std::pair{std::move(ret), N};
 }
 
+struct Delta
+{
+	uint16_t x;
+	uint16_t y;
+	int32_t sign;
+};
+
+inline auto computeDelta(Texpainter::Span2d<int8_t const> mask)
+{
+	std::vector<Delta> deltas;
+	deltas.reserve(mask.height() * (mask.width() + 1));
+	for(auto y = 0u; y != mask.height(); ++y)
+	{
+		if(auto val = -mask(0u, y); val != 0)
+		{ deltas.push_back(Delta{0u, static_cast<uint16_t>(y), val}); }
+
+		for(auto x = 1u; x != mask.width(); ++x)
+		{
+			if(auto val = mask(x, y) - mask(0, y); val != 0)
+			{ deltas.push_back(Delta{static_cast<uint16_t>(x), static_cast<uint16_t>(y), val}); }
+		}
+	}
+	return deltas;
+}
+
 void main(auto const& args)
 {
-	auto const size = args.canvasSize();
-	auto const start_time  = std::chrono::steady_clock::now();
-	auto const mask = crop(Texpainter::Span2d{input<1>(args), size}, 0.5f);
-	auto const w    = size.width();
-	auto const h    = size.height();
-	auto const w_m  = mask.first.width();
-	auto const h_m  = mask.first.height();
+	auto const size       = args.canvasSize();
+	auto const start_time = std::chrono::steady_clock::now();
+	auto const mask       = crop(Texpainter::Span2d{input<1>(args), size}, 0.5f);
+	auto const mask_delta = computeDelta(mask.first.pixels());
+	auto const w          = size.width();
+	auto const h          = size.height();
+	auto const w_m        = mask.first.width();
+	auto const h_m        = mask.first.height();
 
 	Texpainter::PreallocatedMultiset<float> sorted_vals{mask.second};
 	printf("Init %zu\n", (std::chrono::steady_clock::now() - start_time).count());
@@ -130,19 +156,19 @@ void main(auto const& args)
 	{
 		for(auto x = 0u; x != w; ++x)
 		{
-			sorted_vals.erase_one(input<0>(
-						args, (x + w - w_m / 2 - 1) % w, (y + h - h_m / 2 - 1) % h));
+			sorted_vals.erase_one(
+			    input<0>(args, (x + w - w_m / 2 - 1) % w, (y + h - h_m / 2 - 1) % h));
 			for(auto y_m = 0u; y_m != h_m; ++y_m)
 			{
 
-				sorted_vals.erase_one(input<0>(
-						    args, (x + w - w_m / 2 - 1) % w, (y + y_m + h - h_m / 2) % h));
+				sorted_vals.erase_one(
+				    input<0>(args, (x + w - w_m / 2 - 1) % w, (y + y_m + h - h_m / 2) % h));
 
 				auto const ins_col = w_m - 1;
 				if(mask.first(ins_col, y_m) == 1)
 				{
 					sorted_vals.insert(input<0>(
-								args, (x + ins_col + w - w_m / 2) % w, (y + y_m + h - h_m / 2) % h));
+					    args, (x + ins_col + w - w_m / 2) % w, (y + y_m + h - h_m / 2) % h));
 				}
 			}
 			output<0>(args, x, y) = *std::begin(sorted_vals);
