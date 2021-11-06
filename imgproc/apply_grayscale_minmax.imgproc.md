@@ -19,6 +19,7 @@ __Includes:__
 ```c++
 #include "pixel_store/image.hpp"
 #include "utils/span_2d.hpp"
+#include "utils/preallocated_multiset.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -122,28 +123,26 @@ void main(auto const& args)
 	auto const w_m  = mask.first.width();
 	auto const h_m  = mask.first.height();
 
-	auto const masked_pixels = std::make_unique<float[]>(mask.second);
+	Texpainter::PreallocatedMultiset<float> sorted_vals{mask.second};
 	printf("Init %zu\n", (std::chrono::steady_clock::now() - start_time).count());
+
 	for(auto y = 0u; y != h; ++y)
 	{
 		for(auto x = 0u; x != w; ++x)
 		{
-			auto masked_pixels_end = masked_pixels.get();
+			sorted_vals.clear();
 			for(auto y_m = 0u; y_m != h_m; ++y_m)
 			{
 				for(auto x_m = 0u; x_m != w_m; ++x_m)
 				{
 					if(mask.first(x_m, y_m) == 1)
 					{
-						*masked_pixels_end = input<0>(
-						    args, (x + x_m + w - w_m / 2) % w, (y + y_m + h - h_m / 2) % h);
-						++masked_pixels_end;
+						sorted_vals.insert(input<0>(
+						    args, (x + x_m + w - w_m / 2) % w, (y + y_m + h - h_m / 2) % h));
 					}
 				}
 			}
-			auto const m = masked_pixels.get();  //+ mask.second / 2;
-			std::nth_element(masked_pixels.get(), m, masked_pixels_end);
-			output<0>(args, x, y) = *m;
+			output<0>(args, x, y) = *std::begin(sorted_vals);
 		}
 	}
 	printf("Render %zu\n", (std::chrono::steady_clock::now() - start_time).count());
