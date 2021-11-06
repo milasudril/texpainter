@@ -17,10 +17,11 @@ __Output:__ (Grayscale image) The filtered image
 __Includes:__
 
 ```c++
-#include "utils/span_2d.hpp"
 #include "pixel_store/image.hpp"
+#include "utils/span_2d.hpp"
 
 #include <algorithm>
+#include <chrono>
 ```
 
 __Source code:__
@@ -114,6 +115,7 @@ inline auto crop(Texpainter::Span2d<float const> img, float threshold)
 void main(auto const& args)
 {
 	auto const size = args.canvasSize();
+	auto const start_time  = std::chrono::steady_clock::now();
 	auto const mask = crop(Texpainter::Span2d{input<1>(args), size}, 0.5f);
 	auto const w    = size.width();
 	auto const h    = size.height();
@@ -121,7 +123,7 @@ void main(auto const& args)
 	auto const h_m  = mask.first.height();
 
 	auto const masked_pixels = std::make_unique<float[]>(mask.second);
-
+	printf("Init %zu\n", (std::chrono::steady_clock::now() - start_time).count());
 	for(auto y = 0u; y != h; ++y)
 	{
 		for(auto x = 0u; x != w; ++x)
@@ -144,6 +146,7 @@ void main(auto const& args)
 			output<0>(args, x, y) = *m;
 		}
 	}
+	printf("Render %zu\n", (std::chrono::steady_clock::now() - start_time).count());
 }
 ```
 
