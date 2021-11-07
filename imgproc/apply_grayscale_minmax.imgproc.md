@@ -14,7 +14,7 @@ __Output:__ (Grayscale image) The filtered image
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include "pixel_store/image.hpp"
@@ -25,7 +25,7 @@ __Includes:__
 #include <chrono>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 struct BoundingBox
@@ -123,18 +123,33 @@ struct Delta
 inline auto computeDelta(Texpainter::Span2d<int8_t const> mask)
 {
 	std::vector<Delta> deltas;
-	deltas.reserve(2*(mask.height() + mask.width()));
+	deltas.reserve(2 * (mask.height() + mask.width()));
+	auto sum = 0;
 	for(auto y = 0u; y != mask.height(); ++y)
 	{
 		if(auto val = -mask(0u, y); val != 0)
-		{ deltas.push_back(Delta{0u, static_cast<uint16_t>(y), val}); }
+		{
+			deltas.push_back(Delta{0u, static_cast<uint16_t>(y), val});
+			--sum;
+		}
 
 		for(auto x = 1u; x != mask.width(); ++x)
 		{
-			if(auto val = mask(x, y) - mask(0, y); val != 0)
-			{ deltas.push_back(Delta{static_cast<uint16_t>(x), static_cast<uint16_t>(y), val}); }
+			if(auto val = mask(x - 1, y) - mask(x, y); val != 0)
+			{
+				deltas.push_back(Delta{static_cast<uint16_t>(x), static_cast<uint16_t>(y), val});
+				sum += val;
+			}
+		}
+
+		if(auto val = mask(mask.width() - 1, y); val != 0)
+		{
+			deltas.push_back(
+			    Delta{static_cast<uint16_t>(mask.width()), static_cast<uint16_t>(y), val});
+			++sum;
 		}
 	}
+	assert(sum == 0);
 	return deltas;
 }
 
@@ -154,23 +169,31 @@ void main(auto const& args)
 
 	for(auto y = 0u; y != h; ++y)
 	{
+		sorted_vals.clear();
+		/*	for(auto x = 0u; x != w; ++x)
+		{
+			sorted_vals.erase_one(input<0>(args, x, (y + h - h_m / 2 - 1) % h));
+		}*/
+
+		//	printf("Erased %u\n", y);
 		for(auto x = 0u; x != w; ++x)
 		{
-			sorted_vals.erase_one(
-			    input<0>(args, (x + w - w_m / 2 - 1) % w, (y + h - h_m / 2 - 1) % h));
-			for(auto y_m = 0u; y_m != h_m; ++y_m)
-			{
-
-				sorted_vals.erase_one(
-				    input<0>(args, (x + w - w_m / 2 - 1) % w, (y + y_m + h - h_m / 2) % h));
-
-				auto const ins_col = w_m - 1;
-				if(mask.first(ins_col, y_m) == 1)
-				{
-					sorted_vals.insert(input<0>(
-					    args, (x + ins_col + w - w_m / 2) % w, (y + y_m + h - h_m / 2) % h));
-				}
-			}
+			std::ranges::for_each(
+			    mask_delta, [x, y, &args, w, h, w_m, h_m, &sorted_vals](auto item) {
+				    auto const x_m = item.x;
+				    auto const y_m = item.y;
+				    if(item.sign < 0)
+				    {
+					    sorted_vals.erase_one(input<0>(
+					        args, (x + w + x_m - w_m / 2) % w, (y + h + y_m - h_m / 2) % h));
+				    }
+				    else
+				    {
+					    sorted_vals.insert(input<0>(
+					        args, (x + w + x_m - w_m / 2) % w, (y + h + y_m - h_m / 2) % h));
+				    }
+			    });
+			//	printf("%u %u %zu\n", x, y, std::size(sorted_vals));
 			output<0>(args, x, y) = *std::begin(sorted_vals);
 		}
 	}
