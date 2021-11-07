@@ -14,7 +14,7 @@ __Output:__ (Grayscale image) The filtered image
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include "pixel_store/image.hpp"
@@ -25,7 +25,7 @@ __Includes:__
 #include <chrono>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 struct BoundingBox
@@ -120,10 +120,10 @@ struct Delta
 	int32_t sign;
 };
 
-inline auto computeDelta(Texpainter::Span2d<int8_t const> mask)
+inline auto computeDeltaCol(Texpainter::Span2d<int8_t const> mask)
 {
 	std::vector<Delta> deltas;
-	deltas.reserve(2 * (mask.height() + mask.width()));
+	deltas.reserve(2 * (mask.height() + mask.width() + 1));
 	auto sum = 0;
 	for(auto y = 0u; y != mask.height(); ++y)
 	{
@@ -153,12 +153,93 @@ inline auto computeDelta(Texpainter::Span2d<int8_t const> mask)
 	return deltas;
 }
 
+inline auto computeDeltaRow(Texpainter::Span2d<int8_t const> mask)
+{
+	std::vector<Delta> deltas;
+	deltas.reserve(2 * (mask.height() + mask.width() + 2));
+	auto sum = 0;
+	for(auto x = 0u; x != mask.width(); ++x)
+	{
+		if(auto val = -mask(x, 0u))
+		{
+			deltas.push_back(Delta{static_cast<uint16_t>(x), 0u, val});
+			printf("- ");
+			--sum;
+		}
+		else
+		{
+			printf(". ");
+		}
+	}
+	printf("\n");
+
+	for(auto y = 1u; y != mask.height(); ++y)
+	{
+		if(auto val = -mask(0u, y); val != 0)
+		{
+			deltas.push_back(Delta{0u, static_cast<uint16_t>(y), val});
+			printf("- ");
+			--sum;
+		}
+		else
+		{
+			printf(". ");
+		}
+
+
+		for(auto x = 1u; x != mask.width(); ++x)
+		{
+			if(auto val = mask(x - 1, y - 1) - mask(x, y); val != 0)
+			{
+				deltas.push_back(Delta{static_cast<uint16_t>(x), static_cast<uint16_t>(y), val});
+				printf("%c ", val < 0 ? '-' : '+');
+				sum += val;
+			}
+			else
+			{
+				printf(". ");
+			}
+		}
+
+		if(auto val = mask(mask.width() - 1, y); val != 0)
+		{
+			deltas.push_back(
+			    Delta{static_cast<uint16_t>(mask.width()), static_cast<uint16_t>(y), val});
+			printf("+ ");
+			++sum;
+		}
+		else
+		{
+			printf(". ");
+		}
+		printf("\n");
+	}
+
+	for(auto x = 0u; x != mask.width(); ++x)
+	{
+		if(auto val = mask(x, mask.height() - 1))
+		{
+			deltas.push_back(Delta{static_cast<uint16_t>(x), static_cast<uint16_t>(mask.height() - 1), val});
+			printf("+ ");
+			++sum;
+		}
+		else
+		{
+			printf(". ");
+		}
+	}
+	printf("\n");
+	assert(sum == 0);
+	return deltas;
+}
+
 void main(auto const& args)
 {
 	auto const size       = args.canvasSize();
 	auto const start_time = std::chrono::steady_clock::now();
 	auto const mask       = crop(Texpainter::Span2d{input<1>(args), size}, 0.5f);
-	auto const mask_delta = computeDelta(mask.first.pixels());
+	auto const mask_delta_col = computeDeltaCol(mask.first.pixels());
+	auto const mask_delta_row = computeDeltaRow(mask.first.pixels());
 	auto const w          = size.width();
 	auto const h          = size.height();
 	auto const w_m        = mask.first.width();
@@ -179,7 +260,7 @@ void main(auto const& args)
 		for(auto x = 0u; x != w; ++x)
 		{
 			std::ranges::for_each(
-			    mask_delta, [x, y, &args, w, h, w_m, h_m, &sorted_vals](auto item) {
+			    mask_delta_col, [x, y, &args, w, h, w_m, h_m, &sorted_vals](auto item) {
 				    auto const x_m = item.x;
 				    auto const y_m = item.y;
 				    if(item.sign < 0)
