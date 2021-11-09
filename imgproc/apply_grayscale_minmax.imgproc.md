@@ -14,7 +14,7 @@ __Output:__ (Grayscale image) The filtered image
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include "pixel_store/image.hpp"
@@ -25,7 +25,7 @@ __Includes:__
 #include <chrono>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 struct BoundingBox
@@ -99,7 +99,8 @@ inline auto crop(Texpainter::Span2d<float const> img, float threshold)
 	auto const bb     = computeBoundingBox(img, threshold);
 	auto const width  = bb.x_max - bb.x_min;
 	auto const height = bb.y_max - bb.y_min;
-	Mask ret{width, height};
+	Mask ret{width + 1, height + 1};
+	std::ranges::fill(ret.pixels(), 0);
 	size_t N = 0;
 	for(auto y = bb.y_min; y != bb.y_max; ++y)
 	{
@@ -125,12 +126,12 @@ inline auto computeDeltaCol(Texpainter::Span2d<int8_t const> mask)
 	std::vector<Delta> deltas;
 	deltas.reserve(2 * (mask.height() + mask.width() + 1));
 	auto sum = 0;
-	for(auto y = 0u; y != mask.height(); ++y)
+	for(auto y = 0u; y != mask.height() - 1; ++y)
 	{
-		if(auto val = -mask(0u, y); val != 0)
+		if(auto val = -mask(0, y); val != 0)
 		{
 			deltas.push_back(Delta{0u, static_cast<uint16_t>(y), val});
-			--sum;
+			sum += val;
 		}
 
 		for(auto x = 1u; x != mask.width(); ++x)
@@ -140,13 +141,6 @@ inline auto computeDeltaCol(Texpainter::Span2d<int8_t const> mask)
 				deltas.push_back(Delta{static_cast<uint16_t>(x), static_cast<uint16_t>(y), val});
 				sum += val;
 			}
-		}
-
-		if(auto val = mask(mask.width() - 1, y); val != 0)
-		{
-			deltas.push_back(
-			    Delta{static_cast<uint16_t>(mask.width()), static_cast<uint16_t>(y), val});
-			++sum;
 		}
 	}
 	assert(sum == 0);
@@ -219,7 +213,8 @@ inline auto computeDeltaRow(Texpainter::Span2d<int8_t const> mask)
 	{
 		if(auto val = mask(x, mask.height() - 1))
 		{
-			deltas.push_back(Delta{static_cast<uint16_t>(x), static_cast<uint16_t>(mask.height() - 1), val});
+			deltas.push_back(
+			    Delta{static_cast<uint16_t>(x), static_cast<uint16_t>(mask.height() - 1), val});
 			printf("+ ");
 			++sum;
 		}
@@ -235,15 +230,15 @@ inline auto computeDeltaRow(Texpainter::Span2d<int8_t const> mask)
 
 void main(auto const& args)
 {
-	auto const size       = args.canvasSize();
-	auto const start_time = std::chrono::steady_clock::now();
-	auto const mask       = crop(Texpainter::Span2d{input<1>(args), size}, 0.5f);
+	auto const size           = args.canvasSize();
+	auto const start_time     = std::chrono::steady_clock::now();
+	auto const mask           = crop(Texpainter::Span2d{input<1>(args), size}, 0.5f);
 	auto const mask_delta_col = computeDeltaCol(mask.first.pixels());
 	auto const mask_delta_row = computeDeltaRow(mask.first.pixels());
-	auto const w          = size.width();
-	auto const h          = size.height();
-	auto const w_m        = mask.first.width();
-	auto const h_m        = mask.first.height();
+	auto const w              = size.width();
+	auto const h              = size.height();
+	auto const w_m            = mask.first.width();
+	auto const h_m            = mask.first.height();
 
 	Texpainter::PreallocatedMultiset<float> sorted_vals{mask.second};
 	printf("Init %zu\n", (std::chrono::steady_clock::now() - start_time).count());
