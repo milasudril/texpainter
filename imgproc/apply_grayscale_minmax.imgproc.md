@@ -14,7 +14,7 @@ __Output:__ (Grayscale image) The filtered image
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include "pixel_store/image.hpp"
@@ -25,7 +25,7 @@ __Includes:__
 #include <chrono>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 struct BoundingBox
@@ -150,80 +150,52 @@ inline auto computeDeltaCol(Texpainter::Span2d<int8_t const> mask)
 inline auto computeDeltaRow(Texpainter::Span2d<int8_t const> mask)
 {
 	std::vector<Delta> deltas;
-	deltas.reserve(2 * (mask.height() + mask.width() + 2));
+	deltas.reserve(2 * (mask.height() + mask.width() + 1));
+
 	auto sum = 0;
 	for(auto x = 0u; x != mask.width(); ++x)
 	{
-		if(auto val = -mask(x, 0u))
+		if(auto val = - mask(x, 0); val != 0)
 		{
-			deltas.push_back(Delta{static_cast<uint16_t>(x), 0u, val});
-			printf("- ");
-			--sum;
+			deltas.push_back(Delta{static_cast<uint16_t>(x), static_cast<uint16_t>(0), val});
+			sum += val;
+			printf("%c ", val < 0? '-': '+');
 		}
 		else
 		{
-			printf(". ");
+			printf("0 ");
 		}
 	}
 	printf("\n");
 
 	for(auto y = 1u; y != mask.height(); ++y)
 	{
-		if(auto val = -mask(0u, y); val != 0)
+		if(auto val = -mask(0, y); val != 0)
 		{
 			deltas.push_back(Delta{0u, static_cast<uint16_t>(y), val});
+			sum += val;
 			printf("- ");
-			--sum;
 		}
 		else
 		{
-			printf(". ");
+			printf("o ");
 		}
-
 
 		for(auto x = 1u; x != mask.width(); ++x)
 		{
 			if(auto val = mask(x - 1, y - 1) - mask(x, y); val != 0)
 			{
 				deltas.push_back(Delta{static_cast<uint16_t>(x), static_cast<uint16_t>(y), val});
-				printf("%c ", val < 0 ? '-' : '+');
 				sum += val;
+				printf("%c ", val < 0? '-': '+');
 			}
 			else
 			{
 				printf(". ");
 			}
 		}
-
-		if(auto val = mask(mask.width() - 1, y); val != 0)
-		{
-			deltas.push_back(
-			    Delta{static_cast<uint16_t>(mask.width()), static_cast<uint16_t>(y), val});
-			printf("+ ");
-			++sum;
-		}
-		else
-		{
-			printf(". ");
-		}
 		printf("\n");
 	}
-
-	for(auto x = 0u; x != mask.width(); ++x)
-	{
-		if(auto val = mask(x, mask.height() - 1))
-		{
-			deltas.push_back(
-			    Delta{static_cast<uint16_t>(x), static_cast<uint16_t>(mask.height() - 1), val});
-			printf("+ ");
-			++sum;
-		}
-		else
-		{
-			printf(". ");
-		}
-	}
-	printf("\n");
 	assert(sum == 0);
 	return deltas;
 }
