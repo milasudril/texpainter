@@ -25,7 +25,7 @@ namespace Texpainter::RollingRankFilter
 		std::vector<Location> to_insert;
 	};
 
-	Delta genLineDelta(Span2d<int8_t const> src);
+	Delta genXDelta(Span2d<int8_t const> src);
 }
 
 #endif

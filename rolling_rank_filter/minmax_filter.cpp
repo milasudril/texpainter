@@ -6,7 +6,7 @@
 
 #include <vector>
 
-Texpainter::RollingRankFilter::Delta Texpainter::RollingRankFilter::genLineDelta(
+Texpainter::RollingRankFilter::Delta Texpainter::RollingRankFilter::genXDelta(
     Span2d<int8_t const> src)
 {
 	Delta ret;

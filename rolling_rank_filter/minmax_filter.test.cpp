@@ -10,7 +10,7 @@
 
 namespace Testcases
 {
-	void texpainterRollingRankFilterGenLineDeltaEllipse6By8()
+	void texpainterRollingRankFilterGenXDeltaEllipse6By8()
 	{
 		// clang-format off
 		constexpr std::array<int8_t, 63> mask{
@@ -25,10 +25,10 @@ namespace Testcases
 
 		auto const mask_span = Texpainter::Span2d<int8_t const>{std::data(mask), 9, 7};
 
-		auto line_deltas = Texpainter::RollingRankFilter::genLineDelta(mask_span);
+		auto x_deltas = Texpainter::RollingRankFilter::genXDelta(mask_span);
 
-		assert(std::size(line_deltas.to_erase) == 6);
-		assert(std::size(line_deltas.to_insert) == 6);
+		assert(std::size(x_deltas.to_erase) == 6);
+		assert(std::size(x_deltas.to_insert) == 6);
 
 		std::multiset<std::pair<uint32_t, uint32_t>> active_set;
 		for(uint32_t y = 0; y != mask_span.height() - 1; ++y)
@@ -40,14 +40,14 @@ namespace Testcases
 		}
 		assert(std::size(active_set) == 36);
 
-		std::ranges::for_each(line_deltas.to_erase, [&active_set](auto item) {
+		std::ranges::for_each(x_deltas.to_erase, [&active_set](auto item) {
 			auto i = active_set.find(std::pair{item.x, item.y});
 			assert(i != std::end(active_set));
 			active_set.erase(i);
 		});
-		assert(std::size(active_set) == 36 - std::size(line_deltas.to_erase));
+		assert(std::size(active_set) == 36 - std::size(x_deltas.to_erase));
 
-		std::ranges::for_each(line_deltas.to_insert, [&active_set](auto item) {
+		std::ranges::for_each(x_deltas.to_insert, [&active_set](auto item) {
 			active_set.insert(std::pair{item.x, item.y});
 		});
 
@@ -77,6 +77,6 @@ namespace Testcases
 
 int main()
 {
-	Testcases::texpainterRollingRankFilterGenLineDeltaEllipse6By8();
+	Testcases::texpainterRollingRankFilterGenXDeltaEllipse6By8();
 	return 0;
 }
