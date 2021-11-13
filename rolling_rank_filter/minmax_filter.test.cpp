@@ -5,6 +5,7 @@
 #include "./minmax_filter.hpp"
 
 #include <cassert>
+#include <numeric>
 
 namespace Testcases
 {
@@ -39,6 +40,12 @@ namespace Testcases
 		std::ranges::for_each(line_deltas, [&delta_mask](auto val) {
 			delta_mask(val.x, val.y) = static_cast<int8_t>(val.sign);
 		});
+
+		auto const sum = std::accumulate(std::begin(line_deltas),
+		                                 std::end(line_deltas),
+		                                 0,
+		                                 [](int32_t a, auto b) { return a + b.sign; });
+		assert(sum == 0);
 
 		// clang-format off
 		constexpr std::array<int8_t, 54> mask_res{
