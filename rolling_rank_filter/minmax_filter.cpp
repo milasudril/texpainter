@@ -22,12 +22,14 @@ void Texpainter::RollingRankFilter::minmaxFilter(Span2d<float const> src,
 	{
 		for(uint32_t x = 0; x != mask.width(); ++x)
 		{
-			auto const sample_x = (x + src.width() - mask.width() / 2) % src.width();
-			auto const sample_y = (y + src.height() - mask.height() / 2) % src.height();
-			sorted_vals.insert(src(sample_x, sample_y));
+			if(mask(x, y) != 0)
+			{
+				auto const sample_x = (x + src.width() - mask.width() / 2) % src.width();
+				auto const sample_y = (y + src.height() - mask.height() / 2) % src.height();
+				sorted_vals.insert(src(sample_x, sample_y));
+			}
 		}
 	}
-
 
 	for(uint32_t y = 0; y != src.height(); ++y)
 	{
