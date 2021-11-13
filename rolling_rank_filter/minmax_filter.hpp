@@ -13,14 +13,19 @@
 
 namespace Texpainter::RollingRankFilter
 {
-	struct Delta
+	struct Location
 	{
 		uint16_t x;
 		uint16_t y;
-		int32_t sign;
 	};
 
-	std::vector<Delta> genLineDelta(Span2d<int8_t const> src);
+	struct Delta
+	{
+		std::vector<Location> to_erase;
+		std::vector<Location> to_insert;
+	};
+
+	Delta genLineDelta(Span2d<int8_t const> src);
 }
 
 #endif
