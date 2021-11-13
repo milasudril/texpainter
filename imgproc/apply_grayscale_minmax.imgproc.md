@@ -200,6 +200,22 @@ inline auto computeDeltaRow(Texpainter::Span2d<int8_t const> mask)
 	return deltas;
 }
 
+struct SortedValsData
+{
+	SortedValsData(float val, uint32_t x, uint32_t y): m_val{val}, m_x{x}, m_y{y}{}
+
+	bool operator<(SortedValsData other) const
+	{
+		return m_val < other.m_val;
+	}
+
+	operator float() const { return m_val; }
+
+	float m_val;
+	uint32_t m_x;
+	uint32_t m_y;
+};
+
 void main(auto const& args)
 {
 	auto const size           = args.canvasSize();
@@ -209,14 +225,43 @@ void main(auto const& args)
 	auto const mask_delta_row = computeDeltaRow(mask.first.pixels());
 	auto const w              = size.width();
 	auto const h              = size.height();
-	auto const w_m            = mask.first.width();
-	auto const h_m            = mask.first.height();
+	auto const w_m            = mask.first.width() - 1;
+	auto const h_m            = mask.first.height() - 1;
 
-	Texpainter::PreallocatedMultiset<float> sorted_vals{mask.second};
+	Texpainter::PreallocatedMultiset<SortedValsData> sorted_vals{mask.second};
 	printf("Init %zu\n", (std::chrono::steady_clock::now() - start_time).count());
+
+	auto insert = [&sorted_vals, &args](uint32_t x, uint32_t y) {
+		printf("I (%u, %u) %zu\n", x, y, std::size(sorted_vals));
+		sorted_vals.insert(SortedValsData{input<0>(args, x, y), x, y});
+	};
+
+	auto erase = [&sorted_vals, &args](uint32_t x, uint32_t y) {
+		printf("E (%u, %u) %zu ", x, y, std::size(sorted_vals));
+		sorted_vals.erase_one(SortedValsData{input<0>(args, x, y), x, y});
+		printf("%zu\n", std::size(sorted_vals));
+	};
 
 	for(auto y = 0u; y != h; ++y)
 	{
+		printf("Before: %zu %u %u\n", std::size(sorted_vals), w_m, h_m);
+		std::ranges::for_each(sorted_vals, [](auto item) {
+			printf("%.9e (%u, %u)\n", item.m_val, item.m_x, item.m_y);
+		});
+		std::ranges::for_each(
+		mask_delta_row, [x = 0, y, w, h, w_m, h_m, insert, erase](auto item) {
+			auto const x_m = item.x - 1;
+			auto const y_m = item.y - 1;
+			if(item.sign < 0)
+			{
+				erase((x + w + x_m - w_m / 2) % w, (y + h + y_m - h_m / 2) % h);
+			}
+			else
+			{
+				insert((x + w + x_m - w_m / 2) % w, (y + h + y_m - h_m / 2) % h);
+			}
+		});
+		printf("After: %zu\n", std::size(sorted_vals));
 		sorted_vals.clear();
 		/*	for(auto x = 0u; x != w; ++x)
 		{
@@ -227,19 +272,17 @@ void main(auto const& args)
 		for(auto x = 0u; x != w; ++x)
 		{
 			std::ranges::for_each(
-			    mask_delta_col, [x, y, &args, w, h, w_m, h_m, &sorted_vals](auto item) {
-				    auto const x_m = item.x;
-				    auto const y_m = item.y;
-				    if(item.sign < 0)
-				    {
-					    sorted_vals.erase_one(input<0>(
-					        args, (x + w + x_m - w_m / 2) % w, (y + h + y_m - h_m / 2) % h));
-				    }
-				    else
-				    {
-					    sorted_vals.insert(input<0>(
-					        args, (x + w + x_m - w_m / 2) % w, (y + h + y_m - h_m / 2) % h));
-				    }
+			    mask_delta_col, [x, y, &args, w, h, w_m, h_m, insert, erase](auto item) {
+				    auto const x_m = item.x - 1;
+				    auto const y_m = item.y - 1;
+					if(item.sign < 0)
+					{
+						erase((x + w + x_m - w_m / 2) % w, (y + h + y_m - h_m / 2) % h);
+					}
+					else
+					{
+						insert((x + w + x_m - w_m / 2) % w, (y + h + y_m - h_m / 2) % h);
+					}
 			    });
 			//	printf("%u %u %zu\n", x, y, std::size(sorted_vals));
 			output<0>(args, x, y) = *std::begin(sorted_vals);
