@@ -93,6 +93,15 @@ namespace Texpainter
 				}
 			return i;
 		}
+
+		decltype(auto) front() const { return *std::begin(*this); }
+
+		decltype(auto) back() const
+		{
+			auto i = std::end(*this);
+			--i;
+			return *i;
+		}
 	};
 }
 
