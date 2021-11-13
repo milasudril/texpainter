@@ -31,6 +31,97 @@ namespace Testcases
 		assert(img(1, 1) == 4);
 		assert(img(2, 1) == 5);
 	}
+
+
+	void texpainterImageCropAllZeros()
+	{
+		constexpr std::array<float, 48> data{
+		    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+
+
+		Texpainter::PixelStore::Image const img{Texpainter::Span2d{data.data(), 8, 6}};
+		auto img_cropped = Texpainter::PixelStore::crop(
+		    img.pixels(), boundingBox(img.pixels(), [](auto val) { return val > 0.0f; }));
+		assert(img_cropped.width() == 1);
+		assert(img_cropped.height() == 1);
+		assert(img_cropped(0, 0) == 0.0f);
+	}
+
+	void texpainterImageCropDiagUp()
+	{
+		// clang-format off
+		constexpr std::array<float, 48> data{
+		    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+		    0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+		    0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		    0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
+		};
+		// clang-format on
+
+		Texpainter::PixelStore::Image const img{Texpainter::Span2d{data.data(), 8, 6}};
+		auto img_cropped = Texpainter::PixelStore::crop(
+		    img.pixels(), boundingBox(img.pixels(), [](auto val) { return val > 0.0f; }));
+
+		assert(img_cropped.width() == 5);
+		assert(img_cropped.height() == 4);
+
+		// clang-format off
+		constexpr std::array<float, 20> result{
+		    0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+		    0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+		    0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+		    1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		};
+		// clang-format on
+
+		assert(std::equal(
+		    img_cropped.pixels().data(), img_cropped.pixels().data() + 20, std::data(result)));
+	}
+
+	void texpainterImageCropDiagUpPadding()
+	{
+		// clang-format off
+		constexpr std::array<float, 48> data{
+		    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+		    0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+		    0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		    0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
+		};
+		// clang-format on
+
+		Texpainter::PixelStore::Image const img{Texpainter::Span2d{data.data(), 8, 6}};
+		auto img_cropped = Texpainter::PixelStore::crop(
+		    img.pixels(), boundingBox(img.pixels(), [](auto val) { return val > 0.0f; }), 2, 1);
+
+		assert(img_cropped.width() == 7);
+		assert(img_cropped.height() == 5);
+
+		// clang-format off
+		constexpr std::array<float, 35> result{
+		    0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+		    0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+		    0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		    1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
+		};
+		// clang-format on
+
+		assert(std::equal(
+		    img_cropped.pixels().data(), img_cropped.pixels().data() + 35, std::data(result)));
+	}
 }
 
-int main() { Testcases::texpainterImageCreateFromDataBlock(); }
+int main()
+{
+	Testcases::texpainterImageCreateFromDataBlock();
+	Testcases::texpainterImageCropAllZeros();
+	Testcases::texpainterImageCropDiagUp();
+	return 0;
+}

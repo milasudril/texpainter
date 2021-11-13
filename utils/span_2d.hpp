@@ -138,9 +138,9 @@ namespace Texpainter
 				if(pred(data(col, row)))
 				{
 					x_min = std::min(x_min, col);
-					x_max = std::max(x_max, col);
+					x_max = std::max(x_max, col + 1);
 					y_min = std::min(y_min, row);
-					y_max = std::max(y_max, row);
+					y_max = std::max(y_max, row + 1);
 				}
 			}
 		}

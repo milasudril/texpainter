@@ -20,44 +20,52 @@ namespace Testcases
 
 	void texpainterSpan2dBoundingBoxDiagUp()
 	{
+		// clang-format off
 		constexpr std::array<float, 48> data{
-		    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-		    0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-		    0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-		    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+		    0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+		    0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		    0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
 		};
+		// clang-format on
 
 		auto bb =
 		    boundingBox(Texpainter::Span2d{data.data(), 8, 6}, [](auto val) { return val > 0.0f; });
 
 		assert(bb.valid());
 		assert(bb.x_min == 1);
-		assert(bb.x_max == 5);
+		assert(bb.x_max == 6);
 		assert(bb.y_min == 1);
-		assert(bb.y_max == 4);
-		assert(bb.width() == 4);
-		assert(bb.height() == 3);
+		assert(bb.y_max == 5);
+		assert(bb.width() == 5);
+		assert(bb.height() == 4);
 	}
 
 	void texpainterSpan2dBoundingBoxDiagDown()
 	{
+		// clang-format off
 		constexpr std::array<float, 48> data{
-		    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-		    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-		    0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-		    0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		    0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		    0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		    0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+		    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
 		};
+		// clang-format off
 
 		auto bb =
 		    boundingBox(Texpainter::Span2d{data.data(), 8, 6}, [](auto val) { return val > 0.0f; });
 
 		assert(bb.valid());
 		assert(bb.x_min == 1);
-		assert(bb.x_max == 5);
+		assert(bb.x_max == 6);
 		assert(bb.y_min == 1);
-		assert(bb.y_max == 4);
-		assert(bb.width() == 4);
-		assert(bb.height() == 3);
+		assert(bb.y_max == 5);
+		assert(bb.width() == 5);
+		assert(bb.height() == 4);
 	}
 }
 
