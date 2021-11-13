@@ -26,6 +26,8 @@ namespace Texpainter::RollingRankFilter
 	};
 
 	Delta genXDelta(Span2d<int8_t const> src);
+
+	Delta genXYDelta(Span2d<int8_t const> src);
 }
 
 #endif
