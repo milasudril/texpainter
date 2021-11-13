@@ -25,9 +25,13 @@ namespace Texpainter::RollingRankFilter
 		std::vector<Location> to_insert;
 	};
 
+	PixelStore::Image<int8_t> quantize(Span2d<float const> src, float threshold = 0.5f);
+
 	Delta genXDelta(Span2d<int8_t const> src);
 
 	Delta genXYDelta(Span2d<int8_t const> src);
+
+
 }
 
 #endif

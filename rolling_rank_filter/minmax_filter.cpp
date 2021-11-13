@@ -5,6 +5,7 @@
 #include "./minmax_filter.hpp"
 
 #include <vector>
+#include <algorithm>
 
 Texpainter::RollingRankFilter::Delta Texpainter::RollingRankFilter::genXDelta(
     Span2d<int8_t const> src)
@@ -51,7 +52,10 @@ Texpainter::RollingRankFilter::Delta Texpainter::RollingRankFilter::genXYDelta(
 	for(uint32_t y = 1; y != src.height(); ++y)
 	{
 		if(auto const delta = -src(0, y - 1); delta != 0)
-		{ ret.to_erase.push_back(Location{static_cast<uint16_t>(0), static_cast<uint16_t>(y - 1)}); }
+		{
+			ret.to_erase.push_back(
+			    Location{static_cast<uint16_t>(0), static_cast<uint16_t>(y - 1)});
+		}
 
 		for(uint32_t x = 1; x != src.width(); ++x)
 		{
@@ -71,4 +75,12 @@ Texpainter::RollingRankFilter::Delta Texpainter::RollingRankFilter::genXYDelta(
 	return ret;
 }
 
-
+Texpainter::PixelStore::Image<int8_t> Texpainter::RollingRankFilter::quantize(
+    Span2d<float const> src, float threshold)
+{
+	PixelStore::Image<int8_t> ret{src.width(), src.height()};
+	std::ranges::transform(src, std::data(ret.pixels()), [threshold](auto val) -> int8_t {
+		return val >= threshold ? 1 : 0;
+	});
+	return ret;
+}
