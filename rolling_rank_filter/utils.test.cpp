@@ -1,8 +1,8 @@
 //@	{
-//@	 "targets":[{"name":"minmax_filter.test","type":"application", "autorun":1}]
+//@	 "targets":[{"name":"utils.test","type":"application", "autorun":1}]
 //@	}
 
-#include "./minmax_filter.hpp"
+#include "./utils.hpp"
 
 #include <cassert>
 #include <numeric>

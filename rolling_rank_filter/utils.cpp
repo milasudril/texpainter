@@ -1,10 +1,9 @@
 //@	{
-//@	 "targets":[{"name":"minmax_filter.o","type":"object"}]
+//@	 "targets":[{"name":"utils.o","type":"object"}]
 //@	}
 
-#include "./minmax_filter.hpp"
+#include "./utils.hpp"
 
-#include <vector>
 #include <algorithm>
 
 Texpainter::RollingRankFilter::Delta Texpainter::RollingRankFilter::genXDelta(

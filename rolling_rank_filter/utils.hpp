@@ -1,10 +1,10 @@
 //@	{
-//@	 "targets":[{"name":"minmax_filter.hpp","type":"include"}]
-//@	,"dependencies_extra":[{"ref":"minmax_filter.o","rel":"implementation"}]
+//@	 "targets":[{"name":"utils.hpp","type":"include"}]
+//@	,"dependencies_extra":[{"ref":"utils.o","rel":"implementation"}]
 //@	}
 
-#ifndef TEXPAINTER_ROLLINGRANKFILTER_MINMAXFILTER_HPP
-#define TEXPAINTER_ROLLINGRANKFILTER_MINMAXFILTER_HPP
+#ifndef TEXPAINTER_ROLLINGRANKFILTER_UTILS_HPP
+#define TEXPAINTER_ROLLINGRANKFILTER_UTILS_HPP
 
 #include "pixel_store/image.hpp"
 
