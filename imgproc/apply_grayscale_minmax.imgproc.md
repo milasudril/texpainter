@@ -14,7 +14,7 @@ __Output:__ (Grayscale image) The filtered image
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include "pixel_store/image.hpp"
@@ -25,7 +25,7 @@ __Includes:__
 #include <chrono>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 struct BoundingBox
@@ -155,11 +155,11 @@ inline auto computeDeltaRow(Texpainter::Span2d<int8_t const> mask)
 	auto sum = 0;
 	for(auto x = 0u; x != mask.width(); ++x)
 	{
-		if(auto val = - mask(x, 0); val != 0)
+		if(auto val = -mask(x, 0); val != 0)
 		{
 			deltas.push_back(Delta{static_cast<uint16_t>(x), static_cast<uint16_t>(0), val});
 			sum += val;
-			printf("%c ", val < 0? '-': '+');
+			printf("%c ", val < 0 ? '-' : '+');
 		}
 		else
 		{
@@ -187,7 +187,7 @@ inline auto computeDeltaRow(Texpainter::Span2d<int8_t const> mask)
 			{
 				deltas.push_back(Delta{static_cast<uint16_t>(x), static_cast<uint16_t>(y), val});
 				sum += val;
-				printf("%c ", val < 0? '-': '+');
+				printf("%c ", val < 0 ? '-' : '+');
 			}
 			else
 			{
@@ -202,12 +202,9 @@ inline auto computeDeltaRow(Texpainter::Span2d<int8_t const> mask)
 
 struct SortedValsData
 {
-	SortedValsData(float val, uint32_t x, uint32_t y): m_val{val}, m_x{x}, m_y{y}{}
+	SortedValsData(float val, uint32_t x, uint32_t y): m_val{val}, m_x{x}, m_y{y} {}
 
-	bool operator<(SortedValsData other) const
-	{
-		return m_val < other.m_val;
-	}
+	bool operator<(SortedValsData other) const { return m_val < other.m_val; }
 
 	operator float() const { return m_val; }
 
@@ -248,14 +245,10 @@ void main(auto const& args)
 		std::ranges::for_each(sorted_vals, [](auto item) {
 			printf("%.9e (%u, %u)\n", item.m_val, item.m_x, item.m_y);
 		});
-		std::ranges::for_each(
-		mask_delta_row, [x = 0, y, w, h, w_m, h_m, insert, erase](auto item) {
+		std::ranges::for_each(mask_delta_row, [x = 0, y, w, h, w_m, h_m, insert, erase](auto item) {
 			auto const x_m = item.x - 1;
 			auto const y_m = item.y - 1;
-			if(item.sign < 0)
-			{
-				erase((x + w + x_m - w_m / 2) % w, (y + h + y_m - h_m / 2) % h);
-			}
+			if(item.sign < 0) { erase((x + w + x_m - w_m / 2) % w, (y + h + y_m - h_m / 2) % h); }
 			else
 			{
 				insert((x + w + x_m - w_m / 2) % w, (y + h + y_m - h_m / 2) % h);
@@ -275,14 +268,12 @@ void main(auto const& args)
 			    mask_delta_col, [x, y, &args, w, h, w_m, h_m, insert, erase](auto item) {
 				    auto const x_m = item.x - 1;
 				    auto const y_m = item.y - 1;
-					if(item.sign < 0)
-					{
-						erase((x + w + x_m - w_m / 2) % w, (y + h + y_m - h_m / 2) % h);
-					}
-					else
-					{
-						insert((x + w + x_m - w_m / 2) % w, (y + h + y_m - h_m / 2) % h);
-					}
+				    if(item.sign < 0)
+				    { erase((x + w + x_m - w_m / 2) % w, (y + h + y_m - h_m / 2) % h); }
+				    else
+				    {
+					    insert((x + w + x_m - w_m / 2) % w, (y + h + y_m - h_m / 2) % h);
+				    }
 			    });
 			//	printf("%u %u %zu\n", x, y, std::size(sorted_vals));
 			output<0>(args, x, y) = *std::begin(sorted_vals);
