@@ -18,10 +18,11 @@ namespace Testcases
 
 		assert(area(input) == 48);
 
-		Texpainter::PixelStore::Image<int8_t> mask{5, 4};
-		for(uint32_t y = 0; y != mask.height(); ++y)
+		Texpainter::PixelStore::Image<int8_t> mask{6, 5};
+		std::ranges::fill(mask.pixels(), 0);
+		for(uint32_t y = 0; y != mask.height() - 1; ++y)
 		{
-			for(uint32_t x = 0; x != mask.width(); ++x)
+			for(uint32_t x = 0; x != mask.width() - 1; ++x)
 			{
 				if(y % 2 == 0) { mask(x, y) = x % 2; }
 				else
@@ -31,7 +32,7 @@ namespace Testcases
 			}
 		}
 
-		assert(area(mask) == 20);
+		assert(area(mask) == 30);
 
 		Texpainter::PixelStore::Image<float> min{8, 6};
 		Texpainter::PixelStore::Image<float> max{8, 6};
