@@ -7,12 +7,24 @@
 
 #include "utils/preallocated_multiset.hpp"
 
+#include <cmath>
+
 namespace
 {
+	struct FloatCompare
+	{
+		bool operator()(float a, float b) const
+		{
+			if(std::isnan(a)) [[unlikely]]
+			{ return true; }
+			return a < b;
+		}
+	};
+
 	void update(Texpainter::Span2d<float const> src,
 	            uint32_t x,
 	            uint32_t y,
-	            Texpainter::PreallocatedMultiset<float>& sorted_vals,
+	            Texpainter::PreallocatedMultiset<float, FloatCompare>& sorted_vals,
 	            uint32_t mask_width,
 	            uint32_t mask_height,
 	            Texpainter::RollingRankFilter::Delta const& delta)
@@ -40,7 +52,7 @@ void Texpainter::RollingRankFilter::minmaxFilter(Span2d<float const> src,
 
 	auto const mask_size =
 	    static_cast<size_t>(std::ranges::count_if(mask, [](auto val) { return val == 1; }));
-	PreallocatedMultiset<float> sorted_vals{mask_size};
+	PreallocatedMultiset<float, FloatCompare> sorted_vals{mask_size};
 
 	for(uint32_t y = 0; y != mask.height(); ++y)
 	{
