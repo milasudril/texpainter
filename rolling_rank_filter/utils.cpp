@@ -5,6 +5,7 @@
 #include "./utils.hpp"
 
 #include <algorithm>
+#include <random>
 
 Texpainter::RollingRankFilter::Delta Texpainter::RollingRankFilter::genXDelta(
     Span2d<int8_t const> src)
@@ -81,5 +82,18 @@ Texpainter::PixelStore::Image<int8_t> Texpainter::RollingRankFilter::quantize(
 	std::ranges::transform(src, std::data(ret.pixels()), [threshold](auto val) -> int8_t {
 		return val >= threshold ? 1 : 0;
 	});
+	return ret;
+}
+
+Texpainter::PixelStore::Image<int8_t> Texpainter::RollingRankFilter::quantize(
+    Span2d<float const> src, DefaultRng::SeedValue seed_val)
+{
+	PixelStore::Image<int8_t> ret{src.width(), src.height()};
+	std::ranges::transform(src,
+	                       std::data(ret.pixels()),
+	                       [rng = DefaultRng::Engine{seed_val}](auto val) mutable -> int8_t {
+		                       auto const res = std::bernoulli_distribution{val}(rng);
+		                       return res ? 1 : 0;
+	                       });
 	return ret;
 }

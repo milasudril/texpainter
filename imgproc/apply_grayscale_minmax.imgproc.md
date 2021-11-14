@@ -14,6 +14,10 @@ __Min:__ (Grayscale image) The min values
 
 __Max:__ (Grayscale image) The max values
 
+## Parameters
+
+__Mask quant mode:__ (= 0.0) The method used to quantize the mask. 0.0 means using a fixed 0.5 threshould. 1.0 means using a Bernoulli distribution with the mask value as probability.
+
 ## Implementation
 
 __Includes:__ 
@@ -28,14 +32,27 @@ __Includes:__
 __Source code:__ 
 
 ```c++
-void main(auto const& args)
+void main(auto const& args, auto const& params)
 {
 	auto const size = args.canvasSize();
 
-	Texpainter::RollingRankFilter::minmaxFilter(Texpainter::Span2d{args.template input<0>(), size},
-	                                            args.template input<1>(),
-	                                            args.template output<0>(),
-	                                            args.template output<1>());
+	if(param<Str{"Mask quant mode"}>(params).value() >= 0.5f)
+	{
+		Texpainter::RollingRankFilter::minmaxFilter(
+		    Texpainter::Span2d{args.template input<0>(), size},
+		    args.template input<1>(),
+		    args.template output<0>(),
+		    args.template output<1>(),
+		    args.rngSeed());
+	}
+	else
+	{
+		Texpainter::RollingRankFilter::minmaxFilter(
+		    Texpainter::Span2d{args.template input<0>(), size},
+		    args.template input<1>(),
+		    args.template output<0>(),
+		    args.template output<1>());
+	}
 }
 ```
 
