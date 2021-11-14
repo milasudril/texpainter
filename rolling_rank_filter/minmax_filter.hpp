@@ -20,7 +20,10 @@ namespace Texpainter::RollingRankFilter
 	{
 		auto const binary_mask = quantize(Span2d{mask, src.width(), src.height()});
 		auto const bb = boundingBox(binary_mask.pixels(), [](auto val) { return val > 0; });
-		if(!bb.valid()) [[unlikely]] { return; }
+		if(!bb.valid()) [[unlikely]]
+			{
+				return;
+			}
 		auto const mask_cropped = PixelStore::crop(binary_mask.pixels(), bb, 1, 1);
 		minmaxFilter(src, mask_cropped.pixels(), min, max);
 	}
@@ -33,7 +36,10 @@ namespace Texpainter::RollingRankFilter
 	{
 		auto const binary_mask = quantize(Span2d{mask, src.width(), src.height()}, seed_val);
 		auto const bb = boundingBox(binary_mask.pixels(), [](auto val) { return val > 0; });
-		if(!bb.valid()) [[unlikely]] { return; }
+		if(!bb.valid()) [[unlikely]]
+			{
+				return;
+			}
 		auto const mask_cropped = PixelStore::crop(binary_mask.pixels(), bb, 1, 1);
 		minmaxFilter(src, mask_cropped.pixels(), min, max);
 	}
