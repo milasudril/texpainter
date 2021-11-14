@@ -32,8 +32,8 @@ namespace
 
 void Texpainter::RollingRankFilter::minmaxFilter(Span2d<float const> src,
                                                  Span2d<int8_t const> mask,
-                                                 Span2d<float> min,
-                                                 Span2d<float> max)
+                                                 float* min,
+                                                 float* max)
 {
 	auto const x_delta  = genXDelta(mask);
 	auto const xy_delta = genXYDelta(mask);
@@ -59,16 +59,16 @@ void Texpainter::RollingRankFilter::minmaxFilter(Span2d<float const> src,
 	{
 		for(uint32_t x = 0; x != src.width() - 1; ++x)
 		{
-			min(x, y) = sorted_vals.front();
-			max(x, y) = sorted_vals.back();
+			min[y * src.width() + x] = sorted_vals.front();
+			max[y * src.width() + x] = sorted_vals.back();
 
 			update(src, x, y, sorted_vals, mask.width(), mask.height(), x_delta);
 		}
 
 		auto const x = src.width() - 1;
 
-		min(x, y) = sorted_vals.front();
-		max(x, y) = sorted_vals.back();
+		min[y * src.width() + x] = sorted_vals.front();
+		max[y * src.width() + x] = sorted_vals.back();
 
 		update(src, x, y, sorted_vals, mask.width(), mask.height(), xy_delta);
 	}

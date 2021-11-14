@@ -12,10 +12,7 @@
 
 namespace Texpainter::RollingRankFilter
 {
-	void minmaxFilter(Span2d<float const> src,
-	                  Span2d<int8_t const> mask,
-	                  Span2d<float> min,
-	                  Span2d<float> max);
+	void minmaxFilter(Span2d<float const> src, Span2d<int8_t const> mask, float* min, float* max);
 }
 
 #endif
