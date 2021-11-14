@@ -1,9 +1,9 @@
 //@	{
-//@	 "targets":[{"name":"preallocated_multiset.hpp", "type":"include"}]
+//@	 "targets":[{"name":"preallocated_set.hpp", "type":"include"}]
 //@	}
 
-#ifndef TEXPAINTER_UTILS_PREALLOCATEDMULTISET_HPP
-#define TEXPAINTER_UTILS_PREALLOCATEDMULTISET_HPP
+#ifndef TEXPAINTER_UTILS_PREALLOCATEDSET_HPP
+#define TEXPAINTER_UTILS_PREALLOCATEDSET_HPP
 
 #include "./stack_allocator.hpp"
 
@@ -11,7 +11,7 @@
 
 namespace Texpainter
 {
-	namespace prealloc_multiset_detail
+	namespace prealloc_set_detail
 	{
 		template<class T>
 		class Allocator: public PreallocStackAllocator<T>
@@ -55,9 +55,9 @@ namespace Texpainter
 
 	template<class T, class Compare = std::less<>>
 	class PreallocatedMultiset
-	    : private std::multiset<T, Compare, prealloc_multiset_detail::AllocatorProxy<T>>
+	    : private std::multiset<T, Compare, prealloc_set_detail::AllocatorProxy<T>>
 	{
-		using Allocator = prealloc_multiset_detail::AllocatorProxy<T>;
+		using Allocator = prealloc_set_detail::AllocatorProxy<T>;
 		using Base      = std::multiset<T, Compare, Allocator>;
 
 	public:
@@ -84,24 +84,48 @@ namespace Texpainter
 
 		// Additional functions
 
-		auto erase_one(key_type const& key)
+		void erase_one(key_type const& key)
 		{
 			auto i = find(key);
 			if(i != std::end(*this)) [[likely]]
 				{
-					return erase(i);
+					erase(i);
 				}
-			return i;
 		}
+	};
 
-		decltype(auto) front() const { return *std::begin(*this); }
 
-		decltype(auto) back() const
-		{
-			auto i = std::end(*this);
-			--i;
-			return *i;
-		}
+	template<class T, class Compare = std::less<>>
+	class PreallocatedSet: private std::set<T, Compare, prealloc_set_detail::AllocatorProxy<T>>
+	{
+		using Allocator = prealloc_set_detail::AllocatorProxy<T>;
+		using Base      = std::set<T, Compare, Allocator>;
+
+	public:
+		explicit PreallocatedSet(size_t capacity): Base{Allocator{capacity}} {}
+
+		// Import stuff from base class
+
+		using value_type = typename Base::value_type;
+		using key_type   = typename Base::key_type;
+		using Base::begin;
+		using Base::clear;
+		using Base::contains;
+		using Base::count;
+		using Base::emplace;
+		using Base::emplace_hint;
+		using Base::end;
+		using Base::erase;
+		using Base::extract;
+		using Base::find;
+		using Base::insert;
+		using Base::merge;
+		using Base::size;
+		using Base::swap;
+
+		// Additional functions
+
+		auto erase_one(key_type const& key) { return erase(key); }
 	};
 }
 

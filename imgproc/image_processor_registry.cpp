@@ -69,6 +69,7 @@
 
 //HACK must have a static references to these for linking to work properly
 #include "utils/discrete_pdf.hpp"
+#include "rolling_rank_filter/minmax_filter.hpp"
 #include "dft/engine.hpp"
 
 namespace

@@ -73,7 +73,7 @@ namespace Texpainter
 	}
 
 	template<class T, class Func>
-	void for_each(Span2d<T> span, Func&& f)
+	void constexpr for_each(Span2d<T> span, Func&& f)
 	{
 		for(uint32_t row = 0; row < span.height(); ++row)
 		{
@@ -85,7 +85,7 @@ namespace Texpainter
 	}
 
 	template<class T, class U, class Func>
-	void transform(Span2d<T> in, Span2d<U> out, Func&& f)
+	void constexpr transform(Span2d<T> in, Span2d<U> out, Func&& f)
 	{
 		for(uint32_t row = 0; row < in.height(); ++row)
 		{
@@ -97,7 +97,7 @@ namespace Texpainter
 	}
 
 	template<class T, class Func>
-	void generate(Span2d<T> out, Func&& f)
+	void constexpr generate(Span2d<T> out, Func&& f)
 	{
 		for(uint32_t row = 0; row < out.height(); ++row)
 		{
@@ -106,6 +106,46 @@ namespace Texpainter
 				out(col, row) = f(col, row);
 			}
 		}
+	}
+
+	struct Span2dBoundingBox
+	{
+		uint32_t x_min;
+		uint32_t x_max;
+		uint32_t y_min;
+		uint32_t y_max;
+
+		constexpr auto width() const { return x_max - x_min; }
+		constexpr auto height() const { return y_max - y_min; }
+		constexpr bool valid() const { return x_max > x_min && y_max > y_min; }
+
+		constexpr bool operator==(Span2dBoundingBox const&) const = default;
+		constexpr bool operator!=(Span2dBoundingBox const&) const = default;
+	};
+
+	template<class T, class UnaryPredicate>
+	Span2dBoundingBox boundingBox(Span2d<T const> data, UnaryPredicate pred)
+	{
+		uint32_t x_min = data.width();
+		uint32_t x_max = 0;
+		uint32_t y_min = data.height();
+		uint32_t y_max = 0;
+
+		for(uint32_t row = 0; row < data.height(); ++row)
+		{
+			for(uint32_t col = 0; col < data.width(); ++col)
+			{
+				if(pred(data(col, row)))
+				{
+					x_min = std::min(x_min, col);
+					x_max = std::max(x_max, col + 1);
+					y_min = std::min(y_min, row);
+					y_max = std::max(y_max, row + 1);
+				}
+			}
+		}
+
+		return Span2dBoundingBox{x_min, x_max, y_min, y_max};
 	}
 }
 

@@ -81,6 +81,30 @@ namespace Texpainter::PixelStore
 	{
 		return area(img.size());
 	}
+
+	template<class PixelType>
+	inline auto crop(Span2d<PixelType const> pixels,
+	                 Span2dBoundingBox bb,
+	                 uint32_t padding_x = 0u,
+	                 uint32_t padding_y = 0u)
+	{
+		if(!bb.valid()) [[unlikely]]
+			{
+				return Image<PixelType>{1 + padding_x, 1 + padding_y};
+			}
+
+		Image<PixelType> ret{bb.width() + padding_x, bb.height() + padding_y};
+		std::fill_n(ret.pixels().data(), area(ret), PixelType{});
+		for(uint32_t y = 0u; y != bb.height(); ++y)
+		{
+			for(uint32_t x = 0u; x != bb.width(); ++x)
+			{
+				ret(x, y) = pixels(x + bb.x_min, y + bb.y_min);
+			}
+		}
+
+		return ret;
+	}
 }
 
 #endif
