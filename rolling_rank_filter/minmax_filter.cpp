@@ -7,6 +7,29 @@
 
 #include "utils/preallocated_multiset.hpp"
 
+namespace
+{
+	void update(Texpainter::Span2d<float const> src,
+	            uint32_t x,
+	            uint32_t y,
+	            Texpainter::PreallocatedMultiset<float>& sorted_vals,
+	            uint32_t mask_width,
+	            uint32_t mask_height,
+	            Texpainter::RollingRankFilter::Delta const& delta)
+	{
+		auto const sample_x = x + src.width() - mask_width / 2;
+		auto const sample_y = y + src.height() - mask_height / 2;
+		std::ranges::for_each(delta.to_erase, [&src, sample_x, sample_y, &sorted_vals](auto val) {
+			sorted_vals.erase_one(
+			    src((sample_x + val.x) % src.width(), (sample_y + val.y) % src.height()));
+		});
+		std::ranges::for_each(delta.to_insert, [&src, sample_x, sample_y, &sorted_vals](auto val) {
+			sorted_vals.insert(
+			    src((sample_x + val.x) % src.width(), (sample_y + val.y) % src.height()));
+		});
+	}
+}
+
 void Texpainter::RollingRankFilter::minmaxFilter(Span2d<float const> src,
                                                  Span2d<int8_t const> mask,
                                                  Span2d<float> min,
@@ -39,18 +62,7 @@ void Texpainter::RollingRankFilter::minmaxFilter(Span2d<float const> src,
 			min(x, y) = sorted_vals.front();
 			max(x, y) = sorted_vals.back();
 
-			auto const sample_x = x + src.width() - mask.width() / 2;
-			auto const sample_y = y + src.height() - mask.height() / 2;
-			std::ranges::for_each(x_delta.to_erase,
-			                      [&src, sample_x, sample_y, &sorted_vals](auto val) {
-				                      sorted_vals.erase_one(src((sample_x + val.x) % src.width(),
-				                                                (sample_y + val.y) % src.height()));
-			                      });
-			std::ranges::for_each(x_delta.to_insert,
-			                      [&src, sample_x, sample_y, &sorted_vals](auto val) {
-				                      sorted_vals.insert(src((sample_x + val.x) % src.width(),
-				                                             (sample_y + val.y) % src.height()));
-			                      });
+			update(src, x, y, sorted_vals, mask.width(), mask.height(), x_delta);
 		}
 
 		auto const x = src.width() - 1;
@@ -58,17 +70,6 @@ void Texpainter::RollingRankFilter::minmaxFilter(Span2d<float const> src,
 		min(x, y) = sorted_vals.front();
 		max(x, y) = sorted_vals.back();
 
-		auto const sample_x = x + src.width() - mask.width() / 2;
-		auto const sample_y = y + src.height() - mask.height() / 2;
-		std::ranges::for_each(xy_delta.to_erase,
-		                      [&src, sample_x, sample_y, &sorted_vals](auto val) {
-			                      sorted_vals.erase_one(src((sample_x + val.x) % src.width(),
-			                                                (sample_y + val.y) % src.height()));
-		                      });
-		std::ranges::for_each(xy_delta.to_insert,
-		                      [&src, sample_x, sample_y, &sorted_vals](auto val) {
-			                      sorted_vals.insert(src((sample_x + val.x) % src.width(),
-			                                             (sample_y + val.y) % src.height()));
-		                      });
+		update(src, x, y, sorted_vals, mask.width(), mask.height(), xy_delta);
 	}
 }
