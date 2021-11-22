@@ -14,6 +14,18 @@
 
 namespace Texpainter::RollingRankFilter
 {
+	struct ScanlineRange
+	{
+		uint32_t first;
+		uint32_t last;
+	};
+
+	void minmaxFilter(Span2d<float const> src,
+	                  Span2d<int8_t const> mask,
+	                  float* min,
+	                  float* max,
+	                  ScanlineRange rangs);
+
 	void minmaxFilter(Span2d<float const> src, Span2d<int8_t const> mask, float* min, float* max);
 
 	inline void minmaxFilter(Span2d<float const> src, float const* mask, float* min, float* max)
