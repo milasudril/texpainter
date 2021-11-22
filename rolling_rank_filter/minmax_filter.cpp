@@ -94,12 +94,22 @@ void Texpainter::RollingRankFilter::minmaxFilter(Span2d<float const> src,
 {
 	std::array<std::jthread, 16> workers;
 	auto const lines_per_thread = src.height() / std::size(workers);
-	for(size_t k = 0; k != std::size(workers); ++k)
+	auto num_lines_left         = src.height();
+	uint32_t line_start         = 0;
+	size_t batch_no             = 0;
+	while(num_lines_left != 0)
 	{
-		workers[k] = std::jthread([thread_no = k, lines_per_thread, src, mask, min, max]() {
-			auto const y_start = static_cast<uint32_t>(thread_no * lines_per_thread);
-			auto const y_last   = static_cast<uint32_t>((thread_no + 1) * lines_per_thread);
-			minmaxFilter(src, mask, min, max, ScanlineRange{y_start, y_last});
-		});
+		auto const batch_size = std::min(num_lines_left, lines_per_thread);
+		workers[batch_no]     = std::jthread([lines_per_thread,
+                                          src,
+                                          mask,
+                                          min,
+                                          max,
+                                          ScanlineRange{line_start, line_start + batch_size}]() {
+            minmaxFilter(src, mask, min, max, range);
+        });
+		line_start += batch_size;
+		num_lines_left -= batch_size;
+		++batch_no;
 	}
 }
