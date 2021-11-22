@@ -17,9 +17,9 @@ namespace
 		bool operator()(float a, float b) const
 		{
 			if(std::isnan(a)) [[unlikely]]
-				{
-					return true;
-				}
+			{
+				return !std::isnan(b);
+			}
 			return a < b;
 		}
 	};
