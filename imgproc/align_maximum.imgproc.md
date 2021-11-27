@@ -18,7 +18,7 @@ __y:__ (= 0) The y coordinate
 
 ## Implementation
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 inline int32_t mapParameter(ParamValue value, uint32_t scale)

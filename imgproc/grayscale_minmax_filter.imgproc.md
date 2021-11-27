@@ -20,7 +20,7 @@ __Mask quant mode:__ (= 0.0) The method used to quantize the mask. 0.0 means usi
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include "rolling_rank_filter/minmax_filter.hpp"
@@ -29,7 +29,7 @@ __Includes:__
 #include <chrono>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& args, auto const& params)

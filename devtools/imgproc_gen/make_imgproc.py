@@ -37,6 +37,8 @@ def translateType(str):
 		return 'PointCloud'
 	if str == 'Polyline set':
 		return 'PolylineSet'
+	if str == 'Line segment tree':
+		return 'LineSegTree'
 	raise Exception('Unsupported port type ' + str)
 
 
