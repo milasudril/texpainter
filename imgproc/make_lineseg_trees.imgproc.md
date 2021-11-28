@@ -14,7 +14,7 @@ __Segment length:__ (= 0.5)
 
 __Stiffness:__ (= 0.5)
 
-__Integrated length:__ (= 0.5)
+__Branch length:__ (= 0.5)
 
 __Max depth:__ (= 0.0) The number of tree levels __Branch scale factor: (= 0.5) The scaling factor between tree levels
 
@@ -41,8 +41,10 @@ inline auto gen_branch(double const segment_length,
 	std::uniform_real_distribution turn{-0.5 * std::numbers::pi, 0.5 * std::numbers::pi};
 	std::gamma_distribution seg_length{2.0, std::max(segment_length, 1.0)};
 	auto const h0 = heading;
+	auto const lsq = length_tot*length_tot;
+	auto const l0 = location;
 	auto l_tot    = 0.0;
-	while(l_tot < length_tot)
+	while(Texpainter::lengthSquared(location - l0) < lsq)
 	{
 		auto l = seg_length(rng);
 		heading += turn(rng);
