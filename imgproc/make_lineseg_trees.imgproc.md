@@ -2,11 +2,11 @@
 
 ## Input ports
 
-__Input:__ (Point cloud) Input
+__Input:__ (Point cloud)
 
 ## Output ports
 
-__Output:__ (Line segment tree) Output image
+__Output:__ (Line segment tree)
 
 ## Parameters
 
@@ -39,7 +39,7 @@ inline auto gen_branch(double const segment_length,
 	std::vector<std::pair<vec2_t, LineSegTree>> ret{std::pair{location, LineSegTree{}}};
 
 	std::uniform_real_distribution turn{-0.5 * std::numbers::pi, 0.5 * std::numbers::pi};
-	std::gamma_distribution seg_length{2.0, segment_length};
+	std::gamma_distribution seg_length{2.0, std::max(segment_length, 1.0)};
 	auto const h0 = heading;
 	auto l_tot    = 0.0;
 	while(l_tot < length_tot)
