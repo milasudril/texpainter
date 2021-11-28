@@ -20,13 +20,13 @@ __Max depth:__ (= 0.0) The number of tree levels __Branch scale factor: (= 0.5) 
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <random>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 inline auto gen_branch(double const segment_length,
@@ -88,8 +88,9 @@ void main(auto const& args, auto const& params)
 		    auto const loc_vec =
 		        vec2_t{static_cast<double>(val.loc.x), static_cast<double>(val.loc.y)};
 		    auto const start_heading = val.rot.radians();
+		    auto const length_scale = static_cast<double>(val.scale);
 		    return gen_line_segment_tree(
-		        segment_length, stiffness, length_tot, rng, loc_vec, start_heading, max_depth);
+		        segment_length*length_scale, stiffness, length_tot*length_scale, rng, loc_vec, start_heading, max_depth);
 	    });
 }
 ```
