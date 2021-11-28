@@ -16,8 +16,7 @@ __Stiffness:__ (= 0.5)
 
 __Integrated length:__ (= 0.5)
 
-__Max depth:__ (= 0.0) The number of tree levels
-__Branch scale factor: (= 0.5) The scaling factor between tree levels
+__Max depth:__ (= 0.0) The number of tree levels __Branch scale factor: (= 0.5) The scaling factor between tree levels
 
 ## Implementation
 
@@ -30,12 +29,12 @@ __Includes:__
 __Source code:__ 
 
 ```c++
-auto gen_branch(double const segment_length,
-                double const stiffness,
-                double const length_tot,
-                vec2_t location,
-                double heading,
-                Rng& rng)
+inline auto gen_branch(double const segment_length,
+                       double const stiffness,
+                       double const length_tot,
+                       Rng& rng,
+                       vec2_t location,
+                       double heading)
 {
 	std::vector<std::pair<vec2_t, LineSegTree>> ret{std::pair{location, LineSegTree{}}};
 
@@ -56,24 +55,41 @@ auto gen_branch(double const segment_length,
 	return ret;
 }
 
-LineSegTree gen_line_segment_tree(vec2_t, size_t)
+inline LineSegTree gen_line_segment_tree(double segment_length,
+                                         double const stiffness,
+                                         double const length_tot,
+                                         Rng& rng,
+                                         vec2_t const start_loc,
+                                         double start_heading,
+                                         size_t const)
 {
-	LineSegTree ret{};
-
-	return ret;
+	return LineSegTree{
+	    gen_branch(segment_length, stiffness, length_tot, rng, start_loc, start_heading)};
 }
 
 void main(auto const& args, auto const& params)
 {
-	size_t const max_depth =
-	    1
-	    + static_cast<size_t>(
-	        std::lerp(0.0f, std::nextafter(3.0f, 0.0f), param<Str{"Max depth"}>(params).value()));
+	auto const domain_length = std::sqrt(area(args.canvasSize()));
+
 	std::ranges::transform(
-	    input<0>(args).get(), std::back_inserter(output<0>(args).get()), [max_depth](auto val) {
+	    input<0>(args).get(),
+	    std::back_inserter(output<0>(args).get()),
+	    [segment_length =
+	         static_cast<double>(param<Str{"Segment length"}>(params).value() * domain_length),
+	     stiffness = static_cast<double>(param<Str{"Stiffness"}>(params).value()),
+	     length_tot =
+	         static_cast<double>(param<Str{"Integrated length"}>(params).value() * domain_length),
+	     rng = Rng{args.rngSeed()},
+	     max_depth =
+	         static_cast<size_t>(1)
+	         + static_cast<size_t>(std::lerp(
+	             0.0f, std::nextafter(3.0f, 0.0f), param<Str{"Max depth"}>(params).value()))](
+	        auto val) mutable {
 		    auto const loc_vec =
 		        vec2_t{static_cast<double>(val.loc.x), static_cast<double>(val.loc.y)};
-		    return gen_line_segment_tree(loc_vec, max_depth);
+		    auto const start_heading = val.rot.radians();
+		    return gen_line_segment_tree(
+		        segment_length, stiffness, length_tot, rng, loc_vec, start_heading, max_depth);
 	    });
 }
 ```
