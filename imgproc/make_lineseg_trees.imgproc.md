@@ -80,7 +80,7 @@ void main(auto const& args, auto const& params)
 	         static_cast<double>(param<Str{"Segment length"}>(params).value() * domain_length),
 	     stiffness = static_cast<double>(param<Str{"Stiffness"}>(params).value()),
 	     length_tot =
-	         static_cast<double>(param<Str{"Integrated length"}>(params).value() * domain_length),
+	         static_cast<double>(param<Str{"Branch length"}>(params).value() * domain_length),
 	     rng = Rng{args.rngSeed()},
 	     max_depth =
 	         static_cast<size_t>(1)
