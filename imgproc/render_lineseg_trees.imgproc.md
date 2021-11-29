@@ -18,13 +18,13 @@ __Growth rate:__ (= 0.5)
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <algorithm>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 [[nodiscard]] double draw(
@@ -62,19 +62,24 @@ void draw(std::vector<std::pair<vec2_t, LineSegTree>> const& points,
 	auto range = std::span{std::data(points) + 1, std::size(points) - 1};
 
 	auto length = 0.0;
-	std::ranges::for_each(range, [start = points.front().first, &sum = length](auto const& item) mutable {
-		sum += Texpainter::length(item.first - start);
-		start = item.first;
-	});
-
 	std::ranges::for_each(range,
-	                      [start = points.front().first,
-	                       &args,
-	                       &line_width,
-	                       growth_factor = std::exp2(growth_rate / length)](auto const& item) mutable {
-		                      line_width = draw(item.first, start, args, line_width, growth_factor);
-		                      start      = item.first;
+	                      [start = points.front().first, &sum = length](auto const& item) mutable {
+		                      sum += Texpainter::length(item.first - start);
+		                      start = item.first;
 	                      });
+
+	std::ranges::for_each(
+	    range,
+	    [start = points.front().first,
+	     &args,
+	     &line_width,
+	     growth_factor = std::exp2(growth_rate / length)](auto const& item) mutable {
+		    line_width = draw(item.first, start, args, line_width, growth_factor);
+		    start      = item.first;
+	    });
+	std::ranges::for_each(range, [args, line_width, growth_rate](auto const& item) {
+		draw(item.second.data, args, line_width, growth_rate);
+	});
 }
 
 void main(auto const& args, auto const& params)

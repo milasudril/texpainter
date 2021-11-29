@@ -156,9 +156,8 @@ namespace
 	    get_info<::RgbaPosterization::ImageProcessor>(),
 	    get_info<::GrayscaleMinmaxFilter::ImageProcessor>(),
 	    get_info<::AlignMaximum::ImageProcessor>(),
-		get_info<::MakeLineSegmentTrees::ImageProcessor>(),
-		get_info<::RenderLineSegmentTrees::ImageProcessor>()
-	};
+	    get_info<::MakeLineSegmentTrees::ImageProcessor>(),
+	    get_info<::RenderLineSegmentTrees::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;

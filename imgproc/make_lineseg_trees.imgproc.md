@@ -20,13 +20,13 @@ __Max depth:__ (= 0.0) The number of tree levels __Branch scale factor: (= 0.5) 
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <random>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 inline auto gen_branch(double const segment_length,
@@ -40,10 +40,9 @@ inline auto gen_branch(double const segment_length,
 
 	std::uniform_real_distribution turn{-0.5 * std::numbers::pi, 0.5 * std::numbers::pi};
 	std::gamma_distribution seg_length{2.0, std::max(segment_length, 1.0)};
-	auto const h0 = heading;
-	auto const lsq = length_tot*length_tot;
-	auto const l0 = location;
-	auto l_tot    = 0.0;
+	auto const h0  = heading;
+	auto const lsq = length_tot * length_tot;
+	auto const l0  = location;
 	while(Texpainter::lengthSquared(location - l0) < lsq)
 	{
 		auto l = seg_length(rng);
@@ -51,10 +50,21 @@ inline auto gen_branch(double const segment_length,
 		heading += stiffness * (h0 - heading);
 		location += l * vec2_t{std::cos(heading), std::sin(heading)};
 		ret.push_back(std::pair{location, LineSegTree{}});
-		l_tot += l;
 	}
 
 	return ret;
+}
+
+inline auto compute_normal(vec2_t prev, vec2_t current, vec2_t next)
+{
+	auto const v      = Texpainter::normalize(next - prev);
+	auto const delta  = current - prev;
+	auto const n_temp = vec2_t{v[1], -v[0]};
+	if(auto const side = Texpainter::dot(delta, n_temp); side < 0.0) { return -n_temp; }
+	else
+	{
+		return n_temp;
+	}
 }
 
 inline LineSegTree gen_line_segment_tree(double segment_length,
@@ -65,8 +75,20 @@ inline LineSegTree gen_line_segment_tree(double segment_length,
                                          double start_heading,
                                          size_t const)
 {
-	return LineSegTree{
-	    gen_branch(segment_length, stiffness, length_tot, rng, start_loc, start_heading)};
+	auto branch  = gen_branch(segment_length, stiffness, length_tot, rng, start_loc, start_heading);
+	auto prev    = branch.back().first;
+	auto current = branch.front().first;
+	for(size_t k = 1; k != std::size(branch); ++k)
+	{
+		auto const n = compute_normal(prev, current, branch[k].first);
+		branch[k - 1].second.data =
+		    std::vector{std::pair{branch[k - 1].first, LineSegTree{}},
+		                std::pair{branch[k - 1].first + 30.0 * n, LineSegTree{}}};
+		prev    = current;
+		current = branch[k].first;
+	}
+
+	return LineSegTree{std::move(branch)};
 }
 
 void main(auto const& args, auto const& params)
@@ -90,9 +112,14 @@ void main(auto const& args, auto const& params)
 		    auto const loc_vec =
 		        vec2_t{static_cast<double>(val.loc.x), static_cast<double>(val.loc.y)};
 		    auto const start_heading = val.rot.radians();
-		    auto const length_scale = static_cast<double>(val.scale);
-		    return gen_line_segment_tree(
-		        segment_length*length_scale, stiffness, length_tot*length_scale, rng, loc_vec, start_heading, max_depth);
+		    auto const length_scale  = static_cast<double>(val.scale);
+		    return gen_line_segment_tree(segment_length * length_scale,
+		                                 stiffness,
+		                                 length_tot * length_scale,
+		                                 rng,
+		                                 loc_vec,
+		                                 start_heading,
+		                                 max_depth);
 	    });
 }
 ```
