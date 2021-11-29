@@ -16,7 +16,10 @@ __Stiffness:__ (= 0.5)
 
 __Branch length:__ (= 0.5)
 
-__Max depth:__ (= 0.0) The number of tree levels __Branch scale factor: (= 0.5) The scaling factor between tree levels
+__Max depth:__ (= 0.0) The number of tree levels
+
+__Branch rate:__ (= 0.5)
+__Branch scale factor__: (= 0.5) The scaling factor between tree levels
 
 __Segment scale factor:__ (= 0.5)
 
@@ -24,13 +27,13 @@ __Branch scale factor:__ (= 0.5)
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <random>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 inline auto gen_branch(double segment_length,
@@ -78,6 +81,7 @@ inline LineSegTree gen_line_segment_tree(double segment_length,
                                          vec2_t start_loc,
                                          double start_heading,
                                          size_t max_depth,
+                                         double branch_rate,
                                          double seg_scale_factor,
                                          double branch_scale_factor)
 {
@@ -88,19 +92,23 @@ inline LineSegTree gen_line_segment_tree(double segment_length,
 		auto current = branch.front().first;
 		for(size_t k = 1; k != std::size(branch); ++k)
 		{
-			auto const n              = compute_normal(prev, current, branch[k].first);
-			auto const theta          = std::atan2(n[1], n[0]);
-			branch[k - 1].second = gen_line_segment_tree(segment_length*seg_scale_factor,
-			                                                  stiffness,
-			                                                  length_tot*branch_scale_factor,
-			                                                  rng,
-			                                                  branch[k - 1].first,
-			                                                  theta,
-			                                                  max_depth - 1,
-			                                                  seg_scale_factor,
-			                                                  branch_scale_factor);
-			prev                      = current;
-			current                   = branch[k].first;
+			if(std::bernoulli_distribution{branch_rate}(rng))
+			{
+				auto const n         = compute_normal(prev, current, branch[k].first);
+				auto const theta     = std::atan2(n[1], n[0]);
+				branch[k - 1].second = gen_line_segment_tree(segment_length * seg_scale_factor,
+				                                             stiffness,
+				                                             length_tot * branch_scale_factor,
+				                                             rng,
+				                                             branch[k - 1].first,
+				                                             theta,
+				                                             max_depth - 1,
+				                                             branch_rate,
+				                                             seg_scale_factor,
+				                                             branch_scale_factor);
+				prev                 = current;
+				current              = branch[k].first;
+			}
 		}
 	}
 
@@ -121,9 +129,9 @@ void main(auto const& args, auto const& params)
 	                     static_cast<size_t>(std::lerp(0.0f,
 	                                                   std::nextafter(4.0f, 0.0f),
 	                                                   param<Str{"Max depth"}>(params).value())),
-	                 seg_scale_factor = param<Str{"Segment scale factor"}>(params).value(),
-	                 branch_scale_factor =
-	                     param<Str{"Branch scale factor"}>(params).value()](auto val) mutable {
+	                 seg_scale_factor    = param<Str{"Segment scale factor"}>(params).value(),
+	                 branch_scale_factor = param<Str{"Branch scale factor"}>(params).value(),
+	                 branch_rate = param<Str{"Branch rate"}>(params).value()](auto val) mutable {
 		auto const loc_vec = vec2_t{static_cast<double>(val.loc.x), static_cast<double>(val.loc.y)};
 		auto const start_heading = val.rot.radians();
 		auto const length_scale  = static_cast<double>(val.scale);
@@ -134,6 +142,7 @@ void main(auto const& args, auto const& params)
 		                             loc_vec,
 		                             start_heading,
 		                             max_depth,
+		                             branch_rate,
 		                             seg_scale_factor,
 		                             branch_scale_factor);
 	};
