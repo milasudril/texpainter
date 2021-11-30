@@ -27,13 +27,13 @@ __Branch scale factor:__ (= 0.5)
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <random>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 inline auto gen_branch(double segment_length,
@@ -46,7 +46,7 @@ inline auto gen_branch(double segment_length,
 	std::vector<std::pair<vec2_t, LineSegTree>> ret{std::pair{location, LineSegTree{}}};
 
 	std::uniform_real_distribution turn{-0.5 * std::numbers::pi, 0.5 * std::numbers::pi};
-	std::gamma_distribution seg_length{2.0, std::max(segment_length, 1.0)};
+	std::gamma_distribution seg_length{3.0, std::max(segment_length, 16.0)};
 	auto const h0  = heading;
 	auto const lsq = length_tot * length_tot;
 	auto const l0  = location;
