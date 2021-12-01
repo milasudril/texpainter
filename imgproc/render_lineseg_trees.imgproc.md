@@ -18,14 +18,14 @@ __Growth rate:__ (= 0.5)
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <algorithm>
 #include <chrono>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 [[nodiscard]] double draw(

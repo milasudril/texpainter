@@ -22,7 +22,7 @@ __Branch rate:__ (= 0.5) __Branch scale factor__: (= 0.5) The scaling factor bet
 
 __Segment scale factor:__ (= 0.5)
 
-__Branch scale factor:__ (= 0.5)
+__Secondary branch length:__ (= 0.5)
 
 ## Implementation
 
@@ -31,7 +31,6 @@ __Includes:__
 ```c++
 #include <random>
 #include <deque>
-#include <chrono>
 ```
 
 __Source code:__
@@ -47,12 +46,11 @@ inline auto gen_branch(double segment_length,
 	std::vector<std::pair<vec2_t, LineSegTree>> ret{std::pair{location, LineSegTree{}}};
 
 	std::uniform_real_distribution turn{-0.5 * std::numbers::pi, 0.5 * std::numbers::pi};
-	std::gamma_distribution seg_length{3.0, segment_length*length_tot};
+	std::gamma_distribution seg_length{3.0, segment_length * length_tot};
 	auto const h0  = heading;
 	auto const lsq = length_tot * length_tot;
 	auto const l0  = location;
 	while(Texpainter::lengthSquared(location - l0) < lsq)
-//	for(size_t k = 0; k  < 3 ; ++k)
 	{
 		auto const l = std::max(seg_length(rng), 16.0);
 		location += l * vec2_t{std::cos(heading), std::sin(heading)};
@@ -95,19 +93,19 @@ inline LineSegTree gen_line_segment_tree(double segment_length,
                                          vec2_t start_loc,
                                          double start_heading,
                                          size_t max_depth,
-                                         double /*branch_rate*/,
+                                         double branch_rate,
                                          double seg_scale_factor,
                                          double branch_scale_factor)
 {
 	std::deque<BranchParams> branches;
 	LineSegTree ret;
-	branches.push_back(BranchParams{segment_length, length_tot, start_loc, start_heading, ret, length_tot, 0});
+	branches.push_back(
+	    BranchParams{segment_length, length_tot, start_loc, start_heading, ret, length_tot, 0});
 
 	while(!branches.empty())
 	{
 		auto node = branches.front();
 		branches.pop_front();
-		printf("%zu %.15g\n", node.depth, node.length_tot);
 		node.ret.get().data = gen_branch(node.segment_length,
 		                                 stiffness,
 		                                 node.length_tot,
@@ -122,21 +120,23 @@ inline LineSegTree gen_line_segment_tree(double segment_length,
 			auto current = branch.front().first;
 			for(size_t k = 1; k != std::size(branch); ++k)
 			{
-			//	if(std::bernoulli_distribution{branch_rate}(rng))
+				if(std::bernoulli_distribution{branch_rate}(rng))
 				{
 					auto const n     = compute_normal(prev, current, branch[k].first);
 					auto const theta = std::atan2(n[1], n[0]);
-					branches.push_back(BranchParams{segment_length * seg_scale_factor,
-					                                std::min(length_tot * branch_scale_factor, node.max_seg_length),
-					                                current,
-					                                theta,
-					                                branch[k - 1].second,
-					                                0.5*std::min(Texpainter::length(prev - current),
-					                                Texpainter::length(branch[k].first - current)),
-					                                node.depth + 1});
-					prev    = current;
-					current = branch[k].first;
+					branches.push_back(BranchParams{
+					    segment_length * seg_scale_factor,
+					    std::min(length_tot * branch_scale_factor, node.max_seg_length),
+					    current,
+					    theta,
+					    branch[k - 1].second,
+					    0.5
+					        * std::min(Texpainter::length(prev - current),
+					                   Texpainter::length(branch[k].first - current)),
+					    node.depth + 1});
 				}
+				prev    = current;
+				current = branch[k].first;
 			}
 		}
 	}
@@ -147,8 +147,8 @@ void main(auto const& args, auto const& params)
 {
 	auto const domain_length = std::sqrt(area(args.canvasSize()));
 
-	auto gen_segs = [segment_length = static_cast<double>(
-	                     param<Str{"Segment length"}>(params).value()),
+	auto gen_segs = [segment_length =
+	                     static_cast<double>(param<Str{"Segment length"}>(params).value()),
 	                 stiffness  = static_cast<double>(param<Str{"Stiffness"}>(params).value()),
 	                 length_tot = static_cast<double>(param<Str{"Branch length"}>(params).value()
 	                                                  * domain_length),
@@ -158,7 +158,7 @@ void main(auto const& args, auto const& params)
 	                                                   std::nextafter(4.0f, 0.0f),
 	                                                   param<Str{"Max depth"}>(params).value())),
 	                 seg_scale_factor    = param<Str{"Segment scale factor"}>(params).value(),
-	                 branch_scale_factor = param<Str{"Branch scale factor"}>(params).value(),
+	                 branch_scale_factor = param<Str{"Secondary branch length"}>(params).value(),
 	                 branch_rate = param<Str{"Branch rate"}>(params).value()](auto val) mutable {
 		auto const loc_vec = vec2_t{static_cast<double>(val.loc.x), static_cast<double>(val.loc.y)};
 		auto const start_heading = val.rot.radians();
@@ -175,11 +175,8 @@ void main(auto const& args, auto const& params)
 		                             branch_scale_factor);
 	};
 
-	auto now = std::chrono::steady_clock::now();
 	std::ranges::transform(
 	    input<0>(args).get(), std::back_inserter(output<0>(args).get()), gen_segs);
-
-	printf("MakeLinesegTrees: %zu\n", (std::chrono::steady_clock::now() - now).count());
 }
 ```
 
