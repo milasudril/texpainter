@@ -26,14 +26,14 @@ __Secondary branch length:__ (= 0.5)
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <random>
 #include <deque>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 inline auto gen_branch(double segment_length,
@@ -147,7 +147,8 @@ void main(auto const& args, auto const& params)
 {
 	auto const domain_length = std::sqrt(area(args.canvasSize()));
 
-	auto gen_segs = [segment_length = Texpainter::ScalingFactors::sizeScaleFactor( static_cast<double>(param<Str{"Segment length"}>(params).value())),
+	auto gen_segs = [segment_length = Texpainter::ScalingFactors::sizeScaleFactor(
+	                     static_cast<double>(param<Str{"Segment length"}>(params).value())),
 	                 stiffness  = static_cast<double>(param<Str{"Stiffness"}>(params).value()),
 	                 length_tot = static_cast<double>(param<Str{"Branch length"}>(params).value()
 	                                                  * domain_length),
