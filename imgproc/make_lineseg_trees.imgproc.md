@@ -18,7 +18,7 @@ __Branch length:__ (= 0.5)
 
 __Max depth:__ (= 0.0) The number of tree levels
 
-__Branch rate:__ (= 0.5) __Branch scale factor__: (= 0.5) The scaling factor between tree levels
+__Branch rate:__ (= 0.5)
 
 __Segment scale factor:__ (= 0.5)
 
@@ -26,14 +26,14 @@ __Secondary branch length:__ (= 0.5)
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <random>
 #include <deque>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 inline auto gen_branch(double segment_length,
