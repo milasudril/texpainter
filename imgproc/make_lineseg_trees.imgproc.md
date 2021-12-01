@@ -49,11 +49,12 @@ inline auto gen_branch(double segment_length,
 	std::uniform_real_distribution turn{-0.5 * std::numbers::pi, 0.5 * std::numbers::pi};
 	std::gamma_distribution seg_length{3.0, segment_length};
 	auto const h0  = heading;
-	auto const lsq = length_tot * length_tot;
-	auto const l0  = location;
-	while(Texpainter::lengthSquared(location - l0) < lsq)
+//	auto const lsq = length_tot * length_tot;
+//	auto const l0  = location;
+//	while(Texpainter::lengthSquared(location - l0) < lsq)
+	for(size_t k = 0; k  < 3 ; ++k)
 	{
-		auto const l = std::max(seg_length(rng), 16.0);
+		auto const l =  0.33333*length_tot; //std::max(seg_length(rng), 16.0);
 		location += l * vec2_t{std::cos(heading), std::sin(heading)};
 		heading += turn(rng);
 		heading += stiffness * (h0 - heading);
@@ -82,6 +83,7 @@ struct BranchParams
 	vec2_t start_loc;
 	double start_heading;
 	std::reference_wrapper<LineSegTree> ret;
+	double max_seg_length;
 	size_t depth;
 };
 
@@ -99,12 +101,13 @@ inline LineSegTree gen_line_segment_tree(double segment_length,
 {
 	std::deque<BranchParams> branches;
 	LineSegTree ret;
-	branches.push_back(BranchParams{segment_length, length_tot, start_loc, start_heading, ret, 0});
+	branches.push_back(BranchParams{segment_length, length_tot, start_loc, start_heading, ret, length_tot, 0});
 
 	while(!branches.empty())
 	{
 		auto node = branches.front();
 		branches.pop_front();
+		printf("%zu %.15g\n", node.depth, node.length_tot);
 		node.ret.get().data = gen_branch(node.segment_length,
 		                                 stiffness,
 		                                 node.length_tot,
@@ -124,10 +127,12 @@ inline LineSegTree gen_line_segment_tree(double segment_length,
 					auto const n     = compute_normal(prev, current, branch[k].first);
 					auto const theta = std::atan2(n[1], n[0]);
 					branches.push_back(BranchParams{segment_length * seg_scale_factor,
-					                                length_tot * branch_scale_factor,
+					                                std::min(length_tot * branch_scale_factor, node.max_seg_length),
 					                                current,
 					                                theta,
 					                                branch[k - 1].second,
+					                                0.5*std::min(Texpainter::length(prev - current),
+					                                Texpainter::length(branch[k].first - current)),
 					                                node.depth + 1});
 					prev    = current;
 					current = branch[k].first;
