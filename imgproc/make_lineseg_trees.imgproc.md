@@ -47,13 +47,13 @@ inline auto gen_branch(double segment_length,
 	std::vector<std::pair<vec2_t, LineSegTree>> ret{std::pair{location, LineSegTree{}}};
 
 	std::uniform_real_distribution turn{-0.5 * std::numbers::pi, 0.5 * std::numbers::pi};
-	std::gamma_distribution seg_length{3.0, std::max(segment_length, 16.0)};
+	std::gamma_distribution seg_length{3.0, segment_length};
 	auto const h0  = heading;
 	auto const lsq = length_tot * length_tot;
 	auto const l0  = location;
 	while(Texpainter::lengthSquared(location - l0) < lsq)
 	{
-		auto l = seg_length(rng);
+		auto const l = std::max(seg_length(rng), 16.0);
 		location += l * vec2_t{std::cos(heading), std::sin(heading)};
 		heading += turn(rng);
 		heading += stiffness * (h0 - heading);
@@ -93,7 +93,7 @@ inline LineSegTree gen_line_segment_tree(double segment_length,
                                          vec2_t start_loc,
                                          double start_heading,
                                          size_t max_depth,
-                                         double branch_rate,
+                                         double /*branch_rate*/,
                                          double seg_scale_factor,
                                          double branch_scale_factor)
 {
@@ -119,7 +119,7 @@ inline LineSegTree gen_line_segment_tree(double segment_length,
 			auto current = branch.front().first;
 			for(size_t k = 1; k != std::size(branch); ++k)
 			{
-				if(std::bernoulli_distribution{branch_rate}(rng))
+			//	if(std::bernoulli_distribution{branch_rate}(rng))
 				{
 					auto const n     = compute_normal(prev, current, branch[k].first);
 					auto const theta = std::atan2(n[1], n[0]);
