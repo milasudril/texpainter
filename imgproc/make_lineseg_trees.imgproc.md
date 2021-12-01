@@ -47,14 +47,14 @@ inline auto gen_branch(double segment_length,
 	std::vector<std::pair<vec2_t, LineSegTree>> ret{std::pair{location, LineSegTree{}}};
 
 	std::uniform_real_distribution turn{-0.5 * std::numbers::pi, 0.5 * std::numbers::pi};
-	std::gamma_distribution seg_length{3.0, segment_length};
+	std::gamma_distribution seg_length{3.0, segment_length*length_tot};
 	auto const h0  = heading;
-//	auto const lsq = length_tot * length_tot;
-//	auto const l0  = location;
-//	while(Texpainter::lengthSquared(location - l0) < lsq)
-	for(size_t k = 0; k  < 3 ; ++k)
+	auto const lsq = length_tot * length_tot;
+	auto const l0  = location;
+	while(Texpainter::lengthSquared(location - l0) < lsq)
+//	for(size_t k = 0; k  < 3 ; ++k)
 	{
-		auto const l =  0.33333*length_tot; //std::max(seg_length(rng), 16.0);
+		auto const l = std::max(seg_length(rng), 16.0);
 		location += l * vec2_t{std::cos(heading), std::sin(heading)};
 		heading += turn(rng);
 		heading += stiffness * (h0 - heading);
@@ -148,7 +148,7 @@ void main(auto const& args, auto const& params)
 	auto const domain_length = std::sqrt(area(args.canvasSize()));
 
 	auto gen_segs = [segment_length = static_cast<double>(
-	                     param<Str{"Segment length"}>(params).value() * domain_length),
+	                     param<Str{"Segment length"}>(params).value()),
 	                 stiffness  = static_cast<double>(param<Str{"Stiffness"}>(params).value()),
 	                 length_tot = static_cast<double>(param<Str{"Branch length"}>(params).value()
 	                                                  * domain_length),
