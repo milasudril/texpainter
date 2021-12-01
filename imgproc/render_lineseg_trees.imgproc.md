@@ -18,13 +18,14 @@ __Growth rate:__ (= 0.5)
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <algorithm>
+#include <chrono>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 [[nodiscard]] double draw(
@@ -87,9 +88,11 @@ void main(auto const& args, auto const& params)
 	auto const line_width = sizeFromMin(args.canvasSize(), param<Str{"Line width"}>(params)) / 32.0;
 	auto const grow_rate  = std::lerp(-4.0f, 4.0f, param<Str{"Growth rate"}>(params).value());
 
+	auto now = std::chrono::steady_clock::now();
 	std::ranges::for_each(input<0>(args).get(), [&args, line_width, grow_rate](auto const& item) {
 		draw(item.data, args, line_width, grow_rate);
 	});
+	printf("RenderTrees: %zu\n", (std::chrono::steady_clock::now() - now).count());
 }
 ```
 

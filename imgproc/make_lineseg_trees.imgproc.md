@@ -18,8 +18,7 @@ __Branch length:__ (= 0.5)
 
 __Max depth:__ (= 0.0) The number of tree levels
 
-__Branch rate:__ (= 0.5)
-__Branch scale factor__: (= 0.5) The scaling factor between tree levels
+__Branch rate:__ (= 0.5) __Branch scale factor__: (= 0.5) The scaling factor between tree levels
 
 __Segment scale factor:__ (= 0.5)
 
@@ -31,6 +30,8 @@ __Includes:__
 
 ```c++
 #include <random>
+#include <deque>
+#include <chrono>
 ```
 
 __Source code:__
@@ -53,9 +54,9 @@ inline auto gen_branch(double segment_length,
 	while(Texpainter::lengthSquared(location - l0) < lsq)
 	{
 		auto l = seg_length(rng);
+		location += l * vec2_t{std::cos(heading), std::sin(heading)};
 		heading += turn(rng);
 		heading += stiffness * (h0 - heading);
-		location += l * vec2_t{std::cos(heading), std::sin(heading)};
 		ret.push_back(std::pair{location, LineSegTree{}});
 	}
 
@@ -74,6 +75,17 @@ inline auto compute_normal(vec2_t prev, vec2_t current, vec2_t next)
 	}
 }
 
+struct BranchParams
+{
+	double segment_length;
+	double length_tot;
+	vec2_t start_loc;
+	double start_heading;
+	std::reference_wrapper<LineSegTree> ret;
+	size_t depth;
+};
+
+
 inline LineSegTree gen_line_segment_tree(double segment_length,
                                          double stiffness,
                                          double length_tot,
@@ -85,34 +97,45 @@ inline LineSegTree gen_line_segment_tree(double segment_length,
                                          double seg_scale_factor,
                                          double branch_scale_factor)
 {
-	auto branch = gen_branch(segment_length, stiffness, length_tot, rng, start_loc, start_heading);
-	if(max_depth != 0)
+	std::deque<BranchParams> branches;
+	LineSegTree ret;
+	branches.push_back(BranchParams{segment_length, length_tot, start_loc, start_heading, ret, 0});
+
+	while(!branches.empty())
 	{
-		auto prev    = branch.back().first;
-		auto current = branch.front().first;
-		for(size_t k = 1; k != std::size(branch); ++k)
+		auto node = branches.front();
+		branches.pop_front();
+		node.ret.get().data = gen_branch(node.segment_length,
+		                                 stiffness,
+		                                 node.length_tot,
+		                                 rng,
+		                                 node.start_loc,
+		                                 node.start_heading);
+
+		if(node.depth != max_depth)
 		{
-			if(std::bernoulli_distribution{branch_rate}(rng))
+			auto& branch = node.ret.get().data;
+			auto prev    = branch.back().first;
+			auto current = branch.front().first;
+			for(size_t k = 1; k != std::size(branch); ++k)
 			{
-				auto const n         = compute_normal(prev, current, branch[k].first);
-				auto const theta     = std::atan2(n[1], n[0]);
-				branch[k - 1].second = gen_line_segment_tree(segment_length * seg_scale_factor,
-				                                             stiffness,
-				                                             length_tot * branch_scale_factor,
-				                                             rng,
-				                                             branch[k - 1].first,
-				                                             theta,
-				                                             max_depth - 1,
-				                                             branch_rate,
-				                                             seg_scale_factor,
-				                                             branch_scale_factor);
-				prev                 = current;
-				current              = branch[k].first;
+				if(std::bernoulli_distribution{branch_rate}(rng))
+				{
+					auto const n     = compute_normal(prev, current, branch[k].first);
+					auto const theta = std::atan2(n[1], n[0]);
+					branches.push_back(BranchParams{segment_length * seg_scale_factor,
+					                                length_tot * branch_scale_factor,
+					                                current,
+					                                theta,
+					                                branch[k - 1].second,
+					                                node.depth + 1});
+					prev    = current;
+					current = branch[k].first;
+				}
 			}
 		}
 	}
-
-	return LineSegTree{std::move(branch)};
+	return ret;
 }
 
 void main(auto const& args, auto const& params)
@@ -147,8 +170,11 @@ void main(auto const& args, auto const& params)
 		                             branch_scale_factor);
 	};
 
+	auto now = std::chrono::steady_clock::now();
 	std::ranges::transform(
 	    input<0>(args).get(), std::back_inserter(output<0>(args).get()), gen_segs);
+
+	printf("MakeLinesegTrees: %zu\n", (std::chrono::steady_clock::now() - now).count());
 }
 ```
 
