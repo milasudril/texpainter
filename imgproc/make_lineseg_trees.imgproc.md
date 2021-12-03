@@ -28,14 +28,14 @@ __Secondary branch length:__ (= 0.5)
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <random>
 #include <deque>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 inline auto gen_branch(double segment_length,
@@ -54,20 +54,20 @@ inline auto gen_branch(double segment_length,
 	auto const h0  = heading;
 	auto const lsq = length_tot * length_tot;
 	auto const l0  = location;
-	auto const w = domain_size.width();
-	auto const h = domain_size.height();
+	auto const w   = domain_size.width();
+	auto const h   = domain_size.height();
 	while(Texpainter::lengthSquared(location - l0) < lsq)
 	{
-		auto const l = std::max(seg_length(rng), 16.0);
-		location += l * vec2_t{std::cos(heading), std::sin(heading)};
-
-		auto const x = static_cast<uint32_t>(location[0] + w);
-		auto const y = static_cast<uint32_t>(location[1] + h);
-		auto const field = topo_info[w*(y%h) + x%w].normal();
-		auto const h_grad = std::atan2(-field[1], -field[0]);
-
+		auto const l         = std::max(seg_length(rng), 16.0);
+		auto const x         = static_cast<uint32_t>(location[0] + w);
+		auto const y         = static_cast<uint32_t>(location[1] + h);
+		auto const field     = topo_info[w * (y % h) + x % w].normal();
+		auto const grad      = vec2_t{field[0], field[1]};
+		auto const t         = Texpainter::length(grad);
+		auto const noise_dir = vec2_t{std::cos(heading), std::sin(heading)};
+		location += l * ((1.0 - t) * noise_dir + t * grad);
 		heading += turn(rng);
-		heading += stiffness * (h0*0.75 + (1.0 - 0.75)*h_grad - heading);
+		heading += stiffness * (h0 - heading);
 
 		ret.push_back(std::pair{location, LineSegTree{}});
 	}
@@ -175,9 +175,9 @@ void main(auto const& args, auto const& params)
 	                                                   param<Str{"Max depth"}>(params).value())),
 	                 seg_scale_factor    = param<Str{"Segment scale factor"}>(params).value(),
 	                 branch_scale_factor = param<Str{"Secondary branch length"}>(params).value(),
-	                 branch_rate = param<Str{"Branch rate"}>(params).value(),
-	                 topo_info = input<1>(args),
-	                 domain_size = args.canvasSize()](auto val) mutable {
+	                 branch_rate         = param<Str{"Branch rate"}>(params).value(),
+	                 topo_info           = input<1>(args),
+	                 domain_size         = args.canvasSize()](auto val) mutable {
 		auto const loc_vec = vec2_t{static_cast<double>(val.loc.x), static_cast<double>(val.loc.y)};
 		auto const start_heading = val.rot.radians();
 		auto const length_scale  = static_cast<double>(val.scale);
@@ -195,7 +195,8 @@ void main(auto const& args, auto const& params)
 		                             domain_size);
 	};
 
-	std::ranges::transform(input<0>(args).get(), std::back_inserter(output<0>(args).get()), gen_segs);
+	std::ranges::transform(
+	    input<0>(args).get(), std::back_inserter(output<0>(args).get()), gen_segs);
 }
 ```
 
