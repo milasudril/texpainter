@@ -4,6 +4,8 @@
 
 __Input:__ (Point cloud)
 
+__Direction field:__ (Topography data)
+
 ## Output ports
 
 __Output:__ (Line segment tree)
@@ -41,7 +43,9 @@ inline auto gen_branch(double segment_length,
                        double length_tot,
                        Rng& rng,
                        vec2_t location,
-                       double heading)
+                       double heading,
+                       TopographyInfo const* topo_info,
+                       Size2d domain_size)
 {
 	std::vector<std::pair<vec2_t, LineSegTree>> ret{std::pair{location, LineSegTree{}}};
 
@@ -50,12 +54,21 @@ inline auto gen_branch(double segment_length,
 	auto const h0  = heading;
 	auto const lsq = length_tot * length_tot;
 	auto const l0  = location;
+	auto const w = domain_size.width();
+	auto const h = domain_size.height();
 	while(Texpainter::lengthSquared(location - l0) < lsq)
 	{
 		auto const l = std::max(seg_length(rng), 16.0);
 		location += l * vec2_t{std::cos(heading), std::sin(heading)};
+
+		auto const x = static_cast<uint32_t>(location[0] + w);
+		auto const y = static_cast<uint32_t>(location[1] + h);
+		auto const field = topo_info[w*(y%h) + x%w].normal();
+		auto const h_grad = std::atan2(-field[1], -field[0]);
+
 		heading += turn(rng);
-		heading += stiffness * (h0 - heading);
+		heading += stiffness * (h0*0.75 + (1.0 - 0.75)*h_grad - heading);
+
 		ret.push_back(std::pair{location, LineSegTree{}});
 	}
 
@@ -85,7 +98,6 @@ struct BranchParams
 	size_t depth;
 };
 
-
 inline LineSegTree gen_line_segment_tree(double segment_length,
                                          double stiffness,
                                          double length_tot,
@@ -95,7 +107,9 @@ inline LineSegTree gen_line_segment_tree(double segment_length,
                                          size_t max_depth,
                                          double branch_rate,
                                          double seg_scale_factor,
-                                         double branch_scale_factor)
+                                         double branch_scale_factor,
+                                         TopographyInfo const* topo_info,
+                                         Size2d domain_size)
 {
 	std::deque<BranchParams> branches;
 	LineSegTree ret;
@@ -111,7 +125,9 @@ inline LineSegTree gen_line_segment_tree(double segment_length,
 		                                 node.length_tot,
 		                                 rng,
 		                                 node.start_loc,
-		                                 node.start_heading);
+		                                 node.start_heading,
+		                                 topo_info,
+		                                 domain_size);
 
 		if(node.depth != max_depth)
 		{
@@ -159,7 +175,9 @@ void main(auto const& args, auto const& params)
 	                                                   param<Str{"Max depth"}>(params).value())),
 	                 seg_scale_factor    = param<Str{"Segment scale factor"}>(params).value(),
 	                 branch_scale_factor = param<Str{"Secondary branch length"}>(params).value(),
-	                 branch_rate = param<Str{"Branch rate"}>(params).value()](auto val) mutable {
+	                 branch_rate = param<Str{"Branch rate"}>(params).value(),
+	                 topo_info = input<1>(args),
+	                 domain_size = args.canvasSize()](auto val) mutable {
 		auto const loc_vec = vec2_t{static_cast<double>(val.loc.x), static_cast<double>(val.loc.y)};
 		auto const start_heading = val.rot.radians();
 		auto const length_scale  = static_cast<double>(val.scale);
@@ -172,11 +190,12 @@ void main(auto const& args, auto const& params)
 		                             max_depth,
 		                             branch_rate,
 		                             seg_scale_factor,
-		                             branch_scale_factor);
+		                             branch_scale_factor,
+		                             topo_info,
+		                             domain_size);
 	};
 
-	std::ranges::transform(
-	    input<0>(args).get(), std::back_inserter(output<0>(args).get()), gen_segs);
+	std::ranges::transform(input<0>(args).get(), std::back_inserter(output<0>(args).get()), gen_segs);
 }
 ```
 
