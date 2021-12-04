@@ -28,16 +28,125 @@ __Secondary branch length:__ (= 0.5)
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <random>
 #include <deque>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
+inline auto compute_normal(vec2_t prev, vec2_t next)
+{
+	auto const v = Texpainter::normalize(next - prev);
+	return vec2_t{v[1], -v[0]};
+}
+
+inline std::pair<vec2_t, double> closest_seg_dist(
+    std::span<std::pair<vec2_t, LineSegTree> const> line_segs, vec2_t loc)
+{
+	auto r0 = line_segs[0].first;
+	auto r  = line_segs[1].first;
+
+	auto n0 = compute_normal(r0, r);
+	auto d0 = Texpainter::dot(loc - r0, n0);
+	r0      = r;
+
+	for(size_t k = 2; k != std::size(line_segs); ++k)
+	{
+		r            = line_segs[k].first;
+		auto const n = compute_normal(r0, r);
+		auto const d = Texpainter::dot(loc - r0, n);
+		if(d < d0)
+		{
+			n0 = n;
+			d0 = d;
+		}
+		r0 = r;
+	}
+
+	return std::pair{n0, d0};
+}
+
+inline vec2_t eval_sibling_field(std::pair<vec2_t, double> dir_distance, double size)
+{
+	return dir_distance.first * std::exp2(-dir_distance.second / size);
+}
+
+struct ExtFeild
+{
+	TopographyInfo const* ext_field;
+	Size2d domain_size;
+};
+
+struct SiblingField
+{
+	std::span<std::pair<vec2_t, LineSegTree> const> line_segs;
+	double size;
+};
+
+struct BranchingConstants
+{
+	double dir_randomization;
+	double ext_field_strength;
+	double init_field_strength;
+	double sibling_field_strength;
+
+	Size2d domain_size;
+	TopographyInfo const* ext_potential;
+};
+
+struct BranchParams2
+{
+	double length_tot;
+	double seg_length;
+	vec2_t loc_init;
+	vec2_t v0;
+	vec2_t init_field;
+	SiblingField sibling_field;
+};
+
+inline auto gen_branch(BranchingConstants const& branching_constants,
+                       BranchParams2 const& branch_params,
+                       Rng& rng)
+{
+	std::uniform_real_distribution turn{-0.5 * std::numbers::pi, 0.5 * std::numbers::pi};
+	std::gamma_distribution seg_length{3.0, branch_params.length_tot * branch_params.seg_length};
+
+	auto const length_squared       = branch_params.length_tot * branch_params.length_tot;
+	auto v                          = branch_params.v0;
+	auto const w                    = branching_constants.domain_size.width();
+	auto const h                    = branching_constants.domain_size.height();
+	auto const ext_potential        = branching_constants.ext_potential;
+	auto const sibling_field_params = branch_params.sibling_field;
+
+	auto location = branch_params.loc_init;
+	std::vector<std::pair<vec2_t, LineSegTree>> ret{std::pair{location, LineSegTree{}}};
+
+	while(Texpainter::lengthSquared(location - branch_params.loc_init) < length_squared)
+	{
+		auto const random_heading = turn(rng);
+		auto const l              = std::max(seg_length(rng), 16.0);
+		location += l * v / Texpainter::length(v);
+
+		auto const x              = static_cast<uint32_t>(location[0] + w);
+		auto const y              = static_cast<uint32_t>(location[1] + h);
+		auto const ext_pot_normal = ext_potential[w * (y % h) + x % w].normal();
+		auto const ext_field      = vec2_t{ext_pot_normal[0], ext_pot_normal[1]};
+
+		auto const sibling_seg   = closest_seg_dist(sibling_field_params.line_segs, location);
+		auto const sibling_field = eval_sibling_field(sibling_seg, sibling_field_params.size);
+
+		v += branching_constants.dir_randomization
+		         * vec2_t{std::cos(random_heading), std::sin(random_heading)}
+		     + branching_constants.ext_field_strength * ext_field
+		     + branching_constants.init_field_strength * branch_params.init_field
+		     + branching_constants.sibling_field_strength * sibling_field;
+	}
+}
+
 inline auto gen_branch(double segment_length,
                        double stiffness,
                        double length_tot,
@@ -75,12 +184,6 @@ inline auto gen_branch(double segment_length,
 	return ret;
 }
 
-inline auto compute_normal(vec2_t prev, vec2_t next)
-{
-	auto const v = Texpainter::normalize(next - prev);
-	return vec2_t{v[1], -v[0]};
-}
-
 struct BranchParams
 {
 	double segment_length;
@@ -108,8 +211,8 @@ inline LineSegTree gen_line_segment_tree(double segment_length,
 {
 	std::deque<BranchParams> branches;
 	LineSegTree ret;
-	branches.push_back(
-	    BranchParams{segment_length, length_tot, start_loc, start_heading, -1.0, ret, length_tot, 0});
+	branches.push_back(BranchParams{
+	    segment_length, length_tot, start_loc, start_heading, -1.0, ret, length_tot, 0});
 
 	while(!branches.empty())
 	{
@@ -157,7 +260,8 @@ inline LineSegTree gen_line_segment_tree(double segment_length,
 				current = next;
 			}
 
-			std::ranges::sort(next_set, [](auto const& a, auto const& b){return a.side < b.side;});
+			std::ranges::sort(next_set,
+			                  [](auto const& a, auto const& b) { return a.side < b.side; });
 			std::ranges::copy(next_set, std::back_inserter(branches));
 		}
 	}
