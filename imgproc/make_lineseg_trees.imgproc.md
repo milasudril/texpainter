@@ -75,16 +75,10 @@ inline auto gen_branch(double segment_length,
 	return ret;
 }
 
-inline auto compute_normal(vec2_t prev, vec2_t current, vec2_t next)
+inline auto compute_normal(vec2_t prev, vec2_t next)
 {
-	auto const v      = Texpainter::normalize(next - prev);
-	auto const delta  = current - prev;
-	auto const n_temp = vec2_t{v[1], -v[0]};
-	if(auto const side = Texpainter::dot(delta, n_temp); side < 0.0) { return -n_temp; }
-	else
-	{
-		return n_temp;
-	}
+	auto const v = Texpainter::normalize(next - prev);
+	return vec2_t{v[1], -v[0]};
 }
 
 struct BranchParams
@@ -97,6 +91,42 @@ struct BranchParams
 	double max_seg_length;
 	size_t depth;
 };
+
+/*
+struct SeedPoint
+{
+	vec2_t start_loc;
+	vec2_t normal;
+	double side;
+};
+
+SeedPoint gen_seed_point(vec2_t prev, vec2_t current, vec2_t next)
+{
+	auto const v      = Texpainter::normalize(next - prev);
+	auto const delta  = current - prev;
+	auto const n = vec2_t{v[1], -v[0]};
+	auto const side = Texpainter::dot(delta, n) < 0.0? -1.0 : 1.0;
+	return SeedPoint{current, n, side};
+}
+
+inline auto gen_seed_points(std::vector<std::pair<vec2_t, LineSegTree>> const& branch, Rng& rng, double branch_rate)
+{
+	std::vector<SeedPoint> seed_points;
+	seed_points.reserve(std::size(branch));
+	auto prev    = branch.back().first;
+	auto current = branch.front().first;
+	for(size_t k = 1; k != std::size(branch); ++k)
+	{
+		if(std::bernoulli_distribution{branch_rate}(rng))
+		{
+			seed_points.push_back(gen_seed_point(prev, current, branch[k].first));
+		}
+		prev    = current;
+		current = branch[k].first;
+	}
+	return seed_points;
+}
+*/
 
 inline LineSegTree gen_line_segment_tree(double segment_length,
                                          double stiffness,
@@ -136,9 +166,12 @@ inline LineSegTree gen_line_segment_tree(double segment_length,
 			auto current = branch.front().first;
 			for(size_t k = 1; k != std::size(branch); ++k)
 			{
+				auto const next = branch[k].first;
 				if(std::bernoulli_distribution{branch_rate}(rng))
 				{
-					auto const n     = compute_normal(prev, current, branch[k].first);
+					auto n          = compute_normal(prev, next);
+					auto const side = Texpainter::dot(current - prev, n) < 0.0 ? -1.0 : 1.0;
+					n *= side;
 					auto const theta = std::atan2(n[1], n[0]);
 					branches.push_back(BranchParams{
 					    segment_length * seg_scale_factor,
@@ -148,11 +181,11 @@ inline LineSegTree gen_line_segment_tree(double segment_length,
 					    branch[k - 1].second,
 					    0.5
 					        * std::min(Texpainter::length(prev - current),
-					                   Texpainter::length(branch[k].first - current)),
+					                   Texpainter::length(next - current)),
 					    node.depth + 1});
 				}
 				prev    = current;
-				current = branch[k].first;
+				current = next;
 			}
 		}
 	}
