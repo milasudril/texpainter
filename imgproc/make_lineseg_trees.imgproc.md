@@ -18,8 +18,6 @@ __Ext. field strength:__ (= 0.0)
 
 __Parent field strength:__ (= 0.5)
 
-__Sibling field strength:__ (= 0.0)
-
 __Trunk length:__ (= 0.5)
 
 __Segment length:__ (= 0.5)
@@ -65,7 +63,6 @@ inline auto get_branch_constants(auto const& args, auto const& params)
 	ret.dir_noise              = param<Str{"Direction noise"}>(params).value();
 	ret.ext_field_strength     = param<Str{"Ext. field strength"}>(params).value();
 	ret.parent_field_strength  = param<Str{"Parent field strength"}>(params).value();
-	ret.sibling_field_strength = param<Str{"Sibling field strength"}>(params).value();
 	ret.ext_potential          = input<1>(args);
 
 	return ret;
@@ -113,7 +110,6 @@ struct BranchParams
 	vec2_t loc_init;
 	vec2_t v0;
 	vec2_t parent_field;
-	std::vector<std::pair<vec2_t, LineSegTree>> const* sibling_field;
 };
 
 
@@ -122,44 +118,6 @@ inline auto compute_normal(vec2_t prev, vec2_t next)
 	auto const v = Texpainter::normalize(next - prev);
 	return vec2_t{v[1], -v[0]};
 }
-
-inline std::pair<vec2_t, double> closest_seg_dist(
-    std::span<std::pair<vec2_t, LineSegTree> const> line_segs, vec2_t loc)
-{
-	if(std::size(line_segs) == 0) { return std::pair{vec2_t{0.0, 0.0}, 0.0}; }
-
-	auto r0 = line_segs[0].first;
-
-	size_t k = 1;
-
-	auto r  = line_segs[k].first;
-	auto n0 = compute_normal(r0, r);
-	auto const d_singed = Texpainter::dot(loc - r0, n0);
-	auto d0 = std::abs(d_singed);
-	r0      = r;
-
-	for(; k != std::size(line_segs); ++k)
-	{
-		r            = line_segs[k].first;
-		auto const n = compute_normal(r0, r);
-		auto const d_singed = Texpainter::dot(loc - r0, n);
-		auto const d = std::abs(d_singed);
-		if(d < d0)
-		{
-			n0 = n;
-			d0 = d;
-		}
-		r0 = r;
-	}
-
-	return std::pair{n0, d0};
-}
-
-inline vec2_t eval_sibling_field(std::pair<vec2_t, double> dir_distance, double size)
-{
-	return dir_distance.first * std::exp2(-dir_distance.second / size);
-}
-
 
 inline auto gen_branch(BranchConstants const& branch_constants,
                        BranchParams const& branch_params,
@@ -177,7 +135,6 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 	auto const w                    = branch_constants.domain_size.width();
 	auto const h                    = branch_constants.domain_size.height();
 	auto const ext_potential        = branch_constants.ext_potential;
-	auto const sibling = branch_params.sibling_field;
 
 	auto location = branch_params.loc_init;
 	std::vector<std::pair<vec2_t, LineSegTree>> ret{std::pair{location, LineSegTree{}}};
@@ -195,15 +152,10 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 		auto const ext_pot_normal = ext_potential[w * (y % h) + x % w].normal();
 		auto const ext_field      = vec2_t{ext_pot_normal[0], ext_pot_normal[1]};
 
-		auto const sibling_seg   = sibling != nullptr ? closest_seg_dist(*sibling, location):
-			std::pair{vec2_t{0.0, 0.0}, 0.0};
-		auto const sibling_field = 2.0*eval_sibling_field(sibling_seg, length_tot * seg_length);
-
 
 		v = branch_constants.dir_noise * vec2_t{std::cos(random_heading), std::sin(random_heading )}
 		     + branch_constants.ext_field_strength * ext_field
-		     + branch_constants.parent_field_strength * branch_params.parent_field
-		     + branch_constants.sibling_field_strength * sibling_field;
+		     + branch_constants.parent_field_strength * branch_params.parent_field;
 		v /= Texpainter::length(v);
 	}
 
@@ -244,8 +196,6 @@ inline LineSegTree gen_line_segment_tree(BranchConstants const& branch_constants
 			auto prev    = branch.back().first;
 			auto current = branch.front().first;
 
-			std::vector<Node> next_set;
-			next_set.reserve(std::size(branch));
 			for(size_t k = 1; k != std::size(branch); ++k)
 			{
 				auto const next = branch[k].first;
@@ -268,44 +218,12 @@ inline LineSegTree gen_line_segment_tree(BranchConstants const& branch_constants
 					                    .seg_length = branch_params.size_params.seg_length},
 					            .loc_init     = current,
 					            .v0           = n,
-					            .parent_field = n,
-					            .sibling_field = nullptr}
+					            .parent_field = n}
 					};
-					next_set.push_back(new_node);
+					pending_branches.push_back(new_node);
 				}
 				prev    = current;
 				current = next;
-			}
-
-			if(std::size(next_set) != 0)
-			{
-				std::ranges::sort(next_set, [](auto const& a, auto const& b) {
-					if(a.side == b.side)
-					{
-						if(a.side < 0.0)
-						{ return a.index < b.index; }
-						return a.index > b.index;
-					}
-					return a.side < b.side;
-				});
-
-				auto ptr = std::begin(next_set);
-				auto side = ptr->side;
-				auto prev = ptr;
-				for(; ptr != std::end(next_set); ++ptr)
-				{
-					if(ptr->side != side) { break; }
-					ptr->branch_params.sibling_field = &prev->ret.get().data;
-					prev = ptr;
-				}
-				side = ptr->side;
-				for(; ptr != std::end(next_set); ++ptr)
-				{
-					ptr->branch_params.sibling_field = &prev->ret.get().data;
-					prev = ptr;
-				}
-
-				std::ranges::copy(next_set, std::back_inserter(pending_branches));
 			}
 		}
 	}
@@ -332,7 +250,6 @@ void main(auto const& args, auto const& params)
 		trunk_params.loc_init               = loc_vec;
 		trunk_params.v0                 = vec2_t{std::cos(start_heading), std::sin(start_heading)};
 		trunk_params.parent_field       = trunk_params.v0;
-		trunk_params.sibling_field = nullptr;
 
 		return gen_line_segment_tree(branch_constants, branching_params, trunk_params, rng);
 	};
