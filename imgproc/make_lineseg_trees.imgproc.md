@@ -339,45 +339,6 @@ void main(auto const& args, auto const& params)
 
 	std::ranges::transform(
 	    input<0>(args).get(), std::back_inserter(output<0>(args).get()), gen_segs);
-
-
-	/*
-
-	auto gen_segs = [segment_length = Texpainter::ScalingFactors::sizeScaleFactor(
-	                     static_cast<double>(param<Str{"Segment length"}>(params).value())),
-	                 stiffness  = static_cast<double>(param<Str{"Stiffness"}>(params).value()),
-	                 length_tot = static_cast<double>(param<Str{"Branch length"}>(params).value()
-	                                                  * domain_length),
-	                 rng        = Rng{args.rngSeed()},
-	                 max_depth =
-	                     static_cast<size_t>(std::lerp(0.0f,
-	                                                   std::nextafter(4.0f, 0.0f),
-	                                                   param<Str{"Max depth"}>(params).value())),
-	                 seg_scale_factor    = param<Str{"Segment scale factor"}>(params).value(),
-	                 branch_scale_factor = param<Str{"Secondary branch length"}>(params).value(),
-	                 branch_rate         = param<Str{"Branch rate"}>(params).value(),
-	                 topo_info           = input<1>(args),
-	                 domain_size         = args.canvasSize()](auto val) mutable {
-		auto const loc_vec = vec2_t{static_cast<double>(val.loc.x), static_cast<double>(val.loc.y)};
-		auto const start_heading = val.rot.radians();
-		auto const length_scale  = static_cast<double>(val.scale);
-		return gen_line_segment_tree(segment_length * length_scale,
-		                             stiffness,
-		                             length_tot * length_scale,
-		                             rng,
-		                             loc_vec,
-		                             start_heading,
-		                             max_depth,
-		                             branch_rate,
-		                             seg_scale_factor,
-		                             branch_scale_factor,
-		                             topo_info,
-		                             domain_size);
-	};
-
-	std::ranges::transform(
-	    input<0>(args).get(), std::back_inserter(output<0>(args).get()), gen_segs);
-*/
 }
 ```
 
