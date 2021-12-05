@@ -94,7 +94,7 @@ struct BranchingParameters
 {
 	size_t max_depth;
 	double branch_rate;
-	std::array<double, 4> branch_lengths;
+	std::array<double, 3> branch_lengths;
 };
 
 inline auto get_branching_parameters(auto const& params)
@@ -106,7 +106,6 @@ inline auto get_branching_parameters(auto const& params)
 	ret.branch_lengths[0] = param<Str{"Level 1 length"}>(params).value();
 	ret.branch_lengths[1] = param<Str{"Level 2 length"}>(params).value();
 	ret.branch_lengths[2] = param<Str{"Level 3 length"}>(params).value();
-	ret.branch_lengths[3] = param<Str{"Level 4 length"}>(params).value();
 	return ret;
 }
 
