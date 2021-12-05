@@ -34,8 +34,6 @@ __Level 2 length:__ (= 0.5)
 
 __Level 3 length:__ (= 0.5)
 
-__Level 4 length:__ (= 0.5)
-
 ## Implementation
 
 __Includes:__
@@ -199,10 +197,10 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 
 		auto const sibling_seg   = sibling != nullptr ? closest_seg_dist(*sibling, location):
 			std::pair{vec2_t{0.0, 0.0}, 0.0};
-		auto const sibling_field = 2.0*eval_sibling_field(sibling_seg, 2.0*length_tot * seg_length);
+		auto const sibling_field = 2.0*eval_sibling_field(sibling_seg, length_tot * seg_length);
 
 
-		v += branch_constants.dir_noise * vec2_t{std::cos(random_heading), std::sin(random_heading )}
+		v = branch_constants.dir_noise * vec2_t{std::cos(random_heading), std::sin(random_heading )}
 		     + branch_constants.ext_field_strength * ext_field
 		     + branch_constants.parent_field_strength * branch_params.parent_field
 		     + branch_constants.sibling_field_strength * sibling_field;
