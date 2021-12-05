@@ -170,7 +170,7 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 	std::uniform_real_distribution turn{-0.5*std::numbers::pi, 0.5*std::numbers::pi};
 	auto const length_tot = branch_params.size_params.length_tot;
 	auto const seg_length = branch_params.size_params.seg_length;
-	std::gamma_distribution seg_length_dist{3.0, length_tot * seg_length};
+	std::gamma_distribution seg_length_dist{4.0, length_tot * seg_length};
 
 	printf("length_tot = %.15g  %.15g\n", length_tot, seg_length);
 
