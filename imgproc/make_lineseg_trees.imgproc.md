@@ -213,44 +213,6 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 
 	return ret;
 }
-/*
-inline auto gen_branch(double segment_length,
-                       double stiffness,
-                       double length_tot,
-                       Rng& rng,
-                       vec2_t location,
-                       double heading,
-                       TopographyInfo const* topo_info,
-                       Size2d domain_size)
-{
-	std::vector<std::pair<vec2_t, LineSegTree>> ret{std::pair{location, LineSegTree{}}};
-
-	std::uniform_real_distribution turn{-0.5 * std::numbers::pi, 0.5 * std::numbers::pi};
-	std::gamma_distribution seg_length{3.0, segment_length * length_tot};
-	auto const h0  = heading;
-	auto const lsq = length_tot * length_tot;
-	auto const l0  = location;
-	auto const w   = domain_size.width();
-	auto const h   = domain_size.height();
-	while(Texpainter::lengthSquared(location - l0) < lsq)
-	{
-		auto const l         = std::max(seg_length(rng), 16.0);
-		auto const x         = static_cast<uint32_t>(location[0] + w);
-		auto const y         = static_cast<uint32_t>(location[1] + h);
-		auto const field     = topo_info[w * (y % h) + x % w].normal();
-		auto const grad      = vec2_t{field[0], field[1]};
-		auto const t         = Texpainter::length(grad);
-		auto const noise_dir = vec2_t{std::cos(heading), std::sin(heading)};
-		location += l * ((1.0 - t) * noise_dir + t * grad);
-		heading += turn(rng);
-		heading += stiffness * (h0 - heading);
-
-		ret.push_back(std::pair{location, LineSegTree{}});
-	}
-
-	return ret;
-}
-*/
 
 struct Node
 {
