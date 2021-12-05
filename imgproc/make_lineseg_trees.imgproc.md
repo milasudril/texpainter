@@ -20,6 +20,8 @@ __Parent field strength:__ (= 0.5)
 
 __Sibling field strength:__ (= 0.0)
 
+
+
 __Trunk length:__ (= 0.5)
 
 __Segment length:__ (= 0.5)
@@ -38,14 +40,14 @@ __Level 4 length:__ (= 0.5)
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <random>
 #include <deque>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 struct BranchConstants
@@ -107,7 +109,6 @@ inline auto get_branching_parameters(auto const& params)
 	ret.branch_lengths[1] = param<Str{"Level 2 length"}>(params).value();
 	ret.branch_lengths[2] = param<Str{"Level 3 length"}>(params).value();
 	ret.branch_lengths[3] = param<Str{"Level 4 length"}>(params).value();
-
 	return ret;
 }
 
@@ -136,14 +137,21 @@ inline auto compute_normal(vec2_t prev, vec2_t next)
 inline std::pair<vec2_t, double> closest_seg_dist(
     std::span<std::pair<vec2_t, LineSegTree> const> line_segs, vec2_t loc)
 {
-	auto r0 = line_segs[0].first;
-	auto r  = line_segs[1].first;
+	if(std::size(line_segs) == 0)
+	{
+		return std::pair{vec2_t{0.0, 0.0}, 0.0};
+	}
 
+	auto r0 = line_segs[0].first;
+
+	size_t k = 1;
+
+	auto r  = line_segs[k].first;
 	auto n0 = compute_normal(r0, r);
 	auto d0 = Texpainter::dot(loc - r0, n0);
 	r0      = r;
 
-	for(size_t k = 2; k != std::size(line_segs); ++k)
+	for(; k != std::size(line_segs); ++k)
 	{
 		r            = line_segs[k].first;
 		auto const n = compute_normal(r0, r);
@@ -174,6 +182,8 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 	auto const seg_length = branch_params.size_params.seg_length;
 	std::gamma_distribution seg_length_dist{3.0, length_tot * seg_length};
 
+	printf("length_tot = %.15g  %.15g\n", length_tot, seg_length);
+
 	auto const length_squared       = length_tot * length_tot;
 	auto v                          = branch_params.v0;
 	auto const w                    = branch_constants.domain_size.width();
@@ -186,25 +196,28 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 
 	while(Texpainter::lengthSquared(location - branch_params.loc_init) < length_squared)
 	{
-		auto const random_heading = turn(rng);
 		auto const l              = std::max(seg_length_dist(rng), 16.0);
-		location += l * v / Texpainter::length(v);
+		printf("l = %.15g (%.15g, %.15g)\n", l, v[0], v[1]);
+		location += l * v;
+		ret.push_back(std::pair{location, LineSegTree{}});
 
+		auto const random_heading = turn(rng);
 		auto const x              = static_cast<uint32_t>(location[0] + w);
 		auto const y              = static_cast<uint32_t>(location[1] + h);
 		auto const ext_pot_normal = ext_potential[w * (y % h) + x % w].normal();
 		auto const ext_field      = vec2_t{ext_pot_normal[0], ext_pot_normal[1]};
 
-		auto const sibling_seg = std::size(sibling_field_params.line_segs) >= 2
-		                             ? closest_seg_dist(sibling_field_params.line_segs, location)
-		                             : std::pair{vec2_t{0.0, 0.0}, 0.0};
+		auto const sibling_seg = closest_seg_dist(sibling_field_params.line_segs, location);
 		auto const sibling_field = eval_sibling_field(sibling_seg, sibling_field_params.size);
 
 		v += branch_constants.dir_noise * vec2_t{std::cos(random_heading), std::sin(random_heading)}
 		     + branch_constants.ext_field_strength * ext_field
 		     + branch_constants.parent_field_strength * branch_params.parent_field
 		     + branch_constants.sibling_field_strength * sibling_field;
+		v/=Texpainter::length(v);
 	}
+
+	printf("num segs = %zu\n", std::size(ret));
 
 	return ret;
 }
@@ -356,6 +369,7 @@ void main(auto const& args, auto const& params)
 		trunk_params.loc_init               = loc_vec;
 		trunk_params.v0           = vec2_t{std::cos(start_heading), std::sin(start_heading)};
 		trunk_params.parent_field = trunk_params.v0;
+		trunk_params.sibling_field.size = 1.0;
 
 		return gen_line_segment_tree(branch_constants, branching_params, trunk_params, rng);
 	};
