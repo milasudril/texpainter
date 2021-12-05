@@ -167,7 +167,7 @@ inline auto gen_branch(BranchConstants const& branch_constants,
                        BranchParams const& branch_params,
                        Rng& rng)
 {
-	std::uniform_real_distribution turn{-std::numbers::pi, std::numbers::pi};
+	std::uniform_real_distribution turn{-0.5*std::numbers::pi, 0.5*std::numbers::pi};
 	auto const length_tot = branch_params.size_params.length_tot;
 	auto const seg_length = branch_params.size_params.seg_length;
 	std::gamma_distribution seg_length_dist{3.0, length_tot * seg_length};
@@ -191,7 +191,7 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 		location += l * v;
 		ret.push_back(std::pair{location, LineSegTree{}});
 
-		auto const random_heading = turn(rng);
+		auto const random_heading = turn(rng) + std::atan2(v[1], v[0]);
 		auto const x              = static_cast<uint32_t>(location[0] + w);
 		auto const y              = static_cast<uint32_t>(location[1] + h);
 		auto const ext_pot_normal = ext_potential[w * (y % h) + x % w].normal();
@@ -201,7 +201,8 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 			std::pair{vec2_t{0.0, 0.0}, 0.0};
 		auto const sibling_field = eval_sibling_field(sibling_seg, l);
 
-		v += branch_constants.dir_noise * vec2_t{std::cos(random_heading), std::sin(random_heading)}
+
+		v += branch_constants.dir_noise * vec2_t{std::cos(random_heading), std::sin(random_heading )}
 		     + branch_constants.ext_field_strength * ext_field
 		     + branch_constants.parent_field_strength * branch_params.parent_field
 		     + branch_constants.sibling_field_strength * sibling_field;
