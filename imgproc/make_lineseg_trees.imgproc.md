@@ -109,19 +109,13 @@ inline auto get_branching_parameters(auto const& params)
 	return ret;
 }
 
-struct SiblingField
-{
-	std::span<std::pair<vec2_t, LineSegTree> const> line_segs;
-	double size;
-};
-
 struct BranchParams
 {
 	SizeParameters size_params;
 	vec2_t loc_init;
 	vec2_t v0;
 	vec2_t parent_field;
-	SiblingField sibling_field;
+	std::vector<std::pair<vec2_t, LineSegTree>> const* sibling_field;
 };
 
 
@@ -142,14 +136,16 @@ inline std::pair<vec2_t, double> closest_seg_dist(
 
 	auto r  = line_segs[k].first;
 	auto n0 = compute_normal(r0, r);
-	auto d0 = Texpainter::dot(loc - r0, n0);
+	auto const d_singed = Texpainter::dot(loc - r0, n0);
+	auto d0 = std::abs(d_singed);
 	r0      = r;
 
 	for(; k != std::size(line_segs); ++k)
 	{
 		r            = line_segs[k].first;
 		auto const n = compute_normal(r0, r);
-		auto const d = Texpainter::dot(loc - r0, n);
+		auto const d_singed = Texpainter::dot(loc - r0, n);
+		auto const d = std::abs(d_singed);
 		if(d < d0)
 		{
 			n0 = n;
@@ -183,7 +179,7 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 	auto const w                    = branch_constants.domain_size.width();
 	auto const h                    = branch_constants.domain_size.height();
 	auto const ext_potential        = branch_constants.ext_potential;
-	auto const sibling_field_params = branch_params.sibling_field;
+	auto const sibling = branch_params.sibling_field;
 
 	auto location = branch_params.loc_init;
 	std::vector<std::pair<vec2_t, LineSegTree>> ret{std::pair{location, LineSegTree{}}};
@@ -201,8 +197,9 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 		auto const ext_pot_normal = ext_potential[w * (y % h) + x % w].normal();
 		auto const ext_field      = vec2_t{ext_pot_normal[0], ext_pot_normal[1]};
 
-		auto const sibling_seg   = closest_seg_dist(sibling_field_params.line_segs, location);
-		auto const sibling_field = eval_sibling_field(sibling_seg, sibling_field_params.size);
+		auto const sibling_seg   = sibling != nullptr ? closest_seg_dist(*sibling, location):
+			std::pair{vec2_t{0.0, 0.0}, 0.0};
+		auto const sibling_field = eval_sibling_field(sibling_seg, l);
 
 		v += branch_constants.dir_noise * vec2_t{std::cos(random_heading), std::sin(random_heading)}
 		     + branch_constants.ext_field_strength * ext_field
@@ -308,34 +305,7 @@ inline LineSegTree gen_line_segment_tree(BranchConstants const& branch_constants
 					            .loc_init     = current,
 					            .v0           = n,
 					            .parent_field = n,
-					            .sibling_field = SiblingField{{}, 1.0}}
-
-					    /*
-					struct BranchParams
-{
-	SizeParameters size_params;
-	vec2_t loc_init;
-	vec2_t v0;
-	vec2_t parent_field;
-	SiblingField sibling_field;
-};
-*/
-
-
-					    /*
-					next_set.push_back(BranchParams{
-					    segment_length * seg_scale_factor,
-					    std::min(length_tot * branch_scale_factor, node.max_seg_length),
-					    current,
-					    theta,
-					    side,
-					    k,
-					    branch[k - 1].second,
-					    0.5
-					        * std::min(Texpainter::length(prev - current),
-					                   Texpainter::length(next - current)),
-					    node.depth + 1});
-*/
+					            .sibling_field = nullptr}
 					};
 					next_set.push_back(new_node);
 				}
@@ -343,12 +313,36 @@ inline LineSegTree gen_line_segment_tree(BranchConstants const& branch_constants
 				current = next;
 			}
 
+			if(std::size(next_set) != 0)
+			{
+				std::ranges::sort(next_set, [](auto const& a, auto const& b) {
+					if(a.side == b.side)
+					{
+						if(a.side < 0.0)
+						{ return a.index < b.index; }
+						return a.index > b.index;
+					}
+					return a.side < b.side;
+				});
 
-			std::ranges::sort(next_set, [](auto const& a, auto const& b) {
-				if(a.side == b.side) { return a.index < b.index; }
-				return a.side < b.side;
-			});
-			std::ranges::copy(next_set, std::back_inserter(pending_branches));
+				auto ptr = std::begin(next_set);
+				auto side = ptr->side;
+				auto prev = ptr;
+				for(; ptr != std::end(next_set); ++ptr)
+				{
+					if(ptr->side != side) { break; }
+					ptr->branch_params.sibling_field = &prev->ret.get().data;
+					prev = ptr;
+				}
+				side = ptr->side;
+				for(; ptr != std::end(next_set); ++ptr)
+				{
+					ptr->branch_params.sibling_field = &prev->ret.get().data;
+					prev = ptr;
+				}
+
+				std::ranges::copy(next_set, std::back_inserter(pending_branches));
+			}
 		}
 	}
 	return ret;
@@ -374,7 +368,7 @@ void main(auto const& args, auto const& params)
 		trunk_params.loc_init               = loc_vec;
 		trunk_params.v0                 = vec2_t{std::cos(start_heading), std::sin(start_heading)};
 		trunk_params.parent_field       = trunk_params.v0;
-		trunk_params.sibling_field.size = 1.0;
+		trunk_params.sibling_field = nullptr;
 
 		return gen_line_segment_tree(branch_constants, branching_params, trunk_params, rng);
 	};
