@@ -199,7 +199,7 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 
 		auto const sibling_seg   = sibling != nullptr ? closest_seg_dist(*sibling, location):
 			std::pair{vec2_t{0.0, 0.0}, 0.0};
-		auto const sibling_field = eval_sibling_field(sibling_seg, l);
+		auto const sibling_field = 2.0*eval_sibling_field(sibling_seg, 2.0*length_tot * seg_length);
 
 
 		v += branch_constants.dir_noise * vec2_t{std::cos(random_heading), std::sin(random_heading )}
@@ -213,7 +213,7 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 
 	return ret;
 }
-
+/*
 inline auto gen_branch(double segment_length,
                        double stiffness,
                        double length_tot,
@@ -250,6 +250,7 @@ inline auto gen_branch(double segment_length,
 
 	return ret;
 }
+*/
 
 struct Node
 {
@@ -274,6 +275,8 @@ inline LineSegTree gen_line_segment_tree(BranchConstants const& branch_constants
 		auto const node = pending_branches.front();
 		pending_branches.pop_front();
 		node.ret.get().data = gen_branch(branch_constants, node.branch_params, rng);
+
+		printf("length_tot %.15g\n", node.branch_params.size_params.length_tot);
 
 		if(node.depth != branching_params.max_depth)
 		{
@@ -301,7 +304,7 @@ inline LineSegTree gen_line_segment_tree(BranchConstants const& branch_constants
 					            .size_params =
 					                SizeParameters{
 					                    .length_tot = branching_params.branch_lengths[node.depth]
-					                                  * branch_params.size_params.length_tot,
+					                                  * node.branch_params.size_params.length_tot,
 					                    .seg_length = branch_params.size_params.seg_length},
 					            .loc_init     = current,
 					            .v0           = n,
