@@ -28,14 +28,14 @@ __Secondary branch length:__ (= 0.5)
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <random>
 #include <deque>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 inline auto compute_normal(vec2_t prev, vec2_t next)
@@ -191,6 +191,7 @@ struct BranchParams
 	vec2_t start_loc;
 	double start_heading;
 	double side;
+	size_t index;
 	std::reference_wrapper<LineSegTree> ret;
 	double max_seg_length;
 	size_t depth;
@@ -212,7 +213,7 @@ inline LineSegTree gen_line_segment_tree(double segment_length,
 	std::deque<BranchParams> branches;
 	LineSegTree ret;
 	branches.push_back(BranchParams{
-	    segment_length, length_tot, start_loc, start_heading, -1.0, ret, length_tot, 0});
+	    segment_length, length_tot, start_loc, start_heading, -1.0, 0, ret, length_tot, 0});
 
 	while(!branches.empty())
 	{
@@ -250,6 +251,7 @@ inline LineSegTree gen_line_segment_tree(double segment_length,
 					    current,
 					    theta,
 					    side,
+					    k,
 					    branch[k - 1].second,
 					    0.5
 					        * std::min(Texpainter::length(prev - current),
@@ -260,8 +262,10 @@ inline LineSegTree gen_line_segment_tree(double segment_length,
 				current = next;
 			}
 
-			std::ranges::sort(next_set,
-			                  [](auto const& a, auto const& b) { return a.side < b.side; });
+			std::ranges::sort(next_set, [](auto const& a, auto const& b) {
+				if(a.side == b.side) { return a.index < b.index; }
+				return a.side < b.side;
+			});
 			std::ranges::copy(next_set, std::back_inserter(branches));
 		}
 	}
