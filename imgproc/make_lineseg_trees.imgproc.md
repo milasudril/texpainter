@@ -34,14 +34,14 @@ __Level 3 length:__ (= 0.5)
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <random>
 #include <deque>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 struct BranchConstants
@@ -125,25 +125,37 @@ struct LineSeg
 	vec2_t p2;
 };
 
-inline bool lineseg_intersect(LineSeg a, LineSeg b)
+inline bool intersect(LineSeg a, LineSeg b)
 {
 	auto const dir_a = a.p2 - a.p1;
-	auto const dir_b = b.p2 - a.p1;
+	auto const dir_b = b.p2 - b.p1;
 
 	auto const det = dir_a[0] * dir_b[1] - dir_a[1] * dir_b[0];
 
 	if(det == 0.0) [[unlikely]]
-	{
-		// For now, ingore overlapping line segments
-		return false;
-	}
+		{
+			return false;
+		}
 
 	auto const t_a = ((b.p1[0] - a.p1[0]) * dir_b[1] + (a.p1[1] - b.p1[1]) * dir_b[0]) / det;
 	auto const t_b = ((b.p1[0] - a.p1[0]) * dir_a[1] + (a.p1[1] - b.p1[1]) * dir_a[0]) / det;
 
-	return (t_a >= 0.0 && t_a <= 1.0) && (t_b >= 0.0 && t_b <= 1.0);
+	return (t_a > 0.0 && t_a < 1.0) && (t_b > 0.0 && t_b < 1.0);
 }
 
+inline bool intersect(LineSeg a, std::vector<std::pair<vec2_t, LineSegTree>> const& segs)
+{
+	if(std::size(segs) <= 1) { return false; }
+
+	auto p0 = segs.front().first;
+	for(size_t k = 1; k != std::size(segs); ++k)
+	{
+		if(intersect(a, LineSeg{p0, segs[k].first})) { return true; }
+		p0 = segs[k].first;
+	}
+
+	return false;
+}
 
 inline auto gen_branch(BranchConstants const& branch_constants,
                        BranchParams const& branch_params,
@@ -153,8 +165,6 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 	auto const length_tot = branch_params.size_params.length_tot;
 	auto const seg_length = branch_params.size_params.seg_length;
 	std::gamma_distribution seg_length_dist{4.0, length_tot * seg_length};
-
-	printf("length_tot = %.15g  %.15g\n", length_tot, seg_length);
 
 	auto const length_squared = length_tot * length_tot;
 	auto v                    = branch_params.v0;
@@ -168,8 +178,14 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 	while(Texpainter::lengthSquared(location - branch_params.loc_init) < length_squared)
 	{
 		auto const l = std::max(seg_length_dist(rng), 16.0);
-		printf("l = %.15g (%.15g, %.15g)\n", l, v[0], v[1]);
-		location += l * v;
+
+		auto const loc_next = location + l * v;
+		if(intersect(LineSeg{location, loc_next}, ret)) [[unlikely]]
+			{
+				return ret;
+			}
+
+		location = loc_next;
 		ret.push_back(std::pair{location, LineSegTree{}});
 
 		auto const random_heading = turn(rng) + std::atan2(v[1], v[0]);
@@ -178,14 +194,11 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 		auto const ext_pot_normal = ext_potential[w * (y % h) + x % w].normal();
 		auto const ext_field      = vec2_t{ext_pot_normal[0], ext_pot_normal[1]};
 
-
 		v = branch_constants.dir_noise * vec2_t{std::cos(random_heading), std::sin(random_heading)}
 		    + branch_constants.ext_field_strength * ext_field
 		    + branch_constants.parent_field_strength * branch_params.parent_field;
 		v /= Texpainter::length(v);
 	}
-
-	printf("num segs = %zu\n", std::size(ret));
 
 	return ret;
 }
@@ -213,8 +226,6 @@ inline LineSegTree gen_line_segment_tree(BranchConstants const& branch_constants
 		auto const node = pending_branches.front();
 		pending_branches.pop_front();
 		node.ret.get().data = gen_branch(branch_constants, node.branch_params, rng);
-
-		printf("length_tot %.15g\n", node.branch_params.size_params.length_tot);
 
 		if(node.depth != branching_params.max_depth)
 		{
