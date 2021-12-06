@@ -34,14 +34,14 @@ __Level 3 length:__ (= 0.5)
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <random>
 #include <deque>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 struct BranchConstants
@@ -60,10 +60,10 @@ struct BranchConstants
 inline auto get_branch_constants(auto const& args, auto const& params)
 {
 	BranchConstants ret{args.canvasSize()};
-	ret.dir_noise              = param<Str{"Direction noise"}>(params).value();
-	ret.ext_field_strength     = param<Str{"Ext. field strength"}>(params).value();
-	ret.parent_field_strength  = param<Str{"Parent field strength"}>(params).value();
-	ret.ext_potential          = input<1>(args);
+	ret.dir_noise             = param<Str{"Direction noise"}>(params).value();
+	ret.ext_field_strength    = param<Str{"Ext. field strength"}>(params).value();
+	ret.parent_field_strength = param<Str{"Parent field strength"}>(params).value();
+	ret.ext_potential         = input<1>(args);
 
 	return ret;
 }
@@ -123,18 +123,18 @@ inline auto gen_branch(BranchConstants const& branch_constants,
                        BranchParams const& branch_params,
                        Rng& rng)
 {
-	std::uniform_real_distribution turn{-0.5*std::numbers::pi, 0.5*std::numbers::pi};
+	std::uniform_real_distribution turn{-0.5 * std::numbers::pi, 0.5 * std::numbers::pi};
 	auto const length_tot = branch_params.size_params.length_tot;
 	auto const seg_length = branch_params.size_params.seg_length;
 	std::gamma_distribution seg_length_dist{4.0, length_tot * seg_length};
 
 	printf("length_tot = %.15g  %.15g\n", length_tot, seg_length);
 
-	auto const length_squared       = length_tot * length_tot;
-	auto v                          = branch_params.v0;
-	auto const w                    = branch_constants.domain_size.width();
-	auto const h                    = branch_constants.domain_size.height();
-	auto const ext_potential        = branch_constants.ext_potential;
+	auto const length_squared = length_tot * length_tot;
+	auto v                    = branch_params.v0;
+	auto const w              = branch_constants.domain_size.width();
+	auto const h              = branch_constants.domain_size.height();
+	auto const ext_potential  = branch_constants.ext_potential;
 
 	auto location = branch_params.loc_init;
 	std::vector<std::pair<vec2_t, LineSegTree>> ret{std::pair{location, LineSegTree{}}};
@@ -153,9 +153,9 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 		auto const ext_field      = vec2_t{ext_pot_normal[0], ext_pot_normal[1]};
 
 
-		v = branch_constants.dir_noise * vec2_t{std::cos(random_heading), std::sin(random_heading )}
-		     + branch_constants.ext_field_strength * ext_field
-		     + branch_constants.parent_field_strength * branch_params.parent_field;
+		v = branch_constants.dir_noise * vec2_t{std::cos(random_heading), std::sin(random_heading)}
+		    + branch_constants.ext_field_strength * ext_field
+		    + branch_constants.parent_field_strength * branch_params.parent_field;
 		v /= Texpainter::length(v);
 	}
 
@@ -201,25 +201,31 @@ inline LineSegTree gen_line_segment_tree(BranchConstants const& branch_constants
 				auto const next = branch[k].first;
 				if(std::bernoulli_distribution{branching_params.branch_rate}(rng))
 				{
-					auto n          = compute_normal(prev, next);
-					auto const side = Texpainter::dot(current - prev, n) < 0.0 ? -1.0 : 1.0;
+					auto n = compute_normal(prev, next);
+
+					auto const side = [](vec2_t a, vec2_t b, Rng& rng) {
+						auto const proj = Texpainter::dot(a, b);
+						if(proj < 0.0) { return -1.0; }
+						if(proj > 0.0) { return 1.0; }
+						return std::bernoulli_distribution{0.5}(rng) ? -1.0 : 1.0;
+					}(current - prev, n, rng);
+
 					n *= side;
+
 					Node new_node{
-					    .side  = side,
-					    .index = k,
-					    .ret   = branch[k - 1].second,
-					    .depth = node.depth + 1,
-					    .branch_params =
-					        BranchParams{
-					            .size_params =
-					                SizeParameters{
-					                    .length_tot = branching_params.branch_lengths[node.depth]
-					                                  * node.branch_params.size_params.length_tot,
-					                    .seg_length = branch_params.size_params.seg_length},
-					            .loc_init     = current,
-					            .v0           = n,
-					            .parent_field = n}
-					};
+					    .side          = side,
+					    .index         = k,
+					    .ret           = branch[k - 1].second,
+					    .depth         = node.depth + 1,
+					    .branch_params = BranchParams{
+					        .size_params =
+					            SizeParameters{.length_tot =
+					                               branching_params.branch_lengths[node.depth]
+					                               * node.branch_params.size_params.length_tot,
+					                           .seg_length = branch_params.size_params.seg_length},
+					        .loc_init     = current,
+					        .v0           = n,
+					        .parent_field = n}};
 					pending_branches.push_back(new_node);
 				}
 				prev    = current;
@@ -248,8 +254,8 @@ void main(auto const& args, auto const& params)
 		trunk_params.size_params.length_tot = length_scale * size_params.length_tot;
 		trunk_params.size_params.seg_length = size_params.seg_length;
 		trunk_params.loc_init               = loc_vec;
-		trunk_params.v0                 = vec2_t{std::cos(start_heading), std::sin(start_heading)};
-		trunk_params.parent_field       = trunk_params.v0;
+		trunk_params.v0           = vec2_t{std::cos(start_heading), std::sin(start_heading)};
+		trunk_params.parent_field = trunk_params.v0;
 
 		return gen_line_segment_tree(branch_constants, branching_params, trunk_params, rng);
 	};
