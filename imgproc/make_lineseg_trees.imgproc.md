@@ -217,7 +217,6 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 struct Node
 {
 	double side;
-	size_t index;
 	std::reference_wrapper<LineSegTree> ret;
 	size_t depth;
 	BranchParams branch_params;
@@ -230,7 +229,7 @@ inline LineSegTree gen_line_segment_tree(BranchConstants const& branch_constants
 {
 	LineSegTree ret;
 	std::deque<Node> pending_branches;
-	pending_branches.push_back(Node{-1.0, 0, ret, 0, branch_params});
+	pending_branches.push_back(Node{-1.0, ret, 0, branch_params});
 
 	while(!pending_branches.empty())
 	{
@@ -262,7 +261,6 @@ inline LineSegTree gen_line_segment_tree(BranchConstants const& branch_constants
 
 					Node new_node{
 					    .side          = side,
-					    .index         = k,
 					    .ret           = branch[k - 1].second,
 					    .depth         = node.depth + 1,
 					    .branch_params = BranchParams{
