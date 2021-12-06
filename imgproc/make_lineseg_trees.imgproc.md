@@ -157,8 +157,17 @@ inline bool intersect(LineSeg a, std::vector<std::pair<vec2_t, LineSegTree>> con
 	return false;
 }
 
+inline bool intersect(LineSeg a, LineSegTree const& tree)
+{
+	if(intersect(a, tree.data)) { return true; }
+
+	return std::ranges::any_of(tree.data,
+	                           [a](auto const& item) { return intersect(a, item.second); });
+}
+
 inline auto gen_branch(BranchConstants const& branch_constants,
                        BranchParams const& branch_params,
+                       LineSegTree const& tree,
                        Rng& rng)
 {
 	std::uniform_real_distribution turn{-0.5 * std::numbers::pi, 0.5 * std::numbers::pi};
@@ -184,6 +193,8 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 			{
 				return ret;
 			}
+
+		if(intersect(LineSeg{location, loc_next}, tree)) { return ret; }
 
 		location = loc_next;
 		ret.push_back(std::pair{location, LineSegTree{}});
@@ -225,7 +236,7 @@ inline LineSegTree gen_line_segment_tree(BranchConstants const& branch_constants
 	{
 		auto const node = pending_branches.front();
 		pending_branches.pop_front();
-		node.ret.get().data = gen_branch(branch_constants, node.branch_params, rng);
+		node.ret.get().data = gen_branch(branch_constants, node.branch_params, ret, rng);
 
 		if(node.depth != branching_params.max_depth)
 		{
