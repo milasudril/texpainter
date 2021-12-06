@@ -34,14 +34,14 @@ __Level 3 length:__ (= 0.5)
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <random>
 #include <deque>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 struct BranchConstants
@@ -118,6 +118,32 @@ inline auto compute_normal(vec2_t prev, vec2_t next)
 	auto const v = Texpainter::normalize(next - prev);
 	return vec2_t{v[1], -v[0]};
 }
+
+struct LineSeg
+{
+	vec2_t p1;
+	vec2_t p2;
+};
+
+inline bool lineseg_intersect(LineSeg a, LineSeg b)
+{
+	auto const dir_a = a.p2 - a.p1;
+	auto const dir_b = b.p2 - a.p1;
+
+	auto const det = dir_a[0] * dir_b[1] - dir_a[1] * dir_b[0];
+
+	if(det == 0.0) [[unlikely]]
+	{
+		// For now, ingore overlapping line segments
+		return false;
+	}
+
+	auto const t_a = ((b.p1[0] - a.p1[0]) * dir_b[1] + (a.p1[1] - b.p1[1]) * dir_b[0]) / det;
+	auto const t_b = ((b.p1[0] - a.p1[0]) * dir_a[1] + (a.p1[1] - b.p1[1]) * dir_a[0]) / det;
+
+	return (t_a >= 0.0 && t_a <= 1.0) && (t_b >= 0.0 && t_b <= 1.0);
+}
+
 
 inline auto gen_branch(BranchConstants const& branch_constants,
                        BranchParams const& branch_params,
