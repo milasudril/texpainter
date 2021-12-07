@@ -110,6 +110,7 @@ struct BranchParams
 	vec2_t loc_init;
 	vec2_t v0;
 	vec2_t parent_field;
+	std::optional<std::pair<vec2_t, vec2_t>> neighbours;
 };
 
 
@@ -193,10 +194,14 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 		auto const l = std::max(seg_length_dist(rng), 16.0);
 
 		auto const loc_next = location + l * v;
-		if(intersect(LineSeg{location, loc_next}, std::span{std::data(ret), std::size(ret) - 1}, [](auto const&){return true;}))
+		if(intersect(LineSeg{location, loc_next},
+		             std::span{std::data(ret), std::size(ret) - 1},
+		             [](auto const&) { return true; }))
 			[[unlikely]] { return ret; }
 
-		if(intersect(LineSeg{location, loc_next}, tree, [](auto const&){return true;})) { return ret; }
+		if((!branch_params.neighbours.has_value() || std::size(ret) != 1)
+		   && intersect(LineSeg{location, loc_next}, tree, [](auto const&) { return true; }))
+		{ return ret; }
 
 		location = loc_next;
 		ret.push_back(std::pair{location, LineSegTree{}});
@@ -273,7 +278,8 @@ inline LineSegTree gen_line_segment_tree(BranchConstants const& branch_constants
 					                           .seg_length = branch_params.size_params.seg_length},
 					        .loc_init     = current,
 					        .v0           = n,
-					        .parent_field = n}};
+					        .parent_field = n,
+					        .neighbours = std::nullopt}};
 					pending_branches.push_back(new_node);
 				}
 				prev    = current;
