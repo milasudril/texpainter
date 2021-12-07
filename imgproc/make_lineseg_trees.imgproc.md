@@ -34,14 +34,14 @@ __Level 3 length:__ (= 0.5)
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <random>
 #include <deque>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 struct BranchConstants
@@ -143,7 +143,7 @@ inline bool intersect(LineSeg a, LineSeg b)
 	return (t_a > 0.0 && t_a < 1.0) && (t_b > 0.0 && t_b < 1.0);
 }
 
-inline bool intersect(LineSeg a, std::vector<std::pair<vec2_t, LineSegTree>> const& segs)
+inline bool intersect(LineSeg a, std::span<std::pair<vec2_t, LineSegTree> const> segs)
 {
 	if(std::size(segs) <= 1) { return false; }
 
