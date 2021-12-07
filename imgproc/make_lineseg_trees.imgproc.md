@@ -189,7 +189,7 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 		auto const l = std::max(seg_length_dist(rng), 16.0);
 
 		auto const loc_next = location + l * v;
-		if(intersect(LineSeg{location, loc_next}, ret)) [[unlikely]]
+		if(intersect(LineSeg{location, loc_next}, std::span{std::data(ret), std::size(ret) - 1})) [[unlikely]]
 			{
 				return ret;
 			}
