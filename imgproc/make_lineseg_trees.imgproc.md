@@ -143,26 +143,30 @@ inline bool intersect(LineSeg a, LineSeg b)
 	return (t_a > 0.0 && t_a < 1.0) && (t_b > 0.0 && t_b < 1.0);
 }
 
-inline bool intersect(LineSeg a, std::span<std::pair<vec2_t, LineSegTree> const> segs)
+template<class Filter>
+inline bool intersect(LineSeg a, std::span<std::pair<vec2_t, LineSegTree> const> segs, Filter f)
 {
 	if(std::size(segs) <= 1) { return false; }
 
 	auto p0 = segs.front().first;
 	for(size_t k = 1; k != std::size(segs); ++k)
 	{
-		if(intersect(a, LineSeg{p0, segs[k].first})) { return true; }
+		auto const seg = LineSeg{p0, segs[k].first};
+		if(f(seg) && intersect(a, seg)) { return true; }
 		p0 = segs[k].first;
 	}
 
 	return false;
 }
 
-inline bool intersect(LineSeg a, LineSegTree const& tree)
+template<class Filter>
+inline bool intersect(LineSeg a, LineSegTree const& tree, Filter filter)
 {
-	if(intersect(a, tree.data)) { return true; }
+	if(intersect(a, tree.data, filter)) { return true; }
 
-	return std::ranges::any_of(tree.data,
-	                           [a](auto const& item) { return intersect(a, item.second); });
+	return std::ranges::any_of(tree.data, [a, f = std::forward<Filter>(filter)](auto const& item) {
+		return intersect(a, item.second, f);
+	});
 }
 
 inline auto gen_branch(BranchConstants const& branch_constants,
@@ -189,12 +193,10 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 		auto const l = std::max(seg_length_dist(rng), 16.0);
 
 		auto const loc_next = location + l * v;
-		if(intersect(LineSeg{location, loc_next}, std::span{std::data(ret), std::size(ret) - 1})) [[unlikely]]
-			{
-				return ret;
-			}
+		if(intersect(LineSeg{location, loc_next}, std::span{std::data(ret), std::size(ret) - 1}, [](auto const&){return true;}))
+			[[unlikely]] { return ret; }
 
-		if(intersect(LineSeg{location, loc_next}, tree)) { return ret; }
+		if(intersect(LineSeg{location, loc_next}, tree, [](auto const&){return true;})) { return ret; }
 
 		location = loc_next;
 		ret.push_back(std::pair{location, LineSegTree{}});
