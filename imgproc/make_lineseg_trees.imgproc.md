@@ -34,14 +34,14 @@ __Level 3 length:__ (= 0.5)
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <random>
 #include <deque>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 struct BranchConstants
@@ -152,7 +152,7 @@ inline bool intersect(LineSeg a, LineSeg b)
 	auto const t_a = ((b.p1[0] - a.p1[0]) * dir_b[1] + (a.p1[1] - b.p1[1]) * dir_b[0]) / det;
 	auto const t_b = ((b.p1[0] - a.p1[0]) * dir_a[1] + (a.p1[1] - b.p1[1]) * dir_a[0]) / det;
 
-	return (t_a > 0.0 && t_a < 1.0) && (t_b > 0.0 && t_b < 1.0);
+	return (t_a >= -1.0/8.0 && t_a <= 1.0 + 1.0/8.0) && (t_b >= -1.0/8.0 && t_b <= 1.0 + 1.0/8.0);
 }
 
 template<class Filter>
