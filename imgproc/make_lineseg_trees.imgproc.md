@@ -34,14 +34,14 @@ __Level 3 length:__ (= 0.5)
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <random>
 #include <deque>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 struct BranchConstants
@@ -126,6 +126,17 @@ struct LineSeg
 	vec2_t p2;
 };
 
+bool operator==(LineSeg a, LineSeg b)
+{
+	auto const var_a =
+	    a.p1[0] == b.p1[0] && a.p1[1] == b.p1[1] && a.p2[0] == b.p2[0] && a.p2[1] == b.p2[1];
+
+	auto const var_b =
+	    a.p1[0] == b.p2[0] && a.p1[1] == b.p2[1] && a.p2[0] == b.p1[0] && a.p2[1] == b.p1[1];
+
+	return var_a || var_b;
+}
+
 inline bool intersect(LineSeg a, LineSeg b)
 {
 	auto const dir_a = a.p2 - a.p1;
@@ -199,9 +210,24 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 		             [](auto const&) { return true; }))
 			[[unlikely]] { return ret; }
 
-		if((!branch_params.neighbours.has_value() || std::size(ret) != 1)
-		   && intersect(LineSeg{location, loc_next}, tree, [](auto const&) { return true; }))
-		{ return ret; }
+		if(branch_params.neighbours.has_value() && std::size(ret) == 1)
+		{
+			auto const neighbours = *branch_params.neighbours;
+
+			if(intersect(
+			       LineSeg{location, loc_next},
+			       tree,
+			       [linesegs = std::pair{LineSeg{neighbours.first, location},
+			                             LineSeg{location, neighbours.second}}](auto const& seg) {
+				       return seg != linesegs.first && seg != linesegs.second;
+			       }))
+			{ return ret; }
+		}
+		else
+		{
+			if(intersect(LineSeg{location, loc_next}, tree, [](auto const&) { return true; }))
+			{ return ret; }
+		}
 
 		location = loc_next;
 		ret.push_back(std::pair{location, LineSegTree{}});
@@ -279,7 +305,7 @@ inline LineSegTree gen_line_segment_tree(BranchConstants const& branch_constants
 					        .loc_init     = current,
 					        .v0           = n,
 					        .parent_field = n,
-					        .neighbours = std::nullopt}};
+					        .neighbours   = std::pair{prev, next}}};
 					pending_branches.push_back(new_node);
 				}
 				prev    = current;
