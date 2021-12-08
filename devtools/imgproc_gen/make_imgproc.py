@@ -37,6 +37,8 @@ def translateType(str):
 		return 'PointCloud'
 	if str == 'Polyline set':
 		return 'PolylineSet'
+	if str == 'Line segment tree':
+		return 'LineSegTree'
 	raise Exception('Unsupported port type ' + str)
 
 
@@ -120,6 +122,5 @@ cppsource = cppsource.makeCppSource(imgproc, sys.argv[2])
 validation_result = validate(cppsource, compiler)
 if validation_result == 0:
 	writeImgproc(cppsource, sys.argv[3])
-else:
-	print(cppsource)
+
 exit(validation_result)

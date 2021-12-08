@@ -27,6 +27,7 @@ namespace Texpainter::FilterGraph
 		TopographyData,
 		PointCloud,
 		Palette,
+		LineSegTree,
 		PolylineSet
 	};
 
@@ -39,6 +40,11 @@ namespace Texpainter::FilterGraph
 	using Palette        = PixelStore::RgbaPalette<16>;
 	using TopographyInfo = PixelStore::TopographyInfo;
 	using PolylineSet    = std::vector<std::vector<vec2_t>>;
+
+	struct LineSegTree
+	{
+		std::vector<std::pair<vec2_t, LineSegTree>> data;
+	};
 
 	struct ImageCoordinates
 	{
@@ -115,6 +121,13 @@ namespace Texpainter::FilterGraph
 	{
 		using type = PolylineSet;
 
+		static type createValue(Size2d) { return type{}; }
+	};
+
+	template<>
+	struct PortTypeToType<PortType::LineSegTree>
+	{
+		using type = std::vector<LineSegTree>;
 		static type createValue(Size2d) { return type{}; }
 	};
 }

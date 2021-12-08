@@ -31,6 +31,10 @@ namespace Texpainter
 
 	constexpr double length(vec2_t v) { return std::sqrt(dot(v, v)); }
 
+	constexpr auto normalize(vec2_t v) { return v / length(v); }
+
+	constexpr double lengthSquared(vec2_t v) { return dot(v, v); }
+
 	constexpr float dot(vec4_t a, vec4_t b)
 	{
 		a *= b;
