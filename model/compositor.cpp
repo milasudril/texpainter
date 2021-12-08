@@ -98,15 +98,14 @@ Texpainter::Model::CompositorOutput Texpainter::Model::Compositor::process(Size2
 		{
 			m_workers.addTask([item = *i,
 			                   domain_size,
-			                   resolution   = static_cast<double>(scale),
-			                   force_update = domain_size != m_current_size,
-			                   counter      = std::unique_lock{num_running_tasks},
-			                   at_exit      = ScopeExitHandler{
+			                   resolution = static_cast<double>(scale),
+			                   counter    = std::unique_lock{num_running_tasks},
+			                   at_exit    = ScopeExitHandler{
                                    [&e, &node_status = m_node_status, task_id = i->task_id]() {
                                        node_status[task_id] = true;
                                        e.set();
                                    }}]() {
-				if(force_update || !isUpToDate(item.node))
+				if(!isUpToDate(item.node, domain_size))
 				{
 					_mm_setcsr(_mm_getcsr() | 0x8040);  // Denormals are zero
 					item.node(domain_size, resolution);

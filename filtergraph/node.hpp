@@ -65,6 +65,7 @@ namespace Texpainter::FilterGraph
 		explicit Node(std::unique_ptr<AbstractImageProcessor> proc, NodeId id)
 		    : m_last_modified{now()}
 		    , m_last_rendered{0}
+		    , m_result_cache_size{Size2d{0, 0}}
 		    , m_proc{std::move(proc)}
 		    , m_id{id}
 		    , m_rng_seed{DefaultRng::genSeed()}
@@ -73,7 +74,14 @@ namespace Texpainter::FilterGraph
 
 		Node(Node&&) = delete;
 
-		Node(): m_last_modified{now()}, m_last_rendered{0}, m_proc{nullptr}, m_id{InvalidNodeId} {}
+		Node()
+		    : m_last_modified{now()}
+		    , m_last_rendered{0}
+		    , m_result_cache_size{Size2d{0, 0}}
+		    , m_proc{nullptr}
+		    , m_id{InvalidNodeId}
+		{
+		}
 
 		auto clonedProcessor() const { return m_proc->clone(); }
 
@@ -97,8 +105,9 @@ namespace Texpainter::FilterGraph
 			std::transform(std::begin(m_inputs), input_end, std::begin(args), [](auto const& val) {
 				return makeInputPortValue(val.result());
 			});
-			m_result_cache  = (*m_proc)(NodeArgument{size, resolution, m_rng_seed, args});
-			m_last_rendered = now();
+			m_result_cache      = (*m_proc)(NodeArgument{size, resolution, m_rng_seed, args});
+			m_result_cache_size = size;
+			m_last_rendered     = now();
 			return m_result_cache;
 		}
 
@@ -237,11 +246,14 @@ namespace Texpainter::FilterGraph
 			return *this;
 		}
 
+		auto resultCacheSize() const { return m_result_cache_size; }
+
 	private:
 		inline static std::atomic<size_t> s_clock;
 		static size_t now() { return s_clock.fetch_add(1); }
 		std::atomic<size_t> m_last_modified;
 		mutable std::atomic<size_t> m_last_rendered;
+		mutable Size2d m_result_cache_size;
 		mutable result_type m_result_cache;
 
 		std::array<Source, NodeArgument::MaxNumInputs> m_inputs;
@@ -265,8 +277,10 @@ namespace Texpainter::FilterGraph
 		mutable std::map<Node*, std::set<InputPortIndex, InputPortIndexCompare>> r_consumers;
 	};
 
-	inline bool isUpToDate(Node const& node)
+	inline bool isUpToDate(Node const& node, Size2d size)
 	{
+		if(node.resultCacheSize() != size) { return false; }
+
 		auto const inputs = node.inputs();
 		if(std::size(inputs) != 0)
 		{
@@ -283,12 +297,6 @@ namespace Texpainter::FilterGraph
 		{
 			return node.lastModified() < node.lastRendered();
 		}
-	}
-
-	inline bool inputsUpToDate(Node const& node)
-	{
-		return std::ranges::all_of(node.inputs(),
-		                           [](auto const& item) { return isUpToDate(item.processor()); });
 	}
 
 	inline bool isConnected(Node const& node)
