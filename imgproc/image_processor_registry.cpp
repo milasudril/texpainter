@@ -153,8 +153,7 @@ namespace
 	    get_info<::GrayscalePosterization::ImageProcessor>(),
 	    get_info<::RgbaPosterization::ImageProcessor>(),
 	    get_info<::GrayscaleMinmaxFilter::ImageProcessor>(),
-		get_info<::AlignMaximum::ImageProcessor>()
-	};
+	    get_info<::AlignMaximum::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
