@@ -36,14 +36,14 @@ __Level 3 length:__ (= 0.5)
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <random>
 #include <deque>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 struct BranchConstants
@@ -141,7 +141,7 @@ bool operator==(LineSeg a, LineSeg b)
 	return var_a || var_b;
 }
 
-inline bool intersect(LineSeg a, LineSeg b, double margin)
+inline bool intersect(LineSeg a, LineSeg b)
 {
 	auto const dir_a = a.p2 - a.p1;
 	auto const dir_b = b.p2 - b.p1;
@@ -156,11 +156,11 @@ inline bool intersect(LineSeg a, LineSeg b, double margin)
 	auto const t_a = ((b.p1[0] - a.p1[0]) * dir_b[1] + (a.p1[1] - b.p1[1]) * dir_b[0]) / det;
 	auto const t_b = ((b.p1[0] - a.p1[0]) * dir_a[1] + (a.p1[1] - b.p1[1]) * dir_a[0]) / det;
 
-	return (t_a >= -margin && t_a <= 1.0 + margin) && (t_b >= -margin && t_b <= 1.0 + margin);
+	return (t_a >= 0 && t_a <= 1.0) && (t_b >= 0.0 && t_b <= 1.0);
 }
 
 template<class Filter>
-inline bool intersect(LineSeg a, std::span<std::pair<vec2_t, LineSegTree> const> segs, double margin, Filter f)
+inline bool intersect(LineSeg a, std::span<std::pair<vec2_t, LineSegTree> const> segs, Filter f)
 {
 	if(std::size(segs) <= 1) { return false; }
 
@@ -168,7 +168,7 @@ inline bool intersect(LineSeg a, std::span<std::pair<vec2_t, LineSegTree> const>
 	for(size_t k = 1; k != std::size(segs); ++k)
 	{
 		auto const seg = LineSeg{p0, segs[k].first};
-		if(f(seg) && intersect(a, seg, margin)) { return true; }
+		if(f(seg) && intersect(a, seg)) { return true; }
 		p0 = segs[k].first;
 	}
 
@@ -176,12 +176,12 @@ inline bool intersect(LineSeg a, std::span<std::pair<vec2_t, LineSegTree> const>
 }
 
 template<class Filter>
-inline bool intersect(LineSeg a, LineSegTree const& tree, double margin, Filter filter)
+inline bool intersect(LineSeg a, LineSegTree const& tree, Filter filter)
 {
-	if(intersect(a, tree.data, margin, filter)) { return true; }
+	if(intersect(a, tree.data, filter)) { return true; }
 
-	return std::ranges::any_of(tree.data, [a, margin, f = std::forward<Filter>(filter)](auto const& item) {
-		return intersect(a, item.second, margin, f);
+	return std::ranges::any_of(tree.data, [a, f = std::forward<Filter>(filter)](auto const& item) {
+		return intersect(a, item.second, f);
 	});
 }
 
@@ -195,11 +195,11 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 	auto const seg_length = branch_params.size_params.seg_length;
 	std::gamma_distribution seg_length_dist{4.0, length_tot * seg_length};
 
-	auto const length_squared = length_tot * length_tot;
-	auto v                    = branch_params.v0;
-	auto const w              = branch_constants.domain_size.width();
-	auto const h              = branch_constants.domain_size.height();
-	auto const ext_potential  = branch_constants.ext_potential;
+	auto const length_squared  = length_tot * length_tot;
+	auto v                     = branch_params.v0;
+	auto const w               = branch_constants.domain_size.width();
+	auto const h               = branch_constants.domain_size.height();
+	auto const ext_potential   = branch_constants.ext_potential;
 	auto const line_seg_margin = branch_constants.line_seg_margin;
 
 	auto location = branch_params.loc_init;
@@ -209,9 +209,10 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 	{
 		auto const l = std::max(seg_length_dist(rng), 16.0);
 
-		auto const loc_next = location + l * v;
-		if(intersect(LineSeg{location, loc_next},
-		             std::span{std::data(ret), std::size(ret) - 1}, line_seg_margin,
+		auto const loc_next      = location + l * v;
+		auto const loc_next_test = loc_next + l * v * line_seg_margin;
+		if(intersect(LineSeg{location, loc_next_test},
+		             std::span{std::data(ret), std::size(ret) - 1},
 		             [](auto const&) { return true; }))
 			[[unlikely]] { return ret; }
 
@@ -220,9 +221,8 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 			auto const neighbours = *branch_params.neighbours;
 
 			if(intersect(
-			       LineSeg{location, loc_next},
+			       LineSeg{location, loc_next_test},
 			       tree,
-			       line_seg_margin,
 			       [linesegs = std::pair{LineSeg{neighbours.first, location},
 			                             LineSeg{location, neighbours.second}}](auto const& seg) {
 				       return seg != linesegs.first && seg != linesegs.second;
@@ -231,7 +231,7 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 		}
 		else
 		{
-			if(intersect(LineSeg{location, loc_next}, tree, line_seg_margin, [](auto const&) { return true; }))
+			if(intersect(LineSeg{location, loc_next_test}, tree, [](auto const&) { return true; }))
 			{ return ret; }
 		}
 
