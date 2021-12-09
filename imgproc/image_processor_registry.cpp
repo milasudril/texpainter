@@ -61,7 +61,8 @@
 //@		"./grayscale_minmax_filter.imgproc.hpp",
 //@		"./align_maximum.imgproc.hpp",
 //@		"./make_lineseg_trees.imgproc.hpp",
-//@		"./render_lineseg_trees.imgproc.hpp"
+//@		"./render_lineseg_trees.imgproc.hpp",
+//@		"./single_spawn_spot.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -157,7 +158,8 @@ namespace
 	    get_info<::GrayscaleMinmaxFilter::ImageProcessor>(),
 	    get_info<::AlignMaximum::ImageProcessor>(),
 	    get_info<::MakeLineSegmentTrees::ImageProcessor>(),
-	    get_info<::RenderLineSegmentTrees::ImageProcessor>()};
+	    get_info<::RenderLineSegmentTrees::ImageProcessor>(),
+	    get_info<::SingleSpawnSpot::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;

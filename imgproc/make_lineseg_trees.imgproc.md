@@ -38,14 +38,14 @@ __Level 3 length:__ (= 0.5)
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <random>
 #include <deque>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 struct BranchConstants
@@ -68,7 +68,7 @@ inline auto get_branch_constants(auto const& args, auto const& params)
 	ret.dir_noise             = param<Str{"Direction noise"}>(params).value();
 	ret.ext_field_strength    = param<Str{"Ext. field strength"}>(params).value();
 	ret.parent_field_strength = param<Str{"Parent field strength"}>(params).value();
-	ret.smoothness = param<Str{"Smoothness"}>(params).value();
+	ret.smoothness            = param<Str{"Smoothness"}>(params).value();
 	ret.line_seg_margin       = param<Str{"Collision margin"}>(params).value();
 	ret.ext_potential         = input<1>(args);
 
@@ -204,7 +204,7 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 	auto const h               = branch_constants.domain_size.height();
 	auto const ext_potential   = branch_constants.ext_potential;
 	auto const line_seg_margin = branch_constants.line_seg_margin;
-	auto const smoothness = branch_constants.smoothness;
+	auto const smoothness      = branch_constants.smoothness;
 
 	auto location = branch_params.loc_init;
 	std::vector<std::pair<vec2_t, LineSegTree>> ret{std::pair{location, LineSegTree{}}};
@@ -248,11 +248,12 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 		auto const ext_pot_normal = ext_potential[w * (y % h) + x % w].normal();
 		auto const ext_field      = vec2_t{ext_pot_normal[0], ext_pot_normal[1]};
 
-		auto const v_new = branch_constants.dir_noise * vec2_t{std::cos(random_heading), std::sin(random_heading)}
+		auto const v_new =
+		    branch_constants.dir_noise * vec2_t{std::cos(random_heading), std::sin(random_heading)}
 		    + branch_constants.ext_field_strength * ext_field
 		    + branch_constants.parent_field_strength * branch_params.parent_field;
 
-		v = (1.0 - smoothness)*v_new + v*smoothness;
+		v = (1.0 - smoothness) * v_new + v * smoothness;
 
 		v /= Texpainter::length(v);
 	}
