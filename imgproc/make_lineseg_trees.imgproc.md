@@ -22,8 +22,6 @@ __Smoothness:__ (= 0.5)
 
 __Trunk length:__ (= 0.5)
 
-__Segment length:__ (= 0.5)
-
 __Collision margin:__ (= 0.0)
 
 __Tree depth:__ (= 0.0)
@@ -38,14 +36,14 @@ __Level 3 length:__ (= 0.5)
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <random>
 #include <deque>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 struct BranchConstants
@@ -79,16 +77,12 @@ inline auto get_branch_constants(auto const& args, auto const& params)
 struct SizeParameters
 {
 	double length_tot;
-	double seg_length;
 };
 
 inline auto get_size_params(auto const& params, double domain_length)
 {
 	SizeParameters ret;
-
 	ret.length_tot = param<Str{"Trunk length"}>(params).value() * domain_length;
-	ret.seg_length =
-	    Texpainter::ScalingFactors::sizeScaleFactor(param<Str{"Segment length"}>(params).value());
 	return ret;
 }
 
@@ -195,8 +189,6 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 {
 	std::uniform_real_distribution turn{-0.5 * std::numbers::pi, 0.5 * std::numbers::pi};
 	auto const length_tot = branch_params.size_params.length_tot;
-	auto const seg_length = branch_params.size_params.seg_length;
-	std::gamma_distribution seg_length_dist{4.0, length_tot * seg_length};
 
 	auto const length_squared  = length_tot * length_tot;
 	auto v                     = branch_params.v0;
@@ -211,7 +203,7 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 
 	while(Texpainter::lengthSquared(location - branch_params.loc_init) < length_squared)
 	{
-		auto const l = std::max(seg_length_dist(rng), 16.0);
+		auto const l = 16.0;
 
 		auto const loc_next      = location + l * v;
 		auto const loc_next_test = loc_next + l * v * line_seg_margin;
@@ -314,8 +306,7 @@ inline LineSegTree gen_line_segment_tree(BranchConstants const& branch_constants
 					        .size_params =
 					            SizeParameters{.length_tot =
 					                               branching_params.branch_lengths[node.depth]
-					                               * node.branch_params.size_params.length_tot,
-					                           .seg_length = branch_params.size_params.seg_length},
+					                               * node.branch_params.size_params.length_tot},
 					        .loc_init     = current,
 					        .v0           = n,
 					        .parent_field = n,
@@ -346,7 +337,6 @@ void main(auto const& args, auto const& params)
 
 		BranchParams trunk_params{};
 		trunk_params.size_params.length_tot = length_scale * size_params.length_tot;
-		trunk_params.size_params.seg_length = size_params.seg_length;
 		trunk_params.loc_init               = loc_vec;
 		trunk_params.v0           = vec2_t{std::cos(start_heading), std::sin(start_heading)};
 		trunk_params.parent_field = trunk_params.v0;
