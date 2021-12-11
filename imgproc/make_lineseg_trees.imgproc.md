@@ -2,9 +2,9 @@
 
 ## Input ports
 
-__Input:__ (Point cloud)
+__Starting points:__ (Point cloud) The points where to start drawing a new tree
 
-__Direction field:__ (Topography data)
+__Direction field:__ (Topography data) This input controls the direction of trajectories. The trajectories will approach the  projection of the normal vector on the xy-plane.
 
 ## Output ports
 
@@ -12,40 +12,40 @@ __Output:__ (Line segment tree)
 
 ## Parameters
 
-__Direction noise:__ (= 0.5)
+__Direction noise:__ (= 0.5) The amout of randomness in the trajectory direction
 
-__Ext. field strength:__ (= 0.0)
+__Ext. field strength:__ (= 0.0) The influence of `Direction field` on trajectory directions
 
-__Parent field strength:__ (= 0.5)
+__Parent field strength:__ (= 0.5) The influence of the parent normal on trajectory directions
 
-__Smoothness:__ (= 0.5)
+__Smoothness:__ (= 0.5) How smooth trajectories are
 
-__Trunk length:__ (= 0.5)
+__Trunk length:__ (= 0.5) The length of trunk or branch level 0
 
-__Segment length:__ (= 0.5)
+__Segment length:__ (= 0.5) The length of segments relative to the current branch. The scale is logarithmic between 1/64 and 1, with 0.5 being mapped to 1/8.
 
-__Collision margin:__ (= 0.0)
+__Collision margin:__ (= 0.0) How mutch space there has to be between a line segment endpoint and any other line segment
 
-__Tree depth:__ (= 0.0)
+__Tree depth:__ (= 0.0) The maximum tree depth. 0.0 means that only trunks are created. 1.0 will result in a total of four levels, including the trunk.
 
-__Branch rate:__ (= 0.5)
+__Branch rate:__ (= 0.5) The probablity to spawn a new branch, measured per line segment. Thus, reducing the segment length will increase the number of branches.
 
-__Level 1 length:__ (= 0.5)
+__Level 1 scale:__ (= 0.5) How mutch to scale the first branch relative to the length of the trunk
 
-__Level 2 length:__ (= 0.5)
+__Level 2 scale:__ (= 0.5) How mutch to scale the first branch relative to the length of level 1
 
-__Level 3 length:__ (= 0.5)
+__Level 3 scale:__ (= 0.5) How mutch to scale the first branch relative to the length of level 2
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <random>
 #include <deque>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 struct BranchConstants
@@ -70,9 +70,10 @@ inline auto get_branch_constants(auto const& args, auto const& params)
 	ret.ext_field_strength    = param<Str{"Ext. field strength"}>(params).value();
 	ret.parent_field_strength = param<Str{"Parent field strength"}>(params).value();
 	ret.smoothness            = param<Str{"Smoothness"}>(params).value();
-	ret.seg_length            = std::exp2(std::lerp(-6.0f, 0.0f, param<Str{"Segment length"}>(params).value()));
-	ret.line_seg_margin       = param<Str{"Collision margin"}>(params).value();
-	ret.ext_potential         = input<1>(args);
+	ret.seg_length =
+	    std::exp2(std::lerp(-6.0f, 0.0f, param<Str{"Segment length"}>(params).value()));
+	ret.line_seg_margin = param<Str{"Collision margin"}>(params).value();
+	ret.ext_potential   = input<1>(args);
 
 	return ret;
 }
@@ -103,9 +104,9 @@ inline auto get_branching_parameters(auto const& params)
 	ret.max_depth = static_cast<size_t>(
 	    std::lerp(0.0f, std::nextafter(4.0f, 0.0f), param<Str{"Tree depth"}>(params).value()));
 	ret.branch_rate       = param<Str{"Branch rate"}>(params).value();
-	ret.branch_lengths[0] = param<Str{"Level 1 length"}>(params).value();
-	ret.branch_lengths[1] = param<Str{"Level 2 length"}>(params).value();
-	ret.branch_lengths[2] = param<Str{"Level 3 length"}>(params).value();
+	ret.branch_lengths[0] = param<Str{"Level 1 scale"}>(params).value();
+	ret.branch_lengths[1] = param<Str{"Level 2 scale"}>(params).value();
+	ret.branch_lengths[2] = param<Str{"Level 3 scale"}>(params).value();
 	return ret;
 }
 
@@ -204,7 +205,7 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 
 	auto location = branch_params.loc_init;
 	std::vector<std::pair<vec2_t, LineSegTree>> ret{std::pair{location, LineSegTree{}}};
-	auto const l = length_tot*branch_constants.seg_length;
+	auto const l = length_tot * branch_constants.seg_length;
 
 	while(Texpainter::lengthSquared(location - branch_params.loc_init) < length_squared)
 	{
