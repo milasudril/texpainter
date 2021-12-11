@@ -200,11 +200,10 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 
 	auto location = branch_params.loc_init;
 	std::vector<std::pair<vec2_t, LineSegTree>> ret{std::pair{location, LineSegTree{}}};
+	auto const l = std::max(16.0, length_tot/128.0);
 
 	while(Texpainter::lengthSquared(location - branch_params.loc_init) < length_squared)
 	{
-		auto const l = 16.0;
-
 		auto const loc_next      = location + l * v;
 		auto const loc_next_test = loc_next + l * v * line_seg_margin;
 		if(intersect(LineSeg{location, loc_next_test},
