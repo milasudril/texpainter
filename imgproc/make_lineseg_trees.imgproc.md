@@ -22,6 +22,8 @@ __Smoothness:__ (= 0.5)
 
 __Trunk length:__ (= 0.5)
 
+__Segment length:__ (= 0.5)
+
 __Collision margin:__ (= 0.0)
 
 __Tree depth:__ (= 0.0)
@@ -54,6 +56,7 @@ struct BranchConstants
 	double ext_field_strength;
 	double parent_field_strength;
 	double smoothness;
+	double seg_length;
 	double line_seg_margin;
 
 	Size2d domain_size;
@@ -67,6 +70,7 @@ inline auto get_branch_constants(auto const& args, auto const& params)
 	ret.ext_field_strength    = param<Str{"Ext. field strength"}>(params).value();
 	ret.parent_field_strength = param<Str{"Parent field strength"}>(params).value();
 	ret.smoothness            = param<Str{"Smoothness"}>(params).value();
+	ret.seg_length            = std::exp2(std::lerp(-6.0f, 0.0f, param<Str{"Segment length"}>(params).value()));
 	ret.line_seg_margin       = param<Str{"Collision margin"}>(params).value();
 	ret.ext_potential         = input<1>(args);
 
@@ -200,7 +204,7 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 
 	auto location = branch_params.loc_init;
 	std::vector<std::pair<vec2_t, LineSegTree>> ret{std::pair{location, LineSegTree{}}};
-	auto const l = std::max(16.0, length_tot/128.0);
+	auto const l = length_tot*branch_constants.seg_length;
 
 	while(Texpainter::lengthSquared(location - branch_params.loc_init) < length_squared)
 	{
