@@ -209,7 +209,7 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 	while(Texpainter::lengthSquared(location - branch_params.loc_init) < length_squared)
 	{
 		auto const loc_next      = location + l * v;
-		auto const loc_next_test = loc_next + l * v * line_seg_margin;
+		auto const loc_next_test = loc_next + length_tot * v * line_seg_margin;
 		if(intersect(LineSeg{location, loc_next_test},
 		             std::span{std::data(ret), std::size(ret) - 1},
 		             [](auto const&) { return true; }))
