@@ -20,7 +20,7 @@ __Trunk split:__ (= 0.0)
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <algorithm>
@@ -28,7 +28,7 @@ __Includes:__
 #include <ranges>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 [[nodiscard]] inline double draw(

@@ -30,6 +30,8 @@ __Tree depth:__ (= 0.0) The maximum tree depth. 0.0 means that only trunks are c
 
 __Branch rate:__ (= 0.5) The probablity to spawn a new branch, measured per line segment. Thus, reducing the segment length will increase the number of branches.
 
+__Allow branch on first:__ (= 0.0) Set to greater than 0.5 to allow first vertex to have a branch
+
 __Level 1 scale:__ (= 0.5) How mutch to scale the first branch relative to the length of the trunk
 
 __Level 2 scale:__ (= 0.5) How mutch to scale the first branch relative to the length of level 1
@@ -61,6 +63,7 @@ struct BranchConstants
 
 	Size2d domain_size;
 	TopographyInfo const* ext_potential;
+	bool allow_branch_on_first;
 };
 
 inline auto get_branch_constants(auto const& args, auto const& params)
@@ -72,8 +75,9 @@ inline auto get_branch_constants(auto const& args, auto const& params)
 	ret.smoothness            = param<Str{"Smoothness"}>(params).value();
 	ret.seg_length =
 	    std::exp2(std::lerp(-6.0f, 0.0f, param<Str{"Segment length"}>(params).value()));
-	ret.line_seg_margin = param<Str{"Collision margin"}>(params).value();
-	ret.ext_potential   = input<1>(args);
+	ret.line_seg_margin       = param<Str{"Collision margin"}>(params).value();
+	ret.ext_potential         = input<1>(args);
+	ret.allow_branch_on_first = param<Str{"Allow branch on first"}>(params).value() >= 0.5;
 
 	return ret;
 }
@@ -297,7 +301,10 @@ inline LineSegTree gen_line_segment_tree(BranchConstants const& branch_constants
 			for(size_t k = 1; k != std::size(branch); ++k)
 			{
 				auto const next = branch[k].first;
-				if(std::bernoulli_distribution{branching_params.branch_rate}(rng))
+				auto const branch_res =
+				    std::bernoulli_distribution{branching_params.branch_rate}(rng);
+				if(branch_res
+				   && ((branch_constants.allow_branch_on_first && node.depth == 0) || k != 1))
 				{
 					auto n = compute_normal(prev, next);
 
