@@ -1,6 +1,6 @@
 # Render line segment trees
 
-Foo
+Renders a line segment tree as a grayscale image
 
 ## Input ports
 
@@ -24,14 +24,14 @@ __Trunk split point:__ (= 0.0)
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <algorithm>
 #include <chrono>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 struct ModulationState
