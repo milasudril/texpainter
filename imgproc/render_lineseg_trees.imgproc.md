@@ -14,9 +14,13 @@ __Output:__ (Grayscale image)
 
 __Line width:__ (= 0.5)
 
-__Growth rate:__ (= 0.5)
+__Line width growth rate:__ (= 0.5)
 
-__Trunk split:__ (= 0.0)
+__Intensity:__ (= 1.0)
+
+__Intensity growth rate:__ (= 0.5)
+
+__Trunk split point:__ (= 0.0)
 
 ## Implementation
 
@@ -25,14 +29,28 @@ __Includes:__
 ```c++
 #include <algorithm>
 #include <chrono>
-#include <ranges>
 ```
 
 __Source code:__ 
 
 ```c++
-[[nodiscard]] inline double draw(
-    vec2_t to, vec2_t from, auto const& args, double line_width, double growth_factor)
+struct ModulationState
+{
+	double line_width;
+	double intensity;
+};
+
+struct ModulationParams
+{
+	double width_growth;
+	double intensity_growth;
+};
+
+[[nodiscard]] inline ModulationState draw(vec2_t to,
+                                          vec2_t from,
+                                          auto const& args,
+                                          ModulationState mod_state,
+                                          ModulationParams mod_params)
 {
 	auto const dir  = to - from;
 	auto const l    = Texpainter::length(dir);
@@ -42,18 +60,21 @@ __Source code:__
 
 	for(int t = 0; t < static_cast<int>(l + 0.5); ++t)
 	{
-		for(int s = -static_cast<int>(line_width); s < static_cast<int>(line_width + 0.5); ++s)
+		for(int s = -static_cast<int>(mod_state.line_width);
+		    s < static_cast<int>(mod_state.line_width + 0.5);
+		    ++s)
 		{
 			auto const pos = from + static_cast<double>(t) * v + static_cast<double>(s) * 0.5 * n;
 			auto pos_x     = static_cast<int>(pos[0]);
 			auto pos_y     = static_cast<int>(pos[1]);
 			pos_x          = (pos_x + size.width()) % size.width();
 			pos_y          = (pos_y + size.height()) % size.height();
-			output<0>(args, pos_x, pos_y) = 1.0;
+			output<0>(args, pos_x, pos_y) = static_cast<float>(mod_state.intensity);
 		}
-		line_width *= growth_factor;
+		mod_state.line_width *= mod_params.width_growth;
+		mod_state.intensity *= mod_params.intensity_growth;
 	}
-	return line_width;
+	return mod_state;
 }
 
 enum class Direction : int
@@ -62,13 +83,13 @@ enum class Direction : int
 	Backward
 };
 
-[[nodiscard]] inline double draw(std::span<std::pair<vec2_t, LineSegTree> const> points,
-                                 auto const& args,
-                                 double line_width,
-                                 double growth_rate,
-                                 Direction dir)
+[[nodiscard]] inline ModulationState draw(std::span<std::pair<vec2_t, LineSegTree> const> points,
+                                          auto const& args,
+                                          ModulationState mod_state,
+                                          ModulationParams mod_params,
+                                          Direction dir)
 {
-	if(std::size(points) == 0) { return line_width; }
+	if(std::size(points) == 0) { return mod_state; }
 
 	auto range = std::span{std::begin(points) + 1, std::end(points)};
 
@@ -79,52 +100,63 @@ enum class Direction : int
 		                      start = item.first;
 	                      });
 
+	auto const growth_factors_singed =
+	    dir == Direction::Forward
+	        ? ModulationParams{mod_params.width_growth, mod_params.intensity_growth}
+	        : ModulationParams{-mod_params.width_growth, -mod_params.intensity_growth};
+
 	std::ranges::for_each(
 	    range,
 	    [start = points.front().first,
 	     &args,
-	     &line_width,
-	     growth_factor = std::exp2((dir == Direction::Forward ? growth_rate : -growth_rate)
-	                               / length)](auto const& item) mutable {
-		    line_width = draw(item.first, start, args, line_width, growth_factor);
-		    start      = item.first;
+	     &mod_state,
+	     growth_factor = ModulationParams{std::exp2(growth_factors_singed.width_growth / length),
+	                                      std::exp2(growth_factors_singed.intensity_growth
+	                                                / length)}](auto const& item) mutable {
+		    mod_state = draw(item.first, start, args, mod_state, growth_factor);
+		    start     = item.first;
 	    });
 
-	std::ranges::for_each(points, [args, line_width, growth_rate](auto const& item) {
-		(void)draw(item.second.data, args, line_width, growth_rate, Direction::Forward);
+	std::ranges::for_each(points, [args, mod_state, mod_params](auto const& item) {
+		(void)draw(item.second.data, args, mod_state, mod_params, Direction::Forward);
 	});
 
-	return line_width;
+	return mod_state;
 }
 
 void main(auto const& args, auto const& params)
 {
-	auto const line_width = sizeFromMin(args.canvasSize(), param<Str{"Line width"}>(params)) / 32.0;
-	auto const growth_rate = std::lerp(-4.0f, 4.0f, param<Str{"Growth rate"}>(params).value());
+	ModulationParams const mod_params{
+	    std::lerp(-4.0f, 4.0f, param<Str{"Line width growth rate"}>(params).value()),
+	    std::lerp(-4.0f, 4.0f, param<Str{"Intensity growth rate"}>(params).value())};
+
+	ModulationState state{
+	    sizeFromMin(args.canvasSize(), param<Str{"Line width"}>(params)) / 32.0,
+	    std::exp2(std::lerp(-14.0f, 0.0f, param<Str{"Intensity"}>(params).value()))};
 
 	std::ranges::for_each(
 	    input<0>(args).get(),
-	    [&args, line_width, growth_rate, trunk_midpoint = param<Str{"Trunk split"}>(params)](
+	    [&args, state, mod_params, trunk_midpoint = param<Str{"Trunk split point"}>(params)](
 	        auto const& item) {
 		    auto const split_at = static_cast<size_t>(static_cast<float>(std::size(item.data))
 		                                              * trunk_midpoint.value());
 		    if(split_at == 0)
-		    { (void)draw(item.data, args, line_width, growth_rate, Direction::Forward); }
+		    { (void)draw(item.data, args, state, mod_params, Direction::Forward); }
 		    else if(split_at == std::size(item.data))
 		    {
-			    (void)draw(item.data, args, line_width, growth_rate, Direction::Backward);
+			    (void)draw(item.data, args, state, mod_params, Direction::Backward);
 		    }
 		    else
 		    {
 			    auto const res = draw(std::span{std::begin(item.data), split_at},
 			                          args,
-			                          line_width,
-			                          growth_rate,
+			                          state,
+			                          mod_params,
 			                          Direction::Backward);
 			    (void)draw(std::span{std::begin(item.data) + (split_at - 1), std::end(item.data)},
 			               args,
 			               res,
-			               growth_rate,
+			               mod_params,
 			               Direction::Forward);
 		    }
 	    });
