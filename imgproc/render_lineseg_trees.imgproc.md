@@ -16,19 +16,22 @@ __Line width:__ (= 0.5)
 
 __Growth rate:__ (= 0.5)
 
+__Trunk split:__ (= 0.0)
+
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <algorithm>
 #include <chrono>
+#include <ranges>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
-[[nodiscard]] double draw(
+[[nodiscard]] inline double draw(
     vec2_t to, vec2_t from, auto const& args, double line_width, double growth_factor)
 {
 	auto const dir  = to - from;
@@ -53,14 +56,21 @@ __Source code:__
 	return line_width;
 }
 
-void draw(std::vector<std::pair<vec2_t, LineSegTree>> const& points,
-          auto const& args,
-          double line_width,
-          double growth_rate)
+enum class Direction : int
 {
-	if(std::size(points) == 0) { return; }
+	Forward,
+	Backward
+};
 
-	auto range = std::span{std::data(points) + 1, std::size(points) - 1};
+[[nodiscard]] inline double draw(std::span<std::pair<vec2_t, LineSegTree> const> points,
+                                 auto const& args,
+                                 double line_width,
+                                 double growth_rate,
+                                 Direction dir)
+{
+	if(std::size(points) == 0) { return line_width; }
+
+	auto range = std::span{std::begin(points) + 1, std::end(points)};
 
 	auto length = 0.0;
 	std::ranges::for_each(range,
@@ -74,25 +84,50 @@ void draw(std::vector<std::pair<vec2_t, LineSegTree>> const& points,
 	    [start = points.front().first,
 	     &args,
 	     &line_width,
-	     growth_factor = std::exp2(growth_rate / length)](auto const& item) mutable {
+	     growth_factor = std::exp2((dir == Direction::Forward ? growth_rate : -growth_rate)
+	                               / length)](auto const& item) mutable {
 		    line_width = draw(item.first, start, args, line_width, growth_factor);
 		    start      = item.first;
 	    });
-	std::ranges::for_each(range, [args, line_width, growth_rate](auto const& item) {
-		draw(item.second.data, args, line_width, growth_rate);
+
+	std::ranges::for_each(points, [args, line_width, growth_rate](auto const& item) {
+		(void)draw(item.second.data, args, line_width, growth_rate, Direction::Forward);
 	});
+
+	return line_width;
 }
 
 void main(auto const& args, auto const& params)
 {
 	auto const line_width = sizeFromMin(args.canvasSize(), param<Str{"Line width"}>(params)) / 32.0;
-	auto const grow_rate  = std::lerp(-4.0f, 4.0f, param<Str{"Growth rate"}>(params).value());
+	auto const growth_rate = std::lerp(-4.0f, 4.0f, param<Str{"Growth rate"}>(params).value());
 
-	auto now = std::chrono::steady_clock::now();
-	std::ranges::for_each(input<0>(args).get(), [&args, line_width, grow_rate](auto const& item) {
-		draw(item.data, args, line_width, grow_rate);
-	});
-	printf("RenderTrees: %zu\n", (std::chrono::steady_clock::now() - now).count());
+	std::ranges::for_each(
+	    input<0>(args).get(),
+	    [&args, line_width, growth_rate, trunk_midpoint = param<Str{"Trunk split"}>(params)](
+	        auto const& item) {
+		    auto const split_at = static_cast<size_t>(static_cast<float>(std::size(item.data))
+		                                              * trunk_midpoint.value());
+		    if(split_at == 0)
+		    { (void)draw(item.data, args, line_width, growth_rate, Direction::Forward); }
+		    else if(split_at == std::size(item.data))
+		    {
+			    (void)draw(item.data, args, line_width, growth_rate, Direction::Backward);
+		    }
+		    else
+		    {
+			    auto const res = draw(std::span{std::begin(item.data), split_at},
+			                          args,
+			                          line_width,
+			                          growth_rate,
+			                          Direction::Backward);
+			    (void)draw(std::span{std::begin(item.data) + (split_at - 1), std::end(item.data)},
+			               args,
+			               res,
+			               growth_rate,
+			               Direction::Forward);
+		    }
+	    });
 }
 ```
 
