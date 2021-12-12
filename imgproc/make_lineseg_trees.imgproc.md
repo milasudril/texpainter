@@ -38,14 +38,14 @@ __Level 3 scale:__ (= 0.5) How mutch to scale the first branch relative to the l
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <random>
 #include <deque>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 struct BranchConstants
@@ -211,28 +211,40 @@ inline auto gen_branch(BranchConstants const& branch_constants,
 	{
 		auto const loc_next      = location + l * v;
 		auto const loc_next_test = loc_next + length_tot * v * line_seg_margin;
-		if(intersect(LineSeg{location, loc_next_test},
-		             std::span{std::data(ret), std::size(ret) - 1},
-		             [](auto const&) { return true; }))
-			[[unlikely]] { return ret; }
 
-		if(branch_params.neighbours.has_value() && std::size(ret) == 1)
-		{
-			auto const neighbours = *branch_params.neighbours;
+		auto res = [](LineSeg seg, std::span<std::pair<vec2_t, LineSegTree> const> current_branch,
+		LineSegTree const& tree,
+		std::optional<std::pair<vec2_t, vec2_t>> neighbours){
+			if(intersect(seg,
+						current_branch,
+						[](auto const&) { return true; }))
+				[[unlikely]] { return true; }
 
-			if(intersect(
-			       LineSeg{location, loc_next_test},
-			       tree,
-			       [linesegs = std::pair{LineSeg{neighbours.first, location},
-			                             LineSeg{location, neighbours.second}}](auto const& seg) {
-				       return seg != linesegs.first && seg != linesegs.second;
-			       }))
-			{ return ret; }
-		}
-		else
+			if(neighbours.has_value() && std::size(current_branch) == 0)
+			{
+				auto const location = seg.p1;
+				if(intersect(
+					seg,
+					tree,
+					[linesegs = std::pair{LineSeg{neighbours->first, location},
+											LineSeg{location, neighbours->second}}](auto const& seg) {
+						return seg != linesegs.first && seg != linesegs.second;
+					}))
+				{ return true; }
+			}
+			else
+			{
+				if(intersect(seg, tree, [](auto const&) { return true; }))
+				{ return true; }
+			}
+			return false;
+		}(LineSeg{location, loc_next_test},
+		std::span{std::data(ret), std::size(ret) - 1},
+		tree,
+		branch_params.neighbours);
+		if(res)
 		{
-			if(intersect(LineSeg{location, loc_next_test}, tree, [](auto const&) { return true; }))
-			{ return ret; }
+			return ret;
 		}
 
 		location = loc_next;
