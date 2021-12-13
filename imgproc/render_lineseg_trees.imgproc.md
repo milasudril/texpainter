@@ -1,6 +1,6 @@
 # Render line segment trees
 
-Renders a line segment tree as a grayscale image
+Renders line segment trees as a grayscale image
 
 ## Input ports
 
@@ -12,26 +12,26 @@ __Output:__ (Grayscale image)
 
 ## Parameters
 
-__Line width:__ (= 0.5)
+__Line width:__ (= 0.5) The initial line thickness
 
 __Line width growth rate:__ (= 0.5)
 
-__Intensity:__ (= 1.0)
+__Intensity:__ (= 1.0) The initial intensity
 
 __Intensity growth rate:__ (= 0.5)
 
-__Trunk split point:__ (= 0.0)
+__Trunk split point:__ (= 0.0) The point where to split the trunk. The growth rate will be inverted for all vertices that are "to the left" of the trunk split point.
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <algorithm>
 #include <chrono>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 struct ModulationState
@@ -136,29 +136,22 @@ void main(auto const& args, auto const& params)
 
 	std::ranges::for_each(
 	    input<0>(args).get(),
-	    [&args, state, mod_params, trunk_midpoint = param<Str{"Trunk split point"}>(params)](
-	        auto const& item) {
-		    auto const split_at = static_cast<size_t>(static_cast<float>(std::size(item.data))
-		                                              * trunk_midpoint.value());
-		    if(split_at == 0)
-		    { (void)draw(item.data, args, state, mod_params, Direction::Forward); }
-		    else if(split_at == std::size(item.data))
-		    {
-			    (void)draw(item.data, args, state, mod_params, Direction::Backward);
-		    }
-		    else
-		    {
-			    auto const res = draw(std::span{std::begin(item.data), split_at},
-			                          args,
-			                          state,
-			                          mod_params,
-			                          Direction::Backward);
-			    (void)draw(std::span{std::begin(item.data) + (split_at - 1), std::end(item.data)},
-			               args,
-			               res,
-			               mod_params,
-			               Direction::Forward);
-		    }
+	    [&args,
+	     state,
+	     mod_params,
+	     trunk_midpoint = param<Str{"Trunk split point"}>(params).value()](auto const& item) {
+		    auto const split_at = static_cast<size_t>(
+		        std::lerp(1.0f, static_cast<float>(std::size(item.data)), trunk_midpoint));
+		    auto const res = draw(std::span{std::begin(item.data), split_at},
+		                          args,
+		                          state,
+		                          mod_params,
+		                          Direction::Backward);
+		    (void)draw(std::span{std::begin(item.data) + (split_at - 1), std::end(item.data)},
+		               args,
+		               res,
+		               mod_params,
+		               Direction::Forward);
 	    });
 }
 ```
