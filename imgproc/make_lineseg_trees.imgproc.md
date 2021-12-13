@@ -374,4 +374,4 @@ __Id:__ 1a8d90eee0fdedb3e8af0a0981b20130
 
 __Category:__ Converters
 
-__Release state:__ Experimental
+__Release state:__ Stable
