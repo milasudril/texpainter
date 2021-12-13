@@ -24,14 +24,14 @@ __Trunk split point:__ (= 0.0) The point where to split the trunk. The growth ra
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <algorithm>
 #include <chrono>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 struct ModulationState
@@ -162,4 +162,4 @@ __Id:__ 916d9f54c7d922f50752901b95e0c22c
 
 __Category:__ Converters
 
-__Release state:__ Experimental
+__Release state:__ Stable
