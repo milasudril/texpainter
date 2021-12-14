@@ -62,7 +62,8 @@
 //@		"./align_maximum.imgproc.hpp",
 //@		"./make_lineseg_trees.imgproc.hpp",
 //@		"./render_lineseg_trees.imgproc.hpp",
-//@		"./single_spawn_spot.imgproc.hpp"
+//@		"./single_spawn_spot.imgproc.hpp",
+//@		"./grayscale_dither.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -159,7 +160,8 @@ namespace
 	    get_info<::AlignMaximum::ImageProcessor>(),
 	    get_info<::MakeLineSegmentTrees::ImageProcessor>(),
 	    get_info<::RenderLineSegmentTrees::ImageProcessor>(),
-	    get_info<::SingleSpawnSpot::ImageProcessor>()};
+	    get_info<::SingleSpawnSpot::ImageProcessor>(),
+	    get_info<::GrayscaleDither::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
