@@ -35,15 +35,25 @@ Texpainter::PixelStore::RgbaValue Texpainter::WavelengthConv::blackbodyColor(flo
 	if(T < 0.0f) [[unlikely ]]
 	{ return Texpainter::PixelStore::RgbaValue{0.0f, 0.0f, 0.0f, 0.0f}; }
 
-	auto const T_scaled = T * static_cast<float>(std::size(bb_colors));
+	auto const T_scaled = T * static_cast<float>(std::size(bb_colors) - 1);
 
 	auto const index_low = static_cast<size_t>(T_scaled);
 	auto const index_high = index_low + 1;
 
-	if(index_low >= std::size(bb_colors)) [[unlikely]]
-	{ return bb_colors.back(); }
+	if(index_high >= std::size(bb_colors)) [[unlikely]]
+	{
+	//	auto ret = bb_colors.back();
+	//	printf("%.7e %.7e %.7e\n", ret.red(), ret.green(), ret.blue());
+	//	abort();
+		return bb_colors.back();
+	}
 
 	auto const xi = T_scaled - static_cast<float>(index_low);
+
+//	printf("%.7e\n", T);
+//	printf("%.7e %.7e %.7e\n", bb_colors[index_low].red(), bb_colors[index_low].green(), bb_colors[index_low].blue());
+//	printf("%.7e %.7e %.7e\n", bb_colors[index_high].red(), bb_colors[index_high].green(), bb_colors[index_high].blue());
+//	abort();
 
 	return xi*bb_colors[index_high] + (1.0f - xi)*bb_colors[index_low];
 }

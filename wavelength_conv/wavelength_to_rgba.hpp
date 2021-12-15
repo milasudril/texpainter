@@ -499,7 +499,7 @@ namespace Texpainter::WavelengthConv
 
 		auto const i_tot = sum[0] + sum[1] + sum[2];
 
-		auto const xyz = vec4_t{sum[0], sum[1], sum[2], 0.0} / i_tot;
+		auto const xyz = i_tot != 0.0f ? vec4_t{sum[0], sum[1], sum[2], 0.0} / i_tot : vec4_t{1.0f, 1.0f, 1.0f, 0.0}/3.0f;
 		auto const XYZ = xyz / xyz[1];
 
 		auto const ret_temp = vec4_t{dot(vec4_t{1.656492f, -0.354851f, -0.255038f, 0.0f}, XYZ),
