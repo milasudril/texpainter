@@ -160,6 +160,7 @@ template = string.Template("""//@	{
 #include "utils/vec_t.hpp"
 #include "utils/angle.hpp"
 #include "utils/rect.hpp"
+#include "wavelength_conv/wavelength_to_rgba.hpp"
 
 $param_map_include
 #line $user_includes_start "$src_file"
@@ -176,6 +177,7 @@ namespace $namespace_name
 	using Texpainter::FilterGraph::PortInfo;
 	using Texpainter::FilterGraph::PortType;
 	using Rng = Texpainter::DefaultRng::Engine;
+	namespace WavelengthConv = Texpainter::WavelengthConv;
 
 	namespace impl
 	{

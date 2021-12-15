@@ -63,7 +63,8 @@
 //@		"./make_lineseg_trees.imgproc.hpp",
 //@		"./render_lineseg_trees.imgproc.hpp",
 //@		"./single_spawn_spot.imgproc.hpp",
-//@		"./grayscale_dither.imgproc.hpp"
+//@		"./grayscale_dither.imgproc.hpp",
+//@		"./blackbody.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -76,6 +77,7 @@
 #include "utils/discrete_pdf.hpp"
 #include "rolling_rank_filter/minmax_filter.hpp"
 #include "dft/engine.hpp"
+#include "wavelength_conv/wavelength_to_rgba.hpp"
 
 namespace
 {
@@ -161,7 +163,9 @@ namespace
 	    get_info<::MakeLineSegmentTrees::ImageProcessor>(),
 	    get_info<::RenderLineSegmentTrees::ImageProcessor>(),
 	    get_info<::SingleSpawnSpot::ImageProcessor>(),
-	    get_info<::GrayscaleDither::ImageProcessor>()};
+	    get_info<::GrayscaleDither::ImageProcessor>(),
+	    get_info<::Blackbody::ImageProcessor>()
+	};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
