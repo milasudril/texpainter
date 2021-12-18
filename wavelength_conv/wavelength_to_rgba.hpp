@@ -499,7 +499,8 @@ namespace Texpainter::WavelengthConv
 
 		auto const i_tot = sum[0] + sum[1] + sum[2];
 
-		auto const xyz = i_tot != 0.0f ? vec4_t{sum[0], sum[1], sum[2], 0.0} / i_tot : vec4_t{1.0f, 1.0f, 1.0f, 0.0}/3.0f;
+		auto const xyz = i_tot != 0.0f ? vec4_t{sum[0], sum[1], sum[2], 0.0} / i_tot
+		                               : vec4_t{1.0f, 1.0f, 1.0f, 0.0} / 3.0f;
 		auto const XYZ = xyz / xyz[1];
 
 		auto const ret_temp = vec4_t{dot(vec4_t{1.656492f, -0.354851f, -0.255038f, 0.0f}, XYZ),
@@ -524,12 +525,13 @@ namespace Texpainter::WavelengthConv
 		auto const photon_energy  = h * f;
 		auto const thermal_energy = kb * T;
 
-		auto const x = photon_energy/thermal_energy;
+		auto const x = photon_energy / thermal_energy;
 
-		if(x >= 512.0)
-		{ return 0.0; }
+		if(x >= 512.0) { return 0.0; }
 		else
-		{ return 2 * h * f * f * f / ((c * c) * (std::exp(x) - 1.0)); }
+		{
+			return 2 * h * f * f * f / ((c * c) * (std::exp(x) - 1.0));
+		}
 	}
 
 	PixelStore::RgbaValue blackbodyColor(float T);

@@ -64,7 +64,8 @@
 //@		"./render_lineseg_trees.imgproc.hpp",
 //@		"./single_spawn_spot.imgproc.hpp",
 //@		"./grayscale_dither.imgproc.hpp",
-//@		"./blackbody.imgproc.hpp"
+//@		"./blackbody.imgproc.hpp",
+//@		"./place_and_colorize_grayscale_image_at_points.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -164,8 +165,8 @@ namespace
 	    get_info<::RenderLineSegmentTrees::ImageProcessor>(),
 	    get_info<::SingleSpawnSpot::ImageProcessor>(),
 	    get_info<::GrayscaleDither::ImageProcessor>(),
-	    get_info<::Blackbody::ImageProcessor>()
-	};
+	    get_info<::Blackbody::ImageProcessor>(),
+	    get_info<::PlaceAndColorizeGrayscaleImageAtPoints::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;

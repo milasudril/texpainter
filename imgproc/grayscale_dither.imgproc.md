@@ -14,25 +14,26 @@ __Intensity:__ (= 1.0)
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <algorithm>
 #include <random>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& args, auto const& params)
 {
-	std::transform(input<0>(args),
-	               input<0>(args) + area(args.canvasSize()),
-	               output<0>(args),
-	               [intensity = std::exp2(std::lerp(-14.0f, 0.0f, param<Str{"Intensity"}>(params).value())),
-	                rng       = Rng{args.rngSeed()}] (auto value) mutable {
-	                return std::bernoulli_distribution{value*intensity}(rng);
-	                });
+	std::transform(
+	    input<0>(args),
+	    input<0>(args) + area(args.canvasSize()),
+	    output<0>(args),
+	    [intensity = std::exp2(std::lerp(-14.0f, 0.0f, param<Str{"Intensity"}>(params).value())),
+	     rng       = Rng{args.rngSeed()}](auto value) mutable {
+		    return std::bernoulli_distribution{value * intensity}(rng);
+	    });
 }
 ```
 

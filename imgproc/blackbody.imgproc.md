@@ -1,7 +1,6 @@
 # Blackbody
 
-This image processor takes a grayscale image that represents temperature, and maps it to the color
-of a blackbody radiator.
+This image processor takes a grayscale image that represents temperature, and maps it to the color of a blackbody radiator.
 
 ## Input ports
 
@@ -17,13 +16,13 @@ __Scale intensity:__ (= 0.0) Set to greater than 0.5 to use scale intensity by $
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <algorithm>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& args, auto const& params)
@@ -31,13 +30,13 @@ void main(auto const& args, auto const& params)
 	auto size = area(args.canvasSize());
 	if(auto const t4 = param<Str{"Scale intensity"}>(params).value(); t4 >= 0.5f)
 	{
-		std::transform(input<0>(args), input<0>(args) + size, output<0>(args), [](auto const val){
-			return WavelengthConv::blackbodyIntensity(val)*WavelengthConv::blackbodyColor(val);
+		std::transform(input<0>(args), input<0>(args) + size, output<0>(args), [](auto const val) {
+			return WavelengthConv::blackbodyIntensity(val) * WavelengthConv::blackbodyColor(val);
 		});
 	}
 	else
 	{
-		std::transform(input<0>(args), input<0>(args) + size, output<0>(args), [](auto const val){
+		std::transform(input<0>(args), input<0>(args) + size, output<0>(args), [](auto const val) {
 			return WavelengthConv::blackbodyColor(val);
 		});
 	}
