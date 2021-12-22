@@ -340,4 +340,5 @@ void Texpainter::App::TerrainView::resize<Texpainter::App::TerrainView::ControlI
 	auto const camproj =
 	    glm::perspective(0.25f * std::numbers::pi_v<float>, ratio, 1.0f / 1024.0f, 16.0f);
 	glUniformMatrix4fv(ShaderInputs::CamProj, 1, GL_FALSE, glm::value_ptr(camproj));
+	m_gl_area.redraw();
 }
