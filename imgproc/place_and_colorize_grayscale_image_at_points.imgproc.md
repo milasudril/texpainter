@@ -16,13 +16,13 @@ __Result:__ (RGBA image) The generated image
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include "utils/rect.hpp"
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 ImageCoordinates firstY(auto const& args)
@@ -95,10 +95,10 @@ void main(auto const& args)
 		auto const w = args.canvasSize().width();
 		auto const h = args.canvasSize().height();
 
-		auto const O   = vec2_t{0.5 * w, 0.5 * h};
-		auto const pos = spot.loc;
+		auto const O     = vec2_t{0.5 * w, 0.5 * h};
+		auto const pos   = spot.loc;
 		auto const color = input<2>(args, pos.x, pos.y);
-		auto const v   = vec2_t{static_cast<double>(pos.x), static_cast<double>(pos.y)};
+		auto const v     = vec2_t{static_cast<double>(pos.x), static_cast<double>(pos.y)};
 
 		auto const offset = v + O;
 		auto const ϴ      = spot.rot;
@@ -132,7 +132,7 @@ void main(auto const& args)
 				{
 					auto const src_x = static_cast<uint32_t>(src_pos[0]);
 					auto const src_y = static_cast<uint32_t>(src_pos[1]);
-					auto src         = input<1>(args, src_x, src_y)*color;
+					auto src         = input<1>(args, src_x, src_y) * color;
 					auto const Δx    = static_cast<uint32_t>(offset[0]);
 					auto const Δy    = static_cast<uint32_t>(offset[1]);
 					auto& dest = output<0>(args, ((w + col) + Δx) % w, ((h + row) + Δy) % h);
