@@ -105,21 +105,21 @@ enum class Direction : int
 	        ? ModulationParams{mod_params.width_growth, mod_params.intensity_growth}
 	        : ModulationParams{-mod_params.width_growth, -mod_params.intensity_growth};
 
+	(void)draw(points.front().second.data, args, mod_state, mod_params, Direction::Forward);
+
 	std::ranges::for_each(
 	    range,
 	    [start = points.front().first,
 	     &args,
 	     &mod_state,
+	     mod_params,
 	     growth_factor = ModulationParams{std::exp2(growth_factors_singed.width_growth / length),
 	                                      std::exp2(growth_factors_singed.intensity_growth
 	                                                / length)}](auto const& item) mutable {
 		    mod_state = draw(item.first, start, args, mod_state, growth_factor);
-		    start     = item.first;
+		    (void)draw(item.second.data, args, mod_state, mod_params, Direction::Forward);
+		    start = item.first;
 	    });
-
-	std::ranges::for_each(points, [args, mod_state, mod_params](auto const& item) {
-		(void)draw(item.second.data, args, mod_state, mod_params, Direction::Forward);
-	});
 
 	return mod_state;
 }
