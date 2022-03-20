@@ -84,14 +84,17 @@ void main(auto const& args)
 
 		auto const z      = input<0>(args, item.loc.x, item.loc.y).value();
 		auto min_altitude = z[3];
+		auto travel_distance = 0.0;
+
 		points.push_back(loc);
 		{
 			auto const grad = vec2_t{z[0], z[1]};
 			auto const dir  = grad / Texpainter::length(grad);
+			travel_distance += 1.0;
 			loc += dir;
 		}
 
-		for(size_t k = 1; k < 16384; ++k)
+		for(size_t k = 1; k < 16384 && travel_distance <= std::sqrt(area(size)); ++k)
 		{
 			auto get_val = [](vec2_t loc, Size2d size, auto const& args){
 			auto const x_0 = (static_cast<uint32_t>(loc[0] + size.width())) % size.width();
@@ -120,13 +123,15 @@ void main(auto const& args)
 				min_altitude    = z_xy[3];
 				auto const grad = vec2_t{z_xy[0], z_xy[1]};
 				auto const dir  = grad / Texpainter::length(grad);
+				travel_distance += 1.0;
 				loc += dir;
 			}
 			else
 			{
 				std::uniform_real_distribution theta_dist{-std::numbers::pi, std::numbers::pi};
 				auto const theta = theta_dist(rng);
-				loc += 4*vec2_t{std::cos(theta), std::sin(theta)};
+				loc += vec2_t{std::cos(theta), std::sin(theta)};
+				travel_distance += 1.0;
 				min_altitude = std::nextafter(get_val(loc, size, args)[3], INFINITY);
 			}
 
