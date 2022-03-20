@@ -14,21 +14,70 @@ __Output:__ (Polyline set)
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <algorithm>
 #include <cmath>
 #include <numbers>
+#include <random>
+#include <numbers>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
+/*
+auto closest_point_less_than(auto const& args, RealValue threshold, vec2_t loc, double r)
+{
+	using RetValue = std::tuple<double, vec2_t, RealValue>;
+	std::vector<RetValue> temp;
+
+	auto const w = args.canvasSize().width();
+	auto const h = args.canvasSize().height();
+
+	auto const size = vec2_t{static_cast<double>(w),
+	                         static_cast<double>(h)};
+	auto const min  = loc - vec2_t{r, r} + size;
+	auto const max  = loc + vec2_t{r, r} + size;
+
+	for(uint32_t y = static_cast<uint32_t>(min[1]); y <= static_cast<uint32_t>(max[1]); ++y)
+	{
+		for(uint32_t x = static_cast<uint32_t>(min[0]); x <= static_cast<uint32_t>(max[0]); ++x)
+		{
+			auto const loc_current = vec2_t{static_cast<double>(x), static_cast<double>(y)} - size;
+			auto const d2  = Texpainter::lengthSquared(loc_current - loc);
+			auto const z = input<0>(args, x % w, y % h).elevation();
+			if(z < threshold && d2>= 4.0 && d2 <= r*r)
+			{ temp.push_back(std::tuple{d2, loc, z}); }
+		}
+	}
+
+	std::ranges::sort(temp, [](auto const& a, auto const& b)
+	{
+		if(std::get<0>(a) < std::get<0>(b))
+		{
+			return true;
+		}
+
+		if(std::get<0>(a) > std::get<0>(b))
+		{
+			return false;
+		}
+
+		return std::get<2>(a) > std::get<2>(b);
+	});
+
+	return std::size(temp) != 0 ? temp[0] : std::optional<RetValue>{};
+}
+*/
+
 void main(auto const& args)
 {
+	auto rng = Rng{args.rngSeed()};
+
 	auto const& points = input<1>(args);
-	std::ranges::for_each(points.get(), [&args, size = args.canvasSize()](auto const& item) {
+	std::ranges::for_each(points.get(), [&args, size = args.canvasSize(), rng](auto const& item) mutable {
 		auto loc = vec2_t{static_cast<double>(item.loc.x), static_cast<double>(item.loc.y)};
 		std::vector<vec2_t> points;
 		points.reserve(16384);
@@ -44,6 +93,7 @@ void main(auto const& args)
 
 		for(size_t k = 1; k < 16384; ++k)
 		{
+			auto get_val = [](vec2_t loc, Size2d size, auto const& args){
 			auto const x_0 = (static_cast<uint32_t>(loc[0] + size.width())) % size.width();
 			auto const y_0 = (static_cast<uint32_t>(loc[1] + size.height())) % size.height();
 			auto const x_1 = (x_0 + size.width() + 1) % size.width();
@@ -60,17 +110,28 @@ void main(auto const& args)
 			    (1.0f - static_cast<float>(xi[0])) * z_00 + static_cast<float>(xi[0]) * z_10;
 			auto const z_x1 =
 			    (1.0f - static_cast<float>(xi[0])) * z_01 + static_cast<float>(xi[0]) * z_11;
-			auto const z_xy =
-			    (1.0f - static_cast<float>(xi[1])) * z_x0 + static_cast<float>(xi[1]) * z_x1;
+			return (1.0f - static_cast<float>(xi[1])) * z_x0 + static_cast<float>(xi[1]) * z_x1;
+			};
 
-			if(z_xy[3] >= min_altitude) { break; }
+			auto const z_xy = get_val(loc, size, args);
+
+			if(z_xy[3] < min_altitude)
+			{
+				min_altitude    = z_xy[3];
+				auto const grad = vec2_t{z_xy[0], z_xy[1]};
+				auto const dir  = grad / Texpainter::length(grad);
+				loc += dir;
+			}
+			else
+			{
+				std::uniform_real_distribution theta_dist{-std::numbers::pi, std::numbers::pi};
+				auto const theta = theta_dist(rng);
+				loc += 4*vec2_t{std::cos(theta), std::sin(theta)};
+				min_altitude = std::nextafter(get_val(loc, size, args)[3], INFINITY);
+			}
 
 			points.push_back(loc);
 
-			min_altitude    = z_xy[3];
-			auto const grad = vec2_t{z_xy[0], z_xy[1]};
-			auto const dir  = grad / Texpainter::length(grad);
-			loc += dir;
 		}
 		output<0>(args).get().push_back(std::move(points));
 	});

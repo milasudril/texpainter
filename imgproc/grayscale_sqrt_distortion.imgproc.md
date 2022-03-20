@@ -1,7 +1,6 @@
 # Grayscale sqrt distortion
 
-This image processor takes a grayscale image, and transforms its pixel values the square root
-function.
+This image processor takes a grayscale image, and transforms its pixel values the square root function.
 
 $$ g(z, y) = \sqrt{f(x, y)} $$
 
@@ -15,13 +14,13 @@ __Ouptut:__ (Grayscale image) The output image
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <cmath>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& args)
