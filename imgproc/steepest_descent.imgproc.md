@@ -86,15 +86,19 @@ void main(auto const& args)
 		auto min_altitude = z[3];
 		auto travel_distance = 0.0;
 
+		vec2_t v{0.0, 0.0};
 		points.push_back(loc);
 		{
 			auto const grad = vec2_t{z[0], z[1]};
 			auto const dir  = grad / Texpainter::length(grad);
-			travel_distance += 1.0;
+			auto const loc_next = loc + dir;
+			travel_distance += Texpainter::length(loc - loc_next);
 			loc += dir;
+			v = dir;
 		}
 
-		for(size_t k = 1; k < 16384 && travel_distance <= std::sqrt(area(size)); ++k)
+
+		while(travel_distance <= std::sqrt(area(size)))
 		{
 			auto get_val = [](vec2_t loc, Size2d size, auto const& args){
 			auto const x_0 = (static_cast<uint32_t>(loc[0] + size.width())) % size.width();
@@ -121,10 +125,12 @@ void main(auto const& args)
 			if(z_xy[3] < min_altitude)
 			{
 				min_altitude    = z_xy[3];
-				auto const grad = vec2_t{z_xy[0], z_xy[1]};
+				auto const grad = vec2_t{z_xy[0], z_xy[1]} + 0.125*v;
 				auto const dir  = grad / Texpainter::length(grad);
-				travel_distance += 1.0;
+				auto const loc_next = loc + dir;
+				travel_distance += Texpainter::length(loc - loc_next);
 				loc += dir;
+				v = dir;
 			}
 			else
 			{
