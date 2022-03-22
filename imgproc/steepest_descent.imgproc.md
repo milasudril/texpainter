@@ -12,6 +12,12 @@ __Start points:__ (Point cloud)
 
 __Output:__ (Polyline set)
 
+## Parameters
+
+__Inertia:__ (= 0.0) How much of the previous direction vector to use
+
+__Rng step:__ (= 0.0) How long step to take at local minima
+
 ## Implementation
 
 __Includes:__
@@ -27,57 +33,14 @@ __Includes:__
 __Source code:__
 
 ```c++
-/*
-auto closest_point_less_than(auto const& args, RealValue threshold, vec2_t loc, double r)
+void main(auto const& args, auto const& params)
 {
-	using RetValue = std::tuple<double, vec2_t, RealValue>;
-	std::vector<RetValue> temp;
-
-	auto const w = args.canvasSize().width();
-	auto const h = args.canvasSize().height();
-
-	auto const size = vec2_t{static_cast<double>(w),
-	                         static_cast<double>(h)};
-	auto const min  = loc - vec2_t{r, r} + size;
-	auto const max  = loc + vec2_t{r, r} + size;
-
-	for(uint32_t y = static_cast<uint32_t>(min[1]); y <= static_cast<uint32_t>(max[1]); ++y)
-	{
-		for(uint32_t x = static_cast<uint32_t>(min[0]); x <= static_cast<uint32_t>(max[0]); ++x)
-		{
-			auto const loc_current = vec2_t{static_cast<double>(x), static_cast<double>(y)} - size;
-			auto const d2  = Texpainter::lengthSquared(loc_current - loc);
-			auto const z = input<0>(args, x % w, y % h).elevation();
-			if(z < threshold && d2>= 4.0 && d2 <= r*r)
-			{ temp.push_back(std::tuple{d2, loc, z}); }
-		}
-	}
-
-	std::ranges::sort(temp, [](auto const& a, auto const& b)
-	{
-		if(std::get<0>(a) < std::get<0>(b))
-		{
-			return true;
-		}
-
-		if(std::get<0>(a) > std::get<0>(b))
-		{
-			return false;
-		}
-
-		return std::get<2>(a) > std::get<2>(b);
-	});
-
-	return std::size(temp) != 0 ? temp[0] : std::optional<RetValue>{};
-}
-*/
-
-void main(auto const& args)
-{
-	auto rng = Rng{args.rngSeed()};
-
 	auto const& points = input<1>(args);
-	std::ranges::for_each(points.get(), [&args, size = args.canvasSize(), rng](auto const& item) mutable {
+	std::ranges::for_each(points.get(), [&args,
+		size = args.canvasSize(),
+		rng = Rng{args.rngSeed()},
+		inertia = param<Str{"Inertia"}>(params).value(),
+		rng_step = 1.0 + 3.0*param<Str{"Rng step"}>(params).value()](auto const& item) mutable {
 		auto loc = vec2_t{static_cast<double>(item.loc.x), static_cast<double>(item.loc.y)};
 		std::vector<vec2_t> points;
 		points.reserve(16384);
@@ -90,10 +53,10 @@ void main(auto const& args)
 		points.push_back(loc);
 		{
 			auto const grad = vec2_t{z[0], z[1]};
-			auto const dir  = grad / Texpainter::length(grad);
+			auto const dir  = inertia*v + (1.0 - inertia)*grad/Texpainter::length(grad);
 			auto const loc_next = loc + dir;
 			travel_distance += Texpainter::length(loc - loc_next);
-			loc += dir;
+			loc = loc_next;
 			v = dir;
 		}
 
@@ -124,20 +87,23 @@ void main(auto const& args)
 
 			if(z_xy[3] < min_altitude)
 			{
-				min_altitude    = z_xy[3];
-				auto const grad = vec2_t{z_xy[0], z_xy[1]} + 0.125*v;
-				auto const dir  = grad / Texpainter::length(grad);
+				auto const grad = vec2_t{z_xy[0], z_xy[1]};
+				auto const dir  = inertia*v + (1.0 - inertia)*grad/Texpainter::length(grad);
 				auto const loc_next = loc + dir;
 				travel_distance += Texpainter::length(loc - loc_next);
-				loc += dir;
+				loc = loc_next;
 				v = dir;
+				min_altitude    = z_xy[3];
 			}
 			else
 			{
 				std::uniform_real_distribution theta_dist{-std::numbers::pi, std::numbers::pi};
 				auto const theta = theta_dist(rng);
-				loc += vec2_t{std::cos(theta), std::sin(theta)};
-				travel_distance += 1.0;
+				auto const dir = vec2_t{std::cos(theta), std::sin(theta)};
+				auto const loc_next = loc + dir;
+				travel_distance += Texpainter::length(loc - loc_next) / std::sqrt(area(size));
+				loc = loc_next;
+				v = dir;
 				min_altitude = std::nextafter(get_val(loc, size, args)[3], INFINITY);
 			}
 
