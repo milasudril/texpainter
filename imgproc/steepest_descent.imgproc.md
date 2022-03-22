@@ -12,12 +12,6 @@ __Start points:__ (Point cloud)
 
 __Output:__ (Polyline set)
 
-## Parameters
-
-__Inertia:__ (= 0.0) How much of the previous direction vector to use
-
-__Rng step:__ (= 0.0) How long step to take at local minima
-
 ## Implementation
 
 __Includes:__
@@ -33,85 +27,73 @@ __Includes:__
 __Source code:__
 
 ```c++
-void main(auto const& args, auto const& params)
+void main(auto const& args)
 {
 	auto const& points = input<1>(args);
-	std::ranges::for_each(points.get(), [&args,
-		size = args.canvasSize(),
-		rng = Rng{args.rngSeed()},
-		inertia = param<Str{"Inertia"}>(params).value(),
-		rng_step = 1.0 + 3.0*param<Str{"Rng step"}>(params).value()](auto const& item) mutable {
-		auto loc = vec2_t{static_cast<double>(item.loc.x), static_cast<double>(item.loc.y)};
-		std::vector<vec2_t> points;
-		points.reserve(16384);
+	std::ranges::for_each(
+	    points.get(), [&args, size = args.canvasSize()](auto const& item) mutable {
+		    auto loc = vec2_t{static_cast<double>(item.loc.x), static_cast<double>(item.loc.y)};
+		    std::vector<vec2_t> points;
+		    points.reserve(16384);
 
-		auto const z      = input<0>(args, item.loc.x, item.loc.y).value();
-		auto min_altitude = z[3];
-		auto travel_distance = 0.0;
+		    auto const z         = input<0>(args, item.loc.x, item.loc.y).value();
+		    auto min_altitude    = z[3];
+		    auto travel_distance = 0.0;
 
-		vec2_t v{0.0, 0.0};
-		points.push_back(loc);
-		{
-			auto const grad = vec2_t{z[0], z[1]};
-			auto const dir  = inertia*v + (1.0 - inertia)*grad/Texpainter::length(grad);
-			auto const loc_next = loc + dir;
-			travel_distance += Texpainter::length(loc - loc_next);
-			loc = loc_next;
-			v = dir;
-		}
+		    points.push_back(loc);
+		    {
+			    auto const grad = vec2_t{z[0], z[1]};
+			    auto const dir = grad / Texpainter::length(grad);
+			    auto const loc_next = loc + dir;
+			    travel_distance += Texpainter::length(loc - loc_next);
+			    loc = loc_next;
+		    }
 
+		    while(travel_distance <= std::sqrt(area(size)))
+		    {
+			    auto get_val = [](vec2_t loc, Size2d size, auto const& args) {
+				    auto const x_0 = (static_cast<uint32_t>(loc[0] + size.width())) % size.width();
+				    auto const y_0 =
+				        (static_cast<uint32_t>(loc[1] + size.height())) % size.height();
+				    auto const x_1 = (x_0 + size.width() + 1) % size.width();
+				    auto const y_1 = (y_0 + size.height() + 1) % size.height();
 
-		while(travel_distance <= std::sqrt(area(size)))
-		{
-			auto get_val = [](vec2_t loc, Size2d size, auto const& args){
-			auto const x_0 = (static_cast<uint32_t>(loc[0] + size.width())) % size.width();
-			auto const y_0 = (static_cast<uint32_t>(loc[1] + size.height())) % size.height();
-			auto const x_1 = (x_0 + size.width() + 1) % size.width();
-			auto const y_1 = (y_0 + size.height() + 1) % size.height();
+				    auto const z_00 = input<0>(args, x_0, y_0).value();
+				    auto const z_01 = input<0>(args, x_0, y_1).value();
+				    auto const z_10 = input<0>(args, x_1, y_0).value();
+				    auto const z_11 = input<0>(args, x_1, y_1).value();
 
-			auto const z_00 = input<0>(args, x_0, y_0).value();
-			auto const z_01 = input<0>(args, x_0, y_1).value();
-			auto const z_10 = input<0>(args, x_1, y_0).value();
-			auto const z_11 = input<0>(args, x_1, y_1).value();
+				    auto const xi =
+				        loc - vec2_t{static_cast<double>(x_0), static_cast<double>(y_0)};
 
-			auto const xi = loc - vec2_t{static_cast<double>(x_0), static_cast<double>(y_0)};
+				    auto const z_x0 = (1.0f - static_cast<float>(xi[0])) * z_00
+				                      + static_cast<float>(xi[0]) * z_10;
+				    auto const z_x1 = (1.0f - static_cast<float>(xi[0])) * z_01
+				                      + static_cast<float>(xi[0]) * z_11;
+				    return (1.0f - static_cast<float>(xi[1])) * z_x0
+				           + static_cast<float>(xi[1]) * z_x1;
+			    };
 
-			auto const z_x0 =
-			    (1.0f - static_cast<float>(xi[0])) * z_00 + static_cast<float>(xi[0]) * z_10;
-			auto const z_x1 =
-			    (1.0f - static_cast<float>(xi[0])) * z_01 + static_cast<float>(xi[0]) * z_11;
-			return (1.0f - static_cast<float>(xi[1])) * z_x0 + static_cast<float>(xi[1]) * z_x1;
-			};
+			    auto const z_xy = get_val(loc, size, args);
 
-			auto const z_xy = get_val(loc, size, args);
+			    if(z_xy[3] < min_altitude)
+			    {
+				    auto const grad = vec2_t{z_xy[0], z_xy[1]};
+				    auto const dir = grad / Texpainter::length(grad);
+				    auto const loc_next = loc + dir;
+				    travel_distance += Texpainter::length(loc - loc_next);
+				    loc          = loc_next;
+				    min_altitude = z_xy[3];
+			    }
+			    else
+			    {
+				    break;
+			    }
 
-			if(z_xy[3] < min_altitude)
-			{
-				auto const grad = vec2_t{z_xy[0], z_xy[1]};
-				auto const dir  = inertia*v + (1.0 - inertia)*grad/Texpainter::length(grad);
-				auto const loc_next = loc + dir;
-				travel_distance += Texpainter::length(loc - loc_next);
-				loc = loc_next;
-				v = dir;
-				min_altitude    = z_xy[3];
-			}
-			else
-			{
-				std::uniform_real_distribution theta_dist{-std::numbers::pi, std::numbers::pi};
-				auto const theta = theta_dist(rng);
-				auto const dir = vec2_t{std::cos(theta), std::sin(theta)};
-				auto const loc_next = loc + dir;
-				travel_distance += Texpainter::length(loc - loc_next) / std::sqrt(area(size));
-				loc = loc_next;
-				v = dir;
-				min_altitude = std::nextafter(get_val(loc, size, args)[3], INFINITY);
-			}
-
-			points.push_back(loc);
-
-		}
-		output<0>(args).get().push_back(std::move(points));
-	});
+			    points.push_back(loc);
+		    }
+		    output<0>(args).get().push_back(std::move(points));
+	    });
 }
 ```
 
