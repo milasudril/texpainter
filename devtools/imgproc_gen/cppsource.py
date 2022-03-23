@@ -161,6 +161,7 @@ template = string.Template("""//@	{
 #include "utils/angle.hpp"
 #include "utils/rect.hpp"
 #include "wavelength_conv/wavelength_to_rgba.hpp"
+#include "pixel_store/image.hpp"
 
 $param_map_include
 #line $user_includes_start "$src_file"
@@ -195,6 +196,7 @@ namespace $namespace_name
 		using Texpainter::AxisAlignedBoundingBox;
 		using Texpainter::vec2_t;
 		using Texpainter::Angle;
+		using Texpainter::PixelStore::Image;
 		$impl_decl
 	}
 
