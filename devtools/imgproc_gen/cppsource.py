@@ -160,6 +160,7 @@ template = string.Template("""//@	{
 #include "utils/vec_t.hpp"
 #include "utils/angle.hpp"
 #include "utils/rect.hpp"
+#include "utils/static_vector.hpp"
 #include "wavelength_conv/wavelength_to_rgba.hpp"
 #include "pixel_store/image.hpp"
 
@@ -197,6 +198,7 @@ namespace $namespace_name
 		using Texpainter::vec2_t;
 		using Texpainter::Angle;
 		using Texpainter::PixelStore::Image;
+		using Texpainter::StaticVector;
 		$impl_decl
 	}
 
