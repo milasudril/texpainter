@@ -11,6 +11,8 @@ namespace Texpainter
 	class StaticVector
 	{
 	public:
+		StaticVector():m_size{0}{};
+
 		static constexpr auto capacity()
 		{ return N; }
 

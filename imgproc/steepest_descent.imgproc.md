@@ -22,7 +22,7 @@ __Includes:__
 #include <numbers>
 #include <random>
 #include <numbers>
-#include <stack>
+#include <queue>
 #include <vector>
 ```
 
@@ -66,9 +66,42 @@ auto get_val(vec2_t loc, auto const& args)
 			+ static_cast<float>(xi[1]) * z_x1;
 };
 
+template<class Filter>
+void push_neigbours(std::queue<IntLoc>& nodes, auto const& args, IntLoc start_pos, Filter&& f)
+{
+	StaticVector<std::pair<IntLoc, RealValue>, 4> tmp;
+	if(start_pos.x >= 1 && filter(args, start_pos.x - 1, start_pos.y))
+	{
+		tmp.push_back(std::pair{IntLoc{start_pos.x - 1, start_pos.y}, input<0>(args, start_pos.x - 1, start_pos.y)});
+	}
+
+	if(start_pos.x < args.canvasSize().width() - 1 && filter(args, start_pos.x + 1, start_pos.y))
+	{
+		tmp.push_back(std::pair{IntLoc{start_pos.x + 1, start_pos.y}, input<0>(args, start_pos.x + 1, start_pos.y)});
+	}
+
+	if(start_pos.y >= 1 && filter(args, start_pos.x, start_pos.y - 1))
+	{
+		tmp.push_back(std::pair{IntLoc{start_pos.x, start_pos.y - 1}, input<0>(args, start_pos.x, start_pos.y - 1)});
+	}
+
+	if(start_pos.y < args.canvasSize().height() - 1 && filter(args, start_pos.x, start_pos.y + 1))
+	{
+		tmp.push_back(std::pair{IntLoc{start_pos.x + 1, start_pos.y}, input<0>(args, start_pos.x, start_pos.y + 1)});
+	}
+
+	std::ranges::sort(tmp, [](auto const& a, auto const& b){
+		return a.second < b.second;
+	});
+
+	std::ranges::transform(tmp, std::back_inserter(nodes), [](auto const& item) {
+		return item.first;
+	});
+}
+
 std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 {
-	std::stack<IntLoc> nodes;
+	std::queue<IntLoc> nodes;
 	auto const w = static_cast<int32_t>(args.canvasSize().width());
 	auto const h = static_cast<int32_t>(args.canvasSize().height());
 	Image<int8_t> visited{static_cast<uint32_t>(w), static_cast<uint32_t>(h)};
@@ -79,7 +112,7 @@ std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 	nodes.push(IntLoc{static_cast<int32_t>(start_loc[0]), static_cast<int32_t>(start_loc[1]) + 1});
 	while(!nodes.empty())
 	{
-		auto const node = nodes.top();
+		auto const node = nodes.front();
 		nodes.pop();
 
 		auto const z0 = input<0>(args, node.x, node.y).elevation();
