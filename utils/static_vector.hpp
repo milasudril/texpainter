@@ -11,10 +11,9 @@ namespace Texpainter
 	class StaticVector
 	{
 	public:
-		StaticVector():m_size{0}{};
+		StaticVector(): m_size{0} {};
 
-		static constexpr auto capacity()
-		{ return N; }
+		static constexpr auto capacity() { return N; }
 
 		void push_back(T&& val)
 		{
@@ -22,14 +21,14 @@ namespace Texpainter
 			++m_size;
 		}
 
-		auto size() const { return std::size(m_data); }
+		auto size() const { return m_size; }
 
 		auto begin() const { return std::begin(m_data); }
-		auto end() const { return std::end(m_data); }
+		auto end() const { return begin() + size(); }
 		auto data() const { return std::data(m_data); }
 
 		auto begin() { return std::begin(m_data); }
-		auto end() { return std::end(m_data); }
+		auto end() { return begin() + size(); }
 		auto data() { return std::data(m_data); }
 
 	private:

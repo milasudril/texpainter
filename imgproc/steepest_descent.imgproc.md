@@ -31,8 +31,8 @@ __Source code:__
 ```c++
 struct IntLoc
 {
-	int32_t x;
-	int32_t y;
+	uint32_t x;
+	uint32_t y;
 };
 
 struct EscapePoint
@@ -44,113 +44,96 @@ struct EscapePoint
 auto get_val(vec2_t loc, auto const& args)
 {
 	auto const size = args.canvasSize();
-	auto const x_0 = (static_cast<uint32_t>(loc[0] + size.width())) % size.width();
-	auto const y_0 =
-		(static_cast<uint32_t>(loc[1] + size.height())) % size.height();
-	auto const x_1 = (x_0 + size.width() + 1) % size.width();
-	auto const y_1 = (y_0 + size.height() + 1) % size.height();
+	auto const x_0  = (static_cast<uint32_t>(loc[0] + size.width())) % size.width();
+	auto const y_0  = (static_cast<uint32_t>(loc[1] + size.height())) % size.height();
+	auto const x_1  = (x_0 + size.width() + 1) % size.width();
+	auto const y_1  = (y_0 + size.height() + 1) % size.height();
 
 	auto const z_00 = input<0>(args, x_0, y_0).value();
 	auto const z_01 = input<0>(args, x_0, y_1).value();
 	auto const z_10 = input<0>(args, x_1, y_0).value();
 	auto const z_11 = input<0>(args, x_1, y_1).value();
 
-	auto const xi =
-		loc - vec2_t{static_cast<double>(x_0), static_cast<double>(y_0)};
+	auto const xi = loc - vec2_t{static_cast<double>(x_0), static_cast<double>(y_0)};
 
-	auto const z_x0 = (1.0f - static_cast<float>(xi[0])) * z_00
-						+ static_cast<float>(xi[0]) * z_10;
-	auto const z_x1 = (1.0f - static_cast<float>(xi[0])) * z_01
-						+ static_cast<float>(xi[0]) * z_11;
-	return (1.0f - static_cast<float>(xi[1])) * z_x0
-			+ static_cast<float>(xi[1]) * z_x1;
+	auto const z_x0 = (1.0f - static_cast<float>(xi[0])) * z_00 + static_cast<float>(xi[0]) * z_10;
+	auto const z_x1 = (1.0f - static_cast<float>(xi[0])) * z_01 + static_cast<float>(xi[0]) * z_11;
+	return (1.0f - static_cast<float>(xi[1])) * z_x0 + static_cast<float>(xi[1]) * z_x1;
 };
 
 template<class Filter>
 void push_neigbours(std::queue<IntLoc>& nodes, auto const& args, IntLoc start_pos, Filter&& f)
 {
 	StaticVector<std::pair<IntLoc, RealValue>, 4> tmp;
-	if(start_pos.x >= 1 && filter(args, start_pos.x - 1, start_pos.y))
+	if(start_pos.x >= 1 && f(args, start_pos.x - 1, start_pos.y))
 	{
-		tmp.push_back(std::pair{IntLoc{start_pos.x - 1, start_pos.y}, input<0>(args, start_pos.x - 1, start_pos.y)});
+		tmp.push_back(std::pair{IntLoc{start_pos.x - 1, start_pos.y},
+		                        input<0>(args, start_pos.x - 1, start_pos.y).elevation()});
 	}
 
-	if(start_pos.x < args.canvasSize().width() - 1 && filter(args, start_pos.x + 1, start_pos.y))
+	if(start_pos.x < args.canvasSize().width() - 1 && f(args, start_pos.x + 1, start_pos.y))
 	{
-		tmp.push_back(std::pair{IntLoc{start_pos.x + 1, start_pos.y}, input<0>(args, start_pos.x + 1, start_pos.y)});
+		tmp.push_back(std::pair{IntLoc{start_pos.x + 1, start_pos.y},
+		                        input<0>(args, start_pos.x + 1, start_pos.y).elevation()});
 	}
 
-	if(start_pos.y >= 1 && filter(args, start_pos.x, start_pos.y - 1))
+	if(start_pos.y >= 1 && f(args, start_pos.x, start_pos.y - 1))
 	{
-		tmp.push_back(std::pair{IntLoc{start_pos.x, start_pos.y - 1}, input<0>(args, start_pos.x, start_pos.y - 1)});
+		tmp.push_back(std::pair{IntLoc{start_pos.x, start_pos.y - 1},
+		                        input<0>(args, start_pos.x, start_pos.y - 1).elevation()});
 	}
 
-	if(start_pos.y < args.canvasSize().height() - 1 && filter(args, start_pos.x, start_pos.y + 1))
+	if(start_pos.y < args.canvasSize().height() - 1 && f(args, start_pos.x, start_pos.y + 1))
 	{
-		tmp.push_back(std::pair{IntLoc{start_pos.x + 1, start_pos.y}, input<0>(args, start_pos.x, start_pos.y + 1)});
+		tmp.push_back(std::pair{IntLoc{start_pos.x, start_pos.y + 1},
+		                        input<0>(args, start_pos.x, start_pos.y + 1).elevation()});
 	}
 
-	std::ranges::sort(tmp, [](auto const& a, auto const& b){
-		return a.second < b.second;
-	});
+	std::ranges::sort(tmp, [](auto const& a, auto const& b) { return a.second < b.second; });
 
-	std::ranges::transform(tmp, std::back_inserter(nodes), [](auto const& item) {
-		return item.first;
-	});
+	std::ranges::for_each(tmp, [&nodes](auto const& item) { nodes.push(item.first); });
 }
 
 std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 {
 	std::queue<IntLoc> nodes;
-	auto const w = static_cast<int32_t>(args.canvasSize().width());
-	auto const h = static_cast<int32_t>(args.canvasSize().height());
+	auto const w = args.canvasSize().width();
+	auto const h = args.canvasSize().height();
 	Image<int8_t> visited{static_cast<uint32_t>(w), static_cast<uint32_t>(h)};
-	nodes.push(IntLoc{static_cast<int32_t>(start_loc[0]), static_cast<int32_t>(start_loc[1])});
-	nodes.push(IntLoc{static_cast<int32_t>(start_loc[0]) - 1, static_cast<int32_t>(start_loc[1])});
-	nodes.push(IntLoc{static_cast<int32_t>(start_loc[0]) + 1, static_cast<int32_t>(start_loc[1])});
-	nodes.push(IntLoc{static_cast<int32_t>(start_loc[0]), static_cast<int32_t>(start_loc[1]) - 1});
-	nodes.push(IntLoc{static_cast<int32_t>(start_loc[0]), static_cast<int32_t>(start_loc[1]) + 1});
+
+//	nodes.push(IntLoc{static_cast<uint32_t>(start_loc[0]), static_cast<uint32_t>(start_loc[1])});
+	push_neigbours(nodes,
+	               args,
+	               IntLoc{static_cast<uint32_t>(start_loc[0]), static_cast<uint32_t>(start_loc[1])},
+	               [](auto const&...) { return true; });
+
+	size_t n = 0;
 	while(!nodes.empty())
 	{
 		auto const node = nodes.front();
 		nodes.pop();
 
-		auto const z0 = input<0>(args, node.x, node.y).elevation();
-		visited(node.x, node.y) = 1;
-
-		if(node.x - 1 >= 0 && visited(node.x - 1, node.y) == 0)
-		{
-			if(input<0>(args, node.x - 1, node.y).elevation() >= z0)
-			{ nodes.push(IntLoc{node.x - 1, node.y}); }
-		}
-
-		if(node.x + 1 < w && visited(node.x + 1, node.y) == 0)
-		{
-			if(input<0>(args, node.x + 1, node.y).elevation() >= z0)
-			{ nodes.push(IntLoc{node.x + 1, node.y}); }
-		}
-		if(node.y - 1 >= 0 && visited(node.x, node.y - 1) == 0)
-		{
-			if(input<0>(args, node.x, node.y - 1).elevation() >= z0)
-			{ nodes.push(IntLoc{node.x, node.y - 1}); }
-		}
-
-		if(node.y + 1 < h && visited(node.x, node.y + 1) == 0)
-		{
-			if(input<0>(args, node.x, node.y + 1).elevation() >= z0)
-			{ nodes.push(IntLoc{node.x, node.y + 1}); }
-		}
-
+		auto const z0           = input<0>(args, node.x, node.y).elevation();
+		++n;
+		push_neigbours(nodes, args, node, [&visited, z0](auto const& args, uint32_t x, uint32_t y) {
+			if(visited(x, y) == 0 && input<0>(args, x, y).elevation() >= z0)
+			{
+				visited(x, y) = 1;
+				return true;
+			}
+			return false;
+		});
+		assert(n != 256 * 256 + 1);
 	}
 
 	std::vector<EscapePoint> esc_points;
-	for(int32_t k = 0; k != h - 1; ++k)
+	for(uint32_t k = 0; k != h - 1; ++k)
 	{
-		for(int32_t l = 0; l != w - 1; ++l)
+		for(uint32_t l = 0; l != w - 1; ++l)
 		{
 			auto const dx = visited(l + 1, k) - visited(l, k);
 			auto const dy = visited(l, k + 1) - visited(l, k);
-			if(dx * dx + dy*dy > 0)
+			if(dx * dx + dy * dy > 0)
 			{
 				vec2_t loc{static_cast<double>(l) + 0.5, static_cast<double>(k) + 0.5};
 				esc_points.push_back(EscapePoint{loc, get_val(loc, args)[3]});
@@ -158,15 +141,11 @@ std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 		}
 	}
 
-	if(std::size(esc_points) == 0)
-	{
-		return std::optional<EscapePoint>{};
-	}
+	if(std::size(esc_points) == 0) { return std::optional<EscapePoint>{}; }
 
 
-	return *std::ranges::min_element(esc_points, [](auto const& a, auto const& b){
-		return a.value < b.value;
-	});
+	return *std::ranges::min_element(
+	    esc_points, [](auto const& a, auto const& b) { return a.value < b.value; });
 }
 
 void main(auto const& args)
@@ -184,8 +163,8 @@ void main(auto const& args)
 
 		    points.push_back(loc);
 		    {
-			    auto const grad = vec2_t{z[0], z[1]};
-			    auto const dir = grad / Texpainter::length(grad);
+			    auto const grad     = vec2_t{z[0], z[1]};
+			    auto const dir      = grad / Texpainter::length(grad);
 			    auto const loc_next = loc + dir;
 			    travel_distance += Texpainter::length(loc - loc_next);
 			    loc = loc_next;
@@ -197,8 +176,8 @@ void main(auto const& args)
 
 			    if(z_xy[3] < min_altitude)
 			    {
-				    auto const grad = vec2_t{z_xy[0], z_xy[1]};
-				    auto const dir = grad / Texpainter::length(grad);
+				    auto const grad     = vec2_t{z_xy[0], z_xy[1]};
+				    auto const dir      = grad / Texpainter::length(grad);
 				    auto const loc_next = loc + dir;
 				    travel_distance += Texpainter::length(loc - loc_next);
 				    loc          = loc_next;
@@ -206,19 +185,23 @@ void main(auto const& args)
 			    }
 			    else
 			    {
-					if(loc[0] < 0.0 || loc[1] < 0.0)
-					{ break; }
+				    if(loc[0] < 0.0 || loc[1] < 0.0) { break; }
 
 				    auto const esc = find_escape_point(args, loc);
 				    if(!esc.has_value()) { break; }
 
 				    auto const loc_next = esc->loc;
 
-				    printf("%.15g %.15g %.8g-> %.15g %.15g %.8g\n", loc[0], loc[1], z_xy[3],
-						loc_next[0], loc_next[1], esc->value);
+				    printf("%.15g %.15g %.8g-> %.15g %.15g %.8g\n",
+				           loc[0],
+				           loc[1],
+				           z_xy[3],
+				           loc_next[0],
+				           loc_next[1],
+				           esc->value);
 
-					break;
-/*
+				    break;
+				    /*
 				    travel_distance += Texpainter::length(loc - loc_next);
 				    loc = loc_next;
 				    min_altitude = esc->value;
