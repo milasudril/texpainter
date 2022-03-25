@@ -22,7 +22,7 @@ __Includes:__
 #include <numbers>
 #include <random>
 #include <numbers>
-#include <queue>
+#include <stack>
 #include <vector>
 ```
 
@@ -62,46 +62,44 @@ auto get_val(vec2_t loc, auto const& args)
 };
 
 template<class Filter>
-void push_neigbours(std::queue<IntLoc>& nodes, auto const& args, IntLoc start_pos, Filter&& f)
+void push_neigbours(std::stack<IntLoc>& nodes, auto const& args, IntLoc start_pos, Filter&& f)
 {
-	StaticVector<std::pair<IntLoc, RealValue>, 4> tmp;
-	if(start_pos.x >= 1 && f(args, start_pos.x - 1, start_pos.y))
-	{
-		tmp.push_back(std::pair{IntLoc{start_pos.x - 1, start_pos.y},
-		                        input<0>(args, start_pos.x - 1, start_pos.y).elevation()});
-	}
+	auto const w = args.canvasSize().width();
+	auto const h = args.canvasSize().height();
 
-	if(start_pos.x < args.canvasSize().width() - 1 && f(args, start_pos.x + 1, start_pos.y))
-	{
-		tmp.push_back(std::pair{IntLoc{start_pos.x + 1, start_pos.y},
-		                        input<0>(args, start_pos.x + 1, start_pos.y).elevation()});
-	}
+	if(start_pos.y < h - 1 && start_pos.x < w - 1 && f(args, start_pos.x + 1, start_pos.y + 1))
+	{ nodes.push(IntLoc{start_pos.x + 1, start_pos.y + 1}); }
+
+	if(start_pos.y < h - 1 && f(args, start_pos.x, start_pos.y + 1))
+	{ nodes.push(IntLoc{start_pos.x, start_pos.y + 1}); }
+
+	if(start_pos.y < h - 1 && start_pos.x >= 1 && f(args, start_pos.x - 1, start_pos.y + 1))
+	{ nodes.push(IntLoc{start_pos.x - 1, start_pos.y + 1}); }
+
+	if(start_pos.x < w - 1 && f(args, start_pos.x + 1, start_pos.y))
+	{ nodes.push(IntLoc{start_pos.x + 1, start_pos.y}); }
+
+	if(start_pos.x >= 1 && f(args, start_pos.x - 1, start_pos.y))
+	{ nodes.push(IntLoc{start_pos.x - 1, start_pos.y}); }
+
+	if(start_pos.y >= 1 && start_pos.x < w - 1 && f(args, start_pos.x + 1, start_pos.y - 1))
+	{ nodes.push(IntLoc{start_pos.x + 1, start_pos.y - 1}); }
 
 	if(start_pos.y >= 1 && f(args, start_pos.x, start_pos.y - 1))
-	{
-		tmp.push_back(std::pair{IntLoc{start_pos.x, start_pos.y - 1},
-		                        input<0>(args, start_pos.x, start_pos.y - 1).elevation()});
-	}
+	{ nodes.push(IntLoc{start_pos.x, start_pos.y - 1}); }
 
-	if(start_pos.y < args.canvasSize().height() - 1 && f(args, start_pos.x, start_pos.y + 1))
-	{
-		tmp.push_back(std::pair{IntLoc{start_pos.x, start_pos.y + 1},
-		                        input<0>(args, start_pos.x, start_pos.y + 1).elevation()});
-	}
-
-	std::ranges::sort(tmp, [](auto const& a, auto const& b) { return a.second < b.second; });
-
-	std::ranges::for_each(tmp, [&nodes](auto const& item) { nodes.push(item.first); });
+	if(start_pos.y >= 1 && start_pos.x >= 1 && f(args, start_pos.x - 1, start_pos.y - 1))
+	{ nodes.push(IntLoc{start_pos.x - 1, start_pos.y - 1}); }
 }
 
 std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 {
-	std::queue<IntLoc> nodes;
+	std::stack<IntLoc> nodes;
 	auto const w = args.canvasSize().width();
 	auto const h = args.canvasSize().height();
 	Image<int8_t> visited{static_cast<uint32_t>(w), static_cast<uint32_t>(h)};
 
-//	nodes.push(IntLoc{static_cast<uint32_t>(start_loc[0]), static_cast<uint32_t>(start_loc[1])});
+	nodes.push(IntLoc{static_cast<uint32_t>(start_loc[0]), static_cast<uint32_t>(start_loc[1])});
 	push_neigbours(nodes,
 	               args,
 	               IntLoc{static_cast<uint32_t>(start_loc[0]), static_cast<uint32_t>(start_loc[1])},
@@ -110,10 +108,10 @@ std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 	size_t n = 0;
 	while(!nodes.empty())
 	{
-		auto const node = nodes.front();
+		auto const node = nodes.top();
 		nodes.pop();
 
-		auto const z0           = input<0>(args, node.x, node.y).elevation();
+		auto const z0 = input<0>(args, node.x, node.y).elevation();
 		++n;
 		push_neigbours(nodes, args, node, [&visited, z0](auto const& args, uint32_t x, uint32_t y) {
 			if(visited(x, y) == 0 && input<0>(args, x, y).elevation() >= z0)
