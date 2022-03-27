@@ -10,7 +10,9 @@ __Start points:__ (Point cloud)
 
 ## Output ports
 
-__Output:__ (Polyline set)
+__Output:__ (Polyline set) The generated rivers
+
+__Lakes:__ (Point cloud) The points where lakes would appear
 
 ## Implementation
 
@@ -64,13 +66,13 @@ auto get_val(vec2_t loc, auto const& args)
 
 auto grad(vec2_t loc, auto const& args)
 {
-	auto const dx = vec2_t{1.0, 0.0};
-	auto const dy = vec2_t{0.0, 1.0};
+	auto const dx  = vec2_t{1.0, 0.0};
+	auto const dy  = vec2_t{0.0, 1.0};
 	auto const ddx = get_val(loc + dx, args) - get_val(loc - dx, args);
 	auto const ddy = get_val(loc + dy, args) - get_val(loc - dy, args);
 
 	auto const ret = vec2_t{ddx, ddy};
-	return -ret/Texpainter::length(ret);
+	return -ret / Texpainter::length(ret);
 }
 
 template<class Filter>
@@ -104,10 +106,7 @@ void push_neigbours(std::stack<IntLoc>& nodes, auto const& args, IntLoc start_po
 	{ nodes.push(IntLoc{start_pos.x - 1, start_pos.y - 1}); }
 }
 
-int16_t quantize(float val, float factor)
-{
-	return static_cast<int16_t>(val*factor);
-}
+int16_t quantize(float val, float factor) { return static_cast<int16_t>(val * factor); }
 
 std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 {
@@ -149,7 +148,8 @@ std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 			{
 				vec2_t const loc{static_cast<double>(l) + 0.5, static_cast<double>(k) + 0.5};
 				vec2_t const dir{static_cast<double>(dx), static_cast<double>(dy)};
-				esc_points.push_back(EscapePoint{loc, -dir/Texpainter::length(dir), get_val(loc, args)});
+				esc_points.push_back(
+				    EscapePoint{loc, -dir / Texpainter::length(dir), get_val(loc, args)});
 			}
 		}
 	}
@@ -167,6 +167,7 @@ void main(auto const& args)
 	    points.get(), [&args, size = args.canvasSize()](auto const& item) mutable {
 		    auto loc = vec2_t{static_cast<double>(item.loc.x), static_cast<double>(item.loc.y)};
 		    std::vector<vec2_t> points;
+		    auto& lakes = output<1>(args).get();
 		    points.reserve(16384);
 
 		    auto min_altitude    = input<0>(args, item.loc.x, item.loc.y);
@@ -177,6 +178,7 @@ void main(auto const& args)
 			    auto const loc_next = loc + grad(loc, args);
 			    travel_distance += Texpainter::length(loc - loc_next);
 			    loc = loc_next;
+			    points.push_back(loc);
 		    }
 
 		    while(travel_distance <= std::sqrt(area(size)))
@@ -189,7 +191,7 @@ void main(auto const& args)
 				    travel_distance += Texpainter::length(loc - loc_next);
 				    loc          = loc_next;
 				    min_altitude = z_xy;
-					points.push_back(loc);
+				    points.push_back(loc);
 			    }
 			    else
 			    {
@@ -199,25 +201,33 @@ void main(auto const& args)
 				    if(!esc.has_value()) { break; }
 
 				    {
-						auto const loc_next = esc->loc;
-						auto const d = Texpainter::length(loc - loc_next);
-						if(d < 1.0)
-						{ break; }
+					    auto const loc_next = esc->loc;
+					    auto const d        = Texpainter::length(loc - loc_next);
+					    if(d < 1.0) { break; }
 
-						travel_distance += d;
-						loc = loc_next;
-						min_altitude = esc->value;
+					    lakes.push_back(
+					        SpawnSpot{ImageCoordinates{static_cast<uint32_t>(loc_next[0]),
+					                                   static_cast<uint32_t>(loc_next[1])},
+					                  Angle{0},
+					                  1.0f
+					                  /*esc->value*/});
+					    travel_distance += d;
+					    loc          = loc_next;
+					    min_altitude = esc->value;
+					    points.push_back(loc);
 				    }
 
-					{
-						auto const loc_next = loc + esc->dir;
-						travel_distance += Texpainter::length(loc - loc_next);
-						loc = loc_next;
-					}
+				    {
+					    auto const loc_next = loc + esc->dir;
+					    travel_distance += Texpainter::length(loc - loc_next);
+					    loc = loc_next;
+					    points.push_back(loc);
+				    }
 			    }
 		    }
 		    output<0>(args).get().push_back(std::move(points));
 	    });
+	printf("%zu\n", std::size(output<1>(args).get()));
 }
 ```
 
