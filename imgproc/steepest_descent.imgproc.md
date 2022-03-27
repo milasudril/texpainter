@@ -103,6 +103,11 @@ void push_neigbours(std::stack<IntLoc>& nodes, auto const& args, IntLoc start_po
 	{ nodes.push(IntLoc{start_pos.x - 1, start_pos.y - 1}); }
 }
 
+int16_t quantize(float val, float factor)
+{
+	return static_cast<int16_t>(val*factor);
+}
+
 std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 {
 	std::stack<IntLoc> nodes;
@@ -121,9 +126,9 @@ std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 		auto const node = nodes.top();
 		nodes.pop();
 
-		auto const z0 = input<0>(args, node.x, node.y);
+		auto const z0 = quantize(input<0>(args, node.x, node.y), 16384.0f);
 		push_neigbours(nodes, args, node, [&visited, z0](auto const& args, uint32_t x, uint32_t y) {
-			if(visited(x, y) == 0 && input<0>(args, x, y) >= z0)
+			if(visited(x, y) == 0 && quantize(input<0>(args, x, y), 16384.0f) >= z0)
 			{
 				visited(x, y) = 1;
 				return true;
