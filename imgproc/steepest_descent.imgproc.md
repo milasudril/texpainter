@@ -38,6 +38,7 @@ struct IntLoc
 struct EscapePoint
 {
 	vec2_t loc;
+	vec2_t dir;
 	RealValue value;
 };
 
@@ -146,14 +147,14 @@ std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 			auto const dy = visited(l, k + 1) - visited(l, k);
 			if(dx * dx + dy * dy > 0)
 			{
-				vec2_t loc{static_cast<double>(l) + 0.5, static_cast<double>(k) + 0.5};
-				esc_points.push_back(EscapePoint{loc, get_val(loc, args)});
+				vec2_t const loc{static_cast<double>(l) + 0.5, static_cast<double>(k) + 0.5};
+				vec2_t const dir{static_cast<double>(dx), static_cast<double>(dy)};
+				esc_points.push_back(EscapePoint{loc, -dir/Texpainter::length(dir), get_val(loc, args)});
 			}
 		}
 	}
 
 	if(std::size(esc_points) == 0) { return std::optional<EscapePoint>{}; }
-
 
 	return *std::ranges::min_element(
 	    esc_points, [](auto const& a, auto const& b) { return a.value < b.value; });
@@ -188,6 +189,7 @@ void main(auto const& args)
 				    travel_distance += Texpainter::length(loc - loc_next);
 				    loc          = loc_next;
 				    min_altitude = z_xy;
+					points.push_back(loc);
 			    }
 			    else
 			    {
@@ -196,25 +198,23 @@ void main(auto const& args)
 				    auto const esc = find_escape_point(args, loc);
 				    if(!esc.has_value()) { break; }
 
-				    auto const loc_next = esc->loc;
+				    {
+						auto const loc_next = esc->loc;
+						auto const d = Texpainter::length(loc - loc_next);
+						if(d < 1.0)
+						{ break; }
 
-				    printf("%.15g %.15g %.8g-> %.15g %.15g %.8g\n",
-				           loc[0],
-				           loc[1],
-				           z_xy,
-				           loc_next[0],
-				           loc_next[1],
-				           esc->value);
+						travel_distance += d;
+						loc = loc_next;
+						min_altitude = esc->value;
+				    }
 
-				    break;
-				    /*
-				    travel_distance += Texpainter::length(loc - loc_next);
-				    loc = loc_next;
-				    min_altitude = esc->value;
-*/
+					{
+						auto const loc_next = loc + esc->dir;
+						travel_distance += Texpainter::length(loc - loc_next);
+						loc = loc_next;
+					}
 			    }
-
-			    points.push_back(loc);
 		    }
 		    output<0>(args).get().push_back(std::move(points));
 	    });
