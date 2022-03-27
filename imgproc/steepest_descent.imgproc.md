@@ -116,14 +116,12 @@ std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 	               IntLoc{static_cast<uint32_t>(start_loc[0]), static_cast<uint32_t>(start_loc[1])},
 	               [](auto const&...) { return true; });
 
-	size_t n = 0;
 	while(!nodes.empty())
 	{
 		auto const node = nodes.top();
 		nodes.pop();
 
 		auto const z0 = input<0>(args, node.x, node.y);
-		++n;
 		push_neigbours(nodes, args, node, [&visited, z0](auto const& args, uint32_t x, uint32_t y) {
 			if(visited(x, y) == 0 && input<0>(args, x, y) >= z0)
 			{
@@ -132,7 +130,6 @@ std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 			}
 			return false;
 		});
-		assert(n != 256 * 256 + 1);
 	}
 
 	std::vector<EscapePoint> esc_points;
