@@ -108,7 +108,7 @@ std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 	std::stack<IntLoc> nodes;
 	auto const w = args.canvasSize().width();
 	auto const h = args.canvasSize().height();
-	Image<int8_t> visited{static_cast<uint32_t>(w), static_cast<uint32_t>(h)};
+	Image<int8_t> visited{w, h};
 
 	nodes.push(IntLoc{static_cast<uint32_t>(start_loc[0]), static_cast<uint32_t>(start_loc[1])});
 	push_neigbours(nodes,
