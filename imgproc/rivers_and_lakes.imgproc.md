@@ -1,20 +1,27 @@
-# Steepest descent
+# Rivers and lakes
 
-This image processor takes topography data and applies the steepest descent algorithm to each point in `Starget points`.
+This image processor takes a Grayscale image as a heightmap and generates rivier systems, starting
+from each point in `Start points`.
 
 ## Input ports
 
-__Intensity:__ (Grayscale image)
+__Heightmap:__ (Grayscale image)
 
 __Start points:__ (Point cloud)
 
 ## Output ports
 
-__Output:__ (Polyline set) The generated rivers
+__Rivers:__ (Polyline set) The generated rivers
 
 __Lakes:__ (Point cloud) The points where lakes would appear
 
 ## Implementation
+
+The idea behind the implementation is to use steepest descent to generate the rivers. When it gets
+stuck in a local minumum, a variant of floodfill is used to deduce the location and elevation of the
+drainage point of the lake that would form around the local minumum. Then, it will continue by using
+steepest descent, until it reaches the boundary of the heightmap, or when it as traveled for more
+than the size of the heightmap (size here means the square root of its area).
 
 __Includes:__
 
