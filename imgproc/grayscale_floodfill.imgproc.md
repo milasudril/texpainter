@@ -12,14 +12,14 @@ __Ouptut:__ (Grayscale image) The output image
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <algorithm>
 #include <stack>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 template<class Predicate>
@@ -31,7 +31,8 @@ void floodfill4(GrayscalePaintArgs const& init, auto const& args, Predicate&& pr
 	auto const h = args.canvasSize().height();
 	Image<int8_t> visited{w, h};
 
-	auto const f = [p = std::forward<Predicate>(predicate), &visited](auto const& args, uint32_t x, uint32_t y) {
+	auto const f = [p = std::forward<Predicate>(predicate),
+	                &visited](auto const& args, uint32_t x, uint32_t y) {
 		if(visited(x, y) == 1) { return false; }
 		return p(args, x, y);
 	};
@@ -42,17 +43,17 @@ void floodfill4(GrayscalePaintArgs const& init, auto const& args, Predicate&& pr
 		auto const start_pos = nodes.top();
 		nodes.pop();
 		output<0>(args, start_pos.x, start_pos.y) = init.intensity;
-		visited(start_pos.x, start_pos.y) = 1;
+		visited(start_pos.x, start_pos.y)         = 1;
 
 
-//		if(start_pos.y < h - 1 && start_pos.x < w - 1 && f(args, start_pos.x + 1, start_pos.y + 1))
-//		{ nodes.push(ImageCoordinates{start_pos.x + 1, start_pos.y + 1}); }
+		//		if(start_pos.y < h - 1 && start_pos.x < w - 1 && f(args, start_pos.x + 1, start_pos.y + 1))
+		//		{ nodes.push(ImageCoordinates{start_pos.x + 1, start_pos.y + 1}); }
 
 		if(start_pos.y < h - 1 && f(args, start_pos.x, start_pos.y + 1))
 		{ nodes.push(ImageCoordinates{start_pos.x, start_pos.y + 1}); }
 
-//		if(start_pos.y < h - 1 && start_pos.x >= 1 && f(args, start_pos.x - 1, start_pos.y + 1))
-//		{ nodes.push(ImageCoordinates{start_pos.x - 1, start_pos.y + 1}); }
+		//		if(start_pos.y < h - 1 && start_pos.x >= 1 && f(args, start_pos.x - 1, start_pos.y + 1))
+		//		{ nodes.push(ImageCoordinates{start_pos.x - 1, start_pos.y + 1}); }
 
 		if(start_pos.x < w - 1 && f(args, start_pos.x + 1, start_pos.y))
 		{ nodes.push(ImageCoordinates{start_pos.x + 1, start_pos.y}); }
@@ -60,14 +61,14 @@ void floodfill4(GrayscalePaintArgs const& init, auto const& args, Predicate&& pr
 		if(start_pos.x >= 1 && f(args, start_pos.x - 1, start_pos.y))
 		{ nodes.push(ImageCoordinates{start_pos.x - 1, start_pos.y}); }
 
-//		if(start_pos.y >= 1 && start_pos.x < w - 1 && f(args, start_pos.x + 1, start_pos.y - 1))
-//		{ nodes.push(ImageCoordinates{start_pos.x + 1, start_pos.y - 1}); }
+		//		if(start_pos.y >= 1 && start_pos.x < w - 1 && f(args, start_pos.x + 1, start_pos.y - 1))
+		//		{ nodes.push(ImageCoordinates{start_pos.x + 1, start_pos.y - 1}); }
 
 		if(start_pos.y >= 1 && f(args, start_pos.x, start_pos.y - 1))
 		{ nodes.push(ImageCoordinates{start_pos.x, start_pos.y - 1}); }
 
-//		if(start_pos.y >= 1 && start_pos.x >= 1 && f(args, start_pos.x - 1, start_pos.y - 1))
-//		{ nodes.push(ImageCoordinates{start_pos.x - 1, start_pos.y - 1}); }
+		//		if(start_pos.y >= 1 && start_pos.x >= 1 && f(args, start_pos.x - 1, start_pos.y - 1))
+		//		{ nodes.push(ImageCoordinates{start_pos.x - 1, start_pos.y - 1}); }
 	}
 }
 

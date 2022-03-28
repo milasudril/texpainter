@@ -1,7 +1,6 @@
 # Rivers and lakes
 
-This image processor takes a Grayscale image as a heightmap and generates rivier systems, starting
-from each point in `Start points`.
+This image processor takes a Grayscale image as a heightmap and generates rivier systems, starting from each point in `Start points`.
 
 ## Input ports
 
@@ -17,11 +16,7 @@ __Lakes:__ (Grayscale paint args) The points where lakes would appear
 
 ## Implementation
 
-The idea behind the implementation is to use steepest descent to generate the rivers. When it gets
-stuck in a local minumum, a variant of floodfill is used to deduce the location and elevation of the
-drainage point of the lake that would form around the local minumum. Then, it will continue by using
-steepest descent, until it reaches the boundary of the heightmap, or when it as traveled for more
-than the size of the heightmap (size here means the square root of its area).
+The idea behind the implementation is to use steepest descent to generate the rivers. When it gets stuck in a local minumum, a variant of floodfill is used to deduce the location and elevation of the drainage point of the lake that would form around the local minumum. Then, it will continue by using steepest descent, until it reaches the boundary of the heightmap, or when it as traveled for more than the size of the heightmap (size here means the square root of its area).
 
 __Includes:__
 
@@ -79,9 +74,9 @@ auto grad(vec2_t loc, auto const& args)
 	auto const ddy = get_val(loc + dy, args) - get_val(loc - dy, args);
 
 	auto const ret = vec2_t{ddx, ddy};
-	auto const l = Texpainter::length(ret);
+	auto const l   = Texpainter::length(ret);
 
-	return l > 1.0/(1024.0*1024.0)? -ret / l : vec2_t{0.0, 0.0};
+	return l > 1.0 / (1024.0 * 1024.0) ? -ret / l : vec2_t{0.0, 0.0};
 }
 
 template<class Filter>
@@ -128,7 +123,10 @@ std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 	push_neigbours(nodes,
 	               args,
 	               IntLoc{static_cast<uint32_t>(start_loc[0]), static_cast<uint32_t>(start_loc[1])},
-	               [](auto const&...) { return true; });
+	               [&visited](auto const&, uint32_t x, uint32_t y) {
+		visited(x, y) = 1;
+		return true;
+	});
 
 	while(!nodes.empty())
 	{
@@ -164,6 +162,11 @@ std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 	}
 
 	if(std::size(esc_points) == 0) { return std::optional<EscapePoint>{}; }
+#if 0
+	std::ranges::for_each(esc_points, [](auto const& val) {
+		printf("%.15g %.15g %.15g\n", val.loc[0], val.loc[1], val.value);
+	});
+#endif
 
 	return *std::ranges::min_element(
 	    esc_points, [](auto const& a, auto const& b) { return a.value < b.value; });
@@ -193,9 +196,11 @@ void main(auto const& args)
 
 		    while(travel_distance <= std::sqrt(area(size)))
 		    {
-				if(loc[0] < 0.0 || loc[1] < 0.0 || loc[0]>=args.canvasSize().width() || loc[1]>= args.canvasSize().height()) { break; }
+			    if(loc[0] < 0.0 || loc[1] < 0.0 || loc[0] >= args.canvasSize().width()
+			       || loc[1] >= args.canvasSize().height())
+			    { break; }
 
-				auto const z_xy = get_val(loc, args);
+			    auto const z_xy = get_val(loc, args);
 
 			    if(z_xy < min_altitude)
 			    {
@@ -207,8 +212,9 @@ void main(auto const& args)
 			    }
 			    else
 			    {
-    				if(visited(static_cast<uint32_t>(loc[0]), static_cast<uint32_t>(loc[1]))){ break; }
-					visited(static_cast<uint32_t>(loc[0]), static_cast<uint32_t>(loc[1])) = 1;
+				    if(visited(static_cast<uint32_t>(loc[0]), static_cast<uint32_t>(loc[1])))
+				    { break; }
+				    visited(static_cast<uint32_t>(loc[0]), static_cast<uint32_t>(loc[1])) = 1;
 
 				    auto const esc = find_escape_point(args, loc);
 				    if(!esc.has_value()) { break; }
@@ -216,13 +222,17 @@ void main(auto const& args)
 				    {
 					    auto const loc_next = esc->loc;
 					    auto const d        = Texpainter::length(loc - loc_next);
-					    if(d < 1.0) { break; }
+					    if(d < 1.0)
+					    {
+				//		    printf("Stopping with distance %.15g\n", d);
+						    break;
+					    }
 
-					    printf("%.8g -> %.8g\n", z_xy, esc->value);
+				//	    printf("%.8g -> %.8g\n", z_xy, esc->value);
 					    lakes.push_back(
 					        GrayscalePaintArgs{ImageCoordinates{static_cast<uint32_t>(loc[0]),
-					                                   static_cast<uint32_t>(loc[1])},
-					                  esc->value});
+					                                            static_cast<uint32_t>(loc[1])},
+					                           esc->value});
 
 					    travel_distance += d;
 					    loc          = loc_next;
@@ -240,7 +250,7 @@ void main(auto const& args)
 		    }
 		    output<0>(args).get().push_back(std::move(points));
 	    });
-	printf("%zu\n\n", std::size(output<1>(args).get()));
+//	printf("%zu\n\n", std::size(output<1>(args).get()));
 }
 ```
 
