@@ -194,6 +194,7 @@ namespace $namespace_name
 		using Texpainter::FilterGraph::SpawnSpot;
 		using Texpainter::FilterGraph::PolylineSet;
 		using Texpainter::FilterGraph::LineSegTree;
+		using Texpainter::FilterGraph::GrayscalePaintArgs;
 		using Texpainter::AxisAlignedBoundingBox;
 		using Texpainter::vec2_t;
 		using Texpainter::Angle;

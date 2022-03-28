@@ -13,7 +13,7 @@ __Start points:__ (Point cloud)
 
 __Rivers:__ (Polyline set) The generated rivers
 
-__Lakes:__ (Point cloud) The points where lakes would appear
+__Lakes:__ (Grayscale paint args) The points where lakes would appear
 
 ## Implementation
 
@@ -79,7 +79,9 @@ auto grad(vec2_t loc, auto const& args)
 	auto const ddy = get_val(loc + dy, args) - get_val(loc - dy, args);
 
 	auto const ret = vec2_t{ddx, ddy};
-	return -ret / Texpainter::length(ret);
+	auto const l = Texpainter::length(ret);
+
+	return l > 1.0/(1024.0*1024.0)? -ret / l : vec2_t{0.0, 0.0};
 }
 
 template<class Filter>
@@ -176,6 +178,7 @@ void main(auto const& args)
 		    std::vector<vec2_t> points;
 		    auto& lakes = output<1>(args).get();
 		    points.reserve(16384);
+		    Image<int8_t> visited{args.canvasSize()};
 
 		    auto min_altitude    = input<0>(args, item.loc.x, item.loc.y);
 		    auto travel_distance = 0.0;
@@ -190,7 +193,9 @@ void main(auto const& args)
 
 		    while(travel_distance <= std::sqrt(area(size)))
 		    {
-			    auto const z_xy = get_val(loc, args);
+				if(loc[0] < 0.0 || loc[1] < 0.0 || loc[0]>=args.canvasSize().width() || loc[1]>= args.canvasSize().height()) { break; }
+
+				auto const z_xy = get_val(loc, args);
 
 			    if(z_xy < min_altitude)
 			    {
@@ -202,7 +207,8 @@ void main(auto const& args)
 			    }
 			    else
 			    {
-				    if(loc[0] < 0.0 || loc[1] < 0.0) { break; }
+    				if(visited(static_cast<uint32_t>(loc[0]), static_cast<uint32_t>(loc[1]))){ break; }
+					visited(static_cast<uint32_t>(loc[0]), static_cast<uint32_t>(loc[1])) = 1;
 
 				    auto const esc = find_escape_point(args, loc);
 				    if(!esc.has_value()) { break; }
@@ -213,11 +219,9 @@ void main(auto const& args)
 					    if(d < 1.0) { break; }
 
 					    lakes.push_back(
-					        SpawnSpot{ImageCoordinates{static_cast<uint32_t>(loc_next[0]),
+					        GrayscalePaintArgs{ImageCoordinates{static_cast<uint32_t>(loc_next[0]),
 					                                   static_cast<uint32_t>(loc_next[1])},
-					                  Angle{0},
-					                  1.0f
-					                  /*esc->value*/});
+					                  esc->value});
 					    travel_distance += d;
 					    loc          = loc_next;
 					    min_altitude = esc->value;
