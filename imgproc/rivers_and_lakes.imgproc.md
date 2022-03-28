@@ -218,10 +218,12 @@ void main(auto const& args)
 					    auto const d        = Texpainter::length(loc - loc_next);
 					    if(d < 1.0) { break; }
 
+					    printf("%.8g -> %.8g\n", z_xy, esc->value);
 					    lakes.push_back(
-					        GrayscalePaintArgs{ImageCoordinates{static_cast<uint32_t>(loc_next[0]),
-					                                   static_cast<uint32_t>(loc_next[1])},
+					        GrayscalePaintArgs{ImageCoordinates{static_cast<uint32_t>(loc[0]),
+					                                   static_cast<uint32_t>(loc[1])},
 					                  esc->value});
+
 					    travel_distance += d;
 					    loc          = loc_next;
 					    min_altitude = esc->value;
@@ -238,7 +240,7 @@ void main(auto const& args)
 		    }
 		    output<0>(args).get().push_back(std::move(points));
 	    });
-	printf("%zu\n", std::size(output<1>(args).get()));
+	printf("%zu\n\n", std::size(output<1>(args).get()));
 }
 ```
 
