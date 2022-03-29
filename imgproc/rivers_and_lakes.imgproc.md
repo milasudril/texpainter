@@ -162,11 +162,6 @@ std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 	}
 
 	if(std::size(esc_points) == 0) { return std::optional<EscapePoint>{}; }
-#if 0
-	std::ranges::for_each(esc_points, [](auto const& val) {
-		printf("%.15g %.15g %.15g\n", val.loc[0], val.loc[1], val.value);
-	});
-#endif
 
 	return *std::ranges::min_element(
 	    esc_points, [](auto const& a, auto const& b) { return a.value < b.value; });
