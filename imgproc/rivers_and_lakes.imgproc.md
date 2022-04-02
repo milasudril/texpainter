@@ -18,7 +18,7 @@ __Lakes:__ (Grayscale paint args) The points where lakes would appear
 
 The idea behind the implementation is to use steepest descent to generate the rivers. When it gets stuck in a local minumum, a variant of floodfill is used to deduce the location and elevation of the drainage point of the lake that would form around the local minumum. Then, it will continue by using steepest descent, until it reaches the boundary of the heightmap, or when it as traveled for more than the size of the heightmap (size here means the square root of its area).
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <algorithm>
@@ -30,7 +30,7 @@ __Includes:__
 #include <vector>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 struct IntLoc
@@ -121,11 +121,11 @@ std::optional<EscapePoint> find_escape_point(auto const& args,
 	auto const h = args.canvasSize().height();
 	Image<int8_t> visited{w, h};
 
-	start_loc_a += vec2_t{0.5, 0.5};
-	start_loc_b += vec2_t{0.5, 0.5};
+	const auto loc_a = start_loc_a + vec2_t{0.5, 0.5};
+	const auto loc_b = start_loc_b + vec2_t{0.5, 0.5};
 
-	IntLoc const a{static_cast<uint32_t>(start_loc_a[0]), static_cast<uint32_t>(start_loc_a[1])};
-	IntLoc const b{static_cast<uint32_t>(start_loc_b[0]), static_cast<uint32_t>(start_loc_b[1])};
+	IntLoc const a{static_cast<uint32_t>(loc_a[0]), static_cast<uint32_t>(loc_a[1])};
+	IntLoc const b{static_cast<uint32_t>(loc_b[0]), static_cast<uint32_t>(loc_b[1])};
 
 	nodes.push(a);
 	nodes.push(b);
@@ -140,20 +140,26 @@ std::optional<EscapePoint> find_escape_point(auto const& args,
 		return true;
 	});
 
+	const auto start_loc = 0.5 * (start_loc_a + start_loc_b);
 	while(!nodes.empty())
 	{
 		auto const node = nodes.top();
 		nodes.pop();
 
 		auto const z0 = quantize(input<0>(args, node.x, node.y), 16384.0f);
-		push_neigbours(nodes, args, node, [&visited, z0](auto const& args, uint32_t x, uint32_t y) {
-			if(visited(x, y) == 0 && quantize(input<0>(args, x, y), 16384.0f) >= z0)
-			{
-				visited(x, y) = 1;
-				return true;
-			}
-			return false;
-		});
+		push_neigbours(
+		    nodes, args, node, [&visited, z0, start_loc](auto const& args, uint32_t x, uint32_t y) {
+			    if(visited(x, y) == 0
+			       && Texpainter::lengthSquared(
+			              start_loc - vec2_t{static_cast<double>(x), static_cast<double>(y)})
+			              <= 256.0 * 256.0
+			       && quantize(input<0>(args, x, y), 16384.0f) >= z0)
+			    {
+				    visited(x, y) = 1;
+				    return true;
+			    }
+			    return false;
+		    });
 	}
 
 	std::vector<EscapePoint> esc_points;
@@ -201,9 +207,11 @@ void main(auto const& args)
 			       || loc[1] >= args.canvasSize().height() - 1)
 			    { break; }
 
-				if(visited(static_cast<uint32_t>(loc[0] + 0.5), static_cast<uint32_t>(loc[1] + 0.5)))
-				{ break; }
-				visited(static_cast<uint32_t>(loc[0] + 0.5), static_cast<uint32_t>(loc[1] + 0.5)) = 1;
+			    if(visited(static_cast<uint32_t>(loc[0] + 0.5),
+			               static_cast<uint32_t>(loc[1] + 0.5)))
+			    { break; }
+			    visited(static_cast<uint32_t>(loc[0] + 0.5), static_cast<uint32_t>(loc[1] + 0.5)) =
+			        1;
 
 			    auto const loc_next = loc + grad(loc, args);
 			    if(loc_next[0] < 0.0 || loc_next[1] < 0.0
