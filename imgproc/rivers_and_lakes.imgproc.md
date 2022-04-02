@@ -18,7 +18,7 @@ __Lakes:__ (Grayscale paint args) The points where lakes would appear
 
 The idea behind the implementation is to use steepest descent to generate the rivers. When it gets stuck in a local minumum, a variant of floodfill is used to deduce the location and elevation of the drainage point of the lake that would form around the local minumum. Then, it will continue by using steepest descent, until it reaches the boundary of the heightmap, or when it as traveled for more than the size of the heightmap (size here means the square root of its area).
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <algorithm>
@@ -30,7 +30,7 @@ __Includes:__
 #include <vector>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 struct IntLoc
@@ -182,8 +182,9 @@ std::optional<EscapePoint> find_escape_point(auto const& args,
 void main(auto const& args)
 {
 	auto const& points = input<1>(args);
+	Image<int8_t> visited{args.canvasSize()};
 	std::ranges::for_each(
-	    points.get(), [&args, size = args.canvasSize()](auto const& item) mutable {
+	    points.get(), [&args, size = args.canvasSize(), &visited](auto const& item) mutable {
 		    auto loc = vec2_t{static_cast<double>(item.loc.x), static_cast<double>(item.loc.y)};
 		    std::vector<vec2_t> points;
 		    auto& lakes = output<1>(args).get();
@@ -196,9 +197,13 @@ void main(auto const& args)
 
 		    while(travel_distance <= std::sqrt(area(size)))
 		    {
-			    if(loc[0] < 0.0 || loc[1] < 0.0 || loc[0] >= args.canvasSize().width()
-			       || loc[1] >= args.canvasSize().height())
+			    if(loc[0] < 1.0 || loc[1] < 1.0 || loc[0] >= args.canvasSize().width() - 1
+			       || loc[1] >= args.canvasSize().height() - 1)
 			    { break; }
+
+				if(visited(static_cast<uint32_t>(loc[0] + 0.5), static_cast<uint32_t>(loc[1] + 0.5)))
+				{ break; }
+				visited(static_cast<uint32_t>(loc[0] + 0.5), static_cast<uint32_t>(loc[1] + 0.5)) = 1;
 
 			    auto const loc_next = loc + grad(loc, args);
 			    if(loc_next[0] < 0.0 || loc_next[1] < 0.0
