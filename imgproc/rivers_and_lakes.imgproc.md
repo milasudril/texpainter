@@ -18,7 +18,7 @@ __Lakes:__ (Grayscale paint args) The points where lakes would appear
 
 The idea behind the implementation is to use steepest descent to generate the rivers. When it gets stuck in a local minumum, a variant of floodfill is used to deduce the location and elevation of the drainage point of the lake that would form around the local minumum. Then, it will continue by using steepest descent, until it reaches the boundary of the heightmap, or when it as traveled for more than the size of the heightmap (size here means the square root of its area).
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <algorithm>
@@ -30,7 +30,7 @@ __Includes:__
 #include <vector>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 struct IntLoc
@@ -201,23 +201,33 @@ void main(auto const& args)
 
 		    points.push_back(loc);
 
-		    while(travel_distance <= std::sqrt(area(size)))
+		    while(travel_distance <= 2.0*std::sqrt(area(size)))
 		    {
 			    if(loc[0] < 1.0 || loc[1] < 1.0 || loc[0] >= args.canvasSize().width() - 1
 			       || loc[1] >= args.canvasSize().height() - 1)
-			    { break; }
-
+			    {
+					puts("boundary hit");
+					break;
+				}
+/*
 			    if(visited(static_cast<uint32_t>(loc[0] + 0.5),
 			               static_cast<uint32_t>(loc[1] + 0.5)))
-			    { break; }
+			    {
+					puts("location visited");
+					break;
+				}
 			    visited(static_cast<uint32_t>(loc[0] + 0.5), static_cast<uint32_t>(loc[1] + 0.5)) =
 			        1;
+*/
 
 			    auto const loc_next = loc + grad(loc, args);
 			    if(loc_next[0] < 0.0 || loc_next[1] < 0.0
 			       || loc_next[0] >= args.canvasSize().width()
 			       || loc_next[1] >= args.canvasSize().height())
-			    { break; }
+			    {
+					puts("boundary hit");
+					break;
+				}
 
 			    auto const z_next = get_val(loc_next, args);
 
@@ -231,12 +241,20 @@ void main(auto const& args)
 			    else
 			    {
 				    auto const esc = find_escape_point(args, loc, loc_next);
-				    if(!esc.has_value()) { break; }
+				    if(!esc.has_value())
+				    {
+						puts("Stuck no lake");
+						break;
+					}
 				    loc = loc_next;
 
 				    auto const loc_next = esc->loc;
 				    auto const d        = Texpainter::length(loc - loc_next);
-				    if(d < 4.0) { break; }
+				    if(d < 4.0)
+				    {
+						puts("Stuck lake too small");
+						break;
+					}
 
 				    if(esc->value > z_next)
 				    {
@@ -251,9 +269,10 @@ void main(auto const& args)
 				    points.push_back(loc);
 			    }
 		    }
+		    printf("travel_distance: %.15g\n", travel_distance);
 		    output<0>(args).get().push_back(std::move(points));
 	    });
-	//	printf("%zu\n\n", std::size(output<1>(args).get()));
+		printf("lake count: %zu\n\n", std::size(output<1>(args).get()));
 }
 ```
 
