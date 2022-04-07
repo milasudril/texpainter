@@ -146,14 +146,14 @@ std::optional<EscapePoint> find_escape_point(auto const& args,
 		auto const node = nodes.top();
 		nodes.pop();
 
-		auto const z0 = quantize(input<0>(args, node.x, node.y), 16384.0f);
+		auto const z0 = quantize(input<0>(args, node.x, node.y), 32767.5f);
 		push_neigbours(
 		    nodes, args, node, [&visited, z0, start_loc](auto const& args, uint32_t x, uint32_t y) {
 			    if(visited(x, y) == 0
 			       && Texpainter::lengthSquared(
 			              start_loc - vec2_t{static_cast<double>(x), static_cast<double>(y)})
 			              <= 256.0 * 256.0
-			       && quantize(input<0>(args, x, y), 16384.0f) >= z0)
+			       && quantize(input<0>(args, x, y), 32767.5f) >= z0)
 			    {
 				    visited(x, y) = 1;
 				    return true;
@@ -236,12 +236,15 @@ void main(auto const& args)
 
 				    auto const loc_next = esc->loc;
 				    auto const d        = Texpainter::length(loc - loc_next);
-				    if(d < 1.0) { break; }
+				    if(d < 4.0) { break; }
 
-				    lakes.push_back(
-				        GrayscalePaintArgs{ImageCoordinates{static_cast<uint32_t>(loc[0]),
-				                                            static_cast<uint32_t>(loc[1])},
-				                           esc->value});
+				    if(esc->value > z_next)
+				    {
+						lakes.push_back(
+							GrayscalePaintArgs{ImageCoordinates{static_cast<uint32_t>(loc[0]),
+																static_cast<uint32_t>(loc[1])},
+											esc->value});
+					}
 				    travel_distance += Texpainter::length(loc_next - loc);
 				    min_altitude = esc->value;
 				    loc          = loc_next;
