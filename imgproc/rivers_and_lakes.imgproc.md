@@ -56,10 +56,10 @@ auto get_val(vec2_t loc, auto const& args)
 	auto const x_1  = (x_0 + size.width() + 1) % size.width();
 	auto const y_1  = (y_0 + size.height() + 1) % size.height();
 
-	auto const z_00 = input<0>(args, x_0, y_0);
-	auto const z_01 = input<0>(args, x_0, y_1);
-	auto const z_10 = input<0>(args, x_1, y_0);
-	auto const z_11 = input<0>(args, x_1, y_1);
+	auto const z_00 = output<1>(args, x_0, y_0);
+	auto const z_01 = output<1>(args, x_0, y_1);
+	auto const z_10 = output<1>(args, x_1, y_0);
+	auto const z_11 = output<1>(args, x_1, y_1);
 
 	auto const xi = loc - vec2_t{static_cast<double>(x_0), static_cast<double>(y_0)};
 
@@ -151,10 +151,10 @@ std::optional<EscapePoint> find_escape_point(auto const& args,
 		auto const node = nodes.top();
 		nodes.pop();
 
-		auto const z0 = input<0>(args, node.x, node.y);
+		auto const z0 = output<1>(args, node.x, node.y);
 		push_neigbours(
 		    nodes, args, node, [&visited, z0, start_loc](auto const& args, uint32_t x, uint32_t y) {
-			    if(visited(x, y) == 0 && input<0>(args, x, y) >= z0)
+			    if(visited(x, y) == 0 && output<1>(args, x, y) > z0)
 			    {
 				    visited(x, y) = 1;
 				    return true;
@@ -172,7 +172,8 @@ std::optional<EscapePoint> find_escape_point(auto const& args,
 			auto const dy = visited(l, k + 1) - visited(l, k);
 			if(dx * dx + dy * dy > 0)
 			{
-				vec2_t const loc{static_cast<double>(l) + 0.5, static_cast<double>(k) + 0.5};
+				vec2_t const loc{static_cast<double>(l), static_cast<double>(k)};
+			//	vec2_t const loc{static_cast<double>(l) + 0.5, static_cast<double>(k) + 0.5};
 				vec2_t const dir{static_cast<double>(dx), static_cast<double>(dy)};
 				esc_points.push_back(
 				    EscapePoint{loc, -dir / Texpainter::length(dir), get_val(loc, args)});
@@ -221,7 +222,7 @@ void fill_lake(auto const& args,
 
 		push_neigbours(
 		    nodes, args, node, [surface_level, start_loc](auto const& args, uint32_t x, uint32_t y) {
-			    if(output<2>(args, x, y) < 0.5f && input<0>(args, x, y) < surface_level)
+			    if(output<2>(args, x, y) < 0.5f && output<1>(args, x, y) < surface_level)
 			    {
 				    output<1>(args, x, y) = surface_level;
 				    output<2>(args, x, y) = 1.0f;
@@ -235,14 +236,16 @@ void fill_lake(auto const& args,
 void main(auto const& args)
 {
 	auto const& points = input<1>(args);
-	Image<int8_t> visited{args.canvasSize()};
+	std::copy(input<0>(args),
+	               input<0>(args) + area(args.canvasSize()),
+	               output<1>(args));
 	std::ranges::for_each(
-	    points.get(), [&args, size = args.canvasSize(), &visited](auto const& item) mutable {
+	    points.get(), [&args, size = args.canvasSize()](auto const& item) mutable {
 		    auto loc = vec2_t{static_cast<double>(item.loc.x), static_cast<double>(item.loc.y)};
 		    std::vector<vec2_t> points;
 		    points.reserve(16384);
 
-		    auto min_altitude    = input<0>(args, item.loc.x, item.loc.y);
+		    auto min_altitude    = output<1>(args, item.loc.x, item.loc.y);
 		    auto travel_distance = 0.0;
 
 		    points.push_back(loc);
@@ -314,6 +317,7 @@ void main(auto const& args)
 				    min_altitude = esc->value;
 				    loc          = loc_next;
 				    points.push_back(loc);
+				    break;
 			    }
 		    }
 		    printf("travel_distance: %.15g\n", travel_distance);
