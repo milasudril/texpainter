@@ -110,7 +110,7 @@ void push_neigbours(std::stack<IntLoc>& nodes, auto const& args, IntLoc start_po
 	{ nodes.push(IntLoc{start_pos.x - 1, start_pos.y - 1}); }
 }
 
-int16_t quantize(float val, float factor) { return static_cast<int16_t>(val * factor); }
+//int16_t quantize(float val, float factor) { return static_cast<int16_t>(val * factor); }
 
 std::optional<EscapePoint> find_escape_point(auto const& args,
                                              vec2_t start_loc_a,
@@ -146,14 +146,14 @@ std::optional<EscapePoint> find_escape_point(auto const& args,
 		auto const node = nodes.top();
 		nodes.pop();
 
-		auto const z0 = quantize(input<0>(args, node.x, node.y), 32767.5f);
+		auto const z0 = input<0>(args, node.x, node.y);
 		push_neigbours(
 		    nodes, args, node, [&visited, z0, start_loc](auto const& args, uint32_t x, uint32_t y) {
 			    if(visited(x, y) == 0
 			       && Texpainter::lengthSquared(
 			              start_loc - vec2_t{static_cast<double>(x), static_cast<double>(y)})
 			              <= 256.0 * 256.0
-			       && quantize(input<0>(args, x, y), 32767.5f) >= z0)
+			       && input<0>(args, x, y) >= z0)
 			    {
 				    visited(x, y) = 1;
 				    return true;
@@ -250,7 +250,7 @@ void main(auto const& args)
 
 				    auto const loc_next = esc->loc;
 				    auto const d        = Texpainter::length(loc - loc_next);
-				    if(d < 4.0)
+				    if(d < 2.0)
 				    {
 						puts("Stuck lake too small");
 						break;
