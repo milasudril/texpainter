@@ -172,8 +172,8 @@ std::optional<EscapePoint> find_escape_point(auto const& args,
 			auto const dy = visited(l, k + 1) - visited(l, k);
 			if(dx * dx + dy * dy > 0)
 			{
-				vec2_t const loc{static_cast<double>(l), static_cast<double>(k)};
-			//	vec2_t const loc{static_cast<double>(l) + 0.5, static_cast<double>(k) + 0.5};
+			//	vec2_t const loc{static_cast<double>(l), static_cast<double>(k)};
+				vec2_t const loc{static_cast<double>(l) + 0.5, static_cast<double>(k) + 0.5};
 				vec2_t const dir{static_cast<double>(dx), static_cast<double>(dy)};
 				esc_points.push_back(
 				    EscapePoint{loc, -dir / Texpainter::length(dir), get_val(loc, args)});
@@ -258,16 +258,6 @@ void main(auto const& args)
 					puts("boundary hit");
 					break;
 				}
-/*
-			    if(visited(static_cast<uint32_t>(loc[0] + 0.5),
-			               static_cast<uint32_t>(loc[1] + 0.5)))
-			    {
-					puts("location visited");
-					break;
-				}
-			    visited(static_cast<uint32_t>(loc[0] + 0.5), static_cast<uint32_t>(loc[1] + 0.5)) =
-			        1;
-*/
 
 			    auto const loc_next = loc + grad(loc, args);
 			    if(loc_next[0] < 0.0 || loc_next[1] < 0.0
@@ -295,6 +285,10 @@ void main(auto const& args)
 						puts("Stuck no lake");
 						break;
 					}
+				    if(esc->value > z_next)
+				    {
+						fill_lake(args, loc, loc_next, esc->value);
+					}
 				    loc = loc_next;
 
 				    auto const loc_next = esc->loc;
@@ -305,19 +299,10 @@ void main(auto const& args)
 						break;
 					}
 
-				    if(esc->value > z_next)
-				    {
-						fill_lake(args, loc, loc_next, esc->value);
-/*						lakes.push_back(
-							GrayscalePaintArgs{ImageCoordinates{static_cast<uint32_t>(loc[0]),
-																static_cast<uint32_t>(loc[1])},
-											esc->value});*/
-					}
 				    travel_distance += Texpainter::length(loc_next - loc);
 				    min_altitude = esc->value;
 				    loc          = loc_next;
 				    points.push_back(loc);
-				    break;
 			    }
 		    }
 		    printf("travel_distance: %.15g\n", travel_distance);
