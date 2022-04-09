@@ -12,7 +12,9 @@ __Start points:__ (Point cloud)
 
 __Rivers:__ (Polyline set) The generated rivers
 
-__Lakes:__ (Grayscale paint args) The points where lakes would appear
+__Heightmap:__ (Grayscale image) The new heightmap (lakes are flat)
+
+__Lakes:__ (Grayscale image) The regions where lakes would appear
 
 ## Implementation
 
@@ -127,6 +129,9 @@ std::optional<EscapePoint> find_escape_point(auto const& args,
 	IntLoc const a{static_cast<uint32_t>(loc_a[0]), static_cast<uint32_t>(loc_a[1])};
 	IntLoc const b{static_cast<uint32_t>(loc_b[0]), static_cast<uint32_t>(loc_b[1])};
 
+	if(output<2>(args, a.x, a.x) > 0.5 || output<2>(args, b.x, b.y) > 0.5)
+	{ return std::optional<EscapePoint>{};}
+
 	nodes.push(a);
 	nodes.push(b);
 
@@ -149,11 +154,7 @@ std::optional<EscapePoint> find_escape_point(auto const& args,
 		auto const z0 = input<0>(args, node.x, node.y);
 		push_neigbours(
 		    nodes, args, node, [&visited, z0, start_loc](auto const& args, uint32_t x, uint32_t y) {
-			    if(visited(x, y) == 0
-			       && Texpainter::lengthSquared(
-			              start_loc - vec2_t{static_cast<double>(x), static_cast<double>(y)})
-			              <= 256.0 * 256.0
-			       && input<0>(args, x, y) >= z0)
+			    if(visited(x, y) == 0 && input<0>(args, x, y) >= z0)
 			    {
 				    visited(x, y) = 1;
 				    return true;
@@ -185,6 +186,52 @@ std::optional<EscapePoint> find_escape_point(auto const& args,
 	    esc_points, [](auto const& a, auto const& b) { return a.value < b.value; });
 }
 
+void fill_lake(auto const& args,
+			vec2_t start_loc_a,
+            vec2_t start_loc_b, float surface_level)
+{
+	std::stack<IntLoc> nodes;
+
+	const auto loc_a = start_loc_a + vec2_t{0.5, 0.5};
+	const auto loc_b = start_loc_b + vec2_t{0.5, 0.5};
+
+	IntLoc const a{static_cast<uint32_t>(loc_a[0]), static_cast<uint32_t>(loc_a[1])};
+	IntLoc const b{static_cast<uint32_t>(loc_b[0]), static_cast<uint32_t>(loc_b[1])};
+
+	nodes.push(a);
+	nodes.push(b);
+
+	push_neigbours(nodes, args, a, [surface_level](auto const& args, uint32_t x, uint32_t y) {
+		output<1>(args, x, y) = surface_level;
+		output<2>(args, x, y) = 1.0f;
+		return true;
+	});
+
+	push_neigbours(nodes, args, b, [surface_level](auto const& args, uint32_t x, uint32_t y) {
+		output<1>(args, x, y) = surface_level;
+		output<2>(args, x, y) = 1.0f;
+		return true;
+	});
+
+	const auto start_loc = 0.5 * (start_loc_a + start_loc_b);
+	while(!nodes.empty())
+	{
+		auto const node = nodes.top();
+		nodes.pop();
+
+		push_neigbours(
+		    nodes, args, node, [surface_level, start_loc](auto const& args, uint32_t x, uint32_t y) {
+			    if(output<2>(args, x, y) < 0.5f && input<0>(args, x, y) < surface_level)
+			    {
+				    output<1>(args, x, y) = surface_level;
+				    output<2>(args, x, y) = 1.0f;
+				    return true;
+			    }
+			    return false;
+		    });
+	}
+}
+
 void main(auto const& args)
 {
 	auto const& points = input<1>(args);
@@ -193,7 +240,6 @@ void main(auto const& args)
 	    points.get(), [&args, size = args.canvasSize(), &visited](auto const& item) mutable {
 		    auto loc = vec2_t{static_cast<double>(item.loc.x), static_cast<double>(item.loc.y)};
 		    std::vector<vec2_t> points;
-		    auto& lakes = output<1>(args).get();
 		    points.reserve(16384);
 
 		    auto min_altitude    = input<0>(args, item.loc.x, item.loc.y);
@@ -258,10 +304,11 @@ void main(auto const& args)
 
 				    if(esc->value > z_next)
 				    {
-						lakes.push_back(
+						fill_lake(args, loc, loc_next, esc->value);
+/*						lakes.push_back(
 							GrayscalePaintArgs{ImageCoordinates{static_cast<uint32_t>(loc[0]),
 																static_cast<uint32_t>(loc[1])},
-											esc->value});
+											esc->value});*/
 					}
 				    travel_distance += Texpainter::length(loc_next - loc);
 				    min_altitude = esc->value;
@@ -272,7 +319,6 @@ void main(auto const& args)
 		    printf("travel_distance: %.15g\n", travel_distance);
 		    output<0>(args).get().push_back(std::move(points));
 	    });
-		printf("lake count: %zu\n\n", std::size(output<1>(args).get()));
 }
 ```
 
