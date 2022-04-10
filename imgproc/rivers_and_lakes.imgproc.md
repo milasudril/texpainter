@@ -44,7 +44,6 @@ struct IntLoc
 struct EscapePoint
 {
 	vec2_t loc;
-	vec2_t dir;
 	RealValue value;
 };
 
@@ -148,8 +147,8 @@ std::optional<EscapePoint> find_escape_point(auto const& args,
 	IntLoc const a{static_cast<uint32_t>(loc_a[0]), static_cast<uint32_t>(loc_a[1])};
 	IntLoc const b{static_cast<uint32_t>(loc_b[0]), static_cast<uint32_t>(loc_b[1])};
 
-	if(output<2>(args, a.x, a.x) > 0.5 || output<2>(args, b.x, b.y) > 0.5)
-	{ return std::optional<EscapePoint>{};}
+//	if(output<2>(args, a.x, a.x) > 0.5 || output<2>(args, b.x, b.y) > 0.5)
+//	{ return std::optional<EscapePoint>{};}
 
 	nodes.push(a);
 	nodes.push(b);
@@ -171,18 +170,23 @@ std::optional<EscapePoint> find_escape_point(auto const& args,
 		nodes.pop();
 
 		auto const z0 = output<1>(args, node.x, node.y);
-		push_neigbours(
+		push_neigbours_4(
 		    nodes, args, node, [&visited, z0, start_loc](auto const& args, uint32_t x, uint32_t y) {
-			    if(visited(x, y) == 0 && output<1>(args, x, y) > z0)
-			    {
-				    visited(x, y) = 1;
-				    return true;
-			    }
+				if(visited(x, y) == 0)
+				{
+					visited(x, y) = 1;
+					if(output<1>(args, x, y) >= z0)
+					{
+						return true;
+					}
+					return false;
+				}
 			    return false;
 		    });
 	}
 
 	std::vector<EscapePoint> esc_points;
+
 	for(uint32_t k = 0; k != h - 1; ++k)
 	{
 		for(uint32_t l = 0; l != w - 1; ++l)
@@ -191,11 +195,10 @@ std::optional<EscapePoint> find_escape_point(auto const& args,
 			auto const dy = visited(l, k + 1) - visited(l, k);
 			if(dx * dx + dy * dy > 0)
 			{
-			//	vec2_t const loc{static_cast<double>(l), static_cast<double>(k)};
-				vec2_t const loc{static_cast<double>(l) + 0.5, static_cast<double>(k) + 0.5};
-				vec2_t const dir{static_cast<double>(dx), static_cast<double>(dy)};
+				vec2_t const loc{static_cast<double>(l), static_cast<double>(k)};
+			//	vec2_t const loc{static_cast<double>(l) + 0.5, static_cast<double>(k) + 0.5};
 				esc_points.push_back(
-				    EscapePoint{loc, -dir / Texpainter::length(dir), get_val(loc, args)});
+				    EscapePoint{loc, get_val(loc, args)});
 			}
 		}
 	}
@@ -211,6 +214,10 @@ void fill_lake(auto const& args,
             vec2_t start_loc_b, float surface_level)
 {
 	std::stack<IntLoc> nodes;
+
+	auto const w = args.canvasSize().width();
+	auto const h = args.canvasSize().height();
+	Image<int8_t> visited{w, h};
 
 	const auto loc_a = start_loc_a + vec2_t{0.5, 0.5};
 	const auto loc_b = start_loc_b + vec2_t{0.5, 0.5};
@@ -240,11 +247,12 @@ void fill_lake(auto const& args,
 		nodes.pop();
 
 		push_neigbours_4(
-		    nodes, args, node, [surface_level, start_loc](auto const& args, uint32_t x, uint32_t y) {
-			    if(output<2>(args, x, y) < 0.5f && output<1>(args, x, y) < surface_level)
+		    nodes, args, node, [&visited, surface_level, start_loc](auto const& args, uint32_t x, uint32_t y) {
+			    if(visited(x, y) == 0 && output<1>(args, x, y) <= surface_level)
 			    {
 				    output<1>(args, x, y) = surface_level;
 				    output<2>(args, x, y) = 1.0f;
+				    visited(x, y) = 1;
 				    return true;
 			    }
 			    return false;
@@ -298,6 +306,7 @@ void main(auto const& args)
 			    }
 			    else
 			    {
+					printf("Start lake (%.15g, %.15g) (%.15g, %.15g)\n", loc[0], loc[1], loc_next[0], loc_next[1]);
 				    auto const esc = find_escape_point(args, loc, loc_next);
 				    if(!esc.has_value())
 				    {
@@ -308,20 +317,22 @@ void main(auto const& args)
 				    {
 						fill_lake(args, loc, loc_next, esc->value);
 					}
-				    loc = loc_next;
+					printf("Exit at  (%.15g, %.15g)\n", esc->loc[0], esc->loc[1]);
 
+				    loc = loc_next;
 				    auto const loc_next = esc->loc;
 				    auto const d        = Texpainter::length(loc - loc_next);
-				    if(d < 2.0)
-				    {
-						puts("Stuck lake too small");
-						break;
-					}
 
 				    travel_distance += Texpainter::length(loc_next - loc);
 				    min_altitude = esc->value;
 				    loc          = loc_next;
 				    points.push_back(loc);
+				    printf("d = %.15g\n", d);
+				    if(d < 1.0)
+				    {
+						puts("Stuck lake too small");
+						break;
+					}
 			    }
 		    }
 		    printf("travel_distance: %.15g\n", travel_distance);
