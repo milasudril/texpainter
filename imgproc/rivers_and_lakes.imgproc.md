@@ -196,7 +196,6 @@ std::optional<EscapePoint> find_escape_point(auto const& args,
 			if(dx * dx + dy * dy > 0)
 			{
 				vec2_t const loc{static_cast<double>(l), static_cast<double>(k)};
-			//	vec2_t const loc{static_cast<double>(l) + 0.5, static_cast<double>(k) + 0.5};
 				esc_points.push_back(
 				    EscapePoint{loc, get_val(loc, args)});
 			}
