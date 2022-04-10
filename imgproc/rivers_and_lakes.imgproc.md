@@ -112,6 +112,25 @@ void push_neigbours(std::stack<IntLoc>& nodes, auto const& args, IntLoc start_po
 	{ nodes.push(IntLoc{start_pos.x - 1, start_pos.y - 1}); }
 }
 
+template<class Filter>
+void push_neigbours_4(std::stack<IntLoc>& nodes, auto const& args, IntLoc start_pos, Filter&& f)
+{
+	auto const w = args.canvasSize().width();
+	auto const h = args.canvasSize().height();
+
+	if(start_pos.y < h - 1 && f(args, start_pos.x, start_pos.y + 1))
+	{ nodes.push(IntLoc{start_pos.x, start_pos.y + 1}); }
+
+	if(start_pos.x < w - 1 && f(args, start_pos.x + 1, start_pos.y))
+	{ nodes.push(IntLoc{start_pos.x + 1, start_pos.y}); }
+
+	if(start_pos.x >= 1 && f(args, start_pos.x - 1, start_pos.y))
+	{ nodes.push(IntLoc{start_pos.x - 1, start_pos.y}); }
+
+	if(start_pos.y >= 1 && f(args, start_pos.x, start_pos.y - 1))
+	{ nodes.push(IntLoc{start_pos.x, start_pos.y - 1}); }
+}
+
 //int16_t quantize(float val, float factor) { return static_cast<int16_t>(val * factor); }
 
 std::optional<EscapePoint> find_escape_point(auto const& args,
@@ -220,7 +239,7 @@ void fill_lake(auto const& args,
 		auto const node = nodes.top();
 		nodes.pop();
 
-		push_neigbours(
+		push_neigbours_4(
 		    nodes, args, node, [surface_level, start_loc](auto const& args, uint32_t x, uint32_t y) {
 			    if(output<2>(args, x, y) < 0.5f && output<1>(args, x, y) < surface_level)
 			    {
