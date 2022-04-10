@@ -193,7 +193,7 @@ std::optional<EscapePoint> find_escape_point(auto const& args,
 		{
 			auto const dx = visited(l + 1, k) - visited(l, k);
 			auto const dy = visited(l, k + 1) - visited(l, k);
-			if(dx * dx + dy * dy > 0)
+			if(dx * dx + dy * dy > 0 && output<2>(args, l, k) < 0.5f)
 			{
 				vec2_t const loc{static_cast<double>(l), static_cast<double>(k)};
 				esc_points.push_back(
@@ -327,7 +327,7 @@ void main(auto const& args)
 				    loc          = loc_next;
 				    points.push_back(loc);
 				    printf("d = %.15g\n", d);
-				    if(d < 1.0)
+				    if(d <= 1.0)
 				    {
 						puts("Stuck lake too small");
 						break;
