@@ -313,8 +313,8 @@ void main(auto const& args)
 							break;
 						}
 					}
-
-					auto const loc_next_1 = vec2_t{static_cast<double>(static_cast<uint32_t>(lowest[0])), static_cast<double>(static_cast<uint32_t>(lowest[1]))};
+					auto const lowest_offset = lowest + vec2_t{0.5, 0.5};
+					auto const loc_next_1 = vec2_t{static_cast<double>(static_cast<uint32_t>(lowest_offset[0])), static_cast<double>(static_cast<uint32_t>(lowest_offset[1]))};
 					travel_distance += Texpainter::length(loc_next_1 - loc);
 					loc = loc_next_1;
 					points.push_back(loc);
@@ -322,7 +322,7 @@ void main(auto const& args)
 					auto const min_val =  output<1>(args,
 						static_cast<uint32_t>(loc[0]),
 						static_cast<uint32_t>(loc[1]));
-					printf("%d Start lake (%.15g, %.15g, %.8g)\n", k, loc[0], loc[1], min_val);
+					printf("%d Start lake (%.15g, %.15g, %.9g)\n", k, loc[0], loc[1], min_val);
 				    auto const esc = find_escape_point(args, loc);
 				    if(!esc.has_value())
 				    {
@@ -351,8 +351,8 @@ void main(auto const& args)
 				    if(esc->value < min_val)
 				    {
 						printf("d = %.15g\n", d);
-						printf("Low exit point %.8g %.8g\n",esc->value, min_val);
-			//			break;
+						printf("Low exit point %.9g %.9g\n",esc->value, min_val);
+						break;
 					}
 					++k;
 			    }
