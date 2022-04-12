@@ -69,8 +69,8 @@ auto get_val(vec2_t loc, auto const& args)
 
 auto grad(vec2_t loc, auto const& args)
 {
-	auto const dx  = vec2_t{1.0, 0.0};
-	auto const dy  = vec2_t{0.0, 1.0};
+	auto const dx  = vec2_t{0.5, 0.0};
+	auto const dy  = vec2_t{0.0, 0.5};
 	auto const ddx = get_val(loc + dx, args) - get_val(loc - dx, args);
 	auto const ddy = get_val(loc + dy, args) - get_val(loc - dy, args);
 
@@ -132,38 +132,19 @@ void push_neigbours_4(std::stack<IntLoc>& nodes, auto const& args, IntLoc start_
 
 //int16_t quantize(float val, float factor) { return static_cast<int16_t>(val * factor); }
 
-std::optional<EscapePoint> find_escape_point(auto const& args,
-                                             vec2_t start_loc_a,
-                                             vec2_t start_loc_b)
+std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 {
 	std::stack<IntLoc> nodes;
 	auto const w = args.canvasSize().width();
 	auto const h = args.canvasSize().height();
 	Image<int8_t> visited{w, h};
 
-	const auto loc_a = start_loc_a + vec2_t{0.5, 0.5};
-	const auto loc_b = start_loc_b + vec2_t{0.5, 0.5};
-
-	IntLoc const a{static_cast<uint32_t>(loc_a[0]), static_cast<uint32_t>(loc_a[1])};
-	IntLoc const b{static_cast<uint32_t>(loc_b[0]), static_cast<uint32_t>(loc_b[1])};
-
 //	if(output<2>(args, a.x, a.x) > 0.5 || output<2>(args, b.x, b.y) > 0.5)
 //	{ return std::optional<EscapePoint>{};}
 
-	nodes.push(a);
-	nodes.push(b);
+	IntLoc const loc{static_cast<uint32_t>(start_loc[0]), static_cast<uint32_t>(start_loc[1])};
+	nodes.push(loc);
 
-	push_neigbours(nodes, args, a, [&visited](auto const&, uint32_t x, uint32_t y) {
-		visited(x, y) = 1;
-		return true;
-	});
-
-	push_neigbours(nodes, args, b, [&visited](auto const&, uint32_t x, uint32_t y) {
-		visited(x, y) = 1;
-		return true;
-	});
-
-	const auto start_loc = 0.5 * (start_loc_a + start_loc_b);
 	while(!nodes.empty())
 	{
 		auto const node = nodes.top();
@@ -209,8 +190,7 @@ std::optional<EscapePoint> find_escape_point(auto const& args,
 }
 
 void fill_lake(auto const& args,
-			vec2_t start_loc_a,
-            vec2_t start_loc_b, float surface_level)
+			vec2_t start_loc, float surface_level)
 {
 	std::stack<IntLoc> nodes;
 
@@ -218,28 +198,9 @@ void fill_lake(auto const& args,
 	auto const h = args.canvasSize().height();
 	Image<int8_t> visited{w, h};
 
-	const auto loc_a = start_loc_a + vec2_t{0.5, 0.5};
-	const auto loc_b = start_loc_b + vec2_t{0.5, 0.5};
+	IntLoc const loc{static_cast<uint32_t>(start_loc[0]), static_cast<uint32_t>(start_loc[1])};
+	nodes.push(loc);
 
-	IntLoc const a{static_cast<uint32_t>(loc_a[0]), static_cast<uint32_t>(loc_a[1])};
-	IntLoc const b{static_cast<uint32_t>(loc_b[0]), static_cast<uint32_t>(loc_b[1])};
-
-	nodes.push(a);
-	nodes.push(b);
-
-	push_neigbours(nodes, args, a, [surface_level](auto const& args, uint32_t x, uint32_t y) {
-		output<1>(args, x, y) = surface_level;
-		output<2>(args, x, y) = 1.0f;
-		return true;
-	});
-
-	push_neigbours(nodes, args, b, [surface_level](auto const& args, uint32_t x, uint32_t y) {
-		output<1>(args, x, y) = surface_level;
-		output<2>(args, x, y) = 1.0f;
-		return true;
-	});
-
-	const auto start_loc = 0.5 * (start_loc_a + start_loc_b);
 	while(!nodes.empty())
 	{
 		auto const node = nodes.top();
@@ -266,7 +227,7 @@ void main(auto const& args)
 	               input<0>(args) + area(args.canvasSize()),
 	               output<1>(args));
 	std::ranges::for_each(
-	    points.get(), [&args, size = args.canvasSize()](auto const& item) mutable {
+	    points.get(), [&args, size = args.canvasSize(), k = 0](auto const& item) mutable {
 		    auto loc = vec2_t{static_cast<double>(item.loc.x), static_cast<double>(item.loc.y)};
 		    std::vector<vec2_t> points;
 		    points.reserve(16384);
@@ -302,36 +263,98 @@ void main(auto const& args)
 				    min_altitude = z_next;
 				    loc          = loc_next;
 				    points.push_back(loc);
+				    puts("|");
 			    }
 			    else
 			    {
-					printf("Start lake (%.15g, %.15g) (%.15g, %.15g)\n", loc[0], loc[1], loc_next[0], loc_next[1]);
-				    auto const esc = find_escape_point(args, loc, loc_next);
+					std::array<vec2_t, 9> const neighbours{
+						vec2_t{0.0, 0.0},
+
+						vec2_t{-1.0, -1.0},
+						vec2_t{0.0, -1.0},
+						vec2_t{1.0, -1.0},
+
+						vec2_t{-1.0, 0.0},
+						vec2_t{1.0, 0.0},
+
+						vec2_t{-1.0, 1.0},
+						vec2_t{0.0, 1.0},
+						vec2_t{1.0, 1.0}
+					};
+
+					auto const i_lowest = std::ranges::min_element(neighbours, [&args, loc](auto a, auto b) {
+						a += loc + vec2_t{0.5, 0.5};
+						b += loc + vec2_t{0.5, 0.5};
+						auto const x_a = static_cast<uint32_t>(a[0]);
+						auto const y_a = static_cast<uint32_t>(a[1]);
+						auto const x_b = static_cast<uint32_t>(b[0]);
+						auto const y_b = static_cast<uint32_t>(b[1]);
+
+						return output<1>(args, x_a, y_a) < output<1>(args, x_b, y_b);
+					});
+
+					auto const lowest = *i_lowest + loc;
+					if(i_lowest != std::begin(neighbours))
+					{
+						puts("Not local minimum 1");
+						auto const i_lowest_2 = std::ranges::min_element(neighbours, [&args, lowest](auto a, auto b) {
+							a += lowest + vec2_t{0.5, 0.5};
+							b += lowest + vec2_t{0.5, 0.5};
+							auto const x_a = static_cast<uint32_t>(a[0]);
+							auto const y_a = static_cast<uint32_t>(a[1]);
+							auto const x_b = static_cast<uint32_t>(b[0]);
+							auto const y_b = static_cast<uint32_t>(b[1]);
+
+							return output<1>(args, x_a, y_a) < output<1>(args, x_b, y_b);
+						});
+						if(i_lowest_2 != std::begin(neighbours))
+						{
+							puts("Not local minimum 2");
+							break;
+						}
+					}
+
+					auto const loc_next_1 = vec2_t{static_cast<double>(static_cast<uint32_t>(lowest[0])), static_cast<double>(static_cast<uint32_t>(lowest[1]))};
+					travel_distance += Texpainter::length(loc_next_1 - loc);
+					loc = loc_next_1;
+					points.push_back(loc);
+
+					auto const min_val =  output<1>(args,
+						static_cast<uint32_t>(loc[0]),
+						static_cast<uint32_t>(loc[1]));
+					printf("%d Start lake (%.15g, %.15g, %.8g)\n", k, loc[0], loc[1], min_val);
+				    auto const esc = find_escape_point(args, loc);
 				    if(!esc.has_value())
 				    {
 						puts("Stuck no lake");
 						break;
 					}
-				    if(esc->value > z_next)
-				    {
-						fill_lake(args, loc, loc_next, esc->value);
-					}
+
 					printf("Exit at  (%.15g, %.15g)\n", esc->loc[0], esc->loc[1]);
 
-				    loc = loc_next;
-				    auto const loc_next = esc->loc;
-				    auto const d        = Texpainter::length(loc - loc_next);
 
-				    travel_distance += Texpainter::length(loc_next - loc);
+					fill_lake(args, loc, esc->value);
+
+				    auto const loc_next_2 = esc->loc;
+				    auto const d        = Texpainter::length(loc - loc_next_2);
+
+				    travel_distance += d;
 				    min_altitude = esc->value;
-				    loc          = loc_next;
+				    loc          = loc_next_2;
 				    points.push_back(loc);
 				    printf("d = %.15g\n", d);
-				    if(d <= 1.0)
+			/*	    if(d <= 1.0)
 				    {
 						puts("Stuck lake too small");
 						break;
+					}*/
+				    if(esc->value < min_val)
+				    {
+						printf("d = %.15g\n", d);
+						printf("Low exit point %.8g %.8g\n",esc->value, min_val);
+			//			break;
 					}
+					++k;
 			    }
 		    }
 		    printf("travel_distance: %.15g\n", travel_distance);
