@@ -165,13 +165,13 @@ std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 
 	std::vector<EscapePoint> esc_points;
 
-	for(uint32_t k = 0; k != h - 1; ++k)
+	for(uint32_t k = 1; k != h - 1; ++k)
 	{
-		for(uint32_t l = 0; l != w - 1; ++l)
+		for(uint32_t l = 1; l != w - 1; ++l)
 		{
-			auto const dx = visited(l + 1, k) - visited(l, k);
-			auto const dy = visited(l, k + 1) - visited(l, k);
-			if(dx * dx + dy * dy > 0 && output<2>(args, l, k) < 0.5f)
+			auto const dx = visited(l + 1, k) - visited(l - 1, k);
+			auto const dy = visited(l, k + 1) - visited(l, k - 1);
+			if(visited(l, k)*(dx * dx + dy * dy) > 0 && output<2>(args, l, k) < 0.5f)
 			{
 				vec2_t const loc{static_cast<double>(l), static_cast<double>(k)};
 				esc_points.push_back(
@@ -205,7 +205,7 @@ void fill_lake(auto const& args,
 
 		push_neigbours_4(
 		    nodes, args, node, [&visited, surface_level, start_loc](auto const& args, uint32_t x, uint32_t y) {
-			    if(visited(x, y) == 0 && output<1>(args, x, y) <= surface_level)
+			    if(visited(x, y) == 0 && input<0>(args, x, y) < surface_level)
 			    {
 				    output<1>(args, x, y) = surface_level;
 				    output<2>(args, x, y) = 1.0f;
@@ -351,7 +351,10 @@ void main(auto const& args)
 						printf("Low exit point %.9g %.9g\n",esc->value, min_val);
 						break;
 					}
+
 					++k;
+/*					if(k == )
+					{ break; }*/
 			    }
 		    }
 		    printf("travel_distance: %.15g\n", travel_distance);
