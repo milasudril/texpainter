@@ -306,8 +306,16 @@ void main(auto const& args)
 						});
 						if(i_lowest_2 != std::begin(neighbours))
 						{
-							puts("Not local minimum 2");
-							break;
+							puts("Not local minumum 2");
+							auto const lowest_offset = lowest + vec2_t{0.5, 0.5};
+							auto const x = static_cast<uint32_t>(lowest_offset[0]);
+							auto const y = static_cast<uint32_t>(lowest_offset[1]);
+							auto const loc_next_1 = vec2_t{static_cast<double>(x), static_cast<double>(y)};
+							travel_distance += Texpainter::length(loc_next_1 - loc);
+							loc = loc_next_1;
+							min_altitude = output<1>(args, x, y);
+							points.push_back(loc);
+							continue;
 						}
 					}
 					auto const lowest_offset = lowest + vec2_t{0.5, 0.5};
