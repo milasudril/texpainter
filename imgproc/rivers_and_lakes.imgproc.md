@@ -143,6 +143,7 @@ std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 //	{ return std::optional<EscapePoint>{};}
 
 	IntLoc const loc{static_cast<uint32_t>(start_loc[0]), static_cast<uint32_t>(start_loc[1])};
+	visited(loc.x, loc.y) = 1;
 	nodes.push(loc);
 
 	while(!nodes.empty())
@@ -153,14 +154,10 @@ std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 		auto const z0 = output<1>(args, node.x, node.y);
 		push_neigbours_4(
 		    nodes, args, node, [&visited, z0, start_loc](auto const& args, uint32_t x, uint32_t y) {
-				if(visited(x, y) == 0)
+				if(visited(x, y) == 0 && output<1>(args, x, y) >= z0)
 				{
 					visited(x, y) = 1;
-					if(output<1>(args, x, y) >= z0)
-					{
-						return true;
-					}
-					return false;
+					return true;
 				}
 			    return false;
 		    });
