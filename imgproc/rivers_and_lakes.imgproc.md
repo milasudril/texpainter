@@ -130,8 +130,6 @@ void push_neigbours_4(std::stack<IntLoc>& nodes, auto const& args, IntLoc start_
 	{ nodes.push(IntLoc{start_pos.x, start_pos.y - 1}); }
 }
 
-//int16_t quantize(float val, float factor) { return static_cast<int16_t>(val * factor); }
-
 std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 {
 	std::stack<IntLoc> nodes;
@@ -139,24 +137,22 @@ std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 	auto const h = args.canvasSize().height();
 	Image<int8_t> visited{w, h};
 
-	//	if(output<2>(args, a.x, a.x) > 0.5 || output<2>(args, b.x, b.y) > 0.5)
-	//	{ return std::optional<EscapePoint>{};}
-
 	IntLoc const loc{static_cast<uint32_t>(start_loc[0]), static_cast<uint32_t>(start_loc[1])};
-	visited(loc.x, loc.y) = 1;
 	nodes.push(loc);
-
 	while(!nodes.empty())
 	{
 		auto const node = nodes.top();
 		nodes.pop();
+
+		auto const x = node.x;
+		auto const y = node.y;
+		visited(x, y) = 1;
 
 		auto const z0 = output<1>(args, node.x, node.y);
 		push_neigbours_4(
 		    nodes, args, node, [&visited, z0, start_loc](auto const& args, uint32_t x, uint32_t y) {
 			    if(visited(x, y) == 0 && output<1>(args, x, y) >= z0)
 			    {
-				    visited(x, y) = 1;
 				    return true;
 			    }
 			    return false;
@@ -164,7 +160,6 @@ std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 	}
 
 	std::vector<EscapePoint> esc_points;
-
 	for(uint32_t k = 1; k != h - 1; ++k)
 	{
 		for(uint32_t l = 1; l != w - 1; ++l)
@@ -203,7 +198,6 @@ void fill_lake(auto const& args, vec2_t start_loc, float surface_level)
 
 		auto const x = node.x;
 		auto const y = node.y;
-
 		output<1>(args, x, y) = surface_level;
 		output<2>(args, x, y) = 1.0f;
 		visited(x, y)         = 1;
