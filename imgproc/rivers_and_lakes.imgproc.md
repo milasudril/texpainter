@@ -81,37 +81,6 @@ auto grad(vec2_t loc, auto const& args)
 }
 
 template<class Filter>
-void push_neigbours(std::stack<IntLoc>& nodes, auto const& args, IntLoc start_pos, Filter&& f)
-{
-	auto const w = args.canvasSize().width();
-	auto const h = args.canvasSize().height();
-
-	if(start_pos.y < h - 1 && start_pos.x < w - 1 && f(args, start_pos.x + 1, start_pos.y + 1))
-	{ nodes.push(IntLoc{start_pos.x + 1, start_pos.y + 1}); }
-
-	if(start_pos.y < h - 1 && f(args, start_pos.x, start_pos.y + 1))
-	{ nodes.push(IntLoc{start_pos.x, start_pos.y + 1}); }
-
-	if(start_pos.y < h - 1 && start_pos.x >= 1 && f(args, start_pos.x - 1, start_pos.y + 1))
-	{ nodes.push(IntLoc{start_pos.x - 1, start_pos.y + 1}); }
-
-	if(start_pos.x < w - 1 && f(args, start_pos.x + 1, start_pos.y))
-	{ nodes.push(IntLoc{start_pos.x + 1, start_pos.y}); }
-
-	if(start_pos.x >= 1 && f(args, start_pos.x - 1, start_pos.y))
-	{ nodes.push(IntLoc{start_pos.x - 1, start_pos.y}); }
-
-	if(start_pos.y >= 1 && start_pos.x < w - 1 && f(args, start_pos.x + 1, start_pos.y - 1))
-	{ nodes.push(IntLoc{start_pos.x + 1, start_pos.y - 1}); }
-
-	if(start_pos.y >= 1 && f(args, start_pos.x, start_pos.y - 1))
-	{ nodes.push(IntLoc{start_pos.x, start_pos.y - 1}); }
-
-	if(start_pos.y >= 1 && start_pos.x >= 1 && f(args, start_pos.x - 1, start_pos.y - 1))
-	{ nodes.push(IntLoc{start_pos.x - 1, start_pos.y - 1}); }
-}
-
-template<class Filter>
 void push_neigbours_4(std::stack<IntLoc>& nodes, auto const& args, IntLoc start_pos, Filter&& f)
 {
 	auto const w = args.canvasSize().width();
@@ -130,12 +99,12 @@ void push_neigbours_4(std::stack<IntLoc>& nodes, auto const& args, IntLoc start_
 	{ nodes.push(IntLoc{start_pos.x, start_pos.y - 1}); }
 }
 
-std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
+Image<int8_t> gen_drainage_basin(auto const& args, vec2_t start_loc)
 {
-	std::stack<IntLoc> nodes;
+    std::stack<IntLoc> nodes;
 	auto const w = args.canvasSize().width();
 	auto const h = args.canvasSize().height();
-	Image<int8_t> visited{w, h};
+	Image<int8_t> ret{w, h};
 
 	IntLoc const loc{static_cast<uint32_t>(start_loc[0]), static_cast<uint32_t>(start_loc[1])};
 	nodes.push(loc);
@@ -146,27 +115,35 @@ std::optional<EscapePoint> find_escape_point(auto const& args, vec2_t start_loc)
 
 		auto const x = node.x;
 		auto const y = node.y;
-		visited(x, y) = 1;
+		if(ret(x, y)) { continue; }
+
+		ret(x, y) = 1;
 
 		auto const z0 = output<1>(args, node.x, node.y);
 		push_neigbours_4(
-		    nodes, args, node, [&visited, z0, start_loc](auto const& args, uint32_t x, uint32_t y) {
-			    if(visited(x, y) == 0 && output<1>(args, x, y) >= z0)
+		    nodes, args, node, [&ret, z0, start_loc](auto const& args, uint32_t x, uint32_t y) {
+			    if(ret(x, y) == 0 && output<1>(args, x, y) >= z0)
 			    {
 				    return true;
 			    }
 			    return false;
 		    });
 	}
+	return ret;
+}
 
+std::optional<EscapePoint> find_escape_point(Image<int8_t> const& drainage_basin, auto const& args)
+{
+	auto const w = drainage_basin.width();
+	auto const h = drainage_basin.height();
 	std::vector<EscapePoint> esc_points;
 	for(uint32_t k = 1; k != h - 1; ++k)
 	{
 		for(uint32_t l = 1; l != w - 1; ++l)
 		{
-			auto const dx = visited(l + 1, k) - visited(l - 1, k);
-			auto const dy = visited(l, k + 1) - visited(l, k - 1);
-			if(visited(l, k) * (dx * dx + dy * dy) > 0 && output<2>(args, l, k) < 0.5f)
+			auto const dx = drainage_basin(l + 1, k) - drainage_basin(l - 1, k);
+			auto const dy = drainage_basin(l, k + 1) - drainage_basin(l, k - 1);
+			if(drainage_basin(l, k) * (dx * dx + dy * dy) > 0 && output<2>(args, l, k) < 0.5f)
 			{
 				vec2_t const loc{static_cast<double>(l), static_cast<double>(k)};
 				esc_points.push_back(EscapePoint{loc, output<1>(args, l, k)});
@@ -324,12 +301,16 @@ void main(auto const& args)
 				    auto const min_val = output<1>(
 				        args, static_cast<uint32_t>(loc[0]), static_cast<uint32_t>(loc[1]));
 				    printf("%d Start lake (%.15g, %.15g, %.9g)\n", k, loc[0], loc[1], min_val);
-				    auto const esc = find_escape_point(args, loc);
+				    if(k == 50)
+				    { puts("=============================="); }
+				    auto const drainage_basin = gen_drainage_basin(args, loc);
+				    auto const esc = find_escape_point(drainage_basin, args);
 				    if(!esc.has_value())
 				    {
 					    puts("Stuck no lake");
 					    break;
 				    }
+				    
 
 				    printf("%d Exit lake  (%.15g, %.15g, %.9g)\n",
 				           k,
@@ -337,6 +318,8 @@ void main(auto const& args)
 				           esc->loc[1],
 				           esc->value);
 
+                    if(k == 50)
+				    { puts("=============================="); break;}
 
 				    fill_lake(args, loc, esc->value);
 
@@ -347,6 +330,7 @@ void main(auto const& args)
 				    min_altitude = esc->value;
 				    loc          = loc_next_2;
 				    points.push_back(loc);
+
 				    printf("d = %.15g\n", d);
 				    /*	    if(d <= 1.0)
 				    {
@@ -360,9 +344,9 @@ void main(auto const& args)
 					    break;
 				    }
 
+                    if(k == 50)
+                    { break; }
 				    ++k;
-				    /*					if(k == )
-					{ break; }*/
 			    }
 		    }
 		    printf("travel_distance: %.15g\n", travel_distance);
