@@ -115,7 +115,7 @@ Image<int8_t> gen_drainage_basin(auto const& args, vec2_t start_loc)
 
 		auto const x = node.x;
 		auto const y = node.y;
-		if(ret(x, y)) { continue; }
+		if(ret(x, y) == 1) { continue; }
 
 		ret(x, y) = 1;
 
@@ -132,7 +132,7 @@ Image<int8_t> gen_drainage_basin(auto const& args, vec2_t start_loc)
 	return ret;
 }
 
-std::optional<EscapePoint> find_escape_point(Image<int8_t> const& drainage_basin, auto const& args)
+std::optional<EscapePoint> find_escape_point(auto const& args, Image<int8_t> const& drainage_basin)
 {
 	auto const w = drainage_basin.width();
 	auto const h = drainage_basin.height();
@@ -157,7 +157,7 @@ std::optional<EscapePoint> find_escape_point(Image<int8_t> const& drainage_basin
 	    esc_points, [](auto const& a, auto const& b) { return a.value < b.value; });
 }
 
-void fill_lake(auto const& args, vec2_t start_loc, float surface_level)
+void fill_lake(auto const& args, Image<int8_t> const& drainage_basin, vec2_t start_loc, float surface_level)
 {
 	std::stack<IntLoc> nodes;
 
@@ -175,6 +175,10 @@ void fill_lake(auto const& args, vec2_t start_loc, float surface_level)
 
 		auto const x = node.x;
 		auto const y = node.y;
+		
+		if(visited(x, y) == 1)
+		{ continue; }
+		
 		output<1>(args, x, y) = surface_level;
 		output<2>(args, x, y) = 1.0f;
 		visited(x, y)         = 1;
@@ -183,8 +187,9 @@ void fill_lake(auto const& args, vec2_t start_loc, float surface_level)
 		    nodes,
 		    args,
 		    node,
-		    [&visited, surface_level, start_loc](auto const& args, uint32_t x, uint32_t y) {
-			    if(visited(x, y) == 0 && output<1>(args, x, y) < surface_level) { return true; }
+		    [&visited, &drainage_basin, surface_level, start_loc](auto const& args, uint32_t x, uint32_t y) {
+			    if(visited(x, y) == 0 && output<1>(args, x, y) < surface_level && drainage_basin(x, y) != 0)
+			    { return true; }
 			    return false;
 		    });
 	}
@@ -304,7 +309,7 @@ void main(auto const& args)
 				    if(k == 50)
 				    { puts("=============================="); }
 				    auto const drainage_basin = gen_drainage_basin(args, loc);
-				    auto const esc = find_escape_point(drainage_basin, args);
+				    auto const esc = find_escape_point(args, drainage_basin);
 				    if(!esc.has_value())
 				    {
 					    puts("Stuck no lake");
@@ -319,9 +324,9 @@ void main(auto const& args)
 				           esc->value);
 
                     if(k == 50)
-				    { puts("=============================="); break;}
+				    { puts("==============================");}
 
-				    fill_lake(args, loc, esc->value);
+				    fill_lake(args, drainage_basin, loc, esc->value);
 
 				    auto const loc_next_2 = esc->loc;
 				    auto const d          = Texpainter::length(loc - loc_next_2);
@@ -344,8 +349,8 @@ void main(auto const& args)
 					    break;
 				    }
 
-                    if(k == 50)
-                    { break; }
+/*                    if(k == 50)
+                    { break; }*/
 				    ++k;
 			    }
 		    }
