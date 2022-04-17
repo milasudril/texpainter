@@ -210,7 +210,7 @@ void main(auto const& args)
 
 		    points.push_back(loc);
 
-		    while(travel_distance <= 2.0 * std::sqrt(area(size)))
+		    while(travel_distance <= 4.0 * std::sqrt(area(size)))
 		    {
 			    if(loc[0] < 1.0 || loc[1] < 1.0 || loc[0] >= args.canvasSize().width() - 1
 			       || loc[1] >= args.canvasSize().height() - 1)
