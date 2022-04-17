@@ -211,8 +211,8 @@ void main(auto const& args)
 
 		    while(travel_distance <= 4.0 * std::sqrt(area(size)))
 		    {
-			    if(loc[0] < 1.0 || loc[1] < 1.0 || loc[0] >= args.canvasSize().width() - 1
-			       || loc[1] >= args.canvasSize().height() - 1)
+			    if(loc[0] < 2.0 || loc[1] < 2.0 || loc[0] >= args.canvasSize().width() - 2
+			       || loc[1] >= args.canvasSize().height() - 2)
 			    {
 				    puts("boundary hit");
 				    break;
