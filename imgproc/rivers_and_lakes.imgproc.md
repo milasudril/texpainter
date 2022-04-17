@@ -203,7 +203,6 @@ void main(auto const& args)
 	    points.get(), [&args, size = args.canvasSize(), k = 0](auto const& item) mutable {
 		    auto loc = vec2_t{static_cast<double>(item.loc.x), static_cast<double>(item.loc.y)};
 		    std::vector<vec2_t> points;
-		    points.reserve(16384);
 
 		    auto min_altitude    = output<1>(args, item.loc.x, item.loc.y);
 		    auto travel_distance = 0.0;
@@ -331,9 +330,10 @@ void main(auto const& args)
 				    auto const loc_next_2 = esc->loc;
 				    auto const d          = Texpainter::length(loc - loc_next_2);
 
-				    travel_distance += d;
 				    min_altitude = esc->value;
 				    loc          = loc_next_2;
+                    travel_distance = 0;
+				    output<0>(args).get().push_back(std::move(points));
 				    points.push_back(loc);
 
 				    printf("d = %.15g\n", d);
@@ -354,7 +354,6 @@ void main(auto const& args)
 				    ++k;
 			    }
 		    }
-		    printf("travel_distance: %.15g\n", travel_distance);
 		    output<0>(args).get().push_back(std::move(points));
 	    });
 }
