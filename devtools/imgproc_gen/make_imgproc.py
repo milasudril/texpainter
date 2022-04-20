@@ -39,8 +39,6 @@ def translateType(str):
 		return 'PolylineSet'
 	if str == 'Line segment tree':
 		return 'LineSegTree'
-	if str == 'Grayscale paint args':
-		return 'GrayscalePaintArgs'
 	raise Exception('Unsupported port type ' + str)
 
 

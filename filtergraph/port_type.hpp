@@ -26,7 +26,6 @@ namespace Texpainter::FilterGraph
 		GrayscaleComplexPixels,
 		TopographyData,
 		PointCloud,
-		GrayscalePaintArgs,
 		Palette,
 		LineSegTree,
 		PolylineSet
@@ -60,22 +59,8 @@ namespace Texpainter::FilterGraph
 		float scale;
 	};
 
-	struct GrayscalePaintArgs
-	{
-		ImageCoordinates loc;
-		RealValue intensity;
-	};
-
 	template<PortType id>
 	struct PortTypeToType;
-
-	template<>
-	struct PortTypeToType<PortType::GrayscalePaintArgs>
-	{
-		using type = std::vector<GrayscalePaintArgs>;
-
-		static type createValue(Size2d) { return type{}; }
-	};
 
 	template<>
 	struct PortTypeToType<PortType::RgbaPixels>
