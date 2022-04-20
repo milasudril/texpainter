@@ -24,6 +24,8 @@ __Point cloud:__ (Point cloud) The generated point cloud
 
 __Point intensity:__ (= 0.5)
 
+__Volume selection:__ (= 0.0)
+
 ## Implementation
 
 __Includes:__ 
@@ -42,12 +44,17 @@ void main(auto const& args, auto const& params)
 	auto const I = std::exp2(std::lerp(0.0f, 12.0f, param<Str{"Point intensity"}>(params).value()));
 	auto const w = args.canvasSize().width();
 	auto const h = args.canvasSize().height();
-	std::uniform_real_distribution U{0.0f, static_cast<RealValue>(w * h) / I};
+	auto const V =
+	    param<Str{"Volume selection"}>(params).value() < 0.5
+	        ? static_cast<RealValue>(w * h)
+	        : static_cast<RealValue>(std::accumulate(input<0>(args), input<0>(args) + w * h, 0.0));
+
+	std::uniform_real_distribution U{0.0f, V / I};
 	auto rng = Rng{args.rngSeed()};
 
-	for(uint32_t row = 0; row < h; ++row)
+	for(uint32_t row = 0; row != h; ++row)
 	{
-		for(uint32_t col = 0; col < w; ++col)
+		for(uint32_t col = 0; col != w; ++col)
 		{
 			auto val = U(rng);
 			if(val <= input<0>(args, col, row))

@@ -101,7 +101,7 @@ void push_neigbours_4(std::stack<IntLoc>& nodes, auto const& args, IntLoc start_
 
 Image<int8_t> gen_drainage_basin(auto const& args, vec2_t start_loc)
 {
-    std::stack<IntLoc> nodes;
+	std::stack<IntLoc> nodes;
 	auto const w = args.canvasSize().width();
 	auto const h = args.canvasSize().height();
 	Image<int8_t> ret{w, h};
@@ -122,10 +122,7 @@ Image<int8_t> gen_drainage_basin(auto const& args, vec2_t start_loc)
 		auto const z0 = output<1>(args, node.x, node.y);
 		push_neigbours_4(
 		    nodes, args, node, [&ret, z0, start_loc](auto const& args, uint32_t x, uint32_t y) {
-			    if(ret(x, y) == 0 && output<1>(args, x, y) >= z0)
-			    {
-				    return true;
-			    }
+			    if(ret(x, y) == 0 && output<1>(args, x, y) >= z0) { return true; }
 			    return false;
 		    });
 	}
@@ -157,7 +154,10 @@ std::optional<EscapePoint> find_escape_point(auto const& args, Image<int8_t> con
 	    esc_points, [](auto const& a, auto const& b) { return a.value < b.value; });
 }
 
-void fill_lake(auto const& args, Image<int8_t> const& drainage_basin, vec2_t start_loc, float surface_level)
+void fill_lake(auto const& args,
+               Image<int8_t> const& drainage_basin,
+               vec2_t start_loc,
+               float surface_level)
 {
 	std::stack<IntLoc> nodes;
 
@@ -175,23 +175,23 @@ void fill_lake(auto const& args, Image<int8_t> const& drainage_basin, vec2_t sta
 
 		auto const x = node.x;
 		auto const y = node.y;
-		
-		if(visited(x, y) == 1)
-		{ continue; }
-		
+
+		if(visited(x, y) == 1) { continue; }
+
 		output<1>(args, x, y) = surface_level;
 		output<2>(args, x, y) = 1.0f;
 		visited(x, y)         = 1;
 
-		push_neigbours_4(
-		    nodes,
-		    args,
-		    node,
-		    [&visited, &drainage_basin, surface_level, start_loc](auto const& args, uint32_t x, uint32_t y) {
-			    if(visited(x, y) == 0 && output<1>(args, x, y) < surface_level && drainage_basin(x, y) != 0)
-			    { return true; }
-			    return false;
-		    });
+		push_neigbours_4(nodes,
+		                 args,
+		                 node,
+		                 [&visited, &drainage_basin, surface_level, start_loc](
+		                     auto const& args, uint32_t x, uint32_t y) {
+			                 if(visited(x, y) == 0 && output<1>(args, x, y) < surface_level
+			                    && drainage_basin(x, y) != 0)
+			                 { return true; }
+			                 return false;
+		                 });
 	}
 }
 
@@ -305,16 +305,15 @@ void main(auto const& args)
 				    auto const min_val = output<1>(
 				        args, static_cast<uint32_t>(loc[0]), static_cast<uint32_t>(loc[1]));
 				    printf("%d Start lake (%.15g, %.15g, %.9g)\n", k, loc[0], loc[1], min_val);
-				    if(k == 50)
-				    { puts("=============================="); }
+				    if(k == 50) { puts("=============================="); }
 				    auto const drainage_basin = gen_drainage_basin(args, loc);
-				    auto const esc = find_escape_point(args, drainage_basin);
+				    auto const esc            = find_escape_point(args, drainage_basin);
 				    if(!esc.has_value())
 				    {
 					    puts("Stuck no lake");
 					    break;
 				    }
-				    
+
 
 				    printf("%d Exit lake  (%.15g, %.15g, %.9g)\n",
 				           k,
@@ -322,17 +321,16 @@ void main(auto const& args)
 				           esc->loc[1],
 				           esc->value);
 
-                    if(k == 50)
-				    { puts("==============================");}
+				    if(k == 50) { puts("=============================="); }
 
 				    fill_lake(args, drainage_basin, loc, esc->value);
 
 				    auto const loc_next_2 = esc->loc;
 				    auto const d          = Texpainter::length(loc - loc_next_2);
 
-				    min_altitude = esc->value;
-				    loc          = loc_next_2;
-                    travel_distance = 0;
+				    min_altitude    = esc->value;
+				    loc             = loc_next_2;
+				    travel_distance = 0;
 				    output<0>(args).get().push_back(std::move(points));
 				    points.push_back(loc);
 
@@ -349,7 +347,7 @@ void main(auto const& args)
 					    break;
 				    }
 
-/*                    if(k == 50)
+				    /*                    if(k == 50)
                     { break; }*/
 				    ++k;
 			    }

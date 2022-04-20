@@ -168,8 +168,7 @@ namespace
 	    get_info<::GrayscaleDither::ImageProcessor>(),
 	    get_info<::Blackbody::ImageProcessor>(),
 	    get_info<::PlaceAndColorizeGrayscaleImageAtPoints::ImageProcessor>(),
-	    get_info<::GrayscaleSqrtDistortion::ImageProcessor>()
-	};
+	    get_info<::GrayscaleSqrtDistortion::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;
