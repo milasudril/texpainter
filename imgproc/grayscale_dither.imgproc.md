@@ -14,14 +14,14 @@ __Intensity:__ (= 1.0)
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <algorithm>
 #include <random>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 void main(auto const& args, auto const& params)
@@ -43,4 +43,4 @@ __Id:__ 3ef380a94ddd9c6e9cd4ad50e50068c2
 
 __Category:__ Dynamic range adjustments
 
-__Release state:__ Experimental
+__Release state:__ Stable
