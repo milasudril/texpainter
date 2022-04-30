@@ -20,7 +20,7 @@ __Lakes:__ (Grayscale image) The regions where lakes would appear
 
 The idea behind the implementation is to use steepest descent to generate the rivers. When it gets stuck in a local minumum, a variant of floodfill is used to deduce the location and elevation of the drainage point of the lake that would form around the local minumum. Then, it will continue by using steepest descent, until it reaches the boundary of the heightmap, or when it as traveled for more than the size of the heightmap (size here means the square root of its area).
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <algorithm>
@@ -32,7 +32,7 @@ __Includes:__
 #include <vector>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 struct IntLoc
@@ -197,128 +197,118 @@ void fill_lake(auto const& args,
 
 static constexpr std::array<vec2_t, 9> neighbourhood{vec2_t{0.0, 0.0},
 
-													vec2_t{-1.0, -1.0},
-													vec2_t{0.0, -1.0},
-													vec2_t{1.0, -1.0},
+                                                     vec2_t{-1.0, -1.0},
+                                                     vec2_t{0.0, -1.0},
+                                                     vec2_t{1.0, -1.0},
 
-													vec2_t{-1.0, 0.0},
-													vec2_t{1.0, 0.0},
+                                                     vec2_t{-1.0, 0.0},
+                                                     vec2_t{1.0, 0.0},
 
-													vec2_t{-1.0, 1.0},
-													vec2_t{0.0, 1.0},
-													vec2_t{1.0, 1.0}};
+                                                     vec2_t{-1.0, 1.0},
+                                                     vec2_t{0.0, 1.0},
+                                                     vec2_t{1.0, 1.0}};
 
 auto lowest_in_neigbourhood(auto const& args, vec2_t loc)
 {
 	return std::ranges::min_element(neighbourhood, [&args, loc](auto a, auto b) {
-					        a += loc + vec2_t{0.5, 0.5};
-					        b += loc + vec2_t{0.5, 0.5};
-					        auto const x_a = static_cast<uint32_t>(a[0]);
-					        auto const y_a = static_cast<uint32_t>(a[1]);
-					        auto const x_b = static_cast<uint32_t>(b[0]);
-					        auto const y_b = static_cast<uint32_t>(b[1]);
+		a += loc + vec2_t{0.5, 0.5};
+		b += loc + vec2_t{0.5, 0.5};
+		auto const x_a = static_cast<uint32_t>(a[0]);
+		auto const y_a = static_cast<uint32_t>(a[1]);
+		auto const x_b = static_cast<uint32_t>(b[0]);
+		auto const y_b = static_cast<uint32_t>(b[1]);
 
-					        return output<1>(args, x_a, y_a) < output<1>(args, x_b, y_b);
-				        });
-
+		return output<1>(args, x_a, y_a) < output<1>(args, x_b, y_b);
+	});
 }
 
 void main(auto const& args)
 {
 	auto const& points = input<1>(args);
 	std::copy(input<0>(args), input<0>(args) + area(args.canvasSize()), output<1>(args));
-	std::ranges::for_each(
-	    points.get(), [&args, size = args.canvasSize()](auto const& item) {
-		    auto loc = vec2_t{static_cast<double>(item.loc.x), static_cast<double>(item.loc.y)};
-		    std::vector<vec2_t> points;
+	std::ranges::for_each(points.get(), [&args, size = args.canvasSize()](auto const& item) {
+		auto loc = vec2_t{static_cast<double>(item.loc.x), static_cast<double>(item.loc.y)};
+		std::vector<vec2_t> points;
 
-		    auto min_altitude    = output<1>(args, item.loc.x, item.loc.y);
-		    auto travel_distance = 0.0;
+		auto min_altitude    = output<1>(args, item.loc.x, item.loc.y);
+		auto travel_distance = 0.0;
 
-		    points.push_back(loc);
+		points.push_back(loc);
 
-		    while(travel_distance <= 4.0 * std::sqrt(area(size)))
-		    {
-			    if(loc[0] < 2.0 || loc[1] < 2.0 || loc[0] >= args.canvasSize().width() - 2
-			       || loc[1] >= args.canvasSize().height() - 2)
-			    {
-				    break;
-			    }
+		while(travel_distance <= 4.0 * std::sqrt(area(size)))
+		{
+			if(loc[0] < 2.0 || loc[1] < 2.0 || loc[0] >= args.canvasSize().width() - 2
+			   || loc[1] >= args.canvasSize().height() - 2)
+			{ break; }
 
-			    auto const loc_next = loc + grad(loc, args);
+			auto const loc_next = loc + grad(loc, args);
 
-			    auto const z_next = get_val(loc_next, args);
+			auto const z_next = get_val(loc_next, args);
 
-			    if(z_next < min_altitude)
-			    {
-				    travel_distance += Texpainter::length(loc - loc_next);
-				    min_altitude = z_next;
-				    loc          = loc_next;
-				    points.push_back(loc);
-			    }
-			    else
-			    {
-					// Check that we have hit a local minimum. For that to be true, all other points
-					// in its neighbourhood must be greater.
-				    auto const i_lowest = lowest_in_neigbourhood(args, loc);
-				    auto const lowest = *i_lowest + loc;
-				    if(i_lowest != std::begin(neighbourhood))
-				    {
-						// We did not get a local minimum. See if the lowest point found in the
-						// neighbourhood is a local minimum
-					    auto const i_lowest_2 = lowest_in_neigbourhood(args, lowest);
-					    if(i_lowest_2 != std::begin(neighbourhood))
-					    {
-							// If not, continue without creating a lake
-						    auto const lowest_offset = lowest + vec2_t{0.5, 0.5};
-						    auto const x             = static_cast<uint32_t>(lowest_offset[0]);
-						    auto const y             = static_cast<uint32_t>(lowest_offset[1]);
-						    auto const loc_next_1 =
-						        vec2_t{static_cast<double>(x), static_cast<double>(y)};
-						    travel_distance += Texpainter::length(loc_next_1 - loc);
-						    loc          = loc_next_1;
-						    min_altitude = output<1>(args, x, y);
-						    points.push_back(loc);
-						    continue;
-					    }
-				    }
+			if(z_next < min_altitude)
+			{
+				travel_distance += Texpainter::length(loc - loc_next);
+				min_altitude = z_next;
+				loc          = loc_next;
+				points.push_back(loc);
+			}
+			else
+			{
+				// Check that we have hit a local minimum. For that to be true, all other points
+				// in its neighbourhood must be greater.
+				auto const i_lowest = lowest_in_neigbourhood(args, loc);
+				auto const lowest   = *i_lowest + loc;
+				if(i_lowest != std::begin(neighbourhood))
+				{
+					// We did not get a local minimum. See if the lowest point found in the
+					// neighbourhood is a local minimum
+					auto const i_lowest_2 = lowest_in_neigbourhood(args, lowest);
+					if(i_lowest_2 != std::begin(neighbourhood))
+					{
+						// If not, continue without creating a lake
+						auto const lowest_offset = lowest + vec2_t{0.5, 0.5};
+						auto const x             = static_cast<uint32_t>(lowest_offset[0]);
+						auto const y             = static_cast<uint32_t>(lowest_offset[1]);
+						auto const loc_next_1 =
+						    vec2_t{static_cast<double>(x), static_cast<double>(y)};
+						travel_distance += Texpainter::length(loc_next_1 - loc);
+						loc          = loc_next_1;
+						min_altitude = output<1>(args, x, y);
+						points.push_back(loc);
+						continue;
+					}
+				}
 
-					// Go to local minumum
-				    auto const lowest_offset = lowest + vec2_t{0.5, 0.5};
-				    auto const loc_next_1 =
-				        vec2_t{static_cast<double>(static_cast<uint32_t>(lowest_offset[0])),
-				               static_cast<double>(static_cast<uint32_t>(lowest_offset[1]))};
-				    travel_distance += Texpainter::length(loc_next_1 - loc);
-				    loc = loc_next_1;
-				    points.push_back(loc);
+				// Go to local minumum
+				auto const lowest_offset = lowest + vec2_t{0.5, 0.5};
+				auto const loc_next_1 =
+				    vec2_t{static_cast<double>(static_cast<uint32_t>(lowest_offset[0])),
+				           static_cast<double>(static_cast<uint32_t>(lowest_offset[1]))};
+				travel_distance += Texpainter::length(loc_next_1 - loc);
+				loc = loc_next_1;
+				points.push_back(loc);
 
-					// Generate a lake
-				    auto const min_val = output<1>(
-				        args, static_cast<uint32_t>(loc[0]), static_cast<uint32_t>(loc[1]));
-				    auto const drainage_basin = gen_drainage_basin(args, loc);
-				    auto const esc            = find_escape_point(args, drainage_basin);
-				    if(!esc.has_value())
-				    {
-					    break;
-				    }
+				// Generate a lake
+				auto const min_val =
+				    output<1>(args, static_cast<uint32_t>(loc[0]), static_cast<uint32_t>(loc[1]));
+				auto const drainage_basin = gen_drainage_basin(args, loc);
+				auto const esc            = find_escape_point(args, drainage_basin);
+				if(!esc.has_value()) { break; }
 
-				    fill_lake(args, drainage_basin, loc, esc->value);
+				fill_lake(args, drainage_basin, loc, esc->value);
 
-				    auto const loc_next_2 = esc->loc;
-				    min_altitude    = esc->value;
-				    loc             = loc_next_2;
-				    travel_distance = 0;
-				    output<0>(args).get().push_back(std::move(points));
-				    points.push_back(loc);
+				auto const loc_next_2 = esc->loc;
+				min_altitude          = esc->value;
+				loc                   = loc_next_2;
+				travel_distance       = 0;
+				output<0>(args).get().push_back(std::move(points));
+				points.push_back(loc);
 
-				    if(esc->value < min_val)
-				    {
-					    break;
-				    }
-			    }
-		    }
-		    output<0>(args).get().push_back(std::move(points));
-	    });
+				if(esc->value < min_val) { break; }
+			}
+		}
+		output<0>(args).get().push_back(std::move(points));
+	});
 }
 ```
 
