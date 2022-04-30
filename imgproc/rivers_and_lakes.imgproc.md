@@ -195,6 +195,34 @@ void fill_lake(auto const& args,
 	}
 }
 
+static constexpr std::array<vec2_t, 9> neighbourhood{vec2_t{0.0, 0.0},
+
+													vec2_t{-1.0, -1.0},
+													vec2_t{0.0, -1.0},
+													vec2_t{1.0, -1.0},
+
+													vec2_t{-1.0, 0.0},
+													vec2_t{1.0, 0.0},
+
+													vec2_t{-1.0, 1.0},
+													vec2_t{0.0, 1.0},
+													vec2_t{1.0, 1.0}};
+
+auto lowest_in_neigbourhood(auto const& args, vec2_t loc)
+{
+	return std::ranges::min_element(neighbourhood, [&args, loc](auto a, auto b) {
+					        a += loc + vec2_t{0.5, 0.5};
+					        b += loc + vec2_t{0.5, 0.5};
+					        auto const x_a = static_cast<uint32_t>(a[0]);
+					        auto const y_a = static_cast<uint32_t>(a[1]);
+					        auto const x_b = static_cast<uint32_t>(b[0]);
+					        auto const y_b = static_cast<uint32_t>(b[1]);
+
+					        return output<1>(args, x_a, y_a) < output<1>(args, x_b, y_b);
+				        });
+
+}
+
 void main(auto const& args)
 {
 	auto const& points = input<1>(args);
@@ -218,12 +246,6 @@ void main(auto const& args)
 			    }
 
 			    auto const loc_next = loc + grad(loc, args);
-			    if(loc_next[0] < 0.0 || loc_next[1] < 0.0
-			       || loc_next[0] >= args.canvasSize().width()
-			       || loc_next[1] >= args.canvasSize().height())
-			    {
-				    break;
-			    }
 
 			    auto const z_next = get_val(loc_next, args);
 
@@ -236,47 +258,18 @@ void main(auto const& args)
 			    }
 			    else
 			    {
-				    std::array<vec2_t, 9> const neighbours{vec2_t{0.0, 0.0},
-
-				                                           vec2_t{-1.0, -1.0},
-				                                           vec2_t{0.0, -1.0},
-				                                           vec2_t{1.0, -1.0},
-
-				                                           vec2_t{-1.0, 0.0},
-				                                           vec2_t{1.0, 0.0},
-
-				                                           vec2_t{-1.0, 1.0},
-				                                           vec2_t{0.0, 1.0},
-				                                           vec2_t{1.0, 1.0}};
-
-				    auto const i_lowest =
-				        std::ranges::min_element(neighbours, [&args, loc](auto a, auto b) {
-					        a += loc + vec2_t{0.5, 0.5};
-					        b += loc + vec2_t{0.5, 0.5};
-					        auto const x_a = static_cast<uint32_t>(a[0]);
-					        auto const y_a = static_cast<uint32_t>(a[1]);
-					        auto const x_b = static_cast<uint32_t>(b[0]);
-					        auto const y_b = static_cast<uint32_t>(b[1]);
-
-					        return output<1>(args, x_a, y_a) < output<1>(args, x_b, y_b);
-				        });
-
+					// Check that we have hit a local minimum. For that to be true, all other points
+					// in its neighbourhood must be greater.
+				    auto const i_lowest = lowest_in_neigbourhood(args, loc);
 				    auto const lowest = *i_lowest + loc;
-				    if(i_lowest != std::begin(neighbours))
+				    if(i_lowest != std::begin(neighbourhood))
 				    {
-					    auto const i_lowest_2 =
-					        std::ranges::min_element(neighbours, [&args, lowest](auto a, auto b) {
-						        a += lowest + vec2_t{0.5, 0.5};
-						        b += lowest + vec2_t{0.5, 0.5};
-						        auto const x_a = static_cast<uint32_t>(a[0]);
-						        auto const y_a = static_cast<uint32_t>(a[1]);
-						        auto const x_b = static_cast<uint32_t>(b[0]);
-						        auto const y_b = static_cast<uint32_t>(b[1]);
-
-						        return output<1>(args, x_a, y_a) < output<1>(args, x_b, y_b);
-					        });
-					    if(i_lowest_2 != std::begin(neighbours))
+						// We did not get a local minimum. See if the lowest point found in the
+						// neighbourhood is a local minimum
+					    auto const i_lowest_2 = lowest_in_neigbourhood(args, lowest);
+					    if(i_lowest_2 != std::begin(neighbourhood))
 					    {
+							// If not, continue without creating a lake
 						    auto const lowest_offset = lowest + vec2_t{0.5, 0.5};
 						    auto const x             = static_cast<uint32_t>(lowest_offset[0]);
 						    auto const y             = static_cast<uint32_t>(lowest_offset[1]);
@@ -289,6 +282,8 @@ void main(auto const& args)
 						    continue;
 					    }
 				    }
+
+					// Go to local minumum
 				    auto const lowest_offset = lowest + vec2_t{0.5, 0.5};
 				    auto const loc_next_1 =
 				        vec2_t{static_cast<double>(static_cast<uint32_t>(lowest_offset[0])),
@@ -297,6 +292,7 @@ void main(auto const& args)
 				    loc = loc_next_1;
 				    points.push_back(loc);
 
+					// Generate a lake
 				    auto const min_val = output<1>(
 				        args, static_cast<uint32_t>(loc[0]), static_cast<uint32_t>(loc[1]));
 				    auto const drainage_basin = gen_drainage_basin(args, loc);
