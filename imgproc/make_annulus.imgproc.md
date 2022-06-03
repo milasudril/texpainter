@@ -18,14 +18,14 @@ __Number of vertices:__ (= 1.0) The number of vertices. 0.0 maps to four vertice
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <cmath>
 #include <numbers>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 template<int n>
@@ -77,7 +77,7 @@ void main(auto const& args, auto const& params)
 		{
 			auto P                = vec2_t{static_cast<double>(x), static_cast<double>(y)};
 			auto r                = Texpainter::transform(P - O, rot_vec_x, rot_vec_y) / r_0;
-			output<0>(args, x, y) = std::abs(std::sqrt(norm2(r)) - 0.5f * r_x);
+			output<0>(args, x, y) = 2.0f*std::abs(std::sqrt(norm2(r)) - 0.5f);
 		}
 	}
 }
