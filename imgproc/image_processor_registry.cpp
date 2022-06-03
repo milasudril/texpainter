@@ -66,7 +66,8 @@
 //@		"./grayscale_dither.imgproc.hpp",
 //@		"./blackbody.imgproc.hpp",
 //@		"./place_and_colorize_grayscale_image_at_points.imgproc.hpp",
-//@		"./grayscale_sqrt_distortion.imgproc.hpp"
+//@		"./grayscale_sqrt_distortion.imgproc.hpp",
+//@		"./make_annulus.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -168,7 +169,8 @@ namespace
 	    get_info<::GrayscaleDither::ImageProcessor>(),
 	    get_info<::Blackbody::ImageProcessor>(),
 	    get_info<::PlaceAndColorizeGrayscaleImageAtPoints::ImageProcessor>(),
-	    get_info<::GrayscaleSqrtDistortion::ImageProcessor>()};
+	    get_info<::GrayscaleSqrtDistortion::ImageProcessor>(),
+	    get_info<::MakeAnnulus::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;

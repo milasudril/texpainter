@@ -14,14 +14,14 @@ __Intensity:__ (= 1.0)
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <algorithm>
 #include <random>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& args, auto const& params)
