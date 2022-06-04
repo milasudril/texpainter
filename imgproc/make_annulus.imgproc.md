@@ -20,14 +20,14 @@ __Number of vertices:__ (= 1.0) The number of vertices. 0.0 maps to four vertice
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <cmath>
 #include <numbers>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 template<int n>
@@ -92,8 +92,4 @@ __Id:__ 1985a21ebf8bf94879420d1acbf8b0e1
 
 __Category:__ Generators
 
-__Release state:__ Experimental
-
-## TODO:s
-
-* Add mode which fits the long diameter in addition to the short diameter
+__Release state:__ Stable
