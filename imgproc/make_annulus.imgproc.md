@@ -57,7 +57,6 @@ void main(auto const& args, auto const& params)
 	auto const r_x = static_cast<float>(
 	    0.5 * scale
 	    / (param<Str{"Scale with resolution"}>(params).value() > 0.5 ? args.resolution() : 1.0));
-	//	auto const annul_size = r_x/scale;
 
 	auto const r_y = r_x * sizeScaleFactor(param<Str{"Aspect ratio"}>(params));
 	auto const θ   = Angle{0.5 * param<Str{"Orientation"}>(params).value(), Angle::Turns{}};
@@ -77,7 +76,7 @@ void main(auto const& args, auto const& params)
 		{
 			auto P                = vec2_t{static_cast<double>(x), static_cast<double>(y)};
 			auto r                = Texpainter::transform(P - O, rot_vec_x, rot_vec_y) / r_0;
-			output<0>(args, x, y) = 2.0f*std::abs(std::sqrt(norm2(r)) - 0.5f);
+			output<0>(args, x, y) = std::abs(std::sqrt(norm2(r)) - 1.0f);
 		}
 	}
 }
