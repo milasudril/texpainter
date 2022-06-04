@@ -8,6 +8,8 @@ __Output:__ (Grayscale image) Output image
 
 __Size:__ (= 0.93333333) The size of the gradient, along the nominal x axis. The default value is set such that the diameter is half the size of the image.
 
+__Thickness:__ (= 1.0)
+
 __Scale with resolution:__ (= 1.0) If > 0.5, scale the size with rendering resolution. Enable this when output is used for spectral filtering.
 
 __Aspect ratio:__ (= 1.0) The aspect ratio of mask. 1.0 means that the mask is circular.
@@ -18,14 +20,14 @@ __Number of vertices:__ (= 1.0) The number of vertices. 0.0 maps to four vertice
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <cmath>
 #include <numbers>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 template<int n>
@@ -58,8 +60,9 @@ void main(auto const& args, auto const& params)
 	    0.5 * scale
 	    / (param<Str{"Scale with resolution"}>(params).value() > 0.5 ? args.resolution() : 1.0));
 
-	auto const r_y = r_x * sizeScaleFactor(param<Str{"Aspect ratio"}>(params));
-	auto const θ   = Angle{0.5 * param<Str{"Orientation"}>(params).value(), Angle::Turns{}};
+	auto const r_y   = r_x * sizeScaleFactor(param<Str{"Aspect ratio"}>(params));
+	auto const width = sizeScaleFactor(param<Str{"Thickness"}>(params));
+	auto const θ     = Angle{0.5 * param<Str{"Orientation"}>(params).value(), Angle::Turns{}};
 	auto const n =
 	    static_cast<int>(std::lerp(0.0f,
 	                               std::nextafter(static_cast<RealValue>(std::size(norms2)), 0.0f),
@@ -74,9 +77,10 @@ void main(auto const& args, auto const& params)
 	{
 		for(uint32_t x = 0; x < w; ++x)
 		{
-			auto P                = vec2_t{static_cast<double>(x), static_cast<double>(y)};
-			auto r                = Texpainter::transform(P - O, rot_vec_x, rot_vec_y) / r_0;
-			output<0>(args, x, y) = std::abs(std::sqrt(norm2(r)) - 1.0f);
+			auto const P          = vec2_t{static_cast<double>(x), static_cast<double>(y)};
+			auto const r          = Texpainter::transform(P - O, rot_vec_x, rot_vec_y) / r_0;
+			auto const d          = std::sqrt(static_cast<float>(norm2(r)));
+			output<0>(args, x, y) = std::abs(d - 1.0f) / width;
 		}
 	}
 }
