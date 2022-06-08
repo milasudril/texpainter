@@ -1,5 +1,7 @@
 # Make annulus
 
+This image processor generates an annulus as a grayscale image. The intensity is proportional to the distance between current pixel and the annulus. Notice that this is different to how `Make radial gradient` works, since `Make radial gradient` returns the distance squared.
+
 ## Output ports
 
 __Output:__ (Grayscale image) Output image
@@ -8,7 +10,7 @@ __Output:__ (Grayscale image) Output image
 
 __Size:__ (= 0.93333333) The size of the gradient, along the nominal x axis. The default value is set such that the diameter is half the size of the image.
 
-__Thickness:__ (= 1.0)
+__Thickness:__ (= 1.0) Controls the thickness of the annulus. Notice that the width scales with `Size`. Thus, 1.0 corresponds to the largest possible thickness which is half the size.
 
 __Scale with resolution:__ (= 1.0) If > 0.5, scale the size with rendering resolution. Enable this when output is used for spectral filtering.
 
@@ -20,14 +22,14 @@ __Number of vertices:__ (= 1.0) The number of vertices. 0.0 maps to four vertice
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <cmath>
 #include <numbers>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 template<int n>

@@ -1,6 +1,6 @@
 # Make radial gradient
 
-This image processor generates a radial gradient from black to white, with black in the origin. The pixel values are proportional to the square of the distance to the origin. "Number of vertices" can be chosen such that the gradient is circular, or forms an even-sided polygon, with the number of vertices in the range 4 to 12.
+This image processor generates a radial gradient from black to white, with black in the origin. The pixel values are proportional to the square of the distance to the origin. Notice that this is different to how `Make annulus` works, since `Make annulus` returns the distance.
 
 ## Output ports
 
