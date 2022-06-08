@@ -14,7 +14,7 @@ def makeNamespaceName(name):
 	parts = name.split(' ')
 	ret = []
 	for item in parts:
-		ret.append(item.capitalize())
+		ret.append(item.capitalize().replace('.', ''))
 	return ''.join(ret)
 
 
