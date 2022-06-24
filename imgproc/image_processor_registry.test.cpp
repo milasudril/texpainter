@@ -5,6 +5,7 @@
 #include "./image_processor_registry.hpp"
 
 #include <cassert>
+#include <ranges>
 
 namespace
 {
