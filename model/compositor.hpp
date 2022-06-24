@@ -17,7 +17,6 @@
 #include "sched/thread_pool.hpp"
 
 
-#define JSON_USE_IMPLICIT_CONVERSIONS 0
 #include <nlohmann/json.hpp>
 
 namespace Texpainter::Model

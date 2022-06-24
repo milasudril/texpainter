@@ -7,7 +7,6 @@
 
 #include "./port_type.hpp"
 
-#define JSON_USE_IMPLICIT_CONVERSIONS 0
 #include <nlohmann/json.hpp>
 
 #include <cstdint>

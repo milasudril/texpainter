@@ -3,7 +3,6 @@
 #ifndef TEXPAINTER_PIXELSTORE_COLORINDEX_HPP
 #define TEXPAINTER_PIXELSTORE_COLORINDEX_HPP
 
-#define JSON_USE_IMPLICIT_CONVERSIONS 0
 #include <nlohmann/json.hpp>
 
 #include <cstdint>

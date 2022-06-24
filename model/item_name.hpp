@@ -5,7 +5,6 @@
 #ifndef TEXPAINTER_MODEL_ITEMNAME_HPP
 #define TEXPAINTER_MODEL_ITEMNAME_HPP
 
-#define JSON_USE_IMPLICIT_CONVERSIONS 0
 #include <nlohmann/json.hpp>
 
 #include <string>

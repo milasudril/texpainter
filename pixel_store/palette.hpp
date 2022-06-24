@@ -6,7 +6,6 @@
 #include "./rgba_value.hpp"
 #include "./color_index.hpp"
 
-#define JSON_USE_IMPLICIT_CONVERSIONS 0
 #include <nlohmann/json.hpp>
 
 #include <array>

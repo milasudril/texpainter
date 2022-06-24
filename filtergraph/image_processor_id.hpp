@@ -8,7 +8,6 @@
 
 #include "utils/bytes_to_hex.hpp"
 
-#define JSON_USE_IMPLICIT_CONVERSIONS 0
 #include <nlohmann/json.hpp>
 
 #include <array>

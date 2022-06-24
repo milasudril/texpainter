@@ -3,7 +3,6 @@
 #ifndef TEXPAINTER_UTILS_SIZE2D_HPP
 #define TEXPAINTER_UTILS_SIZE2D_HPP
 
-#define JSON_USE_IMPLICIT_CONVERSIONS 0
 #include <nlohmann/json.hpp>
 
 #include <cstdint>

@@ -7,7 +7,6 @@
 
 #include "utils/to_string.hpp"
 
-#define JSON_USE_IMPLICIT_CONVERSIONS 0
 #include <nlohmann/json.hpp>
 
 #include <compare>

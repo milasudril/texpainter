@@ -9,8 +9,6 @@
 #include "./terrain_view.hpp"
 #include "log/logger.hpp"
 
-#define GLM_FORCE_INLINE
-#define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 

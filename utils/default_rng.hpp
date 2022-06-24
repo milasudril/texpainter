@@ -12,7 +12,6 @@
 
 #include "pcg-cpp/include/pcg_random.hpp"
 
-#define JSON_USE_IMPLICIT_CONVERSIONS 0
 
 #include <nlohmann/json.hpp>
 #include <bit>
