@@ -114,7 +114,7 @@ namespace Texpainter::Ui
 
 		void eventHandler(void*, EventHandlerVtable const& vt);
 
-	private:
+	protected:
 		class WidgetDeleter
 		{
 		public:
