@@ -19,10 +19,9 @@ namespace Texpainter::Ui
 {
 	class WidgetCanvasDetail: private Container
 	{
-		class WidgetDeleter;
-
 	protected:
 		class ClientId;
+		class WidgetDeleter;
 
 	public:
 		enum class InsertMode : int
