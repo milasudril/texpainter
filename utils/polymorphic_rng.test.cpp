@@ -22,11 +22,6 @@ namespace Testcases
 		auto b = dice(r);
 
 		assert(a == b);
-
-		// Wrapper returns the same value as original
-		rng    = std::mt19937{};
-		auto c = dice(rng);
-		assert(c == b);
 	}
 }
 
