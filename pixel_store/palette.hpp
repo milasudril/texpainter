@@ -125,7 +125,7 @@ namespace Texpainter::PixelStore
 		                        converter = get_converter(colorspace)](auto const& value) mutable {
 			                       if(k == Size) { throw std::string{"Palette too large"}; }
 			                       ++k;
-			                       return converter(value);
+			                       return converter(std::string{value});
 		                       });
 	}
 
