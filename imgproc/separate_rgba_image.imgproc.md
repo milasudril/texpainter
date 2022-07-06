@@ -1,6 +1,6 @@
-# Split RGBA image
+# Separate RGBA image
 
-This image processor takes an RGBA image, and splits it up in four grayscale images.
+This image processor takes an RGBA image, and separates its color channels it up in four grayscale images.
 
 ## Input ports
 
@@ -18,7 +18,7 @@ __Alpha:__ (Grayscale image) The `alpha` channel
 
 ## Implementation
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 void main(auto const& args)
