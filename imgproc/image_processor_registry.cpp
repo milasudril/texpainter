@@ -69,7 +69,8 @@
 //@		"./grayscale_sqrt_distortion.imgproc.hpp",
 //@		"./make_annulus.imgproc.hpp",
 //@		"./grayscale_mult_inverse.imgproc.hpp",
-//@		"./image_gradient.imgproc.hpp"
+//@		"./image_gradient.imgproc.hpp",
+//@		"./separate_xy.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -174,7 +175,8 @@ namespace
 	    get_info<::GrayscaleSqrtDistortion::ImageProcessor>(),
 	    get_info<::MakeAnnulus::ImageProcessor>(),
 	    get_info<::GrayscaleMultInverse::ImageProcessor>(),
-	    get_info<::ImageGradient::ImageProcessor>()
+	    get_info<::ImageGradient::ImageProcessor>(),
+	    get_info<::SeparateXy::ImageProcessor>()
 	};
 
 	template<class Keys, class Value, class Compare>
