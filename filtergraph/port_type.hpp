@@ -28,6 +28,7 @@ namespace Texpainter::FilterGraph
 		PointCloud,
 		Palette,
 		LineSegTree,
+		VectorField,
 		PolylineSet
 	};
 
@@ -40,6 +41,7 @@ namespace Texpainter::FilterGraph
 	using Palette        = PixelStore::RgbaPalette<16>;
 	using TopographyInfo = PixelStore::TopographyInfo;
 	using PolylineSet    = std::vector<std::vector<vec2_t>>;
+	using Vector         = vec2_t;
 
 	struct LineSegTree
 	{
@@ -68,6 +70,14 @@ namespace Texpainter::FilterGraph
 		using type = std::unique_ptr<RgbaValue[]>;
 
 		static type createValue(Size2d size) { return std::make_unique<RgbaValue[]>(area(size)); }
+	};
+
+	template<>
+	struct PortTypeToType<PortType::VectorField>
+	{
+		using type = std::unique_ptr<Vector[]>;
+
+		static type createValue(Size2d size) { return std::make_unique<Vector[]>(area(size)); }
 	};
 
 	template<>

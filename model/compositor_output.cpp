@@ -28,6 +28,12 @@ namespace
 		using type = T;
 	};
 
+	template<>
+	struct ScalarType<Texpainter::vec2_t>
+	{
+		using type = double;
+	};
+
 	template<class T>
 	std::unique_ptr<T[]> downsample(Texpainter::Size2d size, T const* src, uint32_t scale)
 	{
