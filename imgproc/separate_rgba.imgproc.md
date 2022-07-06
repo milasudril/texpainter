@@ -1,4 +1,4 @@
-# Separate RGBA image
+# Separate RGBA
 
 This image processor takes an RGBA image, and separates its color channels it up in four grayscale images.
 
