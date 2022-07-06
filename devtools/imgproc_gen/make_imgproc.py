@@ -39,6 +39,8 @@ def translateType(str):
 		return 'PolylineSet'
 	if str == 'Line segment tree':
 		return 'LineSegTree'
+	if str == 'Vector field':
+		return 'VectorField'
 	raise Exception('Unsupported port type ' + str)
 
 
