@@ -1,6 +1,6 @@
 # Separate XY
 
-This image processor a vector field and separates its X and Y components
+This image processor takes a vector field and separates its X and Y components
 
 ## Input ports
 
