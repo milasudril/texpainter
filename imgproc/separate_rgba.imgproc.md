@@ -18,7 +18,7 @@ __Alpha:__ (Grayscale image) The `alpha` channel
 
 ## Implementation
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& args)

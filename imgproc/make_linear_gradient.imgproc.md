@@ -14,7 +14,7 @@ __Size:__ (= 1.0) The size of the gradient, along the nominal x axis.
 
 ## Implementation
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& args, auto const& params)

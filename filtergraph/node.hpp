@@ -378,12 +378,14 @@ namespace Texpainter::FilterGraph
 		node.imgproc = obj.at("imgproc").get<ImageProcessorId>();
 
 		node.rng_seed = DefaultRng::genSeed();
-		if(auto i = obj.find("rng_seed"); i != std::end(obj)) { node.rng_seed = DefaultRng::SeedValue{*i}; }
+		if(auto i = obj.find("rng_seed"); i != std::end(obj))
+		{ node.rng_seed = DefaultRng::SeedValue{*i}; }
 
 		if(auto i = obj.find("user_name"); i != std::end(obj)) { node.user_name = std::string{*i}; }
 
 		node.proc_relstate = ImgProcReleaseState::Stable;
-		if(auto i = obj.find("proc_relstate"); i != std::end(obj)) { node.proc_relstate = ImgProcReleaseState{*i}; }
+		if(auto i = obj.find("proc_relstate"); i != std::end(obj))
+		{ node.proc_relstate = ImgProcReleaseState{*i}; }
 
 		auto inputs = obj.at("inputs").get<std::vector<NodeSourceData>>();
 		if(std::size(inputs) > NodeArgument::MaxNumInputs)

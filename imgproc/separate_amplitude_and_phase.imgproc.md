@@ -14,13 +14,13 @@ __Phase:__ (Grayscale image) The phase (argument) of the spectrum. The phase is 
 
 ## Implementation
 
-__Includes:__
+__Includes:__ 
 
 ```c++
 #include <algorithm>
 ```
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& arg)

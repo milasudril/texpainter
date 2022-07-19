@@ -14,7 +14,7 @@ __Output:__ (Vector field) The output image $r(\cos(φ), \sin(φ))$
 
 ## Implementation
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& args)
@@ -28,9 +28,9 @@ void main(auto const& args)
 	{
 		for(uint32_t col = 0; col != w; ++col)
 		{
-			auto const r = input<0>(args, col, row);
-			auto const φ = input<1>(args, col, row);
-			output<0>(args, col, row) = r*vec2_t{std::cos(φ), std::sin(φ)};
+			auto const r              = input<0>(args, col, row);
+			auto const φ              = input<1>(args, col, row);
+			output<0>(args, col, row) = r * vec2_t{std::cos(φ), std::sin(φ)};
 		}
 	}
 }

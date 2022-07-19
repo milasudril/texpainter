@@ -14,7 +14,7 @@ __y:__ (Grayscale image) The y component
 
 ## Implementation
 
-__Source code:__
+__Source code:__ 
 
 ```c++
 void main(auto const& args)

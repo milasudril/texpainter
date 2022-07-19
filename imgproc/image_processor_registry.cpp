@@ -72,7 +72,8 @@
 //@		"./image_gradient.imgproc.hpp",
 //@		"./separate_xy.imgproc.hpp",
 //@		"./separate_magnitude_and_direction.imgproc.hpp",
-//@		"./combine_magnitude_and_direction.imgproc.hpp"
+//@		"./combine_magnitude_and_direction.imgproc.hpp",
+//@		"./sharpen_grayscale_image.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -180,8 +181,8 @@ namespace
 	    get_info<::ImageGradient::ImageProcessor>(),
 	    get_info<::SeparateXy::ImageProcessor>(),
 	    get_info<::SeparateMagnitudeAndDirection::ImageProcessor>(),
-	    get_info<::CombineMagnitudeAndDirection::ImageProcessor>()
-	};
+	    get_info<::CombineMagnitudeAndDirection::ImageProcessor>(),
+	    get_info<::SharpenGrayscaleImage::ImageProcessor>()};
 
 	template<class Keys, class Value, class Compare>
 	using FixedFlatmap = Texpainter::FixedFlatmap<Keys, Value, Compare>;

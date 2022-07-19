@@ -20,14 +20,14 @@ namespace Texpainter
 		using result_type = size_t;
 
 		template<class Rng>
-		using RngType = std::independent_bits_engine<Rng, sizeof(result_type)*CHAR_BIT, result_type>;
+		using RngType =
+		    std::independent_bits_engine<Rng, sizeof(result_type) * CHAR_BIT, result_type>;
 
 		template<class Rng>
 		constexpr explicit PolymorphicRng(std::reference_wrapper<Rng> rng)
 		    : m_state{&rng.get()}
-		    , m_callback{[](void* val) {
-			    return static_cast<result_type>((*static_cast<Rng*>(val))());
-		    }}
+		    , m_callback{
+		          [](void* val) { return static_cast<result_type>((*static_cast<Rng*>(val))()); }}
 		{
 		}
 
