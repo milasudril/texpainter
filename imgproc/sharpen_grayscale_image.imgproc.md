@@ -14,7 +14,7 @@ __Strength:__ (= 0.5) The strength of the filter
 
 ## Implementation
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 void main(auto const& args, auto const& params)
@@ -57,4 +57,4 @@ __Id:__ 73596dadf9aef71aa7adca81252ad6d1
 
 __Category:__ Filters
 
-__Release state:__ Stable
+__Release state:__ Experimental
