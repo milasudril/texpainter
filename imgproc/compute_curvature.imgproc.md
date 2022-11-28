@@ -22,10 +22,10 @@ __Source code:__
 void main(auto const& args, auto const& params)
 {
 	auto const size = args.canvasSize();
-	auto const scale =
+	auto const scale = static_cast<double>(
 	    std::sqrt(static_cast<RealValue>(area(size)))
 	    * std::exp2(std::lerp(-4.0f, 4.0f, param<Str{"Max elevation"}>(params).value()))
-	    * args.resolution();
+	    * args.resolution());
 
 	for(uint32_t row = 1; row != size.height() - 1; ++row)
 	{
@@ -34,26 +34,22 @@ void main(auto const& args, auto const& params)
 			auto const x = col;
 			auto const y = row;
 
-			auto const dx = scale*0.5f*(input<0>(args, x + 1u, y) - input<0>(args, x - 1u, y));
-			auto const dy = scale*0.5f*(input<0>(args, x, y + 1u) - input<0>(args, x, y - 1u));
+			std::array<std::array<double, 3>, 3> const vals{
+				std::array<double, 3>{input<0>(args, x - 1u, y - 1u), input<0>(args, x, y - 1u), input<0>(args, x + 1u, y - 1u)},
+				std::array<double, 3>{input<0>(args, x - 1u, y),      input<0>(args, x, y),      input<0>(args, x + 1u, y)},
+				std::array<double, 3>{input<0>(args, x - 1u, y + 1u), input<0>(args, x, y + 1u), input<0>(args, x + 1u, y + 1u)},
+			};
 
-			auto const dxx = scale*(input<0>(args, x + 1u, y)
-			                  - 2.0f * input<0>(args, x, y)
-			                  + input<0>(args, x - 1u, y));
+			auto const dx = scale*0.5*(vals[1][2] - vals[1][0]);
+			auto const dy = scale*0.5*(vals[2][1] - vals[0][1]);
 
-			auto const dyy = scale*(input<0>(args, x, y + 1u)
-			                  - 2.0f * input<0>(args, x, y)
-			                  + input<0>(args, x , y - 1u));
+			auto const dxx = scale*(vals[1][2] - 2.0*vals[1][1]  + vals[1][0]);
+			auto const dyy = scale*(vals[2][1] - 2.0*vals[1][1]  + vals[0][1]);
 
-			auto const dxy = scale*0.25f*(
-				 input<0>(args, x - 1u, y - 1u)
-				+input<0>(args, x + 1u, y + 1u)
-				-input<0>(args, x + 1u, y - 1u)
-				-input<0>(args, x - 1u, y + 1u)
-			);
+			auto const dxy = scale*0.25*(vals[0][0] + vals[2][2] - vals[0][2] - vals[2][0]);
 
-			auto const d = 1.0f + dx*dx + dy*dy;
-			output<0>(args, col, row) = (dxx*dyy - dxy*dxy)/(d*d);
+			auto const d = 1.0 + dx*dx + dy*dy;
+			output<0>(args, col, row) = static_cast<float>( (dxx*dyy - dxy*dxy)/(d*d) );
 		}
 	}
 }
