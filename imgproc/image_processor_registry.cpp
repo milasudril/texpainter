@@ -74,7 +74,8 @@
 //@		"./separate_magnitude_and_direction.imgproc.hpp",
 //@		"./combine_magnitude_and_direction.imgproc.hpp",
 //@		"./sharpen_grayscale_image.imgproc.hpp",
-//@		"./compute_curvature.imgproc.hpp"
+//@		"./compute_curvature.imgproc.hpp",
+//@		"./compute_absolute_value.imgproc.hpp"
 //@	]}]
 //@	}
 
@@ -184,7 +185,8 @@ namespace
 	    get_info<::SeparateMagnitudeAndDirection::ImageProcessor>(),
 	    get_info<::CombineMagnitudeAndDirection::ImageProcessor>(),
 	    get_info<::SharpenGrayscaleImage::ImageProcessor>(),
-		get_info<::ComputeCurvature::ImageProcessor>()
+		get_info<::ComputeCurvature::ImageProcessor>(),
+		get_info<::ComputeAbsoluteValue::ImageProcessor>()
 	};
 
 	template<class Keys, class Value, class Compare>
