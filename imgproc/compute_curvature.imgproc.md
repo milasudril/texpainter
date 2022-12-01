@@ -27,24 +27,27 @@ void main(auto const& args, auto const& params)
 	    * std::exp2(std::lerp(-4.0f, 4.0f, param<Str{"Max elevation"}>(params).value()))
 	    * args.resolution());
 
-	for(uint32_t row = 1; row != size.height() - 1; ++row)
+	auto const w = size.width();
+	auto const h = size.height();
+
+	for(uint32_t row = 0; row != h; ++row)
 	{
-		for(uint32_t col = 1; col != size.width() - 1; ++col)
+		for(uint32_t col = 0; col != w; ++col)
 		{
 			auto const x = col;
 			auto const y = row;
 
 			std::array<std::array<double, 3>, 3> const vals{
-				std::array<double, 3>{input<0>(args, x - 1u, y - 1u), input<0>(args, x, y - 1u), input<0>(args, x + 1u, y - 1u)},
-				std::array<double, 3>{input<0>(args, x - 1u, y),      input<0>(args, x, y),      input<0>(args, x + 1u, y)},
-				std::array<double, 3>{input<0>(args, x - 1u, y + 1u), input<0>(args, x, y + 1u), input<0>(args, x + 1u, y + 1u)},
+				std::array<double, 3>{input<0>(args, (x - 1 + w)%w, (y - 1 + h)%h), input<0>(args, x, (y - 1 + h)%h), input<0>(args, (x + 1 + w)%w, (y - 1 + h)%h)},
+				std::array<double, 3>{input<0>(args, (x - 1 + w)%w, y),      input<0>(args, x, y),      input<0>(args, (x + 1 + w)%w, y)},
+				std::array<double, 3>{input<0>(args, (x - 1 + w)%w, (y + 1 + h)%h), input<0>(args, x, (y + 1 + h)%h), input<0>(args, (x + 1 + w)%w, (y + 1 + h)%h)},
 			};
 
 			auto const dx = scale*0.5*(vals[1][2] - vals[1][0]);
 			auto const dy = scale*0.5*(vals[2][1] - vals[0][1]);
 
-			auto const dxx = scale*(vals[1][2] - 2.0*vals[1][1]  + vals[1][0]);
-			auto const dyy = scale*(vals[2][1] - 2.0*vals[1][1]  + vals[0][1]);
+			auto const dxx = scale*(vals[1][2] - 2.0*vals[1][1] + vals[1][0]);
+			auto const dyy = scale*(vals[2][1] - 2.0*vals[1][1] + vals[0][1]);
 
 			auto const dxy = scale*0.25*(vals[0][0] + vals[2][2] - vals[0][2] - vals[2][0]);
 
@@ -59,6 +62,6 @@ void main(auto const& args, auto const& params)
 
 __Id:__ df2a5a18cc0be6ac363fd09b80d5a5ab
 
-__Category:__ Filters
+__Category:__ Edge detection
 
-__Release state:__ Experimental
+__Release state:__ Stable
