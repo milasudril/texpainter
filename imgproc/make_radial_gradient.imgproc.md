@@ -20,14 +20,14 @@ __Number of vertices:__ (= 1.0) The number of vertices. 0.0 maps to four vertice
 
 ## Implementation
 
-__Includes:__ 
+__Includes:__
 
 ```c++
 #include <cmath>
 #include <numbers>
 ```
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 template<int n>
@@ -69,7 +69,7 @@ void main(auto const& args, auto const& params)
 	auto const rot_vec_x = vec2_t{cos(θ), -sin(θ)};
 	auto const rot_vec_y = vec2_t{sin(θ), cos(θ)};
 	auto const norm2     = norms2[n];
-	auto O               = 0.5 * vec2_t{static_cast<double>(w), static_cast<double>(h)};
+	auto O               = 0.5 * vec2_t{static_cast<double>(w), static_cast<double>(h)} - vec2_t{0.5, 0.5};
 	for(uint32_t y = 0; y < h; ++y)
 	{
 		for(uint32_t x = 0; x < w; ++x)
