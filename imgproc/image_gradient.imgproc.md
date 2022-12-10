@@ -16,7 +16,7 @@ __Mode:__ (= 0.0)
 
 ## Implementation
 
-__Source code:__ 
+__Source code:__
 
 ```c++
 void periodic(auto const& args)
@@ -62,10 +62,10 @@ void extend(auto const& args)
 	{
 		for(uint32_t col = 0; col != w; ++col)
 		{
-			auto const dx = input<0>(args, std::min(col + 1, w - 1), row)
-			                - input<0>(args, std::max(static_cast<int>(col - 1), 0), row);
-			auto const dy = input<0>(args, col, std::min(row + 1, h - 1))
-			                - input<0>(args, col, std::max(static_cast<int>(row - 1), 0));
+			auto const dx = input<0>(args, std::min(static_cast<int32_t>(col) + 1, static_cast<int32_t>(w) - 1), row)
+			                - input<0>(args, std::max(static_cast<int32_t>(col) - 1, 0), row);
+			auto const dy = input<0>(args, col, std::min(static_cast<int32_t>(row) + 1, static_cast<int32_t>(h) - 1))
+			                - input<0>(args, col, std::max(static_cast<int32_t>(row) - 1, 0));
 			output<0>(args, col, row) = 0.5 * vec2_t{dx, dy};
 		}
 	}
