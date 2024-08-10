@@ -4,6 +4,7 @@
 #define TEXPAINTER_UTILS_INTEGERSEQUENCEITERATOR_HPP
 
 #include <iterator>
+#include <cstdint>
 
 namespace Texpainter
 {
