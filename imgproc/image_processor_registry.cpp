@@ -58,7 +58,6 @@
 //@		"./apply_laplace_operator.imgproc.hpp",
 //@		"./grayscale_posterization.imgproc.hpp",
 //@		"./rgba_posterization.imgproc.hpp",
-//@		"./grayscale_minmax_filter.imgproc.hpp",
 //@		"./align_maximum.imgproc.hpp",
 //@		"./make_lineseg_trees.imgproc.hpp",
 //@		"./render_lineseg_trees.imgproc.hpp",
@@ -86,7 +85,6 @@
 
 //HACK must have a static references to these for linking to work properly
 #include "utils/discrete_pdf.hpp"
-#include "rolling_rank_filter/minmax_filter.hpp"
 #include "dft/engine.hpp"
 #include "wavelength_conv/wavelength_to_rgba.hpp"
 
@@ -169,7 +167,6 @@ namespace
 	    get_info<::ApplyLaplaceOperator::ImageProcessor>(),
 	    get_info<::GrayscalePosterization::ImageProcessor>(),
 	    get_info<::RgbaPosterization::ImageProcessor>(),
-	    get_info<::GrayscaleMinmaxFilter::ImageProcessor>(),
 	    get_info<::AlignMaximum::ImageProcessor>(),
 	    get_info<::MakeLineSegmentTrees::ImageProcessor>(),
 	    get_info<::RenderLineSegmentTrees::ImageProcessor>(),
